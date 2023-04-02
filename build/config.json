@@ -1,0 +1,35 @@
+{
+    "station_settings": {
+        "uuid": "56950fa1-54bf-4b04-b6c9-be5cb7006c16",
+        "name": "防灾科技学院测站",
+        "latitude": 39.0,
+        "longitude": 116.0,
+        "altitude": 0.0
+    },
+    "log_settings": {
+        "level": "debug",
+        "path": "/var/log/earthquake/earthquake.log"
+    },
+    "adc_settings": {
+        "depth": 8,
+        "vref": 5.0,
+        "gain": 4.096
+    },
+    "geophone_settings": {
+        "device": "/dev/ttyUSB0",
+        "baud": 115200,
+        "sensitivity": 28.8
+    },
+    "gnss_settings": {
+        "host": "127.0.0.1",
+        "port": 2947
+    },
+    "collector_settings": {
+        "host": "example.org",
+        "port": 8080
+    },
+    "web_settings": {
+        "host": "0.0.0.0",
+        "port": 8080
+    }
+}
