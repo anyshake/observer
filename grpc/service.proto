@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "/";
+
+message ClientMessage {
+	bool Synced = 1;
+    string UUID = 2;
+    string Station = 3;
+	int64 Errors = 4;
+    int64 Messages = 5;
+}
+
+message ServerMessage {
+    bool Success = 1;
+}
+
+service StringConverter {
+    rpc ToDatabase(ClientMessage) returns (ServerMessage) {}
+}

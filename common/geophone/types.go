@@ -1,18 +1,29 @@
 package geophone
 
 type Geophone struct {
-	Vertical [100]int32 `struct:"littleendian"`
+	Latitude  float32
+	Longitude float32
+	Altitude  float32
+	Vertical  [100]int32
 }
 
 type Acceleration struct {
-	Vertical  [100]float64
 	Timestamp int64
+	Latitude  float64
+	Longitude float64
+	Altitude  float64
+	Vertical  [100]float64
 }
 
-type ReaderOptions struct {
-	Geophone        *Geophone
-	Acceleration    *Acceleration
-	Sensitivity     float64
-	OnErrorCallback func(err error)
-	OnDataCallback  func(acceleration *Acceleration)
+type GeophoneOptions struct {
+	Sensitivity      float64
+	Geophone         *Geophone
+	Acceleration     *Acceleration
+	OnErrorCallback  func(error)
+	OnDataCallback   func(*Acceleration)
+	LocationFallback struct {
+		Latitude  float64
+		Longitude float64
+		Altitude  float64
+	}
 }

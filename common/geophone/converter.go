@@ -2,7 +2,6 @@ package geophone
 
 import (
 	"strconv"
-	"time"
 )
 
 func GetAcceleration(voltage int32, sensitivity float64) float64 {
@@ -14,8 +13,4 @@ func GetAcceleration(voltage int32, sensitivity float64) float64 {
 	}
 
 	return f
-}
-
-func GetTimestamp() int64 {
-	return time.Now().UnixMilli()
 }
