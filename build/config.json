@@ -4,29 +4,23 @@
         "name": "防灾科技学院测站",
         "latitude": 39.0,
         "longitude": 116.0,
-        "altitude": 0.0
-    },
-    "log_settings": {
-        "level": "debug",
-        "path": "/var/log/earthquake/earthquake.log"
-    },
-    "adc_settings": {
-        "depth": 8,
-        "vref": 5.0,
-        "gain": 4.096
+        "altitude": 200.0
     },
     "geophone_settings": {
         "device": "/dev/ttyUSB0",
         "baud": 115200,
         "sensitivity": 28.8
     },
-    "gnss_settings": {
-        "host": "127.0.0.1",
-        "port": 2947
+    "ntpclient_settings": {
+        "host": "0.pool.ntp.org",
+        "port": 123,
+        "timeout": 5,
+        "interval": 30
     },
-    "collector_settings": {
-        "host": "example.org",
-        "port": 8080
+    "push_settings": {
+        "host": "10.0.0.176",
+        "port": 8080,
+        "tls": false
     },
     "web_settings": {
         "host": "0.0.0.0",
