@@ -1,19 +1,21 @@
-package main
+package collector
 
 import "com.geophone.observer/common/geophone"
 
-type DataBuffer struct {
+type Status struct {
+	Messages int64
+	Errors   int64
+	Offset   float64
+}
+
+type Message struct {
 	UUID         string
 	Station      string
-	Latitude     float64
-	Longitude    float64
-	Altitude     float64
-	Syncronized  bool
 	Acceleration [10]geophone.Acceleration
 }
 
-type SysStatus struct {
-	Messages int64
-	Errors   int64
-	Loss     int64
+type Options struct {
+	Status          *Status
+	OnDataCallback  func(*Status)
+	OnErrorCallback func(error)
 }

@@ -1,0 +1,3 @@
+package server
+
+func RegisterRoutes() {}

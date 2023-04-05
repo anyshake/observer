@@ -35,7 +35,6 @@ func VersionStatement() []string {
 
 func PrintVersion() {
 	version := VersionStatement()
-
 	for _, s := range version {
 		fmt.Println(s)
 		os.Exit(0)
