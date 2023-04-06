@@ -2,9 +2,9 @@
     "station_settings": {
         "uuid": "56950fa1-54bf-4b04-b6c9-be5cb7006c16",
         "name": "防灾科技学院测站",
-        "latitude": 39.0,
-        "longitude": 116.0,
-        "altitude": 200.0
+        "latitude": 39.3,
+        "longitude": 116.4,
+        "altitude": 200.5
     },
     "geophone_settings": {
         "device": "/dev/ttyUSB0",
@@ -12,14 +12,14 @@
         "sensitivity": 28.8
     },
     "ntpclient_settings": {
-        "host": "0.pool.ntp.org",
+        "host": "10.160.144.1",
         "port": 123,
         "timeout": 5,
         "interval": 30
     },
-    "push_settings": {
-        "host": "10.0.0.176",
-        "port": 8080,
+    "collector_settings": {
+        "host": "127.0.0.1",
+        "port": 8081,
         "tls": false
     },
     "web_settings": {
