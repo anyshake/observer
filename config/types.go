@@ -29,10 +29,11 @@ type Config struct {
 	} `json:"ntpclient_settings"`
 	// 数据收集配置
 	Collector struct {
-		Host string `json:"host"`
-		Port int    `json:"port"`
-		Path string `json:"path"`
-		TLS  bool   `json:"tls"`
+		Enable bool   `json:"enable"`
+		Host   string `json:"host"`
+		Port   int    `json:"port"`
+		Path   string `json:"path"`
+		TLS    bool   `json:"tls"`
 	} `json:"collector_settings"`
 	// 数据存档设定
 	Archiver struct {

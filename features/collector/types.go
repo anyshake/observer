@@ -16,6 +16,7 @@ type Message struct {
 }
 
 type CollectorOptions struct {
+	Enable             bool
 	Status             *Status
 	Message            *Message
 	OnCompleteCallback func(interface{})

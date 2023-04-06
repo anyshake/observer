@@ -6,7 +6,6 @@ ENVIRONMENT=develop
 BINARY=observer
 RELEASE=`date +%Y%m%d%H%M%S`
 COMMIT=`git rev-parse --short HEAD`
-ARCH=`uname -m`
 
 build: armv7l aarch64 x86_64 i386 mipsle
 

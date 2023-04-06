@@ -19,10 +19,11 @@
     },
     "archiver_settings": {
         "enable": true,
-        "name": "timestamp",
+        "name": "default",
         "path": "/home/yuki/Devel/go/src/com.geophone.observer/archive"
     },
     "collector_settings": {
+        "enable": true,
         "host": "127.0.0.1",
         "port": 8081,
         "tls": false
