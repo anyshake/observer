@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"time"
 	"unsafe"
 )
 
@@ -81,6 +82,7 @@ func ReaderDaemon(device string, baud int, options GeophoneOptions) {
 		err := GeophoneReader(port, options)
 		if err != nil {
 			CloseGeophone(port)
+			time.Sleep(time.Second)
 			port = OpenGeophone(device, baud)
 
 			continue

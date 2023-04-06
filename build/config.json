@@ -8,7 +8,7 @@
     },
     "geophone_settings": {
         "device": "/dev/ttyUSB0",
-        "baud": 115200,
+        "baud": 19200,
         "sensitivity": 28.8
     },
     "ntpclient_settings": {
@@ -23,7 +23,7 @@
         "path": "/home/yuki/Devel/go/src/com.geophone.observer/archive"
     },
     "collector_settings": {
-        "enable": true,
+        "enable": false,
         "host": "127.0.0.1",
         "port": 8081,
         "tls": false
