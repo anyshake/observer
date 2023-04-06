@@ -27,13 +27,13 @@ type Config struct {
 		Timeout  int    `json:"timeout"`
 		Interval int    `json:"interval"`
 	} `json:"ntpclient_settings"`
-	// 数据推送配置
-	Push struct {
+	// 数据收集配置
+	Collector struct {
 		Host string `json:"host"`
 		Port int    `json:"port"`
 		Path string `json:"path"`
 		TLS  bool   `json:"tls"`
-	} `json:"push_settings"`
+	} `json:"collector_settings"`
 	// Web 配置
 	Web struct {
 		Host string `json:"host"`

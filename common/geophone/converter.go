@@ -1,16 +1,13 @@
 package geophone
 
 import (
-	"strconv"
+	"github.com/shopspring/decimal"
 )
 
 func GetAcceleration(voltage int32, sensitivity float64) float64 {
-	result := float64(voltage) / sensitivity
-	formatted := strconv.FormatFloat(result, 'f', 5, 64)
-	f, err := strconv.ParseFloat(formatted, 64)
-	if err != nil {
-		return 0.0
-	}
+	s := decimal.NewFromFloat(sensitivity)
+	v := decimal.NewFromInt32(voltage)
+	result := v.Div(s)
 
-	return f
+	return result.InexactFloat64()
 }

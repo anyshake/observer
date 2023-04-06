@@ -7,6 +7,7 @@ require (
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/gin-contrib/gzip v0.0.6
 	github.com/gin-gonic/gin v1.9.0
+	github.com/shopspring/decimal v1.3.1
 	github.com/tarm/serial v0.0.0-20180830185346-98f6abe2eb07
 	google.golang.org/grpc v1.54.0
 	google.golang.org/protobuf v1.28.1

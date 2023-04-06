@@ -1,13 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"com.geophone.observer/common/collector"
 	"com.geophone.observer/common/geophone"
 	"com.geophone.observer/common/ntpclient"
 	"com.geophone.observer/config"
-	"com.geophone.observer/handler"
+	"com.geophone.observer/helper/handler"
 )
 
 func main() {
@@ -27,16 +28,18 @@ func main() {
 			Station: conf.Station.Name,
 			UUID:    conf.Station.UUID,
 		}
-		fallback = struct {
-			Latitude  float64
-			Longitude float64
-			Altitude  float64
-		}{
-			Latitude:  conf.Station.Latitude,
-			Longitude: conf.Station.Longitude,
-			Altitude:  conf.Station.Altitude,
-		}
 	)
+
+	conn, grpc, err := collector.OpenGrpc(
+		conf.Collector.Host,
+		conf.Collector.Port,
+		conf.Collector.TLS,
+	)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	defer collector.CloseGrpc(conn)
 
 	go ntpclient.ReaderDaemon(
 		conf.NTPClient.Host,
@@ -63,6 +66,15 @@ func main() {
 		conf.Geophone.Device,
 		conf.Geophone.Baud,
 		geophone.GeophoneOptions{
+			LocationFallback: struct {
+				Latitude  float64
+				Longitude float64
+				Altitude  float64
+			}{
+				Latitude:  conf.Station.Latitude,
+				Longitude: conf.Station.Longitude,
+				Altitude:  conf.Station.Altitude,
+			},
 			Geophone:     &geophone.Geophone{},
 			Acceleration: &geophone.Acceleration{},
 			Sensitivity:  conf.Geophone.Sensitivity,
@@ -76,9 +88,20 @@ func main() {
 				handler.HandleMessages(&handler.HandlerOptions{
 					Status:  &status,
 					Message: &message,
+					OnReadyCallback: func(message *collector.Message) {
+						go collector.PushCollection(conn, grpc, &collector.CollectorOptions{
+							Status:  &status,
+							Message: message,
+							OnCompleteCallback: func(r interface{}) {
+								fmt.Println(r)
+							},
+							OnErrorCallback: func(err error) {
+								fmt.Println(err)
+							},
+						})
+					},
 				}, acceleration)
 			},
-			LocationFallback: fallback,
 		},
 	)
 }
