@@ -107,8 +107,9 @@ func main() {
 						go collector.PushMessage(
 							conn, grpc,
 							&collector.CollectorOptions{
-								Status:  &status,
 								Message: message,
+								Status:  &status,
+								Enable:  conf.Collector.Enable,
 								OnCompleteCallback: func(r interface{}) {
 									log.Println(r)
 								},

@@ -10,6 +10,10 @@ import (
 )
 
 func PushMessage(conn *grpc.ClientConn, grpc pb.CollectorClient, options *CollectorOptions) {
+	if !options.Enable {
+		return
+	}
+
 	d, err := json.Marshal(options.Message)
 	if err != nil {
 		options.OnErrorCallback(err)
