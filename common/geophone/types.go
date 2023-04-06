@@ -8,11 +8,11 @@ type Geophone struct {
 }
 
 type Acceleration struct {
-	Timestamp int64
-	Latitude  float64
-	Longitude float64
-	Altitude  float64
-	Vertical  [100]float64
+	Timestamp int64        `json:"timestamp"`
+	Latitude  float64      `json:"latitude"`
+	Longitude float64      `json:"longitude"`
+	Altitude  float64      `json:"altitude"`
+	Vertical  [100]float64 `json:"vertical"`
 }
 
 type GeophoneOptions struct {

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "/";
+
+message ClientMessage {
+	bytes Data = 1;
+}
+
+message ServerMessage {
+	bytes Data = 1;
+}
+
+service Collector {
+	rpc ToDatabase(ClientMessage) returns (ServerMessage) {}
+}
