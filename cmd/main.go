@@ -1,14 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
-	"com.geophone.observer/common/collector"
-	"com.geophone.observer/common/geophone"
-	"com.geophone.observer/common/ntpclient"
+	"com.geophone.observer/common/handler"
 	"com.geophone.observer/config"
-	"com.geophone.observer/helper/handler"
+	"com.geophone.observer/features/archiver"
+	"com.geophone.observer/features/collector"
+	"com.geophone.observer/features/geophone"
+	"com.geophone.observer/features/ntpclient"
 )
 
 func main() {
@@ -66,6 +66,9 @@ func main() {
 		conf.Geophone.Device,
 		conf.Geophone.Baud,
 		geophone.GeophoneOptions{
+			Geophone:     &geophone.Geophone{},
+			Acceleration: &geophone.Acceleration{},
+			Sensitivity:  conf.Geophone.Sensitivity,
 			LocationFallback: struct {
 				Latitude  float64
 				Longitude float64
@@ -75,9 +78,6 @@ func main() {
 				Longitude: conf.Station.Longitude,
 				Altitude:  conf.Station.Altitude,
 			},
-			Geophone:     &geophone.Geophone{},
-			Acceleration: &geophone.Acceleration{},
-			Sensitivity:  conf.Geophone.Sensitivity,
 			OnErrorCallback: func(err error) {
 				handler.HandleErrors(&handler.HandlerOptions{
 					Error:  err,
@@ -89,19 +89,37 @@ func main() {
 					Status:  &status,
 					Message: &message,
 					OnReadyCallback: func(message *collector.Message) {
-						go collector.PushCollection(conn, grpc, &collector.CollectorOptions{
-							Status:  &status,
-							Message: message,
-							OnCompleteCallback: func(r interface{}) {
-								fmt.Println(r)
+						archiver.WriteMessage(
+							conf.Archiver.Path,
+							&archiver.ArchiverOptions{
+								Message: message,
+								Status:  &status,
+								Enable:  conf.Archiver.Enable,
+								Name:    conf.Archiver.Name,
+								OnCompleteCallback: func() {
+									log.Println("Message archived")
+								},
+								OnErrorCallback: func(err error) {
+									log.Println(err)
+								},
 							},
-							OnErrorCallback: func(err error) {
-								fmt.Println(err)
-							},
-						})
+						)
+						go collector.PushMessage(
+							conn, grpc,
+							&collector.CollectorOptions{
+								Status:  &status,
+								Message: message,
+								OnCompleteCallback: func(r interface{}) {
+									log.Println(r)
+								},
+								OnErrorCallback: func(err error) {
+									log.Println(err)
+								},
+							})
 					},
 				}, acceleration)
 			},
 		},
 	)
+
 }

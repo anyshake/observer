@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 
-	pb "com.geophone.observer/helper/grpc"
+	pb "com.geophone.observer/common/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 )
 
-func PushCollection(conn *grpc.ClientConn, grpc pb.CollectorClient, options *CollectorOptions) {
+func PushMessage(conn *grpc.ClientConn, grpc pb.CollectorClient, options *CollectorOptions) {
 	d, err := json.Marshal(options.Message)
 	if err != nil {
 		options.OnErrorCallback(err)

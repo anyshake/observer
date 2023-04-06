@@ -34,6 +34,12 @@ type Config struct {
 		Path string `json:"path"`
 		TLS  bool   `json:"tls"`
 	} `json:"collector_settings"`
+	// 数据存档设定
+	Archiver struct {
+		Enable bool   `json:"enable"`
+		Path   string `json:"path"`
+		Name   string `json:"name"`
+	} `json:"archiver_settings"`
 	// Web 配置
 	Web struct {
 		Host string `json:"host"`

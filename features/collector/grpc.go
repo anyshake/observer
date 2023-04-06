@@ -3,7 +3,7 @@ package collector
 import (
 	"fmt"
 
-	pb "com.geophone.observer/helper/grpc"
+	pb "com.geophone.observer/common/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )

@@ -17,6 +17,11 @@
         "timeout": 5,
         "interval": 30
     },
+    "archiver_settings": {
+        "enable": true,
+        "name": "timestamp",
+        "path": "/home/yuki/Devel/go/src/com.geophone.observer/archive"
+    },
     "collector_settings": {
         "host": "127.0.0.1",
         "port": 8081,

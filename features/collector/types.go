@@ -1,6 +1,6 @@
 package collector
 
-import "com.geophone.observer/common/geophone"
+import "com.geophone.observer/features/geophone"
 
 type Status struct {
 	Messages int64
