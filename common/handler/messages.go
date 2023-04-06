@@ -1,20 +1,20 @@
 package handler
 
 import (
-	"com.geophone.observer/common/geophone"
-	"com.geophone.observer/common/ntpclient"
+	"com.geophone.observer/features/geophone"
+	"com.geophone.observer/features/ntpclient"
 )
 
 func HandleMessages(options *HandlerOptions, v interface{}) {
 	switch v := v.(type) {
+	case *ntpclient.NTP:
+		options.Status.Offset = v.Offset
 	case *geophone.Acceleration:
-		HandleTimestamp(options, v)
+		v.Timestamp = ntpclient.AlignTime(options.Status.Offset)
 		options.Message.Acceleration[options.Status.Messages%10] = *v
 		if options.Status.Messages%10 == 0 {
 			options.OnReadyCallback(options.Message)
 		}
-	case *ntpclient.NTP:
-		options.Status.Offset = v.Offset
 	}
 
 	options.Status.Messages++

@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"com.geophone.observer/common/collector"
-	"com.geophone.observer/common/geophone"
+	"com.geophone.observer/features/collector"
+	"com.geophone.observer/features/geophone"
 )
 
 type HandlerOptions struct {
