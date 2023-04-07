@@ -17,6 +17,6 @@ func RegisterRouter(rg *gin.RouterGroup, options *ServerOptions) {
 		&status.Status{},
 	}
 	for _, s := range services {
-		s.RegisterModule(rg, options.Status)
+		s.RegisterModule(rg, options.Message, options.Status)
 	}
 }

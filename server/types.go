@@ -16,5 +16,5 @@ type ServerOptions struct {
 }
 
 type ApiServices interface {
-	RegisterModule(rg *gin.RouterGroup, s *collector.Status)
+	RegisterModule(rg *gin.RouterGroup, m *collector.Message, s *collector.Status)
 }
