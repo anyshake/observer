@@ -4,6 +4,7 @@ import "com.geophone.observer/features/geophone"
 
 type Status struct {
 	Messages int64   `json:"messages"`
+	Pushed   int64   `json:"pushed"`
 	Errors   int64   `json:"errors"`
 	Failures int64   `json:"failures"`
 	Queued   int64   `json:"queued"`
