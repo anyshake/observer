@@ -24,5 +24,13 @@ _testmain.go
 *.test
 *.prof
 
+# Builds & Tests
 build/release*
 archive/*
+
+# Frontend
+frontend/src/.git
+frontend/src/*.lock
+frontend/src/build
+frontend/src/package-lock*
+frontend/src/node_modules/*

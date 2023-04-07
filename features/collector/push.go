@@ -26,7 +26,7 @@ func PushMessage(conn *grpc.ClientConn, grpc pb.CollectorClient, options *Collec
 			Data: req,
 		})
 	if err != nil {
-		options.Status.Fails++
+		options.Status.Failures++
 		options.Status.Queued--
 		options.OnErrorCallback(err)
 		return
@@ -34,14 +34,15 @@ func PushMessage(conn *grpc.ClientConn, grpc pb.CollectorClient, options *Collec
 
 	resb, err := proto.Marshal(res)
 	if err != nil {
-		options.Status.Fails++
+		options.Status.Failures++
 		options.Status.Queued--
 		options.OnErrorCallback(err)
 		return
 	}
 
 	for i, v := range resb {
-		if v == '\x1d' || v == '\x1e' || v == '\x1f' {
+		if v == '\x1d' || v == '\x1e' || v == '\x1f' ||
+			v == '\x00' || v == '\x0f' {
 			resb = append(resb[:i], resb[i+1:]...)
 		}
 	}
@@ -49,7 +50,7 @@ func PushMessage(conn *grpc.ClientConn, grpc pb.CollectorClient, options *Collec
 	var response interface{}
 	err = json.Unmarshal(resb, &response)
 	if err != nil {
-		options.Status.Fails++
+		options.Status.Failures++
 		options.OnErrorCallback(err)
 	} else {
 		options.OnCompleteCallback(response)

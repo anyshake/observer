@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.26.0
 // 	protoc        v4.22.2
-// source: config.proto
+// source: collector.proto
 
 package __
 
@@ -31,7 +31,7 @@ type RequestMessage struct {
 func (x *RequestMessage) Reset() {
 	*x = RequestMessage{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_proto_msgTypes[0]
+		mi := &file_collector_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -44,7 +44,7 @@ func (x *RequestMessage) String() string {
 func (*RequestMessage) ProtoMessage() {}
 
 func (x *RequestMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_config_proto_msgTypes[0]
+	mi := &file_collector_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -57,7 +57,7 @@ func (x *RequestMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestMessage.ProtoReflect.Descriptor instead.
 func (*RequestMessage) Descriptor() ([]byte, []int) {
-	return file_config_proto_rawDescGZIP(), []int{0}
+	return file_collector_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *RequestMessage) GetData() []byte {
@@ -78,7 +78,7 @@ type ResponseMessage struct {
 func (x *ResponseMessage) Reset() {
 	*x = ResponseMessage{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_config_proto_msgTypes[1]
+		mi := &file_collector_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -91,7 +91,7 @@ func (x *ResponseMessage) String() string {
 func (*ResponseMessage) ProtoMessage() {}
 
 func (x *ResponseMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_config_proto_msgTypes[1]
+	mi := &file_collector_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -104,7 +104,7 @@ func (x *ResponseMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResponseMessage.ProtoReflect.Descriptor instead.
 func (*ResponseMessage) Descriptor() ([]byte, []int) {
-	return file_config_proto_rawDescGZIP(), []int{1}
+	return file_collector_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ResponseMessage) GetData() []byte {
@@ -114,40 +114,40 @@ func (x *ResponseMessage) GetData() []byte {
 	return nil
 }
 
-var File_config_proto protoreflect.FileDescriptor
+var File_collector_proto protoreflect.FileDescriptor
 
-var file_config_proto_rawDesc = []byte{
-	0x0a, 0x0c, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x24,
-	0x0a, 0x0e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
-	0x12, 0x12, 0x0a, 0x04, 0x44, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04,
-	0x44, 0x61, 0x74, 0x61, 0x22, 0x25, 0x0a, 0x0f, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x44, 0x61, 0x74, 0x61, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x44, 0x61, 0x74, 0x61, 0x32, 0x3e, 0x0a, 0x09, 0x43,
-	0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x12, 0x31, 0x0a, 0x0a, 0x54, 0x6f, 0x44, 0x61,
-	0x74, 0x61, 0x62, 0x61, 0x73, 0x65, 0x12, 0x0f, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x1a, 0x10, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x00, 0x42, 0x03, 0x5a, 0x01, 0x2f,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+var file_collector_proto_rawDesc = []byte{
+	0x0a, 0x0f, 0x63, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x22, 0x24, 0x0a, 0x0e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x4d, 0x65, 0x73, 0x73,
+	0x61, 0x67, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x44, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x0c, 0x52, 0x04, 0x44, 0x61, 0x74, 0x61, 0x22, 0x25, 0x0a, 0x0f, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x44, 0x61,
+	0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x44, 0x61, 0x74, 0x61, 0x32, 0x3e,
+	0x0a, 0x09, 0x43, 0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x12, 0x31, 0x0a, 0x0a, 0x54,
+	0x6f, 0x44, 0x61, 0x74, 0x61, 0x62, 0x61, 0x73, 0x65, 0x12, 0x0f, 0x2e, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x1a, 0x10, 0x2e, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x00, 0x42, 0x03,
+	0x5a, 0x01, 0x2f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
-	file_config_proto_rawDescOnce sync.Once
-	file_config_proto_rawDescData = file_config_proto_rawDesc
+	file_collector_proto_rawDescOnce sync.Once
+	file_collector_proto_rawDescData = file_collector_proto_rawDesc
 )
 
-func file_config_proto_rawDescGZIP() []byte {
-	file_config_proto_rawDescOnce.Do(func() {
-		file_config_proto_rawDescData = protoimpl.X.CompressGZIP(file_config_proto_rawDescData)
+func file_collector_proto_rawDescGZIP() []byte {
+	file_collector_proto_rawDescOnce.Do(func() {
+		file_collector_proto_rawDescData = protoimpl.X.CompressGZIP(file_collector_proto_rawDescData)
 	})
-	return file_config_proto_rawDescData
+	return file_collector_proto_rawDescData
 }
 
-var file_config_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_config_proto_goTypes = []interface{}{
+var file_collector_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_collector_proto_goTypes = []interface{}{
 	(*RequestMessage)(nil),  // 0: RequestMessage
 	(*ResponseMessage)(nil), // 1: ResponseMessage
 }
-var file_config_proto_depIdxs = []int32{
+var file_collector_proto_depIdxs = []int32{
 	0, // 0: Collector.ToDatabase:input_type -> RequestMessage
 	1, // 1: Collector.ToDatabase:output_type -> ResponseMessage
 	1, // [1:2] is the sub-list for method output_type
@@ -157,13 +157,13 @@ var file_config_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_config_proto_init() }
-func file_config_proto_init() {
-	if File_config_proto != nil {
+func init() { file_collector_proto_init() }
+func file_collector_proto_init() {
+	if File_collector_proto != nil {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_config_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_collector_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RequestMessage); i {
 			case 0:
 				return &v.state
@@ -175,7 +175,7 @@ func file_config_proto_init() {
 				return nil
 			}
 		}
-		file_config_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_collector_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ResponseMessage); i {
 			case 0:
 				return &v.state
@@ -192,18 +192,18 @@ func file_config_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_config_proto_rawDesc,
+			RawDescriptor: file_collector_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_config_proto_goTypes,
-		DependencyIndexes: file_config_proto_depIdxs,
-		MessageInfos:      file_config_proto_msgTypes,
+		GoTypes:           file_collector_proto_goTypes,
+		DependencyIndexes: file_collector_proto_depIdxs,
+		MessageInfos:      file_collector_proto_msgTypes,
 	}.Build()
-	File_config_proto = out.File
-	file_config_proto_rawDesc = nil
-	file_config_proto_goTypes = nil
-	file_config_proto_depIdxs = nil
+	File_collector_proto = out.File
+	file_collector_proto_rawDesc = nil
+	file_collector_proto_goTypes = nil
+	file_collector_proto_depIdxs = nil
 }

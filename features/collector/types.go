@@ -3,11 +3,11 @@ package collector
 import "com.geophone.observer/features/geophone"
 
 type Status struct {
-	Messages int64
-	Errors   int64
-	Fails    int64
-	Queued   int64
-	Offset   float64
+	Messages int64   `json:"messages"`
+	Errors   int64   `json:"errors"`
+	Failures int64   `json:"failures"`
+	Queued   int64   `json:"queued"`
+	Offset   float64 `json:"offset"`
 }
 
 type Message struct {
@@ -20,6 +20,6 @@ type CollectorOptions struct {
 	Enable             bool
 	Status             *Status
 	Message            *Message
-	OnCompleteCallback func(interface{})
+	OnCompleteCallback func(any)
 	OnErrorCallback    func(error)
 }

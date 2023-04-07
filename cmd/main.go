@@ -37,12 +37,15 @@ func main() {
 		conf.Collector.Host,
 		conf.Collector.Port,
 		conf.Collector.TLS,
+		conf.Collector.Enable,
 	)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	defer collector.CloseGrpc(conn)
+	if conf.Collector.Enable {
+		defer collector.CloseGrpc(conn)
+	}
 
 	go ntpclient.ReaderDaemon(
 		conf.NTPClient.Host,
@@ -108,12 +111,11 @@ func main() {
 							},
 						)
 						go collector.PushMessage(
-							conn, grpc,
-							&collector.CollectorOptions{
+							conn, grpc, &collector.CollectorOptions{
 								Message: message,
 								Status:  &status,
 								Enable:  conf.Collector.Enable,
-								OnCompleteCallback: func(r interface{}) {
+								OnCompleteCallback: func(r any) {
 									log.Println(r)
 								},
 								OnErrorCallback: func(err error) {
@@ -127,11 +129,12 @@ func main() {
 	)
 
 	server.ServerDaemon(&server.ServerOptions{
+		Message: &message,
+		Status:  &status,
 		Version: apiVersion,
 		Host:    conf.Server.Host,
 		Port:    conf.Server.Port,
 		Cors:    true,
 		Gzip:    9,
 	})
-
 }
