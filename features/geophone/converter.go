@@ -7,7 +7,8 @@ import (
 func GetAcceleration(voltage int32, sensitivity float64) float64 {
 	s := decimal.NewFromFloat(sensitivity)
 	v := decimal.NewFromInt32(voltage)
-	result := v.Div(s)
+	r, _ := v.Div(s).Float64()
 
-	return result.InexactFloat64()
+	result, _ := decimal.NewFromFloat(r).Round(5).Float64()
+	return result
 }

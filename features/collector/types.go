@@ -5,6 +5,7 @@ import "com.geophone.observer/features/geophone"
 type Status struct {
 	Messages int64
 	Errors   int64
+	Fails    int64
 	Queued   int64
 	Offset   float64
 }

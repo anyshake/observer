@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CollectorClient interface {
-	ToDatabase(ctx context.Context, in *ClientMessage, opts ...grpc.CallOption) (*ServerMessage, error)
+	ToDatabase(ctx context.Context, in *RequestMessage, opts ...grpc.CallOption) (*ResponseMessage, error)
 }
 
 type collectorClient struct {
@@ -37,8 +37,8 @@ func NewCollectorClient(cc grpc.ClientConnInterface) CollectorClient {
 	return &collectorClient{cc}
 }
 
-func (c *collectorClient) ToDatabase(ctx context.Context, in *ClientMessage, opts ...grpc.CallOption) (*ServerMessage, error) {
-	out := new(ServerMessage)
+func (c *collectorClient) ToDatabase(ctx context.Context, in *RequestMessage, opts ...grpc.CallOption) (*ResponseMessage, error) {
+	out := new(ResponseMessage)
 	err := c.cc.Invoke(ctx, Collector_ToDatabase_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -47,21 +47,19 @@ func (c *collectorClient) ToDatabase(ctx context.Context, in *ClientMessage, opt
 }
 
 // CollectorServer is the server API for Collector service.
-// All implementations must embed UnimplementedCollectorServer
+// All implementations should embed UnimplementedCollectorServer
 // for forward compatibility
 type CollectorServer interface {
-	ToDatabase(context.Context, *ClientMessage) (*ServerMessage, error)
-	mustEmbedUnimplementedCollectorServer()
+	ToDatabase(context.Context, *RequestMessage) (*ResponseMessage, error)
 }
 
-// UnimplementedCollectorServer must be embedded to have forward compatible implementations.
+// UnimplementedCollectorServer should be embedded to have forward compatible implementations.
 type UnimplementedCollectorServer struct {
 }
 
-func (UnimplementedCollectorServer) ToDatabase(context.Context, *ClientMessage) (*ServerMessage, error) {
+func (UnimplementedCollectorServer) ToDatabase(context.Context, *RequestMessage) (*ResponseMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ToDatabase not implemented")
 }
-func (UnimplementedCollectorServer) mustEmbedUnimplementedCollectorServer() {}
 
 // UnsafeCollectorServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to CollectorServer will
@@ -75,7 +73,7 @@ func RegisterCollectorServer(s grpc.ServiceRegistrar, srv CollectorServer) {
 }
 
 func _Collector_ToDatabase_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ClientMessage)
+	in := new(RequestMessage)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -87,7 +85,7 @@ func _Collector_ToDatabase_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: Collector_ToDatabase_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CollectorServer).ToDatabase(ctx, req.(*ClientMessage))
+		return srv.(CollectorServer).ToDatabase(ctx, req.(*RequestMessage))
 	}
 	return interceptor(ctx, in, info, handler)
 }

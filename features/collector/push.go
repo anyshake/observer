@@ -14,33 +14,42 @@ func PushMessage(conn *grpc.ClientConn, grpc pb.CollectorClient, options *Collec
 		return
 	}
 
-	d, err := json.Marshal(options.Message)
+	req, err := json.Marshal(options.Message)
 	if err != nil {
 		options.OnErrorCallback(err)
 		return
 	}
 
 	options.Status.Queued++
-	r, err := grpc.ToDatabase(context.Background(),
-		&pb.ClientMessage{
-			Data: []byte(d),
+	res, err := grpc.ToDatabase(context.Background(),
+		&pb.RequestMessage{
+			Data: req,
 		})
 	if err != nil {
+		options.Status.Fails++
 		options.Status.Queued--
 		options.OnErrorCallback(err)
 		return
 	}
 
-	rb, err := proto.Marshal(r)
+	resb, err := proto.Marshal(res)
 	if err != nil {
+		options.Status.Fails++
 		options.Status.Queued--
 		options.OnErrorCallback(err)
 		return
+	}
+
+	for i, v := range resb {
+		if v == '\x1d' || v == '\x1e' || v == '\x1f' {
+			resb = append(resb[:i], resb[i+1:]...)
+		}
 	}
 
 	var response interface{}
-	err = json.Unmarshal(rb, &response)
+	err = json.Unmarshal(resb, &response)
 	if err != nil {
+		options.Status.Fails++
 		options.OnErrorCallback(err)
 	} else {
 		options.OnCompleteCallback(response)
