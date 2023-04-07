@@ -9,6 +9,7 @@ import (
 	"com.geophone.observer/frontend"
 	"com.geophone.observer/server/middleware/cors"
 	"com.geophone.observer/server/middleware/static"
+	"com.geophone.observer/server/response"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 )
@@ -19,16 +20,29 @@ func init() {
 
 func ServerDaemon(options *ServerOptions) error {
 	r := gin.New()
-	r.Use(gin.LoggerWithFormatter(
-		func(param gin.LogFormatterParams) string {
+	r.NoRoute(func(c *gin.Context) {
+		response.ErrorHandler(c, http.StatusNotFound)
+	})
+
+	RegisterRouter(r.Group(
+		fmt.Sprintf("/api/%s", options.Version),
+	), options)
+
+	r.Use(gzip.Gzip(options.Gzip),
+		gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 			return fmt.Sprintf("%s [%s] %s %d %s %s\n",
 				param.TimeStamp.Format("2006/01/02 15:04:05"),
 				param.ClientIP, param.Method, param.StatusCode,
 				param.Path, param.ErrorMessage,
 			)
-		},
-	))
-
+		}),
+		static.ServeEmbed(&static.LocalFileSystem{
+			Root: "/", Prefix: "/",
+			FileSystem: http.FS(func(path string, f fs.FS) fs.FS {
+				p, _ := fs.Sub(f, path)
+				return p
+			}("dist", frontend.Dist)),
+		}))
 	if options.Cors {
 		r.Use(cors.AllowCros([]cors.HttpHeader{
 			{
@@ -43,18 +57,6 @@ func ServerDaemon(options *ServerOptions) error {
 			},
 		}))
 	}
-
-	RegisterRouter(r.Group(
-		fmt.Sprintf("/api/%s", options.Version),
-	))
-	r.Use(gzip.Gzip(options.Gzip),
-		static.ServeEmbed(&static.LocalFileSystem{
-			Root: "/", Prefix: "/",
-			FileSystem: http.FS(func(path string, f fs.FS) fs.FS {
-				p, _ := fs.Sub(f, path)
-				return p
-			}("dist", frontend.Dist)),
-		}))
 
 	err := r.Run(fmt.Sprintf("%s:%d", options.Host, options.Port))
 	if err != nil {

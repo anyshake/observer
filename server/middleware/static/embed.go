@@ -3,6 +3,7 @@ package static
 import (
 	"net/http"
 
+	"com.geophone.observer/server/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,11 +16,7 @@ func ServeEmbed(fs *LocalFileSystem) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		_, err := fs.FileSystem.Open(c.Request.URL.Path)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{
-				"message": "404 page not found",
-			})
-			c.Abort()
-
+			response.ErrorHandler(c, http.StatusNotFound)
 			return
 		}
 
