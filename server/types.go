@@ -1,8 +1,9 @@
 package server
 
 type ServerOptions struct {
-	Listen string
-	Port   string
-	Cors   bool
-	Gzip   int
+	Version string
+	Host    string
+	Port    int
+	Cors    bool
+	Gzip    int
 }

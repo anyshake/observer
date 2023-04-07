@@ -2,9 +2,13 @@ package server
 
 import (
 	"fmt"
+	"io/fs"
 	"log"
+	"net/http"
 
-	"com.geophone.observer/server/cors"
+	"com.geophone.observer/frontend"
+	"com.geophone.observer/server/middleware/cors"
+	"com.geophone.observer/server/middleware/static"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 )
@@ -13,7 +17,7 @@ func init() {
 	gin.SetMode(gin.ReleaseMode)
 }
 
-func New() *gin.Engine {
+func ServerDaemon(options *ServerOptions) error {
 	r := gin.New()
 	r.Use(gin.LoggerWithFormatter(
 		func(param gin.LogFormatterParams) string {
@@ -25,18 +29,11 @@ func New() *gin.Engine {
 		},
 	))
 
-	return r
-}
-
-func StartServer(r *gin.Engine, options ServerOptions) error {
 	if options.Cors {
 		r.Use(cors.AllowCros([]cors.HttpHeader{
 			{
 				Header: "Access-Control-Allow-Origin",
 				Value:  "*",
-			}, {
-				Header: "Access-Control-Allow-Credentials",
-				Value:  "true",
 			}, {
 				Header: "Access-Control-Allow-Methods",
 				Value:  "POST, OPTIONS, GET",
@@ -46,11 +43,22 @@ func StartServer(r *gin.Engine, options ServerOptions) error {
 			},
 		}))
 	}
-	r.Use(gzip.Gzip(options.Gzip))
 
-	err := r.Run(fmt.Sprintf("%s:%s", options.Listen, options.Port))
+	RegisterRouter(r.Group(
+		fmt.Sprintf("/api/%s", options.Version),
+	))
+	r.Use(gzip.Gzip(options.Gzip),
+		static.ServeEmbed(&static.LocalFileSystem{
+			Root: "/", Prefix: "/",
+			FileSystem: http.FS(func(path string, f fs.FS) fs.FS {
+				p, _ := fs.Sub(f, path)
+				return p
+			}("dist", frontend.Dist)),
+		}))
+
+	err := r.Run(fmt.Sprintf("%s:%d", options.Host, options.Port))
 	if err != nil {
-		log.Println("HTTP 服务启动失败")
+		log.Println("failed to start HTTP server", err)
 	}
 
 	return err

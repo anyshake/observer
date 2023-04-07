@@ -41,9 +41,9 @@ type Config struct {
 		Path   string `json:"path"`
 		Name   string `json:"name"`
 	} `json:"archiver_settings"`
-	// Web 配置
-	Web struct {
+	// HTTP 服务器配置
+	Server struct {
 		Host string `json:"host"`
 		Port int    `json:"port"`
-	} `json:"web_settings"`
+	} `json:"server_settings"`
 }

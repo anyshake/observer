@@ -9,7 +9,10 @@ import (
 	"com.geophone.observer/features/collector"
 	"com.geophone.observer/features/geophone"
 	"com.geophone.observer/features/ntpclient"
+	"com.geophone.observer/server"
 )
+
+const apiVersion = "v1"
 
 func main() {
 	var (
@@ -62,7 +65,7 @@ func main() {
 		},
 	)
 
-	geophone.ReaderDaemon(
+	go geophone.ReaderDaemon(
 		conf.Geophone.Device,
 		conf.Geophone.Baud,
 		geophone.GeophoneOptions{
@@ -97,7 +100,7 @@ func main() {
 								Enable:  conf.Archiver.Enable,
 								Name:    conf.Archiver.Name,
 								OnCompleteCallback: func() {
-									log.Println("Message archived")
+									log.Println("10 message archived")
 								},
 								OnErrorCallback: func(err error) {
 									log.Println(err)
@@ -122,5 +125,13 @@ func main() {
 			},
 		},
 	)
+
+	server.ServerDaemon(&server.ServerOptions{
+		Version: apiVersion,
+		Host:    conf.Server.Host,
+		Port:    conf.Server.Port,
+		Cors:    true,
+		Gzip:    9,
+	})
 
 }

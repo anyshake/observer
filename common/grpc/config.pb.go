@@ -20,7 +20,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type ClientMessage struct {
+type RequestMessage struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -28,8 +28,8 @@ type ClientMessage struct {
 	Data []byte `protobuf:"bytes,1,opt,name=Data,proto3" json:"Data,omitempty"`
 }
 
-func (x *ClientMessage) Reset() {
-	*x = ClientMessage{}
+func (x *RequestMessage) Reset() {
+	*x = RequestMessage{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_config_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -37,13 +37,13 @@ func (x *ClientMessage) Reset() {
 	}
 }
 
-func (x *ClientMessage) String() string {
+func (x *RequestMessage) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ClientMessage) ProtoMessage() {}
+func (*RequestMessage) ProtoMessage() {}
 
-func (x *ClientMessage) ProtoReflect() protoreflect.Message {
+func (x *RequestMessage) ProtoReflect() protoreflect.Message {
 	mi := &file_config_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -55,19 +55,19 @@ func (x *ClientMessage) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ClientMessage.ProtoReflect.Descriptor instead.
-func (*ClientMessage) Descriptor() ([]byte, []int) {
+// Deprecated: Use RequestMessage.ProtoReflect.Descriptor instead.
+func (*RequestMessage) Descriptor() ([]byte, []int) {
 	return file_config_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ClientMessage) GetData() []byte {
+func (x *RequestMessage) GetData() []byte {
 	if x != nil {
 		return x.Data
 	}
 	return nil
 }
 
-type ServerMessage struct {
+type ResponseMessage struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -75,8 +75,8 @@ type ServerMessage struct {
 	Data []byte `protobuf:"bytes,1,opt,name=Data,proto3" json:"Data,omitempty"`
 }
 
-func (x *ServerMessage) Reset() {
-	*x = ServerMessage{}
+func (x *ResponseMessage) Reset() {
+	*x = ResponseMessage{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_config_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -84,13 +84,13 @@ func (x *ServerMessage) Reset() {
 	}
 }
 
-func (x *ServerMessage) String() string {
+func (x *ResponseMessage) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ServerMessage) ProtoMessage() {}
+func (*ResponseMessage) ProtoMessage() {}
 
-func (x *ServerMessage) ProtoReflect() protoreflect.Message {
+func (x *ResponseMessage) ProtoReflect() protoreflect.Message {
 	mi := &file_config_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -102,12 +102,12 @@ func (x *ServerMessage) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ServerMessage.ProtoReflect.Descriptor instead.
-func (*ServerMessage) Descriptor() ([]byte, []int) {
+// Deprecated: Use ResponseMessage.ProtoReflect.Descriptor instead.
+func (*ResponseMessage) Descriptor() ([]byte, []int) {
 	return file_config_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *ServerMessage) GetData() []byte {
+func (x *ResponseMessage) GetData() []byte {
 	if x != nil {
 		return x.Data
 	}
@@ -117,17 +117,17 @@ func (x *ServerMessage) GetData() []byte {
 var File_config_proto protoreflect.FileDescriptor
 
 var file_config_proto_rawDesc = []byte{
-	0x0a, 0x0c, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x23,
-	0x0a, 0x0d, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12,
-	0x12, 0x0a, 0x04, 0x44, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x44,
-	0x61, 0x74, 0x61, 0x22, 0x23, 0x0a, 0x0d, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x4d, 0x65, 0x73,
-	0x73, 0x61, 0x67, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x44, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x0c, 0x52, 0x04, 0x44, 0x61, 0x74, 0x61, 0x32, 0x3b, 0x0a, 0x09, 0x43, 0x6f, 0x6c, 0x6c,
-	0x65, 0x63, 0x74, 0x6f, 0x72, 0x12, 0x2e, 0x0a, 0x0a, 0x54, 0x6f, 0x44, 0x61, 0x74, 0x61, 0x62,
-	0x61, 0x73, 0x65, 0x12, 0x0e, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x4d, 0x65, 0x73, 0x73,
-	0x61, 0x67, 0x65, 0x1a, 0x0e, 0x2e, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x4d, 0x65, 0x73, 0x73,
-	0x61, 0x67, 0x65, 0x22, 0x00, 0x42, 0x03, 0x5a, 0x01, 0x2f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x0a, 0x0c, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x24,
+	0x0a, 0x0e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
+	0x12, 0x12, 0x0a, 0x04, 0x44, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04,
+	0x44, 0x61, 0x74, 0x61, 0x22, 0x25, 0x0a, 0x0f, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x44, 0x61, 0x74, 0x61, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x44, 0x61, 0x74, 0x61, 0x32, 0x3e, 0x0a, 0x09, 0x43,
+	0x6f, 0x6c, 0x6c, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x12, 0x31, 0x0a, 0x0a, 0x54, 0x6f, 0x44, 0x61,
+	0x74, 0x61, 0x62, 0x61, 0x73, 0x65, 0x12, 0x0f, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x1a, 0x10, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x00, 0x42, 0x03, 0x5a, 0x01, 0x2f,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -144,12 +144,12 @@ func file_config_proto_rawDescGZIP() []byte {
 
 var file_config_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_config_proto_goTypes = []interface{}{
-	(*ClientMessage)(nil), // 0: ClientMessage
-	(*ServerMessage)(nil), // 1: ServerMessage
+	(*RequestMessage)(nil),  // 0: RequestMessage
+	(*ResponseMessage)(nil), // 1: ResponseMessage
 }
 var file_config_proto_depIdxs = []int32{
-	0, // 0: Collector.ToDatabase:input_type -> ClientMessage
-	1, // 1: Collector.ToDatabase:output_type -> ServerMessage
+	0, // 0: Collector.ToDatabase:input_type -> RequestMessage
+	1, // 1: Collector.ToDatabase:output_type -> ResponseMessage
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -164,7 +164,7 @@ func file_config_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_config_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ClientMessage); i {
+			switch v := v.(*RequestMessage); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -176,7 +176,7 @@ func file_config_proto_init() {
 			}
 		}
 		file_config_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ServerMessage); i {
+			switch v := v.(*ResponseMessage); i {
 			case 0:
 				return &v.state
 			case 1:
