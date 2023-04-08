@@ -20,6 +20,22 @@ func init() {
 
 func ServerDaemon(options *ServerOptions) error {
 	r := gin.New()
+
+	if options.Cors {
+		r.Use(cors.AllowCros([]cors.HttpHeader{
+			{
+				Header: "Access-Control-Allow-Origin",
+				Value:  "*",
+			}, {
+				Header: "Access-Control-Allow-Methods",
+				Value:  "POST, OPTIONS, GET",
+			}, {
+				Header: "Access-Control-Allow-Headers",
+				Value:  "Authorization, Content-Type, Version",
+			},
+		}))
+	}
+
 	r.NoRoute(func(c *gin.Context) {
 		response.ErrorHandler(c, http.StatusNotFound)
 	})
@@ -43,20 +59,6 @@ func ServerDaemon(options *ServerOptions) error {
 				return p
 			}("dist", frontend.Dist)),
 		}))
-	if options.Cors {
-		r.Use(cors.AllowCros([]cors.HttpHeader{
-			{
-				Header: "Access-Control-Allow-Origin",
-				Value:  "*",
-			}, {
-				Header: "Access-Control-Allow-Methods",
-				Value:  "POST, OPTIONS, GET",
-			}, {
-				Header: "Access-Control-Allow-Headers",
-				Value:  "Authorization, Content-Type, Version",
-			},
-		}))
-	}
 
 	err := r.Run(fmt.Sprintf("%s:%d", options.Host, options.Port))
 	if err != nil {
