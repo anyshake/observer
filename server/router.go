@@ -1,8 +1,8 @@
 package server
 
 import (
+	"com.geophone.observer/app/statistics"
 	"com.geophone.observer/app/status"
-	"com.geophone.observer/app/system"
 	"com.geophone.observer/server/socket"
 	"github.com/gin-gonic/gin"
 )
@@ -13,8 +13,8 @@ func RegisterRouter(rg *gin.RouterGroup, options *ServerOptions) {
 	})
 
 	services := []ApiServices{
-		&system.System{},
 		&status.Status{},
+		&statistics.Statistics{},
 	}
 	for _, s := range services {
 		s.RegisterModule(rg, options.Message, options.Status)
