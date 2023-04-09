@@ -18,12 +18,14 @@
         "interval": 30
     },
     "archiver_settings": {
-        "enable": false,
-        "name": "default",
-        "path": "/home/yuki/Devel/go/src/com.geophone.observer/archive"
+        "enable": true,
+        "host": "ls2k",
+        "port": 6379,
+        "password": "",
+        "database": 0
     },
     "collector_settings": {
-        "enable": true,
+        "enable": false,
         "host": "127.0.0.1",
         "port": 8073,
         "tls": false
