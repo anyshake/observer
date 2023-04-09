@@ -1,4 +1,4 @@
-package geophone
+package serial
 
 import (
 	"io"
@@ -7,7 +7,7 @@ import (
 	"github.com/tarm/serial"
 )
 
-func OpenGeophone(device string, baud int) io.ReadWriteCloser {
+func OpenSerial(device string, baud int) io.ReadWriteCloser {
 	options := &serial.Config{
 		Name: device,
 		Baud: baud,
@@ -21,11 +21,6 @@ func OpenGeophone(device string, baud int) io.ReadWriteCloser {
 	return port
 }
 
-func CloseGeophone(port io.ReadWriteCloser) error {
-	err := port.Close()
-	if err != nil {
-		return err
-	}
-
-	return nil
+func CloseSerial(port io.ReadWriteCloser) error {
+	return port.Close()
 }

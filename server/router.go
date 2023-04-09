@@ -1,22 +1,22 @@
 package server
 
 import (
+	"com.geophone.observer/app"
+	"com.geophone.observer/app/history"
+	"com.geophone.observer/app/socket"
+	"com.geophone.observer/app/station"
 	"com.geophone.observer/app/statistics"
-	"com.geophone.observer/app/status"
-	"com.geophone.observer/server/socket"
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRouter(rg *gin.RouterGroup, options *ServerOptions) {
-	rg.GET("/socket", func(c *gin.Context) {
-		socket.WebsocketHandler(c, options.Message)
-	})
-
+func RegisterRouter(rg *gin.RouterGroup, options *app.ServerOptions) {
 	services := []ApiServices{
-		&status.Status{},
+		&station.Station{},
 		&statistics.Statistics{},
+		&history.History{},
+		&socket.Socket{},
 	}
 	for _, s := range services {
-		s.RegisterModule(rg, options.Message, options.Status)
+		s.RegisterModule(rg, options)
 	}
 }

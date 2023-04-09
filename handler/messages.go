@@ -5,7 +5,7 @@ import (
 	"com.geophone.observer/features/ntpclient"
 )
 
-func HandleMessages(options *HandlerOptions, v interface{}) {
+func HandleMessages(options *HandlerOptions, v any) {
 	switch v := v.(type) {
 	case *ntpclient.NTP:
 		options.Status.Offset = v.Offset

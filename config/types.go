@@ -37,9 +37,11 @@ type Config struct {
 	} `json:"collector_settings"`
 	// 数据存档设定
 	Archiver struct {
-		Enable bool   `json:"enable"`
-		Path   string `json:"path"`
-		Name   string `json:"name"`
+		Enable   bool   `json:"enable"`
+		Host     string `json:"host"`
+		Port     int    `json:"port"`
+		Password string `json:"password"`
+		Database int    `json:"database"`
 	} `json:"archiver_settings"`
 	// HTTP 服务器配置
 	Server struct {
