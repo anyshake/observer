@@ -4,9 +4,9 @@ import "com.geophone.observer/features/collector"
 
 type ArchiverOptions struct {
 	Enable             bool
-	Name               string
+	Database           int
+	Password           string
 	OnCompleteCallback func()
 	OnErrorCallback    func(error)
-	Status             *collector.Status
 	Message            *collector.Message
 }

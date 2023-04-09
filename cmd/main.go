@@ -3,12 +3,14 @@ package main
 import (
 	"log"
 
-	"com.geophone.observer/common/handler"
+	"com.geophone.observer/app"
+	"com.geophone.observer/common/redis"
 	"com.geophone.observer/config"
 	"com.geophone.observer/features/archiver"
 	"com.geophone.observer/features/collector"
 	"com.geophone.observer/features/geophone"
 	"com.geophone.observer/features/ntpclient"
+	"com.geophone.observer/handler"
 	"com.geophone.observer/server"
 )
 
@@ -33,7 +35,7 @@ func main() {
 		}
 	)
 
-	conn, grpc, err := collector.OpenGrpc(
+	conn, grpc, err := collector.OpenGRPC(
 		conf.Collector.Host,
 		conf.Collector.Port,
 		conf.Collector.TLS,
@@ -42,9 +44,22 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	if conf.Collector.Enable {
-		defer collector.CloseGrpc(conn)
+		defer collector.CloseGRPC(conn)
+	}
+
+	rdb, err := redis.OpenRedis(
+		conf.Archiver.Host,
+		conf.Archiver.Port,
+		conf.Archiver.Password,
+		conf.Archiver.Database,
+		conf.Archiver.Enable,
+	)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if conf.Archiver.Enable {
+		defer redis.CloseRedis(rdb)
 	}
 
 	go ntpclient.ReaderDaemon(
@@ -96,12 +111,9 @@ func main() {
 					Message: &message,
 					OnReadyCallback: func(message *collector.Message) {
 						archiver.WriteMessage(
-							conf.Archiver.Path,
-							&archiver.ArchiverOptions{
+							rdb, &archiver.ArchiverOptions{
 								Message: message,
-								Status:  &status,
 								Enable:  conf.Archiver.Enable,
-								Name:    conf.Archiver.Name,
 								OnCompleteCallback: func() {
 									log.Println("10 message archived")
 								},
@@ -128,13 +140,18 @@ func main() {
 		},
 	)
 
-	server.ServerDaemon(&server.ServerOptions{
-		Message: &message,
-		Status:  &status,
-		Version: apiVersion,
-		Host:    conf.Server.Host,
-		Port:    conf.Server.Port,
-		Cors:    true,
-		Gzip:    9,
-	})
+	server.ServerDaemon(
+		conf.Server.Host,
+		conf.Server.Port,
+		&app.ServerOptions{
+			WebPrefix: "/",
+			ApiPrefix: "/api",
+			Version:   apiVersion,
+			Message:   &message,
+			Status:    &status,
+			ConnGRPC:  &grpc,
+			ConnRedis: rdb,
+			Cors:      true,
+			Gzip:      9,
+		})
 }

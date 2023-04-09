@@ -8,22 +8,12 @@ import (
 	"io"
 	"time"
 	"unsafe"
+
+	"com.geophone.observer/common/serial"
 )
 
 func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
-	for {
-		header := make([]byte, 2)
-		_, err := port.Read(header)
-		if err != nil {
-			options.OnErrorCallback(err)
-			return err
-		}
-
-		if header[0] == 0x55 &&
-			header[1] == 0xAA {
-			break
-		}
-	}
+	serial.FilterSerial(port, []byte{0x55, 0xAA})
 
 	buffer := make([]byte, unsafe.Sizeof(Geophone{}))
 	n, err := io.ReadFull(port, buffer)
@@ -75,15 +65,16 @@ func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
 }
 
 func ReaderDaemon(device string, baud int, options GeophoneOptions) {
-	port := OpenGeophone(device, baud)
-	defer CloseGeophone(port)
+	port := serial.OpenSerial(device, baud)
+	defer serial.CloseSerial(port)
 
 	for {
 		err := GeophoneReader(port, options)
 		if err != nil {
-			CloseGeophone(port)
+			serial.CloseSerial(port)
+			options.OnErrorCallback(err)
 			time.Sleep(time.Second)
-			port = OpenGeophone(device, baud)
+			port = serial.OpenSerial(device, baud)
 
 			continue
 		}

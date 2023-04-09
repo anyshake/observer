@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/keepalive"
 )
 
-func OpenGrpc(host string, port int, tls bool, enable bool) (*grpc.ClientConn, pb.CollectorClient, error) {
+func OpenGRPC(host string, port int, tls, enable bool) (*grpc.ClientConn, pb.CollectorClient, error) {
 	if !enable {
 		return nil, nil, nil
 	}
@@ -48,7 +48,7 @@ func OpenGrpc(host string, port int, tls bool, enable bool) (*grpc.ClientConn, p
 	return conn, grpc, nil
 }
 
-func CloseGrpc(conn *grpc.ClientConn) error {
+func CloseGRPC(conn *grpc.ClientConn) error {
 	err := conn.Close()
 	if err != nil {
 		return err
