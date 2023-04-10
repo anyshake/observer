@@ -31,10 +31,12 @@ type CPU struct {
 }
 
 type System struct {
-	Uptime int64            `json:"uptime"`
-	Memory Memory           `json:"memory"`
-	Disk   Disk             `json:"disk"`
-	OS     OS               `json:"os"`
-	CPU    CPU              `json:"cpu"`
-	Status collector.Status `json:"status"`
+	UUID    string           `json:"uuid"`
+	Station string           `json:"station"`
+	Uptime  int64            `json:"uptime"`
+	Memory  Memory           `json:"memory"`
+	Disk    Disk             `json:"disk"`
+	OS      OS               `json:"os"`
+	CPU     CPU              `json:"cpu"`
+	Status  collector.Status `json:"status"`
 }

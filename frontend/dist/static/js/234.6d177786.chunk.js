@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunksrc=self.webpackChunksrc||[]).push([[234],{4234:function(e,r,a){a.r(r);var t=a(6573);r.default=function(e){var r=e.url,a=e.method,u=e.headers,s=e.data;return t.Z.request({headers:u,method:a,data:s,url:r})}}}]);
