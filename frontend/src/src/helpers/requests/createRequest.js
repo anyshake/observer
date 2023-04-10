@@ -16,7 +16,7 @@ const createRequest = ({ url, method, headers, data }) => {
         headers: headers,
         method: method,
         data: data,
-        uri: url,
+        url: url,
     });
 };
 
