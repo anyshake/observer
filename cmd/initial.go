@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"com.geophone.observer/config"
@@ -22,6 +23,7 @@ func ProgramInit(args *config.Args, conf *config.Config) error {
 		os.Exit(0)
 	}
 
+	log.Println("Program starting")
 	err := conf.ReadConfig(args.Path)
 	if err != nil {
 		return err

@@ -14,14 +14,19 @@ import (
 
 func FilterHistory(c *gin.Context, b *Binding, options *app.ServerOptions) {
 	ctx := options.ConnRedis.Context()
-	k, err := options.ConnRedis.Keys(ctx, "*").Result()
-	if err != nil {
+
+	var keys []string
+	iter := options.ConnRedis.Scan(ctx, 0, "*", 0).Iterator()
+	for iter.Next(ctx) {
+		keys = append(keys, iter.Val())
+	}
+	if err := iter.Err(); err != nil {
 		response.ErrorHandler(c, http.StatusInternalServerError)
 		return
 	}
 
 	var acceleration []geophone.Acceleration
-	for _, v := range k {
+	for _, v := range keys {
 		t, _ := strconv.ParseInt(v, 10, 64)
 		if t >= b.Start && t <= b.End {
 			value, err := options.ConnRedis.Get(ctx, v).Result()
