@@ -1,4 +1,4 @@
-package statistics
+package station
 
 import "github.com/shirou/gopsutil/disk"
 

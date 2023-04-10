@@ -18,10 +18,10 @@ const createSocket = ({
     onErrorCallback,
 }) => {
     const conn = new WebSocket(url);
-    conn.binaryType = type;
     conn.onmessage = onMessageCallback;
     conn.onclose = onCloseCallback;
     conn.onerror = onErrorCallback;
+    conn.binaryType = type;
 
     return conn;
 };
