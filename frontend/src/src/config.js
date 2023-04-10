@@ -14,7 +14,7 @@ const AppConfig = {
                 ? window.location.port
                 : `8073`,
         version: `v1`,
-        tls: false,
+        tls: window.location.protocol === "https:" ? true : false,
         api: {
             station: {
                 uri: `station`,

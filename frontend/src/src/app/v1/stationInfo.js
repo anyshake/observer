@@ -6,6 +6,7 @@ import AppConfig from "../../config";
 import { timerAlert } from "../../helpers/alerts/sweetAlert";
 import getApiUrl from "../../helpers/utilities/getApiUrl";
 import ReactPolling from "react-polling";
+import searchKey from "../../helpers/utilities/searchKey";
 
 export default class stationInfo extends Component {
     constructor(props) {
@@ -15,7 +16,7 @@ export default class stationInfo extends Component {
             cards: [
                 {
                     title: `已解码讯息量`,
-                    key: `this.state.response.status.messages`,
+                    key: `messages`,
                     unit: `条`,
                     icon: (
                         <svg
@@ -30,7 +31,7 @@ export default class stationInfo extends Component {
                 },
                 {
                     title: `帧错误讯息量`,
-                    key: `this.state.response.status.errors`,
+                    key: `errors`,
                     unit: `条`,
                     icon: (
                         <svg
@@ -45,7 +46,7 @@ export default class stationInfo extends Component {
                 },
                 {
                     title: `已推送讯息量`,
-                    key: `this.state.response.status.pushed`,
+                    key: `pushed`,
                     unit: `条`,
                     icon: (
                         <svg
@@ -60,7 +61,7 @@ export default class stationInfo extends Component {
                 },
                 {
                     title: `推送失败讯息量`,
-                    key: `this.state.response.status.failures`,
+                    key: `failures`,
                     unit: `条`,
                     icon: (
                         <svg
@@ -75,7 +76,7 @@ export default class stationInfo extends Component {
                 },
                 {
                     title: `等待推送讯息量`,
-                    key: `this.state.response.status.queued`,
+                    key: `queued`,
                     unit: `条`,
                     icon: (
                         <svg
@@ -90,7 +91,7 @@ export default class stationInfo extends Component {
                 },
                 {
                     title: `系统时间偏移量`,
-                    key: `this.state.response.status.offset`,
+                    key: `offset`,
                     unit: `秒`,
                     icon: (
                         <svg
@@ -257,10 +258,10 @@ export default class stationInfo extends Component {
                                         icon={item.icon}
                                         title={item.title}
                                         unit={item.unit}
-                                        value={
-                                            // eslint-disable-next-line no-eval
-                                            eval(item.key)
-                                        }
+                                        value={searchKey(
+                                            this.state.response.status,
+                                            item.key
+                                        )}
                                     />
                                 ))}
                             </div>
