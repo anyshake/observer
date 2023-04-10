@@ -1,63 +1,139 @@
 import React, { Component } from "react";
+import AppConfig from "../config";
+import { Link } from "react-router-dom";
 
 export default class Sidebar extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isSidebarOpen: false,
+            sidebarVersion: AppConfig.frontend.version,
+            sidebarTitle: AppConfig.frontend.title,
+            sidebarList: AppConfig.sidebar,
+            sidebarMark: this.props.sidebarMark,
+        };
+    }
+
     render() {
         return (
-            <nav className="z-10 flex shrink-0 grow-0 justify-around gap-4 border-t bg-white p-2.5 shadow-lg backdrop-blur-lg fixed top-2/4 -translate-y-2/4 left-2 min-h-[auto] min-w-[64px] flex-col rounded-lg border">
-                <a
-                    href="#profile"
-                    className="flex aspect-square min-h-[32px] w-16 flex-col items-center justify-center gap-1 rounded-md p-1.5 bg-gray-200 text-indigo-600 dark:bg-sky-900 dark:text-sky-50"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 512 512"
-                        fill="currentColor"
-                        className="w-6 h-6 shrink-0"
+            <>
+                <div className="fixed w-full z-30 flex bg-white p-2 items-center justify-center h-16 px-10">
+                    <div
+                        className={`${
+                            this.state.isSidebarOpen || `ml-10`
+                        } text-gray-800 transform ease-in-out duration-500 flex-none h-full flex items-center justify-center text-lg font-bold`}
                     >
-                        <path d="M64 32C28.7 32 0 60.7 0 96v64c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm280 72a24 24 0 1 1 0 48 24 24 0 1 1 0-48zm48 24a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zM64 288c-35.3 0-64 28.7-64 64v64c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V352c0-35.3-28.7-64-64-64H64zm280 72a24 24 0 1 1 0 48 24 24 0 1 1 0-48zm56 24a24 24 0 1 1 48 0 24 24 0 1 1 -48 0z" />
-                    </svg>
+                        {this.state.sidebarTitle}
+                    </div>
 
-                    <small className="text-center text-xs font-medium">
-                        测站资讯
-                    </small>
-                </a>
+                    <div className="grow h-full flex items-center justify-center " />
+                    <div className="flex-none h-full text-center flex items-center justify-center text-gray-500">
+                        <div className="flex space-x-2 items-center lg:px-10">
+                            <div className="flex-none flex justify-center">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 512 512"
+                                    className="w-4 h-4"
+                                    fill="currentColor"
+                                >
+                                    <path d="M320 488c0 9.5-5.6 18.1-14.2 21.9s-18.8 2.3-25.8-4.1l-80-72c-5.1-4.6-7.9-11-7.9-17.8s2.9-13.3 7.9-17.8l80-72c7-6.3 17.2-7.9 25.8-4.1s14.2 12.4 14.2 21.9v40h16c35.3 0 64-28.7 64-64V153.3C371.7 141 352 112.8 352 80c0-44.2 35.8-80 80-80s80 35.8 80 80c0 32.8-19.7 61-48 73.3V320c0 70.7-57.3 128-128 128H320v40zM456 80a24 24 0 1 0 -48 0 24 24 0 1 0 48 0zM192 24c0-9.5 5.6-18.1 14.2-21.9s18.8-2.3 25.8 4.1l80 72c5.1 4.6 7.9 11 7.9 17.8s-2.9 13.3-7.9 17.8l-80 72c-7 6.3-17.2 7.9-25.8 4.1s-14.2-12.4-14.2-21.9V128H176c-35.3 0-64 28.7-64 64V358.7c28.3 12.3 48 40.5 48 73.3c0 44.2-35.8 80-80 80s-80-35.8-80-80c0-32.8 19.7-61 48-73.3V192c0-70.7 57.3-128 128-128h16V24zM56 432a24 24 0 1 0 48 0 24 24 0 1 0 -48 0z" />
+                                </svg>
+                            </div>
 
-                <a
-                    href="#analytics"
-                    className="flex aspect-square min-h-[32px] w-16 flex-col items-center justify-center gap-1 rounded-md p-1.5 text-gray-700 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-slate-800"
+                            <div className="md:block text-sm md:text-md">
+                                {this.state.sidebarVersion}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <aside
+                    className={`${
+                        this.state.isSidebarOpen
+                            ? `translate-x-none`
+                            : `-translate-x-48`
+                    } w-60 fixed transition transform ease-in-out duration-1000 z-50 flex h-screen bg-gray-800`}
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 448 512"
-                        fill="currentColor"
-                        className="w-6 h-6 shrink-0"
+                    <div
+                        className={`${
+                            this.state.isSidebarOpen
+                                ? `translate-x-0`
+                                : `translate-x-24 scale-x-0`
+                        } w-full -right-6 transition transform ease-in duration-300 flex items-center justify-between border-4 border-white absolute top-2 rounded-full h-12`}
                     >
-                        <path d="M96 0C60.7 0 32 28.7 32 64V288H144c6.1 0 11.6 3.4 14.3 8.8L176 332.2l49.7-99.4c2.7-5.4 8.3-8.8 14.3-8.8s11.6 3.4 14.3 8.8L281.9 288H352c8.8 0 16 7.2 16 16s-7.2 16-16 16H272c-6.1 0-11.6-3.4-14.3-8.8L240 275.8l-49.7 99.4c-2.7 5.4-8.3 8.8-14.3 8.8s-11.6-3.4-14.3-8.8L134.1 320H32V448c0 35.3 28.7 64 64 64H352c35.3 0 64-28.7 64-64V160H288c-17.7 0-32-14.3-32-32V0H96zM288 0V128H416L288 0z" />
-                    </svg>
+                        <div className="flex items-center space-x-3 group bg-gradient-to-r from-indigo-500 via-purple-500 to-purple-500 pl-16 pr-6 py-2 rounded-full text-white">
+                            <div className="transform ease-in-out duration-300 mr-16 font-bold">
+                                面板菜单
+                            </div>
+                        </div>
+                    </div>
 
-                    <small className="text-center text-xs font-medium">
-                        实时波形
-                    </small>
-                </a>
-
-                <a
-                    href="#settings"
-                    className="flex aspect-square min-h-[32px] w-16 flex-col items-center justify-center gap-1 rounded-md p-1.5 text-gray-700 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-slate-800"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 640 512"
-                        fill="currentColor"
-                        className="w-6 h-6 shrink-0"
+                    <div
+                        onClick={() =>
+                            this.setState({
+                                isSidebarOpen: !this.state.isSidebarOpen,
+                            })
+                        }
+                        className="-right-6 cursor-pointer transition transform ease-in-out duration-500 flex border-4 border-white bg-[#1E293B] hover:bg-purple-500 absolute top-2 p-3 rounded-full text-white hover:rotate-45"
                     >
-                        <path d="M58.9 42.1c3-6.1 9.6-9.6 16.3-8.7L320 64 564.8 33.4c6.7-.8 13.3 2.7 16.3 8.7l41.7 83.4c9 17.9-.6 39.6-19.8 45.1L439.6 217.3c-13.9 4-28.8-1.9-36.2-14.3L320 64 236.6 203c-7.4 12.4-22.3 18.3-36.2 14.3L37.1 170.6c-19.3-5.5-28.8-27.2-19.8-45.1L58.9 42.1zM321.1 128l54.9 91.4c14.9 24.8 44.6 36.6 72.5 28.6L576 211.6v167c0 22-15 41.2-36.4 46.6l-204.1 51c-10.2 2.6-20.9 2.6-31 0l-204.1-51C79 419.7 64 400.5 64 378.5v-167L191.6 248c27.8 8 57.6-3.8 72.5-28.6L318.9 128h2.2z" />
-                    </svg>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={3}
+                            stroke="currentColor"
+                            className="w-4 h-4"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"
+                            />
+                        </svg>
+                    </div>
 
-                    <small className="text-center text-xs font-medium">
-                        历史数据
-                    </small>
-                </a>
-            </nav>
+                    <div
+                        className={`${
+                            this.state.isSidebarOpen ? `flex` : `hidden`
+                        } text-white mt-20 flex-col space-y-2 w-full h-[calc(100vh)]`}
+                    >
+                        {this.state.sidebarList.map((item, index) => (
+                            <Link
+                                key={index}
+                                to={item.link}
+                                className={`${
+                                    this.state.sidebarMark === item.tag
+                                        ? `text-purple-500`
+                                        : `hover:text-purple-500`
+                                } cursor-pointer hover:ml-4 w-full text-white bg-[#1E293B] p-2 pl-8 rounded-full transform ease-in-out duration-300 flex flex-row items-center space-x-3`}
+                            >
+                                {item.icon}
+                                <div>{item.title}</div>
+                            </Link>
+                        ))}
+                    </div>
+
+                    <div
+                        className={`${
+                            this.state.isSidebarOpen ? `hidden` : `flex`
+                        } mt-20 flex-col space-y-2 w-full h-[calc(100vh)]`}
+                    >
+                        {this.state.sidebarList.map((item, index) => (
+                            <Link
+                                key={index}
+                                to={item.link}
+                                className={`${
+                                    this.state.sidebarMark === item.tag
+                                        ? `text-purple-500`
+                                        : `hover:text-purple-500`
+                                } cursor-pointer justify-end pr-5 text-white w-full bg-[#1E293B] p-3 rounded-full transform ease-in-out duration-300 flex`}
+                            >
+                                {item.icon}
+                            </Link>
+                        ))}
+                    </div>
+                </aside>
+            </>
         );
     }
 }
