@@ -30,13 +30,20 @@ type CPU struct {
 	Percent float64 `json:"percent"`
 }
 
+type Location struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	Altitude  float64 `json:"altitude"`
+}
+
 type System struct {
-	UUID    string           `json:"uuid"`
-	Station string           `json:"station"`
-	Uptime  int64            `json:"uptime"`
-	Memory  Memory           `json:"memory"`
-	Disk    Disk             `json:"disk"`
-	OS      OS               `json:"os"`
-	CPU     CPU              `json:"cpu"`
-	Status  collector.Status `json:"status"`
+	UUID     string           `json:"uuid"`
+	Station  string           `json:"station"`
+	Uptime   int64            `json:"uptime"`
+	Memory   Memory           `json:"memory"`
+	Disk     Disk             `json:"disk"`
+	OS       OS               `json:"os"`
+	CPU      CPU              `json:"cpu"`
+	Location Location         `json:"location"`
+	Status   collector.Status `json:"status"`
 }
