@@ -20,10 +20,10 @@ const RouteModule = (props) => {
                 const Element = item;
                 return (
                     <Route
-                        {...(Routes[index].index ? index : null)}
-                        path={Routes[index].path}
-                        element={<Element />}
                         key={index}
+                        element={<Element />}
+                        path={Routes[index].path}
+                        {...(Routes[index].index ? index : null)}
                     />
                 );
             })}

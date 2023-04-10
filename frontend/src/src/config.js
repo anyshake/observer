@@ -1,13 +1,18 @@
 const AppConfig = {
     frontend: {
         router: "hash",
-        transition: 1000,
-        version: "v1.0.0p",
+        version: "v1.0.0d",
         title: `G-Observer 测站面板`,
     },
     backend: {
-        host: `172.17.138.214`,
-        port: `8073`,
+        host:
+            process.env.NODE_ENV === "production"
+                ? window.location.hostname
+                : `172.17.138.214`,
+        port:
+            process.env.NODE_ENV === "production"
+                ? window.location.port
+                : `8073`,
         version: `v1`,
         tls: false,
         api: {

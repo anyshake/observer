@@ -28,7 +28,7 @@ export default class Sidebar extends Component {
 
                     <div className="grow h-full flex items-center justify-center " />
                     <div className="flex-none h-full text-center flex items-center justify-center text-gray-500">
-                        <div className="flex space-x-2 items-center lg:px-10">
+                        <div className="flex space-x-1 items-center lg:px-10">
                             <div className="flex-none flex justify-center">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"

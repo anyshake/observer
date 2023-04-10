@@ -13,6 +13,7 @@ import axios from "axios";
  */
 const createRequest = ({ url, method, headers, data }) => {
     return axios.request({
+        timeout: 10000,
         headers: headers,
         method: method,
         data: data,
