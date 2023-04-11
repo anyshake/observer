@@ -7,6 +7,8 @@ import { timerAlert } from "../../helpers/alerts/sweetAlert";
 import getApiUrl from "../../helpers/utilities/getApiUrl";
 import ReactPolling from "react-polling";
 import searchKey from "../../helpers/utilities/searchKey";
+import ReactApexChart from "react-apexcharts";
+import Footer from "../../components/Footer";
 
 export default class stationInfo extends Component {
     constructor(props) {
@@ -145,6 +147,63 @@ export default class stationInfo extends Component {
                     percent: 0,
                 },
             },
+            chart: {
+                cpu: [
+                    {
+                        color: "#fff",
+                        name: "CPU 占用率",
+                        data: [],
+                    },
+                ],
+                memory: [
+                    {
+                        color: "#fff",
+                        name: "RAM 占用率",
+                        data: [],
+                    },
+                ],
+                options: {
+                    chart: {
+                        type: "area",
+                        height: 350,
+                        toolbar: {
+                            show: false,
+                        },
+                        zoom: {
+                            enabled: false,
+                        },
+                    },
+                    tooltip: {
+                        enabled: true,
+                        theme: "dark",
+                        style: {
+                            fontSize: "14px",
+                            fontFamily: "Helvetica, Arial, sans-serif",
+                        },
+                        fillSeriesColor: false,
+                    },
+                    xaxis: {
+                        type: "datetime",
+                        labels: {
+                            style: {
+                                colors: "#fff",
+                            },
+                            datetimeFormatter: {
+                                hour: "HH:mm:ss",
+                            },
+                        },
+                    },
+                    yaxis: {
+                        opposite: true,
+                        labels: {
+                            style: {
+                                colors: "#fff",
+                            },
+                            formatter: (value) => `${value.toFixed(1)}%`,
+                        },
+                    },
+                },
+            },
         };
     }
 
@@ -152,6 +211,44 @@ export default class stationInfo extends Component {
         return createRequest({
             url: url,
             method: AppConfig.backend.api.station.method,
+        });
+    };
+
+    drawCharts = () => {
+        const {
+            response: {
+                cpu: { percent: cpuPercent },
+                memory: { percent: memoryPercent },
+            },
+        } = this.state;
+
+        this.state.chart.cpu[0].data.length > 60 &&
+            this.state.chart.cpu[0].data.shift();
+        this.state.chart.memory[0].data.length > 60 &&
+            this.state.chart.memory[0].data.shift();
+
+        this.setState({
+            chart: {
+                ...this.state.chart,
+                cpu: [
+                    {
+                        ...this.state.chart.cpu[0],
+                        data: [
+                            ...this.state.chart.cpu[0].data,
+                            [new Date().getTime(), cpuPercent],
+                        ],
+                    },
+                ],
+                memory: [
+                    {
+                        ...this.state.chart.memory[0],
+                        data: [
+                            ...this.state.chart.memory[0].data,
+                            [new Date().getTime(), memoryPercent],
+                        ],
+                    },
+                ],
+            },
         });
     };
 
@@ -172,6 +269,7 @@ export default class stationInfo extends Component {
                         data: { data },
                     } = res;
                     this.setState({ response: data });
+                    this.drawCharts();
                     return res;
                 }}
                 onFailure={() =>
@@ -186,15 +284,16 @@ export default class stationInfo extends Component {
                     })
                 }
                 promise={this.fetchData}
-                render={({ isPolling }) => (
+                render={() => (
                     <>
                         <Sidebar sidebarMark={this.state.sidebarMark} />
-                        <div className="content ml-12 transform ease-in-out duration-500 pt-20 px-2 md:px-5 pb-4 ">
+
+                        <div className="bg-gray-150 content ml-12 transform ease-in-out duration-500 pt-20 px-2 md:px-5 pb-4">
                             <div
                                 className={
                                     this.state.response.station.length > 0
-                                        ? `p-4 mb-4 text-sm text-white rounded-lg bg-gradient-to-r from-cyan-500 to-yellow-500`
-                                        : `p-4 mb-4 text-sm text-white rounded-lg bg-gradient-to-r from-blue-500 to-orange-500`
+                                        ? `shadow-xl p-4 mb-4 text-sm text-white rounded-lg bg-gradient-to-r from-cyan-500 to-yellow-500`
+                                        : `shadow-xl p-4 mb-4 text-sm text-white rounded-lg bg-gradient-to-r from-blue-500 to-orange-500`
                                 }
                             >
                                 <div className="flex flex-col gap-y-2">
@@ -265,7 +364,50 @@ export default class stationInfo extends Component {
                                     />
                                 ))}
                             </div>
+
+                            <div className="mt-12 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2">
+                                <div className="bg-white relative flex flex-col bg-clip-border rounded-xl text-gray-700 shadow-lg">
+                                    <div className="relative bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-green-600 to-green-400 shadow-green-500/40 shadow-lg -mt-6">
+                                        <ReactApexChart
+                                            height={200}
+                                            options={this.state.chart.options}
+                                            series={this.state.chart.cpu}
+                                        />
+                                    </div>
+                                    <div className="p-6">
+                                        <h6 className="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-blue-gray-900">
+                                            上位机 CPU 占用率
+                                        </h6>
+                                        <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">
+                                            {`当前值 ${this.state.response.cpu.percent.toFixed(
+                                                2
+                                            )} %`}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white relative flex flex-col bg-clip-border rounded-xl text-gray-700 shadow-lg">
+                                    <div className="relative bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-blue-600 to-blue-400 shadow-blue-500/40 shadow-lg -mt-6">
+                                        <ReactApexChart
+                                            height={200}
+                                            options={this.state.chart.options}
+                                            series={this.state.chart.memory}
+                                        />
+                                    </div>
+                                    <div className="p-6">
+                                        <h6 className="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-blue-gray-900">
+                                            上位机 RAM 占用率
+                                        </h6>
+                                        <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">
+                                            {`当前值 ${this.state.response.memory.percent.toFixed(
+                                                2
+                                            )} %`}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                        <Footer />
                     </>
                 )}
             />

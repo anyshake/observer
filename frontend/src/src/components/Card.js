@@ -13,7 +13,7 @@ export default class Card extends Component {
     render() {
         return (
             <div className="w-full md:w-1/2 lg:w-1/3 p-2">
-                <div className="flex items-center flex-row w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-md p-3">
+                <div className="flex items-center flex-row w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-md p-3 shadow-xl">
                     <div className="flex text-indigo-500 items-center bg-white p-2 rounded-md flex-none w-8 h-8 md:w-12 md:h-12 ">
                         {this.state.icon}
                     </div>

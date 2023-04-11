@@ -7,9 +7,9 @@ export default class Sidebar extends Component {
         super(props);
         this.state = {
             isSidebarOpen: false,
+            sidebarList: AppConfig.sidebar,
             sidebarVersion: AppConfig.frontend.version,
             sidebarTitle: AppConfig.frontend.title,
-            sidebarList: AppConfig.sidebar,
             sidebarMark: this.props.sidebarMark,
         };
     }
@@ -17,7 +17,7 @@ export default class Sidebar extends Component {
     render() {
         return (
             <>
-                <div className="fixed w-full z-30 flex bg-white p-2 items-center justify-center h-16 px-10">
+                <div className="fixed w-full z-30 flex bg-gray-200 p-2 items-center justify-center h-16 px-10">
                     <div
                         className={`${
                             this.state.isSidebarOpen || `ml-10`
@@ -104,8 +104,8 @@ export default class Sidebar extends Component {
                                 className={`${
                                     this.state.sidebarMark === item.tag
                                         ? `text-purple-500`
-                                        : `hover:text-purple-500`
-                                } cursor-pointer hover:ml-4 w-full text-white bg-[#1E293B] p-2 pl-8 rounded-full transform ease-in-out duration-300 flex flex-row items-center space-x-3`}
+                                        : `text-white hover:text-purple-500`
+                                } cursor-pointer hover:ml-4 w-full bg-[#1E293B] p-2 pl-8 rounded-full transform ease-in-out duration-300 flex flex-row items-center space-x-3`}
                             >
                                 {item.icon}
                                 <div>{item.title}</div>
@@ -125,8 +125,8 @@ export default class Sidebar extends Component {
                                 className={`${
                                     this.state.sidebarMark === item.tag
                                         ? `text-purple-500`
-                                        : `hover:text-purple-500`
-                                } cursor-pointer justify-end pr-5 text-white w-full bg-[#1E293B] p-3 rounded-full transform ease-in-out duration-300 flex`}
+                                        : `text-white hover:text-purple-500`
+                                } cursor-pointer justify-end pr-5 w-full bg-[#1E293B] p-3 rounded-full transform ease-in-out duration-300 flex`}
                             >
                                 {item.icon}
                             </Link>
