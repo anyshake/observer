@@ -3,18 +3,9 @@ const AppConfig = {
         router: "hash",
         version: "v1.0.0d",
         title: `G-Observer 测站面板`,
+        copyright: `© ${new Date().getFullYear()} G-Observer | 通信实验室`,
     },
     backend: {
-        host:
-            process.env.NODE_ENV === "production"
-                ? window.location.hostname
-                : `172.17.138.214`,
-        port:
-            process.env.NODE_ENV === "production"
-                ? window.location.port
-                : `8073`,
-        version: `v1`,
-        tls: window.location.protocol === "https:" ? true : false,
         api: {
             station: {
                 uri: `station`,
@@ -32,12 +23,22 @@ const AppConfig = {
                 method: `arraybuffer`,
             },
         },
+        version: `v1`,
+        host:
+            process.env.NODE_ENV === "production"
+                ? window.location.hostname
+                : `172.17.138.214`,
+        port:
+            process.env.NODE_ENV === "production"
+                ? window.location.port
+                : `8073`,
+        tls: window.location.protocol === "https:" ? true : false,
     },
     sidebar: [
         {
             tag: "index",
             link: "/",
-            title: "面板主页",
+            title: "测站状态",
             icon: (
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

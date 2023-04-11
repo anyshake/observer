@@ -25,7 +25,7 @@ export default class NotFound extends Component {
 
     render() {
         return (
-            <div className="w-full h-screen bg-gradient-to-br text-white bg-indigo-800 from-indigo-600 via-indigo-800 to-indigo-900 flex flex-col items-center justify-center">
+            <div className="w-full h-screen bg-gradient-to-br text-white from-purple-600 to-blue-600 flex flex-col items-center justify-center">
                 <svg
                     className="py-2 w-16 h-16 animate-bounce fill-gray-200"
                     fill="currentColor"
