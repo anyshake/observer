@@ -23,7 +23,7 @@ func ProgramInit(args *config.Args, conf *config.Config) error {
 		os.Exit(0)
 	}
 
-	log.Println("Program starting")
+	log.Println("program starting")
 	err := conf.ReadConfig(args.Path)
 	if err != nil {
 		return err

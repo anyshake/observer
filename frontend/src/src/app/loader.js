@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Sidebar from "../components/Sidebar";
+import Footer from "../components/Footer";
 
 export default class Loader extends Component {
     render() {
@@ -27,6 +28,7 @@ export default class Loader extends Component {
                         </h2>
                     </div>
                 </div>
+                <Footer />
             </>
         );
     }

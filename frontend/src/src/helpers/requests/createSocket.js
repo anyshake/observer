@@ -5,6 +5,7 @@
  * @description 建立同后端通信的 WebSocket 连接
  * @param {String} url - 请求地址
  * @param {String} type - 数据类型
+ * @param {Object} onOpenCallback - 连接讯息回呼函数
  * @param {Object} onMessageCallback - 连接讯息回呼函数
  * @param {Object} onCloseCallback - 连接关闭回呼函数
  * @param {Object} onErrorCallback - 连接出错回呼函数
@@ -13,11 +14,13 @@
 const createSocket = ({
     url,
     type,
+    onOpenCallback,
     onMessageCallback,
     onCloseCallback,
     onErrorCallback,
 }) => {
     const conn = new WebSocket(url);
+    conn.onopen = onOpenCallback;
     conn.onmessage = onMessageCallback;
     conn.onclose = onCloseCallback;
     conn.onerror = onErrorCallback;

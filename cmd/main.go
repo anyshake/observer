@@ -89,7 +89,15 @@ func main() {
 		geophone.GeophoneOptions{
 			Geophone:     &geophone.Geophone{},
 			Acceleration: &geophone.Acceleration{},
-			Sensitivity:  conf.Geophone.Sensitivity,
+			Sensitivity: struct {
+				Vertical   float64
+				EastWest   float64
+				NorthSouth float64
+			}{
+				Vertical:   conf.Geophone.Sensitivity.Vertical,
+				EastWest:   conf.Geophone.Sensitivity.EastWest,
+				NorthSouth: conf.Geophone.Sensitivity.NorthSouth,
+			},
 			LocationFallback: struct {
 				Latitude  float64
 				Longitude float64

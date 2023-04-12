@@ -10,24 +10,11 @@
 const reducer = (state, action) => {
     if (!state) {
         return {
-            bluethDevice: null,
-            focusDuration: 0,
             eventListener: [],
-            userPreference: null,
         };
     }
 
     switch (action.type) {
-        case "SET_BLUETH_DEVICE":
-            return {
-                ...state,
-                bluethDevice: action.payload,
-            };
-        case "SET_FOCUS_DURATION":
-            return {
-                ...state,
-                focusDuration: action.payload,
-            };
         case "ADD_EVENT_LISTENER":
             if (
                 !state.eventListener.some(
@@ -49,11 +36,6 @@ const reducer = (state, action) => {
             );
             return {
                 ...state,
-            };
-        case "SET_USER_PREFERENCE":
-            return {
-                ...state,
-                userPreference: action.payload,
             };
         default:
             return state;
