@@ -14,6 +14,15 @@ export default class Sidebar extends Component {
         };
     }
 
+    componentDidMount() {
+        this.state.sidebarList.forEach((item) => {
+            if (this.state.sidebarMark === item.tag) {
+                document.title = `${item.title} | ${this.state.sidebarTitle}`;
+                return;
+            }
+        });
+    }
+
     render() {
         return (
             <>

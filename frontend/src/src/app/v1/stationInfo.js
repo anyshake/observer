@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, createRef } from "react";
 import Sidebar from "../../components/Sidebar";
 import Card from "../../components/Card";
 import createRequest from "../../helpers/requests/createRequest";
@@ -9,6 +9,12 @@ import ReactPolling from "react-polling";
 import searchKey from "../../helpers/utilities/searchKey";
 import ReactApexChart from "react-apexcharts";
 import Footer from "../../components/Footer";
+import { MapContainer, Marker, TileLayer } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import locationDot from "../../assets/icons/location-dot.svg";
+import Scroller from "../../components/Scroller";
+import Notification from "../../components/Notification";
 
 export default class stationInfo extends Component {
     constructor(props) {
@@ -173,14 +179,20 @@ export default class stationInfo extends Component {
                             enabled: false,
                         },
                     },
+                    stroke: {
+                        curve: "smooth",
+                    },
                     tooltip: {
                         enabled: true,
                         theme: "dark",
+                        fillSeriesColor: false,
                         style: {
                             fontSize: "14px",
                             fontFamily: "Helvetica, Arial, sans-serif",
                         },
-                        fillSeriesColor: false,
+                        x: {
+                            format: "yy/MM/dd HH:mm:ss",
+                        },
                     },
                     xaxis: {
                         type: "datetime",
@@ -199,10 +211,15 @@ export default class stationInfo extends Component {
                             style: {
                                 colors: "#fff",
                             },
-                            formatter: (value) => `${value.toFixed(1)}%`,
+                            formatter: (value) => `${value.toFixed(2)}%`,
                         },
                     },
                 },
+            },
+            map: {
+                zoom: 5,
+                center: [0, 0],
+                ref: createRef(),
             },
         };
     }
@@ -211,6 +228,9 @@ export default class stationInfo extends Component {
         return createRequest({
             url: url,
             method: AppConfig.backend.api.station.method,
+        }).then((res) => {
+            this.setState({ response: res.data.data });
+            return res;
         });
     };
 
@@ -222,9 +242,9 @@ export default class stationInfo extends Component {
             },
         } = this.state;
 
-        this.state.chart.cpu[0].data.length > 60 &&
+        this.state.chart.cpu[0].data.length > 100 &&
             this.state.chart.cpu[0].data.shift();
-        this.state.chart.memory[0].data.length > 60 &&
+        this.state.chart.memory[0].data.length > 100 &&
             this.state.chart.memory[0].data.shift();
 
         this.setState({
@@ -255,7 +275,7 @@ export default class stationInfo extends Component {
     render() {
         return (
             <ReactPolling
-                interval={1000}
+                interval={3000}
                 url={getApiUrl({
                     tls: AppConfig.backend.tls,
                     host: AppConfig.backend.host,
@@ -265,10 +285,6 @@ export default class stationInfo extends Component {
                     type: AppConfig.backend.api.station.type,
                 })}
                 onSuccess={(res) => {
-                    const {
-                        data: { data },
-                    } = res;
-                    this.setState({ response: data });
                     this.drawCharts();
                     return res;
                 }}
@@ -284,132 +300,197 @@ export default class stationInfo extends Component {
                     })
                 }
                 promise={this.fetchData}
-                render={() => (
-                    <>
-                        <Sidebar sidebarMark={this.state.sidebarMark} />
+                render={({ isPolling }) => {
+                    if (isPolling && this.state.map.ref.current) {
+                        this.state.map.ref.current.flyTo(
+                            [
+                                this.state.response.location.latitude,
+                                this.state.response.location.longitude,
+                            ],
+                            this.state.map.zoom
+                        );
+                    }
 
-                        <div className="bg-gray-150 content ml-12 transform ease-in-out duration-500 pt-20 px-2 md:px-5 pb-4">
-                            <div
-                                className={
-                                    this.state.response.station.length > 0
-                                        ? `shadow-xl p-4 mb-4 text-sm text-white rounded-lg bg-gradient-to-r from-cyan-500 to-yellow-500`
-                                        : `shadow-xl p-4 mb-4 text-sm text-white rounded-lg bg-gradient-to-r from-blue-500 to-orange-500`
-                                }
-                            >
-                                <div className="flex flex-col gap-y-2">
-                                    <div className="flex flex-row space-y-1 gap-2 font-bold">
-                                        {this.state.response.uptime ? (
+                    return (
+                        <>
+                            <Sidebar sidebarMark={this.state.sidebarMark} />
+
+                            <div className="bg-gray-150 content ml-12 transform ease-in-out duration-500 pt-20 px-2 md:px-5 pb-4">
+                                <Notification
+                                    className={
+                                        this.state.response.station.length > 0
+                                            ? `shadow-xl p-4 mb-4 text-sm text-white rounded-lg bg-gradient-to-r from-cyan-500 to-yellow-500`
+                                            : `shadow-xl p-4 mb-4 text-sm text-white rounded-lg bg-gradient-to-r from-blue-500 to-orange-500`
+                                    }
+                                    icon={
+                                        this.state.response.station.length >
+                                        0 ? (
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 448 512"
+                                                className="w-6 h-6 ml-3"
+                                                fill="currentColor"
+                                            >
+                                                <path d="M0 64C0 46.3 14.3 32 32 32c229.8 0 416 186.2 416 416c0 17.7-14.3 32-32 32s-32-14.3-32-32C384 253.6 226.4 96 32 96C14.3 96 0 81.7 0 64zM0 416a64 64 0 1 1 128 0A64 64 0 1 1 0 416zM32 160c159.1 0 288 128.9 288 288c0 17.7-14.3 32-32 32s-32-14.3-32-32c0-123.7-100.3-224-224-224c-17.7 0-32-14.3-32-32s14.3-32 32-32z" />
+                                            </svg>
+                                        ) : (
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 640 512"
+                                                className="w-6 h-6 ml-3"
+                                                fill="currentColor"
+                                            >
+                                                <path d="M579.8 267.7c56.5-56.5 56.5-148 0-204.5c-50-50-128.8-56.5-186.3-15.4l-1.6 1.1c-14.4 10.3-17.7 30.3-7.4 44.6s30.3 17.7 44.6 7.4l1.6-1.1c32.1-22.9 76-19.3 103.8 8.6c31.5 31.5 31.5 82.5 0 114L422.3 334.8c-31.5 31.5-82.5 31.5-114 0c-27.9-27.9-31.5-71.8-8.6-103.8l1.1-1.6c10.3-14.4 6.9-34.4-7.4-44.6s-34.4-6.9-44.6 7.4l-1.1 1.6C206.5 251.2 213 330 263 380c56.5 56.5 148 56.5 204.5 0L579.8 267.7zM60.2 244.3c-56.5 56.5-56.5 148 0 204.5c50 50 128.8 56.5 186.3 15.4l1.6-1.1c14.4-10.3 17.7-30.3 7.4-44.6s-30.3-17.7-44.6-7.4l-1.6 1.1c-32.1 22.9-76 19.3-103.8-8.6C74 372 74 321 105.5 289.5L217.7 177.2c31.5-31.5 82.5-31.5 114 0c27.9 27.9 31.5 71.8 8.6 103.9l-1.1 1.6c-10.3 14.4-6.9 34.4 7.4 44.6s34.4 6.9 44.6-7.4l1.1-1.6C433.5 260.8 427 182 377 132c-56.5-56.5-148-56.5-204.5 0L60.2 244.3z" />
+                                            </svg>
+                                        )
+                                    }
+                                    title={
+                                        this.state.response.station.length > 0
+                                            ? `服务器连接已建立`
+                                            : `正在建立服务器连接`
+                                    }
+                                    text={
+                                        this.state.response.station.length >
+                                        0 ? (
                                             <>
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 448 512"
-                                                    className="w-6 h-6 ml-3"
-                                                    fill="currentColor"
-                                                >
-                                                    <path d="M0 64C0 46.3 14.3 32 32 32c229.8 0 416 186.2 416 416c0 17.7-14.3 32-32 32s-32-14.3-32-32C384 253.6 226.4 96 32 96C14.3 96 0 81.7 0 64zM0 416a64 64 0 1 1 128 0A64 64 0 1 1 0 416zM32 160c159.1 0 288 128.9 288 288c0 17.7-14.3 32-32 32s-32-14.3-32-32c0-123.7-100.3-224-224-224c-17.7 0-32-14.3-32-32s14.3-32 32-32z" />
-                                                </svg>
-                                                <span>服务器连接已建立</span>
+                                                {`服务器已上线 ${this.state.response.uptime} 秒`}
+                                                <br />
+                                                {`测站名称：${this.state.response.station}`}
+                                                <br />
+                                                {`测站标识符：${this.state.response.uuid}`}
                                             </>
                                         ) : (
                                             <>
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 640 512"
-                                                    className="w-6 h-6 ml-3"
-                                                    fill="currentColor"
-                                                >
-                                                    <path d="M579.8 267.7c56.5-56.5 56.5-148 0-204.5c-50-50-128.8-56.5-186.3-15.4l-1.6 1.1c-14.4 10.3-17.7 30.3-7.4 44.6s30.3 17.7 44.6 7.4l1.6-1.1c32.1-22.9 76-19.3 103.8 8.6c31.5 31.5 31.5 82.5 0 114L422.3 334.8c-31.5 31.5-82.5 31.5-114 0c-27.9-27.9-31.5-71.8-8.6-103.8l1.1-1.6c10.3-14.4 6.9-34.4-7.4-44.6s-34.4-6.9-44.6 7.4l-1.1 1.6C206.5 251.2 213 330 263 380c56.5 56.5 148 56.5 204.5 0L579.8 267.7zM60.2 244.3c-56.5 56.5-56.5 148 0 204.5c50 50 128.8 56.5 186.3 15.4l1.6-1.1c14.4-10.3 17.7-30.3 7.4-44.6s-30.3-17.7-44.6-7.4l-1.6 1.1c-32.1 22.9-76 19.3-103.8-8.6C74 372 74 321 105.5 289.5L217.7 177.2c31.5-31.5 82.5-31.5 114 0c27.9 27.9 31.5 71.8 8.6 103.9l-1.1 1.6c-10.3 14.4-6.9 34.4 7.4 44.6s34.4 6.9 44.6-7.4l1.1-1.6C433.5 260.8 427 182 377 132c-56.5-56.5-148-56.5-204.5 0L60.2 244.3z" />
-                                                </svg>
-                                                <span>正在建立服务器连接</span>
+                                                {`服务器已上线 0 秒`}
+                                                <br />
+                                                {`测站名称：正在获取`}
+                                                <br />
+                                                {`测站标识符：正在获取`}
                                             </>
-                                        )}
-                                    </div>
-                                    {this.state.response.uptime ? (
-                                        <h3 className="pl-3 text-md font-medium">
-                                            {`测站名称：${this.state.response.station}`}
-                                            <br />
-                                            {`测站位置：经纬 ${this.state.response.location.latitude},
-                                            ${this.state.response.location.longitude} / 海拔
-                                            ${this.state.response.location.altitude}m`}
-                                            <br />
-                                            {`测站标识符：${this.state.response.uuid}`}
-                                            <br />
-                                            {`服务器已上线 ${this.state.response.uptime} 秒`}
-                                        </h3>
-                                    ) : (
-                                        <h3 className="pl-3 text-md font-medium">
-                                            {`测站名称：正在获取`}
-                                            <br />
-                                            {`测站位置：正在获取`}
-                                            <br />
-                                            {`测站标识符：正在获取`}
-                                            <br />
-                                            {`服务器已上线 0 秒`}
-                                        </h3>
-                                    )}
-                                </div>
-                            </div>
+                                        )
+                                    }
+                                />
 
-                            <div className="flex flex-wrap my-2 -mx-2">
-                                {this.state.cards.map((item, index) => (
-                                    <Card
-                                        key={index}
-                                        icon={item.icon}
-                                        title={item.title}
-                                        unit={item.unit}
-                                        value={searchKey(
-                                            this.state.response.status,
-                                            item.key
-                                        )}
-                                    />
-                                ))}
-                            </div>
-
-                            <div className="mt-12 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2">
-                                <div className="bg-white relative flex flex-col bg-clip-border rounded-xl text-gray-700 shadow-lg">
-                                    <div className="relative bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-green-600 to-green-400 shadow-green-500/40 shadow-lg -mt-6">
-                                        <ReactApexChart
-                                            height={200}
-                                            options={this.state.chart.options}
-                                            series={this.state.chart.cpu}
+                                <div className="flex flex-wrap my-2 -mx-2">
+                                    {this.state.cards.map((item, index) => (
+                                        <Card
+                                            key={index}
+                                            icon={item.icon}
+                                            title={item.title}
+                                            unit={item.unit}
+                                            value={searchKey(
+                                                this.state.response.status,
+                                                item.key
+                                            )}
                                         />
+                                    ))}
+                                </div>
+
+                                <div className="mt-12 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2">
+                                    <div className="bg-white relative flex flex-col bg-clip-border rounded-xl text-gray-700 shadow-lg">
+                                        <div className="relative bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-green-600 to-green-400 shadow-green-500/40 shadow-lg -mt-6">
+                                            <ReactApexChart
+                                                height={200}
+                                                options={
+                                                    this.state.chart.options
+                                                }
+                                                series={this.state.chart.cpu}
+                                            />
+                                        </div>
+                                        <div className="p-6">
+                                            <h6 className="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-blue-gray-900">
+                                                上位机 CPU 占用率
+                                            </h6>
+                                            <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">
+                                                {`当前值 ${this.state.response.cpu.percent.toFixed(
+                                                    2
+                                                )} %`}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white relative flex flex-col bg-clip-border rounded-xl text-gray-700 shadow-lg">
+                                        <div className="relative bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-blue-600 to-blue-400 shadow-blue-500/40 shadow-lg -mt-6">
+                                            <ReactApexChart
+                                                height={200}
+                                                options={
+                                                    this.state.chart.options
+                                                }
+                                                series={this.state.chart.memory}
+                                            />
+                                        </div>
+                                        <div className="p-6">
+                                            <h6 className="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-blue-gray-900">
+                                                上位机 RAM 占用率
+                                            </h6>
+                                            <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">
+                                                {`当前值 ${this.state.response.memory.percent.toFixed(
+                                                    2
+                                                )} %`}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="mt-12 bg-white relative flex flex-col bg-clip-border rounded-xl text-gray-700 shadow-lg">
+                                    <div className="relative bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr shadow-lg -mt-6">
+                                        <MapContainer
+                                            className="h-[400px]"
+                                            zoomControl={false}
+                                            scrollWheelZoom={false}
+                                            attributionControl={false}
+                                            zoom={this.state.map.zoom}
+                                            minZoom={this.state.map.zoom}
+                                            maxZoom={this.state.map.zoom}
+                                            center={this.state.map.center}
+                                            ref={this.state.map.ref}
+                                            style={{
+                                                cursor: "default",
+                                            }}
+                                        >
+                                            <TileLayer
+                                                url={"/tiles/5/{y}/{x}.png"}
+                                            />
+                                            <Marker
+                                                position={[
+                                                    this.state.response.location
+                                                        .latitude,
+                                                    this.state.response.location
+                                                        .longitude,
+                                                ]}
+                                                icon={
+                                                    new L.Icon({
+                                                        iconUrl: locationDot,
+                                                        iconAnchor: [13, 28],
+                                                        iconSize: [18, 25],
+                                                    })
+                                                }
+                                            />
+                                        </MapContainer>
                                     </div>
                                     <div className="p-6">
                                         <h6 className="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-blue-gray-900">
-                                            上位机 CPU 占用率
+                                            下位机所在位置
                                         </h6>
                                         <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">
-                                            {`当前值 ${this.state.response.cpu.percent.toFixed(
-                                                2
-                                            )} %`}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="bg-white relative flex flex-col bg-clip-border rounded-xl text-gray-700 shadow-lg">
-                                    <div className="relative bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-blue-600 to-blue-400 shadow-blue-500/40 shadow-lg -mt-6">
-                                        <ReactApexChart
-                                            height={200}
-                                            options={this.state.chart.options}
-                                            series={this.state.chart.memory}
-                                        />
-                                    </div>
-                                    <div className="p-6">
-                                        <h6 className="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-blue-gray-900">
-                                            上位机 RAM 占用率
-                                        </h6>
-                                        <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">
-                                            {`当前值 ${this.state.response.memory.percent.toFixed(
-                                                2
-                                            )} %`}
+                                            {`海拔：${this.state.response.location.altitude} m`}
+                                            <br />
+                                            {`纬度：${this.state.response.location.latitude}° / 经度：${this.state.response.location.longitude}°`}
                                         </p>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <Footer />
-                    </>
-                )}
+
+                            <Scroller />
+                            <Footer
+                                extra={
+                                    this.state.response.os.hostname &&
+                                    `于 ${this.state.response.os.hostname} | 使用 ${this.state.response.os.os}/${this.state.response.os.arch} | 自豪地采用 ${this.state.response.os.distro}`
+                                }
+                            />
+                        </>
+                    );
+                }}
             />
         );
     }

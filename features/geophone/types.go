@@ -5,22 +5,31 @@ type Geophone struct {
 	Longitude float32
 	Altitude  float32
 	Vertical  [100]int32
+	// EastWest  [100]int32
+	// NorthSouth  [100]int32
 }
 
 type Acceleration struct {
-	Timestamp int64        `json:"timestamp"`
-	Latitude  float64      `json:"latitude"`
-	Longitude float64      `json:"longitude"`
-	Altitude  float64      `json:"altitude"`
-	Vertical  [100]float64 `json:"vertical"`
+	Timestamp  int64        `json:"timestamp"`
+	Latitude   float64      `json:"latitude"`
+	Longitude  float64      `json:"longitude"`
+	Altitude   float64      `json:"altitude"`
+	Vertical   [100]float64 `json:"vertical"`
+	EastWest   [100]float64 `json:"east_west"`
+	NorthSouth [100]float64 `json:"north_south"`
+	Synthesis  [100]float64 `json:"synthesis"`
 }
 
 type GeophoneOptions struct {
-	Sensitivity      float64
-	Geophone         *Geophone
-	Acceleration     *Acceleration
-	OnErrorCallback  func(error)
-	OnDataCallback   func(*Acceleration)
+	Geophone        *Geophone
+	Acceleration    *Acceleration
+	OnErrorCallback func(error)
+	OnDataCallback  func(*Acceleration)
+	Sensitivity     struct {
+		Vertical   float64
+		EastWest   float64
+		NorthSouth float64
+	}
 	LocationFallback struct {
 		Latitude  float64
 		Longitude float64

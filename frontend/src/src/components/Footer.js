@@ -6,21 +6,19 @@ export default class Footer extends Component {
         super(props);
         this.state = {
             copyright: AppConfig.frontend.copyright,
-            extra:
-                this.props.extra ||
-                `Constructing Real-time Seismic Network Ambitiously.`,
         };
     }
 
     render() {
         return (
-            <footer>
-                <div className="bg-gray-200 text-gray-500">
-                    <div className="container mx-auto py-4 px-5 flex flex-wrap flex-col sm:flex-row">
-                        <span className="text-xs text-center mt-1 ml-8 md:ml-12 lg:ml-16 md:text-left">
-                            {this.state.extra}
+            <footer className="fixed bottom-0 w-full bg-gray-200 text-gray-500">
+                <div className="container mx-auto flex flex-wrap flex-col sm:flex-row">
+                    <div className="container mx-auto py-2 px-4 flex flex-wrap flex-col sm:flex-row">
+                        <span className="text-xs text-center mt-1 ml-4 md:ml-12 lg:ml-16 md:text-left">
+                            {this.props.extra ||
+                                `Constructing Real-time Seismic Network Ambitiously.`}
                         </span>
-                        <span className="inline-flex sm:ml-auto sm:mt-0 mt-2 justify-center sm:justify-start">
+                        <span className="text-sm inline-flex sm:ml-auto sm:mt-0 mt-2 justify-center sm:justify-start">
                             {this.state.copyright}
                         </span>
                     </div>

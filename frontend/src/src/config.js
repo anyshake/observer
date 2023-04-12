@@ -27,11 +27,11 @@ const AppConfig = {
         host:
             process.env.NODE_ENV === "production"
                 ? window.location.hostname
-                : `172.17.138.214`,
+                : `127.0.0.1`,
         port:
             process.env.NODE_ENV === "production"
                 ? window.location.port
-                : `8073`,
+                : `8080`,
         tls: window.location.protocol === "https:" ? true : false,
     },
     sidebar: [

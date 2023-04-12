@@ -16,9 +16,13 @@ type Config struct {
 	} `json:"station_settings"`
 	// 下位机配置
 	Geophone struct {
-		Device      string  `json:"device"`
-		Baud        int     `json:"baud"`
-		Sensitivity float64 `json:"sensitivity"`
+		Device      string `json:"device"`
+		Baud        int    `json:"baud"`
+		Sensitivity struct {
+			Vertical   float64 `json:"vertical"`
+			EastWest   float64 `json:"east_west"`
+			NorthSouth float64 `json:"north_south"`
+		} `json:"sensitivity"`
 	} `json:"geophone_settings"`
 	// NTP 配置
 	NTPClient struct {

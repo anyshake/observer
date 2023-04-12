@@ -9,7 +9,11 @@
     "geophone_settings": {
         "device": "/dev/ttyUSB0",
         "baud": 19200,
-        "sensitivity": 28.8
+        "sensitivity": {
+            "vertical": 28.8,
+            "east_west": 28.8,
+            "north_south": 28.8
+        }
     },
     "ntpclient_settings": {
         "host": "10.160.144.1",
