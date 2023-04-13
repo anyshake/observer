@@ -1,13 +1,14 @@
 package geophone
 
-import "math"
+import (
+	"fmt"
+	"math"
+	"strconv"
+)
 
-func GetSynthesis(vertical, eastWest, northSouth [100]float64) [100]float64 {
-	var synthesis [100]float64
-	for i := range synthesis {
-		value := math.Pow(vertical[i], 2) + math.Pow(eastWest[i], 2) + math.Pow(northSouth[i], 2)
-		synthesis[i] = math.Sqrt(value)
-	}
+func GetSynthesis(vertical, eastWest, northSouth float64) float64 {
+	value := math.Pow(vertical, 2) + math.Pow(eastWest, 2) + math.Pow(northSouth, 2)
+	synthesis, _ := strconv.ParseFloat(fmt.Sprintf("%.5f", math.Sqrt(value)), 64)
 
 	return synthesis
 }

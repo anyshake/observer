@@ -3,10 +3,7 @@ package geophone
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
-	"fmt"
 	"io"
-	"reflect"
 	"time"
 	"unsafe"
 
@@ -14,7 +11,7 @@ import (
 )
 
 func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
-	serial.FilterSerial(port, []byte{0x55, 0xAA})
+	serial.FilterSerial(port, []byte{0x55, 0x55}, []byte{0x55, 0xAA})
 
 	buffer := make([]byte, unsafe.Sizeof(Geophone{}))
 	n, err := io.ReadFull(port, buffer)
@@ -33,32 +30,18 @@ func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
 		return err
 	}
 
-	val := reflect.ValueOf(options.Geophone).Elem()
-	for i := 0; i < val.NumField(); i++ {
-		field := val.Field(i)
-		if field.Kind() == reflect.Slice {
-			for j := 0; j < field.Len(); j++ {
-				if field.Index(j).Int() > 50000 || field.Index(j).Int() < (-50000) {
-					options.OnErrorCallback(
-						errors.New("incorrect frame: " + fmt.Sprintf("%d", field.Index(j).Int())),
-					)
-					return errors.New("incorrect frame: " + fmt.Sprintf("%d", field.Index(j).Int()))
-				}
-			}
-		}
-	}
-
-	for i, v := range options.Geophone.Vertical {
-		options.Acceleration.Vertical[i] = GetAcceleration(v, options.Sensitivity.Vertical)
-	}
-
-	// for i, v := range options.Geophone.EastWest {
-	// 	options.Acceleration.EastWest[i] = GetAcceleration(v, options.Sensitivity.EastWest)
-	// }
-
-	// for i, v := range options.Geophone.NorthSouth {
-	// 	options.Acceleration.NorthSouth[i] = GetAcceleration(v, options.Sensitivity.NorthSouth)
-	// }
+	options.Acceleration.Vertical = GetAcceleration(
+		float64(options.Geophone.Vertical),
+		options.Sensitivity.Vertical,
+	)
+	options.Acceleration.EastWest = GetAcceleration(
+		float64(options.Geophone.EastWest),
+		options.Sensitivity.EastWest,
+	)
+	options.Acceleration.NorthSouth = GetAcceleration(
+		float64(options.Geophone.NorthSouth),
+		options.Sensitivity.NorthSouth,
+	)
 
 	if options.Geophone.Latitude == -1 &&
 		options.Geophone.Longitude == -1 {
@@ -109,5 +92,6 @@ func ReaderDaemon(device string, baud int, options GeophoneOptions) {
 
 			continue
 		}
+		time.Sleep(100 * time.Millisecond)
 	}
 }

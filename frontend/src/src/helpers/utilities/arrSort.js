@@ -6,7 +6,7 @@
  * @param {Array} arr - 待计算数组
  * @param {String} key - 排序的键
  * @param {String} order - 排序方式
- * @returns {Number} 平均值
+ * @returns {Number} 排序后的数组
  */
 const arrSort = (arr, key, order = "asc") => {
     if (!arr) {
