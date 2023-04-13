@@ -1,4 +1,4 @@
-package handler
+package handlers
 
 import (
 	"com.geophone.observer/features/collector"

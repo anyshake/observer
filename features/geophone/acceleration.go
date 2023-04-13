@@ -4,9 +4,9 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func GetAcceleration(voltage int32, sensitivity float64) float64 {
+func GetAcceleration(voltage float64, sensitivity float64) float64 {
 	s := decimal.NewFromFloat(sensitivity)
-	v := decimal.NewFromInt32(voltage)
+	v := decimal.NewFromFloat(voltage)
 	r, _ := v.Div(s).Float64()
 
 	result, _ := decimal.NewFromFloat(r).Round(5).Float64()

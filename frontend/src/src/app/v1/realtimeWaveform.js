@@ -9,8 +9,8 @@ import ReactApexChart from "react-apexcharts";
 import getTime from "../../helpers/utilities/getTime";
 import Notification from "../../components/Notification";
 import arrSort from "../../helpers/utilities/arrSort";
-import arrSmoothing from "../../helpers/utilities/arrSmoothing";
-import arrMaximum from "../../helpers/utilities/arrMaximum";
+import arrAverage from "../../helpers/utilities/arrAverage";
+import { timerAlert } from "../../helpers/alerts/sweetAlert";
 
 export default class realtimeWaveform extends Component {
     constructor(props) {
@@ -45,10 +45,9 @@ export default class realtimeWaveform extends Component {
                 ],
                 options: {
                     chart: {
-                        type: "area",
                         height: 350,
                         toolbar: {
-                            show: true,
+                            show: false,
                         },
                         zoom: {
                             enabled: false,
@@ -137,6 +136,17 @@ export default class realtimeWaveform extends Component {
                     this.drawWaveform(data);
                     this.analyseData(data);
                 },
+                onErrorCallback: () => {
+                    timerAlert({
+                        title: "连接失败",
+                        html: "请检查网络连接，页面即将刷新",
+                        loading: false,
+                        timer: 3000,
+                        callback: () => {
+                            window.location.reload();
+                        },
+                    });
+                },
                 type: AppConfig.backend.api.socket.method,
             }),
         });
@@ -152,30 +162,26 @@ export default class realtimeWaveform extends Component {
     }
 
     drawWaveform(res) {
-        const { acceleration } = res;
+        let { acceleration } = res;
         const verticalArr = [],
             eastWestArr = [],
             northSouthArr = [],
             synthesisArr = [];
 
         arrSort(acceleration, "timestamp", "asc");
-        acceleration.forEach((value) => {
-            verticalArr.push([
-                new Date(value.timestamp),
-                arrSmoothing(value.vertical, value.vertical.length),
-            ]);
-            eastWestArr.push([
-                new Date(value.timestamp),
-                arrSmoothing(value.east_west, value.east_west.length),
-            ]);
-            northSouthArr.push([
-                new Date(value.timestamp),
-                arrSmoothing(value.north_south, value.north_south.length),
-            ]);
-            synthesisArr.push([
-                new Date(value.timestamp),
-                arrSmoothing(value.synthesis, value.synthesis.length),
-            ]);
+        acceleration.forEach((item) => {
+            verticalArr.push(item.vertical);
+            eastWestArr.push(item.east_west);
+            northSouthArr.push(item.north_south);
+            synthesisArr.push(item.synthesis);
+        });
+
+        this.state.waveform.synthesis[0].data.length > 300 &&
+            this.state.waveform.synthesis[0].data.splice(0, 10);
+        this.state.waveform.factors.forEach((_, index) => {
+            if (this.state.waveform.factors[index].data.length > 300) {
+                this.state.waveform.factors[index].data.splice(0, 10);
+            }
         });
 
         this.setState({
@@ -186,21 +192,21 @@ export default class realtimeWaveform extends Component {
                         ...this.state.waveform.factors[0],
                         data: [
                             ...this.state.waveform.factors[0].data,
-                            ...verticalArr,
+                            ...[[new Date(), arrAverage(verticalArr, 5)]],
                         ],
                     },
                     {
                         ...this.state.waveform.factors[1],
                         data: [
                             ...this.state.waveform.factors[1].data,
-                            ...eastWestArr,
+                            ...[[new Date(), arrAverage(eastWestArr, 5)]],
                         ],
                     },
                     {
                         ...this.state.waveform.factors[2],
                         data: [
                             ...this.state.waveform.factors[2].data,
-                            ...northSouthArr,
+                            ...[[new Date(), arrAverage(northSouthArr, 5)]],
                         ],
                     },
                 ],
@@ -209,7 +215,7 @@ export default class realtimeWaveform extends Component {
                         ...this.state.waveform.synthesis[0],
                         data: [
                             ...this.state.waveform.synthesis[0].data,
-                            ...synthesisArr,
+                            ...[[new Date(), arrAverage(synthesisArr, 5)]],
                         ],
                     },
                 ],
@@ -221,18 +227,10 @@ export default class realtimeWaveform extends Component {
         const { acceleration } = res;
         this.setState({
             analysis: {
-                vertical: arrMaximum(
-                    acceleration[acceleration.length - 1].vertical
-                ),
-                east_west: arrMaximum(
-                    acceleration[acceleration.length - 1].east_west
-                ),
-                north_south: arrMaximum(
-                    acceleration[acceleration.length - 1].north_south
-                ),
-                synthesis: arrMaximum(
-                    acceleration[acceleration.length - 1].synthesis
-                ),
+                vertical: acceleration[acceleration.length - 1].vertical,
+                east_west: acceleration[acceleration.length - 1].east_west,
+                north_south: acceleration[acceleration.length - 1].north_south,
+                synthesis: acceleration[acceleration.length - 1].synthesis,
             },
         });
     };
@@ -306,10 +304,6 @@ export default class realtimeWaveform extends Component {
                                 <div className="p-4 flex-auto shadow-lg bg-gradient-to-tr from-purple-300 to-purple-400 shadow-purple-500/40 rounded-lg">
                                     <div className="relative h-[350px]">
                                         <ReactApexChart
-                                            type={
-                                                this.state.waveform.options
-                                                    .chart.type
-                                            }
                                             height="350px"
                                             series={this.state.waveform.factors}
                                             options={
@@ -339,10 +333,6 @@ export default class realtimeWaveform extends Component {
                                     <div className="relative h-[350px]">
                                         <ReactApexChart
                                             height="350px"
-                                            type={
-                                                this.state.waveform.options
-                                                    .chart.type
-                                            }
                                             series={
                                                 this.state.waveform.synthesis
                                             }
@@ -378,7 +368,7 @@ export default class realtimeWaveform extends Component {
                                                         <div className="flex flex-wrap items-center">
                                                             <div className="relative w-full max-w-full flex-grow flex-1">
                                                                 <h6 className="text-gray-500 mb-1 text-xs font-semibold">
-                                                                    垂直分量最大值
+                                                                    垂直分量最新值
                                                                 </h6>
                                                                 <h2 className="text-gray-700 text-xl font-semibold">
                                                                     {
@@ -399,7 +389,7 @@ export default class realtimeWaveform extends Component {
                                                             <div className="relative w-full max-w-full flex-grow flex-1">
                                                                 <h6 className="text-gray-500 mb-1 text-xs font-semibold">
                                                                     EW
-                                                                    分量最大值
+                                                                    分量最新值
                                                                 </h6>
                                                                 <h2 className="text-gray-700 text-xl font-semibold">
                                                                     {
@@ -420,7 +410,7 @@ export default class realtimeWaveform extends Component {
                                                             <div className="relative w-full max-w-full flex-grow flex-1">
                                                                 <h6 className="text-gray-500 mb-1 text-xs font-semibold">
                                                                     NS
-                                                                    分量最大值
+                                                                    分量最新值
                                                                 </h6>
                                                                 <h2 className="text-gray-700 text-xl font-semibold">
                                                                     {
@@ -440,7 +430,7 @@ export default class realtimeWaveform extends Component {
                                                         <div className="flex flex-wrap items-center">
                                                             <div className="relative w-full max-w-full flex-grow flex-1">
                                                                 <h6 className="text-gray-500 mb-1 text-xs font-semibold">
-                                                                    合成分量最大值
+                                                                    合成分量最新值
                                                                 </h6>
                                                                 <h2 className="text-gray-700 text-xl font-semibold">
                                                                     {

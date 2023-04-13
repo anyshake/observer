@@ -170,7 +170,6 @@ export default class stationInfo extends Component {
                 ],
                 options: {
                     chart: {
-                        type: "area",
                         height: 350,
                         toolbar: {
                             show: false,
@@ -255,7 +254,7 @@ export default class stationInfo extends Component {
                         ...this.state.chart.cpu[0],
                         data: [
                             ...this.state.chart.cpu[0].data,
-                            [new Date().getTime(), cpuPercent],
+                            [Date.now(), cpuPercent],
                         ],
                     },
                 ],
@@ -264,7 +263,7 @@ export default class stationInfo extends Component {
                         ...this.state.chart.memory[0],
                         data: [
                             ...this.state.chart.memory[0].data,
-                            [new Date().getTime(), memoryPercent],
+                            [Date.now(), memoryPercent],
                         ],
                     },
                 ],

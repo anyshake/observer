@@ -10,7 +10,7 @@ import (
 	"com.geophone.observer/features/collector"
 	"com.geophone.observer/features/geophone"
 	"com.geophone.observer/features/ntpclient"
-	"com.geophone.observer/handler"
+	"com.geophone.observer/handlers"
 	"com.geophone.observer/server"
 )
 
@@ -69,13 +69,14 @@ func main() {
 			Port:    conf.NTPClient.Port,
 			Timeout: conf.NTPClient.Timeout,
 			OnErrorCallback: func(err error) {
-				handler.HandleErrors(&handler.HandlerOptions{
+				handlers.HandleErrors(&handlers.HandlerOptions{
 					Error:  err,
 					Status: &status,
 				})
 			},
 			OnDataCallback: func(ntp *ntpclient.NTP) {
-				handler.HandleMessages(&handler.HandlerOptions{
+				log.Println("Read NTP server time")
+				handlers.HandleMessages(&handlers.HandlerOptions{
 					Status:  &status,
 					Message: &message,
 				}, ntp)
@@ -108,13 +109,14 @@ func main() {
 				Altitude:  conf.Station.Altitude,
 			},
 			OnErrorCallback: func(err error) {
-				handler.HandleErrors(&handler.HandlerOptions{
+				handlers.HandleErrors(&handlers.HandlerOptions{
 					Error:  err,
 					Status: &status,
 				})
 			},
 			OnDataCallback: func(acceleration *geophone.Acceleration) {
-				handler.HandleMessages(&handler.HandlerOptions{
+				log.Println("1 message received")
+				handlers.HandleMessages(&handlers.HandlerOptions{
 					Status:  &status,
 					Message: &message,
 					OnReadyCallback: func(message *collector.Message) {
