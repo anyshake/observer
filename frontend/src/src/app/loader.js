@@ -1,14 +1,18 @@
 import React, { Component } from "react";
-import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
+import AppConfig from "../config";
 
 export default class Loader extends Component {
+    componentDidMount() {
+        document.title =
+            document.title = `正在加载中 | ${AppConfig.frontend.title}`;
+    }
+
     render() {
         return (
             <>
-                <Sidebar />
-                <div className="w-full h-screen bg-gradient-to-br flex flex-col items-center justify-center">
-                    <div className="content ml-12 transform ease-in-out duration-500 pt-20 px-2 md:px-5 pb-4">
+                <div className="w-full min-h-screen bg-gradient-to-br flex flex-col text-center items-center justify-center">
+                    <div className="transform ease-in-out duration-500">
                         <svg
                             className="py-2 w-20 h-20 text-gray-200 animate-spin fill-purple-600"
                             viewBox="0 0 100 101"
@@ -23,11 +27,12 @@ export default class Loader extends Component {
                                 fill="currentFill"
                             />
                         </svg>
-                        <h2 className="py-2 text-center text-2xl font-bold text-gray-600">
-                            加载中
-                        </h2>
                     </div>
+                    <h2 className="text-2xl font-bold text-gray-600">
+                        正在加载中
+                    </h2>
                 </div>
+
                 <Footer />
             </>
         );

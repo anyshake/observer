@@ -224,13 +224,10 @@ export default class stationInfo extends Component {
     }
 
     fetchData = (url) => {
-        return createRequest({
+        createRequest({
             url: url,
             method: AppConfig.backend.api.station.method,
-        }).then((res) => {
-            this.setState({ response: res.data.data });
-            return res;
-        });
+        }).then(({ data: { data } }) => this.setState({ response: data }));
     };
 
     drawCharts = () => {

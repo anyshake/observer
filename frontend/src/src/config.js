@@ -1,7 +1,7 @@
 const AppConfig = {
     frontend: {
         router: "hash",
-        version: "v1.0.0d",
+        version: "v1.0.1d",
         title: `G-Observer 测站面板`,
         copyright: `© ${new Date().getFullYear()} G-Observer | 通信实验室`,
     },
@@ -15,7 +15,7 @@ const AppConfig = {
             history: {
                 uri: `history`,
                 type: `http`,
-                method: `get`,
+                method: `post`,
             },
             socket: {
                 uri: `socket`,
@@ -27,13 +27,13 @@ const AppConfig = {
         host:
             process.env.NODE_ENV === "production"
                 ? window.location.hostname
-                : // : `172.17.138.214`,
-                  `localhost`,
+                : `172.17.138.214`,
+        // :   `localhost`,
         port:
             process.env.NODE_ENV === "production"
                 ? window.location.port
-                : // : `8073`,
-                  `8080`,
+                : `8073`,
+        // :  `8080`,
         tls: window.location.protocol === "https:" ? true : false,
     },
     sidebar: [

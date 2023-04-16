@@ -11,9 +11,9 @@ import axios from "axios";
  * @param {Object} data - 请求数据
  * @returns {Promise} Promise - 返回 Promise
  */
-const createRequest = ({ url, method, headers, data }) => {
+const createRequest = ({ url, method, headers, data, timeout }) => {
     return axios.request({
-        timeout: 10000,
+        timeout: timeout || 10000,
         headers: headers,
         method: method,
         data: data,

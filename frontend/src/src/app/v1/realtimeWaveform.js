@@ -10,7 +10,7 @@ import getTime from "../../helpers/utilities/getTime";
 import Notification from "../../components/Notification";
 import arrSort from "../../helpers/utilities/arrSort";
 import arrAverage from "../../helpers/utilities/arrAverage";
-import { timerAlert } from "../../helpers/alerts/sweetAlert";
+import Navbar from "../../components/Navbar";
 
 export default class realtimeWaveform extends Component {
     constructor(props) {
@@ -22,28 +22,36 @@ export default class realtimeWaveform extends Component {
                 factors: [
                     {
                         name: "垂直分量",
-                        color: "#99004C",
+                        color: "#d97706",
                         data: [],
                     },
                     {
                         name: "水平 EW",
-                        color: "#006600",
+                        color: "#0d9488",
                         data: [],
                     },
                     {
                         name: "水平 NS",
-                        color: "#994C00",
+                        color: "#4f46e5",
                         data: [],
                     },
                 ],
                 synthesis: [
                     {
                         name: "合成分量",
-                        color: "#004C99",
+                        color: "#be185d",
                         data: [],
                     },
                 ],
                 options: {
+                    stroke: {
+                        width: 2,
+                        curve: "smooth",
+                    },
+                    hollow: {
+                        margin: 15,
+                        size: "40%",
+                    },
                     chart: {
                         height: 350,
                         toolbar: {
@@ -53,14 +61,14 @@ export default class realtimeWaveform extends Component {
                             enabled: false,
                         },
                     },
+                    dataLabels: {
+                        enabled: false,
+                    },
                     legend: {
                         show: false,
                         labels: {
                             useSeriesColors: true,
                         },
-                    },
-                    stroke: {
-                        curve: "smooth",
                     },
                     tooltip: {
                         enabled: true,
@@ -136,17 +144,6 @@ export default class realtimeWaveform extends Component {
                     this.drawWaveform(data);
                     this.analyseData(data);
                 },
-                onErrorCallback: () => {
-                    timerAlert({
-                        title: "连接失败",
-                        html: "请检查网络连接，页面即将刷新",
-                        loading: false,
-                        timer: 3000,
-                        callback: () => {
-                            window.location.reload();
-                        },
-                    });
-                },
                 type: AppConfig.backend.api.socket.method,
             }),
         });
@@ -161,8 +158,8 @@ export default class realtimeWaveform extends Component {
         }
     }
 
-    drawWaveform(res) {
-        let { acceleration } = res;
+    drawWaveform(data) {
+        let { acceleration } = data;
         const verticalArr = [],
             eastWestArr = [],
             northSouthArr = [],
@@ -176,10 +173,10 @@ export default class realtimeWaveform extends Component {
             synthesisArr.push(item.synthesis);
         });
 
-        this.state.waveform.synthesis[0].data.length > 300 &&
+        this.state.waveform.synthesis[0].data.length > 120 &&
             this.state.waveform.synthesis[0].data.splice(0, 10);
         this.state.waveform.factors.forEach((_, index) => {
-            if (this.state.waveform.factors[index].data.length > 300) {
+            if (this.state.waveform.factors[index].data.length > 120) {
                 this.state.waveform.factors[index].data.splice(0, 10);
             }
         });
@@ -192,21 +189,54 @@ export default class realtimeWaveform extends Component {
                         ...this.state.waveform.factors[0],
                         data: [
                             ...this.state.waveform.factors[0].data,
-                            ...[[new Date(), arrAverage(verticalArr, 5)]],
+                            ...[
+                                [
+                                    new Date(Date.now() - 500),
+                                    arrAverage(verticalArr.slice(0, 4), 5),
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(),
+                                    arrAverage(verticalArr.slice(5, 9), 5),
+                                ],
+                            ],
                         ],
                     },
                     {
                         ...this.state.waveform.factors[1],
                         data: [
                             ...this.state.waveform.factors[1].data,
-                            ...[[new Date(), arrAverage(eastWestArr, 5)]],
+                            ...[
+                                [
+                                    new Date(Date.now() - 500),
+                                    arrAverage(eastWestArr.slice(0, 4), 5),
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(),
+                                    arrAverage(eastWestArr.slice(5, 9), 5),
+                                ],
+                            ],
                         ],
                     },
                     {
                         ...this.state.waveform.factors[2],
                         data: [
                             ...this.state.waveform.factors[2].data,
-                            ...[[new Date(), arrAverage(northSouthArr, 5)]],
+                            ...[
+                                [
+                                    new Date(Date.now() - 500),
+                                    arrAverage(northSouthArr.slice(0, 4), 5),
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(),
+                                    arrAverage(northSouthArr.slice(5, 9), 5),
+                                ],
+                            ],
                         ],
                     },
                 ],
@@ -215,7 +245,18 @@ export default class realtimeWaveform extends Component {
                         ...this.state.waveform.synthesis[0],
                         data: [
                             ...this.state.waveform.synthesis[0].data,
-                            ...[[new Date(), arrAverage(synthesisArr, 5)]],
+                            ...[
+                                [
+                                    new Date(Date.now() - 500),
+                                    arrAverage(synthesisArr.slice(0, 4), 5),
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(),
+                                    arrAverage(synthesisArr.slice(5, 9), 5),
+                                ],
+                            ],
                         ],
                     },
                 ],
@@ -223,8 +264,8 @@ export default class realtimeWaveform extends Component {
         });
     }
 
-    analyseData = (res) => {
-        const { acceleration } = res;
+    analyseData = (data) => {
+        const { acceleration } = data;
         this.setState({
             analysis: {
                 vertical: acceleration[acceleration.length - 1].vertical,
@@ -240,6 +281,8 @@ export default class realtimeWaveform extends Component {
             <>
                 <Sidebar sidebarMark={this.state.sidebarMark} />
                 <div className="content ml-12 transform ease-in-out duration-500 pt-20 px-2 md:px-5 pb-4">
+                    <Navbar navigation={"实时波形"} />
+
                     <Notification
                         className={
                             this.state.response.uuid.length !== 0
@@ -332,6 +375,7 @@ export default class realtimeWaveform extends Component {
                                 <div className="p-4 flex-auto shadow-lg bg-gradient-to-tr from-indigo-300 to-indigo-400 shadow-indigo-500/40 rounded-lg">
                                     <div className="relative h-[350px]">
                                         <ReactApexChart
+                                            type="area"
                                             height="350px"
                                             series={
                                                 this.state.waveform.synthesis
@@ -361,14 +405,14 @@ export default class realtimeWaveform extends Component {
                                 </div>
                                 <div className="p-4 shadow-lg flex-auto">
                                     <div className="relative h-[350px]">
-                                        <div className="flex flex-wrap my-2 -mx-2">
+                                        <div className="flex flex-wrap -mx-2">
                                             <div className="w-full px-2">
                                                 <div className="relative flex flex-col min-w-0 break-words bg-sky-100 w-full mb-4 shadow-lg rounded-lg">
                                                     <div className="px-4 py-3 bg-transparent">
                                                         <div className="flex flex-wrap items-center">
                                                             <div className="relative w-full max-w-full flex-grow flex-1">
                                                                 <h6 className="text-gray-500 mb-1 text-xs font-semibold">
-                                                                    垂直分量最新值
+                                                                    垂直分量当前值
                                                                 </h6>
                                                                 <h2 className="text-gray-700 text-xl font-semibold">
                                                                     {
@@ -389,7 +433,7 @@ export default class realtimeWaveform extends Component {
                                                             <div className="relative w-full max-w-full flex-grow flex-1">
                                                                 <h6 className="text-gray-500 mb-1 text-xs font-semibold">
                                                                     EW
-                                                                    分量最新值
+                                                                    分量当前值
                                                                 </h6>
                                                                 <h2 className="text-gray-700 text-xl font-semibold">
                                                                     {
@@ -410,7 +454,7 @@ export default class realtimeWaveform extends Component {
                                                             <div className="relative w-full max-w-full flex-grow flex-1">
                                                                 <h6 className="text-gray-500 mb-1 text-xs font-semibold">
                                                                     NS
-                                                                    分量最新值
+                                                                    分量当前值
                                                                 </h6>
                                                                 <h2 className="text-gray-700 text-xl font-semibold">
                                                                     {
@@ -430,7 +474,7 @@ export default class realtimeWaveform extends Component {
                                                         <div className="flex flex-wrap items-center">
                                                             <div className="relative w-full max-w-full flex-grow flex-1">
                                                                 <h6 className="text-gray-500 mb-1 text-xs font-semibold">
-                                                                    合成分量最新值
+                                                                    合成分量当前值
                                                                 </h6>
                                                                 <h2 className="text-gray-700 text-xl font-semibold">
                                                                     {

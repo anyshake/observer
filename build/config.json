@@ -10,9 +10,9 @@
         "device": "/dev/ttyUSB0",
         "baud": 19200,
         "sensitivity": {
-            "vertical": 28.8,
-            "east_west": 28.8,
-            "north_south": 28.8
+            "vertical": 0.288,
+            "east_west": 0.288,
+            "north_south": 0.288
         }
     },
     "ntpclient_settings": {

@@ -11,7 +11,7 @@ export default class Navbar extends Component {
 
     render() {
         return (
-            <nav className="flex px-5 py-3 text-gray-700  rounded-lg bg-gray-50">
+            <nav className="flex px-5 py-3 text-gray-700  rounded-lg bg-gray-50 mb-6">
                 <ol className="inline-flex items-center space-x-1 md:space-x-3">
                     <li className="inline-flex items-center">
                         <div
