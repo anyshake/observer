@@ -22,10 +22,7 @@ export default class historyWaveform extends Component {
         super(props);
         this.state = {
             sidebarMark: "history",
-            timePicker: {
-                start: new Date(Date.now() - 60000),
-                end: new Date(),
-            },
+            timePicker: new Date(Date.now() - 60000),
             waveform: {
                 factors: [
                     {
@@ -35,25 +32,25 @@ export default class historyWaveform extends Component {
                     },
                     {
                         name: "水平 EW",
-                        color: "#0d9488",
+                        color: "#128672",
                         data: [],
                     },
                     {
                         name: "水平 NS",
-                        color: "#4f46e5",
+                        color: "#c3268a",
                         data: [],
                     },
                 ],
                 synthesis: [
                     {
                         name: "合成分量",
-                        color: "#be185d",
+                        color: "#cf4500",
                         data: [],
                     },
                 ],
                 options: {
                     stroke: {
-                        width: 2,
+                        width: 3,
                         curve: "smooth",
                     },
                     hollow: {
@@ -63,10 +60,10 @@ export default class historyWaveform extends Component {
                     chart: {
                         height: 350,
                         toolbar: {
-                            show: false,
+                            show: true,
                         },
                         zoom: {
-                            enabled: false,
+                            enabled: true,
                         },
                     },
                     dataLabels: {
@@ -98,12 +95,17 @@ export default class historyWaveform extends Component {
                         },
                     },
                     yaxis: {
+                        tickAmount: 5,
                         opposite: true,
                         labels: {
                             style: {
                                 colors: "#fff",
                             },
                         },
+                    },
+                    brush: {
+                        enabled: true,
+                        target: "main",
                     },
                 },
             },
@@ -141,18 +143,11 @@ export default class historyWaveform extends Component {
                 type: AppConfig.backend.api.history.type,
             }),
             data: {
-                start: this.state.timePicker.start.getTime(),
-                end: this.state.timePicker.end.getTime(),
+                timestamp: this.state.timePicker.getTime(),
             },
-            timeout: 300000,
+            timeout: 60000,
             method: AppConfig.backend.api.history.method,
         })
-            .catch(() => {
-                errorAlert({
-                    title: "查询失败",
-                    html: "未找到相关数据，请检查时间范围",
-                });
-            })
             .then(({ data: { data } }) => {
                 successAlert({
                     title: "查询成功",
@@ -161,6 +156,12 @@ export default class historyWaveform extends Component {
                 this.setState({ response: data });
                 this.drawWaveform(data);
                 this.analyseData(data);
+            })
+            .catch(() => {
+                errorAlert({
+                    title: "查询失败",
+                    html: "未找到相关数据，请检查时间范围",
+                });
             });
     };
 
@@ -172,50 +173,50 @@ export default class historyWaveform extends Component {
 
         arrSort(data, "timestamp", "asc");
         data.forEach((item) => {
-            verticalArr.push([item.vertical, new Date(item.timestamp)]);
-            eastWestArr.push([item.east_west, new Date(item.timestamp)]);
-            northSouthArr.push([item.north_south, new Date(item.timestamp)]);
-            synthesisArr.push([item.synthesis, new Date(item.timestamp)]);
+            verticalArr.push([new Date(item.timestamp), item.vertical]);
+            eastWestArr.push([new Date(item.timestamp), item.east_west]);
+            northSouthArr.push([new Date(item.timestamp), item.north_south]);
+            synthesisArr.push([new Date(item.timestamp), item.synthesis]);
         });
 
-        // this.setState({
-        //     waveform: {
-        //         ...this.state.waveform,
-        //         factors: [
-        //             {
-        //                 ...this.state.waveform.factors[0],
-        //                 data: verticalArr,
-        //             },
-        //             {
-        //                 ...this.state.waveform.factors[1],
-        //                 data: eastWestArr,
-        //             },
-        //             {
-        //                 ...this.state.waveform.factors[2],
-        //                 data: northSouthArr,
-        //             },
-        //         ],
-        //         synthesis: [
-        //             {
-        //                 ...this.state.waveform.synthesis[0],
-        //                 data: synthesisArr,
-        //             },
-        //         ],
-        //     },
-        // });
+        this.setState({
+            waveform: {
+                ...this.state.waveform,
+                factors: [
+                    {
+                        ...this.state.waveform.factors[0],
+                        data: [...verticalArr],
+                    },
+                    {
+                        ...this.state.waveform.factors[1],
+                        data: [...eastWestArr],
+                    },
+                    {
+                        ...this.state.waveform.factors[2],
+                        data: [...northSouthArr],
+                    },
+                ],
+                synthesis: [
+                    {
+                        ...this.state.waveform.synthesis[3],
+                        data: [...synthesisArr],
+                    },
+                ],
+            },
+        });
     }
 
     analyseData = (data) => {
         this.setState({
             analysis: {
                 vertical: data
-                    .map((obj) => obj.vertical)
+                    .map((obj) => Math.abs(obj.vertical))
                     .reduce((max, cur) => (cur > max ? cur : max)),
                 east_west: data
-                    .map((obj) => obj.east_west)
+                    .map((obj) => Math.abs(obj.east_west))
                     .reduce((max, cur) => (cur > max ? cur : max)),
                 north_south: data
-                    .map((obj) => obj.north_south)
+                    .map((obj) => Math.abs(obj.north_south))
                     .reduce((max, cur) => (cur > max ? cur : max)),
                 synthesis: data
                     .map((obj) => obj.synthesis)
@@ -250,19 +251,22 @@ export default class historyWaveform extends Component {
                                 <div className="p-4 shadow-lg flex-auto text-gray-600 ">
                                     <div className="relative h-[350px]">
                                         <div className="flex flex-wrap -mx-2">
-                                            <div className="w-full px-2">
-                                                <span className="ml-2">
-                                                    起始时间（本地时区）
+                                            <div className="w-full px-2 mt-2">
+                                                <span className="ml-2 mt-4">
+                                                    查询时间（本地时区）
                                                 </span>
                                                 <div className="relative flex flex-col min-w-0 break-words w-full mb-4 shadow-lg rounded-lg">
                                                     <div className="px-4 py-3 bg-transparent">
                                                         <div className="flex flex-wrap items-center">
                                                             <div className="relative w-full max-w-full flex-grow flex-1 rounded-lg py-2">
                                                                 <Datetime
+                                                                    dateFormat="YYYY-MM-DD"
+                                                                    timeFormat="HH:mm:ss"
                                                                     inputProps={{
                                                                         className:
-                                                                            "w-full",
+                                                                            "w-full cursor-pointer focus:outline-none rounded-lg",
                                                                         readOnly: true,
+                                                                        placeholder: `点击选择时间`,
                                                                     }}
                                                                     onChange={({
                                                                         _d,
@@ -270,12 +274,7 @@ export default class historyWaveform extends Component {
                                                                         this.setState(
                                                                             {
                                                                                 timePicker:
-                                                                                    {
-                                                                                        ...this
-                                                                                            .state
-                                                                                            .timePicker,
-                                                                                        start: _d,
-                                                                                    },
+                                                                                    _d,
                                                                             }
                                                                         )
                                                                     }
@@ -286,50 +285,12 @@ export default class historyWaveform extends Component {
                                                 </div>
                                             </div>
 
-                                            <div className="w-full px-2">
-                                                <span className="ml-2">
-                                                    结束时间（本地时区）
-                                                </span>
-                                                <div className="relative flex flex-col min-w-0 break-words w-full mb-4 shadow-lg rounded-lg">
-                                                    <div className="px-4 py-3 bg-transparent">
-                                                        <div className="flex flex-wrap items-center">
-                                                            <div className="relative w-full max-w-full flex-grow flex-1 rounded-lg py-2">
-                                                                <Datetime
-                                                                    inputProps={{
-                                                                        className:
-                                                                            "w-full",
-                                                                        readOnly: true,
-                                                                    }}
-                                                                    onChange={({
-                                                                        _d,
-                                                                    }) =>
-                                                                        this.setState(
-                                                                            {
-                                                                                timePicker:
-                                                                                    {
-                                                                                        ...this
-                                                                                            .state
-                                                                                            .timePicker,
-                                                                                        end: _d,
-                                                                                    },
-                                                                            }
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="w-full px-2 text mt-4 ml-2 text-sm">
+                                            <div className="w-full px-2 text mt-32 ml-1 text-sm">
                                                 {`起始于 ${getTime(
-                                                    this.state.timePicker.start
+                                                    this.state.timePicker
                                                 )}`}
                                                 <br />
-                                                {`截止于 ${getTime(
-                                                    this.state.timePicker.end
-                                                )}`}
+                                                {`系统将查询 1 分钟内的波形`}
                                             </div>
                                         </div>
 
@@ -338,8 +299,8 @@ export default class historyWaveform extends Component {
                                                 this.fetchData();
                                                 timerAlert({
                                                     title: "查询中",
-                                                    html: "查询速度取决于数据量，请耐心等待一到五分钟左右",
-                                                    timer: 300000,
+                                                    html: "查询速度取决于上位机性能，请耐心等待一到两分钟左右",
+                                                    timer: 120000,
                                                     loading: false,
                                                     callback: () => {
                                                         errorAlert({
@@ -349,7 +310,7 @@ export default class historyWaveform extends Component {
                                                     },
                                                 });
                                             }}
-                                            className="absolute w-full mt-9 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                                            className="w-full mt-2 text-white shadow-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                                         >
                                             送出查询
                                         </button>
@@ -389,39 +350,7 @@ export default class historyWaveform extends Component {
                     </div>
 
                     <div className="flex flex-wrap mt-6">
-                        <div className="w-full mb-12 xl:w-10/12 xl:mb-0 px-4">
-                            <div className="relative flex flex-col w-full mb-6 shadow-lg rounded-lg">
-                                <div className="px-4 py-3  bg-transparent">
-                                    <div className="flex flex-wrap items-center">
-                                        <div className="relative w-full max-w-full flex-grow flex-1">
-                                            <h6 className="text-gray-500 mb-1 text-xs font-semibold">
-                                                历史
-                                            </h6>
-                                            <h2 className="text-gray-700 text-xl font-semibold">
-                                                合成加速度
-                                            </h2>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="p-4 flex-auto shadow-lg bg-gradient-to-tr from-teal-300 to-teal-400 shadow-teal-500/40 rounded-lg">
-                                    <div className="relative h-[350px]">
-                                        <ReactApexChart
-                                            type="area"
-                                            height="350px"
-                                            series={
-                                                this.state.waveform.synthesis
-                                            }
-                                            options={
-                                                this.state.waveform.options
-                                            }
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="w-full xl:w-2/12 px-4">
+                        <div className="w-full xl:w-3/12 px-4">
                             <div className="relative flex flex-col bg-white w-full mb-6 shadow-lg rounded-lg">
                                 <div className="px-4 py-3 bg-transparent">
                                     <div className="flex flex-wrap items-center">
@@ -444,7 +373,7 @@ export default class historyWaveform extends Component {
                                                         <div className="flex flex-wrap items-center">
                                                             <div className="relative w-full max-w-full flex-grow flex-1">
                                                                 <h6 className="text-gray-500 mb-1 text-xs font-semibold">
-                                                                    垂直分量峰值
+                                                                    垂直分量峰值（绝对值）
                                                                 </h6>
                                                                 <h2 className="text-gray-700 text-xl font-semibold">
                                                                     {
@@ -464,7 +393,8 @@ export default class historyWaveform extends Component {
                                                         <div className="flex flex-wrap items-center">
                                                             <div className="relative w-full max-w-full flex-grow flex-1">
                                                                 <h6 className="text-gray-500 mb-1 text-xs font-semibold">
-                                                                    EW 分量峰值
+                                                                    EW
+                                                                    分量峰值（绝对值）
                                                                 </h6>
                                                                 <h2 className="text-gray-700 text-xl font-semibold">
                                                                     {
@@ -484,7 +414,8 @@ export default class historyWaveform extends Component {
                                                         <div className="flex flex-wrap items-center">
                                                             <div className="relative w-full max-w-full flex-grow flex-1">
                                                                 <h6 className="text-gray-500 mb-1 text-xs font-semibold">
-                                                                    NS 分量峰值
+                                                                    NS
+                                                                    分量峰值（绝对值）
                                                                 </h6>
                                                                 <h2 className="text-gray-700 text-xl font-semibold">
                                                                     {
@@ -520,6 +451,38 @@ export default class historyWaveform extends Component {
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="w-full xl:w-9/12 px-4">
+                            <div className="relative flex flex-col w-full mb-6 shadow-lg rounded-lg">
+                                <div className="px-4 py-3  bg-transparent">
+                                    <div className="flex flex-wrap items-center">
+                                        <div className="relative w-full max-w-full flex-grow flex-1">
+                                            <h6 className="text-gray-500 mb-1 text-xs font-semibold">
+                                                历史
+                                            </h6>
+                                            <h2 className="text-gray-700 text-xl font-semibold">
+                                                合成加速度
+                                            </h2>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="p-4 flex-auto shadow-lg bg-gradient-to-tr from-orange-300 to-orange-400 shadow-orange-500/40 rounded-lg">
+                                    <div className="relative h-[350px]">
+                                        <ReactApexChart
+                                            type="area"
+                                            height="350px"
+                                            series={
+                                                this.state.waveform.synthesis
+                                            }
+                                            options={
+                                                this.state.waveform.options
+                                            }
+                                        />
                                     </div>
                                 </div>
                             </div>

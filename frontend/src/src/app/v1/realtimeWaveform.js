@@ -45,7 +45,7 @@ export default class realtimeWaveform extends Component {
                 ],
                 options: {
                     stroke: {
-                        width: 2,
+                        width: 3,
                         curve: "smooth",
                     },
                     hollow: {
@@ -59,6 +59,13 @@ export default class realtimeWaveform extends Component {
                         },
                         zoom: {
                             enabled: false,
+                        },
+                        animations: {
+                            enabled: true,
+                            easing: "linear",
+                            dynamicAnimation: {
+                                speed: 1000,
+                            },
                         },
                     },
                     dataLabels: {
@@ -173,10 +180,10 @@ export default class realtimeWaveform extends Component {
             synthesisArr.push(item.synthesis);
         });
 
-        this.state.waveform.synthesis[0].data.length > 120 &&
+        this.state.waveform.synthesis[0].data.length > 300 &&
             this.state.waveform.synthesis[0].data.splice(0, 10);
         this.state.waveform.factors.forEach((_, index) => {
-            if (this.state.waveform.factors[index].data.length > 120) {
+            if (this.state.waveform.factors[index].data.length > 300) {
                 this.state.waveform.factors[index].data.splice(0, 10);
             }
         });
@@ -191,14 +198,32 @@ export default class realtimeWaveform extends Component {
                             ...this.state.waveform.factors[0].data,
                             ...[
                                 [
-                                    new Date(Date.now() - 500),
-                                    arrAverage(verticalArr.slice(0, 4), 5),
+                                    new Date(Date.now() - 800),
+                                    arrAverage(verticalArr.slice(0, 1), 5),
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 600),
+                                    arrAverage(verticalArr.slice(2, 3), 5),
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 400),
+                                    arrAverage(verticalArr.slice(4, 5), 5),
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 200),
+                                    arrAverage(verticalArr.slice(6, 7), 5),
                                 ],
                             ],
                             ...[
                                 [
                                     new Date(),
-                                    arrAverage(verticalArr.slice(5, 9), 5),
+                                    arrAverage(verticalArr.slice(8, 9), 5),
                                 ],
                             ],
                         ],
@@ -209,14 +234,32 @@ export default class realtimeWaveform extends Component {
                             ...this.state.waveform.factors[1].data,
                             ...[
                                 [
-                                    new Date(Date.now() - 500),
-                                    arrAverage(eastWestArr.slice(0, 4), 5),
+                                    new Date(Date.now() - 800),
+                                    arrAverage(eastWestArr.slice(0, 1), 5),
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 600),
+                                    arrAverage(eastWestArr.slice(2, 3), 5),
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 400),
+                                    arrAverage(eastWestArr.slice(4, 5), 5),
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 200),
+                                    arrAverage(eastWestArr.slice(6, 7), 5),
                                 ],
                             ],
                             ...[
                                 [
                                     new Date(),
-                                    arrAverage(eastWestArr.slice(5, 9), 5),
+                                    arrAverage(eastWestArr.slice(8, 9), 5),
                                 ],
                             ],
                         ],
@@ -227,14 +270,32 @@ export default class realtimeWaveform extends Component {
                             ...this.state.waveform.factors[2].data,
                             ...[
                                 [
-                                    new Date(Date.now() - 500),
-                                    arrAverage(northSouthArr.slice(0, 4), 5),
+                                    new Date(Date.now() - 800),
+                                    arrAverage(northSouthArr.slice(0, 1), 5),
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 600),
+                                    arrAverage(northSouthArr.slice(2, 3), 5),
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 400),
+                                    arrAverage(northSouthArr.slice(4, 5), 5),
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 200),
+                                    arrAverage(northSouthArr.slice(6, 7), 5),
                                 ],
                             ],
                             ...[
                                 [
                                     new Date(),
-                                    arrAverage(northSouthArr.slice(5, 9), 5),
+                                    arrAverage(northSouthArr.slice(8, 9), 5),
                                 ],
                             ],
                         ],
@@ -247,14 +308,32 @@ export default class realtimeWaveform extends Component {
                             ...this.state.waveform.synthesis[0].data,
                             ...[
                                 [
-                                    new Date(Date.now() - 500),
-                                    arrAverage(synthesisArr.slice(0, 4), 5),
+                                    new Date(Date.now() - 800),
+                                    arrAverage(synthesisArr.slice(0, 1), 5),
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 600),
+                                    arrAverage(synthesisArr.slice(2, 3), 5),
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 400),
+                                    arrAverage(synthesisArr.slice(4, 5), 5),
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 200),
+                                    arrAverage(synthesisArr.slice(6, 7), 5),
                                 ],
                             ],
                             ...[
                                 [
                                     new Date(),
-                                    arrAverage(synthesisArr.slice(5, 9), 5),
+                                    arrAverage(synthesisArr.slice(8, 9), 5),
                                 ],
                             ],
                         ],
@@ -330,7 +409,7 @@ export default class realtimeWaveform extends Component {
                     />
 
                     <div className="flex flex-wrap mt-6">
-                        <div className="w-full xl:w-5/12 mb-12 xl:mb-0 px-4">
+                        <div className="w-full mb-12 xl:mb-0 px-4">
                             <div className="relative flex flex-col w-full mb-6 shadow-lg rounded-lg">
                                 <div className="px-4 py-3  bg-transparent">
                                     <div className="flex flex-wrap items-center">
@@ -358,7 +437,7 @@ export default class realtimeWaveform extends Component {
                             </div>
                         </div>
 
-                        <div className="w-full xl:w-5/12 mb-12 xl:mb-0 px-4">
+                        <div className="w-full mb-12 xl:mb-0 px-4">
                             <div className="relative flex flex-col w-full mb-6 shadow-lg rounded-lg">
                                 <div className="px-4 py-3 bg-transparent">
                                     <div className="flex flex-wrap items-center">
@@ -389,7 +468,7 @@ export default class realtimeWaveform extends Component {
                             </div>
                         </div>
 
-                        <div className="w-full xl:w-2/12 px-4">
+                        <div className="w-full px-4">
                             <div className="relative flex flex-col bg-white w-full mb-6 shadow-lg rounded-lg">
                                 <div className="px-4 py-3 bg-transparent">
                                     <div className="flex flex-wrap items-center">
