@@ -9,7 +9,7 @@ import (
 )
 
 func (s *History) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) {
-	rg.GET("/history", func(c *gin.Context) {
+	rg.POST("/history", func(c *gin.Context) {
 		var binding Binding
 		if err := c.ShouldBind(&binding); err != nil {
 			response.ErrorHandler(c, http.StatusBadRequest)

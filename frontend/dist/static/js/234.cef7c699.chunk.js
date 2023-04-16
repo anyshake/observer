@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunksrc=self.webpackChunksrc||[]).push([[234],{4234:function(e,r,t){t.r(r);var u=t(6573);r.default=function(e){var r=e.url,t=e.method,a=e.headers,s=e.data;return u.Z.request({timeout:1e4,headers:a,method:t,data:s,url:r})}}}]);
