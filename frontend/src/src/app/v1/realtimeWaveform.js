@@ -8,8 +8,6 @@ import AppConfig from "../../config";
 import ReactApexChart from "react-apexcharts";
 import getTime from "../../helpers/utilities/getTime";
 import Notification from "../../components/Notification";
-import arrSort from "../../helpers/utilities/arrSort";
-import arrAverage from "../../helpers/utilities/arrAverage";
 import Navbar from "../../components/Navbar";
 
 export default class realtimeWaveform extends Component {
@@ -45,7 +43,7 @@ export default class realtimeWaveform extends Component {
                 ],
                 options: {
                     stroke: {
-                        width: 3,
+                        width: 2,
                         curve: "smooth",
                     },
                     hollow: {
@@ -82,7 +80,7 @@ export default class realtimeWaveform extends Component {
                         theme: "dark",
                         fillSeriesColor: false,
                         x: {
-                            format: "yy/MM/dd HH:mm:ss",
+                            format: "20yy/MM/dd HH:mm:ss",
                         },
                     },
                     xaxis: {
@@ -165,25 +163,24 @@ export default class realtimeWaveform extends Component {
         }
     }
 
-    drawWaveform(data) {
-        let { acceleration } = data;
-        const verticalArr = [],
-            eastWestArr = [],
-            northSouthArr = [],
-            synthesisArr = [];
+    drawWaveform({ acceleration }) {
+        const dataArr = {
+            vertical: [],
+            east_west: [],
+            north_south: [],
+            synthesis: [],
+        };
 
-        arrSort(acceleration, "timestamp", "asc");
-        acceleration.forEach((item) => {
-            verticalArr.push(item.vertical);
-            eastWestArr.push(item.east_west);
-            northSouthArr.push(item.north_south);
-            synthesisArr.push(item.synthesis);
+        Reflect.ownKeys(dataArr).forEach((key) => {
+            acceleration.forEach((item) => {
+                dataArr[key].push(item[key]);
+            });
         });
 
-        this.state.waveform.synthesis[0].data.length > 300 &&
+        this.state.waveform.synthesis[0].data.length > 600 &&
             this.state.waveform.synthesis[0].data.splice(0, 10);
         this.state.waveform.factors.forEach((_, index) => {
-            if (this.state.waveform.factors[index].data.length > 300) {
+            if (this.state.waveform.factors[index].data.length > 600) {
                 this.state.waveform.factors[index].data.splice(0, 10);
             }
         });
@@ -198,34 +195,59 @@ export default class realtimeWaveform extends Component {
                             ...this.state.waveform.factors[0].data,
                             ...[
                                 [
+                                    new Date(Date.now() - 900),
+                                    dataArr.vertical[0],
+                                ],
+                            ],
+                            ...[
+                                [
                                     new Date(Date.now() - 800),
-                                    arrAverage(verticalArr.slice(0, 1), 5),
+                                    dataArr.vertical[1],
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 700),
+                                    dataArr.vertical[2],
                                 ],
                             ],
                             ...[
                                 [
                                     new Date(Date.now() - 600),
-                                    arrAverage(verticalArr.slice(2, 3), 5),
+                                    dataArr.vertical[3],
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 500),
+                                    dataArr.vertical[4],
                                 ],
                             ],
                             ...[
                                 [
                                     new Date(Date.now() - 400),
-                                    arrAverage(verticalArr.slice(4, 5), 5),
+                                    dataArr.vertical[5],
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 300),
+                                    dataArr.vertical[6],
                                 ],
                             ],
                             ...[
                                 [
                                     new Date(Date.now() - 200),
-                                    arrAverage(verticalArr.slice(6, 7), 5),
+                                    dataArr.vertical[7],
                                 ],
                             ],
                             ...[
                                 [
-                                    new Date(),
-                                    arrAverage(verticalArr.slice(8, 9), 5),
+                                    new Date(Date.now() - 100),
+                                    dataArr.vertical[8],
                                 ],
                             ],
+                            ...[[new Date(Date.now()), dataArr.vertical[9]]],
                         ],
                     },
                     {
@@ -234,34 +256,59 @@ export default class realtimeWaveform extends Component {
                             ...this.state.waveform.factors[1].data,
                             ...[
                                 [
+                                    new Date(Date.now() - 900),
+                                    dataArr.east_west[0],
+                                ],
+                            ],
+                            ...[
+                                [
                                     new Date(Date.now() - 800),
-                                    arrAverage(eastWestArr.slice(0, 1), 5),
+                                    dataArr.east_west[1],
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 700),
+                                    dataArr.east_west[2],
                                 ],
                             ],
                             ...[
                                 [
                                     new Date(Date.now() - 600),
-                                    arrAverage(eastWestArr.slice(2, 3), 5),
+                                    dataArr.east_west[3],
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 500),
+                                    dataArr.east_west[4],
                                 ],
                             ],
                             ...[
                                 [
                                     new Date(Date.now() - 400),
-                                    arrAverage(eastWestArr.slice(4, 5), 5),
+                                    dataArr.east_west[5],
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 300),
+                                    dataArr.east_west[6],
                                 ],
                             ],
                             ...[
                                 [
                                     new Date(Date.now() - 200),
-                                    arrAverage(eastWestArr.slice(6, 7), 5),
+                                    dataArr.east_west[7],
                                 ],
                             ],
                             ...[
                                 [
-                                    new Date(),
-                                    arrAverage(eastWestArr.slice(8, 9), 5),
+                                    new Date(Date.now() - 100),
+                                    dataArr.east_west[8],
                                 ],
                             ],
+                            ...[[new Date(Date.now()), dataArr.east_west[9]]],
                         ],
                     },
                     {
@@ -270,34 +317,59 @@ export default class realtimeWaveform extends Component {
                             ...this.state.waveform.factors[2].data,
                             ...[
                                 [
+                                    new Date(Date.now() - 900),
+                                    dataArr.north_south[0],
+                                ],
+                            ],
+                            ...[
+                                [
                                     new Date(Date.now() - 800),
-                                    arrAverage(northSouthArr.slice(0, 1), 5),
+                                    dataArr.north_south[1],
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 700),
+                                    dataArr.north_south[2],
                                 ],
                             ],
                             ...[
                                 [
                                     new Date(Date.now() - 600),
-                                    arrAverage(northSouthArr.slice(2, 3), 5),
+                                    dataArr.north_south[3],
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 500),
+                                    dataArr.north_south[4],
                                 ],
                             ],
                             ...[
                                 [
                                     new Date(Date.now() - 400),
-                                    arrAverage(northSouthArr.slice(4, 5), 5),
+                                    dataArr.north_south[5],
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 300),
+                                    dataArr.north_south[6],
                                 ],
                             ],
                             ...[
                                 [
                                     new Date(Date.now() - 200),
-                                    arrAverage(northSouthArr.slice(6, 7), 5),
+                                    dataArr.north_south[7],
                                 ],
                             ],
                             ...[
                                 [
-                                    new Date(),
-                                    arrAverage(northSouthArr.slice(8, 9), 5),
+                                    new Date(Date.now() - 100),
+                                    dataArr.north_south[8],
                                 ],
                             ],
+                            ...[[new Date(Date.now()), dataArr.north_south[9]]],
                         ],
                     },
                 ],
@@ -308,34 +380,59 @@ export default class realtimeWaveform extends Component {
                             ...this.state.waveform.synthesis[0].data,
                             ...[
                                 [
+                                    new Date(Date.now() - 900),
+                                    dataArr.synthesis[0],
+                                ],
+                            ],
+                            ...[
+                                [
                                     new Date(Date.now() - 800),
-                                    arrAverage(synthesisArr.slice(0, 1), 5),
+                                    dataArr.synthesis[1],
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 700),
+                                    dataArr.synthesis[2],
                                 ],
                             ],
                             ...[
                                 [
                                     new Date(Date.now() - 600),
-                                    arrAverage(synthesisArr.slice(2, 3), 5),
+                                    dataArr.synthesis[3],
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 500),
+                                    dataArr.synthesis[4],
                                 ],
                             ],
                             ...[
                                 [
                                     new Date(Date.now() - 400),
-                                    arrAverage(synthesisArr.slice(4, 5), 5),
+                                    dataArr.synthesis[5],
+                                ],
+                            ],
+                            ...[
+                                [
+                                    new Date(Date.now() - 300),
+                                    dataArr.synthesis[6],
                                 ],
                             ],
                             ...[
                                 [
                                     new Date(Date.now() - 200),
-                                    arrAverage(synthesisArr.slice(6, 7), 5),
+                                    dataArr.synthesis[7],
                                 ],
                             ],
                             ...[
                                 [
-                                    new Date(),
-                                    arrAverage(synthesisArr.slice(8, 9), 5),
+                                    new Date(Date.now() - 100),
+                                    dataArr.synthesis[8],
                                 ],
                             ],
+                            ...[[new Date(Date.now()), dataArr.synthesis[9]]],
                         ],
                     },
                 ],
@@ -343,8 +440,7 @@ export default class realtimeWaveform extends Component {
         });
     }
 
-    analyseData = (data) => {
-        const { acceleration } = data;
+    analyseData = ({ acceleration }) => {
         this.setState({
             analysis: {
                 vertical: acceleration[acceleration.length - 1].vertical,
