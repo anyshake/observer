@@ -50,7 +50,7 @@ export default class historyWaveform extends Component {
                 ],
                 options: {
                     stroke: {
-                        width: 3,
+                        width: 2,
                         curve: "smooth",
                     },
                     hollow: {
@@ -80,7 +80,7 @@ export default class historyWaveform extends Component {
                         theme: "dark",
                         fillSeriesColor: false,
                         x: {
-                            format: "yy/MM/dd HH:mm:ss",
+                            format: "20yy/MM/dd HH:mm:ss",
                         },
                     },
                     xaxis: {
@@ -251,11 +251,11 @@ export default class historyWaveform extends Component {
                                 <div className="p-4 shadow-lg flex-auto text-gray-600 ">
                                     <div className="relative h-[350px]">
                                         <div className="flex flex-wrap -mx-2">
-                                            <div className="w-full px-2 mt-2">
-                                                <span className="ml-2 mt-4">
+                                            <div className="w-full px-2 mt-8">
+                                                <span className="ml-2">
                                                     查询时间（本地时区）
                                                 </span>
-                                                <div className="relative flex flex-col min-w-0 break-words w-full mb-4 shadow-lg rounded-lg">
+                                                <div className="relative flex flex-col min-w-0 break-words w-full shadow-lg rounded-lg">
                                                     <div className="px-4 py-3 bg-transparent">
                                                         <div className="flex flex-wrap items-center">
                                                             <div className="relative w-full max-w-full flex-grow flex-1 rounded-lg py-2">
@@ -284,14 +284,14 @@ export default class historyWaveform extends Component {
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
 
-                                            <div className="w-full px-2 text mt-32 ml-1 text-sm">
-                                                {`起始于 ${getTime(
-                                                    this.state.timePicker
-                                                )}`}
-                                                <br />
-                                                {`系统将查询 1 分钟内的波形`}
-                                            </div>
+                                        <div className="absolute w-full px-2 text mt-20 ml-1">
+                                            {`起始于 ${getTime(
+                                                this.state.timePicker
+                                            )}`}
+                                            <br />
+                                            {`系统将查询 1 分钟内的波形`}
                                         </div>
 
                                         <button
@@ -310,7 +310,7 @@ export default class historyWaveform extends Component {
                                                     },
                                                 });
                                             }}
-                                            className="w-full mt-2 text-white shadow-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                                            className="absolute w-full mt-40 text-white shadow-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                                         >
                                             送出查询
                                         </button>

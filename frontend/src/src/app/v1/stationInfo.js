@@ -190,7 +190,7 @@ export default class stationInfo extends Component {
                             fontFamily: "Helvetica, Arial, sans-serif",
                         },
                         x: {
-                            format: "yy/MM/dd HH:mm:ss",
+                            format: "20yy/MM/dd HH:mm:ss",
                         },
                     },
                     xaxis: {

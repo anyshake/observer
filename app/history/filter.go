@@ -29,7 +29,7 @@ func FilterHistory(c *gin.Context, b *Binding, options *app.ServerOptions) {
 	var acceleration []geophone.Acceleration
 	for _, v := range keys {
 		t, _ := strconv.ParseInt(v, 10, 64)
-		if t >= b.Timestamp && t <= time.UnixMilli(b.Timestamp).Add(time.Minute).UnixMilli() {
+		if t >= b.Timestamp && t <= time.UnixMilli(b.Timestamp).Add(time.Minute+time.Second).UnixMilli() {
 			value, err := options.ConnRedis.Get(ctx, v).Result()
 			if err != nil {
 				response.ErrorHandler(c, http.StatusInternalServerError)
