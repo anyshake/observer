@@ -39,7 +39,7 @@ func InitPostgres(db *sql.DB) error {
         FROM information_schema.columns
         WHERE table_name = 'acceleration'
 		AND column_name IN ('id', 'timestamp', 'station', 'uuid', 'data')
-    `)
+	`)
 	if err != nil {
 		return err
 	}
