@@ -44,8 +44,9 @@ type Config struct {
 		Enable   bool   `json:"enable"`
 		Host     string `json:"host"`
 		Port     int    `json:"port"`
+		Username string `json:"username"`
 		Password string `json:"password"`
-		Database int    `json:"database"`
+		Database string `json:"database"`
 	} `json:"archiver_settings"`
 	// HTTP 服务器配置
 	Server struct {

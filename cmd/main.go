@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"com.geophone.observer/app"
-	"com.geophone.observer/common/redis"
+	"com.geophone.observer/common/postgres"
 	"com.geophone.observer/config"
 	"com.geophone.observer/features/archiver"
 	"com.geophone.observer/features/collector"
@@ -48,18 +48,19 @@ func main() {
 		defer collector.CloseGRPC(conn)
 	}
 
-	rdb, err := redis.OpenRedis(
+	pdb, err := postgres.OpenPostgres(
 		conf.Archiver.Host,
 		conf.Archiver.Port,
+		conf.Archiver.Username,
 		conf.Archiver.Password,
 		conf.Archiver.Database,
-		conf.Archiver.Enable,
+		conf.Collector.Enable,
 	)
 	if err != nil {
 		log.Fatalln(err)
 	}
 	if conf.Archiver.Enable {
-		defer redis.CloseRedis(rdb)
+		defer postgres.ClosePostgres(pdb)
 	}
 
 	go ntpclient.ReaderDaemon(
@@ -121,7 +122,7 @@ func main() {
 					Message: &message,
 					OnReadyCallback: func(message *collector.Message) {
 						archiver.WriteMessage(
-							rdb, &archiver.ArchiverOptions{
+							pdb, &archiver.ArchiverOptions{
 								Message: message,
 								Enable:  conf.Archiver.Enable,
 								OnCompleteCallback: func() {
@@ -154,14 +155,14 @@ func main() {
 		conf.Server.Host,
 		conf.Server.Port,
 		&app.ServerOptions{
-			WebPrefix: "/",
-			ApiPrefix: "/api",
-			Version:   apiVersion,
-			Message:   &message,
-			Status:    &status,
-			ConnGRPC:  &grpc,
-			ConnRedis: rdb,
-			Cors:      true,
-			Gzip:      9,
+			WebPrefix:    "/",
+			ApiPrefix:    "/api",
+			Version:      apiVersion,
+			Message:      &message,
+			Status:       &status,
+			ConnGRPC:     &grpc,
+			ConnPostgres: pdb,
+			Cors:         true,
+			Gzip:         9,
 		})
 }
