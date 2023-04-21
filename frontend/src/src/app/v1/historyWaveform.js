@@ -22,7 +22,7 @@ export default class historyWaveform extends Component {
         super(props);
         this.state = {
             sidebarMark: "history",
-            timePicker: new Date(Date.now() - 60000),
+            timePicker: new Date(Date.now() - 35000),
             waveform: {
                 factors: [
                     {
@@ -145,7 +145,7 @@ export default class historyWaveform extends Component {
             data: {
                 timestamp: this.state.timePicker.getTime(),
             },
-            timeout: 60000,
+            timeout: 10000,
             method: AppConfig.backend.api.history.method,
         })
             .then(({ data: { data } }) => {
@@ -299,8 +299,8 @@ export default class historyWaveform extends Component {
                                                 this.fetchData();
                                                 timerAlert({
                                                     title: "查询中",
-                                                    html: "查询速度取决于上位机性能，请耐心等待一到两分钟左右",
-                                                    timer: 120000,
+                                                    html: "正在查询中，这可能需要一些时间来完成",
+                                                    timer: 10000,
                                                     loading: false,
                                                     callback: () => {
                                                         errorAlert({

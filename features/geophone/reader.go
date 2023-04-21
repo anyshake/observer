@@ -11,7 +11,11 @@ import (
 )
 
 func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
-	serial.FilterSerial(port, []byte{0x55, 0x55}, []byte{0x55, 0xAA})
+	err := serial.FilterSerial(port, []byte{0x55, 0x55}, []byte{0x55, 0xAA})
+	if err != nil {
+		options.OnErrorCallback(err)
+		return err
+	}
 
 	buffer := make([]byte, unsafe.Sizeof(Geophone{}))
 	n, err := io.ReadFull(port, buffer)

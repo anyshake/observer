@@ -23,7 +23,7 @@ func ProgramInit(args *config.Args, conf *config.Config) error {
 		os.Exit(0)
 	}
 
-	log.Println("G-observer daemon initialised")
+	log.Println("G-Observer daemon initialised")
 	err := conf.ReadConfig(args.Path)
 	if err != nil {
 		return err

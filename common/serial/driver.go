@@ -18,6 +18,7 @@ func OpenSerial(device string, baud int) io.ReadWriteCloser {
 		log.Fatalln(err)
 	}
 
+	port.Flush()
 	return port
 }
 
