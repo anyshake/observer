@@ -22,7 +22,7 @@ export default class historyWaveform extends Component {
         super(props);
         this.state = {
             sidebarMark: "history",
-            timePicker: new Date(Date.now() - 35000),
+            timePicker: new Date(Date.now() - 120000),
             waveform: {
                 factors: [
                     {
@@ -291,7 +291,7 @@ export default class historyWaveform extends Component {
                                                 this.state.timePicker
                                             )}`}
                                             <br />
-                                            {`系统将查询 1 分钟内的波形`}
+                                            {`系统将查询 2 分钟内的加速度数据`}
                                         </div>
 
                                         <button
@@ -301,7 +301,7 @@ export default class historyWaveform extends Component {
                                                     title: "查询中",
                                                     html: "正在查询中，这可能需要一些时间来完成",
                                                     timer: 10000,
-                                                    loading: false,
+                                                    loading: true,
                                                     callback: () => {
                                                         errorAlert({
                                                             title: "查询失败",
