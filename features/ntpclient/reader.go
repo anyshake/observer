@@ -25,7 +25,7 @@ func ReadNTP(server string, options NTPOptions) error {
 
 func ReaderDaemon(server string, interval int, options NTPOptions) {
 	for {
-		ReadNTP(server, options)
 		time.Sleep(time.Second * time.Duration(interval))
+		ReadNTP(server, options)
 	}
 }
