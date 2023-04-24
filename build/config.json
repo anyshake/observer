@@ -19,7 +19,7 @@
         "host": "10.160.144.1",
         "port": 123,
         "timeout": 5,
-        "interval": 120
+        "interval": 600
     },
     "archiver_settings": {
         "enable": true,
