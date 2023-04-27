@@ -7,7 +7,7 @@ import (
 )
 
 func FilterSerial(port io.ReadWriteCloser, request, signature []byte) error {
-	for i := 0; i < 1024; i++ {
+	for i := 0; i < 512; i++ {
 		header := make([]byte, len(signature))
 		port.Write(request)
 		port.Read(header)
