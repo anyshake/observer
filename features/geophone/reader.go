@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io"
-	"time"
 	"unsafe"
 
 	"com.geophone.observer/common/serial"
@@ -92,11 +91,9 @@ func ReaderDaemon(device string, baud int, options GeophoneOptions) {
 		if err != nil {
 			serial.CloseSerial(port)
 			options.OnErrorCallback(err)
-			time.Sleep(time.Second)
 			port = serial.OpenSerial(device, baud)
 
 			continue
 		}
-		time.Sleep(100 * time.Millisecond)
 	}
 }
