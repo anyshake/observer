@@ -17,5 +17,5 @@ func FilterSerial(port io.ReadWriteCloser, request, signature []byte) error {
 		}
 	}
 
-	return fmt.Errorf("serial: failed to identify device")
+	return fmt.Errorf("serial: failed to filter header")
 }

@@ -4,7 +4,7 @@
         "name": "防灾科技学院测站",
         "latitude": 39.96959,
         "longitude": 116.807572,
-        "altitude": 0
+        "altitude": 17
     },
     "geophone_settings": {
         "device": "/dev/ttyUSB0",

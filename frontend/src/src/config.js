@@ -1,7 +1,7 @@
 const AppConfig = {
     frontend: {
         router: "hash",
-        version: "v1.0.1d",
+        version: "v1.0.4d",
         title: `G-Observer 测站面板`,
         copyright: `© ${new Date().getFullYear()} G-Observer | 通信实验室`,
     },

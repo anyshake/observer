@@ -7,6 +7,7 @@ import (
 	"io"
 	"math"
 	"reflect"
+	"time"
 	"unsafe"
 
 	"com.geophone.observer/common/serial"
@@ -48,49 +49,26 @@ func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
 		}
 	}
 
-	options.Acceleration.Vertical = GetAcceleration(
-		float64(options.Geophone.Vertical),
-		options.Sensitivity.Vertical,
-	)
-	options.Acceleration.EastWest = GetAcceleration(
-		float64(options.Geophone.EastWest),
-		options.Sensitivity.EastWest,
-	)
-	options.Acceleration.NorthSouth = GetAcceleration(
-		float64(options.Geophone.NorthSouth),
-		options.Sensitivity.NorthSouth,
-	)
-
-	if options.Geophone.Latitude == -1 &&
-		options.Geophone.Longitude == -1 {
-		options.Acceleration = &Acceleration{
-			Altitude:   options.LocationFallback.Altitude,
-			Latitude:   options.LocationFallback.Latitude,
-			Longitude:  options.LocationFallback.Longitude,
-			Vertical:   options.Acceleration.Vertical,
-			EastWest:   options.Acceleration.EastWest,
-			NorthSouth: options.Acceleration.NorthSouth,
-			Synthesis: GetSynthesis(
-				options.Acceleration.Vertical,
-				options.Acceleration.EastWest,
-				options.Acceleration.NorthSouth,
-			),
-		}
-	} else {
-		options.Acceleration = &Acceleration{
-			Altitude:   float64(options.Geophone.Altitude),
-			Latitude:   float64(options.Geophone.Latitude),
-			Longitude:  float64(options.Geophone.Longitude),
-			Vertical:   options.Acceleration.Vertical,
-			EastWest:   options.Acceleration.EastWest,
-			NorthSouth: options.Acceleration.NorthSouth,
-			Synthesis: GetSynthesis(
-				options.Acceleration.Vertical,
-				options.Acceleration.EastWest,
-				options.Acceleration.NorthSouth,
-			),
-		}
+	options.Acceleration = &Acceleration{
+		Vertical: GetAcceleration(
+			float64(options.Geophone.Vertical),
+			options.Sensitivity.Vertical,
+		),
+		EastWest: GetAcceleration(
+			float64(options.Geophone.EastWest),
+			options.Sensitivity.EastWest,
+		),
+		NorthSouth: GetAcceleration(
+			float64(options.Geophone.NorthSouth),
+			options.Sensitivity.NorthSouth,
+		),
 	}
+
+	options.Acceleration.Synthesis = GetSynthesis(
+		options.Acceleration.Vertical,
+		options.Acceleration.EastWest,
+		options.Acceleration.NorthSouth,
+	)
 
 	options.OnDataCallback(options.Acceleration)
 	return nil
@@ -105,9 +83,12 @@ func ReaderDaemon(device string, baud int, options GeophoneOptions) {
 		if err != nil {
 			serial.CloseSerial(port)
 			options.OnErrorCallback(err)
+			time.Sleep(100 * time.Millisecond)
 			port = serial.OpenSerial(device, baud)
 
 			continue
 		}
+
+		time.Sleep(15 * time.Millisecond)
 	}
 }

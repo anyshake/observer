@@ -13,8 +13,8 @@ func OpenSerial(device string, baud int) io.ReadWriteCloser {
 		serial.WithDataBits(8),
 		serial.WithParity(serial.NoParity),
 		serial.WithStopBits(serial.OneStopBit),
-		serial.WithReadTimeout(1000),
-		serial.WithWriteTimeout(1000),
+		serial.WithReadTimeout(100),
+		serial.WithWriteTimeout(100),
 		serial.WithHUPCL(false),
 	)
 	if err != nil {
