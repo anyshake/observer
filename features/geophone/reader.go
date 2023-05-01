@@ -89,6 +89,6 @@ func ReaderDaemon(device string, baud int, options GeophoneOptions) {
 			continue
 		}
 
-		time.Sleep(15 * time.Millisecond)
+		time.Sleep(time.Duration(options.Interval) * time.Millisecond)
 	}
 }
