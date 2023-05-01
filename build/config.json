@@ -17,7 +17,7 @@
         "interval": 82
     },
     "ntpclient_settings": {
-        "host": "10.160.144.1",
+        "host": "ntp.nict.jp",
         "port": 123,
         "timeout": 5,
         "interval": 600
