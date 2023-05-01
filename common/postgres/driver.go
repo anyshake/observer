@@ -8,6 +8,10 @@ import (
 )
 
 func OpenPostgres(host string, port int, username, password, database string, enable bool) (*sql.DB, error) {
+	if !enable {
+		return nil, nil
+	}
+
 	db, err := sql.Open("postgres", fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, username, password, database,
