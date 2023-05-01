@@ -9,13 +9,13 @@ import (
 
 func OpenSerial(device string, baud int) io.ReadWriteCloser {
 	port, err := serial.Open(device,
-		serial.WithBaudrate(baud),
+		serial.WithHUPCL(false),
 		serial.WithDataBits(8),
+		serial.WithBaudrate(baud),
+		serial.WithReadTimeout(500),
+		serial.WithWriteTimeout(500),
 		serial.WithParity(serial.NoParity),
 		serial.WithStopBits(serial.OneStopBit),
-		serial.WithReadTimeout(100),
-		serial.WithWriteTimeout(100),
-		serial.WithHUPCL(false),
 	)
 	if err != nil {
 		log.Fatalln(err)

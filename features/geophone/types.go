@@ -19,6 +19,7 @@ type GeophoneOptions struct {
 	Acceleration    *Acceleration
 	OnErrorCallback func(error)
 	OnDataCallback  func(*Acceleration)
+	Interval        int
 	Latitude        float64
 	Longitude       float64
 	Altitude        float64

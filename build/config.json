@@ -13,7 +13,8 @@
             "vertical": 0.288,
             "east_west": 0.288,
             "north_south": 0.288
-        }
+        },
+        "interval": 82
     },
     "ntpclient_settings": {
         "host": "10.160.144.1",
@@ -22,7 +23,7 @@
         "interval": 600
     },
     "archiver_settings": {
-        "enable": true,
+        "enable": false,
         "host": "192.168.1.202",
         "port": 5432,
         "username": "postgres",
