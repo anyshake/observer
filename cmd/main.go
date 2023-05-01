@@ -30,8 +30,11 @@ func main() {
 	var (
 		status  collector.Status
 		message = collector.Message{
-			Station: conf.Station.Name,
-			UUID:    conf.Station.UUID,
+			Station:   conf.Station.Name,
+			UUID:      conf.Station.UUID,
+			Latitude:  conf.Station.Latitude,
+			Longitude: conf.Station.Longitude,
+			Altitude:  conf.Station.Altitude,
 		}
 	)
 
@@ -91,6 +94,9 @@ func main() {
 		geophone.GeophoneOptions{
 			Geophone:     &geophone.Geophone{},
 			Acceleration: &geophone.Acceleration{},
+			Latitude:     conf.Station.Latitude,
+			Longitude:    conf.Station.Longitude,
+			Altitude:     conf.Station.Altitude,
 			Sensitivity: struct {
 				Vertical   float64
 				EastWest   float64
@@ -99,15 +105,6 @@ func main() {
 				Vertical:   conf.Geophone.Sensitivity.Vertical,
 				EastWest:   conf.Geophone.Sensitivity.EastWest,
 				NorthSouth: conf.Geophone.Sensitivity.NorthSouth,
-			},
-			LocationFallback: struct {
-				Latitude  float64
-				Longitude float64
-				Altitude  float64
-			}{
-				Latitude:  conf.Station.Latitude,
-				Longitude: conf.Station.Longitude,
-				Altitude:  conf.Station.Altitude,
 			},
 			OnErrorCallback: func(err error) {
 				handlers.HandleErrors(&handlers.HandlerOptions{
