@@ -223,12 +223,19 @@ export default class stationInfo extends Component {
         };
     }
 
-    fetchData = (url) =>
-        createRequest({
+    fetchData = (url) => {
+        const req = createRequest({
             url: url,
             method: AppConfig.backend.api.station.method,
         });
+        req.then((res) => {
+            this.setState({
+                response: res.data.data,
+            });
+        });
 
+        return req;
+    };
     drawCharts = () => {
         const {
             response: {
@@ -280,9 +287,6 @@ export default class stationInfo extends Component {
                     type: AppConfig.backend.api.station.type,
                 })}
                 onSuccess={(res) => {
-                    this.setState({
-                        response: res.data.data,
-                    });
                     this.drawCharts();
                     return res;
                 }}
