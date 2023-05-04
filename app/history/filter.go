@@ -12,6 +12,11 @@ import (
 )
 
 func FilterHistory(c *gin.Context, b *Binding, options *app.ServerOptions) {
+	if options.ConnPostgres == nil {
+		response.ErrorHandler(c, http.StatusInternalServerError)
+		return
+	}
+
 	data, err := postgres.SelectData(options.ConnPostgres, b.Timestamp)
 	if err != nil {
 		response.ErrorHandler(c, http.StatusInternalServerError)

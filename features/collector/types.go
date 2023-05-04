@@ -12,12 +12,12 @@ type Status struct {
 }
 
 type Message struct {
-	UUID         string                    `json:"uuid"`
-	Station      string                    `json:"station"`
-	Latitude     float64                   `json:"latitude"`
-	Longitude    float64                   `json:"longitude"`
-	Altitude     float64                   `json:"altitude"`
-	Acceleration [10]geophone.Acceleration `json:"acceleration"`
+	UUID         string                `json:"uuid"`
+	Station      string                `json:"station"`
+	Latitude     float64               `json:"latitude"`
+	Longitude    float64               `json:"longitude"`
+	Altitude     float64               `json:"altitude"`
+	Acceleration geophone.Acceleration `json:"acceleration"`
 }
 
 type CollectorOptions struct {

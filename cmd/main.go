@@ -94,7 +94,6 @@ func main() {
 		geophone.GeophoneOptions{
 			Geophone:     &geophone.Geophone{},
 			Acceleration: &geophone.Acceleration{},
-			Interval:     conf.Geophone.Interval,
 			Latitude:     conf.Station.Latitude,
 			Longitude:    conf.Station.Longitude,
 			Altitude:     conf.Station.Altitude,
