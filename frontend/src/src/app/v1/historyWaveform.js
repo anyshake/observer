@@ -263,9 +263,9 @@ export default class historyWaveform extends Component {
                                                                     dateFormat="YYYY-MM-DD"
                                                                     timeFormat="HH:mm:ss"
                                                                     inputProps={{
+                                                                        readOnly: true,
                                                                         className:
                                                                             "w-full cursor-pointer focus:outline-none rounded-lg",
-                                                                        readOnly: true,
                                                                         placeholder: `点击选择时间`,
                                                                     }}
                                                                     onChange={({
@@ -287,11 +287,9 @@ export default class historyWaveform extends Component {
                                         </div>
 
                                         <div className="absolute w-full px-2 text mt-20 ml-1">
-                                            {`起始于 ${getTime(
+                                            {`查询时间 ${getTime(
                                                 this.state.timePicker
                                             )}`}
-                                            <br />
-                                            {`系统将查询 2 分钟内的加速度数据`}
                                         </div>
 
                                         <button
@@ -299,7 +297,7 @@ export default class historyWaveform extends Component {
                                                 this.fetchData();
                                                 timerAlert({
                                                     title: "查询中",
-                                                    html: "正在查询中，这可能需要一些时间来完成",
+                                                    html: "正在查询 2 分钟内的加速度数据，这可能需要一些时间来完成",
                                                     timer: 10000,
                                                     loading: true,
                                                     callback: () => {
