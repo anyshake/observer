@@ -18,7 +18,6 @@ type Config struct {
 	Geophone struct {
 		Device      string `json:"device"`
 		Baud        int    `json:"baud"`
-		Interval    int    `json:"interval"`
 		Sensitivity struct {
 			Vertical   float64 `json:"vertical"`
 			EastWest   float64 `json:"east_west"`

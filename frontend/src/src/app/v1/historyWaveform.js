@@ -165,6 +165,14 @@ export default class historyWaveform extends Component {
             });
     };
 
+    fillData(arr) {
+        const span = 1000 / arr.length;
+
+        return arr.map((item, index) => {
+            return [new Date(Date.now() - (arr.length - index) * span), item];
+        });
+    }
+
     drawWaveform(data) {
         const verticalArr = [],
             eastWestArr = [],

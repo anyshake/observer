@@ -19,7 +19,7 @@ func WriteMessage(pdb *sql.DB, options *ArchiverOptions) {
 	}
 
 	postgres.InsertData(
-		pdb, options.Message.Acceleration[0].Timestamp,
+		pdb, options.Message.Acceleration.Timestamp,
 		options.Message.Station, options.Message.UUID, acceleration,
 	)
 

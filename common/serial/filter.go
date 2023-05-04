@@ -6,15 +6,20 @@ import (
 	"io"
 )
 
-func FilterSerial(port io.ReadWriteCloser, request, signature []byte) error {
-	for i := 0; i < 8; i++ {
-		header := make([]byte, len(signature))
-		port.Write(request)
+func FilterSerial(port io.ReadWriteCloser, padding, signature []byte) error {
+	header := make([]byte, len(signature))
+
+	for i := 0; i < len(padding); i++ {
 		port.Read(header)
 
 		if bytes.Equal(header, signature) {
 			return nil
 		}
+
+		if bytes.Equal(header, padding) || bytes.Contains(header, padding[:1]) {
+			continue
+		}
+
 	}
 
 	return fmt.Errorf("serial: failed to filter header")
