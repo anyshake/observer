@@ -27,12 +27,12 @@ const AppConfig = {
         host:
             process.env.NODE_ENV === "production"
                 ? window.location.hostname
-                : `127.0.0.1`,
+                : `172.17.138.214`,
         // :   `localhost`,
         port:
             process.env.NODE_ENV === "production"
                 ? window.location.port
-                : `8080`,
+                : `8073`,
         // :  `8080`,
         tls: window.location.protocol === "https:" ? true : false,
     },
