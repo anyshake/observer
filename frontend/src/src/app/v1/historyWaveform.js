@@ -28,7 +28,7 @@ export default class historyWaveform extends Component {
                 factors: [
                     {
                         name: "垂直分量",
-                        color: "#d97706",
+                        color: "#5a3eba",
                         data: [],
                     },
                     {
