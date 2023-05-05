@@ -1,17 +1,21 @@
 package geophone
 
+const (
+	FRAME_SIZE int = 35
+)
+
 type Geophone struct {
-	Vertical   float32
-	EastWest   float32
-	NorthSouth float32
+	Vertical   [FRAME_SIZE]float32
+	EastWest   [FRAME_SIZE]float32
+	NorthSouth [FRAME_SIZE]float32
 }
 
 type Acceleration struct {
-	Timestamp  int64   `json:"timestamp"`
-	Vertical   float64 `json:"vertical"`
-	EastWest   float64 `json:"east_west"`
-	NorthSouth float64 `json:"north_south"`
-	Synthesis  float64 `json:"synthesis"`
+	Timestamp  int64               `json:"timestamp"`
+	Vertical   [FRAME_SIZE]float64 `json:"vertical"`
+	EastWest   [FRAME_SIZE]float64 `json:"east_west"`
+	NorthSouth [FRAME_SIZE]float64 `json:"north_south"`
+	Synthesis  [FRAME_SIZE]float64 `json:"synthesis"`
 }
 
 type GeophoneOptions struct {
@@ -19,7 +23,6 @@ type GeophoneOptions struct {
 	Acceleration    *Acceleration
 	OnErrorCallback func(error)
 	OnDataCallback  func(*Acceleration)
-	Interval        int
 	Latitude        float64
 	Longitude       float64
 	Altitude        float64

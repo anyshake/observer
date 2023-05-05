@@ -6,10 +6,10 @@ import (
 	"io"
 )
 
-func FilterSerial(port io.ReadWriteCloser, request, signature []byte) error {
-	for i := 0; i < 8; i++ {
-		header := make([]byte, len(signature))
-		port.Write(request)
+func FilterSerial(port io.ReadWriteCloser, signature []byte) error {
+	header := make([]byte, len(signature))
+
+	for i := 0; i < 1024; i++ {
 		port.Read(header)
 
 		if bytes.Equal(header, signature) {

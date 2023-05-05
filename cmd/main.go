@@ -94,7 +94,6 @@ func main() {
 		geophone.GeophoneOptions{
 			Geophone:     &geophone.Geophone{},
 			Acceleration: &geophone.Acceleration{},
-			Interval:     conf.Geophone.Interval,
 			Latitude:     conf.Station.Latitude,
 			Longitude:    conf.Station.Longitude,
 			Altitude:     conf.Station.Altitude,
@@ -124,7 +123,7 @@ func main() {
 								Message: message,
 								Enable:  conf.Archiver.Enable,
 								OnCompleteCallback: func() {
-									log.Println("10 message archived")
+									log.Println("1 message archived")
 								},
 								OnErrorCallback: func(err error) {
 									log.Println(err)

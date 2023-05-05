@@ -11,7 +11,7 @@ import (
 )
 
 func OpenGRPC(host string, port int, tls, enable bool) (*grpc.ClientConn, pb.CollectorClient, error) {
-	if !enable {
+	if enable {
 		return nil, nil, nil
 	}
 

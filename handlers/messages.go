@@ -11,8 +11,9 @@ func HandleMessages(options *HandlerOptions, v any) {
 		options.Status.Offset = v.Offset
 	case *geophone.Acceleration:
 		v.Timestamp = ntpclient.AlignTime(options.Status.Offset)
-		options.Message.Acceleration[options.Status.Messages%10] = *v
-		if options.Status.Messages != 0 && options.Status.Messages%10 == 0 {
+
+		options.Message.Acceleration = *v
+		if options.Status.Messages != 0 {
 			options.OnReadyCallback(options.Message)
 		}
 	}

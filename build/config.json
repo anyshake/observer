@@ -10,11 +10,10 @@
         "device": "/dev/ttyUSB0",
         "baud": 19200,
         "sensitivity": {
-            "vertical": 0.288,
-            "east_west": 0.288,
-            "north_south": 0.288
-        },
-        "interval": 82
+            "vertical": 0.0288,
+            "east_west": 0.0288,
+            "north_south": 0.0288
+        }
     },
     "ntpclient_settings": {
         "host": "ntp.nict.jp",
@@ -23,7 +22,7 @@
         "interval": 600
     },
     "archiver_settings": {
-        "enable": false,
+        "enable": true,
         "host": "192.168.1.202",
         "port": 5432,
         "username": "postgres",
