@@ -43,7 +43,7 @@ func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
 			for j := 0; j < fieldVal.Len(); j++ {
 				itemVal := fieldVal.Index(j)
 
-				if math.Abs(itemVal.Float()) > 10000 {
+				if math.Abs(itemVal.Float()) > 100 {
 					err = fmt.Errorf("reader: incorrect data frame")
 					options.OnErrorCallback(err)
 					return nil
