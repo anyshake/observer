@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func ReadFull(r io.Reader, buf []byte, timeout time.Duration) (n int, err error) {
+func ReadSerial(r io.Reader, buf []byte, timeout time.Duration) (n int, err error) {
 	min := len(buf)
 
 	if len(buf) < min {

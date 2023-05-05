@@ -16,6 +16,7 @@ import createRequest from "../../helpers/requests/createRequest";
 import AppConfig from "../../config";
 import getApiUrl from "../../helpers/utilities/getApiUrl";
 import arrSort from "../../helpers/utilities/arrSort";
+import arrMaximum from "../../helpers/utilities/arrMaximum";
 
 export default class historyWaveform extends Component {
     constructor(props) {
@@ -65,12 +66,15 @@ export default class historyWaveform extends Component {
                         zoom: {
                             enabled: true,
                         },
+                        animations: {
+                            enabled: false,
+                        },
                     },
                     dataLabels: {
                         enabled: false,
                     },
                     legend: {
-                        show: false,
+                        show: true,
                         labels: {
                             useSeriesColors: true,
                         },
@@ -145,7 +149,7 @@ export default class historyWaveform extends Component {
             data: {
                 timestamp: this.state.timePicker.getTime(),
             },
-            timeout: 10000,
+            timeout: 30000,
             method: AppConfig.backend.api.history.method,
         })
             .then(({ data: { data } }) => {
@@ -165,27 +169,29 @@ export default class historyWaveform extends Component {
             });
     };
 
-    fillData(arr) {
-        const span = 1000 / arr.length;
+    fillData(dataArr, timestampArr) {
+        const arr = dataArr.map((item, index) => {
+            const timeDiff =
+                index !== dataArr.length - 1
+                    ? timestampArr[index + 1] - timestampArr[index]
+                    : 1000;
+            const timeSpan = timeDiff / item.length;
 
-        return arr.map((item, index) => {
-            return [new Date(Date.now() - (arr.length - index) * span), item];
+            return item.map((obj, _index) => [
+                new Date(timestampArr[index] + _index * timeSpan),
+                obj,
+            ]);
         });
+
+        return arr.flat();
     }
 
-    drawWaveform(data) {
-        const verticalArr = [],
-            eastWestArr = [],
-            northSouthArr = [],
-            synthesisArr = [];
+    filterData = (arr, key) => {
+        return arrMaximum(arr.map((obj) => obj[key]).flat());
+    };
 
+    drawWaveform(data) {
         arrSort(data, "timestamp", "asc");
-        data.forEach((item) => {
-            verticalArr.push([new Date(item.timestamp), item.vertical]);
-            eastWestArr.push([new Date(item.timestamp), item.east_west]);
-            northSouthArr.push([new Date(item.timestamp), item.north_south]);
-            synthesisArr.push([new Date(item.timestamp), item.synthesis]);
-        });
 
         this.setState({
             waveform: {
@@ -193,21 +199,41 @@ export default class historyWaveform extends Component {
                 factors: [
                     {
                         ...this.state.waveform.factors[0],
-                        data: [...verticalArr],
+                        data: [
+                            ...this.fillData(
+                                data.map((obj) => obj.vertical),
+                                data.map((obj) => obj.timestamp)
+                            ),
+                        ],
                     },
                     {
                         ...this.state.waveform.factors[1],
-                        data: [...eastWestArr],
+                        data: [
+                            ...this.fillData(
+                                data.map((obj) => obj.east_west),
+                                data.map((obj) => obj.timestamp)
+                            ),
+                        ],
                     },
                     {
                         ...this.state.waveform.factors[2],
-                        data: [...northSouthArr],
+                        data: [
+                            ...this.fillData(
+                                data.map((obj) => obj.north_south),
+                                data.map((obj) => obj.timestamp)
+                            ),
+                        ],
                     },
                 ],
                 synthesis: [
                     {
                         ...this.state.waveform.synthesis[3],
-                        data: [...synthesisArr],
+                        data: [
+                            ...this.fillData(
+                                data.map((obj) => obj.synthesis),
+                                data.map((obj) => obj.timestamp)
+                            ),
+                        ],
                     },
                 ],
             },
@@ -217,18 +243,10 @@ export default class historyWaveform extends Component {
     analyseData = (data) => {
         this.setState({
             analysis: {
-                vertical: data
-                    .map((obj) => Math.abs(obj.vertical))
-                    .reduce((max, cur) => (cur > max ? cur : max)),
-                east_west: data
-                    .map((obj) => Math.abs(obj.east_west))
-                    .reduce((max, cur) => (cur > max ? cur : max)),
-                north_south: data
-                    .map((obj) => Math.abs(obj.north_south))
-                    .reduce((max, cur) => (cur > max ? cur : max)),
-                synthesis: data
-                    .map((obj) => obj.synthesis)
-                    .reduce((max, cur) => (cur > max ? cur : max)),
+                vertical: this.filterData(data, "vertical"),
+                east_west: this.filterData(data, "east_west"),
+                north_south: this.filterData(data, "north_south"),
+                synthesis: this.filterData(data, "synthesis"),
             },
         });
     };
@@ -306,7 +324,7 @@ export default class historyWaveform extends Component {
                                                 timerAlert({
                                                     title: "查询中",
                                                     html: "正在查询 2 分钟内的加速度数据，这可能需要一些时间来完成",
-                                                    timer: 10000,
+                                                    timer: 30000,
                                                     loading: true,
                                                     callback: () => {
                                                         errorAlert({
