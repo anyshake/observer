@@ -2,6 +2,7 @@ package history
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"com.geophone.observer/app"
@@ -12,6 +13,11 @@ import (
 )
 
 func FilterHistory(c *gin.Context, b *Binding, options *app.ServerOptions) {
+	if options.ConnPostgres == nil {
+		response.ErrorHandler(c, http.StatusInternalServerError)
+		return
+	}
+
 	data, err := postgres.SelectData(options.ConnPostgres, b.Timestamp)
 	if err != nil {
 		response.ErrorHandler(c, http.StatusInternalServerError)
@@ -25,14 +31,15 @@ func FilterHistory(c *gin.Context, b *Binding, options *app.ServerOptions) {
 
 	var acceleration []geophone.Acceleration
 	for _, v := range data {
-		var acc []geophone.Acceleration
+		var acc geophone.Acceleration
 		err := json.Unmarshal([]byte(v["data"].(string)), &acc)
 		if err != nil {
+			fmt.Println(err)
 			response.ErrorHandler(c, http.StatusInternalServerError)
 			return
 		}
 
-		acceleration = append(acceleration, acc...)
+		acceleration = append(acceleration, acc)
 	}
 
 	c.JSON(http.StatusOK, response.MessageHandler(c, "筛选出如下加速度数据", acceleration))

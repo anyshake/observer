@@ -14,17 +14,17 @@ import (
 )
 
 func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
-	buffer := make([]byte, unsafe.Sizeof(Geophone{}))
-
-	err := serial.FilterSerial(port, []byte{0x55, 0x55}, []byte{0x55, 0xAA})
+	err := serial.FilterSerial(port,
+		[]byte{0xAA, 0x55},
+	)
 	if err != nil {
 		return err
 	}
 
-	n, err := io.ReadFull(port, buffer)
+	buffer := make([]byte, unsafe.Sizeof(Geophone{}))
+	n, err := serial.ReadSerial(port, buffer, 2*time.Second)
 	if err != nil {
 		options.OnErrorCallback(err)
-		return err
 	}
 
 	err = binary.Read(
@@ -34,41 +34,42 @@ func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
 	)
 	if err != nil {
 		options.OnErrorCallback(err)
-		return err
 	}
 
-	v := reflect.ValueOf(options.Geophone).Elem()
-	for i := 0; i < v.NumField(); i++ {
-		field := v.Type().Field(i)
-		if field.Type.Kind() == reflect.Float32 {
-			if math.Abs(v.Field(i).Float()) > 1000 {
-				err = fmt.Errorf("reader: incorrect data frame")
-				options.OnErrorCallback(err)
-				return err
+	val := reflect.ValueOf(options.Geophone).Elem()
+	for i := 0; i < val.NumField(); i++ {
+		fieldVal := val.Field(i)
+		if fieldVal.Kind() == reflect.Array {
+			for j := 0; j < fieldVal.Len(); j++ {
+				itemVal := fieldVal.Index(j)
+
+				if math.Abs(itemVal.Float()) > 100 {
+					err = fmt.Errorf("reader: incorrect data frame")
+					options.OnErrorCallback(err)
+					return nil
+				}
+
+				if err == nil {
+					switch val.Type().Field(i).Name {
+					case "Vertical":
+						options.Acceleration.Vertical[j] = GetAcceleration(itemVal.Float(), options.Sensitivity.Vertical)
+					case "EastWest":
+						options.Acceleration.EastWest[j] = GetAcceleration(itemVal.Float(), options.Sensitivity.EastWest)
+					case "NorthSouth":
+						options.Acceleration.NorthSouth[j] = GetAcceleration(itemVal.Float(), options.Sensitivity.NorthSouth)
+					}
+				}
 			}
 		}
 	}
 
-	options.Acceleration = &Acceleration{
-		Vertical: GetAcceleration(
-			float64(options.Geophone.Vertical),
-			options.Sensitivity.Vertical,
-		),
-		EastWest: GetAcceleration(
-			float64(options.Geophone.EastWest),
-			options.Sensitivity.EastWest,
-		),
-		NorthSouth: GetAcceleration(
-			float64(options.Geophone.NorthSouth),
-			options.Sensitivity.NorthSouth,
-		),
+	for i := range options.Acceleration.Vertical {
+		options.Acceleration.Synthesis[i] = GetSynthesis(
+			options.Acceleration.Vertical[i],
+			options.Acceleration.EastWest[i],
+			options.Acceleration.NorthSouth[i],
+		)
 	}
-
-	options.Acceleration.Synthesis = GetSynthesis(
-		options.Acceleration.Vertical,
-		options.Acceleration.EastWest,
-		options.Acceleration.NorthSouth,
-	)
 
 	options.OnDataCallback(options.Acceleration)
 	return nil
@@ -83,12 +84,10 @@ func ReaderDaemon(device string, baud int, options GeophoneOptions) {
 		if err != nil {
 			serial.CloseSerial(port)
 			options.OnErrorCallback(err)
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(500 * time.Millisecond)
 			port = serial.OpenSerial(device, baud)
 
 			continue
 		}
-
-		time.Sleep(time.Duration(options.Interval) * time.Millisecond)
 	}
 }

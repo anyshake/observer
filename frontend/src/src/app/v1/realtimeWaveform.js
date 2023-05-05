@@ -16,6 +16,12 @@ export default class realtimeWaveform extends Component {
         this.state = {
             sidebarMark: "waveform",
             webSocket: null,
+            lastDataArr: {
+                timestamp: -1,
+                vertical: [],
+                east_west: [],
+                north_south: [],
+            },
             waveform: {
                 factors: [
                     {
@@ -59,11 +65,11 @@ export default class realtimeWaveform extends Component {
                             enabled: false,
                         },
                         animations: {
-                            enabled: true,
-                            easing: "linear",
-                            dynamicAnimation: {
-                                speed: 1000,
-                            },
+                            enabled: false,
+                            // easing: "linear",
+                            // dynamicAnimation: {
+                            //     speed: 1000 * 1.1,
+                            // },
                         },
                     },
                     dataLabels: {
@@ -141,6 +147,7 @@ export default class realtimeWaveform extends Component {
         this.setState({
             webSocket: createSocket({
                 url: socketUrl,
+                type: AppConfig.backend.api.socket.method,
                 onMessageCallback: ({ data: result }) => {
                     const data = JSON.parse(result);
                     this.setState({
@@ -149,7 +156,6 @@ export default class realtimeWaveform extends Component {
                     this.drawWaveform(data);
                     this.analyseData(data);
                 },
-                type: AppConfig.backend.api.socket.method,
             }),
         });
     }
@@ -163,25 +169,33 @@ export default class realtimeWaveform extends Component {
         }
     }
 
-    drawWaveform({ acceleration }) {
-        const dataArr = {
-            vertical: [],
-            east_west: [],
-            north_south: [],
-            synthesis: [],
-        };
+    fillData(data, key) {
+        if (
+            this.state.lastDataArr.timestamp < 1 ||
+            this.state.lastDataArr.timestamp === data.timestamp
+        ) {
+            return [];
+        }
 
-        Reflect.ownKeys(dataArr).forEach((key) => {
-            acceleration.forEach((item) => {
-                dataArr[key].push(item[key]);
-            });
+        const timeDiff = data.timestamp - this.state.lastDataArr.timestamp;
+        const timeSpan = timeDiff / data[key].length;
+
+        return data[key].map((item, index) => {
+            return [
+                new Date(
+                    data.timestamp - (data[key].length - index) * timeSpan
+                ),
+                item,
+            ];
         });
+    }
 
-        this.state.waveform.synthesis[0].data.length > 600 &&
-            this.state.waveform.synthesis[0].data.splice(0, 10);
+    drawWaveform({ acceleration }) {
+        this.state.waveform.synthesis[0].data.length > 35 * 120 &&
+            this.state.waveform.synthesis[0].data.splice(0, 35);
         this.state.waveform.factors.forEach((_, index) => {
-            if (this.state.waveform.factors[index].data.length > 600) {
-                this.state.waveform.factors[index].data.splice(0, 10);
+            if (this.state.waveform.factors[index].data.length > 35 * 120) {
+                this.state.waveform.factors[index].data.splice(0, 35);
             }
         });
 
@@ -193,183 +207,21 @@ export default class realtimeWaveform extends Component {
                         ...this.state.waveform.factors[0],
                         data: [
                             ...this.state.waveform.factors[0].data,
-                            ...[
-                                [
-                                    new Date(Date.now() - 900),
-                                    dataArr.vertical[0],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 800),
-                                    dataArr.vertical[1],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 700),
-                                    dataArr.vertical[2],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 600),
-                                    dataArr.vertical[3],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 500),
-                                    dataArr.vertical[4],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 400),
-                                    dataArr.vertical[5],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 300),
-                                    dataArr.vertical[6],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 200),
-                                    dataArr.vertical[7],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 100),
-                                    dataArr.vertical[8],
-                                ],
-                            ],
-                            ...[[new Date(Date.now()), dataArr.vertical[9]]],
+                            ...this.fillData(acceleration, "vertical"),
                         ],
                     },
                     {
                         ...this.state.waveform.factors[1],
                         data: [
                             ...this.state.waveform.factors[1].data,
-                            ...[
-                                [
-                                    new Date(Date.now() - 900),
-                                    dataArr.east_west[0],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 800),
-                                    dataArr.east_west[1],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 700),
-                                    dataArr.east_west[2],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 600),
-                                    dataArr.east_west[3],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 500),
-                                    dataArr.east_west[4],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 400),
-                                    dataArr.east_west[5],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 300),
-                                    dataArr.east_west[6],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 200),
-                                    dataArr.east_west[7],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 100),
-                                    dataArr.east_west[8],
-                                ],
-                            ],
-                            ...[[new Date(Date.now()), dataArr.east_west[9]]],
+                            ...this.fillData(acceleration, "east_west"),
                         ],
                     },
                     {
                         ...this.state.waveform.factors[2],
                         data: [
                             ...this.state.waveform.factors[2].data,
-                            ...[
-                                [
-                                    new Date(Date.now() - 900),
-                                    dataArr.north_south[0],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 800),
-                                    dataArr.north_south[1],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 700),
-                                    dataArr.north_south[2],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 600),
-                                    dataArr.north_south[3],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 500),
-                                    dataArr.north_south[4],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 400),
-                                    dataArr.north_south[5],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 300),
-                                    dataArr.north_south[6],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 200),
-                                    dataArr.north_south[7],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 100),
-                                    dataArr.north_south[8],
-                                ],
-                            ],
-                            ...[[new Date(Date.now()), dataArr.north_south[9]]],
+                            ...this.fillData(acceleration, "north_south"),
                         ],
                     },
                 ],
@@ -378,61 +230,7 @@ export default class realtimeWaveform extends Component {
                         ...this.state.waveform.synthesis[0],
                         data: [
                             ...this.state.waveform.synthesis[0].data,
-                            ...[
-                                [
-                                    new Date(Date.now() - 900),
-                                    dataArr.synthesis[0],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 800),
-                                    dataArr.synthesis[1],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 700),
-                                    dataArr.synthesis[2],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 600),
-                                    dataArr.synthesis[3],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 500),
-                                    dataArr.synthesis[4],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 400),
-                                    dataArr.synthesis[5],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 300),
-                                    dataArr.synthesis[6],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 200),
-                                    dataArr.synthesis[7],
-                                ],
-                            ],
-                            ...[
-                                [
-                                    new Date(Date.now() - 100),
-                                    dataArr.synthesis[8],
-                                ],
-                            ],
-                            ...[[new Date(Date.now()), dataArr.synthesis[9]]],
+                            ...this.fillData(acceleration, "synthesis"),
                         ],
                     },
                 ],
@@ -443,11 +241,18 @@ export default class realtimeWaveform extends Component {
     analyseData = ({ acceleration }) => {
         this.setState({
             analysis: {
-                vertical: acceleration[acceleration.length - 1].vertical,
-                east_west: acceleration[acceleration.length - 1].east_west,
-                north_south: acceleration[acceleration.length - 1].north_south,
-                synthesis: acceleration[acceleration.length - 1].synthesis,
+                vertical:
+                    acceleration.vertical[acceleration.vertical.length - 1],
+                east_west:
+                    acceleration.east_west[acceleration.east_west.length - 1],
+                north_south:
+                    acceleration.north_south[
+                        acceleration.north_south.length - 1
+                    ],
+                synthesis:
+                    acceleration.synthesis[acceleration.synthesis.length - 1],
             },
+            lastDataArr: acceleration,
         });
     };
 
@@ -489,10 +294,7 @@ export default class realtimeWaveform extends Component {
                             this.state.response.uuid.length !== 0
                                 ? `最后更新于 ${getTime(
                                       new Date(
-                                          this.state.response.acceleration[
-                                              this.state.response.acceleration
-                                                  .length - 1
-                                          ].timestamp
+                                          this.state.response.acceleration.timestamp
                                       )
                                   )}`
                                 : `暂未收到数据`
