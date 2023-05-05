@@ -123,7 +123,7 @@ func main() {
 								Message: message,
 								Enable:  conf.Archiver.Enable,
 								OnCompleteCallback: func() {
-									log.Println("10 message archived")
+									log.Println("1 message archived")
 								},
 								OnErrorCallback: func(err error) {
 									log.Println(err)

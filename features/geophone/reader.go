@@ -27,7 +27,7 @@ func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
 	}
 
 	buffer := make([]byte, unsafe.Sizeof(Geophone{}))
-	n, err := serial.ReadFull(port, buffer, time.Second)
+	n, err := serial.ReadSerial(port, buffer, time.Second)
 	if err != nil {
 		options.OnErrorCallback(err)
 	}
