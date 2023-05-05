@@ -22,7 +22,7 @@ func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
 	}
 
 	buffer := make([]byte, unsafe.Sizeof(Geophone{}))
-	n, err := serial.ReadSerial(port, buffer, time.Second)
+	n, err := serial.ReadSerial(port, buffer, 2*time.Second)
 	if err != nil {
 		options.OnErrorCallback(err)
 	}
@@ -46,6 +46,7 @@ func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
 				if math.Abs(itemVal.Float()) > 10000 {
 					err = fmt.Errorf("reader: incorrect data frame")
 					options.OnErrorCallback(err)
+					return nil
 				}
 
 				if err == nil {
