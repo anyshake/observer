@@ -16,6 +16,12 @@ export default class realtimeWaveform extends Component {
         this.state = {
             sidebarMark: "waveform",
             webSocket: null,
+            lastDataArr: {
+                timestamp: -1,
+                vertical: [],
+                east_west: [],
+                north_south: [],
+            },
             waveform: {
                 factors: [
                     {
@@ -141,6 +147,7 @@ export default class realtimeWaveform extends Component {
         this.setState({
             webSocket: createSocket({
                 url: socketUrl,
+                type: AppConfig.backend.api.socket.method,
                 onMessageCallback: ({ data: result }) => {
                     const data = JSON.parse(result);
                     this.setState({
@@ -149,7 +156,6 @@ export default class realtimeWaveform extends Component {
                     this.drawWaveform(data);
                     this.analyseData(data);
                 },
-                type: AppConfig.backend.api.socket.method,
             }),
         });
     }
@@ -163,10 +169,24 @@ export default class realtimeWaveform extends Component {
         }
     }
 
-    fillData(arr) {
-        const span = 1000 / arr.length;
-        return arr.map((item, index) => {
-            return [new Date(Date.now() - (arr.length - index) * span), item];
+    fillData(data, key) {
+        if (
+            this.state.lastDataArr.timestamp < 1 ||
+            this.state.lastDataArr.timestamp === data.timestamp
+        ) {
+            return [];
+        }
+
+        const timeDiff = data.timestamp - this.state.lastDataArr.timestamp;
+        const timeSpan = timeDiff / data[key].length;
+
+        return data[key].map((item, index) => {
+            return [
+                new Date(
+                    data.timestamp - (data[key].length - index) * timeSpan
+                ),
+                item,
+            ];
         });
     }
 
@@ -187,21 +207,21 @@ export default class realtimeWaveform extends Component {
                         ...this.state.waveform.factors[0],
                         data: [
                             ...this.state.waveform.factors[0].data,
-                            ...this.fillData(acceleration.vertical),
+                            ...this.fillData(acceleration, "vertical"),
                         ],
                     },
                     {
                         ...this.state.waveform.factors[1],
                         data: [
                             ...this.state.waveform.factors[1].data,
-                            ...this.fillData(acceleration.east_west),
+                            ...this.fillData(acceleration, "east_west"),
                         ],
                     },
                     {
                         ...this.state.waveform.factors[2],
                         data: [
                             ...this.state.waveform.factors[2].data,
-                            ...this.fillData(acceleration.north_south),
+                            ...this.fillData(acceleration, "north_south"),
                         ],
                     },
                 ],
@@ -210,7 +230,7 @@ export default class realtimeWaveform extends Component {
                         ...this.state.waveform.synthesis[0],
                         data: [
                             ...this.state.waveform.synthesis[0].data,
-                            ...this.fillData(acceleration.synthesis),
+                            ...this.fillData(acceleration, "synthesis"),
                         ],
                     },
                 ],
@@ -232,6 +252,7 @@ export default class realtimeWaveform extends Component {
                 synthesis:
                     acceleration.synthesis[acceleration.synthesis.length - 1],
             },
+            lastDataArr: acceleration,
         });
     };
 

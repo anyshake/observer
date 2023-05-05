@@ -11,8 +11,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var lastTimestamp int64
-
 func (s *Socket) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) {
 	rg.GET("/socket", func(c *gin.Context) {
 		var upgrader = websocket.Upgrader{
@@ -31,11 +29,6 @@ func (s *Socket) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions)
 		}
 
 		for {
-			if lastTimestamp == options.Message.Acceleration.Timestamp {
-				time.Sleep(100 * time.Millisecond)
-				continue
-			}
-
 			data, err := json.Marshal(options.Message)
 			if err != nil {
 				return
@@ -46,7 +39,7 @@ func (s *Socket) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions)
 				return
 			}
 
-			lastTimestamp = options.Message.Acceleration.Timestamp
+			time.Sleep(time.Second)
 		}
 	})
 }
