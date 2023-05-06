@@ -331,7 +331,7 @@ export default class historyWaveform extends Component {
                                                     >
                                                         <div className="grid grid-cols-6 p-5 gap-y-2">
                                                             <div className="col-span-5 ml-4">
-                                                                <p className="text-sky-500 font-bold text-xs">
+                                                                <p className="text-sky-500 font-bold text-xs mb-2">
                                                                     {`${getTime(
                                                                         new Date(
                                                                             item.timestamp
@@ -345,7 +345,7 @@ export default class historyWaveform extends Component {
                                                                     {`${item.magnitude} 级 / ${item.event}`}
                                                                 </p>
 
-                                                                <p className="text-gray-400">
+                                                                <p className="text-gray-400 text-sm">
                                                                     {`震源深度：${
                                                                         item.depth !==
                                                                         -1
@@ -354,13 +354,13 @@ export default class historyWaveform extends Component {
                                                                     }`}
                                                                 </p>
 
-                                                                <p className="text-gray-400">
+                                                                <p className="text-gray-400 text-sm">
                                                                     {`距离测站：${item.distance.toFixed(
                                                                         2
                                                                     )} km`}
                                                                 </p>
 
-                                                                <p className="text-gray-400">
+                                                                <p className="text-gray-400 text-sm">
                                                                     {`传播时长：${item.estimated.toFixed(
                                                                         2
                                                                     )} s`}
