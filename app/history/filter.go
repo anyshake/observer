@@ -3,30 +3,24 @@ package history
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"com.geophone.observer/app"
 	"com.geophone.observer/common/postgres"
 	"com.geophone.observer/features/geophone"
-	"com.geophone.observer/server/response"
-	"github.com/gin-gonic/gin"
 )
 
-func FilterHistory(c *gin.Context, b *Binding, options *app.ServerOptions) {
+func FilterHistory(timestamp int64, options *app.ServerOptions) ([]geophone.Acceleration, error) {
 	if options.ConnPostgres == nil {
-		response.ErrorHandler(c, http.StatusInternalServerError)
-		return
+		return nil, fmt.Errorf("postgres connection is nil")
 	}
 
-	data, err := postgres.SelectData(options.ConnPostgres, b.Timestamp)
+	data, err := postgres.SelectData(options.ConnPostgres, timestamp)
 	if err != nil {
-		response.ErrorHandler(c, http.StatusInternalServerError)
-		return
+		return nil, err
 	}
 
 	if len(data) == 0 {
-		response.ErrorHandler(c, http.StatusBadRequest)
-		return
+		return nil, fmt.Errorf("no data found")
 	}
 
 	var acceleration []geophone.Acceleration
@@ -34,13 +28,11 @@ func FilterHistory(c *gin.Context, b *Binding, options *app.ServerOptions) {
 		var acc geophone.Acceleration
 		err := json.Unmarshal([]byte(v["data"].(string)), &acc)
 		if err != nil {
-			fmt.Println(err)
-			response.ErrorHandler(c, http.StatusInternalServerError)
-			return
+			return nil, err
 		}
 
 		acceleration = append(acceleration, acc)
 	}
 
-	c.JSON(http.StatusOK, response.MessageHandler(c, "筛选出如下加速度数据", acceleration))
+	return acceleration, nil
 }

@@ -14,7 +14,7 @@ import (
 	"com.geophone.observer/server"
 )
 
-const apiVersion = "v1"
+const apiVersion string = "v1"
 
 func main() {
 	var (
@@ -57,7 +57,7 @@ func main() {
 		conf.Archiver.Username,
 		conf.Archiver.Password,
 		conf.Archiver.Database,
-		conf.Collector.Enable,
+		conf.Archiver.Enable,
 	)
 	if err != nil {
 		log.Fatalln(err)

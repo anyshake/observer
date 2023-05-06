@@ -17,6 +17,10 @@ import AppConfig from "../../config";
 import getApiUrl from "../../helpers/utilities/getApiUrl";
 import arrSort from "../../helpers/utilities/arrSort";
 import arrMaximum from "../../helpers/utilities/arrMaximum";
+import Modal from "react-responsive-modal";
+import "react-responsive-modal/styles.css";
+
+const FETCH_TIMEOUT = 30 * 1000;
 
 export default class historyWaveform extends Component {
     constructor(props) {
@@ -24,6 +28,7 @@ export default class historyWaveform extends Component {
         this.state = {
             sidebarMark: "history",
             timePicker: new Date(Date.now() - 120000),
+            showModal: false,
             waveform: {
                 factors: [
                     {
@@ -90,6 +95,7 @@ export default class historyWaveform extends Component {
                     xaxis: {
                         type: "datetime",
                         labels: {
+                            datetimeUTC: false,
                             datetimeFormatter: {
                                 hour: "HH:mm:ss",
                             },
@@ -127,6 +133,13 @@ export default class historyWaveform extends Component {
                     },
                 ],
             },
+            trace: {
+                location: {
+                    latitude: -1,
+                    longitude: -1,
+                },
+                list: [{}],
+            },
             analysis: {
                 vertical: 0,
                 east_west: 0,
@@ -135,39 +148,6 @@ export default class historyWaveform extends Component {
             },
         };
     }
-
-    fetchData = () => {
-        createRequest({
-            url: getApiUrl({
-                tls: AppConfig.backend.tls,
-                host: AppConfig.backend.host,
-                port: AppConfig.backend.port,
-                version: AppConfig.backend.version,
-                api: AppConfig.backend.api.history.uri,
-                type: AppConfig.backend.api.history.type,
-            }),
-            data: {
-                timestamp: this.state.timePicker.getTime(),
-            },
-            timeout: 30000,
-            method: AppConfig.backend.api.history.method,
-        })
-            .then(({ data: { data } }) => {
-                successAlert({
-                    title: "查询成功",
-                    html: `已找到 ${data.length} 条相关数据`,
-                });
-                this.setState({ response: data });
-                this.drawWaveform(data);
-                this.analyseData(data);
-            })
-            .catch(() => {
-                errorAlert({
-                    title: "查询失败",
-                    html: "未找到相关数据，请检查时间范围",
-                });
-            });
-    };
 
     fillData(dataArr, timestampArr) {
         const arr = dataArr.map((item, index) => {
@@ -258,6 +238,22 @@ export default class historyWaveform extends Component {
                 <div className="content ml-12 transform ease-in-out duration-500 pt-20 px-2 md:px-5 pb-4">
                     <Navbar navigation={"历史数据"} />
 
+                    {this.state.showModal && (
+                        <Modal
+                            open={this.state.showModal}
+                            onClose={() =>
+                                this.setState({
+                                    showModal: false,
+                                })
+                            }
+                            classNames={{
+                                modal: "rounded-lg w-[80%] md:w-[60%] lg:w-[50%]",
+                            }}
+                        >
+                            <h2 className="text-xl font-bold">选择一个地震</h2>
+                        </Modal>
+                    )}
+
                     <div className="flex flex-wrap mt-6">
                         <div className="w-full xl:w-3/12 px-4">
                             <div className="relative flex flex-col bg-white w-full mb-6 shadow-lg rounded-lg">
@@ -275,16 +271,19 @@ export default class historyWaveform extends Component {
                                 </div>
 
                                 <div className="p-4 shadow-lg flex-auto text-gray-600 ">
-                                    <div className="relative h-[350px]">
+                                    <div className="h-[350px] flex flex-col space-y-10">
                                         <div className="flex flex-wrap -mx-2">
-                                            <div className="w-full px-2 mt-8">
+                                            <div className="w-full px-2">
                                                 <span className="ml-2">
-                                                    查询时间（本地时区）
+                                                    {`查询时间（时区 ${
+                                                        Intl.DateTimeFormat().resolvedOptions()
+                                                            .timeZone
+                                                    }）`}
                                                 </span>
-                                                <div className="relative flex flex-col min-w-0 break-words w-full shadow-lg rounded-lg">
+                                                <div className="flex flex-col min-w-0 break-words w-full shadow-lg rounded-lg mt-4">
                                                     <div className="px-4 py-3 bg-transparent">
                                                         <div className="flex flex-wrap items-center">
-                                                            <div className="relative w-full max-w-full flex-grow flex-1 rounded-lg py-2">
+                                                            <div className="w-full max-w-full flex-grow flex-1 rounded-lg py-2">
                                                                 <Datetime
                                                                     dateFormat="YYYY-MM-DD"
                                                                     timeFormat="HH:mm:ss"
@@ -312,32 +311,151 @@ export default class historyWaveform extends Component {
                                             </div>
                                         </div>
 
-                                        <div className="absolute w-full px-2 text mt-20 ml-1">
+                                        <div className="w-full px-2 text ml-1">
                                             {`查询时间 ${getTime(
                                                 this.state.timePicker
                                             )}`}
+                                            <br />
+                                            系统将查询两分钟内震动波形
                                         </div>
 
-                                        <button
-                                            onClick={() => {
-                                                this.fetchData();
-                                                timerAlert({
-                                                    title: "查询中",
-                                                    html: "正在查询 2 分钟内的加速度数据，这可能需要一些时间来完成",
-                                                    timer: 30000,
-                                                    loading: true,
-                                                    callback: () => {
-                                                        errorAlert({
-                                                            title: "查询失败",
-                                                            text: "请求接口超时，请尝试缩小查询范围再试",
+                                        <div className="flex flex-col justify-center items-center gap-4 font-medium text-sm">
+                                            <button
+                                                onClick={() => {
+                                                    createRequest({
+                                                        url: getApiUrl({
+                                                            tls: AppConfig
+                                                                .backend.tls,
+                                                            host: AppConfig
+                                                                .backend.host,
+                                                            port: AppConfig
+                                                                .backend.port,
+                                                            version:
+                                                                AppConfig
+                                                                    .backend
+                                                                    .version,
+                                                            api: AppConfig
+                                                                .backend.api
+                                                                .history.uri,
+                                                            type: AppConfig
+                                                                .backend.api
+                                                                .history.type,
+                                                        }),
+                                                        data: {
+                                                            timestamp:
+                                                                this.state.timePicker.getTime(),
+                                                        },
+                                                        timeout: FETCH_TIMEOUT,
+                                                        method: AppConfig
+                                                            .backend.api.history
+                                                            .method,
+                                                    })
+                                                        .then(
+                                                            ({
+                                                                data: { data },
+                                                            }) => {
+                                                                successAlert({
+                                                                    title: "查询成功",
+                                                                    html: `已找到 ${data.length} 条相关数据`,
+                                                                });
+                                                                this.setState({
+                                                                    response:
+                                                                        data,
+                                                                });
+                                                                this.drawWaveform(
+                                                                    data
+                                                                );
+                                                                this.analyseData(
+                                                                    data
+                                                                );
+                                                            }
+                                                        )
+                                                        .catch(() => {
+                                                            errorAlert({
+                                                                title: "查询失败",
+                                                                html: "未找到相关数据，请检查时间范围",
+                                                            });
                                                         });
-                                                    },
-                                                });
-                                            }}
-                                            className="absolute w-full mt-40 text-white shadow-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-                                        >
-                                            送出查询
-                                        </button>
+
+                                                    timerAlert({
+                                                        title: "查询中",
+                                                        html: "正在查询加速度数据，这可能需要一些时间",
+                                                        timer: 30000,
+                                                        loading: true,
+                                                        callback: () => {
+                                                            errorAlert({
+                                                                title: "查询失败",
+                                                                text: "请求接口超时，请尝试缩小查询范围再试",
+                                                            });
+                                                        },
+                                                    });
+                                                }}
+                                                className="w-full text-white shadow-lg bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none rounded-lg text-sm px-5 py-2.5 text-center"
+                                            >
+                                                送出查询
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    createRequest({
+                                                        url: getApiUrl({
+                                                            tls: AppConfig
+                                                                .backend.tls,
+                                                            host: AppConfig
+                                                                .backend.host,
+                                                            port: AppConfig
+                                                                .backend.port,
+                                                            version:
+                                                                AppConfig
+                                                                    .backend
+                                                                    .version,
+                                                            api: AppConfig
+                                                                .backend.api
+                                                                .history.uri,
+                                                            type: AppConfig
+                                                                .backend.api
+                                                                .history.type,
+                                                        }),
+                                                        data: {
+                                                            timestamp:
+                                                                this.state.timePicker.getTime(),
+                                                        },
+                                                        timeout: FETCH_TIMEOUT,
+                                                        method: AppConfig
+                                                            .backend.api.history
+                                                            .method,
+                                                    }).then((res) => {
+                                                        successAlert({
+                                                            title: "查询成功",
+                                                            html: `已获取到近 30 日地震记录，点击确认继续`,
+                                                        }).then((result) => {
+                                                            if (
+                                                                result.isConfirmed
+                                                            ) {
+                                                                this.setState({
+                                                                    showModal: true,
+                                                                });
+                                                            }
+                                                        });
+                                                    });
+
+                                                    timerAlert({
+                                                        title: "查询中",
+                                                        html: "正在取得香港天文台近 30 日历史地震记录",
+                                                        timer: 30000,
+                                                        loading: true,
+                                                        callback: () => {
+                                                            errorAlert({
+                                                                title: "查询失败",
+                                                                text: "请求接口超时，请检查上位机网络后再试",
+                                                            });
+                                                        },
+                                                    });
+                                                }}
+                                                className="w-full text-white shadow-lg bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none rounded-lg px-5 py-2.5 text-center"
+                                            >
+                                                地震反查
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -8,7 +8,7 @@ import (
 )
 
 func OpenPostgres(host string, port int, username, password, database string, enable bool) (*sql.DB, error) {
-	if enable {
+	if !enable {
 		return nil, nil
 	}
 
