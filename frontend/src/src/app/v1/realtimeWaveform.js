@@ -192,10 +192,10 @@ export default class realtimeWaveform extends Component {
     }
 
     drawWaveform({ acceleration }) {
-        this.state.waveform.synthesis[0].data.length > 35 * 120 &&
+        this.state.waveform.synthesis[0].data.length > 35 * 300 &&
             this.state.waveform.synthesis[0].data.splice(0, 35);
         this.state.waveform.factors.forEach((_, index) => {
-            if (this.state.waveform.factors[index].data.length > 35 * 120) {
+            if (this.state.waveform.factors[index].data.length > 35 * 300) {
                 this.state.waveform.factors[index].data.splice(0, 35);
             }
         });

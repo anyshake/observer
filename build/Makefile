@@ -1,7 +1,7 @@
 
 .PHONY: build
 
-VERSION=1.0.6d
+VERSION=1.0.7d
 ENVIRONMENT=develop
 BINARY=observer
 RELEASE=`date +%Y%m%d%H%M%S`
