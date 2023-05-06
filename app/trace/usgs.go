@@ -12,7 +12,7 @@ type USGS struct{}
 
 func (u *USGS) Property() (string, string) {
 	const (
-		NAME  string = "美国地址调查局"
+		NAME  string = "美国地质调查局"
 		VALUE string = "USGS"
 	)
 
