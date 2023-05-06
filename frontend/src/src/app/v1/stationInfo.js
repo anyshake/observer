@@ -196,11 +196,12 @@ export default class stationInfo extends Component {
                     xaxis: {
                         type: "datetime",
                         labels: {
-                            style: {
-                                colors: "#fff",
-                            },
+                            datetimeUTC: false,
                             datetimeFormatter: {
                                 hour: "HH:mm:ss",
+                            },
+                            style: {
+                                colors: "#fff",
                             },
                         },
                     },

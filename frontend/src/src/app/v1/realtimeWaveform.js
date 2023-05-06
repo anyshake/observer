@@ -92,6 +92,7 @@ export default class realtimeWaveform extends Component {
                     xaxis: {
                         type: "datetime",
                         labels: {
+                            datetimeUTC: false,
                             datetimeFormatter: {
                                 hour: "HH:mm:ss",
                             },

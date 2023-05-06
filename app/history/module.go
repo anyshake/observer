@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *History) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) {
+func (h *History) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) {
 	rg.POST("/history", func(c *gin.Context) {
 		var binding Binding
 		if err := c.ShouldBind(&binding); err != nil {
@@ -16,6 +16,12 @@ func (s *History) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions
 			return
 		}
 
-		FilterHistory(c, &binding, options)
+		data, err := FilterHistory(binding.Timestamp, options)
+		if err != nil {
+			response.ErrorHandler(c, http.StatusInternalServerError)
+			return
+		}
+
+		c.JSON(http.StatusOK, response.MessageHandler(c, "筛选出如下加速度数据", data))
 	})
 }
