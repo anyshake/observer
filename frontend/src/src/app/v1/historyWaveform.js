@@ -30,7 +30,7 @@ export default class historyWaveform extends Component {
             sidebarMark: "history",
             timePicker: new Date(Date.now() - 120000),
             showModal: false,
-            cardLimit: 6,
+            cardLimit: 3,
             waveform: {
                 factors: [
                     {
@@ -329,43 +329,38 @@ export default class historyWaveform extends Component {
                                                             );
                                                         }}
                                                     >
-                                                        <div className="grid grid-cols-6 p-5 gap-y-2">
-                                                            <div className="col-span-5 ml-4">
-                                                                <p className="text-sky-500 font-bold text-xs mb-2">
-                                                                    {`${getTime(
-                                                                        new Date(
-                                                                            item.timestamp
-                                                                        )
-                                                                    )} ${
-                                                                        item.region
-                                                                    }`}
-                                                                </p>
-
-                                                                <p className="text-gray-600 font-bold">
-                                                                    {`${item.magnitude} 级 / ${item.event}`}
-                                                                </p>
-
-                                                                <p className="text-gray-400 text-sm">
-                                                                    {`震源深度：${
-                                                                        item.depth !==
-                                                                        -1
-                                                                            ? `${item.depth} km`
-                                                                            : `数据源未提供`
-                                                                    }`}
-                                                                </p>
-
-                                                                <p className="text-gray-400 text-sm">
-                                                                    {`距离测站：${item.distance.toFixed(
-                                                                        2
-                                                                    )} km`}
-                                                                </p>
-
-                                                                <p className="text-gray-400 text-sm">
-                                                                    {`传播时长：${item.estimated.toFixed(
-                                                                        2
-                                                                    )} s`}
-                                                                </p>
-                                                            </div>
+                                                        <div className="p-5 flex flex-col">
+                                                            <p className="text-sky-500 font-bold text-xs">
+                                                                {`${item.region}`}
+                                                            </p>
+                                                            <p className="text-sky-500 font-bold text-xs">
+                                                                {`${getTime(
+                                                                    new Date(
+                                                                        item.timestamp
+                                                                    )
+                                                                )}`}
+                                                            </p>
+                                                            <p className="text-gray-600 font-bold">
+                                                                {`${item.magnitude} 级 / ${item.event}`}
+                                                            </p>
+                                                            <p className="text-gray-400 text-sm">
+                                                                {`震源深度：${
+                                                                    item.depth !==
+                                                                    -1
+                                                                        ? `${item.depth} km`
+                                                                        : `数据源未提供`
+                                                                }`}
+                                                            </p>
+                                                            <p className="text-gray-400 text-sm">
+                                                                {`距离测站：${item.distance.toFixed(
+                                                                    2
+                                                                )} km`}
+                                                            </p>
+                                                            <p className="text-gray-400 text-sm">
+                                                                {`传播时长：${item.estimated.toFixed(
+                                                                    2
+                                                                )} s`}
+                                                            </p>
                                                         </div>
                                                     </div>
                                                 )
