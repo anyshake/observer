@@ -1,7 +1,7 @@
 const AppConfig = {
     frontend: {
         router: "hash",
-        version: "v1.0.6d",
+        version: "v1.0.7d",
         title: `G-Observer 测站面板`,
         copyright: `© ${new Date().getFullYear()} G-Observer | 通信实验室`,
     },
@@ -14,6 +14,11 @@ const AppConfig = {
             },
             history: {
                 uri: `history`,
+                type: `http`,
+                method: `post`,
+            },
+            trace: {
+                uri: `trace`,
                 type: `http`,
                 method: `post`,
             },

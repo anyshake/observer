@@ -197,6 +197,7 @@ const selectAlert = ({ title, html, inputOptions, callback }) => {
         input: "select",
         inputOptions: inputOptions,
         inputPlaceholder: "请选择",
+        confirmButtonText: "确认",
         showCancelButton: false,
         allowOutsideClick: false,
         inputValidator: (value) => {
