@@ -8,6 +8,7 @@ import "react-datetime/css/react-datetime.css";
 import Datetime from "react-datetime";
 import getTime from "../../helpers/utilities/getTime";
 import {
+    confirmAlert,
     errorAlert,
     selectAlert,
     successAlert,
@@ -314,20 +315,49 @@ export default class historyWaveform extends Component {
                                                         key={index}
                                                         className="cursor-pointer w-full border-2 border-b-4 border-gray-200 rounded-xl hover:bg-gray-50"
                                                         onClick={() => {
-                                                            this.setState({
-                                                                showModal: false,
-                                                                timePicker:
+                                                            confirmAlert({
+                                                                title: "确认选择",
+                                                                html: `选择了位于 <strong>${
+                                                                    item.region
+                                                                }</strong> 的 <strong>${
+                                                                    item.magnitude
+                                                                }</strong> 级地震<br />地震发生于 <strong>${getTime(
+                                                                    new Date(
+                                                                        item.timestamp
+                                                                    )
+                                                                )}</strong><br />将查找 <strong>${getTime(
                                                                     new Date(
                                                                         item.timestamp +
                                                                             item.estimated *
                                                                                 1000
-                                                                    ),
-                                                            });
-
-                                                            setTimeout(
-                                                                () =>
-                                                                    this.queryHistoryData(),
-                                                                100
+                                                                    )
+                                                                )}</strong> 时的波形<br />若要继续请按下确认`,
+                                                                confirmButtonText:
+                                                                    "确认",
+                                                                cancelButtonText:
+                                                                    "取消",
+                                                                callback:
+                                                                    () => {
+                                                                        this.setState(
+                                                                            {
+                                                                                showModal: false,
+                                                                                timePicker:
+                                                                                    new Date(
+                                                                                        item.timestamp +
+                                                                                            item.estimated *
+                                                                                                1000
+                                                                                    ),
+                                                                            }
+                                                                        );
+                                                                    },
+                                                            }).then(
+                                                                (result) => {
+                                                                    if (
+                                                                        result.isConfirmed
+                                                                    ) {
+                                                                        this.queryHistoryData();
+                                                                    }
+                                                                }
                                                             );
                                                         }}
                                                     >
