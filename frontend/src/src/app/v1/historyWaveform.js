@@ -317,11 +317,11 @@ export default class historyWaveform extends Component {
                                                         onClick={() => {
                                                             confirmAlert({
                                                                 title: "确认选择",
-                                                                html: `选择了位于 <strong>${
+                                                                html: `位于 <strong>${
                                                                     item.region
                                                                 }</strong> 的 <strong>${
                                                                     item.magnitude
-                                                                }</strong> 级地震<br />地震发生于 <strong>${getTime(
+                                                                }</strong> 级地震<br />发生于 <strong>${getTime(
                                                                     new Date(
                                                                         item.timestamp
                                                                     )
@@ -331,7 +331,7 @@ export default class historyWaveform extends Component {
                                                                             item.estimated *
                                                                                 1000
                                                                     )
-                                                                )}</strong> 时的波形<br />若要继续请按下确认`,
+                                                                )}</strong><br />若要继续查询，请按下确认`,
                                                                 confirmButtonText:
                                                                     "确认",
                                                                 cancelButtonText:
@@ -341,6 +341,7 @@ export default class historyWaveform extends Component {
                                                                         this.setState(
                                                                             {
                                                                                 showModal: false,
+                                                                                cardLimit: 3,
                                                                                 timePicker:
                                                                                     new Date(
                                                                                         item.timestamp +
@@ -400,12 +401,12 @@ export default class historyWaveform extends Component {
                                         {this.state.cardLimit <
                                         this.state.trace.list.length ? (
                                             <button
-                                                className="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg"
+                                                className="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-8 rounded-lg shadow-lg"
                                                 onClick={() =>
                                                     this.setState({
                                                         cardLimit:
                                                             this.state
-                                                                .cardLimit + 6,
+                                                                .cardLimit + 3,
                                                     })
                                                 }
                                             >
