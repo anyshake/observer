@@ -15,7 +15,7 @@ type CWB struct{}
 
 func (c *CWB) Property() (string, string) {
 	const (
-		NAME  string = "台湾交通部中央气象局"
+		NAME  string = "台湾交通部中央氣象局"
 		VALUE string = "CWB"
 	)
 
