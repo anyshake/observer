@@ -54,6 +54,12 @@ func (j *JMA) Format(latitude, longitude float64, data map[string]interface{}) (
 			continue
 		}
 
+		if !IsEmpty(v, []string{
+			"anm", "mag", "cod", "at",
+		}) {
+			continue
+		}
+
 		ts, err := time.Parse("2006-01-02T15:04:05+09:00", v["at"].(string))
 		if err != nil {
 			continue
