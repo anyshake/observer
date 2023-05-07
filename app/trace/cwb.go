@@ -196,5 +196,5 @@ func (c *CWB) GetTimestamp(data string) int64 {
 		return -1
 	}
 
-	return t.UnixMilli()
+	return t.Add(-8 * time.Hour).UnixMilli()
 }
