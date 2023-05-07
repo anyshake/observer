@@ -2,7 +2,6 @@ package trace
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"com.geophone.observer/common/request"
@@ -12,7 +11,7 @@ type CENC struct{}
 
 func (c *CENC) Property() (string, string) {
 	const (
-		NAME  string = "中国地震台网地震信息"
+		NAME  string = "中国地震局地震台网速报"
 		VALUE string = "CENC"
 	)
 
@@ -57,7 +56,6 @@ func (c *CENC) Format(latitude, longitude float64, data map[string]interface{}) 
 
 		ts, err := time.Parse("2006-01-02 15:04:05", v.(map[string]interface{})["time"].(string))
 		if err != nil {
-			fmt.Println(err)
 			continue
 		}
 
