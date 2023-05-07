@@ -109,8 +109,10 @@ const confirmAlert = ({
         confirmButtonText: confirmButtonText,
     }).then((result) => {
         if (result.value) {
-            callback && callback();
+            callback && callback(result);
         }
+
+        return result;
     });
 };
 
