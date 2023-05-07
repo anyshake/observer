@@ -297,11 +297,13 @@ export default class historyWaveform extends Component {
                                 modal: "rounded-lg w-[80%] md:w-[60%] lg:w-[50%]",
                             }}
                         >
-                            <h2 className="text-xl font-bold">选择一个地震</h2>
-                            <h4 className="text-md mt-2">
+                            <h2 className="text-xl font-bold text-gray-700">
+                                选择一个地震
+                            </h2>
+                            <h4 className="text-md mt-2 text-gray-600">
                                 点击卡片可以查看对应时刻测站波形
                             </h4>
-                            <section className="overflow-hidden text-gray-700 mt-4">
+                            <section className="overflow-hidden mt-4 text-gray-700">
                                 <div className="container mx-auto px-5 py-2">
                                     <div className="flex flex-wrap items-center justify-center gap-2">
                                         {this.state.trace.list.map(
