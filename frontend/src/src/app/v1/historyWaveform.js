@@ -21,6 +21,7 @@ import arrSort from "../../helpers/utilities/arrSort";
 import arrMaximum from "../../helpers/utilities/arrMaximum";
 import Modal from "react-responsive-modal";
 import "react-responsive-modal/styles.css";
+import getIntensity from "../../helpers/utilities/getIntensity";
 
 const FETCH_TIMEOUT = 30 * 1000;
 
@@ -187,7 +188,7 @@ export default class historyWaveform extends Component {
             title: "查询中",
             html: "正在查询加速度数据，这可能需要一些时间",
             timer: 30000,
-            loading: true,
+            loading: false,
             callback: () => {
                 errorAlert({
                     title: "查询失败",
@@ -655,7 +656,7 @@ export default class historyWaveform extends Component {
                                                                                 title: "查询中",
                                                                                 html: "正在请求地震列表数据，这可能需要一些时间",
                                                                                 timer: 30000,
-                                                                                loading: true,
+                                                                                loading: false,
                                                                                 callback:
                                                                                     () => {
                                                                                         errorAlert(
@@ -681,7 +682,7 @@ export default class historyWaveform extends Component {
                                                         title: "查询中",
                                                         html: "正在获取地震数据源，这可能需要一些时间",
                                                         timer: 30000,
-                                                        loading: true,
+                                                        loading: false,
                                                         callback: () => {
                                                             errorAlert({
                                                                 title: "查询失败",
@@ -711,6 +712,26 @@ export default class historyWaveform extends Component {
                                             <h2 className="text-gray-700 text-xl font-semibold">
                                                 三分量加速度
                                             </h2>
+                                            <div className="flex flex-row gap-2 mt-2 flex-wrap text-xs font-medium">
+                                                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded border border-blue-400">
+                                                    {`垂直分量震度 ${getIntensity(
+                                                        this.state.analysis
+                                                            .vertical
+                                                    )}`}
+                                                </span>
+                                                <span className="bg-green-100 text-green-800 px-3 py-1 rounded border border-green-400">
+                                                    {`水平 EW 震度 ${getIntensity(
+                                                        this.state.analysis
+                                                            .east_west
+                                                    )}`}
+                                                </span>
+                                                <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded border border-purple-400">
+                                                    {`水平 NS 震度 ${getIntensity(
+                                                        this.state.analysis
+                                                            .north_south
+                                                    )}`}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -754,7 +775,7 @@ export default class historyWaveform extends Component {
                                                         <div className="flex flex-wrap items-center">
                                                             <div className="relative w-full max-w-full flex-grow flex-1">
                                                                 <h6 className="text-gray-500 mb-1 text-xs font-semibold">
-                                                                    垂直分量峰值（绝对值）
+                                                                    垂直分量峰值
                                                                 </h6>
                                                                 <h2 className="text-gray-700 text-xl font-semibold">
                                                                     {
@@ -763,6 +784,9 @@ export default class historyWaveform extends Component {
                                                                             .analysis
                                                                             .vertical
                                                                     }
+                                                                    <span className="text-sm text-gray-500 m-2">
+                                                                        gal
+                                                                    </span>
                                                                 </h2>
                                                             </div>
                                                         </div>
@@ -774,8 +798,7 @@ export default class historyWaveform extends Component {
                                                         <div className="flex flex-wrap items-center">
                                                             <div className="relative w-full max-w-full flex-grow flex-1">
                                                                 <h6 className="text-gray-500 mb-1 text-xs font-semibold">
-                                                                    EW
-                                                                    分量峰值（绝对值）
+                                                                    EW 分量峰值
                                                                 </h6>
                                                                 <h2 className="text-gray-700 text-xl font-semibold">
                                                                     {
@@ -784,6 +807,9 @@ export default class historyWaveform extends Component {
                                                                             .analysis
                                                                             .east_west
                                                                     }
+                                                                    <span className="text-sm text-gray-500 m-2">
+                                                                        gal
+                                                                    </span>
                                                                 </h2>
                                                             </div>
                                                         </div>
@@ -795,8 +821,7 @@ export default class historyWaveform extends Component {
                                                         <div className="flex flex-wrap items-center">
                                                             <div className="relative w-full max-w-full flex-grow flex-1">
                                                                 <h6 className="text-gray-500 mb-1 text-xs font-semibold">
-                                                                    NS
-                                                                    分量峰值（绝对值）
+                                                                    NS 分量峰值
                                                                 </h6>
                                                                 <h2 className="text-gray-700 text-xl font-semibold">
                                                                     {
@@ -805,6 +830,9 @@ export default class historyWaveform extends Component {
                                                                             .analysis
                                                                             .north_south
                                                                     }
+                                                                    <span className="text-sm text-gray-500 m-2">
+                                                                        gal
+                                                                    </span>
                                                                 </h2>
                                                             </div>
                                                         </div>
@@ -825,6 +853,9 @@ export default class historyWaveform extends Component {
                                                                             .analysis
                                                                             .synthesis
                                                                     }
+                                                                    <span className="text-sm text-gray-500 m-2">
+                                                                        gal
+                                                                    </span>
                                                                 </h2>
                                                             </div>
                                                         </div>
@@ -848,6 +879,14 @@ export default class historyWaveform extends Component {
                                             <h2 className="text-gray-700 text-xl font-semibold">
                                                 合成加速度
                                             </h2>
+                                            <div className="flex flex-row gap-2 mt-2 flex-wrap text-xs font-medium">
+                                                <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded border border-orange-400">
+                                                    {`合成震度 ${getIntensity(
+                                                        this.state.analysis
+                                                            .synthesis
+                                                    )}`}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
