@@ -1,7 +1,7 @@
 package geophone
 
 const (
-	FRAME_SIZE int = 35
+	FRAME_SIZE int = 100
 )
 
 type Geophone struct {
