@@ -9,7 +9,6 @@ import ReactApexChart from "react-apexcharts";
 import getTime from "../../helpers/utilities/getTime";
 import Notification from "../../components/Notification";
 import Navbar from "../../components/Navbar";
-import Spectrum from "../../components/Spectrum";
 import getIntensity from "../../helpers/utilities/getIntensity";
 import arrAverage from "../../helpers/utilities/arrAverage";
 import arrMaximum from "../../helpers/utilities/arrMaximum";
@@ -194,10 +193,10 @@ export default class realtimeWaveform extends Component {
     drawWaveform({ acceleration }) {
         const length = acceleration.synthesis.length;
 
-        this.state.waveform.synthesis[0].data.length > length * 60 &&
+        this.state.waveform.synthesis[0].data.length > length * 300 &&
             this.state.waveform.synthesis[0].data.splice(0, length);
         this.state.waveform.factors.forEach((_, index) => {
-            if (this.state.waveform.factors[index].data.length > length * 60) {
+            if (this.state.waveform.factors[index].data.length > length * 300) {
                 this.state.waveform.factors[index].data.splice(0, length);
             }
         });
@@ -317,10 +316,10 @@ export default class realtimeWaveform extends Component {
                                             </h2>
                                             <div className="flex flex-row gap-2 mt-2 flex-wrap text-xs font-medium">
                                                 <span className="bg-amber-100 text-amber-800 px-3 py-1 rounded border border-amber-400">
-                                                    {`垂直 ${
+                                                    {`垂直分量 ${
                                                         this.state.analysis
                                                             .vertical
-                                                    } cm/s²（震度 ${getIntensity(
+                                                    } gal（震度 ${getIntensity(
                                                         this.state.analysis
                                                             .vertical
                                                     )}）`}
@@ -329,7 +328,7 @@ export default class realtimeWaveform extends Component {
                                                     {`水平 EW ${
                                                         this.state.analysis
                                                             .east_west
-                                                    } cm/s²（震度 ${getIntensity(
+                                                    } gal（震度 ${getIntensity(
                                                         this.state.analysis
                                                             .east_west
                                                     )}）`}
@@ -338,7 +337,7 @@ export default class realtimeWaveform extends Component {
                                                     {`水平 NS ${
                                                         this.state.analysis
                                                             .north_south
-                                                    } cm/s²（震度 ${getIntensity(
+                                                    } gal（震度 ${getIntensity(
                                                         this.state.analysis
                                                             .north_south
                                                     )}）`}
@@ -377,7 +376,7 @@ export default class realtimeWaveform extends Component {
                                                     {`合成 ${
                                                         this.state.analysis
                                                             .synthesis
-                                                    } cm/s²（震度 ${getIntensity(
+                                                    } gal（震度 ${getIntensity(
                                                         this.state.analysis
                                                             .synthesis
                                                     )}）`}
@@ -403,7 +402,7 @@ export default class realtimeWaveform extends Component {
                             </div>
                         </div>
 
-                        <div className="w-full mb-12 xl:mb-0 px-4">
+                        {/* <div className="w-full mb-12 xl:mb-0 px-4">
                             <div className="relative flex flex-col w-full mb-6 shadow-lg rounded-lg">
                                 <div className="px-4 py-3 bg-transparent">
                                     <div className="flex flex-wrap items-center">
@@ -427,7 +426,7 @@ export default class realtimeWaveform extends Component {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
 

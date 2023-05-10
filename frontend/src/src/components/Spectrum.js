@@ -65,7 +65,7 @@ class Spectrogram {
         const frequencies = util.fftFreq(phasors, N.length);
         const magnitudes = util.fftMag(phasors);
         const both = frequencies.map((f, ix) => {
-            return { frequency: f, magnitude: magnitudes[ix] * 50 };
+            return { frequency: f, magnitude: magnitudes[ix] * 100 };
         });
 
         for (let i = 0; i < Math.max(both.length, height); i++) {

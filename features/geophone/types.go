@@ -1,21 +1,19 @@
 package geophone
 
-const (
-	FRAME_SIZE int = 100
-)
+const PACKET_SIZE int = 57
 
 type Geophone struct {
-	Vertical   [FRAME_SIZE]float32
-	EastWest   [FRAME_SIZE]float32
-	NorthSouth [FRAME_SIZE]float32
+	Vertical   [PACKET_SIZE]float32
+	EastWest   [PACKET_SIZE]float32
+	NorthSouth [PACKET_SIZE]float32
 }
 
 type Acceleration struct {
-	Timestamp  int64               `json:"timestamp"`
-	Vertical   [FRAME_SIZE]float64 `json:"vertical"`
-	EastWest   [FRAME_SIZE]float64 `json:"east_west"`
-	NorthSouth [FRAME_SIZE]float64 `json:"north_south"`
-	Synthesis  [FRAME_SIZE]float64 `json:"synthesis"`
+	Timestamp  int64                `json:"timestamp"`
+	Vertical   [PACKET_SIZE]float64 `json:"vertical"`
+	EastWest   [PACKET_SIZE]float64 `json:"east_west"`
+	NorthSouth [PACKET_SIZE]float64 `json:"north_south"`
+	Synthesis  [PACKET_SIZE]float64 `json:"synthesis"`
 }
 
 type GeophoneOptions struct {
