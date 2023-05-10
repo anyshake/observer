@@ -9,6 +9,10 @@ import ReactApexChart from "react-apexcharts";
 import getTime from "../../helpers/utilities/getTime";
 import Notification from "../../components/Notification";
 import Navbar from "../../components/Navbar";
+import Spectrum from "../../components/Spectrum";
+import getIntensity from "../../helpers/utilities/getIntensity";
+import arrAverage from "../../helpers/utilities/arrAverage";
+import arrMaximum from "../../helpers/utilities/arrMaximum";
 
 export default class realtimeWaveform extends Component {
     constructor(props) {
@@ -16,12 +20,7 @@ export default class realtimeWaveform extends Component {
         this.state = {
             sidebarMark: "waveform",
             webSocket: null,
-            lastDataArr: {
-                timestamp: -1,
-                vertical: [],
-                east_west: [],
-                north_south: [],
-            },
+            lastTimestamp: -1,
             waveform: {
                 factors: [
                     {
@@ -82,12 +81,12 @@ export default class realtimeWaveform extends Component {
                         },
                     },
                     tooltip: {
-                        enabled: true,
-                        theme: "dark",
-                        fillSeriesColor: false,
-                        x: {
-                            format: "20yy/MM/dd HH:mm:ss",
-                        },
+                        enabled: false,
+                        // theme: "dark",
+                        // fillSeriesColor: false,
+                        // x: {
+                        //     format: "20yy/MM/dd HH:mm:ss",
+                        // },
                     },
                     xaxis: {
                         type: "datetime",
@@ -123,6 +122,7 @@ export default class realtimeWaveform extends Component {
                         vertical: [],
                         east_west: [],
                         north_south: [],
+                        synthesis: [],
                     },
                 ],
             },
@@ -172,13 +172,13 @@ export default class realtimeWaveform extends Component {
 
     fillData(data, key) {
         if (
-            this.state.lastDataArr.timestamp < 1 ||
-            this.state.lastDataArr.timestamp === data.timestamp
+            this.state.lastTimestamp < 1 ||
+            this.state.lastTimestamp === data.timestamp
         ) {
             return [];
         }
 
-        const timeDiff = data.timestamp - this.state.lastDataArr.timestamp;
+        const timeDiff = data.timestamp - this.state.lastTimestamp;
         const timeSpan = timeDiff / data[key].length;
 
         return data[key].map((item, index) => {
@@ -192,11 +192,13 @@ export default class realtimeWaveform extends Component {
     }
 
     drawWaveform({ acceleration }) {
-        this.state.waveform.synthesis[0].data.length > 35 * 300 &&
-            this.state.waveform.synthesis[0].data.splice(0, 35);
+        const length = acceleration.synthesis.length;
+
+        this.state.waveform.synthesis[0].data.length > length * 60 &&
+            this.state.waveform.synthesis[0].data.splice(0, length);
         this.state.waveform.factors.forEach((_, index) => {
-            if (this.state.waveform.factors[index].data.length > 35 * 300) {
-                this.state.waveform.factors[index].data.splice(0, 35);
+            if (this.state.waveform.factors[index].data.length > length * 60) {
+                this.state.waveform.factors[index].data.splice(0, length);
             }
         });
 
@@ -242,18 +244,12 @@ export default class realtimeWaveform extends Component {
     analyseData = ({ acceleration }) => {
         this.setState({
             analysis: {
-                vertical:
-                    acceleration.vertical[acceleration.vertical.length - 1],
-                east_west:
-                    acceleration.east_west[acceleration.east_west.length - 1],
-                north_south:
-                    acceleration.north_south[
-                        acceleration.north_south.length - 1
-                    ],
-                synthesis:
-                    acceleration.synthesis[acceleration.synthesis.length - 1],
+                vertical: arrAverage(acceleration.vertical).toFixed(5),
+                east_west: arrAverage(acceleration.east_west).toFixed(5),
+                north_south: arrAverage(acceleration.north_south).toFixed(5),
+                synthesis: arrMaximum(acceleration.synthesis).toFixed(5),
             },
-            lastDataArr: acceleration,
+            lastTimestamp: acceleration.timestamp,
         });
     };
 
@@ -319,6 +315,35 @@ export default class realtimeWaveform extends Component {
                                             <h2 className="text-gray-700 text-xl font-semibold">
                                                 实时分量加速度
                                             </h2>
+                                            <div className="flex flex-row gap-2 mt-2 flex-wrap text-xs font-medium">
+                                                <span className="bg-amber-100 text-amber-800 px-3 py-1 rounded border border-amber-400">
+                                                    {`垂直 ${
+                                                        this.state.analysis
+                                                            .vertical
+                                                    } cm/s²（震度 ${getIntensity(
+                                                        this.state.analysis
+                                                            .vertical
+                                                    )}）`}
+                                                </span>
+                                                <span className="bg-green-100 text-green-800 px-3 py-1 rounded border border-green-400">
+                                                    {`水平 EW ${
+                                                        this.state.analysis
+                                                            .east_west
+                                                    } cm/s²（震度 ${getIntensity(
+                                                        this.state.analysis
+                                                            .east_west
+                                                    )}）`}
+                                                </span>
+                                                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded border border-blue-400">
+                                                    {`水平 NS ${
+                                                        this.state.analysis
+                                                            .north_south
+                                                    } cm/s²（震度 ${getIntensity(
+                                                        this.state.analysis
+                                                            .north_south
+                                                    )}）`}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -347,6 +372,17 @@ export default class realtimeWaveform extends Component {
                                             <h2 className="text-gray-700 text-xl font-semibold">
                                                 实时合成加速度
                                             </h2>
+                                            <div className="flex flex-row gap-2 mt-2 flex-wrap text-xs font-medium">
+                                                <span className="bg-pink-100 text-pink-800 px-3 py-1 rounded border border-pink-400">
+                                                    {`合成 ${
+                                                        this.state.analysis
+                                                            .synthesis
+                                                    } cm/s²（震度 ${getIntensity(
+                                                        this.state.analysis
+                                                            .synthesis
+                                                    )}）`}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -367,107 +403,27 @@ export default class realtimeWaveform extends Component {
                             </div>
                         </div>
 
-                        <div className="w-full px-4">
-                            <div className="relative flex flex-col bg-white w-full mb-6 shadow-lg rounded-lg">
+                        <div className="w-full mb-12 xl:mb-0 px-4">
+                            <div className="relative flex flex-col w-full mb-6 shadow-lg rounded-lg">
                                 <div className="px-4 py-3 bg-transparent">
                                     <div className="flex flex-wrap items-center">
                                         <div className="relative w-full max-w-full flex-grow flex-1">
                                             <h6 className="text-gray-500 mb-1 text-xs font-semibold">
-                                                数据
+                                                即时
                                             </h6>
                                             <h2 className="text-gray-700 text-xl font-semibold">
-                                                数据分析
+                                                实时频谱图
                                             </h2>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-4 shadow-lg flex-auto">
+                                <div className="p-4 flex-auto shadow-lg bg-gradient-to-tr from-teal-300 to-teal-400 shadow-teal-500/40 rounded-lg">
                                     <div className="relative h-[350px]">
-                                        <div className="flex flex-wrap -mx-2">
-                                            <div className="w-full px-2">
-                                                <div className="relative flex flex-col min-w-0 break-words bg-sky-100 w-full mb-4 shadow-lg rounded-lg">
-                                                    <div className="px-4 py-3 bg-transparent">
-                                                        <div className="flex flex-wrap items-center">
-                                                            <div className="relative w-full max-w-full flex-grow flex-1">
-                                                                <h6 className="text-gray-500 mb-1 text-xs font-semibold">
-                                                                    垂直分量当前值
-                                                                </h6>
-                                                                <h2 className="text-gray-700 text-xl font-semibold">
-                                                                    {
-                                                                        this
-                                                                            .state
-                                                                            .analysis
-                                                                            .vertical
-                                                                    }
-                                                                </h2>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="relative flex flex-col min-w-0 break-words bg-sky-100 w-full mb-4 shadow-lg rounded-lg">
-                                                    <div className="px-4 py-3 bg-transparent">
-                                                        <div className="flex flex-wrap items-center">
-                                                            <div className="relative w-full max-w-full flex-grow flex-1">
-                                                                <h6 className="text-gray-500 mb-1 text-xs font-semibold">
-                                                                    EW
-                                                                    分量当前值
-                                                                </h6>
-                                                                <h2 className="text-gray-700 text-xl font-semibold">
-                                                                    {
-                                                                        this
-                                                                            .state
-                                                                            .analysis
-                                                                            .east_west
-                                                                    }
-                                                                </h2>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="relative flex flex-col min-w-0 break-words bg-sky-100 w-full mb-4 shadow-lg rounded-lg">
-                                                    <div className="px-4 py-3 bg-transparent">
-                                                        <div className="flex flex-wrap items-center">
-                                                            <div className="relative w-full max-w-full flex-grow flex-1">
-                                                                <h6 className="text-gray-500 mb-1 text-xs font-semibold">
-                                                                    NS
-                                                                    分量当前值
-                                                                </h6>
-                                                                <h2 className="text-gray-700 text-xl font-semibold">
-                                                                    {
-                                                                        this
-                                                                            .state
-                                                                            .analysis
-                                                                            .north_south
-                                                                    }
-                                                                </h2>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="relative flex flex-col min-w-0 break-words bg-sky-100 w-full mb-4 shadow-lg rounded-lg">
-                                                    <div className="px-4 py-3 bg-transparent">
-                                                        <div className="flex flex-wrap items-center">
-                                                            <div className="relative w-full max-w-full flex-grow flex-1">
-                                                                <h6 className="text-gray-500 mb-1 text-xs font-semibold">
-                                                                    合成分量当前值
-                                                                </h6>
-                                                                <h2 className="text-gray-700 text-xl font-semibold">
-                                                                    {
-                                                                        this
-                                                                            .state
-                                                                            .analysis
-                                                                            .synthesis
-                                                                    }
-                                                                </h2>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <Spectrum
+                                            data={
+                                                this.state.response.acceleration
+                                            }
+                                        />
                                     </div>
                                 </div>
                             </div>
