@@ -43,3 +43,10 @@ mipsle:
 	@env GOOS=linux GOARCH=mipsle GOMIPS=softfloat go build -ldflags="-s -w -X main.version=v${VERSION} -X main.release=#0~${ENVIRONMENT}${RELEASE}-${COMMIT}" -o ./release/mipsle/${BINARY} ../cmd/*.go
 	@cp ./config.json ./release/mipsle
 	@cp ./g-observer.service ./release/mipsle
+
+loongarch:
+	@mkdir -p ./release/mipsle
+	@rm -rf  ./release/mipsle/*
+	@env GOOS=linux GOARCH=loong64 go build -ldflags="-s -w -X main.version=v${VERSION} -X main.release=#0~${ENVIRONMENT}${RELEASE}-${COMMIT}" -o ./release/mipsle/${BINARY} ../cmd/*.go
+	@cp ./config.json ./release/mipsle
+	@cp ./g-observer.service ./release/mipsle
