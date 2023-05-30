@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"com.geophone.observer/app"
+	"com.geophone.observer/features/geophone"
 	"com.geophone.observer/server/response"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -39,7 +40,7 @@ func (s *Socket) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions)
 				return
 			}
 
-			time.Sleep(500 * time.Millisecond)
+			time.Sleep(time.Duration(geophone.PACKET_SIZE) * time.Millisecond)
 		}
 	})
 }

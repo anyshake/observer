@@ -21,15 +21,17 @@ func init() {
 
 func ServerDaemon(host string, port int, options *app.ServerOptions) error {
 	r := gin.New()
-	r.Use(gzip.Gzip(options.Gzip),
+	r.Use(
+		gzip.Gzip(options.Gzip),
 		gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 			return fmt.Sprintf("%s [%s] %s %d %s %s\n",
 				param.TimeStamp.Format("2006/01/02 15:04:05"),
 				param.ClientIP, param.Method, param.StatusCode,
 				param.Path, param.ErrorMessage,
 			)
-		}))
-	if options.Cors {
+		}),
+	)
+	if options.CORS {
 		r.Use(cors.AllowCros([]cors.HttpHeader{
 			{
 				Header: "Access-Control-Allow-Origin",

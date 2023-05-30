@@ -10,11 +10,7 @@ import (
 )
 
 func ProgramInit(args *config.Args, conf *config.Config) error {
-	figure.NewFigure(
-		"G-Observer",
-		"standard",
-		true,
-	).Print()
+	figure.NewFigure("G-Observer", "standard", true).Print()
 	fmt.Println()
 
 	args.ReadFlags()

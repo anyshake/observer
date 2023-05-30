@@ -9,7 +9,7 @@ import (
 
 type ServerOptions struct {
 	Gzip         int
-	Cors         bool
+	CORS         bool
 	Version      string
 	ApiPrefix    string
 	WebPrefix    string
