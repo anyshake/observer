@@ -159,7 +159,7 @@ func main() {
 			Status:       &status,
 			ConnGRPC:     &grpc,
 			ConnPostgres: pdb,
-			Cors:         true,
+			CORS:         true,
 			Gzip:         9,
 		})
 }

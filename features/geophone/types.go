@@ -1,6 +1,6 @@
 package geophone
 
-const PACKET_SIZE int = 57
+const PACKET_SIZE int = 10
 
 type Geophone struct {
 	Vertical   [PACKET_SIZE]float32
