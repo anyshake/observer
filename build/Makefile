@@ -7,7 +7,7 @@ BINARY=observer
 RELEASE=`date +%Y%m%d%H%M%S`
 COMMIT=`git rev-parse --short HEAD`
 
-build: armv7l aarch64 x86_64 i386 mipsle
+build: armv7l aarch64 x86_64 i386 mipsle loong64
 
 armv7l:
 	@mkdir -p ./release/armv7l
@@ -44,9 +44,9 @@ mipsle:
 	@cp ./config.json ./release/mipsle
 	@cp ./g-observer.service ./release/mipsle
 
-loongarch:
-	@mkdir -p ./release/mipsle
-	@rm -rf  ./release/mipsle/*
-	@env GOOS=linux GOARCH=loong64 go build -ldflags="-s -w -X main.version=v${VERSION} -X main.release=#0~${ENVIRONMENT}${RELEASE}-${COMMIT}" -o ./release/mipsle/${BINARY} ../cmd/*.go
-	@cp ./config.json ./release/mipsle
-	@cp ./g-observer.service ./release/mipsle
+loong64:
+	@mkdir -p ./release/loong64
+	@rm -rf  ./release/loong64/*
+	@env GOOS=linux GOARCH=loong64 go build -ldflags="-s -w -X main.version=v${VERSION} -X main.release=#0~${ENVIRONMENT}${RELEASE}-${COMMIT}" -o ./release/loong64/${BINARY} ../cmd/*.go
+	@cp ./config.json ./release/loong64
+	@cp ./g-observer.service ./release/loong64
