@@ -32,7 +32,7 @@ func (h *HKO) Fetch() ([]byte, error) {
 	return res, nil
 }
 
-func (h *HKO) Parse(data []byte) (map[string]interface{}, error) {
+func (h *HKO) Parse(data []byte) (map[string]any, error) {
 	decoder := xml2map.NewDecoder(strings.NewReader(string(data)))
 
 	result, err := decoder.Decode()
@@ -43,14 +43,14 @@ func (h *HKO) Parse(data []byte) (map[string]interface{}, error) {
 	return result, nil
 }
 
-func (h *HKO) Format(latitude, longitude float64, data map[string]interface{}) ([]EarthquakeList, error) {
-	events, ok := data["Earthquake"].(map[string]interface{})["EventGroup"].(map[string]interface{})["Event"]
+func (h *HKO) Format(latitude, longitude float64, data map[string]any) ([]EarthquakeList, error) {
+	events, ok := data["Earthquake"].(map[string]any)["EventGroup"].(map[string]any)["Event"]
 	if !ok {
 		return nil, fmt.Errorf("source data is not valid")
 	}
 
 	var list []EarthquakeList
-	for _, v := range events.([]map[string]interface{}) {
+	for _, v := range events.([]map[string]any) {
 		if !HasKey(v, []string{
 			"Verify", "HKTDate", "HKTTime", "City",
 			"Region", "Lat", "Lon", "Mag",

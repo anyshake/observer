@@ -59,7 +59,7 @@ func PushMessage(conn *grpc.ClientConn, grpc pb.CollectorClient, options *Collec
 		return
 	}
 
-	var response interface{}
+	var response any
 	err = json.Unmarshal(respb, &response)
 	if err != nil {
 		options.Status.Failures++
@@ -69,7 +69,7 @@ func PushMessage(conn *grpc.ClientConn, grpc pb.CollectorClient, options *Collec
 	}
 
 	respb, err = base64.StdEncoding.DecodeString(
-		response.(map[string]interface{})["Data"].(string),
+		response.(map[string]any)["Data"].(string),
 	)
 	if err != nil {
 		options.Status.Failures++

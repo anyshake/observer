@@ -31,8 +31,8 @@ func (u *USGS) Fetch() ([]byte, error) {
 	return res, nil
 }
 
-func (u *USGS) Parse(data []byte) (map[string]interface{}, error) {
-	var result map[string]interface{}
+func (u *USGS) Parse(data []byte) (map[string]any, error) {
+	var result map[string]any
 	err := json.Unmarshal(data, &result)
 	if err != nil {
 		return nil, err
@@ -41,48 +41,48 @@ func (u *USGS) Parse(data []byte) (map[string]interface{}, error) {
 	return result, nil
 }
 
-func (u *USGS) Format(latitude, longitude float64, data map[string]interface{}) ([]EarthquakeList, error) {
+func (u *USGS) Format(latitude, longitude float64, data map[string]any) ([]EarthquakeList, error) {
 	events, ok := data["features"]
 	if !ok {
 		return nil, fmt.Errorf("source data is not valid")
 	}
 
 	var list []EarthquakeList
-	for _, v := range events.([]interface{}) {
-		if !HasKey(v.(map[string]interface{}), []string{"properties"}) {
+	for _, v := range events.([]any) {
+		if !HasKey(v.(map[string]any), []string{"properties"}) {
 			continue
 		}
 
-		properties := v.(map[string]interface{})["properties"]
-		if !HasKey(properties.(map[string]interface{}), []string{
+		properties := v.(map[string]any)["properties"]
+		if !HasKey(properties.(map[string]any), []string{
 			"mag", "place", "time", "type", "title",
 		}) {
 			continue
 		}
 
-		geometry := v.(map[string]interface{})["geometry"]
-		if !HasKey(geometry.(map[string]interface{}), []string{"coordinates"}) {
+		geometry := v.(map[string]any)["geometry"]
+		if !HasKey(geometry.(map[string]any), []string{"coordinates"}) {
 			continue
 		}
 
-		coordinates := geometry.(map[string]interface{})["coordinates"]
-		if len(coordinates.([]interface{})) != 3 {
+		coordinates := geometry.(map[string]any)["coordinates"]
+		if len(coordinates.([]any)) != 3 {
 			continue
 		}
 
-		if properties.(map[string]interface{})["type"].(string) != "earthquake" {
+		if properties.(map[string]any)["type"].(string) != "earthquake" {
 			continue
 		}
 
 		l := EarthquakeList{
-			Depth:     coordinates.([]interface{})[2].(float64),
+			Depth:     coordinates.([]any)[2].(float64),
 			Verfied:   true,
-			Timestamp: int64(properties.(map[string]interface{})["time"].(float64)),
-			Event:     properties.(map[string]interface{})["title"].(string),
-			Region:    properties.(map[string]interface{})["place"].(string),
-			Latitude:  coordinates.([]interface{})[1].(float64),
-			Longitude: coordinates.([]interface{})[0].(float64),
-			Magnitude: properties.(map[string]interface{})["mag"].(float64),
+			Timestamp: int64(properties.(map[string]any)["time"].(float64)),
+			Event:     properties.(map[string]any)["title"].(string),
+			Region:    properties.(map[string]any)["place"].(string),
+			Latitude:  coordinates.([]any)[1].(float64),
+			Longitude: coordinates.([]any)[0].(float64),
+			Magnitude: properties.(map[string]any)["mag"].(float64),
 		}
 		l.Distance = GetDistance(latitude, l.Latitude, longitude, l.Longitude)
 		l.Estimated = GetEstimation(l.Distance)

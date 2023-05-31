@@ -31,11 +31,11 @@ func (j *JMA) Fetch() ([]byte, error) {
 	return res, nil
 }
 
-func (j *JMA) Parse(data []byte) (map[string]interface{}, error) {
-	result := make(map[string]interface{}, 0)
-	result["data"] = make([]interface{}, 0)
+func (j *JMA) Parse(data []byte) (map[string]any, error) {
+	result := make(map[string]any, 0)
+	result["data"] = make([]any, 0)
 
-	arr := make([]map[string]interface{}, 0)
+	arr := make([]map[string]any, 0)
 	err := json.Unmarshal(data, &arr)
 	if err != nil {
 		return nil, err
@@ -45,9 +45,9 @@ func (j *JMA) Parse(data []byte) (map[string]interface{}, error) {
 	return result, nil
 }
 
-func (j *JMA) Format(latitude, longitude float64, data map[string]interface{}) ([]EarthquakeList, error) {
+func (j *JMA) Format(latitude, longitude float64, data map[string]any) ([]EarthquakeList, error) {
 	var list []EarthquakeList
-	for _, v := range data["data"].([]map[string]interface{}) {
+	for _, v := range data["data"].([]map[string]any) {
 		if !HasKey(v, []string{
 			"anm", "mag", "cod", "at",
 		}) {

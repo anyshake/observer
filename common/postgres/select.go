@@ -8,7 +8,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func SelectData(db *sql.DB, timestamp int64) ([]map[string]interface{}, error) {
+func SelectData(db *sql.DB, timestamp int64) ([]map[string]any, error) {
 	var (
 		start = timestamp - 155000
 		end   = timestamp + 155000
@@ -24,7 +24,7 @@ func SelectData(db *sql.DB, timestamp int64) ([]map[string]interface{}, error) {
 	}
 	defer rows.Close()
 
-	var resMap []map[string]interface{}
+	var resMap []map[string]any
 	for rows.Next() {
 		var (
 			id      int
@@ -38,7 +38,7 @@ func SelectData(db *sql.DB, timestamp int64) ([]map[string]interface{}, error) {
 			return nil, err
 		}
 
-		resMap = append(resMap, map[string]interface{}{
+		resMap = append(resMap, map[string]any{
 			"id":        id,
 			"timestamp": ts.UnixMilli(),
 			"station":   station,
