@@ -34,9 +34,9 @@ func (c *CWB) Fetch() ([]byte, error) {
 	return res, nil
 }
 
-func (c *CWB) Parse(data []byte) (map[string]interface{}, error) {
-	result := make(map[string]interface{})
-	result["data"] = make([]interface{}, 0)
+func (c *CWB) Parse(data []byte) (map[string]any, error) {
+	result := make(map[string]any)
+	result["data"] = make([]any, 0)
 
 	reader := bytes.NewBuffer(data)
 	doc, err := goquery.NewDocumentFromReader(reader)
@@ -56,7 +56,7 @@ func (c *CWB) Parse(data []byte) (map[string]interface{}, error) {
 		}
 
 		text := s.Text()
-		item := make(map[string]interface{})
+		item := make(map[string]any)
 
 		item["latitude"] = latitude
 		item["longitude"] = longitude
@@ -66,24 +66,24 @@ func (c *CWB) Parse(data []byte) (map[string]interface{}, error) {
 		item["magnitude"] = c.GetMagnitude(text)
 		item["timestamp"] = c.GetTimestamp(text)
 
-		result["data"] = append(result["data"].([]interface{}), item)
+		result["data"] = append(result["data"].([]any), item)
 	})
 
 	return result, nil
 }
 
-func (c *CWB) Format(latitude, longitude float64, data map[string]interface{}) ([]EarthquakeList, error) {
+func (c *CWB) Format(latitude, longitude float64, data map[string]any) ([]EarthquakeList, error) {
 	var list []EarthquakeList
-	for _, v := range data["data"].([]interface{}) {
+	for _, v := range data["data"].([]any) {
 		l := EarthquakeList{
 			Verfied:   true,
-			Latitude:  String2Float(v.(map[string]interface{})["latitude"].(string)),
-			Longitude: String2Float(v.(map[string]interface{})["longitude"].(string)),
-			Depth:     v.(map[string]interface{})["depth"].(float64),
-			Event:     v.(map[string]interface{})["event"].(string),
-			Region:    v.(map[string]interface{})["region"].(string),
-			Timestamp: v.(map[string]interface{})["timestamp"].(int64),
-			Magnitude: v.(map[string]interface{})["magnitude"].(float64),
+			Latitude:  String2Float(v.(map[string]any)["latitude"].(string)),
+			Longitude: String2Float(v.(map[string]any)["longitude"].(string)),
+			Depth:     v.(map[string]any)["depth"].(float64),
+			Event:     v.(map[string]any)["event"].(string),
+			Region:    v.(map[string]any)["region"].(string),
+			Timestamp: v.(map[string]any)["timestamp"].(int64),
+			Magnitude: v.(map[string]any)["magnitude"].(float64),
 		}
 		l.Distance = GetDistance(latitude, l.Latitude, longitude, l.Longitude)
 		l.Estimated = GetEstimation(l.Distance)

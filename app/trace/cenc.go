@@ -30,8 +30,8 @@ func (c *CENC) Fetch() ([]byte, error) {
 	return res, nil
 }
 
-func (c *CENC) Parse(data []byte) (map[string]interface{}, error) {
-	var result map[string]interface{}
+func (c *CENC) Parse(data []byte) (map[string]any, error) {
+	var result map[string]any
 	err := json.Unmarshal(data, &result)
 	if err != nil {
 		return nil, err
@@ -40,34 +40,34 @@ func (c *CENC) Parse(data []byte) (map[string]interface{}, error) {
 	return result, nil
 }
 
-func (c *CENC) Format(latitude, longitude float64, data map[string]interface{}) ([]EarthquakeList, error) {
+func (c *CENC) Format(latitude, longitude float64, data map[string]any) ([]EarthquakeList, error) {
 	var list []EarthquakeList
 	for k, v := range data {
 		if k == "No0" {
 			continue
 		}
 
-		if !HasKey(v.(map[string]interface{}), []string{
+		if !HasKey(v.(map[string]any), []string{
 			"depth", "latitude", "location",
 			"longitude", "magnitude", "time",
 		}) {
 			continue
 		}
 
-		ts, err := time.Parse("2006-01-02 15:04:05", v.(map[string]interface{})["time"].(string))
+		ts, err := time.Parse("2006-01-02 15:04:05", v.(map[string]any)["time"].(string))
 		if err != nil {
 			continue
 		}
 
 		l := EarthquakeList{
-			Depth:     String2Float(v.(map[string]interface{})["depth"].(string)),
+			Depth:     String2Float(v.(map[string]any)["depth"].(string)),
 			Verfied:   true,
 			Timestamp: ts.Add(-8 * time.Hour).UnixMilli(),
-			Event:     v.(map[string]interface{})["location"].(string),
-			Region:    v.(map[string]interface{})["location"].(string),
-			Latitude:  String2Float(v.(map[string]interface{})["latitude"].(string)),
-			Longitude: String2Float(v.(map[string]interface{})["longitude"].(string)),
-			Magnitude: String2Float(v.(map[string]interface{})["magnitude"].(string)),
+			Event:     v.(map[string]any)["location"].(string),
+			Region:    v.(map[string]any)["location"].(string),
+			Latitude:  String2Float(v.(map[string]any)["latitude"].(string)),
+			Longitude: String2Float(v.(map[string]any)["longitude"].(string)),
+			Magnitude: String2Float(v.(map[string]any)["magnitude"].(string)),
 		}
 		l.Distance = GetDistance(latitude, l.Latitude, longitude, l.Longitude)
 		l.Estimated = GetEstimation(l.Distance)

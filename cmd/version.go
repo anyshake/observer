@@ -15,7 +15,7 @@ var (
 	copyright   = "© Telecom-308 " + fmt.Sprintf("%d", time.Now().Year()) + ". All Rights Reversed."
 )
 
-func ConcatString(v ...interface{}) string {
+func ConcatString(v ...any) string {
 	builder := strings.Builder{}
 	for _, value := range v {
 		builder.WriteString(fmt.Sprintf("%+v", value))

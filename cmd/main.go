@@ -118,7 +118,7 @@ func main() {
 					Status:  &status,
 					Message: &message,
 					OnReadyCallback: func(message *collector.Message) {
-						archiver.WriteMessage(
+						go archiver.WriteMessage(
 							pdb, &archiver.ArchiverOptions{
 								Message: message,
 								Enable:  conf.Archiver.Enable,
