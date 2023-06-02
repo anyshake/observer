@@ -8,7 +8,7 @@
     },
     "geophone_settings": {
         "device": "/dev/ttyUSB0",
-        "baud": 19200,
+        "baud": 921600,
         "sensitivity": {
             "vertical": 0.0288,
             "east_west": 0.0288,
