@@ -36,9 +36,17 @@ func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
 		options.OnErrorCallback(err)
 	}
 
+	var (
+		rawVertical   = make([]float64, PACKET_SIZE)
+		rawEastWest   = make([]float64, PACKET_SIZE)
+		rawNorthSouth = make([]float64, PACKET_SIZE)
+	)
+
+	// Error checking
 	val := reflect.ValueOf(options.Geophone).Elem()
 	for i := 0; i < val.NumField(); i++ {
 		fieldVal := val.Field(i)
+
 		if fieldVal.Kind() == reflect.Array {
 			for j := 0; j < fieldVal.Len(); j++ {
 				itemVal := fieldVal.Index(j)
@@ -49,21 +57,61 @@ func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
 					return nil
 				}
 
-				if err == nil {
-					switch val.Type().Field(i).Name {
-					case "Vertical":
-						options.Acceleration.Vertical[j] = GetAcceleration(itemVal.Float(), options.Sensitivity.Vertical)
-					case "EastWest":
-						options.Acceleration.EastWest[j] = GetAcceleration(itemVal.Float(), options.Sensitivity.EastWest)
-					case "NorthSouth":
-						options.Acceleration.NorthSouth[j] = GetAcceleration(itemVal.Float(), options.Sensitivity.NorthSouth)
-					}
+				switch val.Type().Field(i).Name {
+				case "Vertical":
+					rawVertical[j] = itemVal.Float()
+				case "EastWest":
+					rawEastWest[j] = itemVal.Float()
+				case "NorthSouth":
+					rawNorthSouth[j] = itemVal.Float()
 				}
 			}
 		}
 	}
 
-	for i := range options.Acceleration.Vertical {
+	// Low pass filter for vertical
+	filteredVertical, err := LowPassFilter(rawVertical, FILTER_CUTOFF, FILTER_TAPS)
+	if err != nil {
+		options.OnErrorCallback(err)
+		return err
+	}
+
+	// Low pass filter for east-west
+	filteredEastWest, err := LowPassFilter(rawEastWest, FILTER_CUTOFF, FILTER_TAPS)
+	if err != nil {
+		options.OnErrorCallback(err)
+		return err
+	}
+
+	// Low pass filter for north-south
+	filteredNorthSouth, err := LowPassFilter(rawNorthSouth, FILTER_CUTOFF, FILTER_TAPS)
+	if err != nil {
+		options.OnErrorCallback(err)
+		return err
+	}
+
+	// Get vertical acceleration
+	for i := 0; i < PACKET_SIZE; i++ {
+		options.Acceleration.Vertical[i] = GetAcceleration(
+			filteredVertical[i], options.Sensitivity.Vertical,
+		)
+	}
+
+	// Get east-west acceleration
+	for i := 0; i < PACKET_SIZE; i++ {
+		options.Acceleration.EastWest[i] = GetAcceleration(
+			filteredEastWest[i], options.Sensitivity.EastWest,
+		)
+	}
+
+	// Get north-south acceleration
+	for i := 0; i < PACKET_SIZE; i++ {
+		options.Acceleration.NorthSouth[i] = GetAcceleration(
+			filteredNorthSouth[i], options.Sensitivity.NorthSouth,
+		)
+	}
+
+	for i := 0; i < PACKET_SIZE; i++ {
 		options.Acceleration.Synthesis[i] = GetSynthesis(
 			options.Acceleration.Vertical[i],
 			options.Acceleration.EastWest[i],

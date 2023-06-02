@@ -11,6 +11,7 @@ require (
 	github.com/gin-gonic/gin v1.9.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/lib/pq v1.10.8
+	github.com/mattetti/audio v0.0.0-20190404201502-c6aebeb78429
 	github.com/sbabiv/xml2map v1.2.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/shopspring/decimal v1.3.1
