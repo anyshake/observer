@@ -10,7 +10,7 @@ func LowPassFilter(signal []float64, cutoff float64, taps int) ([]float64, error
 		Taps:         taps,
 		CutOffFreq:   cutoff,
 		SamplingFreq: PACKET_SIZE,
-		Window:       windows.Blackman,
+		Window:       windows.Hamming,
 	}}
 
 	filtered, err := fir.LowPass(signal)
