@@ -7,7 +7,6 @@ import { timerAlert } from "../../helpers/alerts/sweetAlert";
 import getApiUrl from "../../helpers/utilities/getApiUrl";
 import ReactPolling from "react-polling";
 import searchKey from "../../helpers/utilities/searchKey";
-import ReactApexChart from "react-apexcharts";
 import Footer from "../../components/Footer";
 import { MapContainer, Marker, TileLayer } from "react-leaflet";
 import L from "leaflet";
@@ -15,6 +14,8 @@ import "leaflet/dist/leaflet.css";
 import locationDot from "../../assets/icons/location-dot.svg";
 import Scroller from "../../components/Scroller";
 import Notification from "../../components/Notification";
+import { HighchartsReact } from "highcharts-react-official";
+import * as Highcharts from "highcharts";
 
 export default class stationInfo extends Component {
     constructor(props) {
@@ -169,49 +170,62 @@ export default class stationInfo extends Component {
                     },
                 ],
                 options: {
-                    chart: {
-                        height: 350,
-                        toolbar: {
-                            show: false,
-                        },
-                        zoom: {
-                            enabled: false,
-                        },
+                    time: {
+                        useUTC: false,
                     },
-                    stroke: {
-                        curve: "smooth",
+                    title: {
+                        text: "",
+                    },
+                    chart: {
+                        height: 200,
+                        marginTop: 25,
+                        backgroundColor: "transparent",
+                        animation: false,
+                    },
+                    xAxis: {
+                        labels: {
+                            style: {
+                                color: "#fff",
+                            },
+                        },
+                        lineColor: "#fff",
+                        tickColor: "#fff",
+                        type: "datetime",
+                    },
+                    yAxis: {
+                        labels: {
+                            style: {
+                                color: "#fff",
+                            },
+                            format: "{value:.0f}",
+                        },
+                        title: {
+                            text: "",
+                        },
+                        lineColor: "#fff",
+                        tickColor: "#fff",
+                        opposite: true,
+                    },
+                    legend: {
+                        enabled: false,
+                        itemStyle: {
+                            color: "#fff",
+                        },
                     },
                     tooltip: {
-                        enabled: true,
-                        theme: "dark",
-                        fillSeriesColor: false,
-                        style: {
-                            fontSize: "14px",
-                            fontFamily: "Helvetica, Arial, sans-serif",
-                        },
-                        x: {
-                            format: "20yy/MM/dd HH:mm:ss",
-                        },
+                        enabled: false,
                     },
-                    xaxis: {
-                        type: "datetime",
-                        labels: {
-                            datetimeUTC: false,
-                            datetimeFormatter: {
-                                hour: "HH:mm:ss",
-                            },
-                            style: {
-                                colors: "#fff",
-                            },
-                        },
+                    credits: {
+                        enabled: false,
                     },
-                    yaxis: {
-                        opposite: true,
-                        labels: {
-                            style: {
-                                colors: "#fff",
+                    plotOptions: {
+                        series: {
+                            lineWidth: 5,
+                            states: {
+                                hover: {
+                                    enabled: false,
+                                },
                             },
-                            formatter: (value) => `${value.toFixed(2)}%`,
                         },
                     },
                 },
@@ -392,12 +406,13 @@ export default class stationInfo extends Component {
                                 <div className="mt-12 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2">
                                     <div className="bg-white relative flex flex-col bg-clip-border rounded-xl text-gray-700 shadow-lg">
                                         <div className="relative bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-green-600 to-green-400 shadow-green-500/40 shadow-lg -mt-6">
-                                            <ReactApexChart
-                                                height={200}
-                                                options={
-                                                    this.state.chart.options
-                                                }
-                                                series={this.state.chart.cpu}
+                                            <HighchartsReact
+                                                highcharts={Highcharts}
+                                                options={{
+                                                    ...this.state.chart.options,
+                                                    series: this.state.chart
+                                                        .cpu,
+                                                }}
                                             />
                                         </div>
                                         <div className="p-6">
@@ -414,12 +429,13 @@ export default class stationInfo extends Component {
 
                                     <div className="bg-white relative flex flex-col bg-clip-border rounded-xl text-gray-700 shadow-lg">
                                         <div className="relative bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-blue-600 to-blue-400 shadow-blue-500/40 shadow-lg -mt-6">
-                                            <ReactApexChart
-                                                height={200}
-                                                options={
-                                                    this.state.chart.options
-                                                }
-                                                series={this.state.chart.memory}
+                                            <HighchartsReact
+                                                highcharts={Highcharts}
+                                                options={{
+                                                    ...this.state.chart.options,
+                                                    series: this.state.chart
+                                                        .memory,
+                                                }}
                                             />
                                         </div>
                                         <div className="p-6">

@@ -5,13 +5,14 @@ import Scroller from "../../components/Scroller";
 import createSocket from "../../helpers/requests/createSocket";
 import getApiUrl from "../../helpers/utilities/getApiUrl";
 import AppConfig from "../../config";
-import ReactApexChart from "react-apexcharts";
 import getTime from "../../helpers/utilities/getTime";
 import Notification from "../../components/Notification";
 import Navbar from "../../components/Navbar";
 import getIntensity from "../../helpers/utilities/getIntensity";
 import arrAverage from "../../helpers/utilities/arrAverage";
 import arrMaximum from "../../helpers/utilities/arrMaximum";
+import { HighchartsReact } from "highcharts-react-official";
+import * as Highcharts from "highcharts";
 
 export default class realtimeWaveform extends Component {
     constructor(props) {
@@ -23,16 +24,22 @@ export default class realtimeWaveform extends Component {
             waveform: {
                 factors: [
                     {
+                        type: "line",
+                        lineWidth: 1,
                         name: "垂直分量",
                         color: "#d97706",
                         data: [],
                     },
                     {
+                        type: "line",
+                        lineWidth: 1,
                         name: "水平 EW",
                         color: "#0d9488",
                         data: [],
                     },
                     {
+                        type: "line",
+                        lineWidth: 1,
                         name: "水平 NS",
                         color: "#4f46e5",
                         data: [],
@@ -40,72 +47,61 @@ export default class realtimeWaveform extends Component {
                 ],
                 synthesis: [
                     {
+                        type: "line",
+                        lineWidth: 1,
                         name: "合成分量",
                         color: "#be185d",
                         data: [],
                     },
                 ],
                 options: {
-                    stroke: {
-                        width: 2,
-                        curve: "smooth",
+                    time: {
+                        useUTC: false,
                     },
-                    hollow: {
-                        margin: 15,
-                        size: "40%",
+                    title: {
+                        text: "",
                     },
                     chart: {
-                        height: 350,
-                        toolbar: {
-                            show: false,
-                        },
-                        zoom: {
-                            enabled: false,
-                        },
-                        animations: {
-                            enabled: false,
-                            // easing: "linear",
-                            // dynamicAnimation: {
-                            //     speed: 1000 * 1.1,
-                            // },
-                        },
+                        height: 360,
+                        backgroundColor: "transparent",
+                        animation: false,
                     },
-                    dataLabels: {
-                        enabled: false,
+                    xAxis: {
+                        labels: {
+                            style: {
+                                color: "#fff",
+                            },
+                        },
+                        lineColor: "#fff",
+                        tickColor: "#fff",
+                        type: "datetime",
+                    },
+                    yAxis: {
+                        labels: {
+                            style: {
+                                color: "#fff",
+                            },
+                            format: "{value:.3f}",
+                        },
+                        title: {
+                            text: "",
+                        },
+                        lineColor: "#fff",
+                        tickColor: "#fff",
+                        opposite: true,
+                        valueDecimals: 3,
                     },
                     legend: {
-                        show: false,
-                        labels: {
-                            useSeriesColors: true,
+                        enabled: true,
+                        itemStyle: {
+                            color: "#fff",
                         },
                     },
                     tooltip: {
                         enabled: false,
-                        // theme: "dark",
-                        // fillSeriesColor: false,
-                        // x: {
-                        //     format: "20yy/MM/dd HH:mm:ss",
-                        // },
                     },
-                    xaxis: {
-                        type: "datetime",
-                        labels: {
-                            datetimeUTC: false,
-                            datetimeFormatter: {
-                                hour: "HH:mm:ss",
-                            },
-                            style: {
-                                colors: "#fff",
-                            },
-                        },
-                    },
-                    yaxis: {
-                        opposite: true,
-                        labels: {
-                            style: {
-                                colors: "#fff",
-                            },
-                        },
+                    credits: {
+                        enabled: false,
                     },
                 },
             },
@@ -191,12 +187,16 @@ export default class realtimeWaveform extends Component {
     }
 
     drawWaveform({ acceleration }) {
+        const multiple = 50;
         const length = acceleration.synthesis.length;
 
-        this.state.waveform.synthesis[0].data.length > length * 300 &&
+        this.state.waveform.synthesis[0].data.length > length * multiple &&
             this.state.waveform.synthesis[0].data.splice(0, length);
         this.state.waveform.factors.forEach((_, index) => {
-            if (this.state.waveform.factors[index].data.length > length * 300) {
+            if (
+                this.state.waveform.factors[index].data.length >
+                length * multiple
+            ) {
                 this.state.waveform.factors[index].data.splice(0, length);
             }
         });
@@ -348,12 +348,13 @@ export default class realtimeWaveform extends Component {
                                 </div>
                                 <div className="p-4 flex-auto shadow-lg bg-gradient-to-tr from-purple-300 to-purple-400 shadow-purple-500/40 rounded-lg">
                                     <div className="relative h-[350px]">
-                                        <ReactApexChart
-                                            height="350px"
-                                            series={this.state.waveform.factors}
-                                            options={
-                                                this.state.waveform.options
-                                            }
+                                        <HighchartsReact
+                                            highcharts={Highcharts}
+                                            options={{
+                                                ...this.state.waveform.options,
+                                                series: this.state.waveform
+                                                    .factors,
+                                            }}
                                         />
                                     </div>
                                 </div>
@@ -387,15 +388,13 @@ export default class realtimeWaveform extends Component {
                                 </div>
                                 <div className="p-4 flex-auto shadow-lg bg-gradient-to-tr from-indigo-300 to-indigo-400 shadow-indigo-500/40 rounded-lg">
                                     <div className="relative h-[350px]">
-                                        <ReactApexChart
-                                            type="area"
-                                            height="350px"
-                                            series={
-                                                this.state.waveform.synthesis
-                                            }
-                                            options={
-                                                this.state.waveform.options
-                                            }
+                                        <HighchartsReact
+                                            highcharts={Highcharts}
+                                            options={{
+                                                ...this.state.waveform.options,
+                                                series: this.state.waveform
+                                                    .synthesis,
+                                            }}
                                         />
                                     </div>
                                 </div>
