@@ -180,7 +180,7 @@ export default class stationInfo extends Component {
                         height: 200,
                         marginTop: 25,
                         backgroundColor: "transparent",
-                        animation: false,
+                        animation: true,
                     },
                     xAxis: {
                         labels: {
@@ -197,7 +197,7 @@ export default class stationInfo extends Component {
                             style: {
                                 color: "#fff",
                             },
-                            format: "{value:.0f}",
+                            format: "{value:.1f}",
                         },
                         title: {
                             text: "",
