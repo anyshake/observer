@@ -85,18 +85,17 @@ export default class historyWaveform extends Component {
                             style: {
                                 color: "#fff",
                             },
-                            format: "{value:.3f}",
                         },
                         lineColor: "#fff",
                         tickColor: "#fff",
                         type: "datetime",
-                        zoomType: "x",
                     },
                     yAxis: {
                         labels: {
                             style: {
                                 color: "#fff",
                             },
+                            format: "{value:.3f}",
                         },
                         title: {
                             text: "",
