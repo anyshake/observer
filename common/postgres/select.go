@@ -10,8 +10,8 @@ import (
 
 func SelectData(db *sql.DB, timestamp int64) ([]map[string]any, error) {
 	var (
-		start = timestamp - 155000
-		end   = timestamp + 155000
+		start = timestamp - 325000
+		end   = timestamp + 325000
 	)
 
 	rows, err := db.Query(fmt.Sprintf(`

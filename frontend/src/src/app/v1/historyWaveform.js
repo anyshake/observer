@@ -3,7 +3,6 @@ import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import Scroller from "../../components/Scroller";
-import ReactApexChart from "react-apexcharts";
 import "react-datetime/css/react-datetime.css";
 import Datetime from "react-datetime";
 import getTime from "../../helpers/utilities/getTime";
@@ -22,8 +21,10 @@ import arrMaximum from "../../helpers/utilities/arrMaximum";
 import Modal from "react-responsive-modal";
 import "react-responsive-modal/styles.css";
 import getIntensity from "../../helpers/utilities/getIntensity";
+import { HighchartsReact } from "highcharts-react-official";
+import * as Highcharts from "highcharts";
 
-const FETCH_TIMEOUT = 30 * 1000;
+const FETCH_TIMEOUT = 60 * 1000;
 
 export default class historyWaveform extends Component {
     constructor(props) {
@@ -36,16 +37,22 @@ export default class historyWaveform extends Component {
             waveform: {
                 factors: [
                     {
+                        type: "line",
+                        lineWidth: 1,
                         name: "垂直分量",
                         color: "#5a3eba",
                         data: [],
                     },
                     {
+                        type: "line",
+                        lineWidth: 1,
                         name: "水平 EW",
                         color: "#128672",
                         data: [],
                     },
                     {
+                        type: "line",
+                        lineWidth: 1,
                         name: "水平 NS",
                         color: "#c3268a",
                         data: [],
@@ -53,73 +60,63 @@ export default class historyWaveform extends Component {
                 ],
                 synthesis: [
                     {
+                        type: "line",
+                        lineWidth: 1,
                         name: "合成分量",
                         color: "#cf4500",
                         data: [],
                     },
                 ],
                 options: {
-                    stroke: {
-                        width: 2,
-                        curve: "smooth",
+                    time: {
+                        useUTC: false,
                     },
-                    hollow: {
-                        margin: 15,
-                        size: "40%",
+                    title: {
+                        text: "",
                     },
                     chart: {
-                        height: 350,
-                        toolbar: {
-                            show: true,
-                        },
-                        zoom: {
-                            enabled: true,
-                        },
-                        animations: {
-                            enabled: false,
-                        },
+                        height: 360,
+                        backgroundColor: "transparent",
+                        animation: true,
+                        zoomType: "x",
                     },
-                    dataLabels: {
-                        enabled: false,
+                    xAxis: {
+                        labels: {
+                            style: {
+                                color: "#fff",
+                            },
+                            format: "{value:.3f}",
+                        },
+                        lineColor: "#fff",
+                        tickColor: "#fff",
+                        type: "datetime",
+                        zoomType: "x",
+                    },
+                    yAxis: {
+                        labels: {
+                            style: {
+                                color: "#fff",
+                            },
+                        },
+                        title: {
+                            text: "",
+                        },
+                        lineColor: "#fff",
+                        tickColor: "#fff",
+                        opposite: true,
+                        valueDecimals: 3,
                     },
                     legend: {
-                        show: true,
-                        labels: {
-                            useSeriesColors: true,
+                        enabled: true,
+                        itemStyle: {
+                            color: "#fff",
                         },
                     },
                     tooltip: {
                         enabled: true,
-                        theme: "dark",
-                        fillSeriesColor: false,
-                        x: {
-                            format: "20yy/MM/dd HH:mm:ss",
-                        },
                     },
-                    xaxis: {
-                        type: "datetime",
-                        labels: {
-                            datetimeUTC: false,
-                            datetimeFormatter: {
-                                hour: "HH:mm:ss",
-                            },
-                            style: {
-                                colors: "#fff",
-                            },
-                        },
-                    },
-                    yaxis: {
-                        tickAmount: 5,
-                        opposite: true,
-                        labels: {
-                            style: {
-                                colors: "#fff",
-                            },
-                        },
-                    },
-                    brush: {
-                        enabled: true,
-                        target: "main",
+                    credits: {
+                        enabled: false,
                     },
                 },
             },
@@ -187,7 +184,7 @@ export default class historyWaveform extends Component {
         timerAlert({
             title: "查询中",
             html: "正在查询加速度数据，这可能需要一些时间",
-            timer: 30000,
+            timer: FETCH_TIMEOUT,
             loading: false,
             callback: () => {
                 errorAlert({
@@ -486,7 +483,7 @@ export default class historyWaveform extends Component {
                                                 this.state.timePicker
                                             )}`}
                                             <br />
-                                            系统将查询 5 分钟内震动波形
+                                            系统将查询 10 分钟内震动波形
                                         </div>
 
                                         <div className="flex flex-col justify-center items-center gap-4 font-medium text-sm">
@@ -655,7 +652,7 @@ export default class historyWaveform extends Component {
                                                                             {
                                                                                 title: "查询中",
                                                                                 html: "正在请求地震列表数据，这可能需要一些时间",
-                                                                                timer: 30000,
+                                                                                timer: FETCH_TIMEOUT,
                                                                                 loading: false,
                                                                                 callback:
                                                                                     () => {
@@ -681,7 +678,7 @@ export default class historyWaveform extends Component {
                                                     timerAlert({
                                                         title: "查询中",
                                                         html: "正在获取地震数据源，这可能需要一些时间",
-                                                        timer: 30000,
+                                                        timer: FETCH_TIMEOUT,
                                                         loading: false,
                                                         callback: () => {
                                                             errorAlert({
@@ -738,12 +735,13 @@ export default class historyWaveform extends Component {
 
                                 <div className="p-4 flex-auto shadow-lg bg-gradient-to-tr from-pink-300 to-pink-400 shadow-pink-500/40 rounded-lg">
                                     <div className="relative h-[350px]">
-                                        <ReactApexChart
-                                            height="350px"
-                                            series={this.state.waveform.factors}
-                                            options={
-                                                this.state.waveform.options
-                                            }
+                                        <HighchartsReact
+                                            highcharts={Highcharts}
+                                            options={{
+                                                ...this.state.waveform.options,
+                                                series: this.state.waveform
+                                                    .factors,
+                                            }}
                                         />
                                     </div>
                                 </div>
@@ -893,15 +891,13 @@ export default class historyWaveform extends Component {
 
                                 <div className="p-4 flex-auto shadow-lg bg-gradient-to-tr from-orange-300 to-orange-400 shadow-orange-500/40 rounded-lg">
                                     <div className="relative h-[350px]">
-                                        <ReactApexChart
-                                            type="area"
-                                            height="350px"
-                                            series={
-                                                this.state.waveform.synthesis
-                                            }
-                                            options={
-                                                this.state.waveform.options
-                                            }
+                                        <HighchartsReact
+                                            highcharts={Highcharts}
+                                            options={{
+                                                ...this.state.waveform.options,
+                                                series: this.state.waveform
+                                                    .synthesis,
+                                            }}
                                         />
                                     </div>
                                 </div>
