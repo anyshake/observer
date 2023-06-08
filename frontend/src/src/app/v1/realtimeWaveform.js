@@ -98,7 +98,7 @@ export default class realtimeWaveform extends Component {
                         },
                     },
                     tooltip: {
-                        enabled: false,
+                        enabled: true,
                     },
                     credits: {
                         enabled: false,
@@ -178,25 +178,34 @@ export default class realtimeWaveform extends Component {
 
         return data[key].map((item, index) => {
             return [
-                new Date(
-                    data.timestamp - (data[key].length - index) * timeSpan
-                ),
+                data.timestamp - (data[key].length - index) * timeSpan,
                 item,
             ];
         });
     }
 
     drawWaveform({ acceleration }) {
-        const multiple = 50;
         const length = acceleration.synthesis.length;
+        let samples = length;
 
-        this.state.waveform.synthesis[0].data.length > length * multiple &&
+        if (samples <= 20) {
+            samples *= 360;
+        } else if (samples <= 40) {
+            samples *= 300;
+        } else if (samples <= 60) {
+            samples *= 240;
+        } else if (samples <= 80) {
+            samples *= 180;
+        } else if (samples <= 100) {
+            samples *= 120;
+        } else {
+            samples *= 60;
+        }
+
+        this.state.waveform.synthesis[0].data.length >= samples &&
             this.state.waveform.synthesis[0].data.splice(0, length);
         this.state.waveform.factors.forEach((_, index) => {
-            if (
-                this.state.waveform.factors[index].data.length >
-                length * multiple
-            ) {
+            if (this.state.waveform.factors[index].data.length >= samples) {
                 this.state.waveform.factors[index].data.splice(0, length);
             }
         });

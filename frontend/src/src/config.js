@@ -32,8 +32,8 @@ const AppConfig = {
         host:
             process.env.NODE_ENV === "production"
                 ? window.location.hostname
-                // : `172.17.138.214`,
-        :   `localhost`,
+                : `172.17.138.214`,
+        // :   `localhost`,
         port:
             process.env.NODE_ENV === "production"
                 ? window.location.port

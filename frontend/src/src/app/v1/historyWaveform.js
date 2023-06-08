@@ -203,7 +203,7 @@ export default class historyWaveform extends Component {
             const timeSpan = timeDiff / item.length;
 
             return item.map((obj, _index) => [
-                new Date(timestampArr[index] + _index * timeSpan),
+                timestampArr[index] + _index * timeSpan,
                 obj,
             ]);
         });
