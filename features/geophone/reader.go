@@ -5,8 +5,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"math"
-	"reflect"
 	"time"
 	"unsafe"
 
@@ -25,6 +23,7 @@ func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
 	n, err := serial.ReadSerial(port, buffer, 2*time.Second)
 	if err != nil {
 		options.OnErrorCallback(err)
+		return err
 	}
 
 	err = binary.Read(
@@ -36,55 +35,30 @@ func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
 		options.OnErrorCallback(err)
 	}
 
-	var (
-		rawVertical   = make([]float64, PACKET_SIZE)
-		rawEastWest   = make([]float64, PACKET_SIZE)
-		rawNorthSouth = make([]float64, PACKET_SIZE)
-	)
-
-	// Error checking
-	val := reflect.ValueOf(options.Geophone).Elem()
-	for i := 0; i < val.NumField(); i++ {
-		fieldVal := val.Field(i)
-
-		if fieldVal.Kind() == reflect.Array {
-			for j := 0; j < fieldVal.Len(); j++ {
-				itemVal := fieldVal.Index(j)
-
-				if math.Abs(itemVal.Float()) > 100 {
-					err = fmt.Errorf("reader: incorrect data frame")
-					options.OnErrorCallback(err)
-					return nil
-				}
-
-				switch val.Type().Field(i).Name {
-				case "Vertical":
-					rawVertical[j] = itemVal.Float()
-				case "EastWest":
-					rawEastWest[j] = itemVal.Float()
-				case "NorthSouth":
-					rawNorthSouth[j] = itemVal.Float()
-				}
-			}
-		}
+	// Compare checksum
+	ok := CompareChecksum(options.Geophone)
+	if !ok {
+		err = fmt.Errorf("reader: incorrect data frame")
+		options.OnErrorCallback(err)
+		return nil
 	}
 
 	// Low pass filter for vertical
-	filteredVertical, err := LowPassFilter(rawVertical, FILTER_CUTOFF, FILTER_TAPS)
+	filteredVertical, err := LowPassFilter(options.Geophone.Vertical[:], FILTER_CUTOFF, FILTER_TAPS)
 	if err != nil {
 		options.OnErrorCallback(err)
 		return err
 	}
 
 	// Low pass filter for east-west
-	filteredEastWest, err := LowPassFilter(rawEastWest, FILTER_CUTOFF, FILTER_TAPS)
+	filteredEastWest, err := LowPassFilter(options.Geophone.EastWest[:], FILTER_CUTOFF, FILTER_TAPS)
 	if err != nil {
 		options.OnErrorCallback(err)
 		return err
 	}
 
 	// Low pass filter for north-south
-	filteredNorthSouth, err := LowPassFilter(rawNorthSouth, FILTER_CUTOFF, FILTER_TAPS)
+	filteredNorthSouth, err := LowPassFilter(options.Geophone.NorthSouth[:], FILTER_CUTOFF, FILTER_TAPS)
 	if err != nil {
 		options.OnErrorCallback(err)
 		return err
@@ -111,6 +85,7 @@ func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
 		)
 	}
 
+	// Get synthesis acceleration
 	for i := 0; i < PACKET_SIZE; i++ {
 		options.Acceleration.Synthesis[i] = GetSynthesis(
 			options.Acceleration.Vertical[i],

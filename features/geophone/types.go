@@ -1,15 +1,16 @@
 package geophone
 
 const (
-	PACKET_SIZE   int     = 255
+	PACKET_SIZE   int     = 300
 	FILTER_TAPS   int     = 11
 	FILTER_CUTOFF float64 = 10.0
 )
 
 type Geophone struct {
-	Vertical   [PACKET_SIZE]float32
-	EastWest   [PACKET_SIZE]float32
-	NorthSouth [PACKET_SIZE]float32
+	Vertical   [PACKET_SIZE]float64
+	EastWest   [PACKET_SIZE]float64
+	NorthSouth [PACKET_SIZE]float64
+	Checksum   [3]uint8
 }
 
 type Acceleration struct {
