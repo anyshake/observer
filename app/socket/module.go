@@ -39,7 +39,7 @@ func (s *Socket) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions)
 				return
 			}
 
-			time.Sleep(200 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 		}
 	})
 }

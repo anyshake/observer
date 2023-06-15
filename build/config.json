@@ -8,11 +8,11 @@
     },
     "geophone_settings": {
         "device": "/dev/ttyUSB0",
-        "baud": 921600,
+        "baud": 19200,
         "sensitivity": {
-            "vertical": 0.0288,
-            "east_west": 0.0288,
-            "north_south": 0.0288
+            "vertical": 0.288,
+            "east_west": 0.288,
+            "north_south": 0.288
         }
     },
     "ntpclient_settings": {

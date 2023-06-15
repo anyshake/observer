@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"reflect"
 	"time"
 	"unsafe"
 
@@ -20,7 +21,7 @@ func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
 	}
 
 	buffer := make([]byte, unsafe.Sizeof(Geophone{}))
-	n, err := serial.ReadSerial(port, buffer, 2*time.Second)
+	n, err := serial.ReadSerial(port, buffer, 10*time.Second)
 	if err != nil {
 		options.OnErrorCallback(err)
 		return err
@@ -38,51 +39,28 @@ func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
 	// Compare checksum
 	ok := CompareChecksum(options.Geophone)
 	if !ok {
-		err = fmt.Errorf("reader: incorrect data frame")
+		err = fmt.Errorf("reader: incorrect data frame checksum")
 		options.OnErrorCallback(err)
 		return nil
 	}
 
-	// Low pass filter for vertical
-	filteredVertical, err := LowPassFilter(options.Geophone.Vertical[:], FILTER_CUTOFF, FILTER_TAPS)
-	if err != nil {
-		options.OnErrorCallback(err)
-		return err
-	}
+	val := reflect.ValueOf(options.Geophone).Elem()
+	for i := 0; i < val.NumField(); i++ {
+		fieldVal := val.Field(i)
+		if fieldVal.Kind() == reflect.Array {
+			for j := 0; j < fieldVal.Len(); j++ {
+				itemVal := fieldVal.Index(j)
 
-	// Low pass filter for east-west
-	filteredEastWest, err := LowPassFilter(options.Geophone.EastWest[:], FILTER_CUTOFF, FILTER_TAPS)
-	if err != nil {
-		options.OnErrorCallback(err)
-		return err
-	}
-
-	// Low pass filter for north-south
-	filteredNorthSouth, err := LowPassFilter(options.Geophone.NorthSouth[:], FILTER_CUTOFF, FILTER_TAPS)
-	if err != nil {
-		options.OnErrorCallback(err)
-		return err
-	}
-
-	// Get vertical acceleration
-	for i := 0; i < PACKET_SIZE; i++ {
-		options.Acceleration.Vertical[i] = GetAcceleration(
-			filteredVertical[i], options.Sensitivity.Vertical,
-		)
-	}
-
-	// Get east-west acceleration
-	for i := 0; i < PACKET_SIZE; i++ {
-		options.Acceleration.EastWest[i] = GetAcceleration(
-			filteredEastWest[i], options.Sensitivity.EastWest,
-		)
-	}
-
-	// Get north-south acceleration
-	for i := 0; i < PACKET_SIZE; i++ {
-		options.Acceleration.NorthSouth[i] = GetAcceleration(
-			filteredNorthSouth[i], options.Sensitivity.NorthSouth,
-		)
+				switch val.Type().Field(i).Name {
+				case "Vertical":
+					options.Acceleration.Vertical[j] = GetAcceleration(itemVal.Float(), options.Sensitivity.Vertical)
+				case "EastWest":
+					options.Acceleration.EastWest[j] = GetAcceleration(itemVal.Float(), options.Sensitivity.EastWest)
+				case "NorthSouth":
+					options.Acceleration.NorthSouth[j] = GetAcceleration(itemVal.Float(), options.Sensitivity.NorthSouth)
+				}
+			}
+		}
 	}
 
 	// Get synthesis acceleration
