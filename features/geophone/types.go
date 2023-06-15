@@ -1,16 +1,12 @@
 package geophone
 
-const (
-	PACKET_SIZE   int     = 375
-	FILTER_TAPS   int     = 11
-	FILTER_CUTOFF float64 = 10.0
-)
+const PACKET_SIZE int = 10 // maximum 375
 
 type Geophone struct {
 	Vertical   [PACKET_SIZE]float64
 	EastWest   [PACKET_SIZE]float64
 	NorthSouth [PACKET_SIZE]float64
-	Checksum   [3]uint8
+	Checksum   [3]byte
 }
 
 type Acceleration struct {

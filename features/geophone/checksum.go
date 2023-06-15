@@ -4,7 +4,7 @@ import (
 	"math"
 )
 
-func GetChecksum(arr []float64) uint8 {
+func GetChecksum(arr []float64) byte {
 	var sum uint16 = 0
 
 	for _, num := range arr {
@@ -19,7 +19,7 @@ func GetChecksum(arr []float64) uint8 {
 		}
 	}
 
-	return uint8(sum % 256)
+	return byte(sum % 256)
 }
 
 func CompareChecksum(geophone *Geophone) bool {
@@ -34,6 +34,5 @@ func CompareChecksum(geophone *Geophone) bool {
 		checksum_northsouth != geophone.Checksum[2] {
 		return false
 	}
-
 	return true
 }
