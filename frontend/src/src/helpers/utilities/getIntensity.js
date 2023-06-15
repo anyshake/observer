@@ -8,7 +8,7 @@
  */
 const getIntensity = (acceleration) => {
     const intensity = Math.round(
-        Math.round(2 * Math.log(Math.abs(acceleration)) + 0.94),
+        Math.round(2 * Math.log10(Math.abs(acceleration)) + 0.94),
         2
     );
 

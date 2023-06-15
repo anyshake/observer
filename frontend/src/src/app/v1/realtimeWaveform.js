@@ -90,6 +90,7 @@ export default class realtimeWaveform extends Component {
                         tickColor: "#fff",
                         opposite: true,
                         valueDecimals: 3,
+                        tickInterval: 0.005,
                     },
                     legend: {
                         enabled: true,
