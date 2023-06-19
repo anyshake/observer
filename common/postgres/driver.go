@@ -13,7 +13,7 @@ func OpenPostgres(host string, port int, username, password, database string, en
 	}
 
 	db, err := sql.Open("postgres", fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable connect_timeout=10",
 		host, port, username, password, database,
 	))
 	if err != nil {
