@@ -40,12 +40,6 @@ func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
 	ok := CompareChecksum(options.Geophone)
 	if !ok {
 		options.OnErrorCallback(fmt.Errorf("reader: incorrect data frame checksum"))
-
-		err = ResetGeophone(port)
-		if err != nil {
-			options.OnErrorCallback(fmt.Errorf("reader: failed to reset geophone"))
-		}
-
 		return nil
 	}
 
@@ -88,12 +82,16 @@ func ReaderDaemon(device string, baud int, options GeophoneOptions) {
 	for {
 		err := GeophoneReader(port, options)
 		if err != nil {
+			_err := ResetGeophone(port)
+			if _err != nil {
+				options.OnErrorCallback(fmt.Errorf("reader: failed to reset geophone"))
+			}
+
 			serial.CloseSerial(port)
 			options.OnErrorCallback(err)
-			time.Sleep(500 * time.Millisecond)
-			port = serial.OpenSerial(device, baud)
 
-			continue
+			time.Sleep(time.Second)
+			port = serial.OpenSerial(device, baud)
 		}
 	}
 }
