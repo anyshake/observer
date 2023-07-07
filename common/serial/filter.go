@@ -9,7 +9,7 @@ import (
 func FilterSerial(port io.ReadWriteCloser, signature []byte) error {
 	header := make([]byte, len(signature))
 
-	for i := 0; i < 512; i++ {
+	for i := 0; i < 64; i++ {
 		port.Read(header)
 
 		if bytes.Equal(header, signature) {
