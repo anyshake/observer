@@ -22,7 +22,9 @@ import Modal from "react-responsive-modal";
 import "react-responsive-modal/styles.css";
 import getIntensity from "../../helpers/utilities/getIntensity";
 import { HighchartsReact } from "highcharts-react-official";
+import HighchartsBoost from "highcharts/modules/boost";
 import * as Highcharts from "highcharts";
+HighchartsBoost(Highcharts);
 
 const FETCH_TIMEOUT = 60 * 1000;
 
@@ -68,6 +70,10 @@ export default class historyWaveform extends Component {
                     },
                 ],
                 options: {
+                    boost: {
+                        enabled: true,
+                        seriesThreshold: 5,
+                    },
                     time: {
                         useUTC: false,
                     },

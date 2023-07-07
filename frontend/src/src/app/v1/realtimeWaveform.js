@@ -12,7 +12,9 @@ import getIntensity from "../../helpers/utilities/getIntensity";
 import arrAverage from "../../helpers/utilities/arrAverage";
 import arrMaximum from "../../helpers/utilities/arrMaximum";
 import { HighchartsReact } from "highcharts-react-official";
+import HighchartsBoost from "highcharts/modules/boost";
 import * as Highcharts from "highcharts";
+HighchartsBoost(Highcharts);
 
 export default class realtimeWaveform extends Component {
     constructor(props) {
@@ -55,6 +57,10 @@ export default class realtimeWaveform extends Component {
                     },
                 ],
                 options: {
+                    boost: {
+                        enabled: true,
+                        seriesThreshold: 5,
+                    },
                     time: {
                         useUTC: false,
                     },
@@ -99,7 +105,7 @@ export default class realtimeWaveform extends Component {
                         },
                     },
                     tooltip: {
-                        enabled: true,
+                        enabled: false,
                     },
                     credits: {
                         enabled: false,
