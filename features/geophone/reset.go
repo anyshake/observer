@@ -12,10 +12,6 @@ func ResetGeophone(port io.ReadWriteCloser) error {
 		return err
 	}
 
-	err = serial.FilterSerial(port, []byte{0xAC, 0x55})
-	if err != nil {
-		return err
-	}
-
+	serial.FilterSerial(port, []byte{0xAC, 0x55})
 	return nil
 }
