@@ -39,8 +39,13 @@ func GeophoneReader(port io.ReadWriteCloser, options GeophoneOptions) error {
 	// Compare checksum
 	ok := CompareChecksum(options.Geophone)
 	if !ok {
-		err = fmt.Errorf("reader: incorrect data frame checksum")
-		options.OnErrorCallback(err)
+		options.OnErrorCallback(fmt.Errorf("reader: incorrect data frame checksum"))
+
+		err = ResetGeophone(port)
+		if err != nil {
+			options.OnErrorCallback(fmt.Errorf("reader: failed to reset geophone"))
+		}
+
 		return nil
 	}
 
