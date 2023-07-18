@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"com.geophone.observer/common/request"
+	"com.geophone.observer/utils/request"
 )
 
 type USGS struct{}
@@ -20,7 +20,7 @@ func (u *USGS) Property() (string, string) {
 }
 
 func (u *USGS) Fetch() ([]byte, error) {
-	res, err := request.GETRequest(
+	res, err := request.GET(
 		"https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson",
 		10*time.Second, time.Second, 3, false,
 	)
@@ -49,19 +49,19 @@ func (u *USGS) Format(latitude, longitude float64, data map[string]any) ([]Earth
 
 	var list []EarthquakeList
 	for _, v := range events.([]any) {
-		if !HasKey(v.(map[string]any), []string{"properties"}) {
+		if !hasKey(v.(map[string]any), []string{"properties"}) {
 			continue
 		}
 
 		properties := v.(map[string]any)["properties"]
-		if !HasKey(properties.(map[string]any), []string{
+		if !hasKey(properties.(map[string]any), []string{
 			"mag", "place", "time", "type", "title",
 		}) {
 			continue
 		}
 
 		geometry := v.(map[string]any)["geometry"]
-		if !HasKey(geometry.(map[string]any), []string{"coordinates"}) {
+		if !hasKey(geometry.(map[string]any), []string{"coordinates"}) {
 			continue
 		}
 
@@ -84,8 +84,8 @@ func (u *USGS) Format(latitude, longitude float64, data map[string]any) ([]Earth
 			Longitude: coordinates.([]any)[0].(float64),
 			Magnitude: properties.(map[string]any)["mag"].(float64),
 		}
-		l.Distance = GetDistance(latitude, l.Latitude, longitude, l.Longitude)
-		l.Estimated = GetEstimation(l.Distance)
+		l.Distance = getDistance(latitude, l.Latitude, longitude, l.Longitude)
+		l.Estimated = getEstimation(l.Distance)
 
 		list = append(list, l)
 	}

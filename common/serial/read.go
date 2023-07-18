@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func ReadSerial(r io.Reader, buf []byte, timeout time.Duration) (n int, err error) {
+func Read(r io.Reader, buf []byte, timeout time.Duration) (n int, err error) {
 	min := len(buf)
 
 	if len(buf) < min {
@@ -16,7 +16,7 @@ func ReadSerial(r io.Reader, buf []byte, timeout time.Duration) (n int, err erro
 	start := time.Now()
 	for n < min && err == nil {
 		if time.Since(start) > timeout {
-			return 0, fmt.Errorf("reader: timeout due to no response")
+			return 0, fmt.Errorf("timeout due to no response")
 		}
 
 		nn, err := r.Read(buf[n:])

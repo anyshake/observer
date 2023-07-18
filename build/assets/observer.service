@@ -1,0 +1,12 @@
+[Unit]
+Description=Observer Service
+After=network.target
+
+[Service]
+User=root
+ExecStartPre=/bin/sleep 3
+ExecStart=/usr/local/bin/observer -config /usr/local/etc/observer/config.json
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,20 +1,12 @@
 package app
 
-import (
-	"database/sql"
-
-	pb "com.geophone.observer/common/grpc"
-	"com.geophone.observer/features/collector"
-)
+import "com.geophone.observer/feature"
 
 type ServerOptions struct {
-	Gzip         int
-	CORS         bool
-	Version      string
-	ApiPrefix    string
-	WebPrefix    string
-	ConnPostgres *sql.DB
-	ConnGRPC     *pb.CollectorClient
-	Message      *collector.Message
-	Status       *collector.Status
+	Gzip           int
+	CORS           bool
+	Version        string
+	WebPrefix      string
+	APIPrefix      string
+	FeatureOptions *feature.FeatureOptions
 }

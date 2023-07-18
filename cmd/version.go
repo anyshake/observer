@@ -4,39 +4,28 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	"strings"
 	"time"
+
+	"com.geophone.observer/utils/text"
+	"github.com/fatih/color"
 )
 
 var (
-	version     = "Custom build"
 	release     = "unknown"
+	version     = "Custom build"
 	description = "Constructing Real-time Seismic Network Ambitiously"
-	copyright   = "© Telecom-308 " + fmt.Sprintf("%d", time.Now().Year()) + ". All Rights Reversed."
 )
 
-func ConcatString(v ...any) string {
-	builder := strings.Builder{}
-	for _, value := range v {
-		builder.WriteString(fmt.Sprintf("%+v", value))
-	}
-
-	return builder.String()
-}
-
-func VersionStatement() []string {
-	return []string{
-		ConcatString(
+func printVersion() {
+	var (
+		copyright = "© Telecom-308 " + fmt.Sprintf("%d", time.Now().Year()) + ". All Rights Reversed."
+		version   = text.Concat(
 			"G-Observer ", version, " (", description, ")\nRelease: ", release, " ",
 			runtime.Version(), " ", runtime.GOOS, "/", runtime.GOARCH, "\n", copyright,
-		),
-	}
-}
+		)
+	)
 
-func PrintVersion() {
-	version := VersionStatement()
-	for _, s := range version {
-		fmt.Println(s)
-		os.Exit(0)
-	}
+	w := color.New(color.FgHiCyan).SprintFunc()
+	fmt.Println(w(version))
+	os.Exit(0)
 }

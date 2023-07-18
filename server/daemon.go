@@ -3,7 +3,6 @@ package server
 import (
 	"fmt"
 	"io/fs"
-	"log"
 	"net/http"
 
 	"com.geophone.observer/app"
@@ -11,6 +10,8 @@ import (
 	"com.geophone.observer/server/middleware/cors"
 	"com.geophone.observer/server/middleware/static"
 	"com.geophone.observer/server/response"
+	"com.geophone.observer/utils/logger"
+	"github.com/fatih/color"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 )
@@ -24,11 +25,14 @@ func ServerDaemon(host string, port int, options *app.ServerOptions) error {
 	r.Use(
 		gzip.Gzip(options.Gzip),
 		gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
-			return fmt.Sprintf("%s [%s] %s %d %s %s\n",
+			w := color.New(color.FgCyan).SprintFunc()
+			text := w(fmt.Sprintf("%s [server] (%s) %s %d %s %s\n",
 				param.TimeStamp.Format("2006/01/02 15:04:05"),
 				param.ClientIP, param.Method, param.StatusCode,
 				param.Path, param.ErrorMessage,
-			)
+			))
+
+			return text
 		}),
 	)
 	if options.CORS {
@@ -47,11 +51,11 @@ func ServerDaemon(host string, port int, options *app.ServerOptions) error {
 	}
 
 	r.NoRoute(func(c *gin.Context) {
-		response.ErrorHandler(c, http.StatusNotFound)
+		response.Error(c, http.StatusNotFound)
 	})
 
 	RegisterRouter(r.Group(
-		fmt.Sprintf("/%s/%s", options.ApiPrefix, options.Version),
+		fmt.Sprintf("/%s/%s", options.APIPrefix, options.Version),
 	), options)
 
 	r.Use(static.ServeEmbed(&static.LocalFileSystem{
@@ -64,7 +68,7 @@ func ServerDaemon(host string, port int, options *app.ServerOptions) error {
 
 	err := r.Run(fmt.Sprintf("%s:%d", host, port))
 	if err != nil {
-		log.Println("failed to start HTTP server", err)
+		logger.Fatal("server", err, color.FgRed)
 	}
 
 	return err

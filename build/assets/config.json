@@ -1,0 +1,40 @@
+{
+    "station_settings": {
+        "uuid": "a3773e39-8e15-44ae-a1ad-6fb622bc49e6",
+        "name": "测试测站",
+        "latitude": 1.0,
+        "longitude": 1.0,
+        "altitude": 0
+    },
+    "adc_settings": {
+        "resolution": 24,
+        "fullscale": 5.0
+    },
+    "serial_settings": {
+        "baud": 19200,
+        "device": "/dev/ttyUSB0"
+    },
+    "geophone_settings": {
+        "ehz": 0.288,
+        "ehe": 0.288,
+        "ehn": 0.288
+    },
+    "ntpclient_settings": {
+        "host": "ntp.aliyun.com",
+        "port": 123,
+        "timeout": 3,
+        "interval": 5
+    },
+    "archiver_settings": {
+        "enable": false,
+        "host": "172.17.138.214",
+        "port": 5432,
+        "username": "postgres",
+        "password": "0308",
+        "database": "observer"
+    },
+    "server_settings": {
+        "host": "0.0.0.0",
+        "port": 8073
+    }
+}

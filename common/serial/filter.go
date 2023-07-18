@@ -6,7 +6,7 @@ import (
 	"io"
 )
 
-func FilterSerial(port io.ReadWriteCloser, signature []byte) error {
+func Filter(port io.ReadWriteCloser, signature []byte) error {
 	header := make([]byte, len(signature))
 
 	for i := 0; i < 64; i++ {
@@ -17,5 +17,5 @@ func FilterSerial(port io.ReadWriteCloser, signature []byte) error {
 		}
 	}
 
-	return fmt.Errorf("serial: failed to filter header")
+	return fmt.Errorf("failed to filter header")
 }

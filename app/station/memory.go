@@ -2,7 +2,7 @@ package station
 
 import "github.com/shirou/gopsutil/mem"
 
-func GetMemory() Memory {
+func getMemory() Memory {
 	vmStat, _ := mem.VirtualMemory()
 
 	return Memory{

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"com.geophone.observer/common/request"
+	"com.geophone.observer/utils/request"
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -23,7 +23,7 @@ func (c *CWB) Property() (string, string) {
 }
 
 func (c *CWB) Fetch() ([]byte, error) {
-	res, err := request.GETRequest(
+	res, err := request.GET(
 		"https://www.cwb.gov.tw/V8/C/E/MOD/MAP_LIST.html",
 		10*time.Second, time.Second, 3, false,
 	)
@@ -77,16 +77,16 @@ func (c *CWB) Format(latitude, longitude float64, data map[string]any) ([]Earthq
 	for _, v := range data["data"].([]any) {
 		l := EarthquakeList{
 			Verfied:   true,
-			Latitude:  String2Float(v.(map[string]any)["latitude"].(string)),
-			Longitude: String2Float(v.(map[string]any)["longitude"].(string)),
+			Latitude:  string2Float(v.(map[string]any)["latitude"].(string)),
+			Longitude: string2Float(v.(map[string]any)["longitude"].(string)),
 			Depth:     v.(map[string]any)["depth"].(float64),
 			Event:     v.(map[string]any)["event"].(string),
 			Region:    v.(map[string]any)["region"].(string),
 			Timestamp: v.(map[string]any)["timestamp"].(int64),
 			Magnitude: v.(map[string]any)["magnitude"].(float64),
 		}
-		l.Distance = GetDistance(latitude, l.Latitude, longitude, l.Longitude)
-		l.Estimated = GetEstimation(l.Distance)
+		l.Distance = getDistance(latitude, l.Latitude, longitude, l.Longitude)
+		l.Estimated = getEstimation(l.Distance)
 
 		list = append(list, l)
 	}
@@ -127,7 +127,7 @@ func (c *CWB) GetDepth(data string) float64 {
 	zh := regexp.MustCompile("[\u4e00-\u9fa5]+")
 	result := zh.ReplaceAllString(r[0][0], "")
 
-	return String2Float(result)
+	return string2Float(result)
 }
 
 func (c *CWB) GetMagnitude(data string) float64 {
@@ -143,7 +143,7 @@ func (c *CWB) GetMagnitude(data string) float64 {
 
 	zh := regexp.MustCompile("[\u4e00-\u9fa5]+")
 	result := zh.ReplaceAllString(r[0][0], "")
-	return String2Float(result)
+	return string2Float(result)
 }
 
 func (c *CWB) GetEvent(data string) string {

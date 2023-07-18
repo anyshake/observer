@@ -2,12 +2,11 @@ package serial
 
 import (
 	"io"
-	"log"
 
 	"github.com/albenik/go-serial/v2"
 )
 
-func OpenSerial(device string, baud int) io.ReadWriteCloser {
+func Open(device string, baud int) (io.ReadWriteCloser, error) {
 	port, err := serial.Open(device,
 		serial.WithHUPCL(false),
 		serial.WithDataBits(8),
@@ -18,15 +17,19 @@ func OpenSerial(device string, baud int) io.ReadWriteCloser {
 		serial.WithStopBits(serial.OneStopBit),
 	)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	port.SetDTR(true)
 	port.SetRTS(true)
 
-	return port
+	return port, nil
 }
 
-func CloseSerial(port io.ReadWriteCloser) error {
+func Close(port io.ReadWriteCloser) error {
+	if port == nil {
+		return nil
+	}
+
 	return port.Close()
 }

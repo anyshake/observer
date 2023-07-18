@@ -8,14 +8,14 @@ import (
 
 func CreateTable(db *sql.DB) error {
 	_, err := db.Exec(`
-		CREATE TABLE IF NOT EXISTS acceleration (
-			id SERIAL PRIMARY KEY,
-			timestamp TIMESTAMP,
-			station TEXT,
-			uuid TEXT,
-			data JSON
-		)
-	`)
+        CREATE TABLE IF NOT EXISTS counts (
+            id SERIAL PRIMARY KEY,
+            ts TIMESTAMP,
+            ehz INTEGER [],
+            ehn INTEGER [],
+            ehe INTEGER []
+        )
+    `)
 	if err != nil {
 		return err
 	}

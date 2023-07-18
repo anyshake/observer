@@ -1,20 +1,20 @@
 package history
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"com.geophone.observer/app"
 	"com.geophone.observer/common/postgres"
-	"com.geophone.observer/features/geophone"
+	"com.geophone.observer/handler"
 )
 
-func FilterHistory(timestamp int64, options *app.ServerOptions) ([]geophone.Acceleration, error) {
-	if options.ConnPostgres == nil {
-		return nil, fmt.Errorf("postgres connection is nil")
+func FilterHistory(start, end int64, options *app.ServerOptions) ([]handler.Geophone, error) {
+	pdb := options.FeatureOptions.Database
+	if pdb == nil {
+		return nil, fmt.Errorf("databse is not connected")
 	}
 
-	data, err := postgres.SelectData(options.ConnPostgres, timestamp)
+	data, err := postgres.Query(pdb, start, end)
 	if err != nil {
 		return nil, err
 	}
@@ -23,16 +23,15 @@ func FilterHistory(timestamp int64, options *app.ServerOptions) ([]geophone.Acce
 		return nil, fmt.Errorf("no data found")
 	}
 
-	var acceleration []geophone.Acceleration
+	var count []handler.Geophone
 	for _, v := range data {
-		var acc geophone.Acceleration
-		err := json.Unmarshal([]byte(v["data"].(string)), &acc)
-		if err != nil {
-			return nil, err
-		}
-
-		acceleration = append(acceleration, acc)
+		count = append(count, handler.Geophone{
+			TS:  v["ts"].(int64),
+			EHZ: v["ehz"].([]int32),
+			EHE: v["ehe"].([]int32),
+			EHN: v["ehn"].([]int32),
+		})
 	}
 
-	return acceleration, nil
+	return count, nil
 }

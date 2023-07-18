@@ -16,7 +16,7 @@ func (t *Trace) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) 
 	rg.POST("/trace", func(c *gin.Context) {
 		var binding Binding
 		if err := c.ShouldBind(&binding); err != nil {
-			response.ErrorHandler(c, http.StatusBadRequest)
+			response.Error(c, http.StatusBadRequest)
 			return
 		}
 
@@ -35,24 +35,28 @@ func (t *Trace) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) 
 				})
 			}
 
-			c.JSON(http.StatusOK, response.MessageHandler(c, "成功取得可用数据源列表", list))
+			response.Message(c, "成功取得可用数据源列表", list)
 			return
 		}
 
+		var (
+			latitude  = options.FeatureOptions.Config.Station.Latitude
+			longitude = options.FeatureOptions.Config.Station.Longitude
+		)
 		for _, v := range sources {
 			_, value := v.Property()
 			if value == binding.Source {
-				events, err := v.List(options.Message.Latitude, options.Message.Longitude)
+				events, err := v.List(latitude, longitude)
 				if err != nil {
-					response.ErrorHandler(c, http.StatusInternalServerError)
+					response.Error(c, http.StatusInternalServerError)
 					return
 				}
 
-				c.JSON(http.StatusOK, response.MessageHandler(c, "成功取得地震列表数据", events))
+				response.Message(c, "成功取得地震列表数据", events)
 				return
 			}
 		}
 
-		response.ErrorHandler(c, http.StatusBadRequest)
+		response.Error(c, http.StatusBadRequest)
 	})
 }

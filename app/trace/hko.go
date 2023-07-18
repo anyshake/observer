@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"com.geophone.observer/common/request"
+	"com.geophone.observer/utils/request"
 	"github.com/sbabiv/xml2map"
 )
 
@@ -21,7 +21,7 @@ func (h *HKO) Property() (string, string) {
 }
 
 func (h *HKO) Fetch() ([]byte, error) {
-	res, err := request.GETRequest(
+	res, err := request.GET(
 		"https://www.hko.gov.hk/gts/QEM/eq_app-30d_uc.xml",
 		10*time.Second, time.Second, 3, false,
 	)
@@ -51,7 +51,7 @@ func (h *HKO) Format(latitude, longitude float64, data map[string]any) ([]Earthq
 
 	var list []EarthquakeList
 	for _, v := range events.([]map[string]any) {
-		if !HasKey(v, []string{
+		if !hasKey(v, []string{
 			"Verify", "HKTDate", "HKTTime", "City",
 			"Region", "Lat", "Lon", "Mag",
 		}) {
@@ -71,12 +71,12 @@ func (h *HKO) Format(latitude, longitude float64, data map[string]any) ([]Earthq
 			Timestamp: ts.Add(-8 * time.Hour).UnixMilli(),
 			Event:     v["City"].(string),
 			Region:    v["Region"].(string),
-			Latitude:  String2Float(v["Lat"].(string)),
-			Longitude: String2Float(v["Lon"].(string)),
-			Magnitude: String2Float(v["Mag"].(string)),
+			Latitude:  string2Float(v["Lat"].(string)),
+			Longitude: string2Float(v["Lon"].(string)),
+			Magnitude: string2Float(v["Mag"].(string)),
 		}
-		l.Distance = GetDistance(latitude, l.Latitude, longitude, l.Longitude)
-		l.Estimated = GetEstimation(l.Distance)
+		l.Distance = getDistance(latitude, l.Latitude, longitude, l.Longitude)
+		l.Estimated = getEstimation(l.Distance)
 
 		list = append(list, l)
 	}

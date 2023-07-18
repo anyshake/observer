@@ -2,7 +2,7 @@ package station
 
 import "github.com/shirou/gopsutil/disk"
 
-func GetDisk() Disk {
+func getDisk() Disk {
 	partitions, err := disk.Partitions(false)
 	if err != nil {
 		panic(err)
