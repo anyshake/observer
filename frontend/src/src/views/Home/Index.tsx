@@ -122,7 +122,7 @@ export default class Home extends Component<{}, HomeState> {
                 {
                     tag: "memory",
                     area: {
-                        label: "CPU 占用率",
+                        label: "RAM 占用率",
                         text: "当前占用率：正在获取中",
                     },
                     chart: {
