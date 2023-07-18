@@ -24,15 +24,15 @@ const websocketByTag = ({
         }
 
         const uri = getApiUrl(tag);
-        const backend = `ws:${getBackend()}`;
-        const ws = new WebSocket(`${backend}${uri}`);
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        const websocket = new WebSocket(`${protocol}${getBackend()}${uri}`);
 
-        ws.onmessage = onData;
-        ws.onopen = onOpen || (() => {});
-        ws.onclose = onClose || (() => {});
-        ws.onerror = onError || (() => {});
+        websocket.onmessage = onData;
+        websocket.onopen = onOpen || (() => {});
+        websocket.onclose = onClose || (() => {});
+        websocket.onerror = onError || (() => {});
 
-        return ws;
+        return websocket;
     } catch (err: unknown) {
         if (onError) {
             onError(new Event("error occurred"));
