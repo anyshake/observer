@@ -2,7 +2,7 @@ package trace
 
 import "math"
 
-func GetDistance(lat1, lat2, lng1, lng2 float64) float64 {
+func getDistance(lat1, lat2, lng1, lng2 float64) float64 {
 	var (
 		radius = 6371000.0
 		rad    = math.Pi / 180.0

@@ -1,11 +1,11 @@
 package station
 
-import "com.geophone.observer/features/collector"
+import "com.geophone.observer/config"
 
-func GetLocation(message collector.Message) Location {
+func getLocation(conf *config.Conf) Location {
 	return Location{
-		Latitude:  message.Latitude,
-		Longitude: message.Longitude,
-		Altitude:  message.Altitude,
+		Latitude:  conf.Station.Latitude,
+		Longitude: conf.Station.Longitude,
+		Altitude:  conf.Station.Altitude,
 	}
 }

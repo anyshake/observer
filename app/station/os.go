@@ -1,31 +1,19 @@
 package station
 
 import (
-	"bufio"
 	"os"
 	"runtime"
-	"strings"
+
+	"github.com/wille/osutil"
 )
 
-func GetOS() OS {
+func getOS() OS {
 	hostname, _ := os.Hostname()
 	osInfo := OS{
 		OS:       runtime.GOOS,
 		Arch:     runtime.GOARCH,
+		Distro:   osutil.Name,
 		Hostname: hostname,
-	}
-
-	if osInfo.OS == "linux" {
-		file, _ := os.Open("/etc/os-release")
-		defer file.Close()
-
-		scanner := bufio.NewScanner(file)
-		for scanner.Scan() {
-			line := scanner.Text()
-			if strings.HasPrefix(line, "ID=") {
-				osInfo.Distro = strings.TrimPrefix(line, "ID=")
-			}
-		}
 	}
 
 	return osInfo

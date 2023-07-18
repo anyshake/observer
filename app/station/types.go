@@ -1,8 +1,19 @@
 package station
 
-import "com.geophone.observer/features/collector"
+import "com.geophone.observer/handler"
 
 type Station struct{}
+
+type ADC struct {
+	Resolution int     `json:"resolution"`
+	FullScale  float64 `json:"fullscale"`
+}
+
+type Geophone struct {
+	EHZ float64 `json:"ehz"`
+	EHE float64 `json:"ehe"`
+	EHN float64 `json:"ehn"`
+}
 
 type Memory struct {
 	Total   uint64  `json:"total"`
@@ -37,13 +48,15 @@ type Location struct {
 }
 
 type System struct {
-	UUID     string           `json:"uuid"`
-	Station  string           `json:"station"`
-	Uptime   int64            `json:"uptime"`
-	Memory   Memory           `json:"memory"`
-	Disk     Disk             `json:"disk"`
-	OS       OS               `json:"os"`
-	CPU      CPU              `json:"cpu"`
-	Location Location         `json:"location"`
-	Status   collector.Status `json:"status"`
+	UUID     string          `json:"uuid"`
+	Station  string          `json:"station"`
+	Uptime   int64           `json:"uptime"`
+	Memory   Memory          `json:"memory"`
+	Disk     Disk            `json:"disk"`
+	ADC      ADC             `json:"adc"`
+	OS       OS              `json:"os"`
+	CPU      CPU             `json:"cpu"`
+	Geophone Geophone        `json:"geophone"`
+	Location Location        `json:"location"`
+	Status   *handler.System `json:"status"`
 }

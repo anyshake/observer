@@ -24,12 +24,10 @@ _testmain.go
 *.test
 *.prof
 
-# Builds & Tests
-build/release*
-
-# Frontend
-frontend/src/.git
-frontend/src/*.lock
-frontend/src/build
-frontend/src/package-lock*
-frontend/src/node_modules/*
+# Distribution directory
+build/dist*
+# Frontend dependencies
+frontend/src*/.git*
+frontend/src*/*lock*
+frontend/src*/build
+frontend/src*/node_modules/*

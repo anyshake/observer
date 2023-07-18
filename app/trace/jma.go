@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"com.geophone.observer/common/request"
+	"com.geophone.observer/utils/request"
 )
 
 type JMA struct{}
@@ -20,7 +20,7 @@ func (j *JMA) Property() (string, string) {
 }
 
 func (j *JMA) Fetch() ([]byte, error) {
-	res, err := request.GETRequest(
+	res, err := request.GET(
 		"https://www.jma.go.jp/bosai/quake/data/list.json",
 		10*time.Second, time.Second, 3, false,
 	)
@@ -48,13 +48,13 @@ func (j *JMA) Parse(data []byte) (map[string]any, error) {
 func (j *JMA) Format(latitude, longitude float64, data map[string]any) ([]EarthquakeList, error) {
 	var list []EarthquakeList
 	for _, v := range data["data"].([]map[string]any) {
-		if !HasKey(v, []string{
+		if !hasKey(v, []string{
 			"anm", "mag", "cod", "at",
 		}) {
 			continue
 		}
 
-		if !IsEmpty(v, []string{
+		if !isEmpty(v, []string{
 			"anm", "mag", "cod", "at",
 		}) {
 			continue
@@ -73,10 +73,10 @@ func (j *JMA) Format(latitude, longitude float64, data map[string]any) ([]Earthq
 			Region:    v["anm"].(string),
 			Latitude:  j.GetLatitude(v["cod"].(string)),
 			Longitude: j.GetLongitude(v["cod"].(string)),
-			Magnitude: String2Float(v["mag"].(string)),
+			Magnitude: string2Float(v["mag"].(string)),
 		}
-		l.Distance = GetDistance(latitude, l.Latitude, longitude, l.Longitude)
-		l.Estimated = GetEstimation(l.Distance)
+		l.Distance = getDistance(latitude, l.Latitude, longitude, l.Longitude)
+		l.Estimated = getEstimation(l.Distance)
 
 		list = append(list, l)
 	}
@@ -111,7 +111,7 @@ func (j *JMA) GetDepth(data string) float64 {
 		return 0
 	}
 
-	return String2Float(arr[2]) / 1000
+	return string2Float(arr[2]) / 1000
 }
 
 func (j *JMA) GetLatitude(data string) float64 {
@@ -122,7 +122,7 @@ func (j *JMA) GetLatitude(data string) float64 {
 		return 0
 	}
 
-	return String2Float(arr[0])
+	return string2Float(arr[0])
 }
 
 func (j *JMA) GetLongitude(data string) float64 {
@@ -133,5 +133,5 @@ func (j *JMA) GetLongitude(data string) float64 {
 		return 0
 	}
 
-	return String2Float(arr[1])
+	return string2Float(arr[1])
 }

@@ -1,17 +1,21 @@
 package station
 
-import "com.geophone.observer/features/collector"
+import (
+	"com.geophone.observer/feature"
+)
 
-func GetStation(message collector.Message, status collector.Status) System {
+func getStation(options *feature.FeatureOptions) System {
 	return System{
-		UUID:     message.UUID,
-		Station:  message.Station,
-		Location: GetLocation(message),
-		CPU:      GetCPU(),
-		OS:       GetOS(),
-		Disk:     GetDisk(),
-		Memory:   GetMemory(),
-		Uptime:   GetUptime(),
-		Status:   status,
+		Status:   options.Status.System,
+		Station:  options.Config.Station.Name,
+		UUID:     options.Config.Station.UUID,
+		Location: getLocation(options.Config),
+		Geophone: getGeophone(options.Config),
+		ADC:      getADC(options.Config),
+		OS:       getOS(),
+		CPU:      getCPU(),
+		Disk:     getDisk(),
+		Memory:   getMemory(),
+		Uptime:   getUptime(),
 	}
 }

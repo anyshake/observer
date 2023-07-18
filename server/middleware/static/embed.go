@@ -16,7 +16,7 @@ func ServeEmbed(fs *LocalFileSystem) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		_, err := fs.FileSystem.Open(c.Request.URL.Path)
 		if err != nil {
-			response.ErrorHandler(c, http.StatusNotFound)
+			response.Error(c, http.StatusNotFound)
 			return
 		}
 

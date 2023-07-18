@@ -12,16 +12,31 @@ func (h *History) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions
 	rg.POST("/history", func(c *gin.Context) {
 		var binding Binding
 		if err := c.ShouldBind(&binding); err != nil {
-			response.ErrorHandler(c, http.StatusBadRequest)
+			response.Error(c, http.StatusBadRequest)
 			return
 		}
 
-		data, err := FilterHistory(binding.Timestamp, options)
+		data, err := FilterHistory(binding.Start, binding.End, options)
 		if err != nil {
-			response.ErrorHandler(c, http.StatusInternalServerError)
+			response.Error(c, http.StatusGone)
 			return
 		}
 
-		c.JSON(http.StatusOK, response.MessageHandler(c, "筛选出如下加速度数据", data))
+		switch binding.Format {
+		case "json":
+			response.Message(c, "筛选出如下波形数据", data)
+			return
+		case "sac":
+			fileName, dataBytes, err := GetSACBytes(data, binding.Channel, options)
+			if err != nil {
+				response.Error(c, http.StatusInternalServerError)
+				return
+			}
+
+			response.File(c, fileName, dataBytes)
+			return
+		}
+
+		response.Error(c, http.StatusBadRequest)
 	})
 }

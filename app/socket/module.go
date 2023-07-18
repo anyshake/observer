@@ -3,9 +3,9 @@ package socket
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"com.geophone.observer/app"
+	"com.geophone.observer/handler"
 	"com.geophone.observer/server/response"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -16,7 +16,7 @@ func (s *Socket) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions)
 		var upgrader = websocket.Upgrader{
 			ReadBufferSize: 1024, WriteBufferSize: 1024, EnableCompression: true,
 			Error: func(w http.ResponseWriter, r *http.Request, status int, reason error) {
-				response.ErrorHandler(c, http.StatusBadRequest)
+				response.Error(c, http.StatusBadRequest)
 			},
 			CheckOrigin: func(r *http.Request) bool {
 				return true
@@ -28,18 +28,35 @@ func (s *Socket) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions)
 			return
 		}
 
-		for {
-			data, err := json.Marshal(options.Message)
-			if err != nil {
-				return
+		// Properly close connection
+		go func() {
+			for {
+				_, _, err := conn.ReadMessage()
+				if err != nil {
+					break
+				}
 			}
 
-			err = conn.WriteMessage(websocket.TextMessage, data)
-			if err != nil {
-				return
-			}
+			conn.Close()
+		}()
 
-			time.Sleep(100 * time.Millisecond)
-		}
+		// Write when new message arrived
+		handler.OnMessage(&options.FeatureOptions.Status.Geophone,
+			func(gp *handler.Geophone) error {
+				data, err := json.Marshal(gp)
+				if err != nil {
+					conn.Close()
+					return err
+				}
+
+				err = conn.WriteMessage(websocket.TextMessage, data)
+				if err != nil {
+					conn.Close()
+					return err
+				}
+
+				return nil
+			},
+		)
 	})
 }

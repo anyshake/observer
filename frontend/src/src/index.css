@@ -1,31 +1,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-body {
-    padding-bottom: 6rem;
-}
-
-.apexcharts-zoomin-icon svg {
-    fill: #d6d3d1 !important;
-}
-
-.apexcharts-zoomout-icon svg {
-    fill: #d6d3d1 !important;
-}
-
-.apexcharts-zoom-icon svg {
-    fill: #d6d3d1 !important;
-}
-
-.apexcharts-pan-icon svg {
-    stroke: #d6d3d1 !important;
-}
-
-.apexcharts-reset-icon svg {
-    fill: #d6d3d1 !important;
-}
-
-.apexcharts-menu-icon svg {
-    fill: #d6d3d1 !important;
-}

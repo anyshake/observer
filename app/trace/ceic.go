@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"com.geophone.observer/common/request"
+	"com.geophone.observer/utils/request"
 )
 
 type CEIC struct{}
@@ -19,7 +19,7 @@ func (c *CEIC) Property() (string, string) {
 }
 
 func (c *CEIC) Fetch() ([]byte, error) {
-	res, err := request.GETRequest(
+	res, err := request.GET(
 		"https://news.ceic.ac.cn/ajax/google",
 		10*time.Second, time.Second, 3, false,
 	)
@@ -47,13 +47,13 @@ func (c *CEIC) Parse(data []byte) (map[string]any, error) {
 func (c *CEIC) Format(latitude, longitude float64, data map[string]any) ([]EarthquakeList, error) {
 	var list []EarthquakeList
 	for _, v := range data["data"].([]map[string]any) {
-		if !HasKey(v, []string{
+		if !hasKey(v, []string{
 			"O_TIME", "EPI_LAT", "EPI_LON", "EPI_DEPTH", "M", "LOCATION_C",
 		}) {
 			continue
 		}
 
-		if !IsEmpty(v, []string{
+		if !isEmpty(v, []string{
 			"O_TIME", "EPI_LAT", "EPI_LON", "EPI_DEPTH", "M", "LOCATION_C",
 		}) {
 			continue
@@ -65,17 +65,17 @@ func (c *CEIC) Format(latitude, longitude float64, data map[string]any) ([]Earth
 		}
 
 		l := EarthquakeList{
-			Depth:     String2Float(v["EPI_DEPTH"].(string)),
+			Depth:     string2Float(v["EPI_DEPTH"].(string)),
 			Verfied:   true,
 			Timestamp: ts.Add(-8 * time.Hour).UnixMilli(),
 			Event:     v["LOCATION_C"].(string),
 			Region:    v["LOCATION_C"].(string),
-			Latitude:  String2Float(v["EPI_LAT"].(string)),
-			Longitude: String2Float(v["EPI_LON"].(string)),
-			Magnitude: String2Float(v["M"].(string)),
+			Latitude:  string2Float(v["EPI_LAT"].(string)),
+			Longitude: string2Float(v["EPI_LON"].(string)),
+			Magnitude: string2Float(v["M"].(string)),
 		}
-		l.Distance = GetDistance(latitude, l.Latitude, longitude, l.Longitude)
-		l.Estimated = GetEstimation(l.Distance)
+		l.Distance = getDistance(latitude, l.Latitude, longitude, l.Longitude)
+		l.Estimated = getEstimation(l.Distance)
 
 		list = append(list, l)
 	}

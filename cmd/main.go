@@ -1,165 +1,87 @@
 package main
 
 import (
-	"log"
+	"fmt"
+	"os"
+
+	"github.com/fatih/color"
 
 	"com.geophone.observer/app"
-	"com.geophone.observer/common/postgres"
 	"com.geophone.observer/config"
-	"com.geophone.observer/features/archiver"
-	"com.geophone.observer/features/collector"
-	"com.geophone.observer/features/geophone"
-	"com.geophone.observer/features/ntpclient"
-	"com.geophone.observer/handlers"
+	"com.geophone.observer/feature"
+	"com.geophone.observer/feature/archiver"
+	"com.geophone.observer/feature/geophone"
+	"com.geophone.observer/feature/ntpclient"
+	"com.geophone.observer/handler"
+	"com.geophone.observer/handler/callbacks"
 	"com.geophone.observer/server"
+	"com.geophone.observer/utils/logger"
+	"github.com/common-nighthawk/go-figure"
 )
 
-const apiVersion string = "v1"
+func parseCommandLine(conf *config.Conf) error {
+	var args config.Args
+	args.Read()
+	if args.Version {
+		printVersion()
+		os.Exit(0)
+	}
+
+	err := conf.Read(args.Path)
+	if err != nil {
+		return err
+	}
+
+	logger.Print("main", "G-Observer daemon initialized", color.FgMagenta)
+	return nil
+}
+
+func init() {
+	w := color.New(color.FgHiCyan).SprintFunc()
+	t := figure.NewFigure("G-Observer", "standard", true).String()
+	fmt.Println(w(t))
+}
 
 func main() {
-	var (
-		args config.Args
-		conf config.Config
-	)
-
-	err := ProgramInit(&args, &conf)
+	// Read configuration
+	var conf config.Conf
+	err := parseCommandLine(&conf)
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatal("main", err, color.FgRed)
 	}
 
-	var (
-		status  collector.Status
-		message = collector.Message{
-			Station:   conf.Station.Name,
-			UUID:      conf.Station.UUID,
-			Latitude:  conf.Station.Latitude,
-			Longitude: conf.Station.Longitude,
-			Altitude:  conf.Station.Altitude,
-		}
-	)
+	// Initialize global status
+	var status handler.Status
+	handler.InitHandler(&conf, &status)
 
-	conn, grpc, err := collector.OpenGRPC(
-		conf.Collector.Host,
-		conf.Collector.Port,
-		conf.Collector.TLS,
-		conf.Collector.Enable,
-	)
-	if err != nil {
-		log.Fatalln(err)
+	// Register features
+	featureOptions := &feature.FeatureOptions{
+		Config:  &conf,
+		Status:  &status,
+		OnStart: callbacks.OnStart,
+		OnStop:  callbacks.OnStop,
+		OnReady: callbacks.OnReady,
+		OnError: callbacks.OnError,
 	}
-	if conf.Collector.Enable {
-		defer collector.CloseGRPC(conn)
+	features := []feature.Feature{
+		&ntpclient.NTP{},
+		&geophone.Geophone{},
+		&archiver.Archiver{},
+	}
+	for _, s := range features {
+		go s.Start(featureOptions)
 	}
 
-	pdb, err := postgres.OpenPostgres(
-		conf.Archiver.Host,
-		conf.Archiver.Port,
-		conf.Archiver.Username,
-		conf.Archiver.Password,
-		conf.Archiver.Database,
-		conf.Archiver.Enable,
-	)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	if conf.Archiver.Enable {
-		defer postgres.ClosePostgres(pdb)
-	}
-
-	go ntpclient.ReaderDaemon(
-		conf.NTPClient.Host,
-		conf.NTPClient.Interval,
-		ntpclient.NTPOptions{
-			Port:    conf.NTPClient.Port,
-			Timeout: conf.NTPClient.Timeout,
-			OnErrorCallback: func(err error) {
-				handlers.HandleErrors(&handlers.HandlerOptions{
-					Error:  err,
-					Status: &status,
-				})
-			},
-			OnDataCallback: func(ntp *ntpclient.NTP) {
-				log.Println("Read NTP server time")
-				handlers.HandleMessages(&handlers.HandlerOptions{
-					Status:  &status,
-					Message: &message,
-				}, ntp)
-			},
-		},
-	)
-
-	go geophone.ReaderDaemon(
-		conf.Geophone.Device,
-		conf.Geophone.Baud,
-		geophone.GeophoneOptions{
-			Geophone:     &geophone.Geophone{},
-			Acceleration: &geophone.Acceleration{},
-			Latitude:     conf.Station.Latitude,
-			Longitude:    conf.Station.Longitude,
-			Altitude:     conf.Station.Altitude,
-			Sensitivity: struct {
-				Vertical   float64
-				EastWest   float64
-				NorthSouth float64
-			}{
-				Vertical:   conf.Geophone.Sensitivity.Vertical,
-				EastWest:   conf.Geophone.Sensitivity.EastWest,
-				NorthSouth: conf.Geophone.Sensitivity.NorthSouth,
-			},
-			OnErrorCallback: func(err error) {
-				handlers.HandleErrors(&handlers.HandlerOptions{
-					Error:  err,
-					Status: &status,
-				})
-			},
-			OnDataCallback: func(acceleration *geophone.Acceleration) {
-				log.Println("1 message received")
-				handlers.HandleMessages(&handlers.HandlerOptions{
-					Status:  &status,
-					Message: &message,
-					OnReadyCallback: func(message *collector.Message) {
-						go archiver.WriteMessage(
-							pdb, &archiver.ArchiverOptions{
-								Message: message,
-								Enable:  conf.Archiver.Enable,
-								OnCompleteCallback: func() {
-									log.Println("1 message archived")
-								},
-								OnErrorCallback: func(err error) {
-									log.Println(err)
-								},
-							},
-						)
-						go collector.PushMessage(
-							conn, grpc, &collector.CollectorOptions{
-								Message: message,
-								Status:  &status,
-								Enable:  conf.Collector.Enable,
-								OnCompleteCallback: func(r any) {
-									log.Println(r)
-								},
-								OnErrorCallback: func(err error) {
-									log.Println(err)
-								},
-							})
-					},
-				}, acceleration)
-			},
-		},
-	)
-
+	// Start HTTP server
 	server.ServerDaemon(
 		conf.Server.Host,
 		conf.Server.Port,
 		&app.ServerOptions{
-			WebPrefix:    "/",
-			ApiPrefix:    "/api",
-			Version:      apiVersion,
-			Message:      &message,
-			Status:       &status,
-			ConnGRPC:     &grpc,
-			ConnPostgres: pdb,
-			CORS:         true,
-			Gzip:         9,
+			Gzip:           9,
+			WebPrefix:      WEB_PREFIX,
+			CORS:           API_CORS,
+			APIPrefix:      API_PREFIX,
+			Version:        API_VERSION,
+			FeatureOptions: featureOptions,
 		})
 }
