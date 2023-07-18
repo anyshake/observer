@@ -1,6 +1,6 @@
 {
     "station_settings": {
-        "uuid": "a3773e39-8e15-44ae-a1ad-6fb622bc49e6",
+        "uuid": "a373e39-8e15-44ae-a1ad-6fb622bc49e6",
         "name": "测试测站",
         "latitude": 1.0,
         "longitude": 1.0,
@@ -20,13 +20,13 @@
         "ehn": 0.288
     },
     "ntpclient_settings": {
-        "host": "ntp.aliyun.com",
+        "host": "0.pool.ntp.org",
         "port": 123,
         "timeout": 3,
         "interval": 5
     },
     "archiver_settings": {
-        "enable": false,
+        "enable": true,
         "host": "172.17.138.214",
         "port": 5432,
         "username": "postgres",
