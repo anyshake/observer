@@ -62,8 +62,8 @@ export default class History extends Component<{}, State> {
                 source: "show",
             },
             history: {
-                end: 0,
-                start: 0,
+                start: Date.now() - 60000,
+                end: Date.now(),
                 format: "json",
                 channel: "EHZ",
             },

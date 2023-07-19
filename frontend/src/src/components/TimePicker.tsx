@@ -18,9 +18,13 @@ export default class TimePicker extends Component<TimePickerProps> {
     render() {
         const { label, onChange, value, defaultValue } = this.props;
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const locale = require("dayjs/locale/zh");
 
         return (
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <LocalizationProvider
+                adapterLocale={locale}
+                dateAdapter={AdapterDayjs}
+            >
                 <DateTimePicker
                     className="w-full"
                     timezone="system"
