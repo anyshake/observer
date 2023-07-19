@@ -85,7 +85,7 @@ export default class Realtime extends Component<{}, State> {
                 {
                     tag: "ehn",
                     area: {
-                        label: "EHN 南北方向通道",
+                        label: "EHN 南北方向通道加速度",
                         text: "PGA: 正在获取中\nPGV: 正在获取中",
                     },
                     chart: {
