@@ -59,6 +59,7 @@ export default class Realtime extends Component<{}, State> {
                         lineWidth: 1,
                         height: 300,
                         series: {
+                            name: "EHZ",
                             type: "line",
                             color: "#fff",
                             data: [],
@@ -76,6 +77,7 @@ export default class Realtime extends Component<{}, State> {
                         lineWidth: 1,
                         height: 300,
                         series: {
+                            name: "EHE",
                             type: "line",
                             color: "#fff",
                             data: [],
@@ -93,6 +95,7 @@ export default class Realtime extends Component<{}, State> {
                         lineWidth: 1,
                         height: 300,
                         series: {
+                            name: "EHN",
                             type: "line",
                             color: "#fff",
                             data: [],
@@ -177,6 +180,7 @@ export default class Realtime extends Component<{}, State> {
                             <Area key={index} {...area}>
                                 <Chart
                                     {...chart}
+                                    tooltip={true}
                                     zooming={true}
                                     animation={false}
                                     tickPrecision={0.4}
