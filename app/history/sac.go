@@ -25,8 +25,8 @@ func GetSACBytes(data []handler.Geophone, channel string, options *app.ServerOpt
 
 	// Get basic info
 	var (
-		startTime = time.UnixMilli(data[0].TS).UTC()
-		endTime   = time.UnixMilli(data[len(data)-1].TS).UTC()
+		startTime = time.UnixMilli(data[0].TS)
+		endTime   = time.UnixMilli(data[len(data)-1].TS)
 		station   = getStation(options.FeatureOptions.Config)
 		network   = getNetwork(options.FeatureOptions.Config)
 		location  = getLocation(options.FeatureOptions.Config)

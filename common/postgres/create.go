@@ -10,7 +10,7 @@ func CreateTable(db *sql.DB) error {
 	_, err := db.Exec(`
         CREATE TABLE IF NOT EXISTS counts (
             id SERIAL PRIMARY KEY,
-            ts TIMESTAMP,
+            ts TIMESTAMPTZ,
             ehz INTEGER [],
             ehn INTEGER [],
             ehe INTEGER []

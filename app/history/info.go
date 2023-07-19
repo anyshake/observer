@@ -8,7 +8,7 @@ import (
 )
 
 func getNetwork(*config.Conf) string {
-	return text.TruncateString(NETWORK, 8)
+	return NETWORK
 }
 
 func getStation(conf *config.Conf) string {
