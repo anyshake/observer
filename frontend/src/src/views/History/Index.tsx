@@ -62,8 +62,8 @@ export default class History extends Component<{}, State> {
                 source: "show",
             },
             history: {
-                start: 0,
                 end: 0,
+                start: 0,
                 format: "json",
                 channel: "EHZ",
             },
@@ -308,10 +308,19 @@ export default class History extends Component<{}, State> {
         const trace = {
             source: "show",
         };
-        const { data, error } = await requestByTag({
-            body: trace,
-            tag: "trace",
-        });
+
+        const { data, error } = await toast.promise(
+            requestByTag({
+                body: trace,
+                tag: "trace",
+            }),
+            {
+                loading: "正在获取数据源...",
+                success: "成功取得数据源",
+                error: "数据源获取失败",
+            }
+        );
+
         if (error || !data) {
             const error = "请求失败，请检查输入后重试";
             toast.error(error);
@@ -342,21 +351,6 @@ export default class History extends Component<{}, State> {
                 <Sidebar />
 
                 <Content>
-                    <Toaster position="top-center" />
-                    <SelectDialog
-                        {...dialog}
-                        onSelect={(value: string) =>
-                            this.handleSelect(from, value)
-                        }
-                    />
-                    <ModalDialog
-                        {...modal}
-                        onSelect={this.handleChooseEvent}
-                        onClose={() =>
-                            this.setState({ modal: { ...modal, open: false } })
-                        }
-                    />
-
                     <Navbar />
                     <Container layout="grid">
                         <Card className="h-[430px]" label="历史查询">
@@ -405,6 +399,19 @@ export default class History extends Component<{}, State> {
 
                 <Scroller />
                 <Footer />
+
+                <SelectDialog
+                    {...dialog}
+                    onSelect={(value: string) => this.handleSelect(from, value)}
+                />
+                <ModalDialog
+                    {...modal}
+                    onSelect={this.handleChooseEvent}
+                    onClose={() =>
+                        this.setState({ modal: { ...modal, open: false } })
+                    }
+                />
+                <Toaster position="top-center" />
             </View>
         );
     }

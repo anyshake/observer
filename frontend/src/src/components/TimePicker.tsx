@@ -23,7 +23,7 @@ export default class TimePicker extends Component<TimePickerProps> {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DateTimePicker
                     className="w-full"
-                    timezone="default"
+                    timezone="system"
                     views={[
                         "year",
                         "month",
@@ -42,12 +42,8 @@ export default class TimePicker extends Component<TimePickerProps> {
                         onChange(val as number);
                     }}
                     label={`${label}（时区 ${timezone}）`}
-                    {...(defaultValue && {
-                        defaultValue: dayjs(value),
-                    })}
-                    {...(value && {
-                        value: dayjs(value),
-                    })}
+                    value={value ? dayjs(value) : dayjs(0)}
+                    defaultValue={defaultValue ? dayjs(defaultValue) : dayjs(0)}
                 />
             </LocalizationProvider>
         );

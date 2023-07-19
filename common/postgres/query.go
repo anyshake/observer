@@ -41,7 +41,7 @@ func Query(db *sql.DB, start, end int64) ([]map[string]any, error) {
 			"ehz": ehz,
 			"ehe": ehe,
 			"ehn": ehn,
-			"ts":  ts.UnixMilli(),
+			"ts":  ts.UTC().UnixMilli(),
 		})
 	}
 
