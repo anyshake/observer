@@ -170,8 +170,6 @@ export default class Realtime extends Component<{}, State> {
                 <Sidebar />
 
                 <Content>
-                    <Toaster position="top-center" />
-
                     <Navbar />
                     <Banner {...banner} />
                     <Container layout="none">
@@ -179,7 +177,6 @@ export default class Realtime extends Component<{}, State> {
                             <Area key={index} {...area}>
                                 <Chart
                                     {...chart}
-                                    zooming={true}
                                     animation={false}
                                     tickPrecision={0.4}
                                     tickInterval={0.0001}
@@ -191,6 +188,7 @@ export default class Realtime extends Component<{}, State> {
 
                 <Scroller />
                 <Footer />
+                <Toaster position="top-center" />
             </View>
         );
     }
