@@ -120,6 +120,19 @@ export default class Chart extends Component<ChartProps, ChartState> {
         const { series } = this.props;
         const { state: options } = this;
 
+        // sort series data again
+        if (series.data) {
+            series.data.sort((a: any, b: any) => {
+                return a[0] - b[0];
+            });
+        } else if (series.length) {
+            for (let i of series as any) {
+                i.data.sort((a: any, b: any) => {
+                    return a[0] - b[0];
+                });
+            }
+        }
+
         return (
             <HighchartsReact
                 options={{ ...options, series }}

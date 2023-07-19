@@ -27,6 +27,12 @@ func (a *Archiver) Start(options *feature.FeatureOptions) {
 		options.OnError(MODULE, options, err)
 		os.Exit(1)
 	}
+
+	err = postgres.Init(pdb)
+	if err != nil {
+		options.OnError(MODULE, options, err)
+		os.Exit(1)
+	}
 	options.Database = pdb
 
 	// Archive when new message arrived

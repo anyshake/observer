@@ -71,7 +71,7 @@ export default class History extends Component<{}, State> {
                 backgroundColor: "transparent",
                 tickInterval: 0.1,
                 tickPrecision: 0.2,
-                lineWidth: 2,
+                lineWidth: 1,
                 height: 400,
                 tooltip: true,
                 legend: true,

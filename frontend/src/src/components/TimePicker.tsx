@@ -1,13 +1,13 @@
 import { Component } from "react";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
     DateTimePicker,
     LocalizationProvider,
     renderTimeViewClock,
 } from "@mui/x-date-pickers";
-import dayjs from "dayjs";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import zh from "date-fns/locale/zh-CN";
 
-interface TimePickerProps {
+export interface TimePickerProps {
     readonly label: string;
     readonly value?: number;
     readonly defaultValue?: number;
@@ -18,12 +18,11 @@ export default class TimePicker extends Component<TimePickerProps> {
     render() {
         const { label, onChange, value, defaultValue } = this.props;
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const locale = require("dayjs/locale/zh");
 
         return (
             <LocalizationProvider
-                adapterLocale={locale}
-                dateAdapter={AdapterDayjs}
+                dateAdapter={AdapterDateFns}
+                adapterLocale={zh}
             >
                 <DateTimePicker
                     className="w-full"
@@ -46,8 +45,9 @@ export default class TimePicker extends Component<TimePickerProps> {
                         onChange(val as number);
                     }}
                     label={`${label}（时区 ${timezone}）`}
-                    value={value ? dayjs(value) : dayjs(0)}
-                    defaultValue={defaultValue ? dayjs(defaultValue) : dayjs(0)}
+                    defaultValue={defaultValue}
+                    value={value}
+                    ampm={false}
                 />
             </LocalizationProvider>
         );

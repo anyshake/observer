@@ -177,6 +177,7 @@ export default class Realtime extends Component<{}, State> {
                             <Area key={index} {...area}>
                                 <Chart
                                     {...chart}
+                                    zooming={true}
                                     animation={false}
                                     tickPrecision={0.4}
                                     tickInterval={0.0001}
