@@ -51,12 +51,12 @@ export default class Realtime extends Component<{}, State> {
                 {
                     tag: "ehz",
                     area: {
-                        label: "EHZ 垂直分量通道加速度",
+                        label: "EHZ 分量通道加速度",
                         text: "PGA: 正在获取中\nPGV: 正在获取中",
                     },
                     chart: {
                         backgroundColor: "#d97706",
-                        lineWidth: 2,
+                        lineWidth: 1,
                         height: 300,
                         series: {
                             type: "line",
@@ -68,12 +68,12 @@ export default class Realtime extends Component<{}, State> {
                 {
                     tag: "ehe",
                     area: {
-                        label: "EHE 东西分量通道加速度",
+                        label: "EHE 分量通道加速度",
                         text: "PGA: 正在获取中\nPGV: 正在获取中",
                     },
                     chart: {
                         backgroundColor: "#10b981",
-                        lineWidth: 2,
+                        lineWidth: 1,
                         height: 300,
                         series: {
                             type: "line",
@@ -85,12 +85,12 @@ export default class Realtime extends Component<{}, State> {
                 {
                     tag: "ehn",
                     area: {
-                        label: "EHN 南北方向通道加速度",
+                        label: "EHN 分量通道加速度",
                         text: "PGA: 正在获取中\nPGV: 正在获取中",
                     },
                     chart: {
                         backgroundColor: "#0ea5e9",
-                        lineWidth: 2,
+                        lineWidth: 1,
                         height: 300,
                         series: {
                             type: "line",
