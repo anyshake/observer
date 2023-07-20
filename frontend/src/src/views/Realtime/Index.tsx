@@ -51,7 +51,7 @@ export default class Realtime extends Component<{}, State> {
                 {
                     tag: "ehz",
                     area: {
-                        label: "EHZ 分量通道加速度",
+                        label: "EHZ 通道加速度",
                         text: "PGA: 正在获取中\nPGV: 正在获取中",
                     },
                     chart: {
@@ -69,7 +69,7 @@ export default class Realtime extends Component<{}, State> {
                 {
                     tag: "ehe",
                     area: {
-                        label: "EHE 分量通道加速度",
+                        label: "EHE 通道加速度",
                         text: "PGA: 正在获取中\nPGV: 正在获取中",
                     },
                     chart: {
@@ -87,7 +87,7 @@ export default class Realtime extends Component<{}, State> {
                 {
                     tag: "ehn",
                     area: {
-                        label: "EHN 分量通道加速度",
+                        label: "EHN 通道加速度",
                         text: "PGA: 正在获取中\nPGV: 正在获取中",
                     },
                     chart: {
