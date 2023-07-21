@@ -201,13 +201,23 @@ export default class History extends Component<{}, State> {
                 ...state.modal,
                 open: true,
                 values: data.map((item: any) => {
-                    const { magnitude, region, event, timestamp, depth } = item;
+                    const {
+                        magnitude,
+                        region,
+                        event,
+                        timestamp,
+                        depth,
+                        estimated,
+                    } = item;
                     const desc = `[M ${magnitude.toFixed(
                         1
                     )}] ${region} / 时刻 ${getTimeString(
                         timestamp
                     )} / 深度 ${depth} km`;
-                    return [event, timestamp, desc];
+
+                    console.log(timestamp, timestamp + estimated * 1000);
+
+                    return [event, timestamp + estimated * 1000, desc];
                 }),
             },
         }));
