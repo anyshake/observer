@@ -24,7 +24,7 @@ import getTimeString from "../../helpers/getTimeString";
 
 // 100s by default
 const QUERY_TIMEOUT = 100000;
-const TRACE_RANGE = 1000 * 10 * 60;
+const TRACE_RANGE = 1000 * 5 * 60;
 
 interface HistoryForm {
     readonly start: number;
@@ -213,7 +213,7 @@ export default class History extends Component<{}, State> {
                         1
                     )}] ${region} / 时刻 ${getTimeString(
                         timestamp
-                    )} / 深度 ${depth} km / 传播 ${estimated} s`;
+                    )} / 深度 ${depth} km / 传播 ${estimated.toFixed(1)} s`;
 
                     return [event, timestamp + estimated * 1000, desc];
                 }),
