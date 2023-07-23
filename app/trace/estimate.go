@@ -1,5 +1,5 @@
 package trace
 
 func getEstimation(distance float64) float64 {
-	return distance / 7.0
+	return distance / 5.0
 }
