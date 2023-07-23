@@ -72,10 +72,10 @@ func (c *CWB) Parse(data []byte) (map[string]any, error) {
 	return result, nil
 }
 
-func (c *CWB) Format(latitude, longitude float64, data map[string]any) ([]EarthquakeList, error) {
-	var list []EarthquakeList
+func (c *CWB) Format(latitude, longitude float64, data map[string]any) ([]Event, error) {
+	var list []Event
 	for _, v := range data["data"].([]any) {
-		l := EarthquakeList{
+		l := Event{
 			Verfied:   true,
 			Latitude:  string2Float(v.(map[string]any)["latitude"].(string)),
 			Longitude: string2Float(v.(map[string]any)["longitude"].(string)),
@@ -94,7 +94,7 @@ func (c *CWB) Format(latitude, longitude float64, data map[string]any) ([]Earthq
 	return list, nil
 }
 
-func (c *CWB) List(latitude, longitude float64) ([]EarthquakeList, error) {
+func (c *CWB) List(latitude, longitude float64) ([]Event, error) {
 	res, err := c.Fetch()
 	if err != nil {
 		return nil, err

@@ -52,6 +52,7 @@ func (t *Trace) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) 
 					return
 				}
 
+				sortByTimestamp(events)
 				response.Message(c, "成功取得地震列表数据", events)
 				return
 			}

@@ -43,13 +43,13 @@ func (h *HKO) Parse(data []byte) (map[string]any, error) {
 	return result, nil
 }
 
-func (h *HKO) Format(latitude, longitude float64, data map[string]any) ([]EarthquakeList, error) {
+func (h *HKO) Format(latitude, longitude float64, data map[string]any) ([]Event, error) {
 	events, ok := data["Earthquake"].(map[string]any)["EventGroup"].(map[string]any)["Event"]
 	if !ok {
 		return nil, fmt.Errorf("source data is not valid")
 	}
 
-	var list []EarthquakeList
+	var list []Event
 	for _, v := range events.([]map[string]any) {
 		if !hasKey(v, []string{
 			"Verify", "HKTDate", "HKTTime", "City",
@@ -65,7 +65,7 @@ func (h *HKO) Format(latitude, longitude float64, data map[string]any) ([]Earthq
 			continue
 		}
 
-		l := EarthquakeList{
+		l := Event{
 			Depth:     -1,
 			Verfied:   v["Verify"].(string) == "Y",
 			Timestamp: ts.Add(-8 * time.Hour).UnixMilli(),
@@ -84,7 +84,7 @@ func (h *HKO) Format(latitude, longitude float64, data map[string]any) ([]Earthq
 	return list, nil
 }
 
-func (h *HKO) List(latitude, longitude float64) ([]EarthquakeList, error) {
+func (h *HKO) List(latitude, longitude float64) ([]Event, error) {
 	res, err := h.Fetch()
 	if err != nil {
 		return nil, err

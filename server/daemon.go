@@ -26,9 +26,9 @@ func ServerDaemon(host string, port int, options *app.ServerOptions) error {
 		gzip.Gzip(options.Gzip),
 		gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 			w := color.New(color.FgCyan).SprintFunc()
-			text := w(fmt.Sprintf("%s [server] (%s) %s %d %s %s\n",
+			text := w(fmt.Sprintf("%s [server] %s %d %s %s %s\n",
 				param.TimeStamp.Format("2006/01/02 15:04:05"),
-				param.ClientIP, param.Method, param.StatusCode,
+				param.Method, param.StatusCode, param.ClientIP,
 				param.Path, param.ErrorMessage,
 			))
 

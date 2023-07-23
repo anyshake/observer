@@ -41,13 +41,13 @@ func (u *USGS) Parse(data []byte) (map[string]any, error) {
 	return result, nil
 }
 
-func (u *USGS) Format(latitude, longitude float64, data map[string]any) ([]EarthquakeList, error) {
+func (u *USGS) Format(latitude, longitude float64, data map[string]any) ([]Event, error) {
 	events, ok := data["features"]
 	if !ok {
 		return nil, fmt.Errorf("source data is not valid")
 	}
 
-	var list []EarthquakeList
+	var list []Event
 	for _, v := range events.([]any) {
 		if !hasKey(v.(map[string]any), []string{"properties"}) {
 			continue
@@ -74,7 +74,7 @@ func (u *USGS) Format(latitude, longitude float64, data map[string]any) ([]Earth
 			continue
 		}
 
-		l := EarthquakeList{
+		l := Event{
 			Depth:     coordinates.([]any)[2].(float64),
 			Verfied:   true,
 			Timestamp: int64(properties.(map[string]any)["time"].(float64)),
@@ -93,7 +93,7 @@ func (u *USGS) Format(latitude, longitude float64, data map[string]any) ([]Earth
 	return list, nil
 }
 
-func (u *USGS) List(latitude, longitude float64) ([]EarthquakeList, error) {
+func (u *USGS) List(latitude, longitude float64) ([]Event, error) {
 	res, err := u.Fetch()
 	if err != nil {
 		return nil, err
