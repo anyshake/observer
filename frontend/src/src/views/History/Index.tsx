@@ -213,9 +213,7 @@ export default class History extends Component<{}, State> {
                         1
                     )}] ${region} / 时刻 ${getTimeString(
                         timestamp
-                    )} / 深度 ${depth} km`;
-
-                    console.log(timestamp, timestamp + estimated * 1000);
+                    )} / 深度 ${depth} km / 传播 ${estimated} s`;
 
                     return [event, timestamp + estimated * 1000, desc];
                 }),
@@ -227,6 +225,7 @@ export default class History extends Component<{}, State> {
         const span = TRACE_RANGE / 2;
         const start = new Date(value).getTime() - span;
         const end = new Date(value).getTime() + span;
+
         await this.promisedSetState({
             history: { start, end, format: "json" },
             modal: { ...this.state.modal, open: false },
