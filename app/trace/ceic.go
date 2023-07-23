@@ -44,8 +44,8 @@ func (c *CEIC) Parse(data []byte) (map[string]any, error) {
 	return result, nil
 }
 
-func (c *CEIC) Format(latitude, longitude float64, data map[string]any) ([]EarthquakeList, error) {
-	var list []EarthquakeList
+func (c *CEIC) Format(latitude, longitude float64, data map[string]any) ([]Event, error) {
+	var list []Event
 	for _, v := range data["data"].([]map[string]any) {
 		if !hasKey(v, []string{
 			"O_TIME", "EPI_LAT", "EPI_LON", "EPI_DEPTH", "M", "LOCATION_C",
@@ -64,7 +64,7 @@ func (c *CEIC) Format(latitude, longitude float64, data map[string]any) ([]Earth
 			continue
 		}
 
-		l := EarthquakeList{
+		l := Event{
 			Depth:     string2Float(v["EPI_DEPTH"].(string)),
 			Verfied:   true,
 			Timestamp: ts.Add(-8 * time.Hour).UnixMilli(),
@@ -83,7 +83,7 @@ func (c *CEIC) Format(latitude, longitude float64, data map[string]any) ([]Earth
 	return list, nil
 }
 
-func (c *CEIC) List(latitude, longitude float64) ([]EarthquakeList, error) {
+func (c *CEIC) List(latitude, longitude float64) ([]Event, error) {
 	res, err := c.Fetch()
 	if err != nil {
 		return nil, err

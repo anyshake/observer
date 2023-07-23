@@ -6,7 +6,7 @@ type Binding struct {
 	Source string `form:"source" json:"source" xml:"source" binding:"required"`
 }
 
-type EarthquakeList struct {
+type Event struct {
 	Verfied   bool    `json:"verfied"`
 	Timestamp int64   `json:"timestamp"`
 	Event     string  `json:"event"`
@@ -23,6 +23,6 @@ type DataSource interface {
 	Fetch() ([]byte, error)
 	Property() (string, string)
 	Parse([]byte) (map[string]any, error)
-	List(latitude, longitude float64) ([]EarthquakeList, error)
-	Format(float64, float64, map[string]any) ([]EarthquakeList, error)
+	List(latitude, longitude float64) ([]Event, error)
+	Format(float64, float64, map[string]any) ([]Event, error)
 }

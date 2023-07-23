@@ -45,8 +45,8 @@ func (j *JMA) Parse(data []byte) (map[string]any, error) {
 	return result, nil
 }
 
-func (j *JMA) Format(latitude, longitude float64, data map[string]any) ([]EarthquakeList, error) {
-	var list []EarthquakeList
+func (j *JMA) Format(latitude, longitude float64, data map[string]any) ([]Event, error) {
+	var list []Event
 	for _, v := range data["data"].([]map[string]any) {
 		if !hasKey(v, []string{
 			"anm", "mag", "cod", "at",
@@ -65,7 +65,7 @@ func (j *JMA) Format(latitude, longitude float64, data map[string]any) ([]Earthq
 			continue
 		}
 
-		l := EarthquakeList{
+		l := Event{
 			Depth:     j.GetDepth(v["cod"].(string)),
 			Verfied:   true,
 			Timestamp: ts.Add(-9 * time.Hour).UnixMilli(),
@@ -84,7 +84,7 @@ func (j *JMA) Format(latitude, longitude float64, data map[string]any) ([]Earthq
 	return list, nil
 }
 
-func (j *JMA) List(latitude, longitude float64) ([]EarthquakeList, error) {
+func (j *JMA) List(latitude, longitude float64) ([]Event, error) {
 	res, err := j.Fetch()
 	if err != nil {
 		return nil, err
