@@ -19,6 +19,8 @@ import setBanner from "./setBanner";
 import setAreas from "./setAreas";
 import { Geophone } from "../../config/geophone";
 import { ADC } from "../../config/adc";
+import { IntensityScaleStandard } from "../../helpers/getIntensity";
+import getLocalStorage from "../../helpers/getLocalStorage";
 
 // 180s by default
 const QUENE_LENGTH = 180;
@@ -34,6 +36,7 @@ interface State {
     readonly banner: BannerProps;
     readonly areas: RealtimeArea[];
     readonly geophone: Geophone;
+    readonly scale: IntensityScaleStandard;
 }
 
 export default class Realtime extends Component<{}, State> {
@@ -42,6 +45,7 @@ export default class Realtime extends Component<{}, State> {
     constructor(props: {}) {
         super(props);
         this.state = {
+            scale: "JMA",
             banner: {
                 type: "warning",
                 label: "正在连接服务器",
@@ -52,7 +56,7 @@ export default class Realtime extends Component<{}, State> {
                     tag: "ehz",
                     area: {
                         label: "EHZ 通道加速度",
-                        text: "PGA: 正在获取中\nPGV: 正在获取中",
+                        text: "震度：正在获取中\nPGA: 正在获取中\nPGV: 正在获取中",
                     },
                     chart: {
                         backgroundColor: "#d97706",
@@ -70,7 +74,7 @@ export default class Realtime extends Component<{}, State> {
                     tag: "ehe",
                     area: {
                         label: "EHE 通道加速度",
-                        text: "PGA: 正在获取中\nPGV: 正在获取中",
+                        text: "震度：正在获取中\nPGA: 正在获取中\nPGV: 正在获取中",
                     },
                     chart: {
                         backgroundColor: "#10b981",
@@ -88,7 +92,7 @@ export default class Realtime extends Component<{}, State> {
                     tag: "ehn",
                     area: {
                         label: "EHN 通道加速度",
-                        text: "PGA: 正在获取中\nPGV: 正在获取中",
+                        text: "震度：正在获取中\nPGA: 正在获取中\nPGV: 正在获取中",
                     },
                     chart: {
                         backgroundColor: "#0ea5e9",
@@ -124,15 +128,17 @@ export default class Realtime extends Component<{}, State> {
     };
 
     handleWebsocketData = (event: MessageEvent): void => {
+        const { adc, geophone, scale } = this.state;
         const jsonData = JSON.parse(event.data);
-        const banner = setBanner(jsonData, this.prevTs);
+        const banner = setBanner(jsonData, this.prevTs, scale);
         const areas = setAreas(
             this.state.areas,
             jsonData,
             this.prevTs,
             QUENE_LENGTH,
-            this.state.adc,
-            this.state.geophone
+            adc,
+            geophone,
+            scale
         );
 
         this.prevTs = jsonData.ts;
@@ -146,7 +152,11 @@ export default class Realtime extends Component<{}, State> {
         if (res.data) {
             const adc = setADC(res);
             const geophone = setGeophone(res);
-            this.setState({ adc, geophone });
+            const scale = getLocalStorage(
+                "scale",
+                "JMA"
+            ) as IntensityScaleStandard;
+            this.setState({ adc, geophone, scale });
         } else {
             return;
         }

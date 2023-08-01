@@ -4,7 +4,7 @@ import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar";
 import Content from "../../components/Content";
 import Banner, { BannerProps } from "../../components/Banner";
-import Badges, { BadgesProps } from "../../components/Badges";
+import Label, { LabelProps } from "../../components/Label";
 import View from "../../components/View";
 import Area, { AreaProps } from "../../components/Area";
 import Chart, { ChartProps } from "../../components/Chart";
@@ -21,7 +21,7 @@ import ClockIcon from "../../assets/icons/clock-solid.svg";
 import requestByTag, { ApiResponse } from "../../helpers/requestByTag";
 import Polling from "../../components/Polling";
 import setBanner from "./setBanner";
-import setBadges from "./setBadges";
+import setLabels from "./setLabels";
 import setMap from "./setMap";
 import setAreas from "./setAreas";
 
@@ -41,7 +41,7 @@ export interface HomeMap {
 
 export interface HomeState {
     readonly banner: BannerProps;
-    readonly badges: BadgesProps;
+    readonly labels: LabelProps[];
     readonly areas: HomeArea[];
     readonly map: HomeMap;
 }
@@ -55,52 +55,56 @@ export default class Home extends Component<{}, HomeState> {
                 label: "正在连接服务器",
                 text: "请稍等...",
             },
-            badges: {
-                list: [
-                    {
-                        tag: "messages",
-                        label: "已解码讯息量",
-                        value: "0",
-                        unit: "条",
-                        icon: CheckIcon,
-                    },
-                    {
-                        tag: "errors",
-                        label: "帧错误讯息量",
-                        value: "0",
-                        unit: "条",
-                        icon: BugIcon,
-                    },
-                    {
-                        tag: "pushed",
-                        label: "已推送讯息量",
-                        value: "0",
-                        unit: "条",
-                        icon: PlaneIcon,
-                    },
-                    {
-                        tag: "failures",
-                        label: "推送失败讯息量",
-                        value: "0",
-                        unit: "条",
-                        icon: ErrorIcon,
-                    },
-                    {
-                        tag: "queued",
-                        label: "等待推送讯息量",
-                        value: "0",
-                        unit: "条",
-                        icon: TimerIcon,
-                    },
-                    {
-                        tag: "offset",
-                        label: "系统时间偏移量",
-                        value: "0",
-                        unit: "秒",
-                        icon: ClockIcon,
-                    },
-                ],
-            },
+            labels: [
+                {
+                    tag: "messages",
+                    label: "已解码讯息量",
+                    value: "0",
+                    unit: "条",
+                    icon: CheckIcon,
+                    color: true,
+                },
+                {
+                    tag: "errors",
+                    label: "帧错误讯息量",
+                    value: "0",
+                    unit: "条",
+                    icon: BugIcon,
+                    color: true,
+                },
+                {
+                    tag: "pushed",
+                    label: "已推送讯息量",
+                    value: "0",
+                    unit: "条",
+                    icon: PlaneIcon,
+                    color: true,
+                },
+                {
+                    tag: "failures",
+                    label: "推送失败讯息量",
+                    value: "0",
+                    unit: "条",
+                    icon: ErrorIcon,
+                    color: true,
+                },
+                {
+                    tag: "queued",
+                    label: "等待推送讯息量",
+                    value: "0",
+                    unit: "条",
+                    icon: TimerIcon,
+                    color: true,
+                },
+                {
+                    tag: "offset",
+                    label: "系统时间偏移量",
+                    value: "0",
+                    unit: "秒",
+                    icon: ClockIcon,
+                    color: true,
+                },
+            ],
             areas: [
                 {
                     tag: "cpu",
@@ -169,9 +173,9 @@ export default class Home extends Component<{}, HomeState> {
         const banner = setBanner(res);
         if (!error) {
             const map = setMap(this.state.map, res);
-            const badges = setBadges(this.state.badges, res);
+            const labels = setLabels(this.state.labels, res);
             const areas = setAreas(this.state.areas, res, QUENE_LENGTH);
-            this.setState({ banner, badges, areas, map });
+            this.setState({ banner, labels, areas, map });
             return true;
         }
 
@@ -180,7 +184,7 @@ export default class Home extends Component<{}, HomeState> {
     };
 
     render() {
-        const { banner, badges, areas } = this.state;
+        const { banner, labels, areas } = this.state;
         const { area, instance } = this.state.map;
 
         return (
@@ -197,7 +201,16 @@ export default class Home extends Component<{}, HomeState> {
                         onFetch={this.handleFetch}
                     >
                         <Banner {...banner} />
-                        <Badges {...badges} />
+
+                        <Container layout={"flex"}>
+                            {labels.map((label, index) => (
+                                <Label
+                                    key={index}
+                                    {...label}
+                                    className="md:w-1/2 lg:w-1/3"
+                                />
+                            ))}
+                        </Container>
 
                         <Container layout={"grid"}>
                             {areas.map(({ area, chart }, index) => (

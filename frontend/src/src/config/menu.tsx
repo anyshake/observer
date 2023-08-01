@@ -1,6 +1,7 @@
 import IndexIcon from "../assets/icons/server-solid.svg";
 import RealtimeIcon from "../assets/icons/wave-square-solid.svg";
 import HistoryIcon from "../assets/icons/file-waveform-solid.svg";
+import SettingIcon from "../assets/icons/gear-solid.svg";
 
 const MENU_CONFIG: MenuConfig[] = [
     {
@@ -18,11 +19,11 @@ const MENU_CONFIG: MenuConfig[] = [
         label: "历史数据",
         icon: HistoryIcon,
     },
-    // {
-    //     uri: "/settings",
-    //     label: "系统设定",
-    //     icon: SettingsIcon,
-    // },
+    {
+        uri: "/setting",
+        label: "面板设定",
+        icon: SettingIcon,
+    },
 ];
 
 export interface MenuConfig {

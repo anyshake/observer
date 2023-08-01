@@ -116,6 +116,15 @@ export default class Chart extends Component<ChartProps, ChartState> {
         };
     }
 
+    componentDidMount(): void {
+        Highcharts.setOptions({
+            lang: {
+                resetZoom: "复位视图",
+                resetZoomTitle: "复位视图为 1:1",
+            },
+        });
+    }
+
     render() {
         const { series } = this.props;
         const { state: options } = this;

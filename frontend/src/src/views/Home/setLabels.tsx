@@ -1,8 +1,8 @@
-import { BadgesProps } from "../../components/Badges";
+import { LabelProps } from "../../components/Label";
 import { ApiResponse } from "../../helpers/requestByTag";
 import setObject from "../../helpers/setObject";
 
-const setCard = (obj: BadgesProps, res: ApiResponse): BadgesProps => {
+const setLabels = (obj: LabelProps[], res: ApiResponse): LabelProps[] => {
     const tags = [
         "messages",
         "errors",
@@ -13,10 +13,10 @@ const setCard = (obj: BadgesProps, res: ApiResponse): BadgesProps => {
     ];
     for (let i of tags) {
         const { status } = res.data;
-        setObject(obj, `list[tag:${i}]>value`, status[i]);
+        setObject(obj, `[tag:${i}]>value`, status[i]);
     }
 
     return obj;
 };
 
-export default setCard;
+export default setLabels;

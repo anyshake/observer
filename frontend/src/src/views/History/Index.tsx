@@ -21,6 +21,10 @@ import setGeophone from "./setGeophone";
 import setADC from "./setADC";
 import ModalDialog, { ModalDialogProps } from "../../components/ModalDialog";
 import getTimeString from "../../helpers/getTimeString";
+import Label, { LabelProps } from "../../components/Label";
+import setLabels from "./setLabels";
+import { IntensityScaleStandard } from "../../helpers/getIntensity";
+import getLocalStorage from "../../helpers/getLocalStorage";
 
 // 100s by default
 const QUERY_TIMEOUT = 100000;
@@ -52,12 +56,15 @@ interface State {
     readonly geophone: Geophone;
     readonly select: HistorySelect;
     readonly modal: ModalDialogProps;
+    readonly scale: IntensityScaleStandard;
+    readonly labels: LabelProps[];
 }
 
 export default class History extends Component<{}, State> {
     constructor(props: {}) {
         super(props);
         this.state = {
+            scale: "JMA",
             trace: {
                 source: "show",
             },
@@ -123,6 +130,44 @@ export default class History extends Component<{}, State> {
                 fullscale: 5,
                 resolution: 24,
             },
+            labels: [
+                {
+                    tag: "ehz-pga",
+                    label: "EHZ 峰值加速度",
+                    value: "0",
+                    unit: "gal",
+                },
+                {
+                    tag: "ehz-intensity",
+                    label: "EHZ 瞬时最大震度",
+                    value: "0",
+                    unit: "",
+                },
+                {
+                    tag: "ehe-pga",
+                    label: "EHZ 峰值加速度",
+                    value: "0",
+                    unit: "gal",
+                },
+                {
+                    tag: "ehe-intensity",
+                    label: "EHE 瞬时最大震度",
+                    value: "0",
+                    unit: "",
+                },
+                {
+                    tag: "ehn-pga",
+                    label: "EHN 峰值加速度",
+                    value: "0",
+                    unit: "gal",
+                },
+                {
+                    tag: "ehn-intensity",
+                    label: "EHN 瞬时最大震度",
+                    value: "0",
+                    unit: "",
+                },
+            ],
         };
     }
 
@@ -133,7 +178,11 @@ export default class History extends Component<{}, State> {
         if (res.data) {
             const adc = setADC(res);
             const geophone = setGeophone(res);
-            this.setState({ adc, geophone });
+            const scale = getLocalStorage(
+                "scale",
+                "JMA"
+            ) as IntensityScaleStandard;
+            this.setState({ adc, geophone, scale });
         } else {
             return;
         }
@@ -285,13 +334,16 @@ export default class History extends Component<{}, State> {
             error: "历史波形数据查询失败",
         });
         if (res) {
-            const chart = setChart(
-                this.state.chart,
+            const { adc, geophone, scale } = this.state;
+            const chart = setChart(this.state.chart, res, adc, geophone);
+            const labels = setLabels(
+                this.state.labels,
                 res,
-                this.state.adc,
-                this.state.geophone
+                adc,
+                geophone,
+                scale
             );
-            this.setState({ chart });
+            this.setState({ chart, labels });
         }
     };
 
@@ -350,7 +402,7 @@ export default class History extends Component<{}, State> {
     };
 
     render() {
-        const { chart, select, modal, history } = this.state;
+        const { chart, select, modal, history, labels } = this.state;
         const { from, dialog } = select;
         const { start, end } = history;
 
@@ -403,7 +455,13 @@ export default class History extends Component<{}, State> {
                         </Card>
                     </Container>
 
-                    {/* <Card label="数据分析">暂无支持</Card> */}
+                    <Card className="rounded-lg" label="数据分析">
+                        <Container layout="grid">
+                            {labels.map((label, index) => (
+                                <Label key={index} {...label} />
+                            ))}
+                        </Container>
+                    </Card>
                 </Content>
 
                 <Scroller />

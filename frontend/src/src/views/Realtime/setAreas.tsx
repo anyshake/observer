@@ -6,6 +6,9 @@ import { RealtimeArea } from "./Index";
 import getAcceleration from "../../helpers/getAcceleration";
 import { ADC } from "../../config/adc";
 import { Geophone } from "../../config/geophone";
+import getIntensity, {
+    IntensityScaleStandard,
+} from "../../helpers/getIntensity";
 
 const setAreas = (
     obj: RealtimeArea[],
@@ -13,7 +16,8 @@ const setAreas = (
     prevTs: number,
     length: number,
     adc: ADC,
-    gp: Geophone
+    gp: Geophone,
+    scale: IntensityScaleStandard
 ): RealtimeArea[] => {
     const tags = ["ehz", "ehe", "ehn"];
     const { ts } = data;
@@ -49,7 +53,7 @@ const setAreas = (
         const resultArr = getQueueArray(srcArr, newArr, length * sampleRate);
         setObject(obj, `[tag:${i}]>chart>series>data`, resultArr);
 
-        // Get PGV, PGA
+        // Get PGV, PGA, Intensity
         const pgv = velocity.reduce((a, b) => {
             const absA = Math.abs(a);
             const absB = Math.abs(b);
@@ -60,13 +64,15 @@ const setAreas = (
             const absB = Math.abs(b);
             return Math.max(absA, absB);
         }, 0);
+        const intensity = getIntensity(pgv, pga, scale);
 
-        // Set PGV, PGA in area
+        // Set PGV, PGA, Intensity in area
         setObject(
             obj,
             `[tag:${i}]>area>text`,
-            `PGA: ${pga.toFixed(5)} gal\n
-            PGV: ${pgv.toFixed(5)} cm/s\n`
+            `震度：${intensity}\n
+            PGA: ${pga.toFixed(5)} gal\n
+            PGV: ${pgv.toFixed(5)} cm/s`
         );
     }
 
