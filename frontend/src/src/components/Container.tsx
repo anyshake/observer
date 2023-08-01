@@ -12,13 +12,11 @@ export default class Container extends Component<ContainerProps> {
 
         let layoutClassName = "my-6";
         switch (layout) {
+            case "flex":
+                layoutClassName = "mt-5 flex flex-wrap";
+                break;
             case "grid":
                 layoutClassName = "mt-5 gap-4 grid grid-cols-1 md:grid-cols-2";
-                break;
-            case "flex":
-                layoutClassName = "mt-5 gap-4 flex flex-row flex-wrap";
-                break;
-            default:
                 break;
         }
 

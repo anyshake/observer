@@ -9,12 +9,12 @@ BUILD_DIR=./build
 GLOBAL_MAKEFILE=../../build/Makefile
 
 build: clean pre-build
-	@npm run build
+	@GENERATE_SOURCEMAP=false npm run build
 	@rm -rf $(DIST_DIR)
 	@mv $(BUILD_DIR) $(DIST_DIR)
 
 run: pre-build
-	@npm run start
+	@BROWSER=none npm run start
 
 clean:
 	@rm -rf $(BUILD_DIR) $(DIST_DIR)

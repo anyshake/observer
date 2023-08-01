@@ -1,4 +1,5 @@
 import { ReactNode, lazy } from "react";
+import Setting from "../views/Settings/Setting";
 
 const Home = lazy(() => import("../views/Home/Index"));
 const Realtime = lazy(() => import("../views/Realtime/Index"));
@@ -19,6 +20,11 @@ const ROUTER_CONFIG: RouterConfig[] = [
         uri: "/history",
         title: "历史查询",
         node: <History />,
+    },
+    {
+        uri: "/setting",
+        title: "面板设定",
+        node: <Setting />,
     },
 ];
 
