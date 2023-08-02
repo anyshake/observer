@@ -70,9 +70,9 @@ const setAreas = (
         setObject(
             obj,
             `[tag:${i}]>area>text`,
-            `震度：${intensity}\n
-            PGA: ${pga.toFixed(5)} gal\n
-            PGV: ${pgv.toFixed(5)} cm/s`
+            `PGA：${pga.toFixed(5)} gal\n
+            PGV：${pgv.toFixed(5)} cm/s\n
+            震度：${scale} 震度 ${intensity}`
         );
     }
 

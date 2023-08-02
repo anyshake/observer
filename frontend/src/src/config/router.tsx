@@ -1,9 +1,9 @@
 import { ReactNode, lazy } from "react";
-import Setting from "../views/Settings/Setting";
 
 const Home = lazy(() => import("../views/Home/Index"));
 const Realtime = lazy(() => import("../views/Realtime/Index"));
 const History = lazy(() => import("../views/History/Index"));
+const Setting = lazy(() => import("../views/Setting/Index"));
 
 const ROUTER_CONFIG: RouterConfig[] = [
     {

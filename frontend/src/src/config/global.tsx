@@ -1,4 +1,5 @@
 import getBackend from "../helpers/getBackend";
+import { IntensityScaleStandard } from "../helpers/getIntensity";
 import getRelease from "../helpers/getRelease";
 import getVersion from "../helpers/getVersion";
 
@@ -11,6 +12,7 @@ const GLOBAL_CONFIG: GlobalConfig = {
         description: "Constructing Realtime Seismic Network Ambitiously.",
         version: getVersion(),
         release: getRelease(),
+        scale: "JMA",
     },
     api_settings: {
         version: "v1",
@@ -28,6 +30,7 @@ export interface AppSettings {
     readonly version: string;
     readonly release: string;
     readonly description: string;
+    readonly scale: IntensityScaleStandard;
 }
 
 export interface ApiSettings {
