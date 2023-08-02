@@ -86,27 +86,24 @@ const setLabels = (
     }, 0);
 
     setObject(obj, "[tag:ehz-pga]>value", ehzPGA.toFixed(2));
-    setObject(obj, "[tag:ehz-intensity]>unit", scale);
     setObject(
         obj,
         "[tag:ehz-intensity]>value",
-        getIntensity(ehzPGV, ehzPGA, scale)
+        `${scale} 震度 ${getIntensity(ehzPGV, ehzPGA, scale)}`
     );
 
     setObject(obj, "[tag:ehe-pga]>value", ehePGA.toFixed(2));
-    setObject(obj, "[tag:ehe-intensity]>unit", scale);
     setObject(
         obj,
         "[tag:ehe-intensity]>value",
-        getIntensity(ehePGV, ehePGA, scale)
+        `${scale} 震度 ${getIntensity(ehePGV, ehePGA, scale)}`
     );
 
     setObject(obj, "[tag:ehn-pga]>value", ehnPGA.toFixed(2));
-    setObject(obj, "[tag:ehn-intensity]>unit", scale);
     setObject(
         obj,
         "[tag:ehn-intensity]>value",
-        getIntensity(ehnPGV, ehnPGA, scale)
+        `${scale} 震度 ${getIntensity(ehnPGV, ehnPGA, scale)}`
     );
 
     return obj;

@@ -25,6 +25,7 @@ import Label, { LabelProps } from "../../components/Label";
 import setLabels from "./setLabels";
 import { IntensityScaleStandard } from "../../helpers/getIntensity";
 import getLocalStorage from "../../helpers/getLocalStorage";
+import GLOBAL_CONFIG from "../../config/global";
 
 // 100s by default
 const QUERY_TIMEOUT = 100000;
@@ -139,20 +140,20 @@ export default class History extends Component<{}, State> {
                 },
                 {
                     tag: "ehz-intensity",
-                    label: "EHZ 瞬时最大震度",
-                    value: "0",
+                    label: "EHZ 峰值震度",
+                    value: "未知",
                     unit: "",
                 },
                 {
                     tag: "ehe-pga",
-                    label: "EHZ 峰值加速度",
+                    label: "EHE 峰值加速度",
                     value: "0",
                     unit: "gal",
                 },
                 {
                     tag: "ehe-intensity",
-                    label: "EHE 瞬时最大震度",
-                    value: "0",
+                    label: "EHE 峰值震度",
+                    value: "未知",
                     unit: "",
                 },
                 {
@@ -163,8 +164,8 @@ export default class History extends Component<{}, State> {
                 },
                 {
                     tag: "ehn-intensity",
-                    label: "EHN 瞬时最大震度",
-                    value: "0",
+                    label: "EHN 峰值震度",
+                    value: "未知",
                     unit: "",
                 },
             ],
@@ -176,11 +177,12 @@ export default class History extends Component<{}, State> {
             tag: "station",
         });
         if (res.data) {
+            const { scale: fallbackScale } = GLOBAL_CONFIG.app_settings;
             const adc = setADC(res);
             const geophone = setGeophone(res);
             const scale = getLocalStorage(
                 "scale",
-                "JMA"
+                fallbackScale
             ) as IntensityScaleStandard;
             this.setState({ adc, geophone, scale });
         } else {
@@ -258,11 +260,11 @@ export default class History extends Component<{}, State> {
                         depth,
                         estimated,
                     } = item;
-                    const desc = `[M ${magnitude.toFixed(
+                    const desc = `[M${magnitude.toFixed(
                         1
                     )}] ${region} / 时刻 ${getTimeString(
                         timestamp
-                    )} / 深度 ${depth} km / 传播 ${estimated.toFixed(1)} s`;
+                    )} / 深度 ${depth.toFixed(1)} km / 传播 ${estimated.toFixed(1)} s`;
 
                     return [event, timestamp + estimated * 1000, desc];
                 }),
@@ -413,8 +415,16 @@ export default class History extends Component<{}, State> {
 
                 <Content>
                     <Navbar />
+
+                    <Card
+                        className="h-[430px] rounded-lg bg-pink-300"
+                        label="加速度波形图"
+                    >
+                        <Chart {...chart} />
+                    </Card>
+
                     <Container layout="grid">
-                        <Card className="h-[430px]" label="历史查询">
+                        <Card className="h-[372px]" label="历史查询">
                             <TimePicker
                                 value={start}
                                 label="选择起始时间"
@@ -447,21 +457,14 @@ export default class History extends Component<{}, State> {
                             />
                         </Card>
 
-                        <Card
-                            className="h-[430px] rounded-lg bg-pink-300"
-                            label="加速度波形图"
-                        >
-                            <Chart {...chart} />
+                        <Card label="数据分析">
+                            <Container layout="grid">
+                                {labels.map((label, index) => (
+                                    <Label key={index} {...label} />
+                                ))}
+                            </Container>
                         </Card>
                     </Container>
-
-                    <Card className="rounded-lg" label="数据分析">
-                        <Container layout="grid">
-                            {labels.map((label, index) => (
-                                <Label key={index} {...label} />
-                            ))}
-                        </Container>
-                    </Card>
                 </Content>
 
                 <Scroller />

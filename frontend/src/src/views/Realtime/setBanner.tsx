@@ -14,7 +14,7 @@ const setBanner = (
     return {
         type: "success",
         label: `连接成功：采样率 ${sampleRate.toFixed(2)} Sps`,
-        text: `数据最后更新于 ${getTimeString(ts)}\n震度标准：${scale}`,
+        text: `当前震度标准为 ${scale}\n数据最后更新于 ${getTimeString(ts)}`,
     };
 };
 

@@ -15,6 +15,7 @@ import getLocalStorage from "../../helpers/getLocalStorage";
 import Button from "../../components/Button";
 import SelectDialog, { SelectDialogProps } from "../../components/SelectDialog";
 import setLocalStorage from "../../helpers/setLocalStorage";
+import GLOBAL_CONFIG from "../../config/global";
 
 interface State {
     readonly scale: IntensityScaleStandard;
@@ -27,20 +28,24 @@ export default class Setting extends Component<{}, State> {
         this.state = {
             scale: "JMA",
             select: {
-                title: "选择烈度标准",
+                title: "选择震度标准",
                 open: false,
                 values: [
                     ["日本気象庁震度", "JMA"],
-                    ["中国地震局地震烈度", "CSIS"],
-                    ["修訂麥加利地震烈度表", "MMI"],
+                    ["中国地震局地震震度", "CSIS"],
                     ["台湾中央氣象局新震度", "CWB"],
+                    ["修訂麥加利地震震度表", "MMI"],
                 ],
             },
         };
     }
 
     componentDidMount(): void {
-        const scale = getLocalStorage("scale", "JMA") as IntensityScaleStandard;
+        const { scale: fallbackScale } = GLOBAL_CONFIG.app_settings;
+        const scale = getLocalStorage(
+            "scale",
+            fallbackScale
+        ) as IntensityScaleStandard;
         this.setState({ scale });
     }
 
@@ -65,7 +70,7 @@ export default class Setting extends Component<{}, State> {
             scale: value as IntensityScaleStandard,
             select: { ...this.state.select, open: false },
         });
-        toast.success(`已切换烈度标准为 ${value}`);
+        toast.success(`已切换震度标准为 ${value}`);
     };
 
     render() {
@@ -79,10 +84,10 @@ export default class Setting extends Component<{}, State> {
                     <Navbar />
 
                     <Container layout="grid">
-                        <Card className="h-[200px]" label="烈度标准">
-                            {`当前烈度标准为 ${scale}`}
+                        <Card className="h-[200px]" label="震度标准">
+                            {`当前震度标准为 ${scale}。`}
                             <Text>
-                                烈度标准是用来衡量地震烈度的标准，不同的标准会导致不同的烈度值。
+                                震度标准是用来衡量地震震度的标准，不同的标准会导致不同的震度值。
                             </Text>
                             <Button
                                 className="bg-lime-700 hover:bg-lime-800"
@@ -92,11 +97,9 @@ export default class Setting extends Component<{}, State> {
                         </Card>
 
                         <Card className="h-[200px]" label="重置应用">
+                            <Text>应用出现问题时，可尝试重置应用偏好。</Text>
                             <Text>
-                                当应用出现问题时，可以尝试在此重置应用偏好。
-                            </Text>
-                            <Text>
-                                在重置应用后，应用将会恢复到初始状态，但是不会对后端数据造成影响。
+                                执行重置后，浏览器中的偏好将被清理，不会对后端服务器产生影响。
                             </Text>
                             <Button
                                 className="bg-rose-700 hover:bg-rose-800"
