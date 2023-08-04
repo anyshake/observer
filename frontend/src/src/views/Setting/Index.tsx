@@ -109,14 +109,14 @@ export default class Setting extends Component<{}, State> {
                         </Card>
                     </Container>
 
-                    <Card label="开源许可">
-                        <Text className="font-medium">
-                            版权所有 (C) Project ES
+                    <Card label="关于软件">
+                        <Text>
+                            感谢使用本软件！本项目隶属于 Project ES
+                            项目中的一部分，由 github.com/bclswl0827
+                            主导开发，并遵循 MIT 协议开源。
                         </Text>
                         <Text>
-                            许可证持有人特此授予任何获得本软件和相关文档文件（以下简称「软件」）副本的人免费许可，以无限制地处理本软件的权利，包括但不限于使用、复制、修改、合并、发布、分发、再许可和
-                            /
-                            或销售本软件的副本，并允许提供本软件的人员这样做，但须满足以下条件：
+                            许可证持有人特此授予任何获得本软件和相关文档文件副本的人免费许可，以无限制地处理本软件的权利，包括但不限于使用、复制、修改、合并、发布、分发、再许可和（或）销售本软件的副本，并允许提供本软件的人员这样做，但须满足以下条件：
                         </Text>
                         <Text className="ml-4">
                             1. Project ES
@@ -127,13 +127,8 @@ export default class Setting extends Component<{}, State> {
                             的开发者和版权持有者保留拒绝对其软件提供技术支持的权利。用户可以通过本软件自行修改和使用，但不得寻求
                             Project ES 的开发者和版权持有者的技术支持。
                         </Text>
-                        <Text>
-                            MIT
-                            开源许可协议是一种宽松的许可协议，允许您自由使用、修改和分发您的软件，只要您包含原始许可和版权声明。
-                        </Text>
-                        <Text>
-                            请注意，MIT
-                            许可协议不提供任何担保，并且作者或版权持有者不对软件的使用产生的任何索赔或损害负责。如果您决定使用本许可协议，请确保在您的项目中包含适当的许可和版权声明，以保护您的权益。谢谢您选择开源，并祝您的项目也取得成功！
+                        <Text className="font-medium">
+                            版权所有 (C) Project ES
                         </Text>
                     </Card>
                 </Content>

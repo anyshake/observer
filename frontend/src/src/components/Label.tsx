@@ -30,7 +30,9 @@ export default class Label extends Component<LabelProps> {
                         />
                     )}
 
-                    <div className="flex flex-col flex-grow ml-5">
+                    <div
+                        className={`flex flex-col flex-grow ${icon && `ml-5`}`}
+                    >
                         <div
                             className={`text-sm whitespace-nowrap ${
                                 color ? `text-gray-50` : `text-gray-600`
