@@ -1,9 +1,8 @@
 export type IntensityScaleStandard = "JMA" | "CWB" | "MMI" | "CSIS";
 
 const getJMAIntensity = (pga: number): string => {
-    const intensity = Math.round(
-        Math.round(2 * Math.log10(Math.abs(pga)) + 0.94)
-    );
+    let intensity = parseFloat((2 * Math.log10(pga) + 0.94).toFixed(3));
+    intensity = parseFloat(intensity.toFixed(2));
 
     switch (true) {
         case intensity < 0.5:
@@ -93,8 +92,8 @@ const getMMIIntensity = (pgv: number, pga: number): string => {
 };
 
 const getCSISIntensity = (pgv: number, pga: number): string => {
-    const IA = 3.17 * Math.log(pga) + 6.59;
-    const IV = 3 * Math.log(pgv) + 9.77;
+    const IA = 3.17 * Math.log10(pga) + 6.59;
+    const IV = 3 * Math.log10(pgv) + 9.77;
 
     let II = 1;
     if (IA >= 6 && IV >= 6) {
