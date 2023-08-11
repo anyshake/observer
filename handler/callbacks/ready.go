@@ -14,6 +14,8 @@ func OnReady(module string, options *feature.FeatureOptions, v ...any) {
 	switch module {
 	case "archiver":
 		logger.Print(module, "1 message has been archived", color.FgGreen)
+	case "miniseed":
+		logger.Print(module, "1 record has been written", color.FgGreen)
 	case "ntpclient":
 		options.Status.System.Offset = v[0].(float64)
 		options.Status.IsReady = true

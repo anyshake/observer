@@ -64,8 +64,19 @@ func (c *CEIC) Format(latitude, longitude float64, data map[string]any) ([]Event
 			continue
 		}
 
+		// EPI_DEPTH type is not fixed
+		var depth float64
+		switch v["EPI_DEPTH"].(type) {
+		case string:
+			depth = string2Float(v["EPI_DEPTH"].(string))
+		case float64:
+			depth = v["EPI_DEPTH"].(float64)
+		default:
+			depth = 0.0
+		}
+
 		l := Event{
-			Depth:     string2Float(v["EPI_DEPTH"].(string)),
+			Depth:     depth,
 			Verfied:   true,
 			Timestamp: ts.Add(-8 * time.Hour).UnixMilli(),
 			Event:     v["LOCATION_C"].(string),

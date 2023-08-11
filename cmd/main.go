@@ -11,6 +11,7 @@ import (
 	"com.geophone.observer/feature"
 	"com.geophone.observer/feature/archiver"
 	"com.geophone.observer/feature/geophone"
+	"com.geophone.observer/feature/miniseed"
 	"com.geophone.observer/feature/ntpclient"
 	"com.geophone.observer/handler"
 	"com.geophone.observer/handler/callbacks"
@@ -67,6 +68,7 @@ func main() {
 		&ntpclient.NTP{},
 		&geophone.Geophone{},
 		&archiver.Archiver{},
+		&miniseed.MiniSEED{},
 	}
 	for _, s := range features {
 		go s.Start(featureOptions)

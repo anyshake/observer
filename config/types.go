@@ -44,4 +44,10 @@ type Conf struct {
 		Host string `json:"host"`
 		Port int    `json:"port"`
 	} `json:"server_settings"`
+	MiniSEED struct {
+		Enable  bool   `json:"enable"`
+		Path    string `json:"path"`
+		Station string `json:"station"`
+		Network string `json:"network"`
+	} `json:"miniseed_settings"`
 }
