@@ -4,6 +4,8 @@ github.com/albenik/go-serial/v2 v2.6.0 h1:UX30WZPL0qouDrKu4xwVFgvQA3YDTNhk3+aVC6
 github.com/albenik/go-serial/v2 v2.6.0/go.mod h1:sqQA6eeZHKUB6rAgrBsP/8d3Go5Md5cjCof1WcyaK0o=
 github.com/andybalholm/cascadia v1.3.1 h1:nhxRkql1kdYCc8Snf7D5/D3spOX+dBgjA6u8x004T2c=
 github.com/andybalholm/cascadia v1.3.1/go.mod h1:R4bJ1UQfqADjvDa4P6HZHLh/3OxWWEqc0Sk8XGwHqvA=
+github.com/bclswl0827/mseedio v1.0.1 h1:7Vlh2z39flHhI53gj9LKTgX9WA9nbVkwOILj1tMR07M=
+github.com/bclswl0827/mseedio v1.0.1/go.mod h1:G9nOPR8epxb7ihX5pUpvs3HqYZMnMlXc1Ha1WSMWn7s=
 github.com/bclswl0827/sacio v1.0.4 h1:t3pmYfsaKQYuX3SzjNIM3jtC0jFR+lYKCYf4AqOGu9Y=
 github.com/bclswl0827/sacio v1.0.4/go.mod h1:SuiIK7hBHCJvxUOC/rgbJRUO5IoFrEnuCY0xVJ7RyQk=
 github.com/beevik/ntp v0.3.0 h1:xzVrPrE4ziasFXgBVBZJDP0Wg/KpMwk2KHJ4Ba8GrDw=

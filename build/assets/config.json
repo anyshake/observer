@@ -26,15 +26,21 @@
         "interval": 5
     },
     "archiver_settings": {
-        "enable": true,
-        "host": "172.17.138.214",
+        "enable": false,
+        "host": "127.0.0.1",
         "port": 5432,
         "username": "postgres",
-        "password": "0308",
+        "password": "passw0rd",
         "database": "observer"
     },
     "server_settings": {
         "host": "0.0.0.0",
         "port": 8073
+    },
+    "miniseed_settings": {
+        "enable": false,
+        "path": "/data/miniseed",
+        "station": "TEST",
+        "network": "CN"
     }
 }
