@@ -2,6 +2,8 @@ package miniseed
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 	"time"
 
 	"com.geophone.observer/feature"
@@ -40,13 +42,39 @@ func (m *MiniSEED) Start(options *feature.FeatureOptions) {
 				ts.Format("2006-01-02"),
 			)
 
-			// Increments sequence number
-			seqNumberString := fmt.Sprintf("%06d", seqNumber)
-			if seqNumber == 999999 {
+			// If file exists, check sequence number
+			_, err := os.Stat(filePath)
+			if err == nil && seqNumber == 0 {
+				// Read MiniSEED file
+				var ms mseedio.MiniSeedData
+				err := ms.Read(filePath)
+				if err != nil {
+					options.OnError(MODULE, options, err)
+					return err
+				}
+
+				// Get last sequence number
+				recordLength := len(ms.Series)
+				if recordLength > 0 {
+					lastRecord := ms.Series[recordLength-1]
+					n, err := strconv.Atoi(lastRecord.FixedSection.SequenceNumber)
+					if err != nil {
+						options.OnError(MODULE, options, err)
+						return err
+					}
+
+					// Set current sequence number
+					seqNumber = n
+				}
+			}
+
+			// Increments sequence number by 1
+			if seqNumber >= 999999 {
 				seqNumber = 0
 			} else {
 				seqNumber++
 			}
+			seqNumberString := fmt.Sprintf("%06d", seqNumber)
 
 			// Append 3 channels
 			var (
