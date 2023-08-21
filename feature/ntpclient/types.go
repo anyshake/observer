@@ -2,4 +2,4 @@ package ntpclient
 
 const MODULE string = "ntpclient"
 
-type NTP struct{}
+type NTPClient struct{}

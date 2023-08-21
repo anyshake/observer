@@ -91,7 +91,7 @@ func (m *MiniSEED) Start(options *feature.FeatureOptions) {
 						StationCode:    station,
 						NetworkCode:    network,
 						SequenceNumber: seqNumberString,
-						SampleRate:     float64(len(ehz)) - 0.1,
+						SampleRate:     float64(len(ehz) - 1),
 					})
 				case 1:
 					err = miniseed.Append(v, mseedio.AppendOptions{
@@ -100,7 +100,7 @@ func (m *MiniSEED) Start(options *feature.FeatureOptions) {
 						StationCode:    station,
 						NetworkCode:    network,
 						SequenceNumber: seqNumberString,
-						SampleRate:     float64(len(ehe)) - 0.1,
+						SampleRate:     float64(len(ehe) - 1),
 					})
 				case 2:
 					err = miniseed.Append(v, mseedio.AppendOptions{
@@ -109,7 +109,7 @@ func (m *MiniSEED) Start(options *feature.FeatureOptions) {
 						StationCode:    station,
 						NetworkCode:    network,
 						SequenceNumber: seqNumberString,
-						SampleRate:     float64(len(ehn)) - 0.1,
+						SampleRate:     float64(len(ehn) - 1),
 					})
 				}
 				if err != nil {

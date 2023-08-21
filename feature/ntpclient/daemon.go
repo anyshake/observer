@@ -6,7 +6,7 @@ import (
 	"com.geophone.observer/feature"
 )
 
-func (n *NTP) Start(options *feature.FeatureOptions) {
+func (n *NTPClient) Start(options *feature.FeatureOptions) {
 	var (
 		host     = options.Config.NTPClient.Host
 		port     = options.Config.NTPClient.Port
