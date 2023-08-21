@@ -164,7 +164,9 @@ export default class Realtime extends Component<{}, State> {
             ) as IntensityScaleStandard;
             this.setState({ adc, geophone, scale });
         } else {
-            return;
+            const error = "取得测站资讯时发生错误，功能无法使用";
+            toast.error(error);
+            return Promise.reject(error);
         }
 
         this.websocket = websocketByTag({

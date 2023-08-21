@@ -104,11 +104,11 @@ const requestByTag = async ({
 
         return {
             path: url,
-            time: time,
             data: null,
             error: true,
             status: status || 500,
-            message: message,
+            message,
+            time,
         };
     }
 };

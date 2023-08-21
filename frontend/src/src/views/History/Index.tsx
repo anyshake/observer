@@ -186,7 +186,9 @@ export default class History extends Component<{}, State> {
             ) as IntensityScaleStandard;
             this.setState({ adc, geophone, scale });
         } else {
-            return;
+            const error = "取得测站资讯时发生错误，功能无法使用";
+            toast.error(error);
+            return Promise.reject(error);
         }
     }
 
@@ -264,7 +266,9 @@ export default class History extends Component<{}, State> {
                         1
                     )}] ${region} / 时刻 ${getTimeString(
                         timestamp
-                    )} / 深度 ${depth.toFixed(1)} km / 传播 ${estimated.toFixed(1)} s`;
+                    )} / 深度 ${depth.toFixed(1)} km / 传播 ${estimated.toFixed(
+                        1
+                    )} s`;
 
                     return [event, timestamp + estimated * 1000, desc];
                 }),
@@ -372,18 +376,13 @@ export default class History extends Component<{}, State> {
             source: "show",
         };
 
-        const { data, error } = await toast.promise(
-            requestByTag({
-                body: trace,
-                tag: "trace",
-            }),
-            {
-                loading: "正在获取数据源...",
-                success: "成功取得数据源",
-                error: "数据源获取失败",
-            }
-        );
+        const loader = toast.loading("正在获取数据源...");
+        const { data, error } = await requestByTag({
+            body: trace,
+            tag: "trace",
+        });
 
+        toast.remove(loader);
         if (error || !data) {
             const error = "请求失败，请检查输入后重试";
             toast.error(error);
