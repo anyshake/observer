@@ -25,13 +25,7 @@ const setAreas = (
     for (let i of tags) {
         // Get sample rate
         const { ehz, ehe, ehn } = data;
-        const sampleLength = (ehz.length + ehe.length + ehn.length) / 3;
-        let sampleRate = 0;
-        if (prevTs !== 0) {
-            sampleRate = (1000 * sampleLength) / (ts - prevTs);
-        } else {
-            sampleRate = sampleLength;
-        }
+        let sampleRate = (ehz.length + ehe.length + ehn.length) / 3;
 
         // Get time difference and time span
         const timeDiff = prevTs !== 0 ? ts - prevTs : 1000;

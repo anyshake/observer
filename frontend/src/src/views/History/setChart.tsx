@@ -29,13 +29,7 @@ const setChart = (
     for (let i of sortedData) {
         for (let j of tag) {
             // Get data sample rate
-            const sampleLength = i[j].length;
-            let sampleRate = 0;
-            if (prevTs !== 0) {
-                sampleRate = (1000 * sampleLength) / (prevTs - i.ts);
-            } else {
-                sampleRate = i[j].length;
-            }
+            let sampleRate = i[j].length;
 
             // Get time difference and time span
             const timeDiff = prevTs !== 0 ? prevTs - i.ts : 1000;
