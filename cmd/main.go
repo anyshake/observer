@@ -65,7 +65,7 @@ func main() {
 		OnError: callbacks.OnError,
 	}
 	features := []feature.Feature{
-		&ntpclient.NTP{},
+		&ntpclient.NTPClient{},
 		&geophone.Geophone{},
 		&archiver.Archiver{},
 		&miniseed.MiniSEED{},
