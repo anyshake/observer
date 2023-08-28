@@ -46,17 +46,11 @@ func (j *JMA) Parse(data []byte) (map[string]any, error) {
 }
 
 func (j *JMA) Format(latitude, longitude float64, data map[string]any) ([]Event, error) {
+	keys := []string{"anm", "mag", "cod", "at"}
+
 	var list []Event
 	for _, v := range data["data"].([]map[string]any) {
-		if !hasKey(v, []string{
-			"anm", "mag", "cod", "at",
-		}) {
-			continue
-		}
-
-		if !isEmpty(v, []string{
-			"anm", "mag", "cod", "at",
-		}) {
+		if !hasKey(v, keys) || !isEmpty(v, keys) {
 			continue
 		}
 

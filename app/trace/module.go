@@ -10,7 +10,8 @@ import (
 
 func (t *Trace) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) {
 	sources := []DataSource{
-		&USGS{}, &JMA{}, &CWB{}, &HKO{}, &CEIC{},
+		&USGS{}, &JMA{}, &CWB{}, &HKO{},
+		&CEIC{}, &SCEA_E{}, &SCEA_B{},
 	}
 
 	rg.POST("/trace", func(c *gin.Context) {
