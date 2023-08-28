@@ -264,13 +264,13 @@ export default class History extends Component<{}, State> {
                     } = item;
                     const desc = `[M${magnitude.toFixed(
                         1
-                    )}] ${region} / 时刻 ${getTimeString(
+                    )}] ${event} / 时刻 ${getTimeString(
                         timestamp
                     )} / 深度 ${depth.toFixed(1)} km / 传播 ${estimated.toFixed(
                         1
                     )} s`;
 
-                    return [event, timestamp + estimated * 1000, desc];
+                    return [region, timestamp + estimated * 1000, desc];
                 }),
             },
         }));
@@ -395,7 +395,7 @@ export default class History extends Component<{}, State> {
                 dialog: {
                     ...state.select.dialog,
                     open: true,
-                    title: "选择要地震数据来源",
+                    title: "选择地震数据来源",
                     values: data.map((item: any) => [item.name, item.value]),
                 },
             },

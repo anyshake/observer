@@ -45,17 +45,11 @@ func (c *CEIC) Parse(data []byte) (map[string]any, error) {
 }
 
 func (c *CEIC) Format(latitude, longitude float64, data map[string]any) ([]Event, error) {
+	keys := []string{"O_TIME", "EPI_LAT", "EPI_LON", "EPI_DEPTH", "M", "LOCATION_C"}
+
 	var list []Event
 	for _, v := range data["data"].([]map[string]any) {
-		if !hasKey(v, []string{
-			"O_TIME", "EPI_LAT", "EPI_LON", "EPI_DEPTH", "M", "LOCATION_C",
-		}) {
-			continue
-		}
-
-		if !isEmpty(v, []string{
-			"O_TIME", "EPI_LAT", "EPI_LON", "EPI_DEPTH", "M", "LOCATION_C",
-		}) {
+		if !hasKey(v, keys) || !isEmpty(v, keys) {
 			continue
 		}
 
@@ -72,7 +66,7 @@ func (c *CEIC) Format(latitude, longitude float64, data map[string]any) ([]Event
 		case float64:
 			depth = v["EPI_DEPTH"].(float64)
 		default:
-			depth = 0.0
+			depth = -1
 		}
 
 		l := Event{
