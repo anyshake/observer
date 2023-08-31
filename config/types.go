@@ -16,6 +16,7 @@ type Conf struct {
 	Serial struct {
 		Device string `json:"device"`
 		Baud   int    `json:"baud"`
+		Length int    `json:"length"`
 	} `json:"serial_settings"`
 	ADC struct {
 		FullScale  float64 `json:"fullscale"`

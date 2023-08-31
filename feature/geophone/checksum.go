@@ -5,7 +5,7 @@ import (
 	"unsafe"
 )
 
-func (g *Geophone) getChecksum(data []int32) uint8 {
+func (g *Geophone) getChecksum(data []int32) byte {
 	checksum := uint8(0)
 
 	for i := 0; i < len(data); i++ {
@@ -28,7 +28,10 @@ func (g *Geophone) isChecksumCorrect(packet *Packet) error {
 	if EHZ != packet.Checksum[0] ||
 		EHE != packet.Checksum[1] ||
 		EHN != packet.Checksum[2] {
-		return fmt.Errorf("incorrect packet checksum")
+		return fmt.Errorf(
+			"expected checksum %v, got %v",
+			packet.Checksum, [3]uint8{EHZ, EHE, EHN},
+		)
 	}
 
 	return nil

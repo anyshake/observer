@@ -11,6 +11,7 @@
         "fullscale": 5.0
     },
     "serial_settings": {
+        "length": 100,
         "baud": 19200,
         "device": "/dev/ttyUSB0"
     },

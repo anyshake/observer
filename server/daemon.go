@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	"io/fs"
 	"net/http"
 
 	"com.geophone.observer/app"
@@ -60,10 +59,7 @@ func ServerDaemon(host string, port int, options *app.ServerOptions) error {
 
 	r.Use(static.ServeEmbed(&static.LocalFileSystem{
 		Root: options.WebPrefix, Prefix: options.WebPrefix,
-		FileSystem: http.FS(func(path string, f fs.FS) fs.FS {
-			p, _ := fs.Sub(f, path)
-			return p
-		}("dist", frontend.Dist)),
+		FileSystem: static.CreateFilesystem(frontend.Dist, "dist"),
 	}))
 
 	err := r.Run(fmt.Sprintf("%s:%d", host, port))
