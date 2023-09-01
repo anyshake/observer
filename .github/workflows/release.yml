@@ -58,12 +58,16 @@ jobs:
                   mkdir -p ./build/release
                   for i in ./build/dist/*; do
                       arch=$(basename $i)
-                      if [ "x$arch" != "xwindows" ]; then
+                      if [ "x$arch" != "xwin32" ] && [ "x$arch" != "xwin64" ]; then
                           echo "Packaging Linux $arch"
                           filename=./build/release/linux_$arch.tar.gz
                           tar zcf $filename -C$i .
-                      else
-                          echo "Packaging Windows amd64"
+                      elif [ "x$arch" == "xwin32" ]; then
+                          echo "Packaging Windows 32-bit"
+                          filename=./build/release/windows_386.zip
+                          zip -rj $filename $i
+                      elif [ "x$arch" == "xwin64" ]; then
+                          echo "Packaging Windows 64-bit"
                           filename=./build/release/windows_amd64.zip
                           zip -rj $filename $i
                       fi

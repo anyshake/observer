@@ -23,11 +23,14 @@ $(BUILD_ARCH):
 	@cp -r $(ASSETS_DIR) $(DIST_DIR)/$@
 
 windows:
-	@mkdir -p $(DIST_DIR)/windows
-	@rm -rf $(DIST_DIR)/windows/*
+	@mkdir -p $(DIST_DIR)/win32 $(DIST_DIR)/win64
+	@rm -rf $(DIST_DIR)/win32/* $(DIST_DIR)/win64/*
+	@GOOS=windows GOARCH=386 go build -ldflags="$(BUILD_FLAGS)" \
+		-o $(DIST_DIR)/win32/$(BINARY).exe $(SRC_DIR)/*.go
 	@GOOS=windows GOARCH=amd64 go build -ldflags="$(BUILD_FLAGS)" \
-		-o $(DIST_DIR)/windows/$(BINARY).exe $(SRC_DIR)/*.go
-	@cp -r $(ASSETS_DIR) $(DIST_DIR)/windows
+		-o $(DIST_DIR)/win64/$(BINARY).exe $(SRC_DIR)/*.go
+	@cp -r $(ASSETS_DIR) $(DIST_DIR)/win32
+	@cp -r $(ASSETS_DIR) $(DIST_DIR)/win64
 
 version:
 	@go run $(SRC_DIR)/*.go --version
