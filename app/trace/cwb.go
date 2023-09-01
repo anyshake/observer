@@ -8,10 +8,13 @@ import (
 	"time"
 
 	"com.geophone.observer/utils/request"
+	t "com.geophone.observer/utils/time"
 	"github.com/PuerkitoBio/goquery"
 )
 
-type CWB struct{}
+type CWB struct {
+	DataSourceCache
+}
 
 func (c *CWB) Property() (string, string) {
 	const (
@@ -23,6 +26,10 @@ func (c *CWB) Property() (string, string) {
 }
 
 func (c *CWB) Fetch() ([]byte, error) {
+	if t.Diff(time.Now(), c.Time) <= EXPIRATION {
+		return c.Cache, nil
+	}
+
 	res, err := request.GET(
 		"https://www.cwb.gov.tw/V8/C/E/MOD/MAP_LIST.html",
 		10*time.Second, time.Second, 3, false,
@@ -30,6 +37,10 @@ func (c *CWB) Fetch() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	c.Time = time.Now()
+	c.Cache = make([]byte, len(res))
+	copy(c.Cache, res)
 
 	return res, nil
 }

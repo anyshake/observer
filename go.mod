@@ -11,6 +11,7 @@ require (
 	github.com/gin-contrib/gzip v0.0.6
 	github.com/gin-gonic/gin v1.9.0
 	github.com/gorilla/websocket v1.5.0
+	github.com/juju/ratelimit v1.0.2
 	github.com/lib/pq v1.10.8
 	github.com/mackerelio/go-osstat v0.2.4
 	github.com/sbabiv/xml2map v1.2.1

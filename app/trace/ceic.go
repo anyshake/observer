@@ -5,9 +5,12 @@ import (
 	"time"
 
 	"com.geophone.observer/utils/request"
+	t "com.geophone.observer/utils/time"
 )
 
-type CEIC struct{}
+type CEIC struct {
+	DataSourceCache
+}
 
 func (c *CEIC) Property() (string, string) {
 	const (
@@ -19,6 +22,10 @@ func (c *CEIC) Property() (string, string) {
 }
 
 func (c *CEIC) Fetch() ([]byte, error) {
+	if t.Diff(time.Now(), c.Time) <= EXPIRATION {
+		return c.Cache, nil
+	}
+
 	res, err := request.GET(
 		"https://news.ceic.ac.cn/ajax/google",
 		10*time.Second, time.Second, 3, false,
@@ -26,6 +33,10 @@ func (c *CEIC) Fetch() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	c.Time = time.Now()
+	c.Cache = make([]byte, len(res))
+	copy(c.Cache, res)
 
 	return res, nil
 }

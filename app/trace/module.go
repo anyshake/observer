@@ -2,8 +2,10 @@ package trace
 
 import (
 	"net/http"
+	"time"
 
 	"com.geophone.observer/app"
+	"com.geophone.observer/server/middleware/limit"
 	"com.geophone.observer/server/response"
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +16,7 @@ func (t *Trace) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) 
 		&CEIC{}, &SCEA_E{}, &SCEA_B{},
 	}
 
+	rg.Use(limit.RateLimit(time.Second, CAPACITY, CAPACITY))
 	rg.POST("/trace", func(c *gin.Context) {
 		var binding Binding
 		if err := c.ShouldBind(&binding); err != nil {

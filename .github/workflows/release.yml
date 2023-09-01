@@ -1,0 +1,91 @@
+name: Release
+
+on:
+    push:
+        tags:
+            - master
+
+    workflow_dispatch:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Set up Golang version
+              uses: actions/setup-go@v4
+              with:
+                  go-version: stable
+                  check-latest: true
+
+            - name: Checkout source code
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+
+            - name: Set tag and release names
+              id: set_release
+              run: |
+                  tag_name="Release_$(cat VERSION)-$(git rev-parse --short HEAD)"
+                  echo "::set-output name=tag_name::$tag_name"
+
+            - name: Build frontend dist
+              id: build_frontend
+              run: |
+                  cd frontend/src
+                  npm install
+                  make
+                  echo "::set-output name=status::success"
+
+            - name: Build backend release
+              id: build_release
+              if: steps.build_frontend.outputs.status == 'success'
+              run: |
+                  cd build
+                  make -j$(nproc)
+                  make windows
+                  echo "::set-output name=status::success"
+
+            - name: Package release binaries
+              id: package_release
+              if: steps.build_release.outputs.status == 'success'
+              run: |
+                  mkdir -p ./build/release
+                  for i in ./build/dist/*; do
+                      arch=$(basename $i)
+                      if [ "x$arch" != "xwindows" ]; then
+                          echo "Packaging Linux $arch"
+                          filename=./build/release/linux_$arch.tar.gz
+                          tar zcf $filename -C$i .
+                      else
+                          echo "Packaging Windows amd64"
+                          filename=./build/release/windows_amd64.zip
+                          zip -rj $filename $i
+                      fi
+                  done
+                  echo "::set-output name=status::success"
+
+            - name: "Create release digest"
+              id: create_digest
+              if: steps.package_release.outputs.status == 'success'
+              run: |
+                  cd build/release
+                  for i in *; do
+                      echo "Creating digest for $i"
+                      openssl dgst -md5 $i | sed 's/([^)]*)//g' >> $i.dgst
+                      openssl dgst -sha1 $i | sed 's/([^)]*)//g' >> $i.dgst
+                      openssl dgst -sha256 $i | sed 's/([^)]*)//g' >> $i.dgst
+                      openssl dgst -sha512 $i | sed 's/([^)]*)//g' >> $i.dgst
+                  done
+                  echo "::set-output name=status::success"
+
+            - name: Upload binaries to release
+              uses: svenstaro/upload-release-action@v2
+              if: steps.create_digest.outputs.status == 'success'
+              with:
+                  tag: ${{ steps.set_release.outputs.tag_name }}
+                  repo_token: ${{ secrets.GITHUB_TOKEN }}
+                  overwrite: true
+                  file_glob: true
+                  file: build/release/*
+                  body: |
+                      This is the auto-build binary for Observer release.

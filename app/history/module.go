@@ -2,13 +2,16 @@ package history
 
 import (
 	"net/http"
+	"time"
 
 	"com.geophone.observer/app"
+	"com.geophone.observer/server/middleware/limit"
 	"com.geophone.observer/server/response"
 	"github.com/gin-gonic/gin"
 )
 
 func (h *History) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) {
+	rg.Use(limit.RateLimit(time.Second, CAPACITY, CAPACITY))
 	rg.POST("/history", func(c *gin.Context) {
 		var binding Binding
 		if err := c.ShouldBind(&binding); err != nil {

@@ -6,10 +6,13 @@ import (
 	"time"
 
 	"com.geophone.observer/utils/request"
+	t "com.geophone.observer/utils/time"
 	"github.com/sbabiv/xml2map"
 )
 
-type HKO struct{}
+type HKO struct {
+	DataSourceCache
+}
 
 func (h *HKO) Property() (string, string) {
 	const (
@@ -21,6 +24,10 @@ func (h *HKO) Property() (string, string) {
 }
 
 func (h *HKO) Fetch() ([]byte, error) {
+	if t.Diff(time.Now(), h.Time) <= EXPIRATION {
+		return h.Cache, nil
+	}
+
 	res, err := request.GET(
 		"https://www.hko.gov.hk/gts/QEM/eq_app-30d_uc.xml",
 		10*time.Second, time.Second, 3, false,
@@ -28,6 +35,10 @@ func (h *HKO) Fetch() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	h.Time = time.Now()
+	h.Cache = make([]byte, len(res))
+	copy(h.Cache, res)
 
 	return res, nil
 }

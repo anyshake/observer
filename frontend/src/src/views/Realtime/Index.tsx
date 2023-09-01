@@ -66,7 +66,7 @@ export default class Realtime extends Component<{}, State> {
                         series: {
                             name: "EHZ",
                             type: "line",
-                            color: "#fff",
+                            color: "#f1f5f9",
                             data: [],
                         },
                     },
@@ -84,7 +84,7 @@ export default class Realtime extends Component<{}, State> {
                         series: {
                             name: "EHE",
                             type: "line",
-                            color: "#fff",
+                            color: "#f1f5f9",
                             data: [],
                         },
                     },
@@ -102,7 +102,7 @@ export default class Realtime extends Component<{}, State> {
                         series: {
                             name: "EHN",
                             type: "line",
-                            color: "#fff",
+                            color: "#f1f5f9",
                             data: [],
                         },
                     },

@@ -102,7 +102,10 @@ export default class Chart extends Component<ChartProps, ChartState> {
             },
             tooltip: {
                 enabled: tooltip,
-                format: `<div>{series.name}: {point.y}</div>`,
+                followPointer: true,
+                followTouchMove: true,
+                xDateFormat: "%Y-%m-%d %H:%M:%S",
+                padding: 12,
             },
             credits: {
                 enabled: false,

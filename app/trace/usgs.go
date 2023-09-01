@@ -6,9 +6,12 @@ import (
 	"time"
 
 	"com.geophone.observer/utils/request"
+	t "com.geophone.observer/utils/time"
 )
 
-type USGS struct{}
+type USGS struct {
+	DataSourceCache
+}
 
 func (u *USGS) Property() (string, string) {
 	const (
@@ -20,6 +23,10 @@ func (u *USGS) Property() (string, string) {
 }
 
 func (u *USGS) Fetch() ([]byte, error) {
+	if t.Diff(time.Now(), u.Time) <= EXPIRATION {
+		return u.Cache, nil
+	}
+
 	res, err := request.GET(
 		"https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson",
 		10*time.Second, time.Second, 3, false,
@@ -27,6 +34,10 @@ func (u *USGS) Fetch() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	u.Time = time.Now()
+	u.Cache = make([]byte, len(res))
+	copy(u.Cache, res)
 
 	return res, nil
 }

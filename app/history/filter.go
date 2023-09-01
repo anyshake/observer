@@ -14,6 +14,10 @@ func FilterHistory(start, end int64, options *app.ServerOptions) ([]handler.Geop
 		return nil, fmt.Errorf("databse is not connected")
 	}
 
+	if end-start > DURATION.Milliseconds() {
+		return nil, fmt.Errorf("duration is too large")
+	}
+
 	data, err := postgres.Query(pdb, start, end)
 	if err != nil {
 		return nil, err

@@ -26,8 +26,4 @@ _testmain.go
 
 # Distribution directory
 build/dist*
-# Frontend dependencies
-frontend/src*/.git*
-frontend/src*/*lock*
-frontend/src*/build
-frontend/src*/node_modules/*
+build/release*
