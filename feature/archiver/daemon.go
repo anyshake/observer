@@ -4,18 +4,18 @@ import (
 	"fmt"
 	"os"
 
-	"com.geophone.observer/common/postgres"
-	"com.geophone.observer/feature"
-	"com.geophone.observer/handler"
+	"github.com/bclswl0827/observer/driver/postgres"
+	"github.com/bclswl0827/observer/feature"
+	"github.com/bclswl0827/observer/publisher"
 )
 
 func (a *Archiver) Start(options *feature.FeatureOptions) {
 	if !options.Config.Archiver.Enable {
-		options.OnStop(MODULE, options, "service is disabled")
+		a.OnStop(options, "service is disabled")
 		return
 	}
 
-	options.OnStart(MODULE, options, "service has started")
+	a.OnStart(options, "service has started")
 	pdb, err := postgres.Open(
 		options.Config.Archiver.Host,
 		options.Config.Archiver.Port,
@@ -24,20 +24,21 @@ func (a *Archiver) Start(options *feature.FeatureOptions) {
 		options.Config.Archiver.Database,
 	)
 	if err != nil {
-		options.OnError(MODULE, options, err)
+		a.OnError(options, err)
 		os.Exit(1)
 	}
 
 	err = postgres.Init(pdb)
 	if err != nil {
-		options.OnError(MODULE, options, err)
+		a.OnError(options, err)
 		os.Exit(1)
 	}
 	options.Database = pdb
 
 	// Archive when new message arrived
-	handler.OnMessage(&options.Status.Geophone,
-		func(gp *handler.Geophone) error {
+	publisher.Subscribe(
+		&options.Status.Geophone,
+		func(gp *publisher.Geophone) error {
 			var (
 				ts  = gp.TS
 				ehz = gp.EHZ
@@ -46,7 +47,7 @@ func (a *Archiver) Start(options *feature.FeatureOptions) {
 			)
 			err := postgres.Insert(pdb, ts, ehz, ehe, ehn)
 			if err != nil {
-				options.OnError(MODULE, options, err)
+				a.OnError(options, err)
 				postgres.Close(pdb)
 
 				// Reconnect to PostgreSQL
@@ -58,17 +59,17 @@ func (a *Archiver) Start(options *feature.FeatureOptions) {
 					options.Config.Archiver.Database,
 				)
 				if err != nil {
-					options.OnError(MODULE, options, err)
+					a.OnError(options, err)
 					return err
 				}
 				options.Database = pdb
 			}
 
-			options.OnReady(MODULE, options)
+			a.OnReady(options)
 			return nil
 		},
 	)
 
 	err = fmt.Errorf("service exited with a error")
-	options.OnError(MODULE, options, err)
+	a.OnError(options, err)
 }

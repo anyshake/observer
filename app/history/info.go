@@ -3,8 +3,8 @@ package history
 import (
 	"strings"
 
-	"com.geophone.observer/config"
-	"com.geophone.observer/utils/text"
+	"github.com/bclswl0827/observer/config"
+	"github.com/bclswl0827/observer/utils/text"
 )
 
 func getNetwork(*config.Conf) string {

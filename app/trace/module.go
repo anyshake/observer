@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"time"
 
-	"com.geophone.observer/app"
-	"com.geophone.observer/server/middleware/limit"
-	"com.geophone.observer/server/response"
+	"github.com/bclswl0827/observer/app"
+	"github.com/bclswl0827/observer/server/middleware/limit"
+	"github.com/bclswl0827/observer/server/response"
 	"github.com/gin-gonic/gin"
 )
 

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"com.geophone.observer/utils/request"
-	t "com.geophone.observer/utils/time"
+	"github.com/bclswl0827/observer/utils/duration"
+	"github.com/bclswl0827/observer/utils/request"
 )
 
 type SCEA_B struct {
@@ -23,7 +23,7 @@ func (s *SCEA_B) Property() (string, string) {
 }
 
 func (s *SCEA_B) Fetch() ([]byte, error) {
-	if t.Diff(time.Now(), s.Time) <= EXPIRATION {
+	if duration.Difference(time.Now(), s.Time) <= EXPIRATION {
 		return s.Cache, nil
 	}
 

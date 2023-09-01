@@ -1,13 +1,12 @@
-package handler
+package publisher
 
 import (
 	"time"
 
-	"com.geophone.observer/config"
+	"github.com/bclswl0827/observer/config"
 )
 
-func InitHandler(config *config.Conf, status *Status) {
-	status.Geophone = Geophone{}
+func Init(config *config.Conf, status *Status) {
 	status.System = &System{}
 	status.Buffer = &Geophone{
 		EHZ: []int32{},
@@ -15,4 +14,5 @@ func InitHandler(config *config.Conf, status *Status) {
 		EHN: []int32{},
 		TS:  time.Now().UTC().UnixMilli(),
 	}
+	status.Geophone = Geophone{}
 }

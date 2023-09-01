@@ -1,4 +1,4 @@
-name: Release
+name: Publish release
 
 on:
     push:
@@ -48,7 +48,6 @@ jobs:
                   go mod download
                   cd build
                   make -j$(nproc)
-                  make windows
                   echo "::set-output name=status::success"
 
             - name: Package release binaries
@@ -59,15 +58,15 @@ jobs:
                   for i in ./build/dist/*; do
                       arch=$(basename $i)
                       if [ "x$arch" != "xwin32" ] && [ "x$arch" != "xwin64" ]; then
-                          echo "Packaging Linux $arch"
+                          echo "Packaging Linux $arch ..."
                           filename=./build/release/linux_$arch.zip
                           zip -rj $filename $i
                       elif [ "x$arch" == "xwin32" ]; then
-                          echo "Packaging Windows 32-bit"
+                          echo "Packaging Windows 32-bit ..."
                           filename=./build/release/windows_386.zip
                           zip -rj $filename $i
                       elif [ "x$arch" == "xwin64" ]; then
-                          echo "Packaging Windows 64-bit"
+                          echo "Packaging Windows 64-bit ..."
                           filename=./build/release/windows_amd64.zip
                           zip -rj $filename $i
                       fi
@@ -80,7 +79,7 @@ jobs:
               run: |
                   cd build/release
                   for i in *; do
-                      echo "Creating digest for $i"
+                      echo "Creating digest for $i ..."
                       openssl dgst -md5 $i | sed 's/([^)]*)//g' >> $i.dgst
                       openssl dgst -sha1 $i | sed 's/([^)]*)//g' >> $i.dgst
                       openssl dgst -sha256 $i | sed 's/([^)]*)//g' >> $i.dgst
@@ -98,4 +97,4 @@ jobs:
                   file_glob: true
                   file: build/release/*
                   body: |
-                      This is the auto-build binary for Observer release.
+                      This is the auto-build release for Observer.

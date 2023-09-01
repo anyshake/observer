@@ -1,8 +1,8 @@
-package time
+package duration
 
 import "time"
 
-func Diff(a, b time.Time) time.Duration {
+func Difference(a, b time.Time) time.Duration {
 	if a.After(b) {
 		return a.Sub(b)
 	}

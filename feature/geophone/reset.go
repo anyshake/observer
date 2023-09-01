@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"com.geophone.observer/common/serial"
+	"github.com/bclswl0827/observer/driver/serial"
 )
 
 func (g *Geophone) Reset(port io.ReadWriteCloser) error {

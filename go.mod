@@ -1,4 +1,4 @@
-module com.geophone.observer
+module github.com/bclswl0827/observer
 
 go 1.19
 

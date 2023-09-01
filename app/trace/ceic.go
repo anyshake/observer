@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"com.geophone.observer/utils/request"
-	t "com.geophone.observer/utils/time"
+	"github.com/bclswl0827/observer/utils/duration"
+	"github.com/bclswl0827/observer/utils/request"
 )
 
 type CEIC struct {
@@ -22,7 +22,7 @@ func (c *CEIC) Property() (string, string) {
 }
 
 func (c *CEIC) Fetch() ([]byte, error) {
-	if t.Diff(time.Now(), c.Time) <= EXPIRATION {
+	if duration.Difference(time.Now(), c.Time) <= EXPIRATION {
 		return c.Cache, nil
 	}
 

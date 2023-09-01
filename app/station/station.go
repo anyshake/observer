@@ -1,7 +1,7 @@
 package station
 
 import (
-	"com.geophone.observer/feature"
+	"github.com/bclswl0827/observer/feature"
 )
 
 func getStation(options *feature.FeatureOptions) System {

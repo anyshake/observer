@@ -1,6 +1,6 @@
 package station
 
-import "com.geophone.observer/config"
+import "github.com/bclswl0827/observer/config"
 
 func getLocation(conf *config.Conf) Location {
 	return Location{

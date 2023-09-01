@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"time"
 
-	"com.geophone.observer/handler"
-	t "com.geophone.observer/utils/time"
+	"github.com/bclswl0827/observer/publisher"
+	"github.com/bclswl0827/observer/utils/duration"
 )
 
-func getSampleRate(data []handler.Geophone, channel string) (int, error) {
+func getSampleRate(data []publisher.Geophone, channel string) (int, error) {
 	var (
 		length   = 0
 		lastTime = time.UnixMilli(data[0].TS)
@@ -16,7 +16,7 @@ func getSampleRate(data []handler.Geophone, channel string) (int, error) {
 
 	for _, v := range data {
 		currentTime := time.UnixMilli(v.TS)
-		if t.Diff(currentTime, lastTime) > THRESHOLD {
+		if duration.Difference(currentTime, lastTime) > THRESHOLD {
 			err := fmt.Errorf("uneven gaps between the data")
 			return 0, err
 		}

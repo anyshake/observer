@@ -1,6 +1,6 @@
 package station
 
-import "com.geophone.observer/handler"
+import "github.com/bclswl0827/observer/publisher"
 
 type Station struct{}
 
@@ -48,15 +48,15 @@ type Location struct {
 }
 
 type System struct {
-	UUID     string          `json:"uuid"`
-	Station  string          `json:"station"`
-	Uptime   int64           `json:"uptime"`
-	Memory   Memory          `json:"memory"`
-	Disk     Disk            `json:"disk"`
-	ADC      ADC             `json:"adc"`
-	OS       OS              `json:"os"`
-	CPU      CPU             `json:"cpu"`
-	Geophone Geophone        `json:"geophone"`
-	Location Location        `json:"location"`
-	Status   *handler.System `json:"status"`
+	UUID     string            `json:"uuid"`
+	Station  string            `json:"station"`
+	Uptime   int64             `json:"uptime"`
+	Memory   Memory            `json:"memory"`
+	Disk     Disk              `json:"disk"`
+	ADC      ADC               `json:"adc"`
+	OS       OS                `json:"os"`
+	CPU      CPU               `json:"cpu"`
+	Geophone Geophone          `json:"geophone"`
+	Location Location          `json:"location"`
+	Status   *publisher.System `json:"status"`
 }

@@ -1,4 +1,4 @@
-package handler
+package publisher
 
 type Geophone struct {
 	TS  int64   `json:"ts"`

@@ -3,7 +3,7 @@ package ntpclient
 import (
 	"time"
 
-	"com.geophone.observer/feature"
+	"github.com/bclswl0827/observer/feature"
 )
 
 func (n *NTPClient) Start(options *feature.FeatureOptions) {
@@ -14,16 +14,16 @@ func (n *NTPClient) Start(options *feature.FeatureOptions) {
 		interval = options.Config.NTPClient.Interval
 	)
 
-	options.OnStart(MODULE, options, "service has started")
+	n.OnStart(options, "service has started")
 	for {
 		result, err := n.Read(host, port, timeout)
 		if err != nil {
-			options.OnError(MODULE, options, err)
+			n.OnError(options, err)
 			time.Sleep(time.Second)
 			continue
 		}
 
-		options.OnReady(MODULE, options, result)
+		n.OnReady(options, result)
 		time.Sleep(time.Duration(interval) * time.Second)
 	}
 }
