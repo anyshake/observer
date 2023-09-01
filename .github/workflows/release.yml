@@ -11,6 +11,11 @@ jobs:
     build:
         runs-on: ubuntu-latest
         steps:
+            - name: Set up Node.js version
+              uses: actions/setup-node@v3
+              with:
+                  node-version: "18.14.0"
+
             - name: Set up Golang version
               uses: actions/setup-go@v4
               with:
@@ -79,7 +84,7 @@ jobs:
                   done
                   echo "::set-output name=status::success"
 
-            - name: Upload binaries to release
+            - name: Upload packages to release
               uses: svenstaro/upload-release-action@v2
               if: steps.create_digest.outputs.status == 'success'
               with:

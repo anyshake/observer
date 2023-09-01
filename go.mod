@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.1
-	github.com/albenik/go-serial/v2 v2.6.0
+	github.com/bclswl0827/go-serial v0.0.1
 	github.com/bclswl0827/sacio v1.0.4
 	github.com/beevik/ntp v0.3.0
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
@@ -30,7 +30,7 @@ require (
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/bytedance/sonic v1.8.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
-	github.com/creack/goselect v0.1.2 // indirect
+	github.com/creack/goselect v0.1.3-0.20221130125424-8eac7f782437 // indirect
 	github.com/fatih/color v1.15.0
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect

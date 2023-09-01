@@ -3,7 +3,7 @@ package serial
 import (
 	"io"
 
-	"github.com/albenik/go-serial/v2"
+	"github.com/bclswl0827/go-serial"
 )
 
 func Open(device string, baud int) (io.ReadWriteCloser, error) {
