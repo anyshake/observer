@@ -60,7 +60,7 @@ jobs:
                       arch=$(basename $i)
                       if [ "x$arch" != "xwin32" ] && [ "x$arch" != "xwin64" ]; then
                           echo "Packaging Linux $arch"
-                          filename=./build/release/linux_$arch.tar.gz
+                          filename=./build/release/linux_$arch.zip
                           zip -rj $filename $i
                       elif [ "x$arch" == "xwin32" ]; then
                           echo "Packaging Windows 32-bit"
