@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"com.geophone.observer/utils/request"
-	t "com.geophone.observer/utils/time"
+	"github.com/bclswl0827/observer/utils/duration"
+	"github.com/bclswl0827/observer/utils/request"
 )
 
 type USGS struct {
@@ -23,7 +23,7 @@ func (u *USGS) Property() (string, string) {
 }
 
 func (u *USGS) Fetch() ([]byte, error) {
-	if t.Diff(time.Now(), u.Time) <= EXPIRATION {
+	if duration.Difference(time.Now(), u.Time) <= EXPIRATION {
 		return u.Cache, nil
 	}
 

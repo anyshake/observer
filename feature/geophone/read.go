@@ -6,7 +6,7 @@ import (
 	"io"
 	"time"
 
-	"com.geophone.observer/common/serial"
+	"github.com/bclswl0827/observer/driver/serial"
 )
 
 func (g *Geophone) Read(port io.ReadWriteCloser, packet *Packet, length int) error {

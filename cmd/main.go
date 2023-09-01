@@ -6,17 +6,16 @@ import (
 
 	"github.com/fatih/color"
 
-	"com.geophone.observer/app"
-	"com.geophone.observer/config"
-	"com.geophone.observer/feature"
-	"com.geophone.observer/feature/archiver"
-	"com.geophone.observer/feature/geophone"
-	"com.geophone.observer/feature/miniseed"
-	"com.geophone.observer/feature/ntpclient"
-	"com.geophone.observer/handler"
-	"com.geophone.observer/handler/callbacks"
-	"com.geophone.observer/server"
-	"com.geophone.observer/utils/logger"
+	"github.com/bclswl0827/observer/app"
+	"github.com/bclswl0827/observer/config"
+	"github.com/bclswl0827/observer/feature"
+	"github.com/bclswl0827/observer/feature/archiver"
+	"github.com/bclswl0827/observer/feature/geophone"
+	"github.com/bclswl0827/observer/feature/miniseed"
+	"github.com/bclswl0827/observer/feature/ntpclient"
+	"github.com/bclswl0827/observer/publisher"
+	"github.com/bclswl0827/observer/server"
+	"github.com/bclswl0827/observer/utils/logger"
 	"github.com/common-nighthawk/go-figure"
 )
 
@@ -52,17 +51,13 @@ func main() {
 	}
 
 	// Initialize global status
-	var status handler.Status
-	handler.InitHandler(&conf, &status)
+	var status publisher.Status
+	publisher.Init(&conf, &status)
 
 	// Register features
 	featureOptions := &feature.FeatureOptions{
-		Config:  &conf,
-		Status:  &status,
-		OnStart: callbacks.OnStart,
-		OnStop:  callbacks.OnStop,
-		OnReady: callbacks.OnReady,
-		OnError: callbacks.OnError,
+		Config: &conf,
+		Status: &status,
 	}
 	features := []feature.Feature{
 		&ntpclient.NTPClient{},

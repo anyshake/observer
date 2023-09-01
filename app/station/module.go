@@ -1,8 +1,8 @@
 package station
 
 import (
-	"com.geophone.observer/app"
-	"com.geophone.observer/server/response"
+	"github.com/bclswl0827/observer/app"
+	"github.com/bclswl0827/observer/server/response"
 	"github.com/gin-gonic/gin"
 )
 

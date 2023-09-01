@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"com.geophone.observer/utils/request"
-	t "com.geophone.observer/utils/time"
+	"github.com/bclswl0827/observer/utils/duration"
+	"github.com/bclswl0827/observer/utils/request"
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -26,7 +26,7 @@ func (c *CWB) Property() (string, string) {
 }
 
 func (c *CWB) Fetch() ([]byte, error) {
-	if t.Diff(time.Now(), c.Time) <= EXPIRATION {
+	if duration.Difference(time.Now(), c.Time) <= EXPIRATION {
 		return c.Cache, nil
 	}
 

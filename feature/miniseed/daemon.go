@@ -6,24 +6,25 @@ import (
 	"strconv"
 	"time"
 
-	"com.geophone.observer/feature"
-	"com.geophone.observer/handler"
+	"github.com/bclswl0827/observer/feature"
+	"github.com/bclswl0827/observer/publisher"
 	"github.com/bclswl0827/mseedio"
 )
 
 func (m *MiniSEED) Start(options *feature.FeatureOptions) {
 	if !options.Config.MiniSEED.Enable {
-		options.OnStop(MODULE, options, "service is disabled")
+		m.OnStop(options, "service is disabled")
 		return
 	}
 
 	// Init sequence number
 	var seqNumber int
-	options.OnStart(MODULE, options, "service has started")
+	m.OnStart(options, "service has started")
 
 	// Append and write when new message arrived
-	handler.OnMessage(&options.Status.Geophone,
-		func(gp *handler.Geophone) error {
+	publisher.Subscribe(
+		&options.Status.Geophone,
+		func(gp *publisher.Geophone) error {
 			var (
 				ehz = gp.EHZ
 				ehe = gp.EHE
@@ -49,7 +50,7 @@ func (m *MiniSEED) Start(options *feature.FeatureOptions) {
 				var ms mseedio.MiniSeedData
 				err := ms.Read(filePath)
 				if err != nil {
-					options.OnError(MODULE, options, err)
+					m.OnError(options, err)
 					return err
 				}
 
@@ -59,7 +60,7 @@ func (m *MiniSEED) Start(options *feature.FeatureOptions) {
 					lastRecord := ms.Series[recordLength-1]
 					n, err := strconv.Atoi(lastRecord.FixedSection.SequenceNumber)
 					if err != nil {
-						options.OnError(MODULE, options, err)
+						m.OnError(options, err)
 						return err
 					}
 
@@ -113,30 +114,30 @@ func (m *MiniSEED) Start(options *feature.FeatureOptions) {
 					})
 				}
 				if err != nil {
-					options.OnError(MODULE, options, err)
+					m.OnError(options, err)
 					return err
 				}
 
 				// Encode record to bytes
 				dataBytes, err := miniseed.Encode(mseedio.APPEND, mseedio.MSBFIRST)
 				if err != nil {
-					options.OnError(MODULE, options, err)
+					m.OnError(options, err)
 					return err
 				}
 
 				// Append bytes to file
 				err = miniseed.Write(filePath, mseedio.APPEND, dataBytes)
 				if err != nil {
-					options.OnError(MODULE, options, err)
+					m.OnError(options, err)
 					return err
 				}
 			}
 
-			options.OnReady(MODULE, options)
+			m.OnReady(options)
 			return nil
 		},
 	)
 
 	err := fmt.Errorf("service exited with a error")
-	options.OnError(MODULE, options, err)
+	m.OnError(options, err)
 }

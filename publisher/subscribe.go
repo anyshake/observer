@@ -1,10 +1,10 @@
-package handler
+package publisher
 
 import (
 	"time"
 )
 
-func OnMessage(gp *Geophone, onMessage func(gp *Geophone) error) {
+func Subscribe(gp *Geophone, onMessage func(gp *Geophone) error) {
 	lastTime := time.Now().UTC().UnixMilli()
 
 	for {

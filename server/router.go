@@ -1,11 +1,11 @@
 package server
 
 import (
-	"com.geophone.observer/app"
-	"com.geophone.observer/app/history"
-	"com.geophone.observer/app/socket"
-	"com.geophone.observer/app/station"
-	"com.geophone.observer/app/trace"
+	"github.com/bclswl0827/observer/app"
+	"github.com/bclswl0827/observer/app/history"
+	"github.com/bclswl0827/observer/app/socket"
+	"github.com/bclswl0827/observer/app/station"
+	"github.com/bclswl0827/observer/app/trace"
 	"github.com/gin-gonic/gin"
 )
 

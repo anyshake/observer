@@ -1,6 +1,6 @@
 package app
 
-import "com.geophone.observer/feature"
+import "github.com/bclswl0827/observer/feature"
 
 type ServerOptions struct {
 	Gzip           int

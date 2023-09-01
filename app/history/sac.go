@@ -5,13 +5,13 @@ import (
 	"sort"
 	"time"
 
-	"com.geophone.observer/app"
-	"com.geophone.observer/handler"
-	t "com.geophone.observer/utils/time"
+	"github.com/bclswl0827/observer/app"
+	"github.com/bclswl0827/observer/publisher"
+	"github.com/bclswl0827/observer/utils/duration"
 	"github.com/bclswl0827/sacio"
 )
 
-func GetSACBytes(data []handler.Geophone, channel string, options *app.ServerOptions) (string, []byte, error) {
+func GetSACBytes(data []publisher.Geophone, channel string, options *app.ServerOptions) (string, []byte, error) {
 	// Check channel
 	if channel != "EHZ" && channel != "EHE" && channel != "EHN" {
 		err := fmt.Errorf("no channel selected")
@@ -56,7 +56,7 @@ func GetSACBytes(data []handler.Geophone, channel string, options *app.ServerOpt
 	sac.Init()
 
 	// Set SAC header and body
-	sac.SetTime(startTime, t.Diff(startTime, endTime))
+	sac.SetTime(startTime, duration.Difference(startTime, endTime))
 	sac.SetInfo(network, station, location, channel)
 	sac.SetBody(int32ToFloat32(channelBuffer), sampleRate)
 

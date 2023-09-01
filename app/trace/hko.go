@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"com.geophone.observer/utils/request"
-	t "com.geophone.observer/utils/time"
+	"github.com/bclswl0827/observer/utils/duration"
+	"github.com/bclswl0827/observer/utils/request"
 	"github.com/sbabiv/xml2map"
 )
 
@@ -24,7 +24,7 @@ func (h *HKO) Property() (string, string) {
 }
 
 func (h *HKO) Fetch() ([]byte, error) {
-	if t.Diff(time.Now(), h.Time) <= EXPIRATION {
+	if duration.Difference(time.Now(), h.Time) <= EXPIRATION {
 		return h.Cache, nil
 	}
 

@@ -3,12 +3,12 @@ package history
 import (
 	"fmt"
 
-	"com.geophone.observer/app"
-	"com.geophone.observer/common/postgres"
-	"com.geophone.observer/handler"
+	"github.com/bclswl0827/observer/app"
+	"github.com/bclswl0827/observer/driver/postgres"
+	"github.com/bclswl0827/observer/publisher"
 )
 
-func FilterHistory(start, end int64, options *app.ServerOptions) ([]handler.Geophone, error) {
+func FilterHistory(start, end int64, options *app.ServerOptions) ([]publisher.Geophone, error) {
 	pdb := options.FeatureOptions.Database
 	if pdb == nil {
 		return nil, fmt.Errorf("databse is not connected")
@@ -27,9 +27,9 @@ func FilterHistory(start, end int64, options *app.ServerOptions) ([]handler.Geop
 		return nil, fmt.Errorf("no data found")
 	}
 
-	var count []handler.Geophone
+	var count []publisher.Geophone
 	for _, v := range data {
-		count = append(count, handler.Geophone{
+		count = append(count, publisher.Geophone{
 			TS:  v["ts"].(int64),
 			EHZ: v["ehz"].([]int32),
 			EHE: v["ehe"].([]int32),

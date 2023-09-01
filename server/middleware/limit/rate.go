@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"com.geophone.observer/server/response"
+	"github.com/bclswl0827/observer/server/response"
 	"github.com/gin-gonic/gin"
 	"github.com/juju/ratelimit"
 )

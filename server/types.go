@@ -1,7 +1,7 @@
 package server
 
 import (
-	"com.geophone.observer/app"
+	"github.com/bclswl0827/observer/app"
 	"github.com/gin-gonic/gin"
 )
 

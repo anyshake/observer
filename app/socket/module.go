@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"com.geophone.observer/app"
-	"com.geophone.observer/handler"
-	"com.geophone.observer/server/response"
+	"github.com/bclswl0827/observer/app"
+	"github.com/bclswl0827/observer/publisher"
+	"github.com/bclswl0827/observer/server/response"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -41,8 +41,9 @@ func (s *Socket) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions)
 		}()
 
 		// Write when new message arrived
-		handler.OnMessage(&options.FeatureOptions.Status.Geophone,
-			func(gp *handler.Geophone) error {
+		publisher.Subscribe(
+			&options.FeatureOptions.Status.Geophone,
+			func(gp *publisher.Geophone) error {
 				data, err := json.Marshal(gp)
 				if err != nil {
 					conn.Close()

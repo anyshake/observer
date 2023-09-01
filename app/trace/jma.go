@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"com.geophone.observer/utils/request"
-	t "com.geophone.observer/utils/time"
+	"github.com/bclswl0827/observer/utils/duration"
+	"github.com/bclswl0827/observer/utils/request"
 )
 
 type JMA struct {
@@ -23,7 +23,7 @@ func (j *JMA) Property() (string, string) {
 }
 
 func (j *JMA) Fetch() ([]byte, error) {
-	if t.Diff(time.Now(), j.Time) <= EXPIRATION {
+	if duration.Difference(time.Now(), j.Time) <= EXPIRATION {
 		return j.Cache, nil
 	}
 

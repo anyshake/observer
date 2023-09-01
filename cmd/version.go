@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"time"
 
-	"com.geophone.observer/utils/text"
+	"github.com/bclswl0827/observer/utils/text"
 	"github.com/fatih/color"
 )
 
