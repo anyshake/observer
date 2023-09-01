@@ -6,9 +6,12 @@ import (
 	"time"
 
 	"com.geophone.observer/utils/request"
+	t "com.geophone.observer/utils/time"
 )
 
-type JMA struct{}
+type JMA struct {
+	DataSourceCache
+}
 
 func (j *JMA) Property() (string, string) {
 	const (
@@ -20,6 +23,10 @@ func (j *JMA) Property() (string, string) {
 }
 
 func (j *JMA) Fetch() ([]byte, error) {
+	if t.Diff(time.Now(), j.Time) <= EXPIRATION {
+		return j.Cache, nil
+	}
+
 	res, err := request.GET(
 		"https://www.jma.go.jp/bosai/quake/data/list.json",
 		10*time.Second, time.Second, 3, false,
@@ -27,6 +34,10 @@ func (j *JMA) Fetch() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	j.Time = time.Now()
+	j.Cache = make([]byte, len(res))
+	copy(j.Cache, res)
 
 	return res, nil
 }

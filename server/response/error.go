@@ -60,6 +60,14 @@ func Error(c *gin.Context, code int) {
 			Status:  http.StatusMethodNotAllowed,
 			Message: "所请求资源不可用",
 		})
+	case 413:
+		c.JSON(http.StatusMethodNotAllowed, HttpResponse{
+			Error:   true,
+			Path:    currentPath,
+			Time:    currentTime,
+			Status:  http.StatusMethodNotAllowed,
+			Message: "请求超出数据限制",
+		})
 	case 429:
 		c.JSON(http.StatusTooManyRequests, HttpResponse{
 			Error:   true,
