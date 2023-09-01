@@ -18,16 +18,16 @@ build: clean $(BUILD_ARCH)
 $(BUILD_ARCH):
 	@mkdir -p $(DIST_DIR)/$@
 	@rm -rf $(DIST_DIR)/$@/*
-	@GOOS=linux GOARCH=$@ go build -ldflags="$(BUILD_FLAGS)" \
+	@CGO_ENABLED=0 GOOS=linux GOARCH=$@ go build -ldflags="$(BUILD_FLAGS)" \
 		-o $(DIST_DIR)/$@/$(BINARY) $(SRC_DIR)/*.go
 	@cp -r $(ASSETS_DIR) $(DIST_DIR)/$@
 
 windows:
 	@mkdir -p $(DIST_DIR)/win32 $(DIST_DIR)/win64
 	@rm -rf $(DIST_DIR)/win32/* $(DIST_DIR)/win64/*
-	@GOOS=windows GOARCH=386 go build -ldflags="$(BUILD_FLAGS)" \
+	@CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -ldflags="$(BUILD_FLAGS)" \
 		-o $(DIST_DIR)/win32/$(BINARY).exe $(SRC_DIR)/*.go
-	@GOOS=windows GOARCH=amd64 go build -ldflags="$(BUILD_FLAGS)" \
+	@CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="$(BUILD_FLAGS)" \
 		-o $(DIST_DIR)/win64/$(BINARY).exe $(SRC_DIR)/*.go
 	@cp -r $(ASSETS_DIR) $(DIST_DIR)/win32
 	@cp -r $(ASSETS_DIR) $(DIST_DIR)/win64
