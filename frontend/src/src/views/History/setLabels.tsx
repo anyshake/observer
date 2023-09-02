@@ -1,21 +1,20 @@
 import { LabelProps } from "../../components/Label";
 import { ADC } from "../../config/adc";
 import { Geophone } from "../../config/geophone";
-import getAcceleration from "../../helpers/getAcceleration";
-import getIntensity, {
-    IntensityScaleStandard,
-} from "../../helpers/getIntensity";
-import getSortedArray from "../../helpers/getSortedArray";
-import getVelocity from "../../helpers/getVelocity";
-import getVoltage from "../../helpers/getVoltage";
-import setObject from "../../helpers/setObject";
+import getAcceleration from "../../helpers/seismic/getAcceleration";
+import { IntensityStandardProperty } from "../../helpers/seismic/intensityStandard";
+import getSortedArray from "../../helpers/array/getSortedArray";
+import getVelocity from "../../helpers/seismic/getVelocity";
+import getVoltage from "../../helpers/seismic/getVoltage";
+import setObject from "../../helpers/utils/setObjectByPath";
+import GLOBAL_CONFIG from "../../config/global";
 
 const setLabels = (
     obj: LabelProps[],
     data: any,
     adc: ADC,
     gp: Geophone,
-    scale: IntensityScaleStandard
+    scale: IntensityStandardProperty
 ): LabelProps[] => {
     const { ehz, ehe, ehn } = gp;
     const { fullscale, resolution } = adc;
@@ -85,25 +84,31 @@ const setLabels = (
         return Math.max(absA, absB);
     }, 0);
 
+    // Match scale standard
+    const { scales } = GLOBAL_CONFIG.app_settings;
+    const scaleStandard = scales.find(
+        (item) => item.property().value === scale.value
+    );
+
     setObject(obj, "[tag:ehz-pga]>value", ehzPGA.toFixed(2));
     setObject(
         obj,
         "[tag:ehz-intensity]>value",
-        `${scale} 震度 ${getIntensity(ehzPGV, ehzPGA, scale)}`
+        `${scale.value} 震度 ${scaleStandard?.intensity(ehzPGV, ehzPGA)}`
     );
 
     setObject(obj, "[tag:ehe-pga]>value", ehePGA.toFixed(2));
     setObject(
         obj,
         "[tag:ehe-intensity]>value",
-        `${scale} 震度 ${getIntensity(ehePGV, ehePGA, scale)}`
+        `${scale.value} 震度 ${scaleStandard?.intensity(ehePGV, ehePGA)}`
     );
 
     setObject(obj, "[tag:ehn-pga]>value", ehnPGA.toFixed(2));
     setObject(
         obj,
         "[tag:ehn-intensity]>value",
-        `${scale} 震度 ${getIntensity(ehnPGV, ehnPGA, scale)}`
+        `${scale.value} 震度 ${scaleStandard?.intensity(ehnPGV, ehnPGA)}`
     );
 
     return obj;

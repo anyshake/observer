@@ -10,42 +10,40 @@ import View from "../../components/View";
 import Container from "../../components/Container";
 import Card from "../../components/Card";
 import Text from "../../components/Text";
-import { IntensityScaleStandard } from "../../helpers/getIntensity";
-import getLocalStorage from "../../helpers/getLocalStorage";
+import { IntensityStandardProperty } from "../../helpers/seismic/intensityStandard";
+import getLocalStorage from "../../helpers/storage/getLocalStorage";
 import Button from "../../components/Button";
 import SelectDialog, { SelectDialogProps } from "../../components/SelectDialog";
-import setLocalStorage from "../../helpers/setLocalStorage";
-import GLOBAL_CONFIG from "../../config/global";
+import setLocalStorage from "../../helpers/storage/setLocalStorage";
+import GLOBAL_CONFIG, { fallbackScale } from "../../config/global";
 
-interface State {
-    readonly scale: IntensityScaleStandard;
+interface SettingState {
     readonly select: SelectDialogProps;
+    readonly scale: IntensityStandardProperty;
 }
 
-export default class Setting extends Component<{}, State> {
+export default class Setting extends Component<{}, SettingState> {
     constructor(props: {}) {
         super(props);
         this.state = {
-            scale: "JMA",
             select: {
-                title: "选择震度标准",
                 open: false,
-                values: [
-                    ["日本気象庁震度", "JMA"],
-                    ["中国地震局地震震度", "CSIS"],
-                    ["台湾中央氣象局新震度", "CWB"],
-                    ["修訂麥加利地震震度表", "MMI"],
-                ],
+                title: "选择震度标准",
+                values: GLOBAL_CONFIG.app_settings.scales.map((item) => [
+                    item.property().name,
+                    item.property().value,
+                ]),
             },
+            scale: fallbackScale.property(),
         };
     }
 
     componentDidMount(): void {
-        const { scale: fallbackScale } = GLOBAL_CONFIG.app_settings;
         const scale = getLocalStorage(
             "scale",
-            fallbackScale
-        ) as IntensityScaleStandard;
+            fallbackScale.property(),
+            true
+        ) as IntensityStandardProperty;
         this.setState({ scale });
     }
 
@@ -65,11 +63,17 @@ export default class Setting extends Component<{}, State> {
     };
 
     handleScaleChange = (value: string): void => {
-        setLocalStorage("scale", value);
+        // Match value with scale property
+        const { scales } = GLOBAL_CONFIG.app_settings;
+        const scaleStandard = scales
+            .find((item) => item.property().value === value)
+            ?.property();
         this.setState({
-            scale: value as IntensityScaleStandard,
+            scale: scaleStandard || fallbackScale.property(),
             select: { ...this.state.select, open: false },
         });
+
+        setLocalStorage("scale", scaleStandard, true);
         toast.success(`已切换震度标准为 ${value}`);
     };
 
@@ -85,7 +89,7 @@ export default class Setting extends Component<{}, State> {
 
                     <Container layout="grid">
                         <Card className="h-[200px]" label="震度标准">
-                            {`当前震度标准为 ${scale}。`}
+                            {`当前震度标准为${scale.name}。`}
                             <Text>
                                 震度标准是用来衡量地震震度的标准，不同的标准会导致不同的震度值。
                             </Text>

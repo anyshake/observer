@@ -1,5 +1,5 @@
 import { Geophone } from "../../config/geophone";
-import { ApiResponse } from "../../helpers/requestByTag";
+import { ApiResponse } from "../../helpers/request/restfulApiByTag";
 
 const setGeophone = (res: ApiResponse): Geophone => {
     const { ehz, ehe, ehn } = res.data.geophone;

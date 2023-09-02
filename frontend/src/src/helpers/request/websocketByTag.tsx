@@ -1,6 +1,6 @@
-import API_CONFIG from "../config/api";
-import getApiUrl from "./getApiUrl";
-import getBackend from "./getBackend";
+import API_CONFIG from "../../config/api";
+import getApiUrl from "../app/getApiUrl";
+import getBackend from "../app/getBackend";
 
 interface WebsocketByTag {
     readonly tag: string;

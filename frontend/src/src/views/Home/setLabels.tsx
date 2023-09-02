@@ -1,6 +1,6 @@
 import { LabelProps } from "../../components/Label";
-import { ApiResponse } from "../../helpers/requestByTag";
-import setObject from "../../helpers/setObject";
+import { ApiResponse } from "../../helpers/request/restfulApiByTag";
+import setObjectByPath from "../../helpers/utils/setObjectByPath";
 
 const setLabels = (obj: LabelProps[], res: ApiResponse): LabelProps[] => {
     const tags = [
@@ -13,7 +13,7 @@ const setLabels = (obj: LabelProps[], res: ApiResponse): LabelProps[] => {
     ];
     for (let i of tags) {
         const { status } = res.data;
-        setObject(obj, `[tag:${i}]>value`, status[i]);
+        setObjectByPath(obj, `[tag:${i}]>value`, status[i]);
     }
 
     return obj;

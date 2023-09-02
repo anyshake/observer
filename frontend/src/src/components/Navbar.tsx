@@ -2,8 +2,8 @@ import { Component } from "react";
 import { Link } from "react-router-dom";
 import HomeIcon from "../assets/icons/house-solid.svg";
 import ArrowIcon from "../assets/icons/angle-right-solid.svg";
-import getRouterUri from "../helpers/getRouterUri";
-import getRouterTitle from "../helpers/getRouterTitle";
+import getRouterUri from "../helpers/router/getRouterUri";
+import getRouterTitle from "../helpers/router/getRouterTitle";
 
 export default class Navbar extends Component<{}> {
     render() {

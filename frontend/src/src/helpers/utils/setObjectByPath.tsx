@@ -1,4 +1,4 @@
-const setObject = (obj: any, path: string, value: any): any => {
+const setObjectByPath = (obj: any, path: string, value: any): any => {
     let current = obj;
 
     const keys = path.split(">");
@@ -34,4 +34,4 @@ const setObject = (obj: any, path: string, value: any): any => {
     return obj;
 };
 
-export default setObject;
+export default setObjectByPath;

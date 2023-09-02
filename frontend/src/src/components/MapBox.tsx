@@ -14,6 +14,7 @@ export interface MapBoxProps {
     readonly marker?: [number, number];
     readonly zoomControl?: boolean;
     readonly flyTo?: boolean;
+    readonly dragging?: boolean;
 }
 
 export interface MapBoxState {
@@ -29,10 +30,10 @@ export default class MapBox extends Component<MapBoxProps, MapBoxState> {
     }
 
     componentDidUpdate(): void {
-        const { center, flyTo, maxZoom } = this.props;
+        const { center, flyTo, zoom } = this.props;
         const map = this.state.map?.current;
         if (map && flyTo) {
-            map?.flyTo(center, maxZoom);
+            map?.flyTo(center, zoom);
         }
     }
 
@@ -45,6 +46,7 @@ export default class MapBox extends Component<MapBoxProps, MapBoxState> {
             zoom,
             tile,
             marker,
+            dragging,
             zoomControl,
         } = this.props;
         const { map } = this.state;
@@ -62,6 +64,7 @@ export default class MapBox extends Component<MapBoxProps, MapBoxState> {
                 attributionControl={false}
                 scrollWheelZoom={false}
                 doubleClickZoom={false}
+                dragging={dragging}
                 maxZoom={maxZoom}
                 minZoom={minZoom}
                 center={center}

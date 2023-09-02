@@ -32,13 +32,13 @@ func parseCommandLine(conf *config.Conf) error {
 		return err
 	}
 
-	logger.Print("main", "G-Observer daemon initialized", color.FgMagenta)
+	logger.Print("main", "Observer daemon initialized", color.FgMagenta)
 	return nil
 }
 
 func init() {
 	w := color.New(color.FgHiCyan).SprintFunc()
-	t := figure.NewFigure("G-Observer", "standard", true).String()
+	t := figure.NewFigure("Observer", "standard", true).String()
 	fmt.Println(w(t))
 }
 

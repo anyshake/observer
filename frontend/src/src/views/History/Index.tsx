@@ -11,7 +11,7 @@ import Card from "../../components/Card";
 import Button from "../../components/Button";
 import Container from "../../components/Container";
 import Chart, { ChartProps } from "../../components/Chart";
-import requestByTag from "../../helpers/requestByTag";
+import restfulApiByTag from "../../helpers/request/restfulApiByTag";
 import toast, { Toaster } from "react-hot-toast";
 import setChart from "./setChart";
 import { ADC } from "../../config/adc";
@@ -20,12 +20,16 @@ import SelectDialog, { SelectDialogProps } from "../../components/SelectDialog";
 import setGeophone from "./setGeophone";
 import setADC from "./setADC";
 import ModalDialog, { ModalDialogProps } from "../../components/ModalDialog";
-import getTimeString from "../../helpers/getTimeString";
+import getTimeString from "../../helpers/utils/getTimeString";
 import Label, { LabelProps } from "../../components/Label";
 import setLabels from "./setLabels";
-import { IntensityScaleStandard } from "../../helpers/getIntensity";
-import getLocalStorage from "../../helpers/getLocalStorage";
-import GLOBAL_CONFIG from "../../config/global";
+import { IntensityStandardProperty } from "../../helpers/seismic/intensityStandard";
+import getLocalStorage from "../../helpers/storage/getLocalStorage";
+import { fallbackScale } from "../../config/global";
+import { ReduxStore, ReduxStoreProps } from "../../config/store";
+import { update as updateADC } from "../../store/adc";
+import { update as updateGeophone } from "../../store/geophone";
+import { connect } from "react-redux";
 
 // 100s by default
 const QUERY_TIMEOUT = 100000;
@@ -49,23 +53,22 @@ interface HistorySelect {
     readonly dialog: SelectDialogProps;
 }
 
-interface State {
+interface HistoryState {
     readonly adc: ADC;
+    readonly labels: LabelProps[];
     readonly history: HistoryForm;
     readonly trace: TraceForm;
     readonly chart: ChartProps;
     readonly geophone: Geophone;
     readonly select: HistorySelect;
     readonly modal: ModalDialogProps;
-    readonly scale: IntensityScaleStandard;
-    readonly labels: LabelProps[];
+    readonly scale: IntensityStandardProperty;
 }
 
-export default class History extends Component<{}, State> {
-    constructor(props: {}) {
+class History extends Component<ReduxStoreProps, HistoryState> {
+    constructor(props: ReduxStoreProps) {
         super(props);
         this.state = {
-            scale: "JMA",
             trace: {
                 source: "show",
             },
@@ -169,27 +172,46 @@ export default class History extends Component<{}, State> {
                     unit: "",
                 },
             ],
+            scale: fallbackScale.property(),
         };
     }
 
     async componentDidMount(): Promise<void> {
-        const res = await requestByTag({
-            tag: "station",
-        });
-        if (res.data) {
-            const { scale: fallbackScale } = GLOBAL_CONFIG.app_settings;
-            const adc = setADC(res);
-            const geophone = setGeophone(res);
-            const scale = getLocalStorage(
-                "scale",
-                fallbackScale
-            ) as IntensityScaleStandard;
-            this.setState({ adc, geophone, scale });
-        } else {
-            const error = "取得测站资讯时发生错误，功能无法使用";
-            toast.error(error);
-            return Promise.reject(error);
+        // Get scale standard from localStorage or fallback
+        const scale = getLocalStorage(
+            "scale",
+            fallbackScale.property(),
+            true
+        ) as IntensityStandardProperty;
+
+        // Get ADC & Geophone parameters from redux
+        let { adc } = this.props.adc;
+        let { geophone } = this.props.geophone;
+
+        // Query ADC & Geophone parameters from server
+        const { resolution } = adc;
+        const { ehz, ehe, ehn } = geophone;
+        if (resolution === -1 || ehz * ehe * ehn === 0) {
+            const res = await restfulApiByTag({
+                tag: "station",
+            });
+            if (res.data) {
+                // Get new state
+                adc = setADC(res);
+                geophone = setGeophone(res);
+                // Update redux
+                const { updateADC, updateGeophone } = this.props;
+                updateGeophone(geophone);
+                updateADC(adc);
+            } else {
+                const error = "取得测站资讯时发生错误，功能无法使用";
+                toast.error(error);
+                return Promise.reject(error);
+            }
         }
+
+        // Update state
+        this.setState({ adc, geophone, scale });
     }
 
     promisedSetState = (newState: any) =>
@@ -220,7 +242,7 @@ export default class History extends Component<{}, State> {
             return Promise.reject(error);
         }
 
-        const { error, data } = await requestByTag({
+        const { error, data } = await restfulApiByTag({
             body: history,
             tag: "history",
             timeout: QUERY_TIMEOUT,
@@ -238,7 +260,7 @@ export default class History extends Component<{}, State> {
 
     handleQueryEvents = async (): Promise<unknown> => {
         const { trace } = this.state;
-        const { error, data } = await requestByTag({
+        const { error, data } = await restfulApiByTag({
             body: trace,
             tag: "trace",
             timeout: QUERY_TIMEOUT,
@@ -377,12 +399,12 @@ export default class History extends Component<{}, State> {
         };
 
         const loader = toast.loading("正在获取数据源...");
-        const { data, error } = await requestByTag({
+        const { data, error } = await restfulApiByTag({
             body: trace,
             tag: "trace",
         });
-
         toast.remove(loader);
+
         if (error || !data) {
             const error = "请求失败，请检查输入后重试";
             toast.error(error);
@@ -485,3 +507,12 @@ export default class History extends Component<{}, State> {
         );
     }
 }
+
+const mapStateToProps = (state: ReduxStore) => {
+    return { ...state };
+};
+
+export default connect(mapStateToProps, {
+    updateGeophone,
+    updateADC,
+})(History);

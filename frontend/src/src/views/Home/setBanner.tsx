@@ -1,9 +1,9 @@
 import { BannerProps } from "../../components/Banner";
-import { ApiResponse } from "../../helpers/requestByTag";
+import { ApiResponse } from "../../helpers/request/restfulApiByTag";
 
-const setBanner = (res: ApiResponse): BannerProps => {
-    const { error, message } = res;
-    const { uuid, station, uptime, os } = res.data;
+const setBanner = (res?: ApiResponse): BannerProps => {
+    const { error, message } = res || {};
+    const { uuid, station, uptime, os } = res?.data || {};
 
     let label = "连接失败";
     let text = "无法连接到服务器，请尝试刷新页面或更换网络";

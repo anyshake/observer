@@ -18,12 +18,16 @@ import PlaneIcon from "../../assets/icons/paper-plane-solid.svg";
 import ErrorIcon from "../../assets/icons/circle-xmark-solid.svg";
 import TimerIcon from "../../assets/icons/hourglass-half-solid.svg";
 import ClockIcon from "../../assets/icons/clock-solid.svg";
-import requestByTag, { ApiResponse } from "../../helpers/requestByTag";
+import restfulApiByTag, { ApiResponse } from "../../helpers/request/restfulApiByTag";
 import Polling from "../../components/Polling";
 import setBanner from "./setBanner";
 import setLabels from "./setLabels";
 import setMap from "./setMap";
 import setAreas from "./setAreas";
+import { connect } from "react-redux";
+import { ReduxStore, ReduxStoreProps } from "../../config/store";
+import { update as updateADC } from "../../store/adc";
+import { update as updateGeophone } from "../../store/geophone";
 
 // 120s by default
 const QUENE_LENGTH = 120;
@@ -46,8 +50,8 @@ export interface HomeState {
     readonly map: HomeMap;
 }
 
-export default class Home extends Component<{}, HomeState> {
-    constructor(props: {}) {
+class Home extends Component<ReduxStoreProps, HomeState> {
+    constructor(props: ReduxStoreProps) {
         super(props);
         this.state = {
             banner: {
@@ -147,8 +151,7 @@ export default class Home extends Component<{}, HomeState> {
                     text: "正在加载位置资讯",
                 },
                 instance: {
-                    className: "h-[400px]",
-                    zoom: 3,
+                    zoom: 6,
                     minZoom: 3,
                     maxZoom: 7,
                     flyTo: true,
@@ -160,26 +163,35 @@ export default class Home extends Component<{}, HomeState> {
     }
 
     handleFetch = async (tag: string): Promise<ApiResponse> => {
-        return await requestByTag({ tag });
+        const res = await restfulApiByTag({ tag });
+        return res;
     };
 
-    handleData = (res: ApiResponse): boolean => {
-        const { error } = res;
-        if (!res.data) {
-            return false;
-        }
+    handleError = (): void => {
+        const banner = setBanner();
+        this.setState({ banner });
+    };
 
+    handleData = (res: ApiResponse): void => {
+        const { error } = res;
         const banner = setBanner(res);
+
         if (!error) {
+            // Update ADC & Geophone
+            const { adc, geophone } = res.data;
+            const { updateADC, updateGeophone } = this.props;
+            // Update redux store
+            updateGeophone(geophone);
+            updateADC(adc);
+            // Update labels state
             const map = setMap(this.state.map, res);
             const labels = setLabels(this.state.labels, res);
             const areas = setAreas(this.state.areas, res, QUENE_LENGTH);
-            this.setState({ banner, labels, areas, map });
-            return true;
+            // Update this.state
+            this.setState({ labels, areas, map });
         }
 
         this.setState({ banner });
-        return false;
     };
 
     render() {
@@ -194,10 +206,12 @@ export default class Home extends Component<{}, HomeState> {
                 <Content>
                     <Navbar />
                     <Polling
+                        retry={3}
                         timer={1000}
                         tag={"station"}
                         onData={this.handleData}
                         onFetch={this.handleFetch}
+                        onError={this.handleError}
                     >
                         <Banner {...banner} />
 
@@ -221,7 +235,7 @@ export default class Home extends Component<{}, HomeState> {
 
                         <Container layout={"none"}>
                             <Area label={area.label} text={area.text}>
-                                <MapBox {...instance} />
+                                <MapBox className="h-[400px]" {...instance} />
                             </Area>
                         </Container>
                     </Polling>
@@ -233,3 +247,12 @@ export default class Home extends Component<{}, HomeState> {
         );
     }
 }
+
+const mapStateToProps = (state: ReduxStore) => {
+    return { ...state };
+};
+
+export default connect(mapStateToProps, {
+    updateGeophone,
+    updateADC,
+})(Home);

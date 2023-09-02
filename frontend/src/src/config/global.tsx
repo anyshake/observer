@@ -1,24 +1,40 @@
-import getBackend from "../helpers/getBackend";
-import { IntensityScaleStandard } from "../helpers/getIntensity";
-import getRelease from "../helpers/getRelease";
-import getVersion from "../helpers/getVersion";
+import getBackend from "../helpers/app/getBackend";
+import {
+    CSISIntensityStandard,
+    CWBIntensityStandard,
+    IntensityStandard,
+    JMAIntensityStandard,
+    MMIIntensityStandard,
+} from "../helpers/seismic/intensityStandard";
+import getRelease from "../helpers/app/getRelease";
+import getVersion from "../helpers/app/getVersion";
+
+const version = getVersion();
+const release = getRelease();
+const backend = getBackend();
+const scales = [
+    new JMAIntensityStandard(),
+    new CWBIntensityStandard(),
+    new MMIIntensityStandard(),
+    new CSISIntensityStandard(),
+];
 
 const GLOBAL_CONFIG: GlobalConfig = {
     app_settings: {
+        version,
+        release,
+        scales,
         router: "hash",
-        name: "G-Observer",
-        author: "通信实验室",
-        title: "G-Observer 测站面板",
+        name: "Observer",
+        author: "Project ES",
+        title: "Observer 测站面板",
         description: "Constructing Realtime Seismic Network Ambitiously.",
-        version: getVersion(),
-        release: getRelease(),
-        scale: "JMA",
     },
     api_settings: {
+        backend,
         version: "v1",
         prefix: "/api",
         types: ["http", "ws"],
-        backend: getBackend(),
     },
 };
 
@@ -30,7 +46,7 @@ export interface AppSettings {
     readonly version: string;
     readonly release: string;
     readonly description: string;
-    readonly scale: IntensityScaleStandard;
+    readonly scales: IntensityStandard[];
 }
 
 export interface ApiSettings {
@@ -46,3 +62,4 @@ export interface GlobalConfig {
 }
 
 export default GLOBAL_CONFIG;
+export const fallbackScale = scales[0];

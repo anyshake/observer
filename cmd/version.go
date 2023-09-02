@@ -18,9 +18,9 @@ var (
 
 func printVersion() {
 	var (
-		copyright = "© Telecom-308 " + fmt.Sprintf("%d", time.Now().Year()) + ". All Rights Reversed."
+		copyright = "© Project ES " + fmt.Sprintf("%d", time.Now().Year()) + ". All Rights Reversed."
 		version   = text.Concat(
-			"G-Observer ", version, " (", description, ")\nRelease: ", release, " ",
+			"Observer ", version, " (", description, ")\nRelease: ", version, "-", release, " ",
 			runtime.Version(), " ", runtime.GOOS, "/", runtime.GOARCH, "\n", copyright,
 		)
 	)

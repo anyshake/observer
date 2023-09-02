@@ -3,12 +3,12 @@ import axios, {
     AxiosResponse,
     InternalAxiosRequestConfig,
 } from "axios";
-import API_CONFIG from "../config/api";
-import getBackend from "./getBackend";
-import getApiUrl from "./getApiUrl";
+import API_CONFIG from "../../config/api";
+import getBackend from "../app/getBackend";
+import getApiUrl from "../app/getApiUrl";
 import fileDownload from "js-file-download";
 
-export interface RequestByTag {
+export interface RESTfulApiByTag {
     readonly tag: string;
     readonly blob?: boolean;
     readonly timeout?: number;
@@ -26,14 +26,14 @@ export interface ApiResponse {
     readonly data: any;
 }
 
-const requestByTag = async ({
+const restfulApiByTag = async ({
     tag,
     header,
     body,
     blob,
     filename,
     timeout = 10000,
-}: RequestByTag): Promise<ApiResponse> => {
+}: RESTfulApiByTag): Promise<ApiResponse> => {
     const _axios = axios.create({
         timeout: timeout,
     });
@@ -113,4 +113,4 @@ const requestByTag = async ({
     }
 };
 
-export default requestByTag;
+export default restfulApiByTag;

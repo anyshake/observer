@@ -1,5 +1,5 @@
-import API_CONFIG from "../config/api";
-import GLOBAL_CONFIG from "../config/global";
+import API_CONFIG from "../../config/api";
+import GLOBAL_CONFIG from "../../config/global";
 
 const getApiUrl = (tag: string): string => {
     const { version, prefix } = GLOBAL_CONFIG.api_settings;

@@ -1,4 +1,4 @@
-import GLOBAL_CONFIG from "../config/global";
+import GLOBAL_CONFIG from "../../config/global";
 
 const getRouterUri = () => {
     const { hash, pathname } = window.location;
