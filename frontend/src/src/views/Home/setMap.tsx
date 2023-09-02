@@ -1,4 +1,4 @@
-import { ApiResponse } from "../../helpers/requestByTag";
+import { ApiResponse } from "../../helpers/request/restfulApiByTag";
 import { HomeMap } from "./Index";
 
 const setMap = (obj: HomeMap, res: ApiResponse): HomeMap => {

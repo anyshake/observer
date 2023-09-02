@@ -1,16 +1,18 @@
 {
-  "name": "g-observer",
+  "name": "observer",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.14.0",
     "@mui/x-date-pickers": "^6.10.0",
+    "@reduxjs/toolkit": "^1.9.5",
     "@types/node": "^16.18.38",
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
     "axios": "^1.4.0",
     "date-fns": "^2.30.0",
+    "eslint-config-react-app": "^7.0.1",
     "highcharts": "^11.1.0",
     "highcharts-react-official": "^3.2.0",
     "js-file-download": "^0.4.12",
@@ -20,8 +22,10 @@
     "react-hot-toast": "^2.4.1",
     "react-leaflet": "^4.2.1",
     "react-polling": "^1.0.9",
+    "react-redux": "^8.1.2",
     "react-router-dom": "^6.14.1",
     "react-scripts": "5.0.1",
+    "redux": "^4.2.1",
     "typescript": "^4.9.5"
   },
   "scripts": {

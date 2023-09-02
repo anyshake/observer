@@ -1,4 +1,4 @@
-import ROUTER_CONFIG from "../config/router";
+import ROUTER_CONFIG from "../../config/router";
 import getRouterUri from "./getRouterUri";
 
 const getRouterTitle = (): string => {

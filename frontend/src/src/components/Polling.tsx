@@ -1,13 +1,13 @@
 import { Component, ReactNode } from "react";
 import ReactPolling from "react-polling";
-import { ApiResponse } from "../helpers/requestByTag";
+import { ApiResponse } from "../helpers/request/restfulApiByTag";
 
 export interface PollingProps {
     readonly tag: string;
     readonly timer: number;
     readonly retry?: number;
-    readonly onError?: () => Promise<void>;
-    readonly onData: (res: ApiResponse) => boolean;
+    readonly onError?: () => void;
+    readonly onData: (res: ApiResponse) => void;
     readonly onFetch: (tag: string) => Promise<ApiResponse>;
     readonly children?: ReactNode | ReactNode[];
 }
@@ -24,9 +24,12 @@ export default class Polling extends Component<PollingProps> {
                 interval={timer}
                 promise={onFetch}
                 retryCount={retry}
-                onSuccess={onData}
                 onFailure={onError}
                 render={() => childrenArr}
+                onSuccess={(res: ApiResponse) => {
+                    onData && onData(res);
+                    return true;
+                }}
             />
         );
     }

@@ -1,7 +1,7 @@
 import { HomeArea } from "./Index";
-import { ApiResponse } from "../../helpers/requestByTag";
-import getQueueArray from "../../helpers/getQueueArray";
-import setObject from "../../helpers/setObject";
+import { ApiResponse } from "../../helpers/request/restfulApiByTag";
+import getQueueArray from "../../helpers/array/getQueueArray";
+import setObjectByPath from "../../helpers/utils/setObjectByPath";
 
 const setAreas = (
     obj: HomeArea[],
@@ -16,12 +16,12 @@ const setAreas = (
         const srcArr = obj.find((item) => item.tag === i)?.chart.series?.data;
 
         const result = getQueueArray(srcArr, newArr, length);
-        setObject(
+        setObjectByPath(
             obj,
             `[tag:${i}]>area>text`,
             `当前占用率：${percent.toFixed(2)}%`
         );
-        setObject(obj, `[tag:${i}]>chart>series>data`, result);
+        setObjectByPath(obj, `[tag:${i}]>chart>series>data`, result);
     }
 
     return obj;

@@ -2,7 +2,7 @@ import { Component } from "react";
 import { Link } from "react-router-dom";
 import MENU_CONFIG from "../config/menu";
 import MenuIcon from "../assets/icons/maximize-solid.svg";
-import getRouterUri from "../helpers/getRouterUri";
+import getRouterUri from "../helpers/router/getRouterUri";
 
 export interface SidebarState {
     readonly isOpen: boolean;

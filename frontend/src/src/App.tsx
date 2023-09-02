@@ -5,13 +5,21 @@ import {
     Route,
     BrowserRouter,
 } from "react-router-dom";
-import withRouter from "./helpers/withRouter";
+import withRouter from "./helpers/router/withRouter";
 import ROUTER_CONFIG from "./config/router";
 import GLOBAL_CONFIG from "./config/global";
 import Loader from "./views/Loader";
 import NotFound from "./views/NotFound";
+import getAsciiArt from "./helpers/app/getAsciiArt";
 
 export default class App extends Component {
+    componentDidMount(): void {
+        const asciiArt = getAsciiArt();
+        const { version, release } = GLOBAL_CONFIG.app_settings;
+        console.info(`%c${asciiArt}`, "color: #0891b2;");
+        console.info(`%cRelease: ${version}-${release}`, "color: #0369a1;");
+    }
+
     render() {
         const { router: routerMode } = GLOBAL_CONFIG.app_settings;
         const router = (props: any): ReactElement => {

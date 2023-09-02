@@ -1,14 +1,13 @@
-import getVelocity from "../../helpers/getVelocity";
-import getQueueArray from "../../helpers/getQueueArray";
-import getVoltage from "../../helpers/getVoltage";
-import setObject from "../../helpers/setObject";
+import getVelocity from "../../helpers/seismic/getVelocity";
+import getQueueArray from "../../helpers/array/getQueueArray";
+import getVoltage from "../../helpers/seismic/getVoltage";
+import setObjectByPath from "../../helpers/utils/setObjectByPath";
 import { RealtimeArea } from "./Index";
-import getAcceleration from "../../helpers/getAcceleration";
+import getAcceleration from "../../helpers/seismic/getAcceleration";
 import { ADC } from "../../config/adc";
 import { Geophone } from "../../config/geophone";
-import getIntensity, {
-    IntensityScaleStandard,
-} from "../../helpers/getIntensity";
+import GLOBAL_CONFIG from "../../config/global";
+import { IntensityStandardProperty } from "../../helpers/seismic/intensityStandard";
 
 const setAreas = (
     obj: RealtimeArea[],
@@ -17,7 +16,7 @@ const setAreas = (
     length: number,
     adc: ADC,
     gp: Geophone,
-    scale: IntensityScaleStandard
+    scale: IntensityStandardProperty
 ): RealtimeArea[] => {
     const tags = ["ehz", "ehe", "ehn"];
     const { ts } = data;
@@ -45,9 +44,9 @@ const setAreas = (
 
         // remove old data and add new data
         const resultArr = getQueueArray(srcArr, newArr, length * sampleRate);
-        setObject(obj, `[tag:${i}]>chart>series>data`, resultArr);
+        setObjectByPath(obj, `[tag:${i}]>chart>series>data`, resultArr);
 
-        // Get PGV, PGA, Intensity
+        // Get PGV, PGA
         const pgv = velocity.reduce((a, b) => {
             const absA = Math.abs(a);
             const absB = Math.abs(b);
@@ -58,15 +57,22 @@ const setAreas = (
             const absB = Math.abs(b);
             return Math.max(absA, absB);
         }, 0);
-        const intensity = getIntensity(pgv, pga, scale);
+
+        // Match scale standard
+        const { scales } = GLOBAL_CONFIG.app_settings;
+        const scaleStandard = scales.find(
+            (item) => item.property().value === scale.value
+        );
+        // Get intensity
+        const intensity = scaleStandard?.intensity(pgv, pga);
 
         // Set PGV, PGA, Intensity in area
-        setObject(
+        setObjectByPath(
             obj,
             `[tag:${i}]>area>text`,
             `PGA：${pga.toFixed(5)} gal\n
             PGV：${pgv.toFixed(5)} cm/s\n
-            震度：${scale} 震度 ${intensity}`
+            震度：${scale.value} 震度 ${intensity}`
         );
     }
 

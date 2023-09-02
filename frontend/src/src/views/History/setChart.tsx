@@ -1,11 +1,11 @@
 import { ChartProps } from "../../components/Chart";
 import { ADC } from "../../config/adc";
 import { Geophone } from "../../config/geophone";
-import getAcceleration from "../../helpers/getAcceleration";
-import getSortedArray from "../../helpers/getSortedArray";
-import getVelocity from "../../helpers/getVelocity";
-import getVoltage from "../../helpers/getVoltage";
-import setObject from "../../helpers/setObject";
+import getAcceleration from "../../helpers/seismic/getAcceleration";
+import getSortedArray from "../../helpers/array/getSortedArray";
+import getVelocity from "../../helpers/seismic/getVelocity";
+import getVoltage from "../../helpers/seismic/getVoltage";
+import setObjectByPath from "../../helpers/utils/setObjectByPath";
 
 const setChart = (
     obj: ChartProps,
@@ -68,9 +68,9 @@ const setChart = (
         prevTs = i.ts;
     }
 
-    setObject(obj, `series>[name:EHZ]>data`, ehzAcceleration);
-    setObject(obj, `series>[name:EHE]>data`, eheAcceleration);
-    setObject(obj, `series>[name:EHN]>data`, ehnAcceleration);
+    setObjectByPath(obj, `series>[name:EHZ]>data`, ehzAcceleration);
+    setObjectByPath(obj, `series>[name:EHE]>data`, eheAcceleration);
+    setObjectByPath(obj, `series>[name:EHN]>data`, ehnAcceleration);
     return obj;
 };
 
