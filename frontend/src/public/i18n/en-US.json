@@ -1,0 +1,226 @@
+{
+    "config": {
+        "global": {
+            "name": "Observer",
+            "author": "Project ES",
+            "title": "Observer Panel",
+            "description": "Constructing Realtime Seismic Network Ambitiously."
+        },
+        "menu": {
+            "title": "Panel Menu",
+            "list": {
+                "index": "Station Status",
+                "realtime": "Realtime Waveform",
+                "history": "Historical Waveform",
+                "setting": "Panel Settings"
+            }
+        },
+        "router": {
+            "error": "Error occurred",
+            "index": "Station Status",
+            "realtime": "Realtime Waveform",
+            "history": "Historical Waveform",
+            "setting": "Panel Settings"
+        }
+    },
+    "components": {
+        "chart": {
+            "reset_zoom": "Reset Zoom",
+            "reset_zoom_title": "Reset Zoom to Default"
+        }
+    },
+    "views": {
+        "home": {
+            "banner": {
+                "warning": {
+                    "label": "Connecting to Server",
+                    "text": "Please wait..."
+                },
+                "success": {
+                    "label": "{{ station }} Connected",
+                    "text": "Server Uptime: {{ uptime }} seconds\nServer Architecture: {{ arch }}/{{ os }}\nUUID: {{ uuid }}"
+                },
+                "error": {
+                    "label": "Connection Failed",
+                    "text": "Unable to connect to the server. Please try refreshing the page or changing your network."
+                }
+            },
+            "areas": {
+                "cpu": {
+                    "label": "CPU Usage",
+                    "text": "Current usage: {{ usage }}%"
+                },
+                "memory": {
+                    "label": "Memory Usage",
+                    "text": "Current usage: {{ usage }}%"
+                }
+            },
+            "map": {
+                "area": {
+                    "label": "Station Location",
+                    "text": "Longitude: {{ longitude }} °\nLatitude: {{ latitude }} °\nElevation: {{ altitude }} m"
+                }
+            },
+            "labels": {
+                "messages": {
+                    "label": "Decoded Messages",
+                    "unit": "messages"
+                },
+                "errors": {
+                    "label": "Frame Errors",
+                    "unit": "errors"
+                },
+                "pushed": {
+                    "label": "Pushed Messages",
+                    "unit": "messages"
+                },
+                "failures": {
+                    "label": "Push Failures",
+                    "unit": "failures"
+                },
+                "queued": {
+                    "label": "Queued Messages",
+                    "unit": "messages"
+                },
+                "offset": {
+                    "label": "System Time Offset",
+                    "unit": "seconds"
+                }
+            }
+        },
+        "realtime": {
+            "banner": {
+                "warning": {
+                    "label": "Connecting to Server",
+                    "text": "Please wait..."
+                },
+                "success": {
+                    "label": "Current Sampling Rate {{ sampleRate }} Sps",
+                    "text": "Current Seismic Scale {{ scale }}\nData updated at {{ time }}"
+                },
+                "error": {
+                    "label": "Connection Failed",
+                    "text": "Attempting to reconnect. If unable to connect to the server for an extended period, please refresh the page or change your network."
+                }
+            },
+            "areas": {
+                "ehz": {
+                    "label": "EHZ Channel Waveform Count",
+                    "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} cm/s\nIntensity: {{ intensity }}"
+                },
+                "ehe": {
+                    "label": "EHE Channel Waveform Count",
+                    "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} cm/s\nIntensity: {{ intensity }}"
+                },
+                "ehn": {
+                    "label": "EHN Channel Waveform Count",
+                    "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} cm/s\nIntensity: {{ intensity }}"
+                }
+            },
+            "toasts": {
+                "websocket_connected": "WebSocket connection established",
+                "fetch_metadata_error": "An error occurred while retrieving station information. The functionality is not available."
+            }
+        },
+        "history": {
+            "modals": {
+                "choose_event": {
+                    "title": "Select an Earthquake Event"
+                }
+            },
+            "selects": {
+                "choose_channel": {
+                    "title": "Select Channels to Export"
+                },
+                "choose_source": {
+                    "title": "Select Earthquake Data Source"
+                }
+            },
+            "areas": {
+                "ehz": {
+                    "label": "EHZ Channel Waveform Count"
+                },
+                "ehe": {
+                    "label": "EHE Channel Waveform Count"
+                },
+                "ehn": {
+                    "label": "EHN Channel Waveform Count"
+                }
+            },
+            "cards": {
+                "query_history": "Historical Query",
+                "analyse_history": "Data Analysis"
+            },
+            "buttons": {
+                "query_waveform": "Retrieve Waveforms",
+                "query_sac_file": "Download Data",
+                "query_source": "Event Lookup"
+            },
+            "labels": {
+                "ehz_pga": {
+                    "label": "EHZ Peak Acc.",
+                    "unit": "gal"
+                },
+                "ehz_intensity": {
+                    "label": "EHZ Peak Intensity",
+                    "unit": ""
+                },
+                "ehe_pga": {
+                    "label": "EHE Peak Acc.",
+                    "unit": "gal"
+                },
+                "ehe_intensity": {
+                    "label": "EHE Peak Intensity",
+                    "unit": ""
+                },
+                "ehn_pga": {
+                    "label": "EHN Peak Acc.",
+                    "unit": "gal"
+                },
+                "ehn_intensity": {
+                    "label": "EHN Peak Intensity",
+                    "unit": ""
+                }
+            },
+            "time_pickers": {
+                "start_time": "Select Start Time",
+                "end_time": "Select End Time"
+            },
+            "toasts": {
+                "time_error": "Please select the correct time range",
+                "metadata_error": "An error occurred while retrieving station information. The functionality is not available.",
+                "is_exporting_sac": "Exporting SAC format waveforms, please wait...",
+                "export_sac_success": "SAC format waveform data export successful",
+                "export_sac_error": "SAC format waveform data export failed",
+                "is_fetching_source": "Fetching event data source, please wait...",
+                "fetch_source_success": "Event data source retrieval successful",
+                "fetch_source_error": "Event data source retrieval failed",
+                "is_fetching_events": "Querying earthquake event data, please wait...",
+                "fetch_events_success": "Earthquake event query successful",
+                "fetch_events_error": "Earthquake event query failed",
+                "is_fetching_waveform": "Querying historical waveform data, please wait...",
+                "fetch_waveform_success": "Historical waveform data query successful",
+                "fetch_waveform_error": "Historical waveform data query failed"
+            }
+        },
+        "setting": {
+            "buttons": {
+                "select_scale": "Select Seismic Scale",
+                "purge_cache": "Clear Application Cache"
+            },
+            "cards": {
+                "select_scale": "Seismic Scale",
+                "purge_cache": "Reset Application"
+            },
+            "selects": {
+                "choose_scale": {
+                    "title": "Select Seismic Scale"
+                }
+            },
+            "toasts": {
+                "cache_purged": "Application cache cleared, page will refresh shortly",
+                "scale_changed": "Seismic scale changed to {{ scale }}"
+            }
+        }
+    }
+}

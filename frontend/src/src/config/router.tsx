@@ -8,22 +8,22 @@ const Setting = lazy(() => import("../views/Setting/Index"));
 const ROUTER_CONFIG: RouterConfig[] = [
     {
         uri: "/",
-        title: "测站状态",
+        title: "config.router.index",
         node: <Home />,
     },
     {
         uri: "/realtime",
-        title: "实时波形",
+        title: "config.router.realtime",
         node: <Realtime />,
     },
     {
         uri: "/history",
-        title: "历史查询",
+        title: "config.router.history",
         node: <History />,
     },
     {
         uri: "/setting",
-        title: "面板设定",
+        title: "config.router.setting",
         node: <Setting />,
     },
 ];

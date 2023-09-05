@@ -52,7 +52,7 @@ func main() {
 
 	// Initialize global status
 	var status publisher.Status
-	publisher.Init(&conf, &status)
+	publisher.Initialize(&conf, &status)
 
 	// Register features
 	featureOptions := &feature.FeatureOptions{

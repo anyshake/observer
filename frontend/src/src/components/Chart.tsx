@@ -3,6 +3,7 @@ import * as Highcharts from "highcharts";
 import { HighchartsReact } from "highcharts-react-official";
 import HighchartsBoost from "highcharts/modules/boost";
 import { Options } from "highcharts";
+import { WithTranslation, withTranslation } from "react-i18next";
 HighchartsBoost(Highcharts);
 
 export interface ChartProps {
@@ -23,8 +24,8 @@ export interface ChartProps {
 
 export interface ChartState extends Options {}
 
-export default class Chart extends Component<ChartProps, ChartState> {
-    constructor(props: ChartProps) {
+class Chart extends Component<ChartProps & WithTranslation, ChartState> {
+    constructor(props: ChartProps & WithTranslation) {
         super(props);
         const {
             height,
@@ -119,11 +120,12 @@ export default class Chart extends Component<ChartProps, ChartState> {
         };
     }
 
-    componentDidMount(): void {
+    componentDidUpdate(): void {
+        const { t } = this.props;
         Highcharts.setOptions({
             lang: {
-                resetZoom: "复位视图",
-                resetZoomTitle: "复位视图为 1:1",
+                resetZoom: t("components.chart.reset_zoom"),
+                resetZoomTitle: t("components.chart.reset_zoom_title"),
             },
         });
     }
@@ -138,7 +140,7 @@ export default class Chart extends Component<ChartProps, ChartState> {
                 return a[0] - b[0];
             });
         } else if (series.length) {
-            for (let i of series as any) {
+            for (let i of series as any[]) {
                 i.data.sort((a: any, b: any) => {
                     return a[0] - b[0];
                 });
@@ -153,3 +155,5 @@ export default class Chart extends Component<ChartProps, ChartState> {
         );
     }
 }
+
+export default withTranslation()(Chart);

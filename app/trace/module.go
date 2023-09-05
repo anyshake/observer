@@ -39,7 +39,7 @@ func (t *Trace) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) 
 				})
 			}
 
-			response.Message(c, "成功取得可用数据源列表", list)
+			response.Message(c, "Successfully read available data source list", list)
 			return
 		}
 
@@ -57,7 +57,7 @@ func (t *Trace) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) 
 				}
 
 				sortByTimestamp(events)
-				response.Message(c, "成功取得地震列表数据", events)
+				response.Message(c, "Successfully read the list of earthquake events", events)
 				return
 			}
 		}

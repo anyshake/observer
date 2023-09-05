@@ -7,25 +7,35 @@ const setBanner = (
     prevTs?: number,
     scale?: IntensityStandardProperty
 ): BannerProps => {
+    // Parse response, empty response means error
     const { ts, ehz, ehe, ehn } = message || { ts: -1, ehz: 0, ehe: 0, ehn: 0 };
     const sampleLength = (ehz.length + ehe.length + ehn.length) / 3;
-    const sampleRate = (1000 * sampleLength) / (ts - (prevTs || 0));
+    const sampleRate = ((1000 * sampleLength) / (ts - (prevTs || 0))).toFixed(
+        2
+    );
 
     // Display error message if ts is -1 and all data are 0
     if (ts === -1 && ehz * ehn * ehe === 0) {
         return {
             type: "error",
-            label: "连线断开",
-            text: "正在尝试重新连线，请稍候",
+            label: { id: "views.realtime.banner.error.label" },
+            text: { id: "views.realtime.banner.error.text" },
         };
     }
 
     return {
         type: "success",
-        label: `连接成功：实际采样率 ${sampleRate.toFixed(2)} Sps`,
-        text: `当前震度标准为${
-            scale?.name || "未知标准"
-        }\n数据最后更新于 ${getTimeString(ts)}`,
+        label: {
+            id: "views.realtime.banner.success.label",
+            format: { sampleRate },
+        },
+        text: {
+            id: "views.realtime.banner.success.text",
+            format: {
+                time: getTimeString(ts),
+                scale: scale?.name || "Unknown",
+            },
+        },
     };
 };
 

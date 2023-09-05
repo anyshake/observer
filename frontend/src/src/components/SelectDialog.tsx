@@ -6,21 +6,23 @@ import {
     ListItemText,
 } from "@mui/material";
 import { Component } from "react";
+import { WithTranslation, withTranslation } from "react-i18next";
+import { I18nTranslation } from "../config/i18n";
 
 export interface SelectDialogProps {
-    readonly title: string;
+    readonly title: I18nTranslation;
     readonly open: boolean;
     readonly values: string[][];
     readonly onClose?: (value: string) => void;
     readonly onSelect?: (value: string) => void;
 }
 
-export default class SelectDialog extends Component<SelectDialogProps> {
+class SelectDialog extends Component<SelectDialogProps & WithTranslation> {
     render() {
-        const { title, open, values, onClose, onSelect } = this.props;
+        const { t, title, open, values, onClose, onSelect } = this.props;
         return (
             <Dialog onClose={onClose} open={open}>
-                <DialogTitle>{title}</DialogTitle>
+                <DialogTitle>{t(title.id, title.format)}</DialogTitle>
                 {values.map((item, index) => (
                     <ListItem key={index} disableGutters>
                         <ListItemButton
@@ -37,3 +39,5 @@ export default class SelectDialog extends Component<SelectDialogProps> {
         );
     }
 }
+
+export default withTranslation()(SelectDialog);

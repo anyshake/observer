@@ -1,23 +1,47 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
-import geophone from "../store/geophone";
 import { Geophone } from "./geophone";
-import adc from "../store/adc";
 import { ADC } from "./adc";
+import adc from "../store/adc";
+import geophone from "../store/geophone";
+import { persistReducer, persistStore } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+import scale from "../store/scale";
+import { IntensityStandardProperty } from "../helpers/seismic/intensityStandard";
 
-const reducer = combineReducers({ adc, geophone });
-const REDUX_STORE = configureStore({ reducer });
-process.env.NODE_ENV !== "production" &&
-    REDUX_STORE.subscribe(() => {
-        console.log(REDUX_STORE.getState());
-    });
+const scalePersistConfig = persistReducer(
+    {
+        storage,
+        key: "scale",
+        whitelist: ["scale"],
+    },
+    scale
+);
+const reducer = combineReducers({
+    adc,
+    geophone,
+    scale: scalePersistConfig,
+});
+
+const REDUX_STORE = configureStore({
+    reducer,
+    middleware: (getDefaultMiddleware) => {
+        return getDefaultMiddleware({
+            serializableCheck: false,
+        });
+    },
+});
+const REDUX_PRESIST = persistStore(REDUX_STORE);
 
 export interface ReduxStoreProps {
     readonly adc: ReduxStore["adc"];
+    readonly scale: ReduxStore["scale"];
     readonly geophone: ReduxStore["geophone"];
-    readonly updateADC: (adc: ADC) => void;
-    readonly updateGeophone: (geophone: Geophone) => void;
+    readonly updateADC?: (adc: ADC) => void;
+    readonly updateGeophone?: (geophone: Geophone) => void;
+    readonly updateScale?: (scale: IntensityStandardProperty) => void;
 }
 
 export type ReduxStore = ReturnType<typeof reducer>;
 export default REDUX_STORE;
+export { REDUX_PRESIST };

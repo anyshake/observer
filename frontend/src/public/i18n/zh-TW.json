@@ -1,0 +1,226 @@
+{
+    "config": {
+        "global": {
+            "name": "Observer",
+            "author": "Project ES",
+            "title": "Observer 測站面板",
+            "description": "雄心勃勃，致力於建置即時地震網路"
+        },
+        "menu": {
+            "title": "面板選單",
+            "list": {
+                "index": "當前站況",
+                "realtime": "即時波形",
+                "history": "歷史資料",
+                "setting": "面板設定"
+            }
+        },
+        "router": {
+            "error": "發生錯誤",
+            "index": "當前站況",
+            "realtime": "即時波形",
+            "history": "歷史資料",
+            "setting": "面板設定"
+        }
+    },
+    "components": {
+        "chart": {
+            "reset_zoom": "重置視圖",
+            "reset_zoom_title": "重置為初始視圖"
+        }
+    },
+    "views": {
+        "home": {
+            "banner": {
+                "warning": {
+                    "label": "正在連線伺服器",
+                    "text": "請稍等..."
+                },
+                "success": {
+                    "label": "{{ station }} 已連線",
+                    "text": "伺服器在線時長 {{ uptime }} 秒\n伺服器採用架構 {{ arch }}/{{ os }}\nUUID：{{ uuid }}"
+                },
+                "error": {
+                    "label": "連線失敗",
+                    "text": "無法連線到伺服器，請嘗試重新整理頁面或更換網路"
+                }
+            },
+            "areas": {
+                "cpu": {
+                    "label": "CPU 使用率",
+                    "text": "目前佔用率：{{ usage }}%"
+                },
+                "memory": {
+                    "label": "記憶體使用率",
+                    "text": "目前佔用率：{{ usage }}%"
+                }
+            },
+            "map": {
+                "area": {
+                    "label": "站點所在位置",
+                    "text": "經度：{{ longitude }} °\n緯度：{{ latitude }} °\n海拔：{{ altitude }} m"
+                }
+            },
+            "labels": {
+                "messages": {
+                    "label": "已解碼訊息量",
+                    "unit": "筆"
+                },
+                "errors": {
+                    "label": "幀錯誤訊息量",
+                    "unit": "筆"
+                },
+                "pushed": {
+                    "label": "已推送訊息量",
+                    "unit": "筆"
+                },
+                "failures": {
+                    "label": "推送失敗訊息量",
+                    "unit": "筆"
+                },
+                "queued": {
+                    "label": "等待推送訊息量",
+                    "unit": "筆"
+                },
+                "offset": {
+                    "label": "系統時間偏移量",
+                    "unit": "秒"
+                }
+            }
+        },
+        "realtime": {
+            "banner": {
+                "warning": {
+                    "label": "正在連線伺服器",
+                    "text": "請稍等..."
+                },
+                "success": {
+                    "label": "目前取樣率 {{ sampleRate }} Sps",
+                    "text": "目前震度標準 {{ scale }}\n資料更新於 {{ time }}"
+                },
+                "error": {
+                    "label": "連線失敗",
+                    "text": "正在嘗試重新連線，若長時間無法連線到伺服器，請嘗試重新整理頁面或更換網路"
+                }
+            },
+            "areas": {
+                "ehz": {
+                    "label": "EHZ 通道波形計數",
+                    "text": "PGA：{{ pga }} gal\nPGV：{{ pgv }} cm/s\n震度：{{ intensity }}"
+                },
+                "ehe": {
+                    "label": "EHE 通道波形計數",
+                    "text": "PGA：{{ pga }} gal\nPGV：{{ pgv }} cm/s\n震度：{{ intensity }}"
+                },
+                "ehn": {
+                    "label": "EHN 通道波形計數",
+                    "text": "PGA：{{ pga }} gal\nPGV：{{ pgv }} cm/s\n震度：{{ intensity }}"
+                }
+            },
+            "toasts": {
+                "websocket_connected": "WebSocket 連線已經建立",
+                "fetch_metadata_error": "取得測站資訊時發生錯誤，功能無法使用"
+            }
+        },
+        "history": {
+            "modals": {
+                "choose_event": {
+                    "title": "選擇一個地震事件"
+                }
+            },
+            "selects": {
+                "choose_channel": {
+                    "title": "選擇要匯出的通道"
+                },
+                "choose_source": {
+                    "title": "選擇地震資料來源"
+                }
+            },
+            "areas": {
+                "ehz": {
+                    "label": "EHZ 通道波形計數"
+                },
+                "ehe": {
+                    "label": "EHE 通道波形計數"
+                },
+                "ehn": {
+                    "label": "EHN 通道波形計數"
+                }
+            },
+            "cards": {
+                "query_history": "歷史查詢",
+                "analyse_history": "資料分析"
+            },
+            "buttons": {
+                "query_waveform": "調閱波形",
+                "query_sac_file": "資料下載",
+                "query_source": "事件反查"
+            },
+            "labels": {
+                "ehz_pga": {
+                    "label": "EHZ 峰值加速度",
+                    "unit": "gal"
+                },
+                "ehz_intensity": {
+                    "label": "EHZ 峰值震度",
+                    "unit": ""
+                },
+                "ehe_pga": {
+                    "label": "EHE 峰值加速度",
+                    "unit": "gal"
+                },
+                "ehe_intensity": {
+                    "label": "EHE 峰值震度",
+                    "unit": ""
+                },
+                "ehn_pga": {
+                    "label": "EHN 峰值加速度",
+                    "unit": "gal"
+                },
+                "ehn_intensity": {
+                    "label": "EHN 峰值震度",
+                    "unit": ""
+                }
+            },
+            "time_pickers": {
+                "start_time": "選擇起始時間",
+                "end_time": "選擇結束時間"
+            },
+            "toasts": {
+                "time_error": "請選擇正確的時間範圍",
+                "metadata_error": "取得測站資訊時發生錯誤，功能無法使用",
+                "is_exporting_sac": "正在匯出 SAC 格式波形，請稍候...",
+                "export_sac_success": "SAC 格式波形資料匯出成功",
+                "export_sac_error": "SAC 格式波形資料匯出失敗",
+                "is_fetching_source": "正在取得事件資料源，請稍候...",
+                "fetch_source_success": "事件資料源取得成功",
+                "fetch_source_error": "事件資料源取得失敗",
+                "is_fetching_events": "正在查詢地震事件資料，請稍候...",
+                "fetch_events_success": "地震事件查詢成功",
+                "fetch_events_error": "地震事件查詢失敗",
+                "is_fetching_waveform": "正在查詢歷史波形資料，請稍候...",
+                "fetch_waveform_success": "歷史波形資料查詢成功",
+                "fetch_waveform_error": "歷史波形資料查詢失敗"
+            }
+        },
+        "setting": {
+            "buttons": {
+                "select_scale": "選擇震度標準",
+                "purge_cache": "清除應用快取"
+            },
+            "cards": {
+                "select_scale": "震度標準",
+                "purge_cache": "重置應用"
+            },
+            "selects": {
+                "choose_scale": {
+                    "title": "選擇地震震度標準"
+                }
+            },
+            "toasts": {
+                "cache_purged": "應用程式快取已清除，頁面即將重新整理",
+                "scale_changed": "地震震度標準已更改為 {{ scale }}"
+            }
+        }
+    }
+}

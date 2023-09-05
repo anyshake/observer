@@ -8,6 +8,7 @@ import { ADC } from "../../config/adc";
 import { Geophone } from "../../config/geophone";
 import GLOBAL_CONFIG from "../../config/global";
 import { IntensityStandardProperty } from "../../helpers/seismic/intensityStandard";
+import getCounts from "../../helpers/seismic/getCounts";
 
 const setAreas = (
     obj: RealtimeArea[],
@@ -31,18 +32,20 @@ const setAreas = (
         const timeSpan = timeDiff / sampleRate;
 
         // Get voltage, velocity, acceleration
-        const voltage = getVoltage(data[i], adc.resolution, adc.fullscale);
+        const channelData = data[i];
+        const counts = getCounts(channelData); // Offset data to center around 0
+        const voltage = getVoltage(counts, adc.resolution, adc.fullscale);
         const velocity = getVelocity(voltage, gp[i]);
         const acceleration = getAcceleration(velocity, timeSpan / timeDiff);
 
-        // Fill data queue with acceleration
+        // Fill data queue with raw count
         const srcArr = obj.find((item) => item.tag === i)?.chart.series?.data;
         const newArr = [];
-        for (let j = 0; j < acceleration.length; j++) {
-            newArr.push([ts - (sampleRate - j) * timeSpan, acceleration[j]]);
+        for (let j = 0; j < counts.length; j++) {
+            newArr.push([ts - (sampleRate - j) * timeSpan, counts[j]]);
         }
 
-        // remove old data and add new data
+        // Merge data queue with raw count
         const resultArr = getQueueArray(srcArr, newArr, length * sampleRate);
         setObjectByPath(obj, `[tag:${i}]>chart>series>data`, resultArr);
 
@@ -66,14 +69,15 @@ const setAreas = (
         // Get intensity
         const intensity = scaleStandard?.intensity(pgv, pga);
 
-        // Set PGV, PGA, Intensity in area
-        setObjectByPath(
-            obj,
-            `[tag:${i}]>area>text`,
-            `PGA：${pga.toFixed(5)} gal\n
-            PGV：${pgv.toFixed(5)} cm/s\n
-            震度：${scale.value} 震度 ${intensity}`
-        );
+        // Set PGV, PGA, intensity in area field
+        setObjectByPath(obj, `[tag:${i}]>area>text`, {
+            id: `views.realtime.areas.${i}.text`,
+            format: {
+                pga: pga.toFixed(5),
+                pgv: pgv.toFixed(5),
+                intensity: `${scale.value} ${intensity}`,
+            },
+        });
     }
 
     return obj;
