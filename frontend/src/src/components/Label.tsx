@@ -1,18 +1,20 @@
 import { Component } from "react";
+import { I18nTranslation } from "../config/i18n";
+import { WithTranslation, withTranslation } from "react-i18next";
 
 export interface LabelProps {
     readonly className?: string;
     readonly tag?: string;
-    readonly label: string;
-    readonly value: string;
-    readonly unit: string;
     readonly icon?: string;
     readonly color?: boolean;
+    readonly value: string;
+    readonly unit: I18nTranslation;
+    readonly label: I18nTranslation;
 }
 
-export default class Label extends Component<LabelProps> {
+class Label extends Component<LabelProps & WithTranslation> {
     render() {
-        const { className, icon, label, value, unit, color } = this.props;
+        const { t, className, icon, label, value, unit, color } = this.props;
         return (
             <div className={`w-full p-2 ${className}`}>
                 <div
@@ -38,15 +40,14 @@ export default class Label extends Component<LabelProps> {
                                 color ? `text-gray-50` : `text-gray-600`
                             }`}
                         >
-                            {label}
+                            {t(label.id, label.format)}
                         </div>
                         <div
-                            className={`text-md font-medium ${
+                            className={`text-md font-medium flex-nowrap ${
                                 color ? `text-gray-100` : `text-gray-800`
                             }`}
                         >
-                            {value}
-                            <span className="text-lg px-2">{unit}</span>
+                            {`${value} ${t(unit.id, unit.format)}`}
                         </div>
                     </div>
                 </div>
@@ -54,3 +55,5 @@ export default class Label extends Component<LabelProps> {
         );
     }
 }
+
+export default withTranslation()(Label);

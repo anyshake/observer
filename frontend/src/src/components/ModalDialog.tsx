@@ -11,24 +11,26 @@ import {
     ListItemButton,
 } from "@mui/material";
 import { Component } from "react";
+import { I18nTranslation } from "../config/i18n";
+import { WithTranslation, withTranslation } from "react-i18next";
 
 export interface ModalDialogProps {
     readonly open: boolean;
-    readonly title: string;
     readonly values: string[][];
     readonly onClose?: () => void;
+    readonly title: I18nTranslation;
     readonly onSelect?: (value: string) => void;
 }
 
-export default class ModalDialog extends Component<ModalDialogProps> {
+class ModalDialog extends Component<ModalDialogProps & WithTranslation> {
     render() {
-        const { title, open, values, onClose, onSelect } = this.props;
+        const { t, title, open, values, onClose, onSelect } = this.props;
         return (
             <Dialog fullWidth open={open}>
                 <AppBar className="bg-purple-500" sx={{ position: "relative" }}>
                     <Toolbar>
                         <Typography sx={{ ml: 2, flex: 1 }} variant="h6">
-                            {title}
+                            {t(title.id, title.format)}
                         </Typography>
                         <Button autoFocus color="inherit" onClick={onClose}>
                             X
@@ -59,3 +61,5 @@ export default class ModalDialog extends Component<ModalDialogProps> {
         );
     }
 }
+
+export default withTranslation()(ModalDialog);

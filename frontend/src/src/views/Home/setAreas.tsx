@@ -11,16 +11,17 @@ const setAreas = (
     const tags = ["cpu", "memory"];
 
     for (let i of tags) {
+        // Get percent by tag
         const percent = res.data[i].percent as number;
+        // Create new array, get source array
         const newArr = [Date.now(), percent];
         const srcArr = obj.find((item) => item.tag === i)?.chart.series?.data;
-
+        // Merge new array with source array
         const result = getQueueArray(srcArr, newArr, length);
-        setObjectByPath(
-            obj,
-            `[tag:${i}]>area>text`,
-            `当前占用率：${percent.toFixed(2)}%`
-        );
+        setObjectByPath(obj, `[tag:${i}]>area>text`, {
+            id: `views.home.areas.${i}.text`,
+            format: { usage: percent.toFixed(2) },
+        });
         setObjectByPath(obj, `[tag:${i}]>chart>series>data`, result);
     }
 

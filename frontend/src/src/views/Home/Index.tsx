@@ -18,16 +18,20 @@ import PlaneIcon from "../../assets/icons/paper-plane-solid.svg";
 import ErrorIcon from "../../assets/icons/circle-xmark-solid.svg";
 import TimerIcon from "../../assets/icons/hourglass-half-solid.svg";
 import ClockIcon from "../../assets/icons/clock-solid.svg";
-import restfulApiByTag, { ApiResponse } from "../../helpers/request/restfulApiByTag";
+import restfulApiByTag, {
+    ApiResponse,
+} from "../../helpers/request/restfulApiByTag";
 import Polling from "../../components/Polling";
 import setBanner from "./setBanner";
 import setLabels from "./setLabels";
 import setMap from "./setMap";
 import setAreas from "./setAreas";
 import { connect } from "react-redux";
-import { ReduxStore, ReduxStoreProps } from "../../config/store";
+import { ReduxStoreProps } from "../../config/store";
 import { update as updateADC } from "../../store/adc";
 import { update as updateGeophone } from "../../store/geophone";
+import mapStateToProps from "../../helpers/utils/mapStateToProps";
+import { WithTranslation, withTranslation } from "react-i18next";
 
 // 120s by default
 const QUENE_LENGTH = 120;
@@ -50,61 +54,61 @@ export interface HomeState {
     readonly map: HomeMap;
 }
 
-class Home extends Component<ReduxStoreProps, HomeState> {
-    constructor(props: ReduxStoreProps) {
+class Home extends Component<ReduxStoreProps & WithTranslation, HomeState> {
+    constructor(props: ReduxStoreProps & WithTranslation) {
         super(props);
         this.state = {
             banner: {
                 type: "warning",
-                label: "正在连接服务器",
-                text: "请稍等...",
+                label: { id: "views.home.banner.warning.label" },
+                text: { id: "views.home.banner.warning.text" },
             },
             labels: [
                 {
                     tag: "messages",
-                    label: "已解码讯息量",
+                    label: { id: "views.home.labels.messages.label" },
+                    unit: { id: "views.home.labels.messages.unit" },
                     value: "0",
-                    unit: "条",
                     icon: CheckIcon,
                     color: true,
                 },
                 {
                     tag: "errors",
-                    label: "帧错误讯息量",
+                    label: { id: "views.home.labels.errors.label" },
+                    unit: { id: "views.home.labels.errors.unit" },
                     value: "0",
-                    unit: "条",
                     icon: BugIcon,
                     color: true,
                 },
                 {
                     tag: "pushed",
-                    label: "已推送讯息量",
+                    label: { id: "views.home.labels.pushed.label" },
+                    unit: { id: "views.home.labels.pushed.unit" },
                     value: "0",
-                    unit: "条",
                     icon: PlaneIcon,
                     color: true,
                 },
                 {
                     tag: "failures",
-                    label: "推送失败讯息量",
+                    label: { id: "views.home.labels.failures.label" },
+                    unit: { id: "views.home.labels.failures.unit" },
                     value: "0",
-                    unit: "条",
                     icon: ErrorIcon,
                     color: true,
                 },
                 {
                     tag: "queued",
-                    label: "等待推送讯息量",
+                    label: { id: "views.home.labels.queued.label" },
+                    unit: { id: "views.home.labels.queued.unit" },
                     value: "0",
-                    unit: "条",
                     icon: TimerIcon,
                     color: true,
                 },
                 {
                     tag: "offset",
-                    label: "系统时间偏移量",
+                    label: { id: "views.home.labels.offset.label" },
+                    unit: { id: "views.home.labels.offset.unit" },
                     value: "0",
-                    unit: "秒",
                     icon: ClockIcon,
                     color: true,
                 },
@@ -113,8 +117,11 @@ class Home extends Component<ReduxStoreProps, HomeState> {
                 {
                     tag: "cpu",
                     area: {
-                        label: "CPU 占用率",
-                        text: "当前占用率：正在获取中",
+                        label: { id: "views.home.areas.cpu.label" },
+                        text: {
+                            id: "views.home.areas.cpu.text",
+                            format: { usage: "0.00%" },
+                        },
                     },
                     chart: {
                         backgroundColor: "#22c55e",
@@ -130,8 +137,11 @@ class Home extends Component<ReduxStoreProps, HomeState> {
                 {
                     tag: "memory",
                     area: {
-                        label: "RAM 占用率",
-                        text: "当前占用率：正在获取中",
+                        label: { id: "views.home.areas.memory.label" },
+                        text: {
+                            id: "views.home.areas.memory.text",
+                            format: { usage: "0.00%" },
+                        },
                     },
                     chart: {
                         backgroundColor: "#06b6d4",
@@ -147,8 +157,15 @@ class Home extends Component<ReduxStoreProps, HomeState> {
             ],
             map: {
                 area: {
-                    label: "测站所在位置",
-                    text: "正在加载位置资讯",
+                    label: { id: "views.home.map.area.label" },
+                    text: {
+                        id: "views.home.map.area.text",
+                        format: {
+                            altitude: "0.00",
+                            latitude: "0.00",
+                            longitude: "0.00",
+                        },
+                    },
                 },
                 instance: {
                     zoom: 6,
@@ -162,16 +179,20 @@ class Home extends Component<ReduxStoreProps, HomeState> {
         };
     }
 
+    // Handler for Polling component to fetch status from server
     handleFetch = async (tag: string): Promise<ApiResponse> => {
         const res = await restfulApiByTag({ tag });
         return res;
     };
 
+    // Handler for Polling component to handle error
     handleError = (): void => {
+        // setBanner returns error when no arguments passed
         const banner = setBanner();
         this.setState({ banner });
     };
 
+    // Handler for Polling component to process server response
     handleData = (res: ApiResponse): void => {
         const { error } = res;
         const banner = setBanner(res);
@@ -180,17 +201,18 @@ class Home extends Component<ReduxStoreProps, HomeState> {
             // Update ADC & Geophone
             const { adc, geophone } = res.data;
             const { updateADC, updateGeophone } = this.props;
-            // Update redux store
-            updateGeophone(geophone);
-            updateADC(adc);
-            // Update labels state
+            // Update status labels
             const map = setMap(this.state.map, res);
             const labels = setLabels(this.state.labels, res);
             const areas = setAreas(this.state.areas, res, QUENE_LENGTH);
-            // Update this.state
+            // Update component state
             this.setState({ labels, areas, map });
+            // Apply ADC & Geophone parameters to Redux store
+            updateGeophone && updateGeophone(geophone);
+            updateADC && updateADC(adc);
         }
 
+        // Update banner
         this.setState({ banner });
     };
 
@@ -206,7 +228,6 @@ class Home extends Component<ReduxStoreProps, HomeState> {
                 <Content>
                     <Navbar />
                     <Polling
-                        retry={3}
                         timer={1000}
                         tag={"station"}
                         onData={this.handleData}
@@ -248,11 +269,7 @@ class Home extends Component<ReduxStoreProps, HomeState> {
     }
 }
 
-const mapStateToProps = (state: ReduxStore) => {
-    return { ...state };
-};
-
 export default connect(mapStateToProps, {
     updateGeophone,
     updateADC,
-})(Home);
+})(withTranslation()(Home));

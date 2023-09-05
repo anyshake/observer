@@ -1,18 +1,25 @@
 import { BannerProps } from "../../components/Banner";
+import { I18nTranslation } from "../../config/i18n";
 import { ApiResponse } from "../../helpers/request/restfulApiByTag";
 
 const setBanner = (res?: ApiResponse): BannerProps => {
-    const { error, message } = res || {};
+    // Parse response, empty response means error
+    const { error } = res || {};
     const { uuid, station, uptime, os } = res?.data || {};
 
-    let label = "连接失败";
-    let text = "无法连接到服务器，请尝试刷新页面或更换网络";
+    // Error banner by default
+    let label = { id: "views.home.banner.error.label" } as I18nTranslation;
+    let text = { id: "views.home.banner.error.text" } as I18nTranslation;
+    // Change to success banner and return if no error
     if (!error) {
-        label = `连接成功：${station}`;
-        text = `${message}\n
-                服务器在线时长 ${uptime} 秒\n
-                服务器采用架构 ${os.arch}/${os.os}\n
-                UUID：${uuid}\n`;
+        label = {
+            id: "views.home.banner.success.label",
+            format: { station },
+        };
+        text = {
+            id: "views.home.banner.success.text",
+            format: { ...os, uptime, uuid },
+        };
     }
 
     return {

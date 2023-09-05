@@ -3,18 +3,24 @@ import { HomeMap } from "./Index";
 
 const setMap = (obj: HomeMap, res: ApiResponse): HomeMap => {
     const { location } = res.data;
+    const { longitude, latitude, altitude } = location;
     return {
         ...obj,
         area: {
             ...obj.area,
-            text: `测站经度：${location.longitude} °\n
-                测站纬度：${location.latitude} °\n
-                测站海拔：${location.altitude} m`,
+            text: {
+                id: "views.home.map.area.text",
+                format: {
+                    altitude: altitude.toFixed(2),
+                    latitude: latitude.toFixed(2),
+                    longitude: longitude.toFixed(2),
+                },
+            },
         },
         instance: {
             ...obj.instance,
-            center: [location.latitude, location.longitude],
-            marker: [location.latitude, location.longitude],
+            center: [latitude, longitude],
+            marker: [latitude, longitude],
         },
     };
 };

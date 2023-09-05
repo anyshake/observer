@@ -4,9 +4,11 @@ import HomeIcon from "../assets/icons/house-solid.svg";
 import ArrowIcon from "../assets/icons/angle-right-solid.svg";
 import getRouterUri from "../helpers/router/getRouterUri";
 import getRouterTitle from "../helpers/router/getRouterTitle";
+import { WithTranslation, withTranslation } from "react-i18next";
 
-export default class Navbar extends Component<{}> {
+class Navbar extends Component<WithTranslation> {
     render() {
+        const { t } = this.props;
         const uri = getRouterUri();
         const title = getRouterTitle();
 
@@ -16,26 +18,26 @@ export default class Navbar extends Component<{}> {
                     <li className="cursor-pointer hover:text-gray-900">
                         <Link className="flex" to={"/"}>
                             <img
-                                className="self-center w-4 h-4"
+                                className="my-2 w-5 h-4 mr-2"
                                 src={HomeIcon}
                                 alt=""
                             />
-                            <span className="ml-2">主页</span>
+                            <span className="my-2">/</span>
                         </Link>
                     </li>
 
                     {uri !== "/" && (
                         <li className="flex">
                             <img
-                                className="self-center w-4 h-4"
+                                className="self-center w-4 h-4 mr-2"
                                 src={ArrowIcon}
                                 alt=""
                             />
                             <Link
-                                className="ml-2 cursor-pointer hover:text-gray-900"
+                                className="my-2 cursor-pointer hover:text-gray-900"
                                 to={uri}
                             >
-                                {title}
+                                {t(title)}
                             </Link>
                         </li>
                     )}
@@ -44,3 +46,5 @@ export default class Navbar extends Component<{}> {
         );
     }
 }
+
+export default withTranslation()(Navbar);

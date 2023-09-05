@@ -20,12 +20,13 @@ import setAreas from "./setAreas";
 import { Geophone } from "../../config/geophone";
 import { ADC } from "../../config/adc";
 import { IntensityStandardProperty } from "../../helpers/seismic/intensityStandard";
-import getLocalStorage from "../../helpers/storage/getLocalStorage";
 import { fallbackScale } from "../../config/global";
-import { ReduxStore, ReduxStoreProps } from "../../config/store";
+import { ReduxStoreProps } from "../../config/store";
 import { connect } from "react-redux";
 import { update as updateADC } from "../../store/adc";
 import { update as updateGeophone } from "../../store/geophone";
+import mapStateToProps from "../../helpers/utils/mapStateToProps";
+import { WithTranslation, withTranslation } from "react-i18next";
 
 // 180s by default
 const QUENE_LENGTH = 180;
@@ -44,23 +45,33 @@ interface RealtimeState {
     readonly scale: IntensityStandardProperty;
 }
 
-class Realtime extends Component<ReduxStoreProps, RealtimeState> {
+class Realtime extends Component<
+    ReduxStoreProps & WithTranslation,
+    RealtimeState
+> {
     prevTs: number;
-    websocket: WebSocket | null;
-    constructor(props: ReduxStoreProps) {
+    websocket: WebSocket | null | {};
+    constructor(props: ReduxStoreProps & WithTranslation) {
         super(props);
         this.state = {
             banner: {
                 type: "warning",
-                label: "正在连接服务器",
-                text: "请稍等...",
+                label: { id: "views.realtime.banner.warning.label" },
+                text: { id: "views.realtime.banner.warning.text" },
             },
             areas: [
                 {
                     tag: "ehz",
                     area: {
-                        label: "EHZ 通道加速度",
-                        text: "PGA：正在获取中\nPGV：正在获取中\n震度：正在获取中",
+                        label: { id: "views.realtime.areas.ehz.label" },
+                        text: {
+                            id: "views.realtime.areas.ehz.text",
+                            format: {
+                                pga: "0.00000",
+                                pgv: "0.00000",
+                                intensity: "Unknown",
+                            },
+                        },
                     },
                     chart: {
                         backgroundColor: "#d97706",
@@ -77,8 +88,15 @@ class Realtime extends Component<ReduxStoreProps, RealtimeState> {
                 {
                     tag: "ehe",
                     area: {
-                        label: "EHE 通道加速度",
-                        text: "PGA：正在获取中\nPGV：正在获取中\n震度：正在获取中",
+                        label: { id: "views.realtime.areas.ehe.label" },
+                        text: {
+                            id: "views.realtime.areas.ehe.text",
+                            format: {
+                                pga: "0.00000",
+                                pgv: "0.00000",
+                                intensity: "Unknown",
+                            },
+                        },
                     },
                     chart: {
                         backgroundColor: "#10b981",
@@ -95,8 +113,15 @@ class Realtime extends Component<ReduxStoreProps, RealtimeState> {
                 {
                     tag: "ehn",
                     area: {
-                        label: "EHN 通道加速度",
-                        text: "PGA：正在获取中\nPGV：正在获取中\n震度：正在获取中",
+                        label: { id: "views.realtime.areas.ehn.label" },
+                        text: {
+                            id: "views.realtime.areas.ehn.text",
+                            format: {
+                                pga: "0.00000",
+                                pgv: "0.00000",
+                                intensity: "Unknown",
+                            },
+                        },
                     },
                     chart: {
                         backgroundColor: "#0ea5e9",
@@ -122,29 +147,40 @@ class Realtime extends Component<ReduxStoreProps, RealtimeState> {
             },
             scale: fallbackScale.property(),
         };
-        this.prevTs = 0;
+        // Some initializations
         this.websocket = null;
+        this.prevTs = 0;
     }
 
+    // WebSocket OnOpen handler
     handleWebsocketOpen = (): void => {
+        // Display success message after connection established
         setTimeout(() => {
-            toast.success("Websocket 连线已经建立");
+            const { t } = this.props;
+            toast.success(t("views.realtime.toasts.websocket_connected"));
         }, 500);
     };
 
+    // WebSocket OnClose handler
     handleWebsocketClose = (): void => {
-        // Display error message
-        const banner = setBanner();
-        this.setState({ banner });
-        // Reconnect to server
-        this.websocket = websocketByTag({
-            tag: "socket",
-            onData: this.handleWebsocketData,
-            onOpen: this.handleWebsocketOpen,
-            onClose: this.handleWebsocketClose,
-        }) as WebSocket;
+        // Reconnect to server if websocket closed
+        // Unless leaving the component, the ref will be {}
+        // So we can use instanceof to check if still in component
+        if (this.websocket && this.websocket instanceof WebSocket) {
+            // setBanner returns error when no arguments passed
+            const banner = setBanner();
+            this.setState({ banner });
+            // Reconnect to server
+            this.websocket = websocketByTag({
+                tag: "socket",
+                onData: this.handleWebsocketData,
+                onOpen: this.handleWebsocketOpen,
+                onClose: this.handleWebsocketClose,
+            }) as WebSocket;
+        }
     };
 
+    // WebSocket OnData handler
     handleWebsocketData = (event: MessageEvent): void => {
         const { adc, geophone, scale } = this.state;
         const jsonData = JSON.parse(event.data);
@@ -164,39 +200,37 @@ class Realtime extends Component<ReduxStoreProps, RealtimeState> {
     };
 
     async componentDidMount(): Promise<void> {
-        // Get scale standard from localStorage or fallback
-        const scale = getLocalStorage(
-            "scale",
-            fallbackScale.property(),
-            true
-        ) as IntensityStandardProperty;
-        // Get ADC & Geophone parameters from redux
+        // Get ADC, Geophone, scale standard from Redux
         let { adc } = this.props.adc;
+        const { scale } = this.props.scale;
         let { geophone } = this.props.geophone;
-        // Query ADC & Geophone parameters from server
-        const { resolution } = adc;
         const { ehz, ehe, ehn } = geophone;
+        const { resolution } = adc;
+
+        // Query again from server if value is not set
         if (resolution === -1 || ehz * ehe * ehn === 0) {
             const res = await restfulApiByTag({
                 tag: "station",
             });
             if (res.data) {
-                // Get new state
-                adc = setADC(res);
+                // Get new formatted state
                 geophone = setGeophone(res);
-                // Update redux
+                adc = setADC(res);
+                // Apply to Redux store
                 const { updateADC, updateGeophone } = this.props;
-                updateGeophone(geophone);
-                updateADC(adc);
+                updateGeophone && updateGeophone(geophone);
+                updateADC && updateADC(adc);
             } else {
-                const error = "取得测站资讯时发生错误，功能无法使用";
-                toast.error(error);
-                return Promise.reject(error);
+                // Show error and return if failed
+                const { t } = this.props;
+                toast.error(t("views.realtime.toasts.fetch_metadata_error"));
+                return;
             }
         }
-        // Update state
+
+        // Apply to component state
         this.setState({ adc, geophone, scale });
-        // Dail WebSocket
+        // Establish websocket connection
         this.websocket = websocketByTag({
             tag: "socket",
             onData: this.handleWebsocketData,
@@ -206,10 +240,10 @@ class Realtime extends Component<ReduxStoreProps, RealtimeState> {
     }
 
     componentWillUnmount(): void {
-        // Close websocket
-        if (this.websocket) {
-            this.websocket.close();
-            this.websocket = null;
+        // Close websocket connection when leaving
+        if (this.websocket instanceof WebSocket) {
+            this.websocket?.close();
+            this.websocket = {};
         }
     }
 
@@ -231,8 +265,8 @@ class Realtime extends Component<ReduxStoreProps, RealtimeState> {
                                     tooltip={true}
                                     zooming={true}
                                     animation={false}
-                                    tickPrecision={0.4}
-                                    tickInterval={0.0001}
+                                    tickPrecision={1}
+                                    tickInterval={10}
                                 />
                             </Area>
                         ))}
@@ -247,11 +281,7 @@ class Realtime extends Component<ReduxStoreProps, RealtimeState> {
     }
 }
 
-const mapStateToProps = (state: ReduxStore) => {
-    return { ...state };
-};
-
 export default connect(mapStateToProps, {
     updateGeophone,
     updateADC,
-})(Realtime);
+})(withTranslation()(Realtime));

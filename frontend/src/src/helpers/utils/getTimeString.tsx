@@ -1,4 +1,4 @@
-const getTimeString = (ts: number): String => {
+const getTimeString = (ts: number): string => {
     const date = new Date(ts);
 
     const year = date.getFullYear();

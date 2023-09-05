@@ -6,27 +6,40 @@ import {
 } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { zhCN } from "@mui/x-date-pickers/locales";
-import zh from "date-fns/locale/zh-CN";
+import * as XDatePickers from "@mui/x-date-pickers/locales";
+import * as DateFnsLang from "date-fns/locale";
+import getLanguage from "../helpers/i18n/getLanguage";
+import { WithTranslation, withTranslation } from "react-i18next";
+import { I18nTranslation } from "../config/i18n";
 
 export interface TimePickerProps {
-    readonly label: string;
     readonly value?: number;
     readonly defaultValue?: number;
+    readonly label: I18nTranslation;
     readonly onChange: (value: number) => void;
 }
 
-export default class TimePicker extends Component<TimePickerProps> {
+const languageConfig: Record<string, { theme: any; adapterLocale: Locale }> = {
+    "zh-CN": { theme: XDatePickers.zhCN, adapterLocale: DateFnsLang.zhCN },
+    "zh-TW": { theme: XDatePickers.zhHK, adapterLocale: DateFnsLang.zhTW },
+    "en-US": { theme: XDatePickers.enUS, adapterLocale: DateFnsLang.enUS },
+    "ja-JP": { theme: XDatePickers.jaJP, adapterLocale: DateFnsLang.ja },
+    "ko-KR": { theme: XDatePickers.koKR, adapterLocale: DateFnsLang.ko },
+};
+
+class TimePicker extends Component<TimePickerProps & WithTranslation> {
     render() {
-        const { label, onChange, value, defaultValue } = this.props;
+        const { t, label, onChange, value, defaultValue } = this.props;
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const theme = createTheme({}, zhCN);
+
+        const i18n = getLanguage();
+        const theme = createTheme({}, languageConfig[i18n].theme);
 
         return (
             <ThemeProvider theme={theme}>
                 <LocalizationProvider
                     dateAdapter={AdapterDateFns}
-                    adapterLocale={zh}
+                    adapterLocale={languageConfig[i18n].adapterLocale}
                 >
                     <DateTimePicker
                         className="w-full"
@@ -48,7 +61,7 @@ export default class TimePicker extends Component<TimePickerProps> {
                             const val = value?.valueOf();
                             onChange(val as number);
                         }}
-                        label={`${label}（时区 ${timezone}）`}
+                        label={`${t(label.id, label.format)} - ${timezone}`}
                         defaultValue={defaultValue}
                         value={value}
                         ampm={false}
@@ -58,3 +71,5 @@ export default class TimePicker extends Component<TimePickerProps> {
         );
     }
 }
+
+export default withTranslation()(TimePicker);

@@ -8,9 +8,9 @@ import {
 import withRouter from "./helpers/router/withRouter";
 import ROUTER_CONFIG from "./config/router";
 import GLOBAL_CONFIG from "./config/global";
-import Loader from "./views/Loader";
-import NotFound from "./views/NotFound";
+import NotFound from "./components/NotFound";
 import getAsciiArt from "./helpers/app/getAsciiArt";
+import PageLoader from "./components/PageLoader";
 
 export default class App extends Component {
     componentDidMount(): void {
@@ -37,13 +37,13 @@ export default class App extends Component {
         const Routes = withRouter(router);
         return routerMode === "hash" ? (
             <HashRouter>
-                <Suspense fallback={<Loader />}>
+                <Suspense fallback={<PageLoader />}>
                     <Routes />
                 </Suspense>
             </HashRouter>
         ) : (
             <BrowserRouter>
-                <Suspense fallback={<Loader />}>
+                <Suspense fallback={<PageLoader />}>
                     <Routes />
                 </Suspense>
             </BrowserRouter>

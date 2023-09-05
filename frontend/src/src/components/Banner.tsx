@@ -2,16 +2,18 @@ import { Component } from "react";
 import SuccessIcon from "../assets/icons/rss-solid.svg";
 import WarningIcon from "../assets/icons/link-solid.svg";
 import ErrorIcon from "../assets/icons/link-slash-solid.svg";
+import { WithTranslation, withTranslation } from "react-i18next";
+import { I18nTranslation } from "../config/i18n";
 
 export interface BannerProps {
+    readonly text: I18nTranslation;
+    readonly label: I18nTranslation;
     readonly type: "success" | "warning" | "error";
-    readonly label: string;
-    readonly text: string;
 }
 
-export default class Banner extends Component<BannerProps> {
+class Banner extends Component<BannerProps & WithTranslation> {
     render() {
-        const { type, label, text } = this.props;
+        const { t, type, label, text } = this.props;
 
         let icon = ErrorIcon;
         let colorClassName = "";
@@ -37,16 +39,23 @@ export default class Banner extends Component<BannerProps> {
                 <div className="flex flex-col gap-y-2">
                     <div className="flex gap-2 font-bold text-lg">
                         <img className="w-6 h-6" src={icon} alt="" />
-                        <span>{label}</span>
+                        <span>{t(label.id, label.format)}</span>
                     </div>
 
                     <span className="pl-3 text-md font-medium">
-                        {text.split("\n").map((item, index) => (
-                            <p key={index}>{item}</p>
-                        ))}
+                        {t(text.id, text.format)
+                            .split("\n")
+                            .map((item: string, key: number) => (
+                                <p key={key}>
+                                    {item}
+                                    <br />
+                                </p>
+                            ))}
                     </span>
                 </div>
             </div>
         );
     }
 }
+
+export default withTranslation()(Banner);

@@ -1,17 +1,21 @@
 import { Component, ReactNode } from "react";
 import getRouterTitle from "../helpers/router/getRouterTitle";
 import GLOBAL_CONFIG from "../config/global";
+import { connect } from "react-redux";
+import mapStateToProps from "../helpers/utils/mapStateToProps";
+import { withTranslation, WithTranslation } from "react-i18next";
 
-export interface ViewProps {
+export interface ViewProps extends WithTranslation {
     readonly className?: string;
     readonly children?: ReactNode;
 }
 
-export default class View extends Component<ViewProps> {
+class View extends Component<ViewProps> {
     componentDidMount(): void {
+        const { t } = this.props;
         const subtitle = getRouterTitle();
         const { title } = GLOBAL_CONFIG.app_settings;
-        document.title = `${subtitle} | ${title}`;
+        document.title = `${t(subtitle)} | ${t(title)}`;
     }
 
     render() {
@@ -19,3 +23,5 @@ export default class View extends Component<ViewProps> {
         return <div className={className}>{children}</div>;
     }
 }
+
+export default connect(mapStateToProps)(withTranslation()(View));

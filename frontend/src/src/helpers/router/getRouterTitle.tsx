@@ -9,7 +9,7 @@ const getRouterTitle = (): string => {
         }
     }
 
-    return "发生错误";
+    return "config.router.error";
 };
 
 export default getRouterTitle;

@@ -6,7 +6,7 @@ import (
 	"github.com/bclswl0827/observer/config"
 )
 
-func Init(config *config.Conf, status *Status) {
+func Initialize(config *config.Conf, status *Status) {
 	status.System = &System{}
 	status.Buffer = &Geophone{
 		EHZ: []int32{},
