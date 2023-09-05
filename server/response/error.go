@@ -18,7 +18,7 @@ func Error(c *gin.Context, code int) {
 			Path:    currentPath,
 			Time:    currentTime,
 			Status:  http.StatusBadRequest,
-			Message: "无法处理此请求",
+			Message: "Unable to process this request",
 		})
 	case 401:
 		c.JSON(http.StatusUnauthorized, HttpResponse{
@@ -26,7 +26,7 @@ func Error(c *gin.Context, code int) {
 			Path:    currentPath,
 			Time:    currentTime,
 			Status:  http.StatusUnauthorized,
-			Message: "未经授权的访问",
+			Message: "Unauthorized access",
 		})
 	case 403:
 		c.JSON(http.StatusForbidden, HttpResponse{
@@ -34,7 +34,7 @@ func Error(c *gin.Context, code int) {
 			Path:    currentPath,
 			Time:    currentTime,
 			Status:  http.StatusForbidden,
-			Message: "请求被禁止",
+			Message: "Request is forbidden",
 		})
 	case 404:
 		c.JSON(http.StatusNotFound, HttpResponse{
@@ -42,7 +42,7 @@ func Error(c *gin.Context, code int) {
 			Path:    currentPath,
 			Time:    currentTime,
 			Status:  http.StatusNotFound,
-			Message: "无法找到此资源",
+			Message: "Could not find this resource",
 		})
 	case 405:
 		c.JSON(http.StatusMethodNotAllowed, HttpResponse{
@@ -50,7 +50,7 @@ func Error(c *gin.Context, code int) {
 			Path:    currentPath,
 			Time:    currentTime,
 			Status:  http.StatusMethodNotAllowed,
-			Message: "请求方法不被允许",
+			Message: "Request method is not allowed",
 		})
 	case 410:
 		c.JSON(http.StatusMethodNotAllowed, HttpResponse{
@@ -58,7 +58,7 @@ func Error(c *gin.Context, code int) {
 			Path:    currentPath,
 			Time:    currentTime,
 			Status:  http.StatusMethodNotAllowed,
-			Message: "所请求资源不可用",
+			Message: "The requested resource is not available",
 		})
 	case 413:
 		c.JSON(http.StatusMethodNotAllowed, HttpResponse{
@@ -66,7 +66,7 @@ func Error(c *gin.Context, code int) {
 			Path:    currentPath,
 			Time:    currentTime,
 			Status:  http.StatusMethodNotAllowed,
-			Message: "请求超出数据限制",
+			Message: "Request exceeds data limit",
 		})
 	case 429:
 		c.JSON(http.StatusTooManyRequests, HttpResponse{
@@ -74,7 +74,7 @@ func Error(c *gin.Context, code int) {
 			Path:    currentPath,
 			Time:    currentTime,
 			Status:  http.StatusTooManyRequests,
-			Message: "请求过于频繁",
+			Message: "Too many requests",
 		})
 	case 500:
 		c.JSON(http.StatusInternalServerError, HttpResponse{
@@ -82,7 +82,7 @@ func Error(c *gin.Context, code int) {
 			Path:    currentPath,
 			Time:    currentTime,
 			Status:  http.StatusInternalServerError,
-			Message: "服务器内部错误",
+			Message: "Server internal error",
 		})
 	case 502:
 		c.JSON(http.StatusBadGateway, HttpResponse{
@@ -90,7 +90,7 @@ func Error(c *gin.Context, code int) {
 			Path:    currentPath,
 			Time:    currentTime,
 			Status:  http.StatusBadGateway,
-			Message: "服务器网关错误",
+			Message: "Server gateway error",
 		})
 	case 503:
 		c.JSON(http.StatusServiceUnavailable, HttpResponse{
@@ -98,7 +98,7 @@ func Error(c *gin.Context, code int) {
 			Path:    currentPath,
 			Time:    currentTime,
 			Status:  http.StatusServiceUnavailable,
-			Message: "服务目前不可用",
+			Message: "Service is currently unavailable",
 		})
 	case 504:
 		c.JSON(http.StatusGatewayTimeout, HttpResponse{
@@ -106,7 +106,7 @@ func Error(c *gin.Context, code int) {
 			Path:    currentPath,
 			Time:    currentTime,
 			Status:  http.StatusGatewayTimeout,
-			Message: "服务器网关超时",
+			Message: "Server gateway timeout",
 		})
 	default:
 		c.JSON(http.StatusSeeOther, HttpResponse{
@@ -114,7 +114,7 @@ func Error(c *gin.Context, code int) {
 			Path:    currentPath,
 			Time:    currentTime,
 			Status:  http.StatusSeeOther,
-			Message: "未知错误",
+			Message: "Unknown error occurred",
 		})
 	}
 
