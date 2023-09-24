@@ -9,16 +9,16 @@ import (
 	"github.com/bclswl0827/observer/driver/serial"
 )
 
-func (g *Geophone) Read(port io.ReadWriteCloser, packet *Packet, length int) error {
+func (g *Geophone) Read(port io.ReadWriteCloser, packet *Packet, packetLen int) error {
 	// Filter frame header
-	err := serial.Filter(port, []byte{0xFC, 0x1B})
+	_, err := serial.Filter(port, SYNC_WORD[:], 16)
 	if err != nil {
 		return err
 	}
 
-	// checksumLength * (uint8 + int32 * length)
-	checksumLength := len(packet.Checksum)
-	packetSize := checksumLength * (1 + 4*length)
+	// checksumLen * (uint8 + int32 * packetLen) + uint8
+	checksumLen := len(packet.Checksum)
+	packetSize := checksumLen*(1+4*packetLen) + 1
 
 	// Read data frame
 	buf := make([]byte, packetSize)
@@ -28,9 +28,9 @@ func (g *Geophone) Read(port io.ReadWriteCloser, packet *Packet, length int) err
 	}
 
 	// Allocate memory for data frame
-	packet.EHZ = make([]int32, length)
-	packet.EHE = make([]int32, length)
-	packet.EHN = make([]int32, length)
+	packet.EHZ = make([]int32, packetLen)
+	packet.EHE = make([]int32, packetLen)
+	packet.EHN = make([]int32, packetLen)
 
 	// Create reader for data frame
 	reader := bytes.NewReader(buf[:n])
@@ -54,7 +54,7 @@ func (g *Geophone) Read(port io.ReadWriteCloser, packet *Packet, length int) err
 	}
 
 	// Parse checksum
-	for i := 0; i < checksumLength; i++ {
+	for i := 0; i < checksumLen; i++ {
 		err = binary.Read(reader, binary.LittleEndian, &packet.Checksum[i])
 		if err != nil {
 			return err
@@ -66,6 +66,11 @@ func (g *Geophone) Read(port io.ReadWriteCloser, packet *Packet, length int) err
 	if err != nil {
 		return err
 	}
+
+	// Offset data to center around 0
+	packet.EHZ = g.getCounts(packet.EHZ)
+	packet.EHE = g.getCounts(packet.EHE)
+	packet.EHN = g.getCounts(packet.EHN)
 
 	return nil
 }

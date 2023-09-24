@@ -11,6 +11,15 @@ const (
 	TIMEOUT_THRESHOLD time.Duration = 3 * time.Second
 )
 
+var (
+	// RESET_WORD resets geophone ADC module
+	RESET_WORD = [...]byte{0x61}
+	// SYNC_WORD indicates a data packet is following
+	SYNC_WORD = [...]byte{0xFC, 0x1B}
+	// ACK_WORD indicates a valid command is received
+	ACK_WORD = [...]byte{0xFC, 0x2B}
+)
+
 type Geophone struct{}
 
 type Packet struct {

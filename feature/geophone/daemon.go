@@ -12,9 +12,9 @@ import (
 
 func (g *Geophone) Start(options *feature.FeatureOptions) {
 	var (
-		device = options.Config.Serial.Device
-		baud   = options.Config.Serial.Baud
-		length = options.Config.Serial.Length
+		device    = options.Config.Serial.Device
+		baud      = options.Config.Serial.Baud
+		packetLen = options.Config.Serial.Packet
 	)
 
 	port, err := serial.Open(device, baud)
@@ -29,7 +29,7 @@ func (g *Geophone) Start(options *feature.FeatureOptions) {
 
 	lastRead := time.Now().UTC()
 	for {
-		err := g.Read(port, &packet, length)
+		err := g.Read(port, &packet, packetLen)
 		if err != nil {
 			serial.Close(port)
 			g.OnError(options, err)

@@ -8,7 +8,6 @@ import getVelocity from "../../helpers/seismic/getVelocity";
 import getVoltage from "../../helpers/seismic/getVoltage";
 import setObject from "../../helpers/utils/setObjectByPath";
 import GLOBAL_CONFIG from "../../config/global";
-import getCounts from "../../helpers/seismic/getCounts";
 
 const setLabels = (
     obj: LabelProps[],
@@ -43,15 +42,9 @@ const setLabels = (
     let sampleRate = 0;
     for (let i of data) {
         // getCounts offsets data to center around 0
-        ehzVoltage.push(
-            ...getVoltage(getCounts(i["ehz"]), resolution, fullscale)
-        );
-        eheVoltage.push(
-            ...getVoltage(getCounts(i["ehe"]), resolution, fullscale)
-        );
-        ehnVoltage.push(
-            ...getVoltage(getCounts(i["ehn"]), resolution, fullscale)
-        );
+        ehzVoltage.push(...getVoltage(i["ehz"], resolution, fullscale));
+        eheVoltage.push(...getVoltage(i["ehe"], resolution, fullscale));
+        ehnVoltage.push(...getVoltage(i["ehn"], resolution, fullscale));
 
         // Use average samples
         sampleRate += (i["ehz"].length + i["ehe"].length + i["ehn"].length) / 3;

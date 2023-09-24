@@ -11,7 +11,7 @@ type station struct {
 type serial struct {
 	Device string `json:"device"`
 	Baud   int    `json:"baud"`
-	Length int    `json:"length"`
+	Packet int    `json:"packet"`
 }
 
 type adc struct {
