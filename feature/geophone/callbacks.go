@@ -27,7 +27,7 @@ func (a *Geophone) OnReady(options *feature.FeatureOptions, v ...any) {
 		)
 
 		// Appending packet data to buffer
-		for i := 0; i < options.Config.Serial.Length; i++ {
+		for i := 0; i < options.Config.Serial.Packet; i++ {
 			options.Status.Buffer.EHZ = append(options.Status.Buffer.EHZ, packet.EHZ[i])
 			options.Status.Buffer.EHE = append(options.Status.Buffer.EHE, packet.EHE[i])
 			options.Status.Buffer.EHN = append(options.Status.Buffer.EHN, packet.EHN[i])

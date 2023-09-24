@@ -1,5 +1,4 @@
 import getSortedArray from "../../helpers/array/getSortedArray";
-import getCounts from "../../helpers/seismic/getCounts";
 import setObjectByPath from "../../helpers/utils/setObjectByPath";
 import { HistoryArea } from "./Index";
 
@@ -21,11 +20,9 @@ const setAreas = (obj: HistoryArea[], data: any): HistoryArea[] => {
             // Get time difference and time span
             const timeDiff = prevTs !== 0 ? prevTs - j.ts : 1000;
             const timeSpan = timeDiff / sampleRate;
-            // Get counts (offset data to center around 0)
-            const counts = getCounts(channelData);
             // Append result array
-            for (let k = 0; k < counts.length; k++) {
-                resultArr.push([j.ts + k * timeSpan, counts[k]]);
+            for (let k = 0; k < channelData.length; k++) {
+                resultArr.push([j.ts + k * timeSpan, channelData[k]]);
             }
 
             // Set previous timestamp

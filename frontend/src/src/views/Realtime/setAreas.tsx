@@ -8,7 +8,6 @@ import { ADC } from "../../config/adc";
 import { Geophone } from "../../config/geophone";
 import GLOBAL_CONFIG from "../../config/global";
 import { IntensityStandardProperty } from "../../helpers/seismic/intensityStandard";
-import getCounts from "../../helpers/seismic/getCounts";
 
 const setAreas = (
     obj: RealtimeArea[],
@@ -33,16 +32,15 @@ const setAreas = (
 
         // Get voltage, velocity, acceleration
         const channelData = data[i];
-        const counts = getCounts(channelData); // Offset data to center around 0
-        const voltage = getVoltage(counts, adc.resolution, adc.fullscale);
+        const voltage = getVoltage(channelData, adc.resolution, adc.fullscale);
         const velocity = getVelocity(voltage, gp[i]);
         const acceleration = getAcceleration(velocity, timeSpan / timeDiff);
 
         // Fill data queue with raw count
         const srcArr = obj.find((item) => item.tag === i)?.chart.series?.data;
         const newArr = [];
-        for (let j = 0; j < counts.length; j++) {
-            newArr.push([ts - (sampleRate - j) * timeSpan, counts[j]]);
+        for (let j = 0; j < channelData.length; j++) {
+            newArr.push([ts - (sampleRate - j) * timeSpan, channelData[j]]);
         }
 
         // Merge data queue with raw count

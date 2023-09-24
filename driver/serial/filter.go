@@ -6,16 +6,16 @@ import (
 	"io"
 )
 
-func Filter(port io.ReadWriteCloser, signature []byte) error {
+func Filter(port io.ReadWriteCloser, signature []byte, retry int) ([]byte, error) {
 	header := make([]byte, len(signature))
 
-	for i := 0; i < 64; i++ {
+	for i := 0; i < retry; i++ {
 		port.Read(header)
 
 		if bytes.Equal(header, signature) {
-			return nil
+			return nil, nil
 		}
 	}
 
-	return fmt.Errorf("failed to filter header")
+	return header, fmt.Errorf("failed to filter header")
 }

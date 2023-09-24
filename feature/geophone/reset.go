@@ -8,12 +8,12 @@ import (
 )
 
 func (g *Geophone) Reset(port io.ReadWriteCloser) error {
-	_, err := port.Write([]byte{0x61})
+	_, err := port.Write(RESET_WORD[:])
 	if err != nil {
 		return err
 	}
 
-	err = serial.Filter(port, []byte{0xFC, 0x2B})
+	_, err = serial.Filter(port, ACK_WORD[:], 64)
 	if err != nil {
 		return fmt.Errorf("failed to reset geophone")
 	}
