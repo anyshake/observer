@@ -2,7 +2,7 @@ name: Publish release
 
 on:
     push:
-        tags:
+        branches:
             - master
 
     workflow_dispatch:

@@ -12,6 +12,9 @@ import (
 
 func (g *Geophone) Start(options *feature.FeatureOptions) {
 	var (
+		ehz       = options.Config.Geophone.EHZ
+		ehe       = options.Config.Geophone.EHE
+		ehn       = options.Config.Geophone.EHN
 		device    = options.Config.Serial.Device
 		baud      = options.Config.Serial.Baud
 		packetLen = options.Config.Serial.Packet
@@ -24,12 +27,18 @@ func (g *Geophone) Start(options *feature.FeatureOptions) {
 	}
 	defer serial.Close(port)
 
+	var (
+		ehzFilter = g.getFilter(ehz.Sensitivity, ehz.Frequency, ehz.Damping)
+		eheFilter = g.getFilter(ehe.Sensitivity, ehe.Frequency, ehe.Damping)
+		ehnFilter = g.getFilter(ehn.Sensitivity, ehn.Frequency, ehn.Damping)
+	)
+
 	var packet Packet
 	g.OnStart(options, "service has started")
 
 	lastRead := time.Now().UTC()
 	for {
-		err := g.Read(port, &packet, packetLen)
+		err := g.Read(port, &packet, packetLen, ehzFilter, eheFilter, ehnFilter)
 		if err != nil {
 			serial.Close(port)
 			g.OnError(options, err)

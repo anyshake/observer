@@ -106,15 +106,15 @@
             "areas": {
                 "ehz": {
                     "label": "EHZ Channel Waveform Count",
-                    "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} cm/s\nIntensity: {{ intensity }}"
+                    "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} kine\nIntensity: {{ intensity }}"
                 },
                 "ehe": {
                     "label": "EHE Channel Waveform Count",
-                    "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} cm/s\nIntensity: {{ intensity }}"
+                    "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} kine\nIntensity: {{ intensity }}"
                 },
                 "ehn": {
                     "label": "EHN Channel Waveform Count",
-                    "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} cm/s\nIntensity: {{ intensity }}"
+                    "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} kine\nIntensity: {{ intensity }}"
                 }
             },
             "toasts": {
