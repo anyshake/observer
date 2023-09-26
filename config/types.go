@@ -19,10 +19,16 @@ type adc struct {
 	Resolution int     `json:"resolution"`
 }
 
+type channel struct {
+	Damping     float64 `json:"damping"`
+	Frequency   float64 `json:"frequency"`
+	Sensitivity float64 `json:"sensitivity"`
+}
+
 type geophone struct {
-	EHZ float64 `json:"ehz"`
-	EHE float64 `json:"ehe"`
-	EHN float64 `json:"ehn"`
+	EHZ channel `json:"ehz"`
+	EHE channel `json:"ehe"`
+	EHN channel `json:"ehn"`
 }
 
 type ntpclient struct {

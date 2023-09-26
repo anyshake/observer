@@ -6,19 +6,31 @@
         "longitude": 1.0,
         "altitude": 0
     },
+    "geophone_settings": {
+        "ehz": {
+            "sensitivity": 0.288,
+            "damping": 0.6,
+            "frequency": 4.5
+        },
+        "ehe": {
+            "sensitivity": 0.288,
+            "damping": 0.6,
+            "frequency": 4.5
+        },
+        "ehn": {
+            "sensitivity": 0.288,
+            "damping": 0.6,
+            "frequency": 4.5
+        }
+    },
     "adc_settings": {
         "resolution": 24,
         "fullscale": 5.0
     },
     "serial_settings": {
-        "packet": 2,
+        "packet": 4,
         "baud": 19200,
-        "device": "/dev/ttyUSB0"
-    },
-    "geophone_settings": {
-        "ehz": 0.288,
-        "ehe": 0.288,
-        "ehn": 0.288
+        "device": "/dev/ttyS4"
     },
     "ntpclient_settings": {
         "host": "0.pool.ntp.org",

@@ -106,15 +106,15 @@
             "areas": {
                 "ehz": {
                     "label": "EHZ 通道波形計數",
-                    "text": "PGA：{{ pga }} gal\nPGV：{{ pgv }} cm/s\n震度：{{ intensity }}"
+                    "text": "PGA：{{ pga }} gal\nPGV：{{ pgv }} kine\n震度：{{ intensity }}"
                 },
                 "ehe": {
                     "label": "EHE 通道波形計數",
-                    "text": "PGA：{{ pga }} gal\nPGV：{{ pgv }} cm/s\n震度：{{ intensity }}"
+                    "text": "PGA：{{ pga }} gal\nPGV：{{ pgv }} kine\n震度：{{ intensity }}"
                 },
                 "ehn": {
                     "label": "EHN 通道波形計數",
-                    "text": "PGA：{{ pga }} gal\nPGV：{{ pgv }} cm/s\n震度：{{ intensity }}"
+                    "text": "PGA：{{ pga }} gal\nPGV：{{ pgv }} kine\n震度：{{ intensity }}"
                 }
             },
             "toasts": {

@@ -4,25 +4,21 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io"
-	"time"
 
 	"github.com/bclswl0827/observer/driver/serial"
 )
 
-func (g *Geophone) Read(port io.ReadWriteCloser, packet *Packet, packetLen int) error {
+func (g *Geophone) Read(port io.ReadWriteCloser, packet *Packet, packetLen int, ehzFilter, eheFilter, ehnFilter *Filter) error {
 	// Filter frame header
-	_, err := serial.Filter(port, SYNC_WORD[:], 16)
+	_, err := serial.Filter(port, SYNC_WORD[:], 128)
 	if err != nil {
 		return err
 	}
 
-	// checksumLen * (uint8 + int32 * packetLen) + uint8
-	checksumLen := len(packet.Checksum)
-	packetSize := checksumLen*(1+4*packetLen) + 1
-
 	// Read data frame
-	buf := make([]byte, packetSize)
-	n, err := serial.Read(port, buf, 5*time.Second)
+	checksumLen := len(packet.Checksum)
+	buf := make([]byte, g.getSize(packetLen, checksumLen))
+	n, err := serial.Read(port, buf, TIMEOUT_THRESHOLD)
 	if err != nil {
 		return err
 	}

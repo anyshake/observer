@@ -18,7 +18,7 @@ func (g *Geophone) OnStop(options *feature.FeatureOptions, v ...any) {
 	logger.Print(MODULE, text.Concat(v...), color.FgBlue)
 }
 
-func (a *Geophone) OnReady(options *feature.FeatureOptions, v ...any) {
+func (g *Geophone) OnReady(options *feature.FeatureOptions, v ...any) {
 	if options.Status.IsReady {
 		var (
 			packet         = v[0].(Packet)
@@ -39,12 +39,12 @@ func (a *Geophone) OnReady(options *feature.FeatureOptions, v ...any) {
 			// Set packet timestamp
 			options.Status.System.Messages++
 			options.Status.Buffer.TS = currentTime.UnixMilli()
-			logger.Print(MODULE, "1 full packet received", color.FgGreen)
 			// Copy buffer and reset
 			options.Status.Geophone = *options.Status.Buffer
 			options.Status.Buffer.EHZ = []int32{}
 			options.Status.Buffer.EHE = []int32{}
 			options.Status.Buffer.EHN = []int32{}
+			logger.Print(MODULE, "1 full packet received", color.FgGreen)
 		}
 	} else {
 		logger.Print(MODULE, "waiting for time alignment", color.FgYellow)
