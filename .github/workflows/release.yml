@@ -41,9 +41,18 @@ jobs:
                   make
                   echo "::set-output name=status::success"
 
+            - name: Build Swagger docs
+              if: steps.build_frontend.outputs.status == 'success'
+              id: build_docs
+              run: |
+                  go get -u github.com/swaggo/swag/cmd/swag
+                  cd docs
+                  make
+                  echo "::set-output name=status::success"
+
             - name: Build backend release
               id: build_release
-              if: steps.build_frontend.outputs.status == 'success'
+              if: steps.build_docs.outputs.status == 'success'
               run: |
                   go mod download
                   cd build

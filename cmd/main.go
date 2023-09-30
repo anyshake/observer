@@ -42,6 +42,9 @@ func init() {
 	fmt.Println(w(t))
 }
 
+// @BasePath /api/v1
+// @title Observer
+// @description Observer RESTful API documentation
 func main() {
 	// Read configuration
 	var conf config.Conf
@@ -76,9 +79,9 @@ func main() {
 		&app.ServerOptions{
 			Gzip:           9,
 			WebPrefix:      WEB_PREFIX,
-			CORS:           API_CORS,
 			APIPrefix:      API_PREFIX,
 			Version:        API_VERSION,
 			FeatureOptions: featureOptions,
+			CORS:           conf.Server.CORS,
 		})
 }

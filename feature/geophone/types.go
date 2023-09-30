@@ -11,13 +11,6 @@ const (
 	TIMEOUT_THRESHOLD time.Duration = 3 * time.Second
 )
 
-const (
-	// TARGET_DAMPING is the target damping ratio
-	TARGET_DAMPING float64 = 0.707
-	// TARGET_FREQUENCY is the target frequency
-	TARGET_FREQUENCY float64 = 0.1
-)
-
 var (
 	// RESET_WORD resets geophone ADC module
 	RESET_WORD = [...]byte{0x61}

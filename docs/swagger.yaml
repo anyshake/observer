@@ -1,0 +1,284 @@
+basePath: /api/v1
+definitions:
+  publisher.Geophone:
+    properties:
+      ehe:
+        items:
+          type: integer
+        type: array
+      ehn:
+        items:
+          type: integer
+        type: array
+      ehz:
+        items:
+          type: integer
+        type: array
+      ts:
+        type: integer
+    type: object
+  publisher.System:
+    properties:
+      errors:
+        type: integer
+      failures:
+        type: integer
+      messages:
+        type: integer
+      offset:
+        type: number
+      pushed:
+        type: integer
+      queued:
+        type: integer
+    type: object
+  response.HttpResponse:
+    properties:
+      data: {}
+      error:
+        type: boolean
+      message:
+        type: string
+      path:
+        type: string
+      status:
+        type: integer
+      time:
+        type: string
+    type: object
+  station.ADC:
+    properties:
+      fullscale:
+        type: number
+      resolution:
+        type: integer
+    type: object
+  station.CPU:
+    properties:
+      model:
+        type: string
+      percent:
+        type: number
+    type: object
+  station.Disk:
+    properties:
+      free:
+        type: integer
+      percent:
+        type: number
+      total:
+        type: integer
+      used:
+        type: integer
+    type: object
+  station.Geophone:
+    properties:
+      ehe:
+        type: number
+      ehn:
+        type: number
+      ehz:
+        type: number
+    type: object
+  station.Location:
+    properties:
+      altitude:
+        type: number
+      latitude:
+        type: number
+      longitude:
+        type: number
+    type: object
+  station.Memory:
+    properties:
+      free:
+        type: integer
+      percent:
+        type: number
+      total:
+        type: integer
+      used:
+        type: integer
+    type: object
+  station.OS:
+    properties:
+      arch:
+        type: string
+      distro:
+        type: string
+      hostname:
+        type: string
+      os:
+        type: string
+    type: object
+  station.System:
+    properties:
+      adc:
+        $ref: '#/definitions/station.ADC'
+      cpu:
+        $ref: '#/definitions/station.CPU'
+      disk:
+        $ref: '#/definitions/station.Disk'
+      geophone:
+        $ref: '#/definitions/station.Geophone'
+      location:
+        $ref: '#/definitions/station.Location'
+      memory:
+        $ref: '#/definitions/station.Memory'
+      os:
+        $ref: '#/definitions/station.OS'
+      station:
+        type: string
+      status:
+        $ref: '#/definitions/publisher.System'
+      uptime:
+        type: integer
+      uuid:
+        type: string
+    type: object
+  trace.Event:
+    properties:
+      depth:
+        type: number
+      distance:
+        type: number
+      estimated:
+        type: number
+      event:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      magnitude:
+        type: number
+      region:
+        type: string
+      timestamp:
+        type: integer
+      verfied:
+        type: boolean
+    type: object
+info:
+  contact: {}
+  description: Observer RESTful API documentation
+  title: Observer
+paths:
+  /history:
+    post:
+      consumes:
+      - application/json
+      - application/x-www-form-urlencoded
+      description: Get earthquake events data source list and earthquake event list
+        from data source
+      parameters:
+      - description: Start timestamp of the waveform data to be queried, in milliseconds
+        in: body
+        name: start
+        required: true
+        schema:
+          type: integer
+      - description: End timestamp of the waveform data to be queried, in milliseconds
+        in: body
+        name: end
+        required: true
+        schema:
+          type: integer
+      - description: Format of the waveform data to be exported, `json` or `sac`
+        in: body
+        name: format
+        required: true
+        schema:
+          type: string
+      - description: Channel of the waveform data to be queried, `EHZ`, `EHE` or `EHN`
+        in: body
+        name: channel
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      - application/octet-stream
+      responses:
+        "200":
+          description: Successfully exported the waveform data
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.HttpResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/publisher.Geophone'
+                  type: array
+              type: object
+        "400":
+          description: Failed to export waveform data due to invalid format or channel
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+        "410":
+          description: Failed to export waveform data due to no data available
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+        "500":
+          description: Failed to export waveform data due to failed to read data source
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+      summary: Observer waveform history
+  /station:
+    get:
+      description: Get Observer station status including system information, memory
+        usage, disk usage, CPU usage, ADC information, geophone information, and location
+        information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully read station status
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.HttpResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/station.System'
+              type: object
+      summary: Observer station status
+  /trace:
+    post:
+      consumes:
+      - application/json
+      - application/x-www-form-urlencoded
+      description: Get earthquake events data source list and earthquake event list
+        from data source
+      parameters:
+      - description: Use `source=show` as payload to get available sources first,
+          choose one and request again to get events
+        in: body
+        name: source
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully read the list of earthquake events
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.HttpResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/trace.Event'
+                  type: array
+              type: object
+        "400":
+          description: Failed to read earthquake event list due to invalid data source
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+        "500":
+          description: Failed to read earthquake event list due to failed to read
+            data source
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+      summary: Earthquake events data source
+swagger: "2.0"
