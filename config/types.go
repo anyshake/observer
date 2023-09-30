@@ -20,9 +20,10 @@ type adc struct {
 }
 
 type channel struct {
-	Damping     float64 `json:"damping"`
-	Frequency   float64 `json:"frequency"`
-	Sensitivity float64 `json:"sensitivity"`
+	Compensation bool    `json:"compensation"`
+	Damping      float64 `json:"damping"`
+	Frequency    float64 `json:"frequency"`
+	Sensitivity  float64 `json:"sensitivity"`
 }
 
 type geophone struct {
@@ -48,8 +49,10 @@ type archiver struct {
 }
 
 type server struct {
-	Host string `json:"host"`
-	Port int    `json:"port"`
+	Host  string `json:"host"`
+	Port  int    `json:"port"`
+	CORS  bool   `json:"cors"`
+	Debug bool   `json:"debug"`
 }
 
 type miniseed struct {

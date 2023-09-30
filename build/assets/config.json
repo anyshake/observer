@@ -10,17 +10,20 @@
         "ehz": {
             "sensitivity": 0.288,
             "damping": 0.6,
-            "frequency": 4.5
+            "frequency": 4.5,
+            "compensation": true
         },
         "ehe": {
             "sensitivity": 0.288,
             "damping": 0.6,
-            "frequency": 4.5
+            "frequency": 4.5,
+            "compensation": true
         },
         "ehn": {
             "sensitivity": 0.288,
             "damping": 0.6,
-            "frequency": 4.5
+            "frequency": 4.5,
+            "compensation": true
         }
     },
     "adc_settings": {
@@ -48,7 +51,9 @@
     },
     "server_settings": {
         "host": "0.0.0.0",
-        "port": 8073
+        "port": 8073,
+        "cors": true,
+        "debug": true
     },
     "miniseed_settings": {
         "enable": false,

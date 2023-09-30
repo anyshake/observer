@@ -1,9 +1,5 @@
 package geophone
 
-func (g *Geophone) getFilter(sensitivity, frequency, damping float64) *Filter {
-	return nil
-}
-
 func (g *Geophone) Filter(xValues []int32, filter *Filter) []int32 {
 	x := make([]float64, len(xValues))
 	for i, v := range xValues {

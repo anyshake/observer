@@ -10,6 +10,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary Observer waveform history
+// @Description Get earthquake events data source list and earthquake event list from data source
+// @Router /history [post]
+// @Accept application/json
+// @Accept application/x-www-form-urlencoded
+// @Produce application/json
+// @Produce application/octet-stream
+// @Param start body int true "Start timestamp of the waveform data to be queried, in milliseconds"
+// @Param end body int true "End timestamp of the waveform data to be queried, in milliseconds"
+// @Param format body string true "Format of the waveform data to be exported, `json` or `sac`"
+// @Param channel body string true "Channel of the waveform data to be queried, `EHZ`, `EHE` or `EHN`"
+// @Failure 400 {object} response.HttpResponse "Failed to export waveform data due to invalid format or channel"
+// @Failure 410 {object} response.HttpResponse "Failed to export waveform data due to no data available"
+// @Failure 500 {object} response.HttpResponse "Failed to export waveform data due to failed to read data source"
+// @Success 200 {object} response.HttpResponse{data=[]publisher.Geophone} "Successfully exported the waveform data"
 func (h *History) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) {
 	rg.Use(limit.RateLimit(time.Second, CAPACITY, CAPACITY))
 	rg.POST("/history", func(c *gin.Context) {

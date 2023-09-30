@@ -10,6 +10,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary Earthquake events data source
+// @Description Get earthquake events data source list and earthquake event list from data source
+// @Router /trace [post]
+// @Accept application/json
+// @Accept application/x-www-form-urlencoded
+// @Produce application/json
+// @Param source body string true "Use `source=show` as payload to get available sources first, choose one and request again to get events"
+// @Failure 400 {object} response.HttpResponse "Failed to read earthquake event list due to invalid data source"
+// @Failure 500 {object} response.HttpResponse "Failed to read earthquake event list due to failed to read data source"
+// @Success 200 {object} response.HttpResponse{data=[]Event} "Successfully read the list of earthquake events"
 func (t *Trace) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) {
 	sources := []DataSource{
 		&USGS{}, &JMA{}, &CWB{}, &HKO{},
