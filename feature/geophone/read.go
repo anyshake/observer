@@ -64,42 +64,10 @@ func (g *Geophone) Read(port io.ReadWriteCloser, conf *config.Conf, packet *Pack
 		return err
 	}
 
-	// Get EHZ counts and apply compensation
+	// Get channel counts by offsetting
 	packet.EHZ = g.getCounts(packet.EHZ)
-	if conf.Geophone.EHZ.Compensation {
-		packet.EHZ = g.Filter(packet.EHZ, &Filter{
-			a1: 1.99823115,
-			a2: -0.99822469,
-			b0: 1.03380975,
-			b1: -1.99662644,
-			b2: 0.96601161,
-		})
-	}
-
-	// Get EHE counts and apply compensation
 	packet.EHE = g.getCounts(packet.EHE)
-	if conf.Geophone.EHE.Compensation {
-		packet.EHE = g.Filter(packet.EHE, &Filter{
-			a1: 1.99823115,
-			a2: -0.99822469,
-			b0: 1.03380975,
-			b1: -1.99662644,
-			b2: 0.96601161,
-		})
-
-	}
-
-	// Get EHN counts and apply compensation
 	packet.EHN = g.getCounts(packet.EHN)
-	if conf.Geophone.EHN.Compensation {
-		packet.EHN = g.Filter(packet.EHN, &Filter{
-			a1: 1.99823115,
-			a2: -0.99822469,
-			b0: 1.03380975,
-			b1: -1.99662644,
-			b2: 0.96601161,
-		})
-	}
 
 	return nil
 }

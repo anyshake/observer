@@ -45,8 +45,7 @@ jobs:
               if: steps.build_frontend.outputs.status == 'success'
               id: build_docs
               run: |
-                  sudo curl -L -o /tmp/swag.tar.gz https://github.com/swaggo/swag/releases/download/v1.16.2/swag_1.16.2_Linux_x86_64.tar.gz
-                  sudo tar xvf /tmp/swag.tar.gz -C /usr/local/bin
+                  go install github.com/swaggo/swag/cmd/swag@latest
                   cd docs
                   make
                   echo "::set-output name=status::success"
