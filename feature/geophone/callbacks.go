@@ -39,6 +39,36 @@ func (g *Geophone) OnReady(options *feature.FeatureOptions, v ...any) {
 			// Set packet timestamp
 			options.Status.System.Messages++
 			options.Status.Buffer.TS = currentTime.UnixMilli()
+			// Apply compensation for EHZ
+			if options.Config.Geophone.EHZ.Compensation {
+				packet.EHZ = g.Filter(packet.EHZ, &Filter{
+					a1: 1.99823115,
+					a2: -0.99822469,
+					b0: 1.03380975,
+					b1: -1.99662644,
+					b2: 0.96601161,
+				})
+			}
+			// Apply compensation for EHE
+			if options.Config.Geophone.EHE.Compensation {
+				packet.EHE = g.Filter(packet.EHE, &Filter{
+					a1: 1.99823115,
+					a2: -0.99822469,
+					b0: 1.03380975,
+					b1: -1.99662644,
+					b2: 0.96601161,
+				})
+			}
+			// Apply compensation for EHN
+			if options.Config.Geophone.EHN.Compensation {
+				packet.EHN = g.Filter(packet.EHN, &Filter{
+					a1: 1.99823115,
+					a2: -0.99822469,
+					b0: 1.03380975,
+					b1: -1.99662644,
+					b2: 0.96601161,
+				})
+			}
 			// Copy buffer and reset
 			options.Status.Geophone = *options.Status.Buffer
 			options.Status.Buffer.EHZ = []int32{}
