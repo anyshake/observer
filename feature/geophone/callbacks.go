@@ -40,7 +40,7 @@ func (g *Geophone) OnReady(options *feature.FeatureOptions, v ...any) {
 			options.Status.System.Messages++
 			options.Status.Buffer.TS = currentTime.UnixMilli()
 			// Apply compensation for EHZ
-			if options.Config.Geophone.EHZ.Compensation {
+			if options.Config.Geophone.EHZ.Compensation && len(packet.EHZ) > 1 {
 				packet.EHZ = g.Filter(packet.EHZ, &Filter{
 					a1: 1.99823115,
 					a2: -0.99822469,
@@ -50,7 +50,7 @@ func (g *Geophone) OnReady(options *feature.FeatureOptions, v ...any) {
 				})
 			}
 			// Apply compensation for EHE
-			if options.Config.Geophone.EHE.Compensation {
+			if options.Config.Geophone.EHE.Compensation && len(packet.EHE) > 1 {
 				packet.EHE = g.Filter(packet.EHE, &Filter{
 					a1: 1.99823115,
 					a2: -0.99822469,
@@ -60,7 +60,7 @@ func (g *Geophone) OnReady(options *feature.FeatureOptions, v ...any) {
 				})
 			}
 			// Apply compensation for EHN
-			if options.Config.Geophone.EHN.Compensation {
+			if options.Config.Geophone.EHN.Compensation && len(packet.EHN) > 1 {
 				packet.EHN = g.Filter(packet.EHN, &Filter{
 					a1: 1.99823115,
 					a2: -0.99822469,
