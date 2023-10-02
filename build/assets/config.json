@@ -1,7 +1,7 @@
 {
     "station_settings": {
         "uuid": "a373e39c-8e15-44ae-a1ad-6fb622bc49e6",
-        "name": "测试测站",
+        "name": "Test Station",
         "latitude": 1.0,
         "longitude": 1.0,
         "altitude": 0
@@ -59,6 +59,6 @@
         "enable": false,
         "path": "/data/miniseed",
         "station": "TEST",
-        "network": "CN"
+        "network": "XX"
     }
 }

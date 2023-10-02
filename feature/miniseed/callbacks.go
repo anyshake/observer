@@ -8,17 +8,17 @@ import (
 )
 
 func (g *MiniSEED) OnStart(options *feature.FeatureOptions, v ...any) {
-	logger.Print(MODULE, text.Concat(v...), color.FgMagenta)
+	logger.Print(MODULE, text.Concat(v...), color.FgMagenta, false)
 }
 
 func (g *MiniSEED) OnStop(options *feature.FeatureOptions, v ...any) {
-	logger.Print(MODULE, text.Concat(v...), color.FgBlue)
+	logger.Print(MODULE, text.Concat(v...), color.FgBlue, false)
 }
 
 func (a *MiniSEED) OnReady(options *feature.FeatureOptions, v ...any) {
-	logger.Print(MODULE, "1 record has been written", color.FgGreen)
+	logger.Print(MODULE, "1 record has been written", color.FgGreen, false)
 }
 
 func (m *MiniSEED) OnError(options *feature.FeatureOptions, err error) {
-	logger.Print(MODULE, err, color.FgRed)
+	logger.Print(MODULE, err, color.FgRed, false)
 }

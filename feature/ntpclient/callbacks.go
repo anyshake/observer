@@ -8,19 +8,19 @@ import (
 )
 
 func (g *NTPClient) OnStart(options *feature.FeatureOptions, v ...any) {
-	logger.Print(MODULE, text.Concat(v...), color.FgMagenta)
+	logger.Print(MODULE, text.Concat(v...), color.FgMagenta, false)
 }
 
 func (g *NTPClient) OnStop(options *feature.FeatureOptions, v ...any) {
-	logger.Print(MODULE, text.Concat(v...), color.FgBlue)
+	logger.Print(MODULE, text.Concat(v...), color.FgBlue, false)
 }
 
 func (a *NTPClient) OnReady(options *feature.FeatureOptions, v ...any) {
 	options.Status.System.Offset = v[0].(float64)
 	options.Status.IsReady = true
-	logger.Print(MODULE, "time alignment succeed", color.FgGreen)
+	logger.Print(MODULE, "time alignment succeed", color.FgGreen, false)
 }
 
 func (n *NTPClient) OnError(options *feature.FeatureOptions, err error) {
-	logger.Print(MODULE, err, color.FgRed)
+	logger.Print(MODULE, err, color.FgRed, false)
 }

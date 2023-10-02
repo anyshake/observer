@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 
+	"github.com/bclswl0827/mseedio"
 	"github.com/bclswl0827/observer/feature"
 	"github.com/bclswl0827/observer/publisher"
-	"github.com/bclswl0827/mseedio"
 )
 
-func (m *MiniSEED) Start(options *feature.FeatureOptions) {
+func (m *MiniSEED) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGroup) {
 	if !options.Config.MiniSEED.Enable {
 		m.OnStop(options, "service is disabled")
 		return
@@ -38,9 +39,11 @@ func (m *MiniSEED) Start(options *feature.FeatureOptions) {
 
 			// Get file name by date
 			filePath := fmt.Sprintf(
-				"%s/%s.mseed",
+				"%s/%s_%s_%s.mseed",
 				options.Config.MiniSEED.Path,
 				ts.Format("2006-01-02"),
+				options.Config.MiniSEED.Station,
+				options.Config.MiniSEED.Network,
 			)
 
 			// If file exists, check sequence number
@@ -138,6 +141,6 @@ func (m *MiniSEED) Start(options *feature.FeatureOptions) {
 		},
 	)
 
-	err := fmt.Errorf("service exited with a error")
+	err := fmt.Errorf("service exited with an error")
 	m.OnError(options, err)
 }

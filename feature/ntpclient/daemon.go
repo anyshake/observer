@@ -1,12 +1,13 @@
 package ntpclient
 
 import (
+	"sync"
 	"time"
 
 	"github.com/bclswl0827/observer/feature"
 )
 
-func (n *NTPClient) Start(options *feature.FeatureOptions) {
+func (n *NTPClient) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGroup) {
 	var (
 		host     = options.Config.NTPClient.Host
 		port     = options.Config.NTPClient.Port

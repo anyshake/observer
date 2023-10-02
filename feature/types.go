@@ -2,13 +2,14 @@ package feature
 
 import (
 	"database/sql"
+	"sync"
 
 	"github.com/bclswl0827/observer/config"
 	"github.com/bclswl0827/observer/publisher"
 )
 
 type Feature interface {
-	Start(*FeatureOptions)
+	Run(*FeatureOptions, *sync.WaitGroup)
 	OnStart(*FeatureOptions, ...any)
 	OnStop(*FeatureOptions, ...any)
 	OnReady(*FeatureOptions, ...any)

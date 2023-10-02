@@ -3,6 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 
 	"github.com/fatih/color"
 
@@ -32,7 +35,7 @@ func parseCommandLine(conf *config.Conf) error {
 		return err
 	}
 
-	logger.Print("main", "Observer daemon initialized", color.FgMagenta)
+	logger.Print("main", "main daemon has initialized", color.FgMagenta, false)
 	return nil
 }
 
@@ -58,22 +61,23 @@ func main() {
 	publisher.Initialize(&conf, &status)
 
 	// Register features
-	featureOptions := &feature.FeatureOptions{
-		Config: &conf,
-		Status: &status,
-	}
 	features := []feature.Feature{
 		&ntpclient.NTPClient{},
 		&geophone.Geophone{},
 		&archiver.Archiver{},
 		&miniseed.MiniSEED{},
 	}
+	featureOptions := &feature.FeatureOptions{
+		Config: &conf,
+		Status: &status,
+	}
+	featureWaitGroup := new(sync.WaitGroup)
 	for _, s := range features {
-		go s.Start(featureOptions)
+		go s.Run(featureOptions, featureWaitGroup)
 	}
 
 	// Start HTTP server
-	server.ServerDaemon(
+	go server.StartDaemon(
 		conf.Server.Host,
 		conf.Server.Port,
 		&app.ServerOptions{
@@ -84,4 +88,13 @@ func main() {
 			FeatureOptions: featureOptions,
 			CORS:           conf.Server.CORS,
 		})
+
+	// Receive interrupt signals
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+	<-sigCh
+
+	// Wait for all features to stop
+	logger.Print("main", "main daemon is shutting down", color.FgMagenta, true)
+	featureWaitGroup.Wait()
 }
