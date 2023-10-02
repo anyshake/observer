@@ -11,11 +11,11 @@ import (
 )
 
 func (g *Geophone) OnStart(options *feature.FeatureOptions, v ...any) {
-	logger.Print(MODULE, text.Concat(v...), color.FgMagenta)
+	logger.Print(MODULE, text.Concat(v...), color.FgMagenta, false)
 }
 
 func (g *Geophone) OnStop(options *feature.FeatureOptions, v ...any) {
-	logger.Print(MODULE, text.Concat(v...), color.FgBlue)
+	logger.Print(MODULE, text.Concat(v...), color.FgBlue, true)
 }
 
 func (g *Geophone) OnReady(options *feature.FeatureOptions, v ...any) {
@@ -74,14 +74,14 @@ func (g *Geophone) OnReady(options *feature.FeatureOptions, v ...any) {
 			options.Status.Buffer.EHZ = []int32{}
 			options.Status.Buffer.EHE = []int32{}
 			options.Status.Buffer.EHN = []int32{}
-			logger.Print(MODULE, "1 full packet received", color.FgGreen)
+			logger.Print(MODULE, "1 full packet received", color.FgGreen, false)
 		}
 	} else {
-		logger.Print(MODULE, "waiting for time alignment", color.FgYellow)
+		logger.Print(MODULE, "waiting for time alignment", color.FgYellow, false)
 	}
 }
 
 func (g *Geophone) OnError(options *feature.FeatureOptions, err error) {
 	options.Status.System.Errors++
-	logger.Print(MODULE, err, color.FgRed)
+	logger.Print(MODULE, err, color.FgRed, false)
 }

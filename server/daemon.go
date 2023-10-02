@@ -19,7 +19,7 @@ func init() {
 	gin.SetMode(gin.ReleaseMode)
 }
 
-func ServerDaemon(host string, port int, options *app.ServerOptions) error {
+func StartDaemon(host string, port int, options *app.ServerOptions) error {
 	r := gin.New()
 	r.Use(
 		gzip.Gzip(options.Gzip),

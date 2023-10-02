@@ -3,18 +3,27 @@ package archiver
 import (
 	"fmt"
 	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 
 	"github.com/bclswl0827/observer/driver/postgres"
 	"github.com/bclswl0827/observer/feature"
 	"github.com/bclswl0827/observer/publisher"
+	"github.com/bclswl0827/observer/utils/logger"
+	"github.com/fatih/color"
 )
 
-func (a *Archiver) Start(options *feature.FeatureOptions) {
+func (a *Archiver) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGroup) {
 	if !options.Config.Archiver.Enable {
 		a.OnStop(options, "service is disabled")
 		return
+	} else {
+		waitGroup.Add(1)
+		defer waitGroup.Done()
 	}
 
+	// Connect to PostgreSQL
 	a.OnStart(options, "service has started")
 	pdb, err := postgres.Open(
 		options.Config.Archiver.Host,
@@ -28,6 +37,7 @@ func (a *Archiver) Start(options *feature.FeatureOptions) {
 		os.Exit(1)
 	}
 
+	// Initialize PostgreSQL
 	err = postgres.Init(pdb)
 	if err != nil {
 		a.OnError(options, err)
@@ -36,40 +46,51 @@ func (a *Archiver) Start(options *feature.FeatureOptions) {
 	options.Database = pdb
 
 	// Archive when new message arrived
-	publisher.Subscribe(
-		&options.Status.Geophone,
-		func(gp *publisher.Geophone) error {
-			var (
-				ts  = gp.TS
-				ehz = gp.EHZ
-				ehe = gp.EHE
-				ehn = gp.EHN
-			)
-			err := postgres.Insert(pdb, ts, ehz, ehe, ehn)
-			if err != nil {
-				a.OnError(options, err)
-				postgres.Close(pdb)
-
-				// Reconnect to PostgreSQL
-				pdb, err := postgres.Open(
-					options.Config.Archiver.Host,
-					options.Config.Archiver.Port,
-					options.Config.Archiver.Username,
-					options.Config.Archiver.Password,
-					options.Config.Archiver.Database,
+	go func() {
+		publisher.Subscribe(
+			&options.Status.Geophone,
+			func(gp *publisher.Geophone) error {
+				var (
+					ts  = gp.TS
+					ehz = gp.EHZ
+					ehe = gp.EHE
+					ehn = gp.EHN
 				)
+				err := postgres.Insert(pdb, ts, ehz, ehe, ehn)
 				if err != nil {
 					a.OnError(options, err)
-					return err
+					postgres.Close(pdb)
+
+					// Reconnect to PostgreSQL
+					pdb, err := postgres.Open(
+						options.Config.Archiver.Host,
+						options.Config.Archiver.Port,
+						options.Config.Archiver.Username,
+						options.Config.Archiver.Password,
+						options.Config.Archiver.Database,
+					)
+					if err != nil {
+						a.OnError(options, err)
+						return err
+					}
+					options.Database = pdb
 				}
-				options.Database = pdb
-			}
 
-			a.OnReady(options)
-			return nil
-		},
-	)
+				a.OnReady(options)
+				return nil
+			},
+		)
 
-	err = fmt.Errorf("service exited with a error")
-	a.OnError(options, err)
+		err = fmt.Errorf("service exited with an error")
+		a.OnError(options, err)
+	}()
+
+	// Receive interrupt signals
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+
+	// Wait for interrupt signals
+	<-sigCh
+	logger.Print(MODULE, "closing database connection", color.FgBlue, true)
+	postgres.Close(pdb)
 }
