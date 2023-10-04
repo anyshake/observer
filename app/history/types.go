@@ -7,7 +7,6 @@ const (
 	NETWORK   = "OBSERVER"
 	DURATION  = time.Hour   // The maximum duration of the data to be queried
 	THRESHOLD = time.Minute // There are uneven gaps between the data if time difference is greater than THRESHOLD
-	CAPACITY  = 10          // Capacity for rate limiter to prevent from being attacked
 )
 
 type History struct{}

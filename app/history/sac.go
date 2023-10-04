@@ -11,7 +11,7 @@ import (
 	"github.com/bclswl0827/sacio"
 )
 
-func GetSACBytes(data []publisher.Geophone, channel string, options *app.ServerOptions) (string, []byte, error) {
+func getSACBytes(data []publisher.Geophone, channel string, options *app.ServerOptions) (string, []byte, error) {
 	// Check channel
 	if channel != "EHZ" && channel != "EHE" && channel != "EHN" {
 		err := fmt.Errorf("no channel selected")

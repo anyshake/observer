@@ -1,5 +1,14 @@
 basePath: /api/v1
 definitions:
+  mseed.MiniSEEDFile:
+    properties:
+      name:
+        type: string
+      size:
+        type: string
+      time:
+        type: string
+    type: object
   publisher.Geophone:
     properties:
       ehe:
@@ -161,41 +170,38 @@ definitions:
     type: object
 info:
   contact: {}
-  description: Observer RESTful API documentation
-  title: Observer
+  description: This is Observer RESTful API documentation, please set `server_settings.debug`
+    to `false` in `config.json` when deploying to production environment in case of
+    any security issues.
+  title: Observer RESTful API documentation
 paths:
   /history:
     post:
       consumes:
-      - application/json
       - application/x-www-form-urlencoded
       description: Get earthquake events data source list and earthquake event list
         from data source
       parameters:
       - description: Start timestamp of the waveform data to be queried, in milliseconds
-        in: body
+        in: formData
         name: start
         required: true
-        schema:
-          type: integer
+        type: integer
       - description: End timestamp of the waveform data to be queried, in milliseconds
-        in: body
+        in: formData
         name: end
         required: true
-        schema:
-          type: integer
+        type: integer
       - description: Format of the waveform data to be exported, `json` or `sac`
-        in: body
+        in: formData
         name: format
         required: true
-        schema:
-          type: string
+        type: string
       - description: Channel of the waveform data to be queried, `EHZ`, `EHE` or `EHN`
-        in: body
+        in: formData
         name: channel
         required: true
-        schema:
-          type: string
+        type: string
       produces:
       - application/json
       - application/octet-stream
@@ -224,6 +230,53 @@ paths:
           schema:
             $ref: '#/definitions/response.HttpResponse'
       summary: Observer waveform history
+  /mseed:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: List MiniSEED data if action is `show`, or export MiniSEED data
+        in .mseed format if action is `export`
+      parameters:
+      - description: Action to be performed, either `show` or `export`
+        in: formData
+        name: action
+        required: true
+        type: string
+      - description: Name of MiniSEED file to be exported, end with `.mseed`
+        in: formData
+        name: name
+        type: string
+      produces:
+      - application/json
+      - application/octet-stream
+      responses:
+        "200":
+          description: Successfully get list of MiniSEED files
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.HttpResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/mseed.MiniSEEDFile'
+                  type: array
+              type: object
+        "400":
+          description: Failed to list or export MiniSEED data due to invalid request
+            body
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+        "410":
+          description: Failed to export MiniSEED data due to invalid file name or
+            permission denied
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+        "500":
+          description: Failed to list or export MiniSEED data due to internal server
+            error
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+      summary: Observer MiniSEED data
   /station:
     get:
       description: Get Observer station status including system information, memory
@@ -245,18 +298,16 @@ paths:
   /trace:
     post:
       consumes:
-      - application/json
       - application/x-www-form-urlencoded
       description: Get earthquake events data source list and earthquake event list
         from data source
       parameters:
       - description: Use `source=show` as payload to get available sources first,
           choose one and request again to get events
-        in: body
+        in: formData
         name: source
         required: true
-        schema:
-          type: string
+        type: string
       produces:
       - application/json
       responses:
@@ -280,5 +331,5 @@ paths:
             data source
           schema:
             $ref: '#/definitions/response.HttpResponse'
-      summary: Earthquake events data source
+      summary: Observer event trace
 swagger: "2.0"

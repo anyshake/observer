@@ -1,9 +1,10 @@
 import { ReactNode, lazy } from "react";
 
-const Home = lazy(() => import("../views/Home/Index"));
-const Realtime = lazy(() => import("../views/Realtime/Index"));
-const History = lazy(() => import("../views/History/Index"));
-const Setting = lazy(() => import("../views/Setting/Index"));
+const Home = lazy(() => import("../views/Home/Home"));
+const Realtime = lazy(() => import("../views/Realtime/Realtime"));
+const History = lazy(() => import("../views/History/History"));
+const Export = lazy(() => import("../views/Export/Export"));
+const Setting = lazy(() => import("../views/Setting/Setting"));
 
 const ROUTER_CONFIG: RouterConfig[] = [
     {
@@ -20,6 +21,11 @@ const ROUTER_CONFIG: RouterConfig[] = [
         uri: "/history",
         title: "config.router.history",
         node: <History />,
+    },
+    {
+        uri: "/export",
+        title: "config.router.export",
+        node: <Export />,
     },
     {
         uri: "/setting",

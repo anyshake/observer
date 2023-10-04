@@ -17,7 +17,7 @@ func (n *NTPClient) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGro
 
 	n.OnStart(options, "service has started")
 	for {
-		result, err := n.Read(host, port, timeout)
+		result, err := n.read(host, port, timeout)
 		if err != nil {
 			n.OnError(options, err)
 			time.Sleep(time.Second)

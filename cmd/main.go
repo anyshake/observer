@@ -35,7 +35,6 @@ func parseCommandLine(conf *config.Conf) error {
 		return err
 	}
 
-	logger.Print("main", "main daemon has initialized", color.FgMagenta, false)
 	return nil
 }
 
@@ -46,14 +45,16 @@ func init() {
 }
 
 // @BasePath /api/v1
-// @title Observer
-// @description Observer RESTful API documentation
+// @title Observer RESTful API documentation
+// @description This is Observer RESTful API documentation, please set `server_settings.debug` to `false` in `config.json` when deploying to production environment in case of any security issues.
 func main() {
 	// Read configuration
 	var conf config.Conf
 	err := parseCommandLine(&conf)
 	if err != nil {
 		logger.Fatal("main", err, color.FgRed)
+	} else {
+		logger.Print("main", "main daemon has initialized", color.FgMagenta, false)
 	}
 
 	// Initialize global status

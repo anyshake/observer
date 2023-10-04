@@ -2,21 +2,18 @@ package trace
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/bclswl0827/observer/app"
-	"github.com/bclswl0827/observer/server/middleware/limit"
 	"github.com/bclswl0827/observer/server/response"
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary Earthquake events data source
+// @Summary Observer event trace
 // @Description Get earthquake events data source list and earthquake event list from data source
 // @Router /trace [post]
-// @Accept application/json
 // @Accept application/x-www-form-urlencoded
 // @Produce application/json
-// @Param source body string true "Use `source=show` as payload to get available sources first, choose one and request again to get events"
+// @Param source formData string true "Use `source=show` as payload to get available sources first, choose one and request again to get events"
 // @Failure 400 {object} response.HttpResponse "Failed to read earthquake event list due to invalid data source"
 // @Failure 500 {object} response.HttpResponse "Failed to read earthquake event list due to failed to read data source"
 // @Success 200 {object} response.HttpResponse{data=[]Event} "Successfully read the list of earthquake events"
@@ -26,7 +23,6 @@ func (t *Trace) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) 
 		&CEIC{}, &SCEA_E{}, &SCEA_B{},
 	}
 
-	rg.Use(limit.RateLimit(time.Second, CAPACITY, CAPACITY))
 	rg.POST("/trace", func(c *gin.Context) {
 		var binding Binding
 		if err := c.ShouldBind(&binding); err != nil {

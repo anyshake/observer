@@ -51,6 +51,7 @@ func (g *Geophone) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 			if err != nil {
 				serial.Close(port)
 				g.OnError(options, err)
+				time.Sleep(time.Millisecond * 100)
 
 				// Reopen serial port
 				port, err = serial.Open(device, baud)

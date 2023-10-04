@@ -8,7 +8,7 @@ import (
 	"github.com/bclswl0827/observer/publisher"
 )
 
-func FilterHistory(start, end int64, options *app.ServerOptions) ([]publisher.Geophone, error) {
+func filterHistory(start, end int64, options *app.ServerOptions) ([]publisher.Geophone, error) {
 	pdb := options.FeatureOptions.Database
 	if pdb == nil {
 		return nil, fmt.Errorf("databse is not connected")

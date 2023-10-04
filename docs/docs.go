@@ -19,7 +19,6 @@ const docTemplate = `{
             "post": {
                 "description": "Get earthquake events data source list and earthquake event list from data source",
                 "consumes": [
-                    "application/json",
                     "application/x-www-form-urlencoded"
                 ],
                 "produces": [
@@ -29,40 +28,32 @@ const docTemplate = `{
                 "summary": "Observer waveform history",
                 "parameters": [
                     {
+                        "type": "integer",
                         "description": "Start timestamp of the waveform data to be queried, in milliseconds",
                         "name": "start",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
+                        "in": "formData",
+                        "required": true
                     },
                     {
+                        "type": "integer",
                         "description": "End timestamp of the waveform data to be queried, in milliseconds",
                         "name": "end",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
+                        "in": "formData",
+                        "required": true
                     },
                     {
+                        "type": "string",
                         "description": "Format of the waveform data to be exported, ` + "`" + `json` + "`" + ` or ` + "`" + `sac` + "`" + `",
                         "name": "format",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
+                        "in": "formData",
+                        "required": true
                     },
                     {
+                        "type": "string",
                         "description": "Channel of the waveform data to be queried, ` + "`" + `EHZ` + "`" + `, ` + "`" + `EHE` + "`" + ` or ` + "`" + `EHN` + "`" + `",
                         "name": "channel",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -108,6 +99,75 @@ const docTemplate = `{
                 }
             }
         },
+        "/mseed": {
+            "post": {
+                "description": "List MiniSEED data if action is ` + "`" + `show` + "`" + `, or export MiniSEED data in .mseed format if action is ` + "`" + `export` + "`" + `",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json",
+                    "application/octet-stream"
+                ],
+                "summary": "Observer MiniSEED data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Action to be performed, either ` + "`" + `show` + "`" + ` or ` + "`" + `export` + "`" + `",
+                        "name": "action",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Name of MiniSEED file to be exported, end with ` + "`" + `.mseed` + "`" + `",
+                        "name": "name",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully get list of MiniSEED files",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.HttpResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/mseed.MiniSEEDFile"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to list or export MiniSEED data due to invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/response.HttpResponse"
+                        }
+                    },
+                    "410": {
+                        "description": "Failed to export MiniSEED data due to invalid file name or permission denied",
+                        "schema": {
+                            "$ref": "#/definitions/response.HttpResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to list or export MiniSEED data due to internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.HttpResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/station": {
             "get": {
                 "description": "Get Observer station status including system information, memory usage, disk usage, CPU usage, ADC information, geophone information, and location information",
@@ -141,22 +201,19 @@ const docTemplate = `{
             "post": {
                 "description": "Get earthquake events data source list and earthquake event list from data source",
                 "consumes": [
-                    "application/json",
                     "application/x-www-form-urlencoded"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Earthquake events data source",
+                "summary": "Observer event trace",
                 "parameters": [
                     {
+                        "type": "string",
                         "description": "Use ` + "`" + `source=show` + "`" + ` as payload to get available sources first, choose one and request again to get events",
                         "name": "source",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -198,6 +255,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "mseed.MiniSEEDFile": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "string"
+                }
+            }
+        },
         "publisher.Geophone": {
             "type": "object",
             "properties": {
@@ -451,8 +522,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "Observer",
-	Description:      "Observer RESTful API documentation",
+	Title:            "Observer RESTful API documentation",
+	Description:      "This is Observer RESTful API documentation, please set `server_settings.debug` to `false` in `config.json` when deploying to production environment in case of any security issues.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
