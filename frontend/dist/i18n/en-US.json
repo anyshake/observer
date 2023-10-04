@@ -204,7 +204,8 @@
                 "is_fetching_waveform": "Querying historical waveform data, please wait...",
                 "fetch_waveform_success": "Historical waveform data query successful",
                 "fetch_waveform_error": "Historical waveform data query failed",
-                "copy_link_success": "Share link has copied to clipboard"
+                "copy_link_success": "Share link has copied to clipboard",
+                "copy_link_error": "Failed to copy share link to clipboard"
             }
         },
         "export": {
