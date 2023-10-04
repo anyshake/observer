@@ -1,6 +1,6 @@
 import getSortedArray from "../../helpers/array/getSortedArray";
 import setObjectByPath from "../../helpers/utils/setObjectByPath";
-import { HistoryArea } from "./Index";
+import { HistoryArea } from "./History";
 
 const setAreas = (obj: HistoryArea[], data: any): HistoryArea[] => {
     const tags = ["ehz", "ehe", "ehn"];

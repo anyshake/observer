@@ -42,6 +42,7 @@ class TimePicker extends Component<TimePickerProps & WithTranslation> {
                     adapterLocale={languageConfig[i18n].adapterLocale}
                 >
                     <DateTimePicker
+                        format="yyyy-MM-dd HH:mm:ss"
                         className="w-full"
                         timezone="system"
                         views={[
@@ -60,6 +61,9 @@ class TimePicker extends Component<TimePickerProps & WithTranslation> {
                         onChange={(value) => {
                             const val = value?.valueOf();
                             onChange(val as number);
+                        }}
+                        slotProps={{
+                            field: { clearable: true },
                         }}
                         label={`${t(label.id, label.format)} - ${timezone}`}
                         defaultValue={defaultValue}

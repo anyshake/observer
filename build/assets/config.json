@@ -59,6 +59,7 @@
         "enable": false,
         "path": "/data/miniseed",
         "station": "TEST",
-        "network": "XX"
+        "network": "XX",
+        "lifecycle": 10
     }
 }

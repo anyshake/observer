@@ -56,10 +56,11 @@ type server struct {
 }
 
 type miniseed struct {
-	Enable  bool   `json:"enable"`
-	Path    string `json:"path"`
-	Station string `json:"station"`
-	Network string `json:"network"`
+	Enable    bool   `json:"enable"`
+	Path      string `json:"path"`
+	Station   string `json:"station"`
+	Network   string `json:"network"`
+	LifeCycle int    `json:"lifecycle"`
 }
 
 type Conf struct {

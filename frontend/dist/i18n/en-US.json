@@ -11,7 +11,8 @@
             "list": {
                 "index": "Station Status",
                 "realtime": "Realtime Waveform",
-                "history": "Historical Waveform",
+                "history": "History Waveform",
+                "export": "Waveform Export",
                 "setting": "Panel Settings"
             }
         },
@@ -19,7 +20,8 @@
             "error": "Error occurred",
             "index": "Station Status",
             "realtime": "Realtime Waveform",
-            "history": "Historical Waveform",
+            "history": "History Waveform",
+            "export": "Waveform Export",
             "setting": "Panel Settings"
         }
     },
@@ -148,13 +150,14 @@
                 }
             },
             "cards": {
-                "query_history": "Historical Query",
+                "query_history": "History Query",
                 "analyse_history": "Data Analysis"
             },
             "buttons": {
                 "query_waveform": "Retrieve Waveforms",
                 "query_sac_file": "Download Data",
-                "query_source": "Event Lookup"
+                "query_source": "Event Lookup",
+                "get_share_link": "Get Share Link"
             },
             "labels": {
                 "ehz_pga": {
@@ -200,7 +203,32 @@
                 "fetch_events_error": "Earthquake event query failed",
                 "is_fetching_waveform": "Querying historical waveform data, please wait...",
                 "fetch_waveform_success": "Historical waveform data query successful",
-                "fetch_waveform_error": "Historical waveform data query failed"
+                "fetch_waveform_error": "Historical waveform data query failed",
+                "copy_link_success": "Share link has copied to clipboard"
+            }
+        },
+        "export": {
+            "cards": {
+                "file_list": "File list"
+            },
+            "table": {
+                "columns": {
+                    "name": "File name",
+                    "size": "File size",
+                    "time": "Modified date (UTC)"
+                },
+                "actions": {
+                    "export": "Export"
+                },
+                "placeholder": "List is empty"
+            },
+            "toasts": {
+                "is_exporting_mseed": "Exporting MiniSEED format file, may take some time depending on network conditions",
+                "export_mseed_success": "MiniSEED format file exported successfully",
+                "export_mseed_error": "MiniSEED format file export failed",
+                "is_fetching_mseed": "Fetching MiniSEED format file list, please wait...",
+                "fetch_mseed_success": "MiniSEED format file list fetched successfully",
+                "fetch_mseed_error": "MiniSEED format file list fetch failed"
             }
         },
         "setting": {

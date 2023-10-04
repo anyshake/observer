@@ -12,6 +12,7 @@
                 "index": "當前站況",
                 "realtime": "即時波形",
                 "history": "歷史資料",
+                "export": "波形匯出",
                 "setting": "面板設定"
             }
         },
@@ -20,6 +21,7 @@
             "index": "當前站況",
             "realtime": "即時波形",
             "history": "歷史資料",
+            "export": "波形匯出",
             "setting": "面板設定"
         }
     },
@@ -154,7 +156,8 @@
             "buttons": {
                 "query_waveform": "調閱波形",
                 "query_sac_file": "資料下載",
-                "query_source": "事件反查"
+                "query_source": "事件反查",
+                "get_share_link": "分享連結"
             },
             "labels": {
                 "ehz_pga": {
@@ -200,7 +203,32 @@
                 "fetch_events_error": "地震事件查詢失敗",
                 "is_fetching_waveform": "正在查詢歷史波形資料，請稍候...",
                 "fetch_waveform_success": "歷史波形資料查詢成功",
-                "fetch_waveform_error": "歷史波形資料查詢失敗"
+                "fetch_waveform_error": "歷史波形資料查詢失敗",
+                "copy_link_success": "分享連結已複製到剪貼簿"
+            }
+        },
+        "export": {
+            "cards": {
+                "file_list": "檔案清單"
+            },
+            "table": {
+                "columns": {
+                    "name": "檔案名稱",
+                    "size": "檔案大小",
+                    "time": "修改日期（UTC）"
+                },
+                "actions": {
+                    "export": "匯出檔案"
+                },
+                "placeholder": "清單為空"
+            },
+            "toasts": {
+                "is_exporting_mseed": "正在匯出 MiniSEED 格式檔案，根據網路狀況，這可能需要一些時間",
+                "export_mseed_success": "MiniSEED 格式檔案匯出成功",
+                "export_mseed_error": "MiniSEED 格式檔案匯出失敗",
+                "is_fetching_mseed": "正在取得 MiniSEED 格式檔案清單，請稍等...",
+                "fetch_mseed_success": "MiniSEED 格式檔案清單取得成功",
+                "fetch_mseed_error": "MiniSEED 格式檔案清單取得失敗"
             }
         },
         "setting": {

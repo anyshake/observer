@@ -2,10 +2,7 @@ package trace
 
 import "time"
 
-const (
-	CAPACITY   = 30          // Capacity for rate limiter to prevent from being attacked
-	EXPIRATION = time.Minute // Cache expiration duration for calling external API response
-)
+const EXPIRATION = time.Minute // Cache expiration duration for calling external API response
 
 type Trace struct{}
 

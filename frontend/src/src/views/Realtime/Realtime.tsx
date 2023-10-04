@@ -137,13 +137,13 @@ class Realtime extends Component<
                 },
             ],
             geophone: {
-                ehz: 0.288,
-                ehe: 0.288,
-                ehn: 0.288,
+                ehz: 1,
+                ehe: 1,
+                ehn: 1,
             },
             adc: {
-                fullscale: 5,
-                resolution: 24,
+                fullscale: 1,
+                resolution: 1,
             },
             scale: fallbackScale.property(),
         };

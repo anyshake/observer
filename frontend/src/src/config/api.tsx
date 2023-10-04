@@ -18,6 +18,12 @@ const API_CONFIG: ApiConfig[] = [
         uri: "/trace",
     },
     {
+        tag: "mseed",
+        type: "http",
+        method: "post",
+        uri: "/mseed",
+    },
+    {
         tag: "socket",
         type: "ws",
         uri: "/socket",

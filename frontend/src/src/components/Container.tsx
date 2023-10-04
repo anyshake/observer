@@ -10,7 +10,7 @@ export default class Container extends Component<ContainerProps> {
     render() {
         const { layout, className, children } = this.props;
 
-        let layoutClassName = "my-6";
+        let layoutClassName = "mt-5";
         switch (layout) {
             case "flex":
                 layoutClassName = "mt-5 flex flex-wrap";

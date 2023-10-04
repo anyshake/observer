@@ -2,7 +2,7 @@ import getVelocity from "../../helpers/seismic/getVelocity";
 import getQueueArray from "../../helpers/array/getQueueArray";
 import getVoltage from "../../helpers/seismic/getVoltage";
 import setObjectByPath from "../../helpers/utils/setObjectByPath";
-import { RealtimeArea } from "./Index";
+import { RealtimeArea } from "./Realtime";
 import getAcceleration from "../../helpers/seismic/getAcceleration";
 import { ADC } from "../../config/adc";
 import { Geophone } from "../../config/geophone";

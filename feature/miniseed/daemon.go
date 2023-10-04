@@ -18,6 +18,21 @@ func (m *MiniSEED) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 		return
 	}
 
+	// Get MiniSEED info & options
+	var (
+		basePath  = options.Config.MiniSEED.Path
+		station   = options.Config.MiniSEED.Station
+		network   = options.Config.MiniSEED.Network
+		lifeCycle = options.Config.MiniSEED.LifeCycle
+	)
+
+	// Start cleanup routine if life cycle bigger than 0
+	if lifeCycle > 0 {
+		go m.cleanup(
+			basePath, station, network, lifeCycle,
+		)
+	}
+
 	// Init sequence number
 	var seqNumber int
 	m.OnStart(options, "service has started")
@@ -40,10 +55,8 @@ func (m *MiniSEED) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 			// Get file name by date
 			filePath := fmt.Sprintf(
 				"%s/%s_%s_%s.mseed",
-				options.Config.MiniSEED.Path,
-				ts.Format("2006-01-02"),
-				options.Config.MiniSEED.Station,
-				options.Config.MiniSEED.Network,
+				basePath, station, network,
+				ts.Format("20060102"),
 			)
 
 			// If file exists, check sequence number
@@ -81,10 +94,6 @@ func (m *MiniSEED) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 			seqNumberString := fmt.Sprintf("%06d", seqNumber)
 
 			// Append 3 channels
-			var (
-				station = options.Config.MiniSEED.Station
-				network = options.Config.MiniSEED.Network
-			)
 			for i, v := range [][]int32{ehz, ehe, ehn} {
 				var err error
 				switch i {

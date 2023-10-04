@@ -32,6 +32,8 @@ import mapStateToProps from "../../helpers/utils/mapStateToProps";
 import Area, { AreaProps } from "../../components/Area";
 import setAreas from "./setAreas";
 import { WithTranslation, withTranslation } from "react-i18next";
+import getRouterParam from "../../helpers/router/getRouterParam";
+import getRouterUri from "../../helpers/router/getRouterUri";
 
 // Query duration is 100s by default
 const TRACE_RANGE = 1000 * 5 * 60;
@@ -85,8 +87,8 @@ class History extends Component<
                 source: "show",
             },
             history: {
-                start: Date.now() - 60000,
-                end: Date.now(),
+                start: 0,
+                end: 0,
                 format: "json",
                 channel: "EHZ",
             },
@@ -161,13 +163,13 @@ class History extends Component<
                 title: { id: "views.history.modals.choose_event.title" },
             },
             geophone: {
-                ehz: 0.288,
-                ehe: 0.288,
-                ehn: 0.288,
+                ehz: 1,
+                ehe: 1,
+                ehn: 1,
             },
             adc: {
-                fullscale: 5,
-                resolution: 24,
+                fullscale: 1,
+                resolution: 1,
             },
             labels: [
                 {
@@ -240,8 +242,16 @@ class History extends Component<
             }
         }
 
+        // Read URL params and update state
+        const { start, end } = getRouterParam();
+        const history = {
+            ...this.state.history,
+            start: start ? Number(start) : Date.now() - TRACE_RANGE,
+            end: end ? Number(end) : Date.now(),
+        };
+
         // Apply to component state
-        this.setState({ adc, geophone, scale });
+        this.setState({ history, adc, geophone, scale });
     }
 
     // Promise version of this.setState used for async/await
@@ -290,8 +300,12 @@ class History extends Component<
         });
         if (error) {
             const { t } = this.props;
-            const error = t("views.history.toasts.export_sac_error");
-            toast.error(error);
+            const error = t(
+                history.format === "sac"
+                    ? "views.history.toasts.export_sac_error"
+                    : "views.history.toasts.fetch_waveform_error"
+            );
+            history.format === "sac" && toast.error(error);
             return Promise.reject(error);
         }
 
@@ -489,6 +503,18 @@ class History extends Component<
         }));
     };
 
+    handleGetShareLink = (): void => {
+        const uri = getRouterUri();
+        const { t } = this.props;
+        const { hash, origin } = window.location;
+        const { start, end } = this.state.history;
+        const baseUrl = `${origin}${hash.length && "/#"}${uri}`;
+
+        // Copy share link to clipboard
+        navigator.clipboard.writeText(`${baseUrl}?start=${start}&end=${end}`);
+        toast.success(t("views.history.toasts.copy_link_success"));
+    };
+
     render() {
         const { areas, select, modal, history, labels } = this.state;
         const { from, dialog } = select;
@@ -505,9 +531,7 @@ class History extends Component<
                     <Container className="mb-6" layout="grid">
                         <Card
                             className="h-[360px]"
-                            label={{
-                                id: "views.history.cards.query_history",
-                            }}
+                            label={{ id: "views.history.cards.query_history" }}
                         >
                             <TimePicker
                                 value={start}
@@ -529,7 +553,7 @@ class History extends Component<
                             />
 
                             <Button
-                                className="mt-6 bg-indigo-700 hover:bg-indigo-800"
+                                className="bg-indigo-700 hover:bg-indigo-800"
                                 onClick={this.handleQueryWaveform}
                                 label={{
                                     id: "views.history.buttons.query_waveform",
@@ -547,6 +571,13 @@ class History extends Component<
                                 onClick={this.handleQuerySource}
                                 label={{
                                     id: "views.history.buttons.query_source",
+                                }}
+                            />
+                            <Button
+                                className="bg-cyan-700 hover:bg-cyan-800"
+                                onClick={this.handleGetShareLink}
+                                label={{
+                                    id: "views.history.buttons.get_share_link",
                                 }}
                             />
                         </Card>

@@ -69,7 +69,7 @@
  */
 
 /**
- * @remix-run/router v1.7.1
+ * @remix-run/router v1.9.0
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -80,7 +80,7 @@
  */
 
 /**
- * React Router DOM v6.14.1
+ * React Router DOM v6.16.0
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -91,7 +91,7 @@
  */
 
 /**
- * React Router v6.14.1
+ * React Router v6.16.0
  *
  * Copyright (c) Remix Software Inc.
  *

@@ -6,7 +6,7 @@ const getRouterUri = () => {
 
     let uri = pathname;
     if (router === "hash" && hash.length > 0) {
-        uri = hash.replaceAll("#", "");
+        uri = hash.split("?")[0].replaceAll("#", "");
     }
 
     return uri;

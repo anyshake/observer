@@ -53,15 +53,15 @@ func Error(c *gin.Context, code int) {
 			Message: "Request method is not allowed",
 		})
 	case 410:
-		c.JSON(http.StatusMethodNotAllowed, HttpResponse{
+		c.JSON(http.StatusGone, HttpResponse{
 			Error:   true,
 			Path:    currentPath,
 			Time:    currentTime,
-			Status:  http.StatusMethodNotAllowed,
+			Status:  http.StatusGone,
 			Message: "The requested resource is not available",
 		})
 	case 413:
-		c.JSON(http.StatusMethodNotAllowed, HttpResponse{
+		c.JSON(http.StatusRequestEntityTooLarge, HttpResponse{
 			Error:   true,
 			Path:    currentPath,
 			Time:    currentTime,

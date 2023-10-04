@@ -1,6 +1,6 @@
 package geophone
 
-func (g *Geophone) Filter(xValues []int32, filter *Filter) []int32 {
+func (g *Geophone) filter(xValues []int32, filter *Filter) []int32 {
 	x := make([]float64, len(xValues))
 	for i, v := range xValues {
 		x[i] = float64(v)
