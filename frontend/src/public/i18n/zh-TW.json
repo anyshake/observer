@@ -204,7 +204,8 @@
                 "is_fetching_waveform": "正在查詢歷史波形資料，請稍候...",
                 "fetch_waveform_success": "歷史波形資料查詢成功",
                 "fetch_waveform_error": "歷史波形資料查詢失敗",
-                "copy_link_success": "分享連結已複製到剪貼簿"
+                "copy_link_success": "分享連結已複製到剪貼簿",
+                "copy_link_error": "分享連結複製失敗"
             }
         },
         "export": {

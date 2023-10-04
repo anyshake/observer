@@ -503,16 +503,31 @@ class History extends Component<
         }));
     };
 
-    handleGetShareLink = (): void => {
+    handleGetShareLink = async (): Promise<void> => {
         const uri = getRouterUri();
         const { t } = this.props;
         const { hash, origin } = window.location;
         const { start, end } = this.state.history;
-        const baseUrl = `${origin}${hash.length && "/#"}${uri}`;
+        const baseURL = `${origin}${hash.length && "/#"}${uri}`;
+        const fullURL = `${baseURL}?start=${start}&end=${end}`;
 
-        // Copy share link to clipboard
-        navigator.clipboard.writeText(`${baseUrl}?start=${start}&end=${end}`);
-        toast.success(t("views.history.toasts.copy_link_success"));
+        // Copy share link to clipboard, works on both HTTP(S)
+        const clipboard = navigator.clipboard || {
+            writeText: (text) => {
+                const copyInput = document.createElement("input");
+                copyInput.value = text;
+                document.body.appendChild(copyInput);
+                copyInput.select();
+                document.execCommand("copy");
+                document.body.removeChild(copyInput);
+            },
+        };
+        if (clipboard) {
+            await clipboard.writeText(fullURL);
+            toast.success(t("views.history.toasts.copy_link_success"));
+        } else {
+            toast.error(t("views.history.toasts.copy_link_error"));
+        }
     };
 
     render() {
