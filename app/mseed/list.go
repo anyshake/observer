@@ -12,9 +12,10 @@ import (
 
 func getMiniSEEDList(conf *config.Conf) ([]MiniSEEDFile, error) {
 	var (
-		basePath = conf.MiniSEED.Path
-		station  = conf.MiniSEED.Station
-		network  = conf.MiniSEED.Network
+		basePath  = conf.MiniSEED.Path
+		station   = conf.MiniSEED.Station
+		network   = conf.MiniSEED.Network
+		LifeCycle = conf.MiniSEED.LifeCycle
 	)
 
 	var files []MiniSEEDFile
@@ -26,9 +27,19 @@ func getMiniSEEDList(conf *config.Conf) ([]MiniSEEDFile, error) {
 			filepath.Ext(info.Name()) == ".mseed" &&
 			strings.Contains(info.Name(), station) &&
 			strings.Contains(info.Name(), network) {
+			modTime := info.ModTime().UTC()
+
+			var fileTTL int
+			if LifeCycle > 0 {
+				fileTTL = LifeCycle - int(time.Since(modTime).Hours()/24)
+			} else {
+				fileTTL = -1
+			}
+
 			files = append(files, MiniSEEDFile{
+				TTL:  fileTTL,
 				Name: info.Name(),
-				Time: info.ModTime().UTC().Format(time.RFC3339),
+				Time: modTime.Format(time.RFC3339),
 				Size: fmt.Sprintf("%d MB", info.Size()/1024/1024),
 			})
 		}

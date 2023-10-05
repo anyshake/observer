@@ -10,15 +10,18 @@ import toast, { Toaster } from "react-hot-toast";
 import Card from "../../components/Card";
 import Container from "../../components/Container";
 import Table, { TableData, TableProps } from "../../components/Table";
-import FloppyIcon from "../../assets/icons/floppy-disk-solid.svg";
+import ExportIcon from "../../assets/icons/download-solid.svg";
 import { WithTranslation, withTranslation } from "react-i18next";
 import restfulApiByTag from "../../helpers/request/restfulApiByTag";
+import Progress, { ProgressProps } from "../../components/Progress";
+import getSortedArray from "../../helpers/array/getSortedArray";
 
 // Export timeout is 100s by default
 const EXPORT_TIMEOUT = 100 * 1000;
 
 interface ExportState {
     table: TableProps;
+    progress: ProgressProps;
 }
 
 class Export extends Component<WithTranslation, ExportState> {
@@ -41,8 +44,15 @@ class Export extends Component<WithTranslation, ExportState> {
                         key: "time",
                         label: { id: "views.export.table.columns.time" },
                     },
+                    {
+                        key: "ttl",
+                        label: { id: "views.export.table.columns.ttl" },
+                    },
                 ],
                 placeholder: { id: "views.export.table.placeholder" },
+            },
+            progress: {
+                value: 0,
             },
         };
     }
@@ -57,6 +67,12 @@ class Export extends Component<WithTranslation, ExportState> {
                 filename: name,
                 timeout: EXPORT_TIMEOUT,
                 body: { action: "export", name },
+                onDownload: (e) => {
+                    const { progress } = e;
+                    this.setState({
+                        progress: { value: (progress || 0) * 100 },
+                    });
+                },
             }),
             {
                 loading: t("views.export.toasts.is_exporting_mseed"),
@@ -72,36 +88,41 @@ class Export extends Component<WithTranslation, ExportState> {
         const { table } = this.state;
 
         // Read MiniSEED file list from server
-        const loader = toast.loading(
-            t("views.export.toasts.is_fetching_mseed")
+        const { data } = await toast.promise(
+            restfulApiByTag({
+                tag: "mseed",
+                body: { action: "show" },
+                timeout: EXPORT_TIMEOUT,
+            }),
+            {
+                loading: t("views.export.toasts.is_fetching_mseed"),
+                success: t("views.export.toasts.fetch_mseed_success"),
+                error: t("views.export.toasts.fetch_mseed_error"),
+            }
         );
-        const { data } = await restfulApiByTag({
-            tag: "mseed",
-            body: { action: "show" },
-            timeout: EXPORT_TIMEOUT,
-        });
-        toast.remove(loader);
 
-        // Check if there is no data
-        if (!data) {
-            toast.error(t("views.export.toasts.fetch_mseed_error"));
+        // Sort files by time
+        if (data.length) {
+            getSortedArray(data, "time", "datetime", "desc");
+        } else {
             return;
         }
 
-        // Append export action and show success message
+        // Append export action and update table
         const actions = [
             {
-                icon: FloppyIcon,
+                icon: ExportIcon,
                 onClick: this.exportMiniSEED,
                 label: { id: "views.export.table.actions.export" },
             },
         ];
         this.setState({ table: { ...table, data, actions } });
-        toast.success(t("views.export.toasts.fetch_mseed_success"));
     }
 
     render() {
-        const { table } = this.state;
+        const { table, progress } = this.state;
+        const { value } = progress;
+
         return (
             <View>
                 <Header />
@@ -112,6 +133,7 @@ class Export extends Component<WithTranslation, ExportState> {
 
                     <Container layout="none">
                         <Card label={{ id: "views.export.cards.file_list" }}>
+                            {!!value && <Progress {...progress} />}
                             <Table {...table} />
                         </Card>
                     </Container>

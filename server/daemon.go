@@ -23,7 +23,7 @@ func init() {
 func StartDaemon(host string, port int, options *app.ServerOptions) error {
 	r := gin.New()
 	r.Use(
-		gzip.Gzip(options.Gzip),
+		gzip.Gzip(options.Gzip, gzip.WithExcludedPaths([]string{options.APIPrefix})),
 		gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 			w := color.New(color.FgCyan).SprintFunc()
 			trimmedErr := strings.TrimRight(param.ErrorMessage, "\n")
@@ -46,7 +46,10 @@ func StartDaemon(host string, port int, options *app.ServerOptions) error {
 				Value:  "POST, OPTIONS, GET",
 			}, {
 				Header: "Access-Control-Allow-Headers",
-				Value:  "Authorization, Content-Type, Version",
+				Value:  "Content-Type",
+			}, {
+				Header: "Access-Control-Expose-Headers",
+				Value:  "Content-Length",
 			},
 		}))
 	}

@@ -216,7 +216,8 @@
                 "columns": {
                     "name": "File name",
                     "size": "File size",
-                    "time": "Modified date (UTC)"
+                    "time": "Modified date (UTC)",
+                    "ttl": "TTL (days)"
                 },
                 "actions": {
                     "export": "Export"
@@ -224,7 +225,7 @@
                 "placeholder": "List is empty"
             },
             "toasts": {
-                "is_exporting_mseed": "Exporting MiniSEED format file, may take some time depending on network conditions",
+                "is_exporting_mseed": "Exporting MiniSEED format file, it may take some time",
                 "export_mseed_success": "MiniSEED format file exported successfully",
                 "export_mseed_error": "MiniSEED format file export failed",
                 "is_fetching_mseed": "Fetching MiniSEED format file list, please wait...",

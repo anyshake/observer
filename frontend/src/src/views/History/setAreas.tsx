@@ -6,7 +6,7 @@ const setAreas = (obj: HistoryArea[], data: any): HistoryArea[] => {
     const tags = ["ehz", "ehe", "ehn"];
 
     // Sort data by timestamp
-    const sortedData: any = getSortedArray(data, "ts", "asc");
+    const sortedData: any = getSortedArray(data, "ts", "number", "asc");
     for (let i of tags) {
         // Previous timestamp
         let prevTs = 0;
