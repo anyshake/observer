@@ -13,7 +13,7 @@ import (
 // @Router /trace [post]
 // @Accept application/x-www-form-urlencoded
 // @Produce application/json
-// @Param source formData string true "Use `source=show` as payload to get available sources first, choose one and request again to get events"
+// @Param source formData string true "Use `show` to get available sources first, then choose one and request again to get events"
 // @Failure 400 {object} response.HttpResponse "Failed to read earthquake event list due to invalid data source"
 // @Failure 500 {object} response.HttpResponse "Failed to read earthquake event list due to failed to read data source"
 // @Success 200 {object} response.HttpResponse{data=[]Event} "Successfully read the list of earthquake events"

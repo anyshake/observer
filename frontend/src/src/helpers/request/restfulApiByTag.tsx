@@ -1,5 +1,6 @@
 import axios, {
     AxiosError,
+    AxiosProgressEvent,
     AxiosResponse,
     InternalAxiosRequestConfig,
 } from "axios";
@@ -15,6 +16,8 @@ export interface RESTfulApiByTag {
     readonly filename?: string;
     readonly header?: { [key: string]: string };
     readonly body?: { [key: string]: string | number | undefined };
+    readonly onUpload?: (progressEvent: AxiosProgressEvent) => void;
+    readonly onDownload?: (progressEvent: AxiosProgressEvent) => void;
 }
 
 export interface ApiResponse {
@@ -32,6 +35,8 @@ const restfulApiByTag = async ({
     body,
     blob,
     filename,
+    onUpload,
+    onDownload,
     timeout = 10000,
 }: RESTfulApiByTag): Promise<ApiResponse> => {
     const _axios = axios.create({
@@ -61,11 +66,13 @@ const restfulApiByTag = async ({
 
         const backend = `${window.location.protocol}${getBackend()}`;
         const { data, headers } = await _axios.request({
-            responseType: blob ? "blob" : "json",
-            url: `${backend}${url}`,
-            headers: header,
-            method: method,
             data: body,
+            method: method,
+            headers: header,
+            url: `${backend}${url}`,
+            onUploadProgress: onUpload,
+            onDownloadProgress: onDownload,
+            responseType: blob ? "blob" : "json",
         });
 
         if (blob) {

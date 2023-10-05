@@ -8,6 +8,8 @@ definitions:
         type: string
       time:
         type: string
+      ttl:
+        type: integer
     type: object
   publisher.Geophone:
     properties:
@@ -302,8 +304,8 @@ paths:
       description: Get earthquake events data source list and earthquake event list
         from data source
       parameters:
-      - description: Use `source=show` as payload to get available sources first,
-          choose one and request again to get events
+      - description: Use `show` to get available sources first, then choose one and
+          request again to get events
         in: formData
         name: source
         required: true

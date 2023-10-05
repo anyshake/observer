@@ -44,6 +44,11 @@ func (h *MSeed) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) 
 			return
 		}
 
+		if len(binding.Name) == 0 {
+			response.Error(c, http.StatusBadRequest)
+			return
+		}
+
 		fileBytes, err := getMiniSEEDBytes(options.FeatureOptions.Config, binding.Name)
 		if err != nil {
 			response.Error(c, http.StatusInternalServerError)

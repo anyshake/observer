@@ -1,13 +1,22 @@
-const getSortedArray = (arr: [], key: string, sortOrder: "asc" | "desc") => {
+const getSortedArray = (
+    arr: [],
+    key: string,
+    keyType: "number" | "datetime",
+    sortOrder: "asc" | "desc"
+) => {
     if (!arr.length) {
         return [];
     }
 
     const compare = (a: never, b: never) => {
         if (sortOrder === "desc") {
-            return b[key] - a[key];
+            return keyType === "datetime"
+                ? new Date(b[key]).getTime() - new Date(a[key]).getTime()
+                : b[key] - a[key];
         } else {
-            return a[key] - b[key];
+            return keyType === "datetime"
+                ? new Date(a[key]).getTime() - new Date(b[key]).getTime()
+                : a[key] - b[key];
         }
     };
 

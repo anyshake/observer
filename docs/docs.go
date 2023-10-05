@@ -210,7 +210,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Use ` + "`" + `source=show` + "`" + ` as payload to get available sources first, choose one and request again to get events",
+                        "description": "Use ` + "`" + `show` + "`" + ` to get available sources first, then choose one and request again to get events",
                         "name": "source",
                         "in": "formData",
                         "required": true
@@ -266,6 +266,9 @@ const docTemplate = `{
                 },
                 "time": {
                     "type": "string"
+                },
+                "ttl": {
+                    "type": "integer"
                 }
             }
         },

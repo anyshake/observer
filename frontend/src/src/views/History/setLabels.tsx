@@ -34,7 +34,7 @@ const setLabels = (
     const ehnAcceleration: number[] = [];
 
     // Sort data by timestamp and get data duration in seconds
-    const sortedData: any = getSortedArray(data, "ts", "asc");
+    const sortedData: any = getSortedArray(data, "ts", "number", "asc");
     const durationSec =
         (sortedData[sortedData.length - 1].ts - sortedData[0].ts) / 1000;
 
