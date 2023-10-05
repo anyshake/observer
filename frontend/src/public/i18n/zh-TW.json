@@ -217,12 +217,12 @@
                     "name": "檔案名稱",
                     "size": "檔案大小",
                     "time": "修改日期（UTC）",
-                    "ttl": "剩餘時間"
+                    "ttl": "有效期（天）"
                 },
                 "actions": {
                     "export": "匯出"
                 },
-                "placeholder": "清單為空"
+                "placeholder": "請稍等..."
             },
             "toasts": {
                 "is_exporting_mseed": "正在匯出 MiniSEED 格式檔案，這可能需要一些時間",
@@ -230,7 +230,7 @@
                 "export_mseed_error": "MiniSEED 格式檔案匯出失敗",
                 "is_fetching_mseed": "正在取得 MiniSEED 格式檔案清單，請稍等...",
                 "fetch_mseed_success": "MiniSEED 格式檔案清單取得成功",
-                "fetch_mseed_error": "MiniSEED 格式檔案清單取得失敗"
+                "fetch_mseed_error": "MiniSEED 格式檔案清單為空或取得失敗"
             }
         },
         "setting": {

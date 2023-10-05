@@ -9,7 +9,7 @@ import (
 )
 
 // @Summary Observer event trace
-// @Description Get earthquake events data source list and earthquake event list from data source
+// @Description Get list of earthquake events data source and earthquake events from specified data source
 // @Router /trace [post]
 // @Accept application/x-www-form-urlencoded
 // @Produce application/json

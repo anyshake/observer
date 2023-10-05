@@ -214,15 +214,15 @@
             },
             "table": {
                 "columns": {
-                    "name": "File name",
-                    "size": "File size",
-                    "time": "Modified date (UTC)",
-                    "ttl": "TTL (days)"
+                    "name": "File Name",
+                    "size": "File Size",
+                    "time": "Modified Date (UTC)",
+                    "ttl": "TTL (in days)"
                 },
                 "actions": {
                     "export": "Export"
                 },
-                "placeholder": "List is empty"
+                "placeholder": "Please wait..."
             },
             "toasts": {
                 "is_exporting_mseed": "Exporting MiniSEED format file, it may take some time",
@@ -230,7 +230,7 @@
                 "export_mseed_error": "MiniSEED format file export failed",
                 "is_fetching_mseed": "Fetching MiniSEED format file list, please wait...",
                 "fetch_mseed_success": "MiniSEED format file list fetched successfully",
-                "fetch_mseed_error": "MiniSEED format file list fetch failed"
+                "fetch_mseed_error": "MiniSEED format file list is empty or fetch failed"
             }
         },
         "setting": {

@@ -82,41 +82,38 @@ class Export extends Component<WithTranslation, ExportState> {
         );
     };
 
-    // Fetch available MiniSEED files
+    // Fetch available MiniSEED files from server
     async componentDidMount(): Promise<void> {
         const { t } = this.props;
         const { table } = this.state;
 
         // Read MiniSEED file list from server
-        const { data } = await toast.promise(
-            restfulApiByTag({
-                tag: "mseed",
-                body: { action: "show" },
-                timeout: EXPORT_TIMEOUT,
-            }),
-            {
-                loading: t("views.export.toasts.is_fetching_mseed"),
-                success: t("views.export.toasts.fetch_mseed_success"),
-                error: t("views.export.toasts.fetch_mseed_error"),
-            }
-        );
-
-        // Sort files by time
-        if (data.length) {
-            getSortedArray(data, "time", "datetime", "desc");
+        const { data } = await restfulApiByTag({
+            tag: "mseed",
+            body: { action: "show" },
+            timeout: EXPORT_TIMEOUT,
+        });
+        if (!data || !data.length) {
+            // Show error toast if no MiniSEED files found
+            const err = "views.export.toasts.fetch_mseed_error";
+            toast.error(t(err));
+            this.setState({
+                table: { ...table, placeholder: { id: err } },
+            });
         } else {
-            return;
+            // Sort files by time and show success toast
+            toast.success(t("views.export.toasts.fetch_mseed_success"));
+            getSortedArray(data, "time", "datetime", "desc");
+            // Append export action and update table
+            const actions = [
+                {
+                    icon: ExportIcon,
+                    onClick: this.exportMiniSEED,
+                    label: { id: "views.export.table.actions.export" },
+                },
+            ];
+            this.setState({ table: { ...table, data, actions } });
         }
-
-        // Append export action and update table
-        const actions = [
-            {
-                icon: ExportIcon,
-                onClick: this.exportMiniSEED,
-                label: { id: "views.export.table.actions.export" },
-            },
-        ];
-        this.setState({ table: { ...table, data, actions } });
     }
 
     render() {

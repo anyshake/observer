@@ -222,7 +222,7 @@
                 "actions": {
                     "export": "导出"
                 },
-                "placeholder": "列表为空"
+                "placeholder": "请稍等..."
             },
             "toasts": {
                 "is_exporting_mseed": "正在导出 MiniSEED 格式文件，这可能需要一些时间",
@@ -230,7 +230,7 @@
                 "export_mseed_error": "MiniSEED 格式文件导出失败",
                 "is_fetching_mseed": "正在获取 MiniSEED 格式文件列表，请稍等...",
                 "fetch_mseed_success": "MiniSEED 格式文件列表获取成功",
-                "fetch_mseed_error": "MiniSEED 格式文件列表获取失败"
+                "fetch_mseed_error": "MiniSEED 格式文件列表为空获取失败"
             }
         },
         "setting": {
