@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/history": {
             "post": {
-                "description": "Get earthquake events data source list and earthquake event list from data source",
+                "description": "Get waveform count data in specified time range, channel and format",
                 "consumes": [
                     "application/x-www-form-urlencoded"
                 ],
@@ -43,17 +43,16 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Format of the waveform data to be exported, ` + "`" + `json` + "`" + ` or ` + "`" + `sac` + "`" + `",
+                        "description": "Format of the waveform data to be queried, ` + "`" + `json` + "`" + ` or ` + "`" + `sac` + "`" + `",
                         "name": "format",
                         "in": "formData",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Channel of the waveform data to be queried, ` + "`" + `EHZ` + "`" + `, ` + "`" + `EHE` + "`" + ` or ` + "`" + `EHN` + "`" + `",
+                        "description": "Channel of the waveform, ` + "`" + `EHZ` + "`" + `, ` + "`" + `EHE` + "`" + ` or ` + "`" + `EHN` + "`" + `, reuqired when format is ` + "`" + `sac` + "`" + `",
                         "name": "channel",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -199,7 +198,7 @@ const docTemplate = `{
         },
         "/trace": {
             "post": {
-                "description": "Get earthquake events data source list and earthquake event list from data source",
+                "description": "Get list of earthquake events data source and earthquake events from specified data source",
                 "consumes": [
                     "application/x-www-form-urlencoded"
                 ],

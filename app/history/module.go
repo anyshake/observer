@@ -9,15 +9,15 @@ import (
 )
 
 // @Summary Observer waveform history
-// @Description Get earthquake events data source list and earthquake event list from data source
+// @Description Get waveform count data in specified time range, channel and format
 // @Router /history [post]
 // @Accept application/x-www-form-urlencoded
 // @Produce application/json
 // @Produce application/octet-stream
 // @Param start formData int true "Start timestamp of the waveform data to be queried, in milliseconds"
 // @Param end formData int true "End timestamp of the waveform data to be queried, in milliseconds"
-// @Param format formData string true "Format of the waveform data to be exported, `json` or `sac`"
-// @Param channel formData string true "Channel of the waveform data to be queried, `EHZ`, `EHE` or `EHN`"
+// @Param format formData string true "Format of the waveform data to be queried, `json` or `sac`"
+// @Param channel formData string false "Channel of the waveform, `EHZ`, `EHE` or `EHN`, reuqired when format is `sac`"
 // @Failure 400 {object} response.HttpResponse "Failed to export waveform data due to invalid format or channel"
 // @Failure 410 {object} response.HttpResponse "Failed to export waveform data due to no data available"
 // @Failure 500 {object} response.HttpResponse "Failed to export waveform data due to failed to read data source"

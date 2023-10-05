@@ -1,9 +1,10 @@
+const API_FOR_DEVELOPMENT = `quzhou.p.sdrotg.com`;
+
 const getBackend = (): string => {
     const production = process.env.NODE_ENV === "production";
     return production
         ? `//${window.location.host}`
-        : `//172.17.138.214:8073`;
-        // : `//localhost:8073`;
+        : `//${API_FOR_DEVELOPMENT}`;
 };
 
 export default getBackend;
