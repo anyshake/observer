@@ -210,7 +210,7 @@
         },
         "export": {
             "cards": {
-                "file_list": "File list"
+                "file_list": "File List"
             },
             "table": {
                 "columns": {
@@ -230,7 +230,7 @@
                 "export_mseed_error": "MiniSEED format file export failed",
                 "is_fetching_mseed": "Fetching MiniSEED format file list, please wait...",
                 "fetch_mseed_success": "MiniSEED format file list fetched successfully",
-                "fetch_mseed_error": "MiniSEED format file list is empty or fetch failed"
+                "fetch_mseed_error": "Empty or fetch failed"
             }
         },
         "setting": {

@@ -2,7 +2,9 @@ import axios, {
     AxiosError,
     AxiosProgressEvent,
     AxiosResponse,
+    CancelTokenSource,
     InternalAxiosRequestConfig,
+    isCancel,
 } from "axios";
 import API_CONFIG from "../../config/api";
 import getBackend from "../app/getBackend";
@@ -18,6 +20,7 @@ export interface RESTfulApiByTag {
     readonly body?: { [key: string]: string | number | undefined };
     readonly onUpload?: (progressEvent: AxiosProgressEvent) => void;
     readonly onDownload?: (progressEvent: AxiosProgressEvent) => void;
+    readonly cancelToken?: CancelTokenSource;
 }
 
 export interface ApiResponse {
@@ -37,6 +40,7 @@ const restfulApiByTag = async ({
     filename,
     onUpload,
     onDownload,
+    cancelToken,
     timeout = 10000,
 }: RESTfulApiByTag): Promise<ApiResponse> => {
     const _axios = axios.create({
@@ -72,6 +76,7 @@ const restfulApiByTag = async ({
             url: `${backend}${url}`,
             onUploadProgress: onUpload,
             onDownloadProgress: onDownload,
+            cancelToken: cancelToken?.token,
             responseType: blob ? "blob" : "json",
         });
 
@@ -110,12 +115,12 @@ const restfulApiByTag = async ({
         const { message, status } = err as AxiosError;
 
         return {
+            time,
+            message,
             path: url,
             data: null,
-            error: true,
+            error: !isCancel(err),
             status: status || 500,
-            message,
-            time,
         };
     }
 };

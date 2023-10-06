@@ -34,6 +34,7 @@ import setAreas from "./setAreas";
 import { WithTranslation, withTranslation } from "react-i18next";
 import getRouterParam from "../../helpers/router/getRouterParam";
 import getRouterUri from "../../helpers/router/getRouterUri";
+import axios, { CancelTokenSource } from "axios";
 
 // Query duration is 100s by default
 const TRACE_RANGE = 1000 * 5 * 60;
@@ -74,6 +75,7 @@ interface HistoryState {
     readonly select: HistorySelect;
     readonly modal: ModalDialogProps;
     readonly scale: IntensityStandardProperty;
+    readonly tokens: CancelTokenSource[];
 }
 
 class History extends Component<
@@ -83,6 +85,7 @@ class History extends Component<
     constructor(props: ReduxStoreProps & WithTranslation) {
         super(props);
         this.state = {
+            tokens: [],
             trace: {
                 source: "show",
             },
@@ -290,8 +293,15 @@ class History extends Component<
             return Promise.reject(error);
         }
 
+        // Create cancel token and add to list
+        const { tokens } = this.state;
+        const { source } = axios.CancelToken;
+        const cancelToken = source();
+        tokens.push(cancelToken);
+
         // Auto detect format and filename
         const { error, data } = await restfulApiByTag({
+            cancelToken,
             body: history,
             tag: "history",
             timeout: QUERY_TIMEOUT,
@@ -314,9 +324,15 @@ class History extends Component<
 
     // Fetch events list from specified source and open modal dialog
     handleQueryEvents = async (): Promise<unknown> => {
+        // Create cancel token and add to list
+        const { tokens, trace } = this.state;
+        const { source } = axios.CancelToken;
+        const cancelToken = source();
+        tokens.push(cancelToken);
+
         // Get events list from server
-        const { trace } = this.state;
         const { error, data } = await restfulApiByTag({
+            cancelToken,
             body: trace,
             tag: "trace",
             timeout: QUERY_TIMEOUT,
@@ -470,11 +486,18 @@ class History extends Component<
             source: "show",
         };
 
+        // Create cancel token and add to list
+        const { tokens } = this.state;
+        const { source } = axios.CancelToken;
+        const cancelToken = source();
+        tokens.push(cancelToken);
+
         // Avoiding use toast.promise due to restfulApiByTag never reject
         const loader = toast.loading(
             t("views.history.toasts.is_fetching_source")
         );
         const { data, error } = await restfulApiByTag({
+            cancelToken,
             body: trace,
             tag: "trace",
         });
@@ -529,6 +552,12 @@ class History extends Component<
             toast.error(t("views.history.toasts.copy_link_error"));
         }
     };
+
+    // Cancel all pending requests
+    componentWillUnmount(): void {
+        const { tokens } = this.state;
+        tokens.forEach((token) => token.cancel());
+    }
 
     render() {
         const { areas, select, modal, history, labels } = this.state;

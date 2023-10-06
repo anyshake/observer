@@ -15,19 +15,23 @@ import { WithTranslation, withTranslation } from "react-i18next";
 import restfulApiByTag from "../../helpers/request/restfulApiByTag";
 import Progress, { ProgressProps } from "../../components/Progress";
 import getSortedArray from "../../helpers/array/getSortedArray";
+import axios, { CancelTokenSource } from "axios";
 
 // Export timeout is 100s by default
 const EXPORT_TIMEOUT = 100 * 1000;
 
 interface ExportState {
-    table: TableProps;
-    progress: ProgressProps;
+    readonly table: TableProps;
+    readonly tasks: ProgressProps[];
+    readonly tokens: CancelTokenSource[];
 }
 
 class Export extends Component<WithTranslation, ExportState> {
     constructor(props: WithTranslation) {
         super(props);
         this.state = {
+            tokens: [],
+            tasks: [],
             table: {
                 data: [],
                 actions: [],
@@ -51,28 +55,50 @@ class Export extends Component<WithTranslation, ExportState> {
                 ],
                 placeholder: { id: "views.export.table.placeholder" },
             },
-            progress: {
-                value: 0,
-            },
         };
     }
 
+    // Update export task progress by name
+    updateTaskProgress = (name: string, value: number): void => {
+        // Check if task is new
+        const { tasks } = this.state;
+        const taskIndex = tasks.findIndex(({ label }) => label === name);
+        if (taskIndex === -1) {
+            // Add new task if not found
+            tasks.push({ label: name, value });
+        } else if (value === 100) {
+            // Remove task if completed
+            setTimeout(() => {
+                tasks.splice(taskIndex, 1);
+                this.setState({ tasks });
+            }, 1000);
+        } else {
+            // Update task progress
+            tasks[taskIndex].value = value;
+            this.setState({ tasks });
+        }
+    };
+
     // Export specified MiniSEED file
     exportMiniSEED = async ({ name }: TableData): Promise<void> => {
+        // Create cancel token and add to list
+        const { tokens } = this.state;
+        const { source } = axios.CancelToken;
+        const cancelToken = source();
+        tokens.push(cancelToken);
+
+        // Show toast and update task progress
         const { t } = this.props;
         await toast.promise(
             restfulApiByTag({
+                cancelToken,
                 blob: true,
                 tag: "mseed",
                 filename: name,
                 timeout: EXPORT_TIMEOUT,
                 body: { action: "export", name },
-                onDownload: (e) => {
-                    const { progress } = e;
-                    this.setState({
-                        progress: { value: (progress || 0) * 100 },
-                    });
-                },
+                onDownload: ({ progress }) =>
+                    this.updateTaskProgress(name, (progress || 0) * 100),
             }),
             {
                 loading: t("views.export.toasts.is_exporting_mseed"),
@@ -116,9 +142,14 @@ class Export extends Component<WithTranslation, ExportState> {
         }
     }
 
+    // Cancel all pending requests
+    componentWillUnmount(): void {
+        const { tokens } = this.state;
+        tokens.forEach(({ cancel }) => cancel());
+    }
+
     render() {
-        const { table, progress } = this.state;
-        const { value } = progress;
+        const { table, tasks } = this.state;
 
         return (
             <View>
@@ -130,7 +161,12 @@ class Export extends Component<WithTranslation, ExportState> {
 
                     <Container layout="none">
                         <Card label={{ id: "views.export.cards.file_list" }}>
-                            {!!value && <Progress {...progress} />}
+                            {tasks.map(
+                                (item, index) =>
+                                    !!item.value && (
+                                        <Progress key={index} {...item} />
+                                    )
+                            )}
                             <Table {...table} />
                         </Card>
                     </Container>
