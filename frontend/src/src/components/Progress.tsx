@@ -4,15 +4,17 @@ import Typography from "@mui/material/Typography";
 import { Component } from "react";
 
 export interface ProgressProps {
+    readonly precision?: number;
+    readonly label?: string;
     value: number;
 }
 
 export default class Progress extends Component<ProgressProps> {
     render() {
-        const { value } = this.props;
+        const { value, label, precision } = this.props;
         return (
             <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Box sx={{ width: "100%", mr: 2 }}>
+                <Box sx={{ width: "60%", mr: 2 }}>
                     <LinearProgress
                         className="rounded-lg"
                         variant="determinate"
@@ -20,11 +22,14 @@ export default class Progress extends Component<ProgressProps> {
                         value={value}
                     />
                 </Box>
-                <Box sx={{ minWidth: 35 }}>
+                <Box sx={{ minWidth: 60 }}>
                     <Typography
-                        variant="body2"
+                        className="overflow-hidden"
                         color="text.secondary"
-                    >{`${Math.round(value)}%`}</Typography>
+                        variant="body2"
+                    >{`[${value.toFixed(
+                        precision || 2
+                    )}%] ${label}`}</Typography>
                 </Box>
             </Box>
         );

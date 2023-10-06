@@ -230,7 +230,7 @@
                 "export_mseed_error": "MiniSEED 格式文件导出失败",
                 "is_fetching_mseed": "正在获取 MiniSEED 格式文件列表，请稍等...",
                 "fetch_mseed_success": "MiniSEED 格式文件列表获取成功",
-                "fetch_mseed_error": "MiniSEED 格式文件列表为空获取失败"
+                "fetch_mseed_error": "列表为空或获取失败"
             }
         },
         "setting": {
