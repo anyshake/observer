@@ -81,6 +81,13 @@ class Export extends Component<WithTranslation, ExportState> {
 
     // Export specified MiniSEED file
     exportMiniSEED = async ({ name }: TableData): Promise<void> => {
+        // Return if task is already in progress
+        const { tasks } = this.state;
+        const taskIndex = tasks.findIndex(({ label }) => label === name);
+        if (taskIndex !== -1) {
+            return;
+        }
+
         // Create cancel token and add to list
         const { tokens } = this.state;
         const { source } = axios.CancelToken;
