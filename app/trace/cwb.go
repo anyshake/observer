@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/bclswl0827/observer/utils/duration"
 	"github.com/bclswl0827/observer/utils/request"
-	"github.com/PuerkitoBio/goquery"
 )
 
 type CWB struct {
@@ -71,11 +71,11 @@ func (c *CWB) Parse(data []byte) (map[string]any, error) {
 
 		item["latitude"] = latitude
 		item["longitude"] = longitude
-		item["depth"] = c.GetDepth(text)
-		item["event"] = c.GetEvent(text)
-		item["region"] = c.GetRegion(text)
-		item["magnitude"] = c.GetMagnitude(text)
-		item["timestamp"] = c.GetTimestamp(text)
+		item["depth"] = c.getDepth(text)
+		item["event"] = c.getEvent(text)
+		item["region"] = c.getRegion(text)
+		item["magnitude"] = c.getMagnitude(text)
+		item["timestamp"] = c.getTimestamp(text)
 
 		result["data"] = append(result["data"].([]any), item)
 	})
@@ -124,7 +124,7 @@ func (c *CWB) List(latitude, longitude float64) ([]Event, error) {
 	return list, nil
 }
 
-func (c *CWB) GetDepth(data string) float64 {
+func (c *CWB) getDepth(data string) float64 {
 	exp := regexp.MustCompile(`深度(\d+(\.\d{1,}公里)|([1-9]\d*公里))`)
 	if exp == nil {
 		return -1
@@ -141,7 +141,7 @@ func (c *CWB) GetDepth(data string) float64 {
 	return string2Float(result)
 }
 
-func (c *CWB) GetMagnitude(data string) float64 {
+func (c *CWB) getMagnitude(data string) float64 {
 	exp := regexp.MustCompile(`模\d+(\.\d{1,})|([1-9]\d*)$`)
 	if exp == nil {
 		return -1
@@ -157,7 +157,7 @@ func (c *CWB) GetMagnitude(data string) float64 {
 	return string2Float(result)
 }
 
-func (c *CWB) GetEvent(data string) string {
+func (c *CWB) getEvent(data string) string {
 	exp := regexp.MustCompile(`地點為.+方\d+(\.\d{1,}公里)|([1-9]\d*公里)`)
 	if exp == nil {
 		return "未知地震"
@@ -172,7 +172,7 @@ func (c *CWB) GetEvent(data string) string {
 	return result
 }
 
-func (c *CWB) GetRegion(data string) string {
+func (c *CWB) getRegion(data string) string {
 	exp := regexp.MustCompile(`\(位於.+\)`)
 	if exp == nil {
 		return "未知地点"
@@ -188,7 +188,7 @@ func (c *CWB) GetRegion(data string) string {
 	return result
 }
 
-func (c *CWB) GetTimestamp(data string) int64 {
+func (c *CWB) getTimestamp(data string) int64 {
 	exp := regexp.MustCompile(`時間為\d+月\d+日\d+時\d+，`)
 	if exp == nil {
 		return -1

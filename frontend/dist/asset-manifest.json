@@ -1,12 +1,12 @@
 {
   "files": {
-    "main.css": "/static/css/main.a419fa1a.css",
-    "main.js": "/static/js/main.99270012.js",
+    "main.css": "/static/css/main.4361f646.css",
+    "main.js": "/static/js/main.a9ecacc0.js",
     "static/css/278.525e2941.chunk.css": "/static/css/278.525e2941.chunk.css",
     "static/js/278.d260dbf2.chunk.js": "/static/js/278.d260dbf2.chunk.js",
     "static/js/967.e799d4e2.chunk.js": "/static/js/967.e799d4e2.chunk.js",
-    "static/js/555.adca73cd.chunk.js": "/static/js/555.adca73cd.chunk.js",
-    "static/js/756.2bd9233b.chunk.js": "/static/js/756.2bd9233b.chunk.js",
+    "static/js/555.fd91b56e.chunk.js": "/static/js/555.fd91b56e.chunk.js",
+    "static/js/756.bf429821.chunk.js": "/static/js/756.bf429821.chunk.js",
     "static/js/155.601753db.chunk.js": "/static/js/155.601753db.chunk.js",
     "static/js/377.f0e1c66a.chunk.js": "/static/js/377.f0e1c66a.chunk.js",
     "static/js/453.30461b97.chunk.js": "/static/js/453.30461b97.chunk.js",
@@ -46,7 +46,7 @@
     "static/media/getFetch.cjs": "/static/media/getFetch.40f37ddea2378391108f.cjs"
   },
   "entrypoints": [
-    "static/css/main.a419fa1a.css",
-    "static/js/main.99270012.js"
+    "static/css/main.4361f646.css",
+    "static/js/main.a9ecacc0.js"
   ]
 }

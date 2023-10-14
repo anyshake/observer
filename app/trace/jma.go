@@ -71,13 +71,13 @@ func (j *JMA) Format(latitude, longitude float64, data map[string]any) ([]Event,
 		}
 
 		l := Event{
-			Depth:     j.GetDepth(v["cod"].(string)),
+			Depth:     j.getDepth(v["cod"].(string)),
 			Verfied:   true,
 			Timestamp: ts.Add(-9 * time.Hour).UnixMilli(),
 			Event:     v["anm"].(string),
 			Region:    v["anm"].(string),
-			Latitude:  j.GetLatitude(v["cod"].(string)),
-			Longitude: j.GetLongitude(v["cod"].(string)),
+			Latitude:  j.getLatitude(v["cod"].(string)),
+			Longitude: j.getLongitude(v["cod"].(string)),
 			Magnitude: string2Float(v["mag"].(string)),
 		}
 		l.Distance = getDistance(latitude, l.Latitude, longitude, l.Longitude)
@@ -108,7 +108,7 @@ func (j *JMA) List(latitude, longitude float64) ([]Event, error) {
 	return list, nil
 }
 
-func (j *JMA) GetDepth(data string) float64 {
+func (j *JMA) getDepth(data string) float64 {
 	arr := strings.FieldsFunc(data, func(c rune) bool {
 		return c == '+' || c == '-' || c == '/'
 	})
@@ -119,7 +119,7 @@ func (j *JMA) GetDepth(data string) float64 {
 	return string2Float(arr[2]) / 1000
 }
 
-func (j *JMA) GetLatitude(data string) float64 {
+func (j *JMA) getLatitude(data string) float64 {
 	arr := strings.FieldsFunc(data, func(c rune) bool {
 		return c == '+' || c == '-' || c == '/'
 	})
@@ -130,7 +130,7 @@ func (j *JMA) GetLatitude(data string) float64 {
 	return string2Float(arr[0])
 }
 
-func (j *JMA) GetLongitude(data string) float64 {
+func (j *JMA) getLongitude(data string) float64 {
 	arr := strings.FieldsFunc(data, func(c rune) bool {
 		return c == '+' || c == '-' || c == '/'
 	})
