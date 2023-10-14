@@ -283,7 +283,7 @@ class History extends Component<
     // Fetch history waveform with specified format (JSON or SAC)
     handleQueryHistory = async (): Promise<unknown> => {
         const { history } = this.state;
-        const { start, end } = history;
+        const { start, end, format, channel } = history;
 
         // Check if start time is earlier than end time
         if (end - start <= 0 || !start || !end) {
@@ -305,17 +305,17 @@ class History extends Component<
             body: history,
             tag: "history",
             timeout: QUERY_TIMEOUT,
-            blob: history.format === "sac",
-            filename: `${history.channel}-${history.start}-${history.end}.${history.format}`,
+            blob: format === "sac",
+            filename: `${channel}_${start}_${end}.${format}`,
         });
         if (error) {
             const { t } = this.props;
             const error = t(
-                history.format === "sac"
+                format === "sac"
                     ? "views.history.toasts.export_sac_error"
                     : "views.history.toasts.fetch_waveform_error"
             );
-            history.format === "sac" && toast.error(error);
+            format === "sac" && toast.error(error);
             return Promise.reject(error);
         }
 
@@ -526,6 +526,7 @@ class History extends Component<
         }));
     };
 
+    // Create and copy share link to clipboard
     handleGetShareLink = async (): Promise<void> => {
         const uri = getRouterUri();
         const { t } = this.props;

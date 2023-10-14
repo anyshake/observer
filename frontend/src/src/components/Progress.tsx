@@ -14,7 +14,7 @@ export default class Progress extends Component<ProgressProps> {
         const { value, label, precision } = this.props;
         return (
             <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Box sx={{ width: "60%", mr: 2 }}>
+                <Box sx={{ width: "100%", my: 1, mx: 2 }}>
                     <LinearProgress
                         className="rounded-lg"
                         variant="determinate"
@@ -22,9 +22,9 @@ export default class Progress extends Component<ProgressProps> {
                         value={value}
                     />
                 </Box>
-                <Box sx={{ minWidth: 60 }}>
+                <Box sx={{ minWidth: 100 }}>
                     <Typography
-                        className="overflow-hidden"
+                        className="overflow-scroll"
                         color="text.secondary"
                         variant="body2"
                     >{`[${value.toFixed(

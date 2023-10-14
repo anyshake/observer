@@ -67,7 +67,11 @@ func getSACBytes(data []publisher.Geophone, channel string, options *app.ServerO
 	}
 
 	// Return filename and bytes
-	filename := fmt.Sprintf("%s_%s_%s.sac", station, channel, network)
+	filename := fmt.Sprintf(
+		"%s_%d_%d.sac", channel,
+		startTime.UnixMilli(),
+		endTime.UnixMilli(),
+	)
 	return filename, sacBytes, nil
 }
 
