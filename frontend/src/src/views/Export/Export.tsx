@@ -16,6 +16,7 @@ import restfulApiByTag from "../../helpers/request/restfulApiByTag";
 import Progress, { ProgressProps } from "../../components/Progress";
 import getSortedArray from "../../helpers/array/getSortedArray";
 import axios, { CancelTokenSource } from "axios";
+import userDebounce from "../../helpers/utils/userDebounce";
 
 // Export timeout is 100s by default
 const EXPORT_TIMEOUT = 100 * 1000;
@@ -80,40 +81,42 @@ class Export extends Component<WithTranslation, ExportState> {
     };
 
     // Export specified MiniSEED file
-    exportMiniSEED = async ({ name }: TableData): Promise<void> => {
-        // Return if task is already in progress
-        const { tasks } = this.state;
-        const taskIndex = tasks.findIndex(({ label }) => label === name);
-        if (taskIndex !== -1) {
-            return;
-        }
-
-        // Create cancel token and add to list
-        const { tokens } = this.state;
-        const { source } = axios.CancelToken;
-        const cancelToken = source();
-        tokens.push(cancelToken);
-
-        // Show toast and update task progress
-        const { t } = this.props;
-        await toast.promise(
-            restfulApiByTag({
-                cancelToken,
-                blob: true,
-                tag: "mseed",
-                filename: name,
-                timeout: EXPORT_TIMEOUT,
-                body: { action: "export", name },
-                onDownload: ({ progress }) =>
-                    this.updateTaskProgress(name, (progress || 0) * 100),
-            }),
-            {
-                loading: t("views.export.toasts.is_exporting_mseed"),
-                success: t("views.export.toasts.export_mseed_success"),
-                error: t("views.export.toasts.export_mseed_error"),
+    exportMiniSEED = userDebounce(
+        async ({ name }: TableData): Promise<void> => {
+            // Return if task is already in progress
+            const { tasks } = this.state;
+            const taskIndex = tasks.findIndex(({ label }) => label === name);
+            if (taskIndex !== -1) {
+                return;
             }
-        );
-    };
+
+            // Create cancel token and add to list
+            const { tokens } = this.state;
+            const { source } = axios.CancelToken;
+            const cancelToken = source();
+            tokens.push(cancelToken);
+
+            // Show toast and update task progress
+            const { t } = this.props;
+            await toast.promise(
+                restfulApiByTag({
+                    cancelToken,
+                    blob: true,
+                    tag: "mseed",
+                    filename: name,
+                    timeout: EXPORT_TIMEOUT,
+                    body: { action: "export", name },
+                    onDownload: ({ progress }) =>
+                        this.updateTaskProgress(name, (progress || 0) * 100),
+                }),
+                {
+                    loading: t("views.export.toasts.is_exporting_mseed"),
+                    success: t("views.export.toasts.export_mseed_success"),
+                    error: t("views.export.toasts.export_mseed_error"),
+                }
+            );
+        }
+    );
 
     // Fetch available MiniSEED files from server
     async componentDidMount(): Promise<void> {
