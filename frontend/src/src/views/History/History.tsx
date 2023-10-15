@@ -35,6 +35,7 @@ import { WithTranslation, withTranslation } from "react-i18next";
 import getRouterParam from "../../helpers/router/getRouterParam";
 import getRouterUri from "../../helpers/router/getRouterUri";
 import axios, { CancelTokenSource } from "axios";
+import userDebounce from "../../helpers/utils/userDebounce";
 
 // Query duration is 100s by default
 const TRACE_RANGE = 1000 * 5 * 60;
@@ -385,53 +386,56 @@ class History extends Component<
     };
 
     // Select dialog handler for data source & SAC file export option
-    handleSelect = async (from: string, value: string): Promise<void> => {
-        // Close select dialog
-        const { t } = this.props;
-        const select = {
-            from: "history",
-            dialog: {
-                ...this.state.select.dialog,
-                open: false,
-            },
-        };
+    handleSelect = userDebounce(
+        async (from: string, value: string): Promise<void> => {
+            // Close select dialog
+            const { t } = this.props;
+            const select = {
+                from: "history",
+                dialog: {
+                    ...this.state.select.dialog,
+                    open: false,
+                },
+            };
 
-        // Determine method based on `from` field
-        switch (from) {
-            case "history":
-                await this.promisedSetState({
-                    select,
-                    history: {
-                        ...this.state.history,
-                        channel: value as any,
-                        format: "sac",
-                    },
-                });
-                await toast.promise(this.handleQueryHistory(), {
-                    loading: t("views.history.toasts.is_exporting_sac"),
-                    success: t("views.history.toasts.export_sac_success"),
-                    error: t("views.history.toasts.export_sac_error"),
-                });
-                break;
-            case "trace":
-                await this.promisedSetState({
-                    select,
-                    trace: {
-                        ...this.state.trace,
-                        source: value,
-                    },
-                });
-                await toast.promise(this.handleQueryEvents(), {
-                    loading: t("views.history.toasts.is_fetching_events"),
-                    success: t("views.history.toasts.fetch_events_success"),
-                    error: t("views.history.toasts.fetch_events_error"),
-                });
-                break;
-        }
-    };
+            // Determine method based on `from` field
+            switch (from) {
+                case "history":
+                    await this.promisedSetState({
+                        select,
+                        history: {
+                            ...this.state.history,
+                            channel: value as any,
+                            format: "sac",
+                        },
+                    });
+                    await toast.promise(this.handleQueryHistory(), {
+                        loading: t("views.history.toasts.is_exporting_sac"),
+                        success: t("views.history.toasts.export_sac_success"),
+                        error: t("views.history.toasts.export_sac_error"),
+                    });
+                    break;
+                case "trace":
+                    await this.promisedSetState({
+                        select,
+                        trace: {
+                            ...this.state.trace,
+                            source: value,
+                        },
+                    });
+                    await toast.promise(this.handleQueryEvents(), {
+                        loading: t("views.history.toasts.is_fetching_events"),
+                        success: t("views.history.toasts.fetch_events_success"),
+                        error: t("views.history.toasts.fetch_events_error"),
+                    });
+                    break;
+            }
+        },
+        200
+    );
 
     // Fetch JSON format waveform and update labels
-    handleQueryWaveform = async (): Promise<void> => {
+    handleQueryWaveform = userDebounce(async (): Promise<void> => {
         // Update format to JSON
         await this.promisedSetState({
             history: { ...this.state.history, format: "json" },
@@ -456,7 +460,7 @@ class History extends Component<
             const areas = setAreas(this.state.areas, res);
             this.setState({ areas, labels });
         }
-    };
+    });
 
     // Open select dialog for SAC file export option
     handleQuerySACFile = async (): Promise<void> => {
@@ -479,7 +483,7 @@ class History extends Component<
     };
 
     // Fetch event source list and open select dialog
-    handleQuerySource = async (): Promise<unknown> => {
+    handleQuerySource = userDebounce(async (): Promise<unknown> => {
         // Set payload and fetch source list
         const { t } = this.props;
         const trace = {
@@ -524,7 +528,7 @@ class History extends Component<
                 },
             },
         }));
-    };
+    });
 
     // Create and copy share link to clipboard
     handleGetShareLink = async (): Promise<void> => {
