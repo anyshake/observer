@@ -33,7 +33,7 @@ const setBanner = (
             id: "views.realtime.banner.success.text",
             format: {
                 time: getTimeString(ts),
-                scale: scale?.name || "Unknown",
+                scale: `${scale?.value} - ${scale?.name}` || "Unknown",
             },
         },
     };

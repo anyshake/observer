@@ -28,9 +28,6 @@ import { update as updateGeophone } from "../../store/geophone";
 import mapStateToProps from "../../helpers/utils/mapStateToProps";
 import { WithTranslation, withTranslation } from "react-i18next";
 
-// 180s by default
-const QUENE_LENGTH = 180;
-
 export interface RealtimeArea {
     readonly tag: string;
     readonly area: AreaProps;
@@ -182,14 +179,16 @@ class Realtime extends Component<
 
     // WebSocket OnData handler
     handleWebsocketData = (event: MessageEvent): void => {
-        const { adc, geophone, scale } = this.state;
         const jsonData = JSON.parse(event.data);
+        const { adc, geophone, scale } = this.state;
         const banner = setBanner(jsonData, this.prevTs, scale);
+        // Get waveform retention time from global config
+        const { retention } = this.props.retention;
         const areas = setAreas(
             this.state.areas,
             jsonData,
             this.prevTs,
-            QUENE_LENGTH,
+            retention,
             adc,
             geophone,
             scale

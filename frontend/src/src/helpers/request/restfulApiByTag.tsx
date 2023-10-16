@@ -10,6 +10,7 @@ import API_CONFIG from "../../config/api";
 import getBackend from "../app/getBackend";
 import getApiUrl from "../app/getApiUrl";
 import fileDownload from "js-file-download";
+import GLOBAL_CONFIG from "../../config/global";
 
 export interface RESTfulApiByTag {
     readonly tag: string;
@@ -41,10 +42,10 @@ const restfulApiByTag = async ({
     onUpload,
     onDownload,
     cancelToken,
-    timeout = 10000,
+    timeout = GLOBAL_CONFIG.app_settings.timeout,
 }: RESTfulApiByTag): Promise<ApiResponse> => {
     const _axios = axios.create({
-        timeout: timeout,
+        timeout: timeout * 1000,
     });
 
     _axios.interceptors.request.use((config: InternalAxiosRequestConfig) => {

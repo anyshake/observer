@@ -1,23 +1,23 @@
 {
   "files": {
-    "main.css": "/static/css/main.4361f646.css",
-    "main.js": "/static/js/main.99b6353f.js",
+    "main.css": "/static/css/main.3d547ccc.css",
+    "main.js": "/static/js/main.507c5858.js",
     "static/css/278.525e2941.chunk.css": "/static/css/278.525e2941.chunk.css",
     "static/js/278.d260dbf2.chunk.js": "/static/js/278.d260dbf2.chunk.js",
-    "static/js/967.e799d4e2.chunk.js": "/static/js/967.e799d4e2.chunk.js",
-    "static/js/555.0cb74b57.chunk.js": "/static/js/555.0cb74b57.chunk.js",
-    "static/js/756.2c82592b.chunk.js": "/static/js/756.2c82592b.chunk.js",
-    "static/js/155.601753db.chunk.js": "/static/js/155.601753db.chunk.js",
+    "static/js/967.2fd750da.chunk.js": "/static/js/967.2fd750da.chunk.js",
+    "static/js/555.f18587de.chunk.js": "/static/js/555.f18587de.chunk.js",
+    "static/js/756.f470d0ba.chunk.js": "/static/js/756.f470d0ba.chunk.js",
+    "static/js/886.429c4aac.chunk.js": "/static/js/886.429c4aac.chunk.js",
     "static/js/377.f0e1c66a.chunk.js": "/static/js/377.f0e1c66a.chunk.js",
     "static/js/453.30461b97.chunk.js": "/static/js/453.30461b97.chunk.js",
     "static/js/59.a77c052b.chunk.js": "/static/js/59.a77c052b.chunk.js",
     "static/js/596.0088f6dd.chunk.js": "/static/js/596.0088f6dd.chunk.js",
     "static/js/366.14cf3b89.chunk.js": "/static/js/366.14cf3b89.chunk.js",
-    "static/js/954.bab9c5a7.chunk.js": "/static/js/954.bab9c5a7.chunk.js",
-    "static/js/916.c214f8f4.chunk.js": "/static/js/916.c214f8f4.chunk.js",
+    "static/js/165.41b9296d.chunk.js": "/static/js/165.41b9296d.chunk.js",
+    "static/js/979.14e4e415.chunk.js": "/static/js/979.14e4e415.chunk.js",
     "static/js/822.ae40dac1.chunk.js": "/static/js/822.ae40dac1.chunk.js",
     "static/js/912.2ed8ddb3.chunk.js": "/static/js/912.2ed8ddb3.chunk.js",
-    "static/js/730.a900ba3b.chunk.js": "/static/js/730.a900ba3b.chunk.js",
+    "static/js/730.cafd7702.chunk.js": "/static/js/730.cafd7702.chunk.js",
     "static/media/gear-solid.svg": "/static/media/gear-solid.bf34f9d52ff44a67baec8a0d4220d3a3.svg",
     "static/media/bug-solid.svg": "/static/media/bug-solid.7f781f9ddd35c29f11111e36602dcc87.svg",
     "static/media/earth-americas-solid.svg": "/static/media/earth-americas-solid.4105ee3951f1c7ac60331fccafc17c1f.svg",
@@ -46,7 +46,7 @@
     "static/media/getFetch.cjs": "/static/media/getFetch.40f37ddea2378391108f.cjs"
   },
   "entrypoints": [
-    "static/css/main.4361f646.css",
-    "static/js/main.99b6353f.js"
+    "static/css/main.3d547ccc.css",
+    "static/js/main.507c5858.js"
   ]
 }

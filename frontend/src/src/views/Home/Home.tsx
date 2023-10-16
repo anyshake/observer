@@ -34,7 +34,7 @@ import mapStateToProps from "../../helpers/utils/mapStateToProps";
 import { WithTranslation, withTranslation } from "react-i18next";
 
 // 120s by default
-const QUENE_LENGTH = 120;
+const CHART_RETENTION = 120;
 
 export interface HomeArea {
     readonly tag: string;
@@ -204,7 +204,7 @@ class Home extends Component<ReduxStoreProps & WithTranslation, HomeState> {
             // Update status labels
             const map = setMap(this.state.map, res);
             const labels = setLabels(this.state.labels, res);
-            const areas = setAreas(this.state.areas, res, QUENE_LENGTH);
+            const areas = setAreas(this.state.areas, res, CHART_RETENTION);
             // Update component state
             this.setState({ labels, areas, map });
             // Apply ADC & Geophone parameters to Redux store

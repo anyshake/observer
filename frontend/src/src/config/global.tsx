@@ -24,6 +24,9 @@ const GLOBAL_CONFIG: GlobalConfig = {
         version,
         release,
         scales,
+        timeout: 100,
+        retention: 180,
+        duration: 300,
         router: "hash",
         name: "config.global.name",
         author: "config.global.author",
@@ -45,6 +48,9 @@ export interface AppSettings {
     readonly title: string;
     readonly version: string;
     readonly release: string;
+    readonly timeout: number;
+    readonly duration: number;
+    readonly retention: number;
     readonly description: string;
     readonly scales: IntensityStandard[];
 }

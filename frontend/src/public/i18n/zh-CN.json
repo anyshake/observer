@@ -2,7 +2,7 @@
     "config": {
         "global": {
             "name": "Observer",
-            "author": "Project ES",
+            "author": "AnyShake",
             "title": "Observer 测站面板",
             "description": "雄心勃勃，致力于构建实时地震网络"
         },
@@ -127,7 +127,8 @@
         "history": {
             "modals": {
                 "choose_event": {
-                    "title": "选择一个地震事件"
+                    "title": "选择一个地震事件",
+                    "template": "[M{{ magnitude }}] {{ event }}\n震发时间 {{ time }}\n震源深度 {{ depth }} km\n预计到站 {{ estimated }} 秒"
                 }
             },
             "selects": {
@@ -236,20 +237,46 @@
         "setting": {
             "buttons": {
                 "select_scale": "选择震度标准",
-                "purge_cache": "清除应用缓存"
+                "purge_cache": "清除应用缓存",
+                "waveform_retention": "设定波形保留时间",
+                "query_duration": "设定查询范围"
             },
             "cards": {
                 "select_scale": "震度标准",
-                "purge_cache": "重置应用"
+                "purge_cache": "重置应用",
+                "waveform_retention": "波形设定",
+                "query_duration": "查询设定"
             },
             "selects": {
                 "choose_scale": {
                     "title": "选择震度标准"
                 }
             },
+            "inputs": {
+                "waveform_retention": {
+                    "title": "实时波形保留时间",
+                    "placeholder": "请输入保留时间",
+                    "content": "请以秒为单位，输入一个大于 0 且小于 1000 的整数",
+                    "submit": "提交"
+                },
+                "query_duration": {
+                    "title": "历史查询默认范围",
+                    "placeholder": "请输入默认查询范围",
+                    "content": "请以秒为单位，输入一个大于 0 且小于 3600 的整数",
+                    "submit": "提交"
+                }
+            },
             "toasts": {
                 "cache_purged": "应用缓存已清除，页面即将刷新",
-                "scale_changed": "震度标准已更改为 {{ scale }}"
+                "scale_changed": "震度标准已更改为 {{ scale }}，页面即将刷新",
+                "retention_set": "实时波形保留时间已更改为 {{ retention }} s，页面即将刷新",
+                "duration_set": "历史波形默认查询范围已更改为 {{ duration }} s，页面即将刷新"
+            },
+            "contents": {
+                "select_scale": "当前震度标准：{{ scale }}\n震度标准是用来衡量地震震度的标准，不同的标准会导致不同的震度值。",
+                "purge_cache": "应用出现问题时，可尝试重置应用偏好。\n执行重置后，浏览器中的偏好将被清理，不会对后端服务器产生影响。",
+                "waveform_retention": "此项设定实时波形页面的波形会保留的时间，当前 {{ retention }} s。\n以秒为单位，需要大于 0 且小于 1000，否则将会被重置为默认值 180 秒。",
+                "query_duration": "此项设定历史查询页面自动填写的时间范围，当前 {{ duration }} s。\n以秒为单位，需要大于 0 且小于 3600，否则将会被重置为默认值 300 秒。"
             }
         }
     }
