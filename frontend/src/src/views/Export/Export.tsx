@@ -18,9 +18,6 @@ import getSortedArray from "../../helpers/array/getSortedArray";
 import axios, { CancelTokenSource } from "axios";
 import userDebounce from "../../helpers/utils/userDebounce";
 
-// Export timeout is 100s by default
-const EXPORT_TIMEOUT = 100 * 1000;
-
 interface ExportState {
     readonly table: TableProps;
     readonly tasks: ProgressProps[];
@@ -104,7 +101,6 @@ class Export extends Component<WithTranslation, ExportState> {
                     blob: true,
                     tag: "mseed",
                     filename: name,
-                    timeout: EXPORT_TIMEOUT,
                     body: { action: "export", name },
                     onDownload: ({ progress }) =>
                         this.updateTaskProgress(name, (progress || 0) * 100),
@@ -127,7 +123,6 @@ class Export extends Component<WithTranslation, ExportState> {
         const { data } = await restfulApiByTag({
             tag: "mseed",
             body: { action: "show" },
-            timeout: EXPORT_TIMEOUT,
         });
         if (!data || !data.length) {
             // Show error toast if no MiniSEED files found

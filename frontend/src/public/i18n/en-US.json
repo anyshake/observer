@@ -2,7 +2,7 @@
     "config": {
         "global": {
             "name": "Observer",
-            "author": "Project ES",
+            "author": "AnyShake",
             "title": "Observer Panel",
             "description": "Constructing Realtime Seismic Network Ambitiously."
         },
@@ -127,7 +127,8 @@
         "history": {
             "modals": {
                 "choose_event": {
-                    "title": "Select an Earthquake Event"
+                    "title": "Select an Earthquake Event",
+                    "template": "[M{{ magnitude }}] {{ event }}\nTime: {{ time }}\nDepth: {{ depth }} km\nEstimated arrival time: {{ estimated }} seconds"
                 }
             },
             "selects": {
@@ -236,20 +237,46 @@
         "setting": {
             "buttons": {
                 "select_scale": "Select Seismic Scale",
-                "purge_cache": "Clear Application Cache"
+                "purge_cache": "Clear Application Cache",
+                "waveform_retention": "Set Waveform Retention Time",
+                "query_duration": "Set Query Range"
             },
             "cards": {
                 "select_scale": "Seismic Scale",
-                "purge_cache": "Reset Application"
+                "purge_cache": "Reset Application",
+                "waveform_retention": "Waveform Settings",
+                "query_duration": "Query Settings"
             },
             "selects": {
                 "choose_scale": {
-                    "title": "Select Seismic Scale"
+                    "title": "Select Magnitude Scale"
+                }
+            },
+            "inputs": {
+                "waveform_retention": {
+                    "title": "Real-time waveform retention time",
+                    "placeholder": "Enter retention time",
+                    "content": "Please enter an integer greater than 0 and less than 1000 in seconds.",
+                    "submit": "Submit"
+                },
+                "query_duration": {
+                    "title": "Historical query default range",
+                    "placeholder": "Enter default query range",
+                    "content": "Please enter an integer greater than 0 and less than 3600 in seconds.",
+                    "submit": "Submit"
                 }
             },
             "toasts": {
-                "cache_purged": "Application cache cleared, page will refresh shortly",
-                "scale_changed": "Seismic scale changed to {{ scale }}"
+                "cache_purged": "App cache has been cleared, page will refresh soon",
+                "scale_changed": "Magnitude scale has been changed to {{ scale }}, page will refresh soon",
+                "retention_set": "Real-time waveform retention time has been set to {{ retention }} s, page will refresh soon",
+                "duration_set": "Historical waveform default range has been set to {{ duration }} s, page will refresh soon"
+            },
+            "contents": {
+                "select_scale": "Current magnitude scale: {{ scale }}\nMagnitude scale is a standard used to measure the intensity of an earthquake. Different scales can lead to different magnitude values.",
+                "purge_cache": "If the app is experiencing problems, you can try resetting app preferences.\nAfter resetting, browser preferences will be cleared, but it will not affect the backend server.",
+                "waveform_retention": "This setting determines the amount of time that waveforms will be retained on the real-time waveform page. The current value is {{ retention }} s.\nValues must be greater than 0 and less than 1000. Otherwise, the value will be reset to the default of 180 s.",
+                "query_duration": "This setting determines the time range that is automatically filled in on the historical query page. The current value is {{ duration }} s.\nValues must be greater than 0 and less than 3600. Otherwise, the value will be reset to the default of 300 s."
             }
         }
     }

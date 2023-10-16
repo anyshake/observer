@@ -8,6 +8,8 @@ import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import scale from "../store/scale";
 import { IntensityStandardProperty } from "../helpers/seismic/intensityStandard";
+import duration from "../store/duration";
+import retention from "../store/retention";
 
 const scalePersistConfig = persistReducer(
     {
@@ -17,12 +19,30 @@ const scalePersistConfig = persistReducer(
     },
     scale
 );
+const durationPersistConfig = persistReducer(
+    {
+        storage,
+        key: "duration",
+        whitelist: ["duration"],
+    },
+    duration
+);
+const retentionPersistConfig = persistReducer(
+    {
+        storage,
+        key: "retention",
+        whitelist: ["retention"],
+    },
+    retention
+);
+
 const reducer = combineReducers({
     adc,
     geophone,
     scale: scalePersistConfig,
+    duration: durationPersistConfig,
+    retention: retentionPersistConfig,
 });
-
 const REDUX_STORE = configureStore({
     reducer,
     middleware: (getDefaultMiddleware) => {
@@ -36,8 +56,12 @@ const REDUX_PRESIST = persistStore(REDUX_STORE);
 export interface ReduxStoreProps {
     readonly adc: ReduxStore["adc"];
     readonly scale: ReduxStore["scale"];
+    readonly duration: ReduxStore["duration"];
     readonly geophone: ReduxStore["geophone"];
+    readonly retention: ReduxStore["retention"];
     readonly updateADC?: (adc: ADC) => void;
+    readonly updateDuration?: (duration: number) => void;
+    readonly updateRetention?: (retention: number) => void;
     readonly updateGeophone?: (geophone: Geophone) => void;
     readonly updateScale?: (scale: IntensityStandardProperty) => void;
 }

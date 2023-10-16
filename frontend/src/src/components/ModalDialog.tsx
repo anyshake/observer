@@ -49,7 +49,39 @@ class ModalDialog extends Component<ModalDialogProps & WithTranslation> {
                                 >
                                     <ListItemText
                                         primary={item[0]}
-                                        secondary={item[2] ? item[2] : item[1]}
+                                        secondary={
+                                            <>
+                                                {item[2]
+                                                    ? item[2]
+                                                          .split("\n")
+                                                          .map(
+                                                              (item, index) => (
+                                                                  <span
+                                                                      key={
+                                                                          index
+                                                                      }
+                                                                  >
+                                                                      {item}
+                                                                      <br />
+                                                                  </span>
+                                                              )
+                                                          )
+                                                    : item[1]
+                                                          .split("\n")
+                                                          .map(
+                                                              (item, index) => (
+                                                                  <span
+                                                                      key={
+                                                                          index
+                                                                      }
+                                                                  >
+                                                                      {item}
+                                                                      <br />
+                                                                  </span>
+                                                              )
+                                                          )}
+                                            </>
+                                        }
                                     />
                                 </ListItemButton>
                             </ListItem>

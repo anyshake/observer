@@ -37,11 +37,6 @@ import getRouterUri from "../../helpers/router/getRouterUri";
 import axios, { CancelTokenSource } from "axios";
 import userDebounce from "../../helpers/utils/userDebounce";
 
-// Query duration is 100s by default
-const TRACE_RANGE = 1000 * 5 * 60;
-// Query timeout is 100s by default
-const QUERY_TIMEOUT = 100 * 1000;
-
 export interface HistoryArea {
     readonly tag: string;
     readonly area: AreaProps;
@@ -246,11 +241,13 @@ class History extends Component<
             }
         }
 
+        // Get query duration from Redux store
+        const { duration } = this.props.duration;
         // Read URL params and update state
         const { start, end } = getRouterParam();
         const history = {
             ...this.state.history,
-            start: start ? Number(start) : Date.now() - TRACE_RANGE,
+            start: start ? Number(start) : Date.now() - duration * 1000,
             end: end ? Number(end) : Date.now(),
         };
 
@@ -305,7 +302,6 @@ class History extends Component<
             cancelToken,
             body: history,
             tag: "history",
-            timeout: QUERY_TIMEOUT,
             blob: format === "sac",
             filename: `${channel}_${start}_${end}.${format}`,
         });
@@ -336,7 +332,6 @@ class History extends Component<
             cancelToken,
             body: trace,
             tag: "trace",
-            timeout: QUERY_TIMEOUT,
         });
         if (error) {
             return Promise.reject(error);
@@ -356,15 +351,19 @@ class History extends Component<
                         depth,
                         estimated,
                     } = item;
-                    const desc = `[M${magnitude.toFixed(
-                        1
-                    )}] ${event} / 时刻 ${getTimeString(
-                        timestamp
-                    )} / 深度 ${depth.toFixed(1)} km / 传播 ${estimated.toFixed(
-                        1
-                    )} s`;
 
-                    return [region, timestamp + estimated * 1000, desc];
+                    const { t } = this.props;
+                    const description = t(
+                        "views.history.modals.choose_event.template",
+                        {
+                            event,
+                            time: getTimeString(timestamp),
+                            magnitude: magnitude.toFixed(1),
+                            estimated: estimated.toFixed(1),
+                            depth: depth !== -1 ? depth.toFixed(1) : "Unknown",
+                        }
+                    );
+                    return [region, timestamp + estimated * 1000, description];
                 }),
             },
         }));
@@ -372,8 +371,10 @@ class History extends Component<
 
     // Choose event handler for event list modal dialog
     handleChooseEvent = async (value: string): Promise<void> => {
+        // Get query duration from Redux store
+        const { duration } = this.props.duration;
         // Get time range from event timestamp
-        const span = TRACE_RANGE / 2;
+        const span = (duration * 1000) / 2;
         const time = new Date(value).getTime();
         const start = time - span;
         const end = time + span;
@@ -663,7 +664,7 @@ class History extends Component<
 
                 <SelectDialog
                     {...dialog}
-                    onSelect={(value: string) => this.handleSelect(from, value)}
+                    onSelect={(value) => this.handleSelect(from, value)}
                 />
                 <ModalDialog
                     {...modal}

@@ -10,19 +10,31 @@ import View from "../../components/View";
 import Container from "../../components/Container";
 import Card from "../../components/Card";
 import Text from "../../components/Text";
-import { IntensityStandardProperty } from "../../helpers/seismic/intensityStandard";
 import Button from "../../components/Button";
 import SelectDialog, { SelectDialogProps } from "../../components/SelectDialog";
 import GLOBAL_CONFIG, { fallbackScale } from "../../config/global";
 import mapStateToProps from "../../helpers/utils/mapStateToProps";
 import { update as updateScale } from "../../store/scale";
+import { update as updateRetention } from "../../store/retention";
+import { update as updateDuration } from "../../store/duration";
 import { connect } from "react-redux";
 import { ReduxStoreProps } from "../../config/store";
 import { WithTranslation, withTranslation } from "react-i18next";
+import { I18nTranslation } from "../../config/i18n";
+import FormDialog, { FormDialogProps } from "../../components/FormDialog";
+
+interface SettingCard {
+    readonly label: I18nTranslation;
+    readonly button: I18nTranslation;
+    readonly content: I18nTranslation;
+    readonly className: string;
+    readonly onClick: () => void;
+}
 
 interface SettingState {
+    readonly cards: SettingCard[];
     readonly select: SelectDialogProps;
-    readonly scale: IntensityStandardProperty;
+    readonly input: FormDialogProps;
 }
 
 class Setting extends Component<
@@ -32,6 +44,50 @@ class Setting extends Component<
     constructor(props: ReduxStoreProps & WithTranslation) {
         super(props);
         this.state = {
+            cards: [
+                {
+                    label: { id: "views.setting.cards.waveform_retention" },
+                    content: {
+                        id: "views.setting.contents.waveform_retention",
+                        format: {
+                            retention:
+                                this.props.retention.retention.toString(),
+                        },
+                    },
+                    button: { id: "views.setting.buttons.waveform_retention" },
+                    className: "bg-teal-700 hover:bg-teal-800",
+                    onClick: this.handleRetentionChange,
+                },
+                {
+                    label: { id: "views.setting.cards.query_duration" },
+                    content: {
+                        id: "views.setting.contents.query_duration",
+                        format: {
+                            duration: this.props.duration.duration.toString(),
+                        },
+                    },
+                    button: { id: "views.setting.buttons.query_duration" },
+                    className: "bg-lime-700 hover:bg-lime-800",
+                    onClick: this.handleDurationChange,
+                },
+                {
+                    label: { id: "views.setting.cards.select_scale" },
+                    button: { id: "views.setting.buttons.select_scale" },
+                    className: "bg-sky-700 hover:bg-sky-800",
+                    content: {
+                        id: "views.setting.contents.select_scale",
+                        format: { scale: props.scale.scale.value },
+                    },
+                    onClick: this.handleSelectScale,
+                },
+                {
+                    label: { id: "views.setting.cards.purge_cache" },
+                    content: { id: "views.setting.contents.purge_cache" },
+                    button: { id: "views.setting.buttons.purge_cache" },
+                    className: "bg-pink-700 hover:bg-pink-800",
+                    onClick: this.handlePurgeCache,
+                },
+            ],
             select: {
                 open: false,
                 title: { id: "views.setting.selects.choose_scale.title" },
@@ -40,25 +96,103 @@ class Setting extends Component<
                     item.property().value,
                 ]),
             },
-            scale: fallbackScale.property(),
+            input: {
+                open: false,
+                title: { id: "" },
+                inputType: "number",
+                submitText: { id: "" },
+                onSubmit: this.handleInputSubmit,
+            },
         };
     }
 
-    componentDidMount(): void {
-        // Get scale from Redux store
-        const { scale } = this.props.scale;
-        this.setState({ scale });
-    }
-
-    // Clear localStorage
-    handlePurgeCache = (): void => {
+    // Handler for submitting input dialog
+    handleInputSubmit = (value: string): void => {
         const { t } = this.props;
-        localStorage.clear();
-        toast.success(t("views.setting.toasts.cache_purged"));
+        const { tag } = this.state.input;
+        const { updateRetention, updateDuration } = this.props;
+
+        // Update Redux store
+        switch (tag) {
+            case "retention":
+                updateRetention && updateRetention(Number(value));
+                toast.success(
+                    t("views.setting.toasts.retention_set", {
+                        retention: value,
+                    })
+                );
+                break;
+            case "duration":
+                updateDuration && updateDuration(Number(value));
+                toast.success(
+                    t("views.setting.toasts.duration_set", {
+                        duration: value,
+                    })
+                );
+                break;
+            default:
+                return;
+        }
+
+        // Update state to close input dialog
+        this.setState((state) => ({
+            input: { ...state.input, open: false },
+        }));
+        // Reload page
         setTimeout(() => window.location.reload(), 1000);
     };
 
-    // Open select dialog
+    // Handler for changing waveform retention time
+    handleRetentionChange = (): void => {
+        // Update state to open input dialog
+        this.setState((state) => ({
+            input: {
+                ...state.input,
+                open: true,
+                tag: "retention",
+                title: {
+                    id: "views.setting.inputs.waveform_retention.title",
+                },
+                content: {
+                    id: "views.setting.inputs.waveform_retention.content",
+                },
+                placeholder: {
+                    id: "views.setting.inputs.waveform_retention.placeholder",
+                },
+                submitText: {
+                    id: "views.setting.inputs.waveform_retention.submit",
+                },
+                defaultValue: this.props.retention.retention.toString(),
+            },
+        }));
+    };
+
+    // Handler for changing query duration
+    handleDurationChange = (): void => {
+        // Update state to open input dialog
+        this.setState((state) => ({
+            input: {
+                ...state.input,
+                open: true,
+                tag: "duration",
+                title: {
+                    id: "views.setting.inputs.query_duration.title",
+                },
+                content: {
+                    id: "views.setting.inputs.query_duration.content",
+                },
+                placeholder: {
+                    id: "views.setting.inputs.query_duration.placeholder",
+                },
+                submitText: {
+                    id: "views.setting.inputs.query_duration.submit",
+                },
+                defaultValue: this.props.duration.duration.toString(),
+            },
+        }));
+    };
+
+    // Handler for selecting scale
     handleSelectScale = (): void => {
         this.setState((state) => ({
             select: {
@@ -68,7 +202,7 @@ class Setting extends Component<
         }));
     };
 
-    // Hanlder for changing scale standard
+    // Hanlder for selecting scale standard
     handleScaleChange = (value: string): void => {
         // Match value with scale property
         const { scales } = GLOBAL_CONFIG.app_settings;
@@ -76,7 +210,6 @@ class Setting extends Component<
             .find((item) => item.property().value === value)
             ?.property();
         this.setState({
-            scale: scaleStandard || fallbackScale.property(),
             select: { ...this.state.select, open: false },
         });
         // Apply scale option to Redux store
@@ -85,10 +218,21 @@ class Setting extends Component<
         toast.success(
             t("views.setting.toasts.scale_changed", { scale: value })
         );
+        setTimeout(() => window.location.reload(), 1000);
+    };
+
+    // Handler for purging cache
+    handlePurgeCache = (): void => {
+        const { t } = this.props;
+        localStorage.clear();
+        toast.success(t("views.setting.toasts.cache_purged"));
+        setTimeout(() => window.location.reload(), 1000);
     };
 
     render() {
-        const { scale, select } = this.state;
+        const { t } = this.props;
+        const { select, cards, input } = this.state;
+
         return (
             <View>
                 <Header />
@@ -98,43 +242,31 @@ class Setting extends Component<
                     <Navbar />
 
                     <Container layout="grid">
-                        <Card
-                            className="h-[200px]"
-                            label={{
-                                id: "views.setting.cards.select_scale",
-                            }}
-                        >
-                            {`当前震度标准为${scale.name}。`}
-                            <Text>
-                                震度标准是用来衡量地震震度的标准，不同的标准会导致不同的震度值。
-                            </Text>
-                            <Button
-                                className="bg-lime-700 hover:bg-lime-800"
-                                onClick={this.handleSelectScale}
-                                label={{
-                                    id: "views.setting.buttons.select_scale",
-                                }}
-                            />
-                        </Card>
-
-                        <Card
-                            className="h-[200px]"
-                            label={{
-                                id: "views.setting.cards.purge_cache",
-                            }}
-                        >
-                            <Text>应用出现问题时，可尝试重置应用偏好。</Text>
-                            <Text>
-                                执行重置后，浏览器中的偏好将被清理，不会对后端服务器产生影响。
-                            </Text>
-                            <Button
-                                className="bg-rose-700 hover:bg-rose-800"
-                                onClick={this.handlePurgeCache}
-                                label={{
-                                    id: "views.setting.buttons.purge_cache",
-                                }}
-                            />
-                        </Card>
+                        {cards.map(
+                            (
+                                { label, content, onClick, button, className },
+                                index
+                            ) => (
+                                <Card
+                                    key={index}
+                                    className="min-h-[40vh]"
+                                    label={label}
+                                >
+                                    {t(content.id, content.format)
+                                        .split("\n")
+                                        .map((item: string, index: number) => (
+                                            <Text key={index} className="mb-3">
+                                                {item}
+                                            </Text>
+                                        ))}
+                                    <Button
+                                        className={className}
+                                        onClick={onClick}
+                                        label={button}
+                                    />
+                                </Card>
+                            )
+                        )}
                     </Container>
                 </Content>
 
@@ -142,6 +274,7 @@ class Setting extends Component<
                 <Footer />
 
                 <SelectDialog {...select} onSelect={this.handleScaleChange} />
+                <FormDialog {...input} />
                 <Toaster position="top-center" />
             </View>
         );
@@ -150,4 +283,6 @@ class Setting extends Component<
 
 export default connect(mapStateToProps, {
     updateScale,
+    updateRetention,
+    updateDuration,
 })(withTranslation()(Setting));
