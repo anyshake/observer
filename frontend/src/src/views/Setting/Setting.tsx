@@ -111,22 +111,23 @@ class Setting extends Component<
         const { t } = this.props;
         const { tag } = this.state.input;
         const { updateRetention, updateDuration } = this.props;
+        const roundedValue = Math.round(Number(value));
 
         // Update Redux store
         switch (tag) {
             case "retention":
-                updateRetention && updateRetention(Number(value));
+                updateRetention && updateRetention(roundedValue);
                 toast.success(
                     t("views.setting.toasts.retention_set", {
-                        retention: value,
+                        retention: roundedValue.toString(),
                     })
                 );
                 break;
             case "duration":
-                updateDuration && updateDuration(Number(value));
+                updateDuration && updateDuration(roundedValue);
                 toast.success(
                     t("views.setting.toasts.duration_set", {
-                        duration: value,
+                        duration: roundedValue.toString(),
                     })
                 );
                 break;
