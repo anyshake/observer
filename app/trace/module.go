@@ -19,8 +19,8 @@ import (
 // @Success 200 {object} response.HttpResponse{data=[]Event} "Successfully read the list of earthquake events"
 func (t *Trace) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) {
 	sources := []DataSource{
-		&USGS{}, &JMA{}, &CWB{}, &HKO{},
-		&CEIC{}, &SCEA_E{}, &SCEA_B{},
+		&SCEA_E{}, &SCEA_B{}, &CEIC{},
+		&USGS{}, &JMA{}, &CWA{}, &HKO{},
 	}
 
 	rg.POST("/trace", func(c *gin.Context) {

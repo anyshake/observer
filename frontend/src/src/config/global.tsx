@@ -1,7 +1,7 @@
 import getBackend from "../helpers/app/getBackend";
 import {
     CSISIntensityStandard,
-    CWBIntensityStandard,
+    CWAIntensityStandard,
     IntensityStandard,
     JMAIntensityStandard,
     MMIIntensityStandard,
@@ -14,7 +14,7 @@ const release = getRelease();
 const backend = getBackend();
 const scales = [
     new JMAIntensityStandard(),
-    new CWBIntensityStandard(),
+    new CWAIntensityStandard(),
     new MMIIntensityStandard(),
     new CSISIntensityStandard(),
 ];

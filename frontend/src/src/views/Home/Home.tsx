@@ -120,7 +120,7 @@ class Home extends Component<ReduxStoreProps & WithTranslation, HomeState> {
                         label: { id: "views.home.areas.cpu.label" },
                         text: {
                             id: "views.home.areas.cpu.text",
-                            format: { usage: "0.00%" },
+                            format: { usage: "0.00" },
                         },
                     },
                     chart: {
@@ -140,7 +140,7 @@ class Home extends Component<ReduxStoreProps & WithTranslation, HomeState> {
                         label: { id: "views.home.areas.memory.label" },
                         text: {
                             id: "views.home.areas.memory.text",
-                            format: { usage: "0.00%" },
+                            format: { usage: "0.00" },
                         },
                     },
                     chart: {

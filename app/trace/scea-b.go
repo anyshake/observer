@@ -15,7 +15,7 @@ type SCEA_B struct {
 
 func (s *SCEA_B) Property() (string, string) {
 	const (
-		NAME  string = "四川地震局速报"
+		NAME  string = "四川地震局（速报）"
 		VALUE string = "SCEA-B"
 	)
 

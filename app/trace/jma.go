@@ -15,7 +15,7 @@ type JMA struct {
 
 func (j *JMA) Property() (string, string) {
 	const (
-		NAME  string = "日本気象庁地震情報"
+		NAME  string = "気象庁地震情報"
 		VALUE string = "JMA"
 	)
 

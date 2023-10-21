@@ -76,7 +76,7 @@ class Setting extends Component<
                     className: "bg-sky-700 hover:bg-sky-800",
                     content: {
                         id: "views.setting.contents.select_scale",
-                        format: { scale: props.scale.scale.value },
+                        format: { scale: props.scale.scale },
                     },
                     onClick: this.handleSelectScale,
                 },
@@ -215,7 +215,8 @@ class Setting extends Component<
         });
         // Apply scale option to Redux store
         const { t, updateScale } = this.props;
-        updateScale && updateScale(scaleStandard || fallbackScale.property());
+        updateScale &&
+            updateScale(scaleStandard?.value || fallbackScale.property().value);
         toast.success(
             t("views.setting.toasts.scale_changed", { scale: value })
         );

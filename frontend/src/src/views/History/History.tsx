@@ -23,7 +23,7 @@ import getTimeString from "../../helpers/utils/getTimeString";
 import Label, { LabelProps } from "../../components/Label";
 import setLabels from "./setLabels";
 import { IntensityStandardProperty } from "../../helpers/seismic/intensityStandard";
-import { fallbackScale } from "../../config/global";
+import GLOBAL_CONFIG, { fallbackScale } from "../../config/global";
 import { ReduxStoreProps } from "../../config/store";
 import { update as updateADC } from "../../store/adc";
 import { update as updateGeophone } from "../../store/geophone";
@@ -215,10 +215,10 @@ class History extends Component<
     async componentDidMount(): Promise<void> {
         // Get ADC, Geophone, scale standard from redux
         let { adc } = this.props.adc;
-        const { scale } = this.props.scale;
+        const { resolution } = adc;
         let { geophone } = this.props.geophone;
         const { ehz, ehe, ehn } = geophone;
-        const { resolution } = adc;
+        const { scale: scaleValue } = this.props.scale;
 
         // Query again from server if value is not set
         if (resolution === -1 || ehz * ehe * ehn === 0) {
@@ -251,6 +251,12 @@ class History extends Component<
             end: end ? Number(end) : Date.now(),
         };
 
+        // Get scale standard by value
+        const { scales } = GLOBAL_CONFIG.app_settings;
+        const scale =
+            scales
+                .find((item) => item.property().value === scaleValue)
+                ?.property() || fallbackScale.property();
         // Apply to component state
         this.setState({ history, adc, geophone, scale });
     }
