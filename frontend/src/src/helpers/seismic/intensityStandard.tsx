@@ -11,7 +11,7 @@ export interface IntensityStandard {
 class JMAIntensityStandard implements IntensityStandard {
     property(): IntensityStandardProperty {
         return {
-            name: "日本気象庁震度",
+            name: "気象庁震度階級",
             value: "JMA",
         };
     }
@@ -44,10 +44,10 @@ class JMAIntensityStandard implements IntensityStandard {
     }
 }
 
-class CWBIntensityStandard implements IntensityStandard {
+class CWAIntensityStandard implements IntensityStandard {
     property(): IntensityStandardProperty {
         return {
-            name: "台湾中央氣象局新震度",
+            name: "交通部中央氣象署地震震度分級",
             value: "CWB",
         };
     }
@@ -88,7 +88,7 @@ class CWBIntensityStandard implements IntensityStandard {
 class MMIIntensityStandard implements IntensityStandard {
     property(): IntensityStandardProperty {
         return {
-            name: "修訂麥加利地震震度表",
+            name: "The Modified Mercalli Intensity",
             value: "MMI",
         };
     }
@@ -128,7 +128,7 @@ class MMIIntensityStandard implements IntensityStandard {
 class CSISIntensityStandard implements IntensityStandard {
     property(): IntensityStandardProperty {
         return {
-            name: "中国地震局地震震度",
+            name: "中国地震地震震度",
             value: "CSIS",
         };
     }
@@ -156,7 +156,7 @@ class CSISIntensityStandard implements IntensityStandard {
 
 export {
     JMAIntensityStandard,
-    CWBIntensityStandard,
+    CWAIntensityStandard,
     MMIIntensityStandard,
     CSISIntensityStandard,
 };

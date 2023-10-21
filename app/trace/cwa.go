@@ -12,26 +12,26 @@ import (
 	"github.com/bclswl0827/observer/utils/request"
 )
 
-type CWB struct {
+type CWA struct {
 	DataSourceCache
 }
 
-func (c *CWB) Property() (string, string) {
+func (c *CWA) Property() (string, string) {
 	const (
-		NAME  string = "台湾交通部中央氣象局"
-		VALUE string = "CWB"
+		NAME  string = "交通部中央氣象局"
+		VALUE string = "CWA"
 	)
 
 	return NAME, VALUE
 }
 
-func (c *CWB) Fetch() ([]byte, error) {
+func (c *CWA) Fetch() ([]byte, error) {
 	if duration.Difference(time.Now(), c.Time) <= EXPIRATION {
 		return c.Cache, nil
 	}
 
 	res, err := request.GET(
-		"https://www.cwb.gov.tw/V8/C/E/MOD/MAP_LIST.html",
+		"https://www.cwa.gov.tw/V8/C/E/MOD/MAP_LIST.html",
 		10*time.Second, time.Second, 3, false,
 	)
 	if err != nil {
@@ -45,7 +45,7 @@ func (c *CWB) Fetch() ([]byte, error) {
 	return res, nil
 }
 
-func (c *CWB) Parse(data []byte) (map[string]any, error) {
+func (c *CWA) Parse(data []byte) (map[string]any, error) {
 	result := make(map[string]any)
 	result["data"] = make([]any, 0)
 
@@ -83,7 +83,7 @@ func (c *CWB) Parse(data []byte) (map[string]any, error) {
 	return result, nil
 }
 
-func (c *CWB) Format(latitude, longitude float64, data map[string]any) ([]Event, error) {
+func (c *CWA) Format(latitude, longitude float64, data map[string]any) ([]Event, error) {
 	var list []Event
 	for _, v := range data["data"].([]any) {
 		l := Event{
@@ -105,7 +105,7 @@ func (c *CWB) Format(latitude, longitude float64, data map[string]any) ([]Event,
 	return list, nil
 }
 
-func (c *CWB) List(latitude, longitude float64) ([]Event, error) {
+func (c *CWA) List(latitude, longitude float64) ([]Event, error) {
 	res, err := c.Fetch()
 	if err != nil {
 		return nil, err
@@ -124,7 +124,7 @@ func (c *CWB) List(latitude, longitude float64) ([]Event, error) {
 	return list, nil
 }
 
-func (c *CWB) getDepth(data string) float64 {
+func (c *CWA) getDepth(data string) float64 {
 	exp := regexp.MustCompile(`深度(\d+(\.\d{1,}公里)|([1-9]\d*公里))`)
 	if exp == nil {
 		return -1
@@ -141,7 +141,7 @@ func (c *CWB) getDepth(data string) float64 {
 	return string2Float(result)
 }
 
-func (c *CWB) getMagnitude(data string) float64 {
+func (c *CWA) getMagnitude(data string) float64 {
 	exp := regexp.MustCompile(`模\d+(\.\d{1,})|([1-9]\d*)$`)
 	if exp == nil {
 		return -1
@@ -157,7 +157,7 @@ func (c *CWB) getMagnitude(data string) float64 {
 	return string2Float(result)
 }
 
-func (c *CWB) getEvent(data string) string {
+func (c *CWA) getEvent(data string) string {
 	exp := regexp.MustCompile(`地點為.+方\d+(\.\d{1,}公里)|([1-9]\d*公里)`)
 	if exp == nil {
 		return "未知地震"
@@ -172,7 +172,7 @@ func (c *CWB) getEvent(data string) string {
 	return result
 }
 
-func (c *CWB) getRegion(data string) string {
+func (c *CWA) getRegion(data string) string {
 	exp := regexp.MustCompile(`\(位於.+\)`)
 	if exp == nil {
 		return "未知地点"
@@ -188,7 +188,7 @@ func (c *CWB) getRegion(data string) string {
 	return result
 }
 
-func (c *CWB) getTimestamp(data string) int64 {
+func (c *CWA) getTimestamp(data string) int64 {
 	exp := regexp.MustCompile(`時間為\d+月\d+日\d+時\d+，`)
 	if exp == nil {
 		return -1

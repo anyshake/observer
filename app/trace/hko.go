@@ -16,7 +16,7 @@ type HKO struct {
 
 func (h *HKO) Property() (string, string) {
 	const (
-		NAME  string = "香港天文台全球地震資訊網"
+		NAME  string = "天文台全球地震資訊網"
 		VALUE string = "HKO"
 	)
 

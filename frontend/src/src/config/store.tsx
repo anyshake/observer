@@ -7,7 +7,6 @@ import geophone from "../store/geophone";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import scale from "../store/scale";
-import { IntensityStandardProperty } from "../helpers/seismic/intensityStandard";
 import duration from "../store/duration";
 import retention from "../store/retention";
 
@@ -60,10 +59,10 @@ export interface ReduxStoreProps {
     readonly geophone: ReduxStore["geophone"];
     readonly retention: ReduxStore["retention"];
     readonly updateADC?: (adc: ADC) => void;
+    readonly updateScale?: (scale: string) => void;
     readonly updateDuration?: (duration: number) => void;
-    readonly updateRetention?: (retention: number) => void;
     readonly updateGeophone?: (geophone: Geophone) => void;
-    readonly updateScale?: (scale: IntensityStandardProperty) => void;
+    readonly updateRetention?: (retention: number) => void;
 }
 
 export type ReduxStore = ReturnType<typeof reducer>;
