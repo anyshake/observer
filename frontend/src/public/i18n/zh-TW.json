@@ -40,7 +40,7 @@
                 },
                 "success": {
                     "label": "{{ station }} 已連線",
-                    "text": "伺服器在線時長 {{ uptime }} 秒\n伺服器採用架構 {{ arch }}/{{ os }}\nUUID：{{ uuid }}"
+                    "text": "伺服器在線時長 {{ uptime }} 秒\n伺服器採用架構 {{ arch }}/{{ os }}\nUUID {{ uuid }}"
                 },
                 "error": {
                     "label": "連線失敗",
@@ -50,17 +50,17 @@
             "areas": {
                 "cpu": {
                     "label": "CPU 使用率",
-                    "text": "目前佔用率：{{ usage }}%"
+                    "text": "目前佔用率 {{ usage }}%"
                 },
                 "memory": {
                     "label": "記憶體使用率",
-                    "text": "目前佔用率：{{ usage }}%"
+                    "text": "目前佔用率 {{ usage }}%"
                 }
             },
             "map": {
                 "area": {
                     "label": "站點所在位置",
-                    "text": "經度：{{ longitude }} °\n緯度：{{ latitude }} °\n海拔：{{ altitude }} m"
+                    "text": "經度 {{ longitude }} °\n緯度 {{ latitude }} °\n海拔 {{ altitude }} 公尺"
                 }
             },
             "labels": {
@@ -108,15 +108,15 @@
             "areas": {
                 "ehz": {
                     "label": "EHZ 通道波形計數",
-                    "text": "PGA：{{ pga }} gal\nPGV：{{ pgv }} kine\n震度：{{ intensity }}"
+                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n震度 {{ intensity }}"
                 },
                 "ehe": {
                     "label": "EHE 通道波形計數",
-                    "text": "PGA：{{ pga }} gal\nPGV：{{ pgv }} kine\n震度：{{ intensity }}"
+                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n震度 {{ intensity }}"
                 },
                 "ehn": {
                     "label": "EHN 通道波形計數",
-                    "text": "PGA：{{ pga }} gal\nPGV：{{ pgv }} kine\n震度：{{ intensity }}"
+                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n震度 {{ intensity }}"
                 }
             },
             "toasts": {
@@ -128,7 +128,7 @@
             "modals": {
                 "choose_event": {
                     "title": "選擇一個地震事件",
-                    "template": "[M{{ magnitude }}] {{ event }}\n震發時間 {{ time }}\n震央深度 {{ depth }} 公里\n預定到站 {{ estimated }} 秒"
+                    "template": "[M{{ magnitude }}] {{ event }}\n震發時間 {{ time }}\n震央深度 {{ depth }} 公里\n震央距离 {{ distance }} 公里\nP 波到站 {{ p_wave }} 秒\nS 波到站 {{ s_wave }} 秒"
                 }
             },
             "selects": {
@@ -191,7 +191,7 @@
                 "end_time": "選擇結束時間"
             },
             "toasts": {
-                "time_error": "請選擇正確的時間範圍",
+                "duration_error": "請選擇正確的時間範圍",
                 "metadata_error": "取得測站資訊時發生錯誤，功能無法使用",
                 "is_exporting_sac": "正在匯出 SAC 格式波形，請稍候...",
                 "export_sac_success": "SAC 格式波形資料匯出成功",
@@ -206,7 +206,9 @@
                 "fetch_waveform_success": "歷史波形資料查詢成功",
                 "fetch_waveform_error": "歷史波形資料查詢失敗",
                 "copy_link_success": "分享連結已複製到剪貼簿",
-                "copy_link_error": "分享連結複製失敗"
+                "copy_link_error": "分享連結複製失敗",
+                "duration_excceed": "事件時間跨度超出限制，請根據 P/S 波到達測站時間點手動進行查詢，或更換地震事件",
+                "event_select_success": "事件選擇成功\nP 波約在 {{ p_wave }} 到站\nS 波約在 {{ s_wave }} 到站"
             }
         },
         "export": {
@@ -273,7 +275,7 @@
                 "duration_set": "歷史波形預設查詢範圍已更改為 {{ duration }} 秒，頁面即將刷新"
             },
             "contents": {
-                "select_scale": "目前震度標準：{{ scale }}\n震度標準是用來衡量地震震度的標準，不同的標準會導致不同的震度值。",
+                "select_scale": "目前震度標準 {{ scale }}\n震度標準是用來衡量地震震度的標準，不同的標準會導致不同的震度值。",
                 "purge_cache": "應用出現問題時，可嘗試重置應用偏好。\n執行重置後，瀏覽器中的偏好將被清理，不會對後端伺服器產生影響。",
                 "waveform_retention": "此項設定實時波形頁面的波形會保留的時間，目前 {{ retention }} 秒。\n以秒為單位，需要大於 0 且小於 1000，否則將會被重置為預設值 180 秒。",
                 "query_duration": "此項設定歷史查詢頁面自動填寫的時間範圍，目前 {{ duration }} 秒。\n以秒為單位，需要大於 0 且小於 3600，否則將會被重置為預設值 300 秒。"

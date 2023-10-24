@@ -7,15 +7,15 @@ import (
 	"github.com/fatih/color"
 )
 
-func (g *NTPClient) OnStart(options *feature.FeatureOptions, v ...any) {
+func (n *NTPClient) OnStart(options *feature.FeatureOptions, v ...any) {
 	logger.Print(MODULE, text.Concat(v...), color.FgMagenta, false)
 }
 
-func (g *NTPClient) OnStop(options *feature.FeatureOptions, v ...any) {
+func (n *NTPClient) OnStop(options *feature.FeatureOptions, v ...any) {
 	logger.Print(MODULE, text.Concat(v...), color.FgBlue, false)
 }
 
-func (a *NTPClient) OnReady(options *feature.FeatureOptions, v ...any) {
+func (n *NTPClient) OnReady(options *feature.FeatureOptions, v ...any) {
 	options.Status.System.Offset = v[0].(float64)
 	options.Status.IsReady = true
 	logger.Print(MODULE, "time alignment succeed", color.FgGreen, false)

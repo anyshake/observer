@@ -81,7 +81,7 @@ func (j *JMA) Format(latitude, longitude float64, data map[string]any) ([]Event,
 			Magnitude: string2Float(v["mag"].(string)),
 		}
 		l.Distance = getDistance(latitude, l.Latitude, longitude, l.Longitude)
-		l.Estimated = getEstimation(l.Distance)
+		l.Estimation = getEstimation(l.Distance)
 
 		list = append(list, l)
 	}

@@ -128,7 +128,7 @@
             "modals": {
                 "choose_event": {
                     "title": "Select an Earthquake Event",
-                    "template": "[M{{ magnitude }}] {{ event }}\nTime: {{ time }}\nDepth: {{ depth }} km\nEstimated arrival time: {{ estimated }} seconds"
+                    "template": "[M{{ magnitude }}] {{ event }}\nTime: {{ time }}\nDepth: {{ depth }} km\nDistance: {{ distance }} km\nEstimated P-Wave Arrival: {{ p_wave }} sec\nEstimated S-Wave Arrival: {{ s_wave }} sec"
                 }
             },
             "selects": {
@@ -191,7 +191,7 @@
                 "end_time": "Select End Time"
             },
             "toasts": {
-                "time_error": "Please select the correct time range",
+                "duration_error": "Please select the correct time range",
                 "metadata_error": "An error occurred while retrieving station information. The functionality is not available.",
                 "is_exporting_sac": "Exporting SAC format waveforms, please wait...",
                 "export_sac_success": "SAC format waveform data export successful",
@@ -206,7 +206,9 @@
                 "fetch_waveform_success": "Historical waveform data query successful",
                 "fetch_waveform_error": "Historical waveform data query failed",
                 "copy_link_success": "Share link has copied to clipboard",
-                "copy_link_error": "Failed to copy share link to clipboard"
+                "copy_link_error": "Failed to copy share link to clipboard",
+                "duration_excceed": "The event duration exceeds the limit. Please manually query according to the arrival time of P/S waves at the station, or change the earthquake event",
+                "event_select_success": "Event selection successful.\nP-Wave arrival is about {{ p_wave }}\nS-Wave arrival is about {{ s_wave }}"
             }
         },
         "export": {

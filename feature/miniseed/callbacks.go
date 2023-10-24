@@ -7,15 +7,15 @@ import (
 	"github.com/fatih/color"
 )
 
-func (g *MiniSEED) OnStart(options *feature.FeatureOptions, v ...any) {
+func (m *MiniSEED) OnStart(options *feature.FeatureOptions, v ...any) {
 	logger.Print(MODULE, text.Concat(v...), color.FgMagenta, false)
 }
 
-func (g *MiniSEED) OnStop(options *feature.FeatureOptions, v ...any) {
+func (m *MiniSEED) OnStop(options *feature.FeatureOptions, v ...any) {
 	logger.Print(MODULE, text.Concat(v...), color.FgBlue, false)
 }
 
-func (a *MiniSEED) OnReady(options *feature.FeatureOptions, v ...any) {
+func (m *MiniSEED) OnReady(options *feature.FeatureOptions, v ...any) {
 	logger.Print(MODULE, "1 record has been written", color.FgGreen, false)
 }
 

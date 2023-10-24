@@ -63,6 +63,16 @@ type miniseed struct {
 	LifeCycle int    `json:"lifecycle"`
 }
 
+type seedlink struct {
+	Enable  bool   `json:"enable"`
+	Host    string `json:"host"`
+	Port    int    `json:"port"`
+	Station string `json:"station"`
+	Network string `json:"network"`
+	Buffer  string `json:"buffer"`
+	Size    int    `json:"size"`
+}
+
 type Conf struct {
 	Station   station   `json:"station_settings"`
 	Serial    serial    `json:"serial_settings"`
@@ -72,6 +82,7 @@ type Conf struct {
 	Archiver  archiver  `json:"archiver_settings"`
 	Server    server    `json:"server_settings"`
 	MiniSEED  miniseed  `json:"miniseed_settings"`
+	SeedLink  seedlink  `json:"seedlink_settings"`
 }
 
 type Args struct {

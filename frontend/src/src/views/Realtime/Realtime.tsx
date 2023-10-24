@@ -66,7 +66,7 @@ class Realtime extends Component<
                             format: {
                                 pga: "0.00000",
                                 pgv: "0.00000",
-                                intensity: "Unknown",
+                                intensity: "-",
                             },
                         },
                     },
@@ -91,7 +91,7 @@ class Realtime extends Component<
                             format: {
                                 pga: "0.00000",
                                 pgv: "0.00000",
-                                intensity: "Unknown",
+                                intensity: "-",
                             },
                         },
                     },
@@ -116,7 +116,7 @@ class Realtime extends Component<
                             format: {
                                 pga: "0.00000",
                                 pgv: "0.00000",
-                                intensity: "Unknown",
+                                intensity: "-",
                             },
                         },
                     },

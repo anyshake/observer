@@ -10,17 +10,22 @@ type Binding struct {
 	Source string `form:"source" json:"source" xml:"source" binding:"required"`
 }
 
+type estimation struct {
+	P float64 `json:"p"`
+	S float64 `json:"s"`
+}
+
 type Event struct {
-	Verfied   bool    `json:"verfied"`
-	Timestamp int64   `json:"timestamp"`
-	Event     string  `json:"event"`
-	Region    string  `json:"region"`
-	Depth     float64 `json:"depth"`
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
-	Distance  float64 `json:"distance"`
-	Magnitude float64 `json:"magnitude"`
-	Estimated float64 `json:"estimated"`
+	Verfied    bool       `json:"verfied"`
+	Timestamp  int64      `json:"timestamp"`
+	Event      string     `json:"event"`
+	Region     string     `json:"region"`
+	Depth      float64    `json:"depth"`
+	Latitude   float64    `json:"latitude"`
+	Longitude  float64    `json:"longitude"`
+	Distance   float64    `json:"distance"`
+	Magnitude  float64    `json:"magnitude"`
+	Estimation estimation `json:"estimation"`
 }
 
 type DataSource interface {
