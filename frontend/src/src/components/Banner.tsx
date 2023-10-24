@@ -15,19 +15,15 @@ class Banner extends Component<BannerProps & WithTranslation> {
     render() {
         const { t, type, label, text } = this.props;
 
-        let icon = ErrorIcon;
         let colorClassName = "";
         switch (type) {
             case "success":
-                icon = SuccessIcon;
                 colorClassName = "from-green-400 to-blue-500";
                 break;
             case "warning":
-                icon = WarningIcon;
                 colorClassName = "from-orange-400 to-orange-600";
                 break;
             case "error":
-                icon = ErrorIcon;
                 colorClassName = "from-red-400 to-red-600";
                 break;
         }
@@ -38,7 +34,25 @@ class Banner extends Component<BannerProps & WithTranslation> {
             >
                 <div className="flex flex-col gap-y-2">
                     <div className="flex gap-2 font-bold text-lg">
-                        <img className="w-6 h-6" src={icon} alt="" />
+                        <img
+                            className={
+                                type === "success" ? "w-6 h-6" : "hidden"
+                            }
+                            src={SuccessIcon}
+                            alt=""
+                        />
+                        <img
+                            className={
+                                type === "warning" ? "w-6 h-6" : "hidden"
+                            }
+                            src={WarningIcon}
+                            alt=""
+                        />
+                        <img
+                            className={type === "error" ? "w-6 h-6" : "hidden"}
+                            src={ErrorIcon}
+                            alt=""
+                        />
                         <span>{t(label.id, label.format)}</span>
                     </div>
 

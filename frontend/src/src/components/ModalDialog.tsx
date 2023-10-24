@@ -19,7 +19,7 @@ export interface ModalDialogProps {
     readonly values: string[][];
     readonly onClose?: () => void;
     readonly title: I18nTranslation;
-    readonly onSelect?: (value: string) => void;
+    readonly onSelect?: (value: string | string[]) => void;
 }
 
 class ModalDialog extends Component<ModalDialogProps & WithTranslation> {
@@ -44,7 +44,8 @@ class ModalDialog extends Component<ModalDialogProps & WithTranslation> {
                             <ListItem>
                                 <ListItemButton
                                     onClick={() =>
-                                        onSelect && onSelect(item[1])
+                                        onSelect &&
+                                        onSelect(item[1] as string | string[])
                                     }
                                 >
                                     <ListItemText

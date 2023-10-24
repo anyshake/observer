@@ -181,7 +181,7 @@ class History extends Component<
                     tag: "ehz-intensity",
                     label: { id: "views.history.labels.ehz_intensity.label" },
                     unit: { id: "views.history.labels.ehz_intensity.unit" },
-                    value: "Unknown",
+                    value: "-",
                 },
                 {
                     tag: "ehe-pga",
@@ -193,7 +193,7 @@ class History extends Component<
                     tag: "ehe-intensity",
                     label: { id: "views.history.labels.ehe_intensity.label" },
                     unit: { id: "views.history.labels.ehe_intensity.unit" },
-                    value: "Unknown",
+                    value: "-",
                 },
                 {
                     tag: "ehn-pga",
@@ -205,7 +205,7 @@ class History extends Component<
                     tag: "ehn-intensity",
                     label: { id: "views.history.labels.ehn_intensity.label" },
                     unit: { id: "views.history.labels.ehn_intensity.unit" },
-                    value: "Unknown",
+                    value: "-",
                 },
             ],
             scale: fallbackScale.property(),
@@ -292,7 +292,7 @@ class History extends Component<
         // Check if start time is earlier than end time
         if (end - start <= 0 || !start || !end) {
             const { t } = this.props;
-            const error = t("views.history.toasts.time_error");
+            const error = t("views.history.toasts.duration_error");
             toast.error(error);
             return Promise.reject(error);
         }
@@ -350,12 +350,13 @@ class History extends Component<
                 open: true,
                 values: data.map((item: any) => {
                     const {
+                        distance,
                         magnitude,
                         region,
                         event,
                         timestamp,
                         depth,
-                        estimated,
+                        estimation,
                     } = item;
 
                     const { t } = this.props;
@@ -365,25 +366,58 @@ class History extends Component<
                             event,
                             time: getTimeString(timestamp),
                             magnitude: magnitude.toFixed(1),
-                            estimated: estimated.toFixed(1),
-                            depth: depth !== -1 ? depth.toFixed(1) : "Unknown",
+                            distance: distance.toFixed(1),
+                            p_wave: estimation.p.toFixed(1),
+                            s_wave: estimation.s.toFixed(1),
+                            depth: depth !== -1 ? depth.toFixed(1) : "-",
                         }
                     );
-                    return [region, timestamp + estimated * 1000, description];
+
+                    return [
+                        region,
+                        [
+                            timestamp + estimation.p * 1000,
+                            timestamp + estimation.s * 1000,
+                        ],
+                        description,
+                    ];
                 }),
             },
         }));
     };
 
     // Choose event handler for event list modal dialog
-    handleChooseEvent = async (value: string): Promise<void> => {
+    handleChooseEvent = async (value: string | string[]): Promise<void> => {
+        // Get P and S wave timestamp from value
+        const p_wave = new Date(
+            Array.isArray(value) ? value[0] : value
+        ).getTime();
+        const s_wave = new Date(
+            Array.isArray(value) ? value[1] : value
+        ).getTime();
+
         // Get query duration from Redux store
-        const { duration } = this.props.duration;
+        let { duration } = this.props.duration;
+        duration *= 1000 / 2;
         // Get time range from event timestamp
-        const span = (duration * 1000) / 2;
-        const time = new Date(value).getTime();
-        const start = time - span;
-        const end = time + span;
+        const start = p_wave - duration;
+        const end = s_wave + duration;
+
+        // Check if duration timestamp is valid
+        const { t } = this.props;
+        if ((end - start) / 1000 > 3600) {
+            const error = t("views.history.toasts.duration_excceed");
+            toast.error(error);
+            return Promise.reject(error);
+        } else {
+            const success = t("views.history.toasts.event_select_success", {
+                p_wave: getTimeString(p_wave),
+                s_wave: getTimeString(s_wave),
+            });
+            toast.success(success, {
+                duration: 60000,
+            });
+        }
 
         // Update state and close modal dialog
         await this.promisedSetState({
