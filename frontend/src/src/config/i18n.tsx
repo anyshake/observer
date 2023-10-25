@@ -7,6 +7,8 @@ const I18N_CONFIG: I18nConfig = {
         { name: "简体中文", value: "zh-CN" },
         { name: "正體中文", value: "zh-TW" },
         { name: "English", value: "en-US" },
+        { name: "한국어", value: "ko-KR" },
+        { name: "日本語", value: "ja-JP" },
     ],
     uri: "/i18n/{{lng}}.json",
 };
