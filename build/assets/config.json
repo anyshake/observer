@@ -33,7 +33,7 @@
     "serial_settings": {
         "packet": 4,
         "baud": 115200,
-        "device": "/dev/rfcomm0"
+        "device": "/dev/ttyS4"
     },
     "ntpclient_settings": {
         "host": "0.pool.ntp.org",
@@ -61,5 +61,14 @@
         "station": "TEST",
         "network": "XX",
         "lifecycle": 10
+    },
+    "seedlink_settings": {
+        "enable": true,
+        "host": "0.0.0.0",
+        "port": 18000,
+        "station": "TEST",
+        "network": "XX",
+        "buffer": "/data/seedlink",
+        "size": 1000
     }
 }

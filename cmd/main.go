@@ -16,6 +16,7 @@ import (
 	"github.com/bclswl0827/observer/feature/geophone"
 	"github.com/bclswl0827/observer/feature/miniseed"
 	"github.com/bclswl0827/observer/feature/ntpclient"
+	"github.com/bclswl0827/observer/feature/seedlink"
 	"github.com/bclswl0827/observer/publisher"
 	"github.com/bclswl0827/observer/server"
 	"github.com/bclswl0827/observer/utils/logger"
@@ -67,6 +68,7 @@ func main() {
 		&geophone.Geophone{},
 		&archiver.Archiver{},
 		&miniseed.MiniSEED{},
+		&seedlink.SeedLink{},
 	}
 	featureOptions := &feature.FeatureOptions{
 		Config: &conf,

@@ -29,7 +29,7 @@ func (s *SCEA_B) Fetch() ([]byte, error) {
 
 	res, err := request.GET(
 		"http://118.113.105.29:8002/api/bulletin/jsonPageList?pageSize=100",
-		10*time.Second, time.Second, 3, false,
+		10*time.Second, time.Second, 3, false, nil,
 	)
 	if err != nil {
 		return nil, err

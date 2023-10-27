@@ -47,7 +47,7 @@ class JMAIntensityStandard implements IntensityStandard {
 class CWAIntensityStandard implements IntensityStandard {
     property(): IntensityStandardProperty {
         return {
-            name: "交通部中央氣象署地震震度分級",
+            name: "交通部中央氣象局地震震度分級",
             value: "CWB",
         };
     }
@@ -93,42 +93,15 @@ class MMIIntensityStandard implements IntensityStandard {
         };
     }
 
-    intensity(pgv: number, pga: number): string {
-        switch (true) {
-            case pga < 1:
-                return "1 度";
-            case pga < 2.1:
-                return "2 度";
-            case pga < 5:
-                return "3 度";
-            case pga < 10:
-                return "4 度";
-            case pga < 21:
-                return "5 度";
-            case pga < 44:
-                return "6 度";
-            case pga < 94:
-                return "7 度";
-            case pga < 202:
-                return "8 度";
-            case pga < 432:
-                return "9 度";
-        }
-
-        if (pga >= 432 && pgv > 116) {
-            return "10 度";
-        } else if (pga >= 432) {
-            return "11 度";
-        }
-
-        return "12 度";
+    intensity(_: number, pga: number): string {
+        return (2.33 * Math.log10(pga) + 1.5).toFixed(0);
     }
 }
 
 class CSISIntensityStandard implements IntensityStandard {
     property(): IntensityStandardProperty {
         return {
-            name: "中国地震地震震度",
+            name: "中国地震烈度表",
             value: "CSIS",
         };
     }
@@ -150,7 +123,7 @@ class CSISIntensityStandard implements IntensityStandard {
             II = 12;
         }
 
-        return `${II.toFixed(1)} 级`;
+        return `${II.toFixed(0)}`;
     }
 }
 

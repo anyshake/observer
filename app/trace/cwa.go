@@ -2,7 +2,10 @@ package trace
 
 import (
 	"bytes"
+	"context"
 	"fmt"
+	"net"
+	"net/http"
 	"regexp"
 	"strings"
 	"time"
@@ -11,6 +14,8 @@ import (
 	"github.com/bclswl0827/observer/utils/duration"
 	"github.com/bclswl0827/observer/utils/request"
 )
+
+const HOST_IP_TO_BYPASS_GFW = "168.95.246.1:443"
 
 type CWA struct {
 	DataSourceCache
@@ -25,6 +30,14 @@ func (c *CWA) Property() (string, string) {
 	return NAME, VALUE
 }
 
+func (c *CWA) createGFWBypasser() *http.Transport {
+	return &http.Transport{
+		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+			return (&net.Dialer{}).DialContext(ctx, network, HOST_IP_TO_BYPASS_GFW)
+		},
+	}
+}
+
 func (c *CWA) Fetch() ([]byte, error) {
 	if duration.Difference(time.Now(), c.Time) <= EXPIRATION {
 		return c.Cache, nil
@@ -33,6 +46,7 @@ func (c *CWA) Fetch() ([]byte, error) {
 	res, err := request.GET(
 		"https://www.cwa.gov.tw/V8/C/E/MOD/MAP_LIST.html",
 		10*time.Second, time.Second, 3, false,
+		c.createGFWBypasser(),
 	)
 	if err != nil {
 		return nil, err

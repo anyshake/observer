@@ -251,7 +251,7 @@
             },
             "selects": {
                 "choose_scale": {
-                    "title": "Select Magnitude Scale"
+                    "title": "Select Intensity Scale"
                 }
             },
             "inputs": {
@@ -270,12 +270,12 @@
             },
             "toasts": {
                 "cache_purged": "App cache has been cleared, page will refresh soon",
-                "scale_changed": "Magnitude scale has been changed to {{ scale }}, page will refresh soon",
+                "scale_changed": "Intensity scale has been changed to {{ scale }}, page will refresh soon",
                 "retention_set": "Real-time waveform retention time has been set to {{ retention }} s, page will refresh soon",
                 "duration_set": "Historical waveform default range has been set to {{ duration }} s, page will refresh soon"
             },
             "contents": {
-                "select_scale": "Current magnitude scale: {{ scale }}\nMagnitude scale is a standard used to measure the intensity of an earthquake. Different scales can lead to different magnitude values.",
+                "select_scale": "Current intensity scale: {{ scale }}\nIntensity scale is a standard used to measure the intensity of an earthquake. Different scales can lead to different magnitude values.",
                 "purge_cache": "If the app is experiencing problems, you can try resetting app preferences.\nAfter resetting, browser preferences will be cleared, but it will not affect the backend server.",
                 "waveform_retention": "This setting determines the amount of time that waveforms will be retained on the real-time waveform page. The current value is {{ retention }} s.\nValues must be greater than 0 and less than 1000. Otherwise, the value will be reset to the default of 180 s.",
                 "query_duration": "This setting determines the time range that is automatically filled in on the historical query page. The current value is {{ duration }} s.\nValues must be greater than 0 and less than 3600. Otherwise, the value will be reset to the default of 300 s."

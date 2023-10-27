@@ -98,7 +98,7 @@
                 },
                 "success": {
                     "label": "当前采样率 {{ sampleRate }} Sps",
-                    "text": "当前震度标准 {{ scale }}\n数据更新于 {{ time }}"
+                    "text": "当前烈度标准 {{ scale }}\n数据更新于 {{ time }}"
                 },
                 "error": {
                     "label": "连接失败",
@@ -108,15 +108,15 @@
             "areas": {
                 "ehz": {
                     "label": "EHZ 通道波形计数",
-                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n震度 {{ intensity }}"
+                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}"
                 },
                 "ehe": {
                     "label": "EHE 通道波形计数",
-                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n震度 {{ intensity }}"
+                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}"
                 },
                 "ehn": {
                     "label": "EHN 通道波形计数",
-                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n震度 {{ intensity }}"
+                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}"
                 }
             },
             "toasts": {
@@ -166,7 +166,7 @@
                     "unit": "gal"
                 },
                 "ehz_intensity": {
-                    "label": "EHZ 峰值震度",
+                    "label": "EHZ 峰值烈度",
                     "unit": ""
                 },
                 "ehe_pga": {
@@ -174,7 +174,7 @@
                     "unit": "gal"
                 },
                 "ehe_intensity": {
-                    "label": "EHE 峰值震度",
+                    "label": "EHE 峰值烈度",
                     "unit": ""
                 },
                 "ehn_pga": {
@@ -182,7 +182,7 @@
                     "unit": "gal"
                 },
                 "ehn_intensity": {
-                    "label": "EHN 峰值震度",
+                    "label": "EHN 峰值烈度",
                     "unit": ""
                 }
             },
@@ -238,20 +238,20 @@
         },
         "setting": {
             "buttons": {
-                "select_scale": "选择震度标准",
+                "select_scale": "选择烈度标准",
                 "purge_cache": "清除应用缓存",
                 "waveform_retention": "设定波形保留时间",
                 "query_duration": "设定查询范围"
             },
             "cards": {
-                "select_scale": "震度标准",
+                "select_scale": "烈度标准",
                 "purge_cache": "重置应用",
                 "waveform_retention": "波形设定",
                 "query_duration": "查询设定"
             },
             "selects": {
                 "choose_scale": {
-                    "title": "选择震度标准"
+                    "title": "选择烈度标准"
                 }
             },
             "inputs": {
@@ -270,12 +270,12 @@
             },
             "toasts": {
                 "cache_purged": "应用缓存已清除，页面即将刷新",
-                "scale_changed": "震度标准已更改为 {{ scale }}，页面即将刷新",
+                "scale_changed": "烈度标准已更改为 {{ scale }}，页面即将刷新",
                 "retention_set": "实时波形保留时间已更改为 {{ retention }} s，页面即将刷新",
                 "duration_set": "历史波形默认查询范围已更改为 {{ duration }} s，页面即将刷新"
             },
             "contents": {
-                "select_scale": "当前震度标准 {{ scale }}\n震度标准是用来衡量地震震度的标准，不同的标准会导致不同的震度值。",
+                "select_scale": "当前烈度标准 {{ scale }}\n烈度标准是用来衡量地震烈度的标准，不同的标准会导致不同的烈度值。",
                 "purge_cache": "应用出现问题时，可尝试重置应用偏好。\n执行重置后，浏览器中的偏好将被清理，不会对后端服务器产生影响。",
                 "waveform_retention": "此项设定实时波形页面的波形会保留的时间，当前 {{ retention }} s。\n以秒为单位，需要大于 0 且小于 1000，否则将会被重置为默认值 180 秒。",
                 "query_duration": "此项设定历史查询页面自动填写的时间范围，当前 {{ duration }} s。\n以秒为单位，需要大于 0 且小于 3600，否则将会被重置为默认值 300 秒。"

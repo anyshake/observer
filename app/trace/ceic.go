@@ -28,7 +28,7 @@ func (c *CEIC) Fetch() ([]byte, error) {
 
 	res, err := request.GET(
 		"https://news.ceic.ac.cn/ajax/google",
-		10*time.Second, time.Second, 3, false,
+		10*time.Second, time.Second, 3, false, nil,
 	)
 	if err != nil {
 		return nil, err
