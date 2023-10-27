@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func (m *MiniSEED) cleanup(basePath, station, network string, lifeCycle int) {
+func (m *MiniSEED) handleCleanup(basePath, station, network string, lifeCycle int) {
 	for {
 		expiredFiles := []string{}
 		walkFn := func(path string, info os.FileInfo, err error) error {

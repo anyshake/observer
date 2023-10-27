@@ -29,7 +29,7 @@ func (u *USGS) Fetch() ([]byte, error) {
 
 	res, err := request.GET(
 		"https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson",
-		10*time.Second, time.Second, 3, false,
+		10*time.Second, time.Second, 3, false, nil,
 	)
 	if err != nil {
 		return nil, err

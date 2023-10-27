@@ -30,7 +30,7 @@ func (h *HKO) Fetch() ([]byte, error) {
 
 	res, err := request.GET(
 		"https://www.hko.gov.hk/gts/QEM/eq_app-30d_uc.xml",
-		10*time.Second, time.Second, 3, false,
+		10*time.Second, time.Second, 3, false, nil,
 	)
 	if err != nil {
 		return nil, err

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"runtime"
 	"time"
 
@@ -18,7 +17,7 @@ var (
 
 func printVersion() {
 	var (
-		copyright = "© Project ES " + fmt.Sprintf("%d", time.Now().Year()) + ". All Rights Reversed."
+		copyright = "© AnyShake " + fmt.Sprintf("%d", time.Now().Year()) + ". All Rights Reversed."
 		version   = text.Concat(
 			"Observer ", version, " (", description, ")\nRelease: ", version, "-", release, " ",
 			runtime.Version(), " ", runtime.GOOS, "/", runtime.GOARCH, "\n", copyright,
@@ -27,5 +26,4 @@ func printVersion() {
 
 	w := color.New(color.FgHiCyan).SprintFunc()
 	fmt.Println(w(version))
-	os.Exit(0)
 }
