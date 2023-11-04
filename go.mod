@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/bclswl0827/go-serial v0.0.1
-	github.com/bclswl0827/sacio v1.0.4
+	github.com/bclswl0827/sacio v1.0.6
 	github.com/beevik/ntp v0.3.0
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/gin-contrib/gzip v0.0.6
