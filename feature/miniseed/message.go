@@ -21,7 +21,7 @@ func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.Featur
 
 	// Init MiniSEED library
 	var miniseed mseedio.MiniSeedData
-	miniseed.Init(mseedio.INT32, mseedio.MSBFIRST)
+	miniseed.Init(mseedio.STEIM2, mseedio.MSBFIRST)
 
 	// Get file name by date
 	filePath := fmt.Sprintf(
@@ -69,7 +69,7 @@ func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.Featur
 		var err error
 		switch i {
 		case 0:
-			err = miniseed.Append(v, mseedio.AppendOptions{
+			err = miniseed.Append(v, &mseedio.AppendOptions{
 				StartTime:      ts,
 				ChannelCode:    "EHZ",
 				StationCode:    station,
@@ -78,7 +78,7 @@ func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.Featur
 				SampleRate:     float64(len(ehz) - 1),
 			})
 		case 1:
-			err = miniseed.Append(v, mseedio.AppendOptions{
+			err = miniseed.Append(v, &mseedio.AppendOptions{
 				StartTime:      ts,
 				ChannelCode:    "EHE",
 				StationCode:    station,
@@ -87,7 +87,7 @@ func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.Featur
 				SampleRate:     float64(len(ehe) - 1),
 			})
 		case 2:
-			err = miniseed.Append(v, mseedio.AppendOptions{
+			err = miniseed.Append(v, &mseedio.AppendOptions{
 				StartTime:      ts,
 				ChannelCode:    "EHN",
 				StationCode:    station,

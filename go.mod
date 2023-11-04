@@ -34,7 +34,7 @@ require (
 )
 
 require (
-	github.com/bclswl0827/mseedio v1.0.2
+	github.com/bclswl0827/mseedio v1.0.5
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
