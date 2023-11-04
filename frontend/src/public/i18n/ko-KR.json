@@ -2,7 +2,7 @@
   "config": {
     "global": {
       "name": "Observer",
-      "author": "Project ES",
+      "author": "AnyShake",
       "title": "Observer 스테이션 패널",
       "description": "실시간 지진 네트워크 구축에 야심 차다"
     },

@@ -2,7 +2,7 @@
   "config": {
     "global": {
       "name": "Observer",
-      "author": "Project ES",
+      "author": "AnyShake",
       "title": "Observer 観測パネルです",
       "description": "リアルタイムの地震ネットワークを構築するという野心に満ちています"
     },

@@ -6,8 +6,8 @@ github.com/andybalholm/cascadia v1.3.1 h1:nhxRkql1kdYCc8Snf7D5/D3spOX+dBgjA6u8x0
 github.com/andybalholm/cascadia v1.3.1/go.mod h1:R4bJ1UQfqADjvDa4P6HZHLh/3OxWWEqc0Sk8XGwHqvA=
 github.com/bclswl0827/go-serial v0.0.1 h1:pIQZytCy9gg5lxxhfkhbHEz3WF0+tkZRQsE9qz6OJfM=
 github.com/bclswl0827/go-serial v0.0.1/go.mod h1:qt+s3rGDzar90EshNSPN0myWyCMaSj32BFQNmrh3Pnw=
-github.com/bclswl0827/mseedio v1.0.2 h1:CyIB/btHLARHhc+W0LWSu0e7m9Bp8KB00XoT5WtKxe4=
-github.com/bclswl0827/mseedio v1.0.2/go.mod h1:G9nOPR8epxb7ihX5pUpvs3HqYZMnMlXc1Ha1WSMWn7s=
+github.com/bclswl0827/mseedio v1.0.5 h1:VKe9RbAiJ+d64isvSS80B2wCjO/HTcorroqySjHmkcU=
+github.com/bclswl0827/mseedio v1.0.5/go.mod h1:G9nOPR8epxb7ihX5pUpvs3HqYZMnMlXc1Ha1WSMWn7s=
 github.com/bclswl0827/sacio v1.0.4 h1:t3pmYfsaKQYuX3SzjNIM3jtC0jFR+lYKCYf4AqOGu9Y=
 github.com/bclswl0827/sacio v1.0.4/go.mod h1:SuiIK7hBHCJvxUOC/rgbJRUO5IoFrEnuCY0xVJ7RyQk=
 github.com/beevik/ntp v0.3.0 h1:xzVrPrE4ziasFXgBVBZJDP0Wg/KpMwk2KHJ4Ba8GrDw=
