@@ -21,7 +21,7 @@ func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.Featur
 
 	// Init MiniSEED library
 	var miniseed mseedio.MiniSeedData
-	miniseed.Init(mseedio.STEIM2, mseedio.MSBFIRST)
+	miniseed.Init(mseedio.INT32, mseedio.MSBFIRST)
 
 	// Get file name by date
 	filePath := fmt.Sprintf(

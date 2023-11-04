@@ -61,7 +61,7 @@ func getSACBytes(data []publisher.Geophone, channel string, options *app.ServerO
 	sac.SetBody(int32ToFloat32(channelBuffer), sampleRate)
 
 	// Get SAC file bytes
-	sacBytes, err := sac.GetBytes(sacio.MSBFIRST)
+	sacBytes, err := sac.Encode(sacio.MSBFIRST)
 	if err != nil {
 		return "", nil, err
 	}
