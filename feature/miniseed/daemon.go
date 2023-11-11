@@ -2,10 +2,17 @@ package miniseed
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 	"sync"
+	"time"
 
+	"github.com/bclswl0827/mseedio"
 	"github.com/bclswl0827/observer/feature"
 	"github.com/bclswl0827/observer/publisher"
+	"github.com/bclswl0827/observer/utils/duration"
+	"github.com/bclswl0827/observer/utils/logger"
+	"github.com/fatih/color"
 )
 
 func (m *MiniSEED) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGroup) {
@@ -27,18 +34,74 @@ func (m *MiniSEED) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 		go m.handleCleanup(basePath, station, network, lifeCycle)
 	}
 
-	// Init sequence number
-	var seqNumber int
+	// Wait for time syncing
+	for !options.Status.IsReady {
+		logger.Print(MODULE, "waiting for time alignment", color.FgYellow, false)
+		time.Sleep(50 * time.Millisecond)
+	}
+
+	// Get initial file path
+	currentTime, _ := duration.Timestamp(options.Status.System.Offset)
+	filePath := fmt.Sprintf(
+		"%s/%s_%s_%s.mseed",
+		basePath, station, network,
+		currentTime.Format("20060102"),
+	)
+
+	// Get sequence number if file exists
+	var seqNumber int64
+	_, err := os.Stat(filePath)
+	if err == nil {
+		// Get last sequence number
+		logger.Print(MODULE, "starting from last record", color.FgYellow, false)
+
+		// Read MiniSEED file
+		var ms mseedio.MiniSeedData
+		err := ms.Read(filePath)
+		if err != nil {
+			m.OnError(options, err)
+			return
+		}
+
+		// Get last sequence number
+		recordLength := len(ms.Series)
+		if recordLength > 0 {
+			lastRecord := ms.Series[recordLength-1]
+			lastSeqNum := lastRecord.FixedSection.SequenceNumber
+			n, err := strconv.Atoi(lastSeqNum)
+			if err != nil {
+				m.OnError(options, err)
+				return
+			}
+			// Set current sequence number
+			seqNumber = int64(n)
+		}
+	} else {
+		// Create new file with sequence number 0
+		logger.Print(MODULE, "starting from a new file", color.FgYellow, false)
+	}
+
+	// Init MiniSEED archiving buffer
+	buffer := &miniSEEDBuffer{
+		TimeStamp: currentTime,
+		SeqNum:    seqNumber,
+		EHZ:       &channelBuffer{},
+		EHE:       &channelBuffer{},
+		EHN:       &channelBuffer{},
+		BasePath:  options.Config.MiniSEED.Path,
+		Station:   options.Config.MiniSEED.Station,
+		Network:   options.Config.MiniSEED.Network,
+	}
 	m.OnStart(options, "service has started")
 
 	// Append and write when new message arrived
 	publisher.Subscribe(
 		&options.Status.Geophone,
 		func(gp *publisher.Geophone) error {
-			return m.handleMessage(gp, options, seqNumber, basePath, station, network)
+			return m.handleMessage(gp, options, buffer)
 		},
 	)
 
-	err := fmt.Errorf("service exited with an error")
+	err = fmt.Errorf("service exited with an error")
 	m.OnError(options, err)
 }

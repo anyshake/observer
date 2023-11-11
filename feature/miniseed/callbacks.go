@@ -16,7 +16,12 @@ func (m *MiniSEED) OnStop(options *feature.FeatureOptions, v ...any) {
 }
 
 func (m *MiniSEED) OnReady(options *feature.FeatureOptions, v ...any) {
-	logger.Print(MODULE, "1 record has been written", color.FgGreen, false)
+	switch v[0].(string) {
+	case "append":
+		logger.Print(MODULE, "1 record has been append", color.FgGreen, false)
+	case "write":
+		logger.Print(MODULE, "1 record has been written", color.FgGreen, false)
+	}
 }
 
 func (m *MiniSEED) OnError(options *feature.FeatureOptions, err error) {
