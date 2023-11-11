@@ -2,8 +2,6 @@ package miniseed
 
 import (
 	"fmt"
-	"os"
-	"strconv"
 	"time"
 
 	"github.com/bclswl0827/mseedio"
@@ -11,111 +9,102 @@ import (
 	"github.com/bclswl0827/observer/publisher"
 )
 
-func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.FeatureOptions, seqNumber int, basePath, station, network string) error {
+func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.FeatureOptions, buffer *miniSEEDBuffer) error {
 	var (
-		ehz = gp.EHZ
-		ehe = gp.EHE
-		ehn = gp.EHN
-		ts  = time.UnixMilli(gp.TS).UTC()
+		ehz       = gp.EHZ
+		ehe       = gp.EHE
+		ehn       = gp.EHN
+		station   = options.Config.MiniSEED.Station
+		network   = options.Config.MiniSEED.Network
+		timestamp = time.UnixMilli(gp.TS).UTC()
 	)
 
-	// Init MiniSEED library
-	var miniseed mseedio.MiniSeedData
-	miniseed.Init(mseedio.STEIM2, mseedio.MSBFIRST)
+	// Append EHZ channel to buffer
+	buffer.EHZ.DataBuffer = append(buffer.EHZ.DataBuffer, ehz...)
+	buffer.EHZ.SampleRate = (buffer.EHZ.SampleRate + int32(len(ehz))) / 2
+	// Append EHE channel to buffer
+	buffer.EHE.DataBuffer = append(buffer.EHE.DataBuffer, ehe...)
+	buffer.EHE.SampleRate = (buffer.EHE.SampleRate + int32(len(ehe))) / 2
+	// Append EHN channel to buffer
+	buffer.EHN.DataBuffer = append(buffer.EHN.DataBuffer, ehn...)
+	buffer.EHN.SampleRate = (buffer.EHN.SampleRate + int32(len(ehn))) / 2
 
-	// Get file name by date
-	filePath := fmt.Sprintf(
-		"%s/%s_%s_%s.mseed",
-		basePath, station, network,
-		ts.Format("20060102"),
-	)
-
-	// If file exists, check sequence number
-	_, err := os.Stat(filePath)
-	if err == nil && seqNumber == 0 {
-		// Read MiniSEED file
-		var ms mseedio.MiniSeedData
-		err := ms.Read(filePath)
-		if err != nil {
-			m.OnError(options, err)
-			return err
-		}
-
-		// Get last sequence number
-		recordLength := len(ms.Series)
-		if recordLength > 0 {
-			lastRecord := ms.Series[recordLength-1]
-			n, err := strconv.Atoi(lastRecord.FixedSection.SequenceNumber)
+	// Check if buffer is ready to write to file
+	if timestamp.Sub(buffer.TimeStamp).Seconds() >= MAX_DURATION {
+		// Init MiniSEED data
+		var miniseed mseedio.MiniSeedData
+		miniseed.Init(ENCODING_TYPE, BIT_ORDER)
+		// Set basic data
+		filePath := fmt.Sprintf(
+			"%s/%s_%s_%s.mseed", buffer.BasePath,
+			station, network, timestamp.Format("20060102"),
+		)
+		// Append channels to MiniSEED
+		for _, v := range []string{"EHZ", "EHE", "EHN"} {
+			var (
+				err error
+				seq = fmt.Sprintf("%06d", buffer.SeqNum)
+			)
+			switch v {
+			case "EHZ":
+				// Append EHZ channel
+				err = miniseed.Append(buffer.EHZ.DataBuffer, &mseedio.AppendOptions{
+					ChannelCode:    v,
+					SequenceNumber: seq,
+					StationCode:    station,
+					NetworkCode:    network,
+					StartTime:      buffer.TimeStamp,
+					SampleRate:     float64(buffer.EHZ.SampleRate),
+				})
+			case "EHE":
+				// Append EHZ channel
+				err = miniseed.Append(buffer.EHE.DataBuffer, &mseedio.AppendOptions{
+					ChannelCode:    v,
+					SequenceNumber: seq,
+					StationCode:    station,
+					NetworkCode:    network,
+					StartTime:      buffer.TimeStamp,
+					SampleRate:     float64(buffer.EHE.SampleRate),
+				})
+			case "EHN":
+				// Append EHZ channel
+				err = miniseed.Append(buffer.EHN.DataBuffer, &mseedio.AppendOptions{
+					ChannelCode:    v,
+					SequenceNumber: seq,
+					StationCode:    station,
+					NetworkCode:    network,
+					StartTime:      buffer.TimeStamp,
+					SampleRate:     float64(buffer.EHN.SampleRate),
+				})
+			}
+			if err != nil {
+				m.OnError(options, err)
+				return err
+			} else {
+				buffer.SeqNum++
+			}
+			// Encode record to bytes
+			dataBytes, err := miniseed.Encode(mseedio.APPEND, BIT_ORDER)
 			if err != nil {
 				m.OnError(options, err)
 				return err
 			}
-
-			// Set current sequence number
-			seqNumber = n
+			// Append bytes to file
+			err = miniseed.Write(filePath, mseedio.APPEND, dataBytes)
+			if err != nil {
+				m.OnError(options, err)
+				return err
+			}
 		}
-	}
-
-	// Increments sequence number by 1
-	if seqNumber >= 999999 {
-		seqNumber = 0
+		// Reset buffer
+		m.OnReady(options, "write")
+		buffer.TimeStamp = timestamp
+		buffer.EHZ.DataBuffer = []int32{}
+		buffer.EHE.DataBuffer = []int32{}
+		buffer.EHN.DataBuffer = []int32{}
 	} else {
-		seqNumber++
-	}
-	seqNumberString := fmt.Sprintf("%06d", seqNumber)
-
-	// Append 3 channels
-	for i, v := range [][]int32{ehz, ehe, ehn} {
-		var err error
-		switch i {
-		case 0:
-			err = miniseed.Append(v, &mseedio.AppendOptions{
-				StartTime:      ts,
-				ChannelCode:    "EHZ",
-				StationCode:    station,
-				NetworkCode:    network,
-				SequenceNumber: seqNumberString,
-				SampleRate:     float64(len(ehz) - 1),
-			})
-		case 1:
-			err = miniseed.Append(v, &mseedio.AppendOptions{
-				StartTime:      ts,
-				ChannelCode:    "EHE",
-				StationCode:    station,
-				NetworkCode:    network,
-				SequenceNumber: seqNumberString,
-				SampleRate:     float64(len(ehe) - 1),
-			})
-		case 2:
-			err = miniseed.Append(v, &mseedio.AppendOptions{
-				StartTime:      ts,
-				ChannelCode:    "EHN",
-				StationCode:    station,
-				NetworkCode:    network,
-				SequenceNumber: seqNumberString,
-				SampleRate:     float64(len(ehn) - 1),
-			})
-		}
-		if err != nil {
-			m.OnError(options, err)
-			return err
-		}
-
-		// Encode record to bytes
-		dataBytes, err := miniseed.Encode(mseedio.APPEND, mseedio.MSBFIRST)
-		if err != nil {
-			m.OnError(options, err)
-			return err
-		}
-
-		// Append bytes to file
-		err = miniseed.Write(filePath, mseedio.APPEND, dataBytes)
-		if err != nil {
-			m.OnError(options, err)
-			return err
-		}
+		m.OnReady(options, "append")
 	}
 
-	m.OnReady(options)
 	return nil
 }
