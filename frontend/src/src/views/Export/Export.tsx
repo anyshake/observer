@@ -100,6 +100,7 @@ class Export extends Component<WithTranslation, ExportState> {
                     cancelToken,
                     blob: true,
                     tag: "mseed",
+                    timeout: 3600,
                     filename: name,
                     body: { action: "export", name },
                     onDownload: ({ progress }) =>
