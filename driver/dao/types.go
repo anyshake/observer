@@ -8,7 +8,6 @@ import (
 )
 
 const (
-	DB_TIMEZONE  = "Etc/GMT"
 	DB_TIMEOUT   = 5 * time.Second
 	DB_TABLENAME = "geophone_records"
 )
