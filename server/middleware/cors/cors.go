@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AllowCros(headers []HttpHeader) gin.HandlerFunc {
+func AllowCORS(headers []HttpHeader) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		for _, v := range headers {
 			c.Writer.Header().Set(

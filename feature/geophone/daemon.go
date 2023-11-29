@@ -37,13 +37,6 @@ func (g *Geophone) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 		var packet Packet
 		g.OnStart(options, "service has started")
 
-		// FIXME: Compensation is in beta
-		if options.Config.Geophone.EHZ.Compensation ||
-			options.Config.Geophone.EHE.Compensation ||
-			options.Config.Geophone.EHN.Compensation {
-			g.OnStart(options, "compensation is in beta")
-		}
-
 		lastRead := time.Now().UTC()
 		for {
 			// Read from serial port by channel packet length
@@ -69,7 +62,12 @@ func (g *Geophone) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 				lastRead = time.Now().UTC()
 				continue
 			} else {
-				g.OnReady(options, packet)
+				g.OnReady(
+					options, packet,
+					options.Config.Geophone.EHZ,
+					options.Config.Geophone.EHE,
+					options.Config.Geophone.EHN,
+				)
 			}
 
 			// Reset device if reached TIMEOUT_THRESHOLD

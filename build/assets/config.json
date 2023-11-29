@@ -9,21 +9,18 @@
     "geophone_settings": {
         "ehz": {
             "sensitivity": 0.288,
-            "damping": 0.6,
-            "frequency": 4.5,
-            "compensation": true
+            "damping": 0.56,
+            "frequency": 4.5
         },
         "ehe": {
             "sensitivity": 0.288,
-            "damping": 0.6,
-            "frequency": 4.5,
-            "compensation": true
+            "damping": 0.56,
+            "frequency": 4.5
         },
         "ehn": {
             "sensitivity": 0.288,
-            "damping": 0.6,
-            "frequency": 4.5,
-            "compensation": true
+            "damping": 0.56,
+            "frequency": 4.5
         }
     },
     "adc_settings": {
@@ -43,6 +40,7 @@
     },
     "archiver_settings": {
         "enable": false,
+        "engine": "posgresql",
         "host": "127.0.0.1",
         "port": 5432,
         "username": "postgres",

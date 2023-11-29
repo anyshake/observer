@@ -1,11 +1,11 @@
 package feature
 
 import (
-	"database/sql"
 	"sync"
 
 	"github.com/bclswl0827/observer/config"
 	"github.com/bclswl0827/observer/publisher"
+	"gorm.io/gorm"
 )
 
 type Feature interface {
@@ -17,7 +17,7 @@ type Feature interface {
 }
 
 type FeatureOptions struct {
-	Database *sql.DB
+	Database *gorm.DB
 	Config   *config.Conf
 	Status   *publisher.Status
 }

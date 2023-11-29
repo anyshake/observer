@@ -3,6 +3,7 @@ package geophone
 import (
 	"time"
 
+	"github.com/bclswl0827/observer/config"
 	"github.com/bclswl0827/observer/feature"
 	"github.com/bclswl0827/observer/utils/duration"
 	"github.com/bclswl0827/observer/utils/logger"
@@ -36,38 +37,15 @@ func (g *Geophone) OnReady(options *feature.FeatureOptions, v ...any) {
 		// Archive approximately 1 second has passed
 		timeDiff := duration.Difference(currentTime, lastTime)
 		if timeDiff >= READY_THRESHOLD {
+			// Get compensation filter coefficients
 			// Set packet timestamp
 			options.Status.System.Messages++
 			options.Status.Buffer.TS = currentTime.UnixMilli()
-			// Apply compensation for EHZ
-			if options.Config.Geophone.EHZ.Compensation && len(packet.EHZ) > 1 {
-				packet.EHZ = g.filter(packet.EHZ, &Filter{
-					a1: 1.99823115,
-					a2: -0.99822469,
-					b0: 1.03380975,
-					b1: -1.99662644,
-					b2: 0.96601161,
-				})
-			}
-			// Apply compensation for EHE
-			if options.Config.Geophone.EHE.Compensation && len(packet.EHE) > 1 {
-				packet.EHE = g.filter(packet.EHE, &Filter{
-					a1: 1.99823115,
-					a2: -0.99822469,
-					b0: 1.03380975,
-					b1: -1.99662644,
-					b2: 0.96601161,
-				})
-			}
-			// Apply compensation for EHN
-			if options.Config.Geophone.EHN.Compensation && len(packet.EHN) > 1 {
-				packet.EHN = g.filter(packet.EHN, &Filter{
-					a1: 1.99823115,
-					a2: -0.99822469,
-					b0: 1.03380975,
-					b1: -1.99662644,
-					b2: 0.96601161,
-				})
+			// Apply compensation for EHZ, EHE, EHN channels
+			if len(packet.EHZ) > 1 && len(packet.EHE) > 1 && len(packet.EHN) > 1 {
+				packet.EHZ = g.applyFilter(packet.EHZ, g.getFilter(v[1].(config.Compensation), len(packet.EHZ)))
+				packet.EHE = g.applyFilter(packet.EHE, g.getFilter(v[2].(config.Compensation), len(packet.EHE)))
+				packet.EHN = g.applyFilter(packet.EHN, g.getFilter(v[3].(config.Compensation), len(packet.EHN)))
 			}
 			// Copy buffer and reset
 			options.Status.Geophone = *options.Status.Buffer
