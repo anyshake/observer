@@ -40,7 +40,7 @@
     },
     "archiver_settings": {
         "enable": false,
-        "engine": "posgresql",
+        "engine": "postgresql",
         "host": "127.0.0.1",
         "port": 5432,
         "username": "postgres",

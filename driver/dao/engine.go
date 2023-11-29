@@ -2,7 +2,6 @@ package dao
 
 import (
 	"fmt"
-	"net/url"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
@@ -20,8 +19,8 @@ func (p *PostgreSQL) isCompatible(engine string) bool {
 
 func (p *PostgreSQL) openDBConn(host string, port int, username, password, database string) (*gorm.DB, error) {
 	dsn := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable connect_timeout=%d TimeZone=%s",
-		host, port, username, password, database, int(DB_TIMEOUT.Seconds()), DB_TIMEZONE,
+		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable connect_timeout=%d TimeZone=Etc/GMT",
+		host, port, username, password, database, int(DB_TIMEOUT.Seconds()),
 	)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger:                 logger.Default.LogMode(logger.Silent),
@@ -46,9 +45,9 @@ func (m *MariaDB) isCompatible(engine string) bool {
 
 func (m *MariaDB) openDBConn(host string, port int, username, password, database string) (*gorm.DB, error) {
 	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&timeout=%ds&loc=%s",
+		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&timeout=%ds&loc=UTC",
 		username, password, host, port, database,
-		int(DB_TIMEOUT.Seconds()), url.QueryEscape(DB_TIMEZONE),
+		int(DB_TIMEOUT.Seconds()),
 	)
 	return gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger:                 logger.Default.LogMode(logger.Silent),
