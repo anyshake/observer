@@ -25,11 +25,3 @@ func Open(device string, baud int) (io.ReadWriteCloser, error) {
 
 	return port, nil
 }
-
-func Close(port io.ReadWriteCloser) error {
-	if port == nil {
-		return nil
-	}
-
-	return port.Close()
-}

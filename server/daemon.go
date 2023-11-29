@@ -37,7 +37,7 @@ func StartDaemon(host string, port int, options *app.ServerOptions) error {
 		}),
 	)
 	if options.CORS {
-		r.Use(cors.AllowCros([]cors.HttpHeader{
+		r.Use(cors.AllowCORS([]cors.HttpHeader{
 			{
 				Header: "Access-Control-Allow-Origin",
 				Value:  "*",

@@ -19,17 +19,10 @@ type adc struct {
 	Resolution int     `json:"resolution"`
 }
 
-type channel struct {
-	Compensation bool    `json:"compensation"`
-	Damping      float64 `json:"damping"`
-	Frequency    float64 `json:"frequency"`
-	Sensitivity  float64 `json:"sensitivity"`
-}
-
 type geophone struct {
-	EHZ channel `json:"ehz"`
-	EHE channel `json:"ehe"`
-	EHN channel `json:"ehn"`
+	EHZ Compensation `json:"ehz"`
+	EHE Compensation `json:"ehe"`
+	EHN Compensation `json:"ehn"`
 }
 
 type ntpclient struct {
@@ -40,6 +33,7 @@ type ntpclient struct {
 }
 
 type archiver struct {
+	Engine   string `json:"engine"`
 	Enable   bool   `json:"enable"`
 	Host     string `json:"host"`
 	Port     int    `json:"port"`
@@ -71,6 +65,12 @@ type seedlink struct {
 	Network string `json:"network"`
 	Buffer  string `json:"buffer"`
 	Size    int    `json:"size"`
+}
+
+type Compensation struct {
+	Damping     float64 `json:"damping"`
+	Frequency   float64 `json:"frequency"`
+	Sensitivity float64 `json:"sensitivity"`
 }
 
 type Conf struct {

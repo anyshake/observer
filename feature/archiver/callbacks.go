@@ -1,7 +1,7 @@
 package archiver
 
 import (
-	"github.com/bclswl0827/observer/driver/postgres"
+	"github.com/bclswl0827/observer/driver/dao"
 	"github.com/bclswl0827/observer/feature"
 	"github.com/bclswl0827/observer/utils/logger"
 	"github.com/bclswl0827/observer/utils/text"
@@ -21,6 +21,6 @@ func (a *Archiver) OnReady(options *feature.FeatureOptions, v ...any) {
 }
 
 func (a *Archiver) OnError(options *feature.FeatureOptions, err error) {
-	postgres.Close(options.Database)
+	dao.Close(options.Database)
 	logger.Print(MODULE, err, color.FgRed, false)
 }
