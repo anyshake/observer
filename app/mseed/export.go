@@ -10,6 +10,7 @@ import (
 
 func getMiniSEEDBytes(conf *config.Conf, fileName string) ([]byte, error) {
 	// Remove slash in file name to avoid path traversal
+	fileName = strings.ReplaceAll(fileName, "\\", "")
 	fileName = strings.ReplaceAll(fileName, "/", "")
 	basePath := conf.MiniSEED.Path
 

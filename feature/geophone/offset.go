@@ -2,7 +2,7 @@ package geophone
 
 import "sort"
 
-func (g *Geophone) getCounts(data []int32) []int32 {
+func (g *Geophone) getOffsetCounts(data []int32) []int32 {
 	sortedData := make([]int32, len(data))
 	copy(sortedData, data)
 	sort.Slice(sortedData, func(i, j int) bool {

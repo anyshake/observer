@@ -24,7 +24,7 @@
         }
     },
     "adc_settings": {
-        "resolution": 24,
+        "resolution": 32,
         "fullscale": 5.0
     },
     "serial_settings": {

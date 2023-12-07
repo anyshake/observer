@@ -481,8 +481,8 @@
                 "distance": {
                     "type": "number"
                 },
-                "estimated": {
-                    "type": "number"
+                "estimation": {
+                    "$ref": "#/definitions/trace.estimation"
                 },
                 "event": {
                     "type": "string"
@@ -504,6 +504,17 @@
                 },
                 "verfied": {
                     "type": "boolean"
+                }
+            }
+        },
+        "trace.estimation": {
+            "type": "object",
+            "properties": {
+                "p": {
+                    "type": "number"
+                },
+                "s": {
+                    "type": "number"
                 }
             }
         }
