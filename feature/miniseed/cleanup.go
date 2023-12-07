@@ -40,6 +40,6 @@ func (m *MiniSEED) handleCleanup(basePath, station, network string, lifeCycle in
 			}
 		}
 
-		time.Sleep(time.Second)
+		time.Sleep(time.Minute)
 	}
 }

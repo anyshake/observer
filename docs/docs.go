@@ -489,8 +489,8 @@ const docTemplate = `{
                 "distance": {
                     "type": "number"
                 },
-                "estimated": {
-                    "type": "number"
+                "estimation": {
+                    "$ref": "#/definitions/trace.estimation"
                 },
                 "event": {
                     "type": "string"
@@ -512,6 +512,17 @@ const docTemplate = `{
                 },
                 "verfied": {
                     "type": "boolean"
+                }
+            }
+        },
+        "trace.estimation": {
+            "type": "object",
+            "properties": {
+                "p": {
+                    "type": "number"
+                },
+                "s": {
+                    "type": "number"
                 }
             }
         }

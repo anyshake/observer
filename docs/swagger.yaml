@@ -153,8 +153,8 @@ definitions:
         type: number
       distance:
         type: number
-      estimated:
-        type: number
+      estimation:
+        $ref: '#/definitions/trace.estimation'
       event:
         type: string
       latitude:
@@ -169,6 +169,13 @@ definitions:
         type: integer
       verfied:
         type: boolean
+    type: object
+  trace.estimation:
+    properties:
+      p:
+        type: number
+      s:
+        type: number
     type: object
 info:
   contact: {}
