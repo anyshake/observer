@@ -472,6 +472,9 @@ const docTemplate = `{
                 "status": {
                     "$ref": "#/definitions/publisher.System"
                 },
+                "timestamp": {
+                    "type": "integer"
+                },
                 "uptime": {
                     "type": "integer"
                 },

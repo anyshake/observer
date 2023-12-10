@@ -27,6 +27,8 @@ import { update as updateADC } from "../../store/adc";
 import { update as updateGeophone } from "../../store/geophone";
 import mapStateToProps from "../../helpers/utils/mapStateToProps";
 import { WithTranslation, withTranslation } from "react-i18next";
+// import * as seismograph from "seisplotjs/src/seismograph";
+// import * as seismographconfig from "seisplotjs/src/seismographconfig";
 
 export interface RealtimeArea {
     readonly tag: string;

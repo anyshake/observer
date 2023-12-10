@@ -13,13 +13,8 @@ type JMA struct {
 	DataSourceCache
 }
 
-func (j *JMA) Property() (string, string) {
-	const (
-		NAME  string = "気象庁地震情報"
-		VALUE string = "JMA"
-	)
-
-	return NAME, VALUE
+func (j *JMA) Property() string {
+	return "気象庁地震情報"
 }
 
 func (j *JMA) Fetch() ([]byte, error) {

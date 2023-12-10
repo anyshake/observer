@@ -40,19 +40,13 @@ class Chart extends Component<ChartProps & WithTranslation, ChartState> {
             backgroundColor,
         } = this.props;
         this.state = {
-            accessibility: {
-                enabled: false,
-            },
+            accessibility: { enabled: false },
             boost: {
                 enabled: true,
                 seriesThreshold: 5,
             },
             chart: {
-                zooming: zooming
-                    ? {
-                          type: "x",
-                      }
-                    : {},
+                zooming: zooming ? { type: "x" } : {},
                 marginTop: 20,
                 height: height,
                 animation: animation,
@@ -60,25 +54,17 @@ class Chart extends Component<ChartProps & WithTranslation, ChartState> {
             },
             legend: {
                 enabled: legend,
-                itemStyle: {
-                    color: "#fff",
-                },
+                itemStyle: { color: "#fff" },
             },
             plotOptions: {
                 series: {
-                    states: {
-                        hover: {
-                            enabled: false,
-                        },
-                    },
                     lineWidth: lineWidth,
+                    states: { hover: { enabled: false } },
                 },
             },
             xAxis: {
                 labels: {
-                    style: {
-                        color: "#fff",
-                    },
+                    style: { color: "#fff" },
                     format: "{value:%H:%M:%S}",
                 },
                 type: "datetime",
@@ -87,16 +73,12 @@ class Chart extends Component<ChartProps & WithTranslation, ChartState> {
             },
             yAxis: {
                 labels: {
-                    style: {
-                        color: "#fff",
-                    },
+                    style: { color: "#fff" },
                     format: tickPrecision
                         ? `{value:${tickPrecision}f}`
                         : `{value:0.2f}`,
                 },
-                title: {
-                    text: "",
-                },
+                title: { text: "" },
                 opposite: true,
                 lineColor: lineColor,
                 tickInterval: tickInterval,
@@ -108,15 +90,9 @@ class Chart extends Component<ChartProps & WithTranslation, ChartState> {
                 xDateFormat: "%Y-%m-%d %H:%M:%S",
                 padding: 12,
             },
-            credits: {
-                enabled: false,
-            },
-            time: {
-                useUTC: false,
-            },
-            title: {
-                text: "",
-            },
+            credits: { enabled: false },
+            time: { useUTC: false },
+            title: { text: "" },
         };
     }
 

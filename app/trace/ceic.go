@@ -12,13 +12,8 @@ type CEIC struct {
 	DataSourceCache
 }
 
-func (c *CEIC) Property() (string, string) {
-	const (
-		NAME  string = "中国地震台网中心"
-		VALUE string = "CEIC"
-	)
-
-	return NAME, VALUE
+func (c *CEIC) Property() string {
+	return "中国地震台网中心"
 }
 
 func (c *CEIC) Fetch() ([]byte, error) {

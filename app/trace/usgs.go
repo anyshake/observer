@@ -13,13 +13,8 @@ type USGS struct {
 	DataSourceCache
 }
 
-func (u *USGS) Property() (string, string) {
-	const (
-		NAME  string = "United States Geological Survey"
-		VALUE string = "USGS"
-	)
-
-	return NAME, VALUE
+func (u *USGS) Property() string {
+	return "United States Geological Survey"
 }
 
 func (u *USGS) Fetch() ([]byte, error) {

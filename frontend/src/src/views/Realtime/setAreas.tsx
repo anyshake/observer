@@ -2,7 +2,7 @@ import getVelocity from "../../helpers/seismic/getVelocity";
 import getQueueArray from "../../helpers/array/getQueueArray";
 import getVoltage from "../../helpers/seismic/getVoltage";
 import setObjectByPath from "../../helpers/utils/setObjectByPath";
-import { RealtimeArea } from "./Realtime";
+import { RealtimeArea } from ".";
 import getAcceleration from "../../helpers/seismic/getAcceleration";
 import { ADC } from "../../config/adc";
 import { Geophone } from "../../config/geophone";
@@ -18,10 +18,8 @@ const setAreas = (
     gp: Geophone,
     scale: IntensityStandardProperty
 ): RealtimeArea[] => {
-    const tags = ["ehz", "ehe", "ehn"];
     const { ts } = data;
-
-    for (let i of tags) {
+    for (let i of obj) {
         // Get sample rate
         const { ehz, ehe, ehn } = data;
         let sampleRate = (ehz.length + ehe.length + ehn.length) / 3;
@@ -31,13 +29,14 @@ const setAreas = (
         const timeSpan = timeDiff / sampleRate;
 
         // Get voltage, velocity, acceleration
-        const channelData = data[i];
+        const channelData = data[i.tag];
         const voltage = getVoltage(channelData, adc.resolution, adc.fullscale);
-        const velocity = getVelocity(voltage, gp[i]);
+        const velocity = getVelocity(voltage, gp[i.tag]);
         const acceleration = getAcceleration(velocity, timeSpan / timeDiff);
 
         // Fill data queue with raw count
-        const srcArr = obj.find((item) => item.tag === i)?.chart.series?.data;
+        const srcArr = obj.find((item) => item.tag === i.tag)?.chart.series
+            ?.data;
         const newArr = [];
         for (let j = 0; j < channelData.length; j++) {
             newArr.push([ts - (sampleRate - j) * timeSpan, channelData[j]]);
@@ -45,7 +44,7 @@ const setAreas = (
 
         // Merge data queue with raw count
         const resultArr = getQueueArray(srcArr, newArr, length * sampleRate);
-        setObjectByPath(obj, `[tag:${i}]>chart>series>data`, resultArr);
+        setObjectByPath(obj, `[tag:${i.tag}]>chart>series>data`, resultArr);
 
         // Get PGV, PGA
         const pgv = velocity.reduce((a, b) => {

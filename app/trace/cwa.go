@@ -21,13 +21,8 @@ type CWA struct {
 	DataSourceCache
 }
 
-func (c *CWA) Property() (string, string) {
-	const (
-		NAME  string = "交通部中央氣象局"
-		VALUE string = "CWA"
-	)
-
-	return NAME, VALUE
+func (c *CWA) Property() string {
+	return "交通部中央氣象局"
 }
 
 func (c *CWA) createGFWBypasser() *http.Transport {

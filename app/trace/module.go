@@ -18,9 +18,14 @@ import (
 // @Failure 500 {object} response.HttpResponse "Failed to read earthquake event list due to failed to read data source"
 // @Success 200 {object} response.HttpResponse{data=[]Event} "Successfully read the list of earthquake events"
 func (t *Trace) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) {
-	sources := []DataSource{
-		&SCEA_E{}, &SCEA_B{}, &CEIC{},
-		&USGS{}, &JMA{}, &CWA{}, &HKO{},
+	sources := map[string]DataSource{
+		"CWA":    &CWA{},
+		"HKO":    &HKO{},
+		"JMA":    &JMA{},
+		"CEIC":   &CEIC{},
+		"USGS":   &USGS{},
+		"SCEA_E": &SCEA_E{},
+		"SCEA_B": &SCEA_B{},
 	}
 
 	rg.POST("/trace", func(c *gin.Context) {
@@ -37,11 +42,11 @@ func (t *Trace) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) 
 			}
 
 			var list []availableSources
-			for _, v := range sources {
-				name, value := v.Property()
+			for k, v := range sources {
+				name := v.Property()
 				list = append(list, availableSources{
 					Name:  name,
-					Value: value,
+					Value: k,
 				})
 			}
 
@@ -50,22 +55,20 @@ func (t *Trace) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) 
 		}
 
 		var (
-			latitude  = options.FeatureOptions.Config.Station.Latitude
-			longitude = options.FeatureOptions.Config.Station.Longitude
+			source, ok = sources[binding.Source]
+			latitude   = options.FeatureOptions.Config.Station.Latitude
+			longitude  = options.FeatureOptions.Config.Station.Longitude
 		)
-		for _, v := range sources {
-			_, value := v.Property()
-			if value == binding.Source {
-				events, err := v.List(latitude, longitude)
-				if err != nil {
-					response.Error(c, http.StatusInternalServerError)
-					return
-				}
-
-				sortByTimestamp(events)
-				response.Message(c, "Successfully read the list of earthquake events", events)
+		if ok {
+			events, err := source.List(latitude, longitude)
+			if err != nil {
+				response.Error(c, http.StatusInternalServerError)
 				return
 			}
+
+			sortByTimestamp(events)
+			response.Message(c, "Successfully read the list of earthquake events", events)
+			return
 		}
 
 		response.Error(c, http.StatusBadRequest)
