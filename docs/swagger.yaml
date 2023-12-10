@@ -142,6 +142,8 @@ definitions:
         type: string
       status:
         $ref: '#/definitions/publisher.System'
+      timestamp:
+        type: integer
       uptime:
         type: integer
       uuid:

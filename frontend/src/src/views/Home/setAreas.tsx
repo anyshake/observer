@@ -1,4 +1,4 @@
-import { HomeArea } from "./Home";
+import { HomeArea } from ".";
 import { ApiResponse } from "../../helpers/request/restfulApiByTag";
 import getQueueArray from "../../helpers/array/getQueueArray";
 import setObjectByPath from "../../helpers/utils/setObjectByPath";

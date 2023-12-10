@@ -14,13 +14,8 @@ type HKO struct {
 	DataSourceCache
 }
 
-func (h *HKO) Property() (string, string) {
-	const (
-		NAME  string = "天文台全球地震資訊網"
-		VALUE string = "HKO"
-	)
-
-	return NAME, VALUE
+func (h *HKO) Property() string {
+	return "天文台全球地震資訊網"
 }
 
 func (h *HKO) Fetch() ([]byte, error) {

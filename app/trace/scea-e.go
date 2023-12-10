@@ -12,13 +12,8 @@ type SCEA_E struct {
 	DataSourceCache
 }
 
-func (s *SCEA_E) Property() (string, string) {
-	const (
-		NAME  string = "四川地震局（预警）"
-		VALUE string = "SCEA-E"
-	)
-
-	return NAME, VALUE
+func (s *SCEA_E) Property() string {
+	return "四川地震局（预警）"
 }
 
 func (s *SCEA_E) Fetch() ([]byte, error) {
