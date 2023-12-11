@@ -689,9 +689,10 @@ class History extends Component<
                         <Area key={index} {...area}>
                             <Chart
                                 {...chart}
+                                sort={true}
                                 tooltip={true}
                                 zooming={true}
-                                animation={false}
+                                animation={true}
                                 tickPrecision={1}
                                 tickInterval={10}
                             />

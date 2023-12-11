@@ -3,17 +3,9 @@ import { ApiResponse } from "../../helpers/request/restfulApiByTag";
 import setObjectByPath from "../../helpers/utils/setObjectByPath";
 
 const setLabels = (obj: LabelProps[], res: ApiResponse): LabelProps[] => {
-    const tags = [
-        "messages",
-        "errors",
-        "pushed",
-        "failures",
-        "queued",
-        "offset",
-    ];
-    for (let i of tags) {
+    for (let i of obj) {
         const { status } = res.data;
-        setObjectByPath(obj, `[tag:${i}]>value`, status[i]);
+        setObjectByPath(obj, `[tag:${i.tag}]>value`, status[i.tag || ""]);
     }
 
     return obj;
