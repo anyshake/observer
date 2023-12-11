@@ -8,21 +8,20 @@ const setAreas = (
     res: ApiResponse,
     length: number
 ): HomeArea[] => {
-    const tags = ["cpu", "memory"];
-
-    for (let i of tags) {
+    for (let i of obj) {
         // Get percent by tag
-        const percent = res.data[i].percent as number;
+        const percent = res.data[i.tag].percent as number;
         // Create new array, get source array
         const newArr = [Date.now(), percent];
-        const srcArr = obj.find((item) => item.tag === i)?.chart.series?.data;
+        const srcArr = obj.find((item) => item.tag === i.tag)?.chart.series
+            ?.data;
         // Merge new array with source array
         const result = getQueueArray(srcArr, newArr, length);
-        setObjectByPath(obj, `[tag:${i}]>area>text`, {
-            id: `views.home.areas.${i}.text`,
+        setObjectByPath(obj, `[tag:${i.tag}]>area>text`, {
+            id: `views.home.areas.${i.tag}.text`,
             format: { usage: percent.toFixed(2) },
         });
-        setObjectByPath(obj, `[tag:${i}]>chart>series>data`, result);
+        setObjectByPath(obj, `[tag:${i.tag}]>chart>series>data`, result);
     }
 
     return obj;

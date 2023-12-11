@@ -67,8 +67,8 @@ const setAreas = (
         const intensity = scaleStandard?.intensity(pgv, pga);
 
         // Set PGV, PGA, intensity in area field
-        setObjectByPath(obj, `[tag:${i}]>area>text`, {
-            id: `views.realtime.areas.${i}.text`,
+        setObjectByPath(obj, `[tag:${i.tag}]>area>text`, {
+            id: `views.realtime.areas.${i.tag}.text`,
             format: {
                 pga: pga.toFixed(5),
                 pgv: pgv.toFixed(5),

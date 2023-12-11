@@ -3,11 +3,9 @@ import setObjectByPath from "../../helpers/utils/setObjectByPath";
 import { HistoryArea } from ".";
 
 const setAreas = (obj: HistoryArea[], data: any): HistoryArea[] => {
-    const tags = ["ehz", "ehe", "ehn"];
-
     // Sort data by timestamp
     const sortedData: any = getSortedArray(data, "ts", "number", "asc");
-    for (let i of tags) {
+    for (let i of obj) {
         // Previous timestamp
         let prevTs = 0;
         // Store chart data format
@@ -15,7 +13,7 @@ const setAreas = (obj: HistoryArea[], data: any): HistoryArea[] => {
         // Go through each sorted sample
         for (let j of sortedData) {
             // Get data sample rate
-            const channelData = j[i];
+            const channelData = j[i.tag];
             const sampleRate = channelData.length;
             // Get time difference and time span
             const timeDiff = prevTs !== 0 ? prevTs - j.ts : 1000;
@@ -30,7 +28,7 @@ const setAreas = (obj: HistoryArea[], data: any): HistoryArea[] => {
         }
 
         // Set velocity chart data
-        setObjectByPath(obj, `[tag:${i}]>chart>series>data`, resultArr);
+        setObjectByPath(obj, `[tag:${i.tag}]>chart>series>data`, resultArr);
     }
 
     return obj;
