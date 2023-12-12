@@ -5,9 +5,9 @@ import (
 	"sort"
 	"time"
 
-	"github.com/bclswl0827/observer/app"
-	"github.com/bclswl0827/observer/publisher"
-	"github.com/bclswl0827/observer/utils/duration"
+	"github.com/anyshake/observer/app"
+	"github.com/anyshake/observer/publisher"
+	"github.com/anyshake/observer/utils/duration"
 	"github.com/bclswl0827/sacio"
 )
 

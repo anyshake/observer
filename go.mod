@@ -1,4 +1,4 @@
-module github.com/bclswl0827/observer
+module github.com/anyshake/observer
 
 go 1.19
 

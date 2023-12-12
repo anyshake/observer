@@ -3,9 +3,9 @@ package history
 import (
 	"fmt"
 
-	"github.com/bclswl0827/observer/app"
-	"github.com/bclswl0827/observer/driver/dao"
-	"github.com/bclswl0827/observer/publisher"
+	"github.com/anyshake/observer/app"
+	"github.com/anyshake/observer/driver/dao"
+	"github.com/anyshake/observer/publisher"
 )
 
 func filterHistory(start, end int64, options *app.ServerOptions) ([]publisher.Geophone, error) {

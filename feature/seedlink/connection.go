@@ -6,7 +6,7 @@ import (
 	"net"
 	"strings"
 
-	"github.com/bclswl0827/observer/feature"
+	"github.com/anyshake/observer/feature"
 )
 
 func (s *SeedLink) handleConnection(options *feature.FeatureOptions, conn net.Conn) {

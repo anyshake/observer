@@ -8,9 +8,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/bclswl0827/observer/driver/serial"
-	"github.com/bclswl0827/observer/feature"
-	"github.com/bclswl0827/observer/utils/duration"
+	"github.com/anyshake/observer/driver/serial"
+	"github.com/anyshake/observer/feature"
+	"github.com/anyshake/observer/utils/duration"
 )
 
 func (g *Geophone) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGroup) {

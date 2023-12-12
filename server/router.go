@@ -3,14 +3,14 @@ package server
 import (
 	"time"
 
-	"github.com/bclswl0827/observer/app"
-	"github.com/bclswl0827/observer/app/devel"
-	"github.com/bclswl0827/observer/app/history"
-	"github.com/bclswl0827/observer/app/mseed"
-	"github.com/bclswl0827/observer/app/socket"
-	"github.com/bclswl0827/observer/app/station"
-	"github.com/bclswl0827/observer/app/trace"
-	"github.com/bclswl0827/observer/server/middleware/limit"
+	"github.com/anyshake/observer/app"
+	"github.com/anyshake/observer/app/devel"
+	"github.com/anyshake/observer/app/history"
+	"github.com/anyshake/observer/app/mseed"
+	"github.com/anyshake/observer/app/socket"
+	"github.com/anyshake/observer/app/station"
+	"github.com/anyshake/observer/app/trace"
+	"github.com/anyshake/observer/server/middleware/limit"
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,6 +1,6 @@
 package app
 
-import "github.com/bclswl0827/observer/feature"
+import "github.com/anyshake/observer/feature"
 
 type ServerOptions struct {
 	Gzip           int

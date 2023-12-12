@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/bclswl0827/observer/app"
+	"github.com/anyshake/observer/app"
 	"github.com/gin-gonic/gin"
 )
 

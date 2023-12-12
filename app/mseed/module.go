@@ -3,8 +3,8 @@ package mseed
 import (
 	"net/http"
 
-	"github.com/bclswl0827/observer/app"
-	"github.com/bclswl0827/observer/server/response"
+	"github.com/anyshake/observer/app"
+	"github.com/anyshake/observer/server/response"
 	"github.com/gin-gonic/gin"
 )
 

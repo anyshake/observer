@@ -1,7 +1,7 @@
 package geophone
 
 import (
-	"github.com/bclswl0827/observer/config"
+	"github.com/anyshake/observer/config"
 )
 
 func (g *Geophone) getFilter(geophoneAttr config.Compensation, sampleRate int) filter {

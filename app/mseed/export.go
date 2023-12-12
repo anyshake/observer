@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bclswl0827/observer/config"
+	"github.com/anyshake/observer/config"
 )
 
 func getMiniSEEDBytes(conf *config.Conf, fileName string) ([]byte, error) {

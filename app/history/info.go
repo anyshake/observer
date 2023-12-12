@@ -3,8 +3,8 @@ package history
 import (
 	"strings"
 
-	"github.com/bclswl0827/observer/config"
-	"github.com/bclswl0827/observer/utils/text"
+	"github.com/anyshake/observer/config"
+	"github.com/anyshake/observer/utils/text"
 )
 
 func getNetwork(*config.Conf) string {

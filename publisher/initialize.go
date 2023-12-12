@@ -3,7 +3,7 @@ package publisher
 import (
 	"time"
 
-	"github.com/bclswl0827/observer/config"
+	"github.com/anyshake/observer/config"
 )
 
 func Initialize(config *config.Conf, status *Status) {

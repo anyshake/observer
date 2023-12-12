@@ -6,8 +6,8 @@ import (
 	"os"
 	"sync"
 
-	"github.com/bclswl0827/observer/feature"
-	"github.com/bclswl0827/observer/publisher"
+	"github.com/anyshake/observer/feature"
+	"github.com/anyshake/observer/publisher"
 )
 
 func (s *SeedLink) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGroup) {

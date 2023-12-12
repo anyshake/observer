@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bclswl0827/observer/config"
+	"github.com/anyshake/observer/config"
 )
 
 func getMiniSEEDList(conf *config.Conf) ([]MiniSEEDFile, error) {

@@ -3,8 +3,8 @@ package trace
 import (
 	"time"
 
-	"github.com/bclswl0827/observer/utils/duration"
-	"github.com/bclswl0827/observer/utils/request"
+	"github.com/anyshake/observer/utils/duration"
+	"github.com/anyshake/observer/utils/request"
 )
 
 type SCEA_E struct {

@@ -5,8 +5,8 @@ import (
 	"encoding/binary"
 	"io"
 
-	"github.com/bclswl0827/observer/config"
-	"github.com/bclswl0827/observer/driver/serial"
+	"github.com/anyshake/observer/config"
+	"github.com/anyshake/observer/driver/serial"
 )
 
 func (g *Geophone) Read(port io.ReadWriteCloser, conf *config.Conf, packet *Packet, packetLen int) error {

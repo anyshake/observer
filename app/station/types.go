@@ -1,6 +1,6 @@
 package station
 
-import "github.com/bclswl0827/observer/publisher"
+import "github.com/anyshake/observer/publisher"
 
 type Station struct{}
 

@@ -9,17 +9,17 @@ import (
 
 	"github.com/fatih/color"
 
-	"github.com/bclswl0827/observer/app"
-	"github.com/bclswl0827/observer/config"
-	"github.com/bclswl0827/observer/feature"
-	"github.com/bclswl0827/observer/feature/archiver"
-	"github.com/bclswl0827/observer/feature/geophone"
-	"github.com/bclswl0827/observer/feature/miniseed"
-	"github.com/bclswl0827/observer/feature/ntpclient"
-	"github.com/bclswl0827/observer/feature/seedlink"
-	"github.com/bclswl0827/observer/publisher"
-	"github.com/bclswl0827/observer/server"
-	"github.com/bclswl0827/observer/utils/logger"
+	"github.com/anyshake/observer/app"
+	"github.com/anyshake/observer/config"
+	"github.com/anyshake/observer/feature"
+	"github.com/anyshake/observer/feature/archiver"
+	"github.com/anyshake/observer/feature/geophone"
+	"github.com/anyshake/observer/feature/miniseed"
+	"github.com/anyshake/observer/feature/ntpclient"
+	"github.com/anyshake/observer/feature/seedlink"
+	"github.com/anyshake/observer/publisher"
+	"github.com/anyshake/observer/server"
+	"github.com/anyshake/observer/utils/logger"
 	"github.com/common-nighthawk/go-figure"
 )
 

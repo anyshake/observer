@@ -3,7 +3,7 @@ package socket
 import (
 	"encoding/json"
 
-	"github.com/bclswl0827/observer/publisher"
+	"github.com/anyshake/observer/publisher"
 	"github.com/gorilla/websocket"
 )
 

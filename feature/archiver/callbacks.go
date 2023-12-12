@@ -1,10 +1,10 @@
 package archiver
 
 import (
-	"github.com/bclswl0827/observer/driver/dao"
-	"github.com/bclswl0827/observer/feature"
-	"github.com/bclswl0827/observer/utils/logger"
-	"github.com/bclswl0827/observer/utils/text"
+	"github.com/anyshake/observer/driver/dao"
+	"github.com/anyshake/observer/feature"
+	"github.com/anyshake/observer/utils/logger"
+	"github.com/anyshake/observer/utils/text"
 	"github.com/fatih/color"
 )
 

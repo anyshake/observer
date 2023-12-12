@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/bclswl0827/mseedio"
-	"github.com/bclswl0827/observer/feature"
-	"github.com/bclswl0827/observer/publisher"
-	"github.com/bclswl0827/observer/utils/duration"
-	"github.com/bclswl0827/observer/utils/logger"
+	"github.com/anyshake/observer/feature"
+	"github.com/anyshake/observer/publisher"
+	"github.com/anyshake/observer/utils/duration"
+	"github.com/anyshake/observer/utils/logger"
 	"github.com/fatih/color"
 )
 
