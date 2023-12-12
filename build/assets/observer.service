@@ -1,10 +1,9 @@
 [Unit]
-Description=Observer Service
+Description=AnyShake Observer Service
 After=network.target
 
 [Service]
 User=root
-ExecStartPre=/bin/sleep 3
 ExecStart=/usr/local/bin/observer -config /usr/local/etc/observer/config.json
 Restart=always
 
