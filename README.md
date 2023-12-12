@@ -11,18 +11,9 @@ AnyShake Observer use serial port to collect & parse seismic data from [AnyShake
 
 AnyShake Observer is written in Go, which means it can easily port to a variety of OS and CPU architectures, even embedded Linux devices, AnyShake Observer also supports PostgreSQL, MariaDB (MySQL), SQLite, and SQL Server as seismic data archiving engines.
 
-## Preview
-
-![Preview - Home](https://raw.githubusercontent.com/anyshake/logotype/master/preview_home.gif)
-![Preview - Realtime](https://raw.githubusercontent.com/anyshake/logotype/master/preview_realtime.gif)
-![Preview - History](https://raw.githubusercontent.com/anyshake/logotype/master/preview_history.gif)
-![Preview - Export](https://raw.githubusercontent.com/anyshake/logotype/master/preview_export.gif)
-![Preview - Settings](https://raw.githubusercontent.com/anyshake/logotype/master/preview_setting.gif)
-
-
 ## Features
 
-Please refer to our docs at [https://anyshake.org/features](https://filebrowser.org/features)
+Please refer to our docs at [https://anyshake.org/features](https://anyshake.org/features)
 
 ## Install
 
@@ -35,6 +26,14 @@ TO BE DONE
 ## Contributing
 
 TO BE DONE
+
+## Preview
+
+![Preview - Home](https://raw.githubusercontent.com/anyshake/logotype/master/preview_home.gif)
+![Preview - Realtime](https://raw.githubusercontent.com/anyshake/logotype/master/preview_realtime.gif)
+![Preview - History](https://raw.githubusercontent.com/anyshake/logotype/master/preview_history.gif)
+![Preview - Export](https://raw.githubusercontent.com/anyshake/logotype/master/preview_export.gif)
+![Preview - Settings](https://raw.githubusercontent.com/anyshake/logotype/master/preview_setting.gif)
 
 ## License
 
