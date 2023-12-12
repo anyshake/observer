@@ -1,9 +1,9 @@
 package archiver
 
 import (
-	"github.com/bclswl0827/observer/driver/dao"
-	"github.com/bclswl0827/observer/feature"
-	"github.com/bclswl0827/observer/publisher"
+	"github.com/anyshake/observer/driver/dao"
+	"github.com/anyshake/observer/feature"
+	"github.com/anyshake/observer/publisher"
 	"gorm.io/gorm"
 )
 

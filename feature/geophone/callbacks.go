@@ -3,11 +3,11 @@ package geophone
 import (
 	"time"
 
-	"github.com/bclswl0827/observer/config"
-	"github.com/bclswl0827/observer/feature"
-	"github.com/bclswl0827/observer/utils/duration"
-	"github.com/bclswl0827/observer/utils/logger"
-	"github.com/bclswl0827/observer/utils/text"
+	"github.com/anyshake/observer/config"
+	"github.com/anyshake/observer/feature"
+	"github.com/anyshake/observer/utils/duration"
+	"github.com/anyshake/observer/utils/logger"
+	"github.com/anyshake/observer/utils/text"
 	"github.com/fatih/color"
 )
 

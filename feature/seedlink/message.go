@@ -1,8 +1,8 @@
 package seedlink
 
 import (
-	"github.com/bclswl0827/observer/feature"
-	"github.com/bclswl0827/observer/publisher"
+	"github.com/anyshake/observer/feature"
+	"github.com/anyshake/observer/publisher"
 )
 
 func (s *SeedLink) handleMessage(gp *publisher.Geophone, options *feature.FeatureOptions) error {

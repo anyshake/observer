@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bclswl0827/observer/utils/duration"
-	"github.com/bclswl0827/observer/utils/request"
+	"github.com/anyshake/observer/utils/duration"
+	"github.com/anyshake/observer/utils/request"
 	"github.com/sbabiv/xml2map"
 )
 

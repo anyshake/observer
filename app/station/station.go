@@ -1,8 +1,8 @@
 package station
 
 import (
-	"github.com/bclswl0827/observer/feature"
-	"github.com/bclswl0827/observer/utils/duration"
+	"github.com/anyshake/observer/feature"
+	"github.com/anyshake/observer/utils/duration"
 )
 
 func getStation(options *feature.FeatureOptions) System {

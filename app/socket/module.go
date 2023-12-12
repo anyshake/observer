@@ -3,9 +3,9 @@ package socket
 import (
 	"net/http"
 
-	"github.com/bclswl0827/observer/app"
-	"github.com/bclswl0827/observer/publisher"
-	"github.com/bclswl0827/observer/server/response"
+	"github.com/anyshake/observer/app"
+	"github.com/anyshake/observer/publisher"
+	"github.com/anyshake/observer/server/response"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )

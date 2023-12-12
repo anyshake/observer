@@ -1,6 +1,6 @@
 package station
 
-import "github.com/bclswl0827/observer/config"
+import "github.com/anyshake/observer/config"
 
 func getADC(conf *config.Conf) ADC {
 	return ADC{

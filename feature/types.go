@@ -3,8 +3,8 @@ package feature
 import (
 	"sync"
 
-	"github.com/bclswl0827/observer/config"
-	"github.com/bclswl0827/observer/publisher"
+	"github.com/anyshake/observer/config"
+	"github.com/anyshake/observer/publisher"
 	"gorm.io/gorm"
 )
 

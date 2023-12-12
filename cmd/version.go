@@ -5,7 +5,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/bclswl0827/observer/utils/text"
+	"github.com/anyshake/observer/utils/text"
 	"github.com/fatih/color"
 )
 

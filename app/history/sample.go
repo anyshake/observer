@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bclswl0827/observer/publisher"
-	"github.com/bclswl0827/observer/utils/duration"
+	"github.com/anyshake/observer/publisher"
+	"github.com/anyshake/observer/utils/duration"
 )
 
 func getSampleRate(data []publisher.Geophone, channel string) (int, error) {

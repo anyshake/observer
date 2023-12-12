@@ -3,8 +3,8 @@ package devel
 import (
 	"net/http"
 
-	"github.com/bclswl0827/observer/app"
-	_ "github.com/bclswl0827/observer/docs"
+	"github.com/anyshake/observer/app"
+	_ "github.com/anyshake/observer/docs"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	gs "github.com/swaggo/gin-swagger"

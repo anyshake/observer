@@ -3,7 +3,7 @@ package geophone
 import (
 	"io"
 
-	"github.com/bclswl0827/observer/driver/serial"
+	"github.com/anyshake/observer/driver/serial"
 )
 
 func (g *Geophone) Reset(port io.ReadWriteCloser) error {

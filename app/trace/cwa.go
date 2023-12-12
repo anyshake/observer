@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/bclswl0827/observer/utils/duration"
-	"github.com/bclswl0827/observer/utils/request"
+	"github.com/anyshake/observer/utils/duration"
+	"github.com/anyshake/observer/utils/request"
 )
 
 const HOST_IP_TO_BYPASS_GFW = "168.95.246.1:443"

@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bclswl0827/observer/feature"
+	"github.com/anyshake/observer/feature"
 )
 
 func (n *NTPClient) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGroup) {
