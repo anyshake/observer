@@ -38,7 +38,7 @@ func (h *History) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions
 
 		switch binding.Format {
 		case "json":
-			response.Message(c, "The specified waveform data was successfully filtered", data)
+			response.Message(c, "The waveform data was successfully filtered", data)
 			return
 		case "sac":
 			fileName, dataBytes, err := getSACBytes(data, binding.Channel, options)
