@@ -74,6 +74,10 @@ Thanks to the following tools and libraries, AnyShake Observer is made possible!
  - [gorm.io/driver/sqlite](https://github.com/go-gorm/sqlite)
  - [gorm.io/driver/sqlserver](https://github.com/go-gorm/sqlserver)
  - [gorm.io/gorm](https://gorm.io/)
+ - [github.com/bclswl0827/mseedio](https://github.com/bclswl0827/mseedio)
+ - [github.com/fatih/color](https://github.com/fatih/color)
+ - [github.com/json-iterator/go](https://github.com/json-iterator/go)
+ - [github.com/swaggo/gin-swagger](https://github.com/swaggo/gin-swagger)
 
 ### Frontend
 
