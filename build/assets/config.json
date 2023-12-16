@@ -24,7 +24,7 @@
         }
     },
     "adc_settings": {
-        "resolution": 32,
+        "resolution": 27,
         "fullscale": 5.0
     },
     "serial_settings": {
@@ -39,7 +39,7 @@
         "interval": 5
     },
     "archiver_settings": {
-        "enable": false,
+        "enable": true,
         "engine": "postgresql",
         "host": "127.0.0.1",
         "port": 5432,

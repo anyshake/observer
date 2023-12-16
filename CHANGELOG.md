@@ -2,6 +2,10 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.2.6 (2023-12-16)
+
+ - Fixed SAC file waveform lag issue caused by sample rate calculation
+
 ## v2.2.5 (2023-12-12)
 
  - Migrating to [anyshake/observer](https://github.com/anyshake/observer)

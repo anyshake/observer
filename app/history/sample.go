@@ -10,28 +10,31 @@ import (
 
 func getSampleRate(data []publisher.Geophone, channel string) (int, error) {
 	var (
-		length   = 0
-		lastTime = time.UnixMilli(data[0].TS)
+		sampleRateSum float64
+		lastTime      = time.UnixMilli(data[0].TS)
 	)
 
-	for _, v := range data {
-		currentTime := time.UnixMilli(v.TS)
-		if duration.Difference(currentTime, lastTime) > THRESHOLD {
+	for i := 1; i < len(data); i++ {
+		var (
+			currentTime = time.UnixMilli(data[i].TS)
+			timeDiff    = duration.Difference(currentTime, lastTime)
+		)
+		if timeDiff > THRESHOLD {
 			err := fmt.Errorf("uneven gaps between the data")
 			return 0, err
 		}
 
 		switch channel {
 		case "EHZ":
-			length += len(v.EHZ)
+			sampleRateSum += float64(len(data[i].EHZ)) / timeDiff.Seconds()
 		case "EHE":
-			length += len(v.EHE)
+			sampleRateSum += float64(len(data[i].EHE)) / timeDiff.Seconds()
 		case "EHN":
-			length += len(v.EHN)
+			sampleRateSum += float64(len(data[i].EHN)) / timeDiff.Seconds()
 		}
 
-		lastTime = time.UnixMilli(v.TS)
+		lastTime = currentTime
 	}
 
-	return length / len(data), nil
+	return int(sampleRateSum) / len(data), nil
 }
