@@ -17,7 +17,7 @@ As of the release of the software documentation, AnyShake has successfully captu
 
 ## Documentation
 
-Please visit [anyshake.org/docs/intro](https://anyshake.org/docs/introduction) for quick start guide and more information.
+Please visit [anyshake.org/docs/introduction](https://anyshake.org/docs/introduction) for quick start guide and more information.
 
 ## Features
 
