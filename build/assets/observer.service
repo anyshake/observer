@@ -6,6 +6,7 @@ After=network.target
 User=root
 ExecStart=/usr/local/bin/observer -config /usr/local/etc/observer/config.json
 Restart=always
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
