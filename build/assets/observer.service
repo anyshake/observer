@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=root
 ExecStart=/usr/local/bin/observer -config /usr/local/etc/observer/config.json
-Restart=always
+Restart=on-failure
 RestartSec=5s
 
 [Install]
