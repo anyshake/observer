@@ -60,7 +60,7 @@
             "map": {
                 "area": {
                     "label": "Station Location",
-                    "text": "Longitude: {{ longitude }} °\nLatitude: {{ latitude }} °\nElevation: {{ altitude }} m"
+                    "text": "Longitude: {{ longitude }} °\nLatitude: {{ latitude }} °\nElevation: {{ elevation }} m"
                 }
             },
             "labels": {

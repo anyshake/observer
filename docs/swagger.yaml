@@ -93,7 +93,7 @@ definitions:
     type: object
   station.Location:
     properties:
-      altitude:
+      elevation:
         type: number
       latitude:
         type: number

@@ -3,7 +3,7 @@ import { HomeMap } from ".";
 
 const setMap = (obj: HomeMap, res: ApiResponse): HomeMap => {
     const { location } = res.data;
-    const { longitude, latitude, altitude } = location;
+    const { longitude, latitude, elevation } = location;
     return {
         ...obj,
         area: {
@@ -11,7 +11,7 @@ const setMap = (obj: HomeMap, res: ApiResponse): HomeMap => {
             text: {
                 id: "views.home.map.area.text",
                 format: {
-                    altitude: altitude.toFixed(2),
+                    elevation: elevation.toFixed(2),
                     latitude: latitude.toFixed(2),
                     longitude: longitude.toFixed(2),
                 },

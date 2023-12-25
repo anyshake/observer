@@ -397,7 +397,7 @@ const docTemplate = `{
         "station.Location": {
             "type": "object",
             "properties": {
-                "altitude": {
+                "elevation": {
                     "type": "number"
                 },
                 "latitude": {

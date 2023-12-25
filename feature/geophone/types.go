@@ -5,17 +5,10 @@ import "time"
 const MODULE string = "geophone"
 
 const (
-	// READY_THRESHOLD should be smaller than 1 second
-	READY_THRESHOLD time.Duration = 900 * time.Millisecond
-	// TIMEOUT_THRESHOLD should be greater than 1 second
+	// READY_THRESHOLD should be strictly 1 second
+	READY_THRESHOLD time.Duration = 1 * time.Second
+	// TIMEOUT_THRESHOLD should be greater than READY_THRESHOLD
 	TIMEOUT_THRESHOLD time.Duration = 3 * time.Second
-)
-
-const (
-	// TARGET_DAMPING is the target damping ratio
-	TARGET_DAMPING float64 = 0.707
-	// TARGET_FREQUENCY is the target frequency (Hz)
-	TARGET_FREQUENCY float64 = 0.1
 )
 
 var (
@@ -34,12 +27,4 @@ type Packet struct {
 	EHE      []int32 // East-West
 	EHN      []int32 // North-South
 	Checksum [3]uint8
-}
-
-type filter struct {
-	a1 float64
-	a2 float64
-	b0 float64
-	b1 float64
-	b2 float64
 }

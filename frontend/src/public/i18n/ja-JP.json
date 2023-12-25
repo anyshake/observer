@@ -60,7 +60,7 @@
       "map": {
         "area": {
           "label": "ステーションの位置を測定します",
-          "text": "経度です：{{ longitude }} °\n緯度です：{{ latitude }} °\n海抜です：{{ altitude }} m"
+          "text": "経度です：{{ longitude }} °\n緯度です：{{ latitude }} °\n海抜です：{{ elevation }} m"
         }
       },
       "labels": {

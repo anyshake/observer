@@ -3,7 +3,6 @@ package geophone
 import (
 	"time"
 
-	"github.com/anyshake/observer/config"
 	"github.com/anyshake/observer/feature"
 	"github.com/anyshake/observer/utils/duration"
 	"github.com/anyshake/observer/utils/logger"
@@ -37,16 +36,9 @@ func (g *Geophone) OnReady(options *feature.FeatureOptions, v ...any) {
 		// Archive approximately 1 second has passed
 		timeDiff := duration.Difference(currentTime, lastTime)
 		if timeDiff >= READY_THRESHOLD {
-			// Get compensation filter coefficients
 			// Set packet timestamp
 			options.Status.System.Messages++
 			options.Status.Buffer.TS = currentTime.UnixMilli()
-			// Apply compensation for EHZ, EHE, EHN channels
-			if len(packet.EHZ) > 1 && len(packet.EHE) > 1 && len(packet.EHN) > 1 {
-				packet.EHZ = g.applyFilter(packet.EHZ, g.getFilter(v[1].(config.Compensation), len(packet.EHZ)))
-				packet.EHE = g.applyFilter(packet.EHE, g.getFilter(v[2].(config.Compensation), len(packet.EHE)))
-				packet.EHN = g.applyFilter(packet.EHN, g.getFilter(v[3].(config.Compensation), len(packet.EHN)))
-			}
 			// Copy buffer and reset
 			options.Status.Geophone = *options.Status.Buffer
 			options.Status.Buffer.EHZ = []int32{}

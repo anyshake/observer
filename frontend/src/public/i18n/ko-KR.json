@@ -60,7 +60,7 @@
       "map": {
         "area": {
           "label": "측정소의 위치",
-          "text": "경도：{{ longitude }} °\n위도：{{ latitude }} °\n해발：{{ altitude }} m"
+          "text": "경도：{{ longitude }} °\n위도：{{ latitude }} °\n해발：{{ elevation }} m"
         }
       },
       "labels": {

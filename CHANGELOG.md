@@ -2,6 +2,18 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.3.0
+
+ - Update earthquake event arrival estimation algorithm
+ - Remove compensation IIR filter
+ - Change `altitude` field in `station_settings` to `elevation`
+ - Restart daemon only on-failure
+ - Add restart delay for daemon
+ - Follow the SemVer principles
+ - Update README reference docs
+ - More backend credits
+ - Run build workflow on tag creations only
+
 ## v2.2.6 (2023-12-16)
 
  - Fixed SAC file waveform lag issue caused by sample rate calculation

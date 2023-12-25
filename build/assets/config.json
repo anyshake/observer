@@ -4,7 +4,7 @@
         "name": "Test Station",
         "latitude": 39.9,
         "longitude": 116.3,
-        "altitude": 0
+        "elevation": 0
     },
     "geophone_settings": {
         "ehz": {
@@ -51,7 +51,7 @@
         "host": "0.0.0.0",
         "port": 8073,
         "cors": true,
-        "debug": true
+        "debug": false
     },
     "miniseed_settings": {
         "enable": false,

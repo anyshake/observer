@@ -56,7 +56,7 @@ func (s *SCEA_E) Format(latitude, longitude float64, data map[string]any) ([]Eve
 			Timestamp: time.UnixMilli(int64(v.(map[string]any)["shockTime"].(float64))).UnixMilli(),
 		}
 		l.Distance = getDistance(latitude, l.Latitude, longitude, l.Longitude)
-		l.Estimation = getEstimation(l.Distance)
+		l.Estimation = getEstimation(l.Depth, l.Distance)
 
 		list = append(list, l)
 	}
