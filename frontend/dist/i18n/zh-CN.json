@@ -60,7 +60,7 @@
             "map": {
                 "area": {
                     "label": "测站所在位置",
-                    "text": "经度 {{ longitude }} °\n纬度 {{ latitude }} °\n海拔 {{ altitude }} 米"
+                    "text": "经度 {{ longitude }} °\n纬度 {{ latitude }} °\n海拔 {{ elevation }} 米"
                 }
             },
             "labels": {

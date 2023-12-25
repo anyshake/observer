@@ -91,7 +91,7 @@ func (u *USGS) Format(latitude, longitude float64, data map[string]any) ([]Event
 			Magnitude: properties.(map[string]any)["mag"].(float64),
 		}
 		l.Distance = getDistance(latitude, l.Latitude, longitude, l.Longitude)
-		l.Estimation = getEstimation(l.Distance)
+		l.Estimation = getEstimation(l.Depth, l.Distance)
 
 		list = append(list, l)
 	}

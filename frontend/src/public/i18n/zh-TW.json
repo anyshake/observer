@@ -60,7 +60,7 @@
             "map": {
                 "area": {
                     "label": "站點所在位置",
-                    "text": "經度 {{ longitude }} °\n緯度 {{ latitude }} °\n海拔 {{ altitude }} 公尺"
+                    "text": "經度 {{ longitude }} °\n緯度 {{ latitude }} °\n海拔 {{ elevation }} 公尺"
                 }
             },
             "labels": {

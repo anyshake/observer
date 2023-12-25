@@ -64,10 +64,5 @@ func (g *Geophone) Read(port io.ReadWriteCloser, conf *config.Conf, packet *Pack
 		return err
 	}
 
-	// Get channel counts by offsetting
-	packet.EHZ = g.getOffsetCounts(packet.EHZ)
-	packet.EHE = g.getOffsetCounts(packet.EHE)
-	packet.EHN = g.getOffsetCounts(packet.EHN)
-
 	return nil
 }

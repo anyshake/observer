@@ -161,7 +161,7 @@ class Home extends Component<ReduxStoreProps & WithTranslation, HomeState> {
                     text: {
                         id: "views.home.map.area.text",
                         format: {
-                            altitude: "0.00",
+                            elevation: "0.00",
                             latitude: "0.00",
                             longitude: "0.00",
                         },
