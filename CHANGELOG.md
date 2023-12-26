@@ -2,6 +2,12 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.3.1
+ 
+ - Translation optimizations
+ - Allow collapsing PGA, PGV, intensity data in realtime chart
+ - Automatically adjusting realtime chart height to fit the screen
+
 ## v2.3.0
 
  - Update earthquake event arrival estimation algorithm
@@ -14,11 +20,11 @@ Starting from v2.2.5, all notable changes to this project will be documented in 
  - More backend credits
  - Run build workflow on tag creations only
 
-## v2.2.6 (2023-12-16)
+## v2.2.6
 
  - Fixed SAC file waveform lag issue caused by sample rate calculation
 
-## v2.2.5 (2023-12-12)
+## v2.2.5
 
  - Migrating to [anyshake/observer](https://github.com/anyshake/observer)
  - Supplement of README, CHANGELOG, build instructions, etc.

@@ -7,7 +7,7 @@ import View from "../../components/View";
 import Scroller from "../../components/Scroller";
 import Banner, { BannerProps } from "../../components/Banner";
 import Footer from "../../components/Footer";
-import Area, { AreaProps } from "../../components/Area";
+import Area, { AreaProps, CollapseMode } from "../../components/Area";
 import Container from "../../components/Container";
 import Chart, { ChartProps } from "../../components/Chart";
 import restfulApiByTag from "../../helpers/request/restfulApiByTag";
@@ -62,6 +62,7 @@ class Realtime extends Component<
                 {
                     tag: "ehz",
                     area: {
+                        collapse: CollapseMode.COLLAPSE_HIDE,
                         label: { id: "views.realtime.areas.ehz.label" },
                         text: {
                             id: "views.realtime.areas.ehz.text",
@@ -75,7 +76,6 @@ class Realtime extends Component<
                     chart: {
                         backgroundColor: "#d97706",
                         lineWidth: 1,
-                        height: 300,
                         series: {
                             name: "EHZ",
                             type: "line",
@@ -87,6 +87,7 @@ class Realtime extends Component<
                 {
                     tag: "ehe",
                     area: {
+                        collapse: CollapseMode.COLLAPSE_HIDE,
                         label: { id: "views.realtime.areas.ehe.label" },
                         text: {
                             id: "views.realtime.areas.ehe.text",
@@ -100,7 +101,6 @@ class Realtime extends Component<
                     chart: {
                         backgroundColor: "#10b981",
                         lineWidth: 1,
-                        height: 300,
                         series: {
                             name: "EHE",
                             type: "line",
@@ -112,6 +112,7 @@ class Realtime extends Component<
                 {
                     tag: "ehn",
                     area: {
+                        collapse: CollapseMode.COLLAPSE_HIDE,
                         label: { id: "views.realtime.areas.ehn.label" },
                         text: {
                             id: "views.realtime.areas.ehn.text",
@@ -125,7 +126,6 @@ class Realtime extends Component<
                     chart: {
                         backgroundColor: "#0ea5e9",
                         lineWidth: 1,
-                        height: 300,
                         series: {
                             name: "EHN",
                             type: "line",
@@ -200,7 +200,27 @@ class Realtime extends Component<
         this.setState({ banner, areas });
     };
 
+    // Set height of each chart by window height
+    setChartHeight = (): void => {
+        const { areas } = this.state;
+        const innerHeight = window.innerHeight;
+        let height = Math.round((innerHeight * 0.6) / areas.length);
+        if (height < 150) {
+            height = 150;
+        }
+        this.setState({
+            areas: areas.map((item) => ({
+                ...item,
+                chart: { ...item.chart, height },
+            })),
+        });
+    };
+
     async componentDidMount(): Promise<void> {
+        // Listen to window resize event
+        window.addEventListener("resize", this.setChartHeight);
+        this.setChartHeight();
+
         // Get ADC, Geophone, scale standard from Redux
         let { adc } = this.props.adc;
         const { resolution } = adc;
@@ -247,6 +267,9 @@ class Realtime extends Component<
     }
 
     componentWillUnmount(): void {
+        // Remove event listener
+        window.removeEventListener("resize", this.setChartHeight);
+
         // Close websocket connection when leaving
         if (this.websocket instanceof WebSocket) {
             this.websocket?.close();
@@ -273,7 +296,7 @@ class Realtime extends Component<
                                     zooming={true}
                                     animation={false}
                                     tickPrecision={1}
-                                    tickInterval={10}
+                                    tickInterval={1000}
                                 />
                             </Area>
                         ))}
