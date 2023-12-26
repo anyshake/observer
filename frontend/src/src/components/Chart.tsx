@@ -11,7 +11,7 @@ HighchartsBoost(Highcharts);
 
 export interface ChartProps {
     readonly sort?: boolean;
-    readonly height: number;
+    readonly height?: number;
     readonly legend?: boolean;
     readonly zooming?: boolean;
     readonly tooltip?: boolean;
@@ -102,7 +102,7 @@ class Chart extends Component<ChartProps & WithTranslation, ChartState> {
     }
 
     componentDidUpdate(): void {
-        const { t, series, sort } = this.props;
+        const { t, series, sort, height } = this.props;
         Highcharts.setOptions({
             lang: {
                 resetZoom: t("components.chart.reset_zoom"),
@@ -113,6 +113,9 @@ class Chart extends Component<ChartProps & WithTranslation, ChartState> {
         if (current) {
             const chart = current.chart;
             if (chart) {
+                if (height !== chart.chartHeight) {
+                    chart.update({ chart: { height } });
+                }
                 if (sort) {
                     if (series.data) {
                         series.data.sort((a: any, b: any) => {
