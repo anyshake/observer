@@ -67,7 +67,7 @@ class TimePicker extends Component<TimePickerProps & WithTranslation> {
                         }}
                         label={`${t(label.id, label.format)} - ${timezone}`}
                         defaultValue={defaultValue}
-                        value={value}
+                        value={value ?? 0}
                         ampm={false}
                     />
                 </LocalizationProvider>

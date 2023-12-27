@@ -30,6 +30,7 @@ import { connect } from "react-redux";
 import { ReduxStoreProps } from "../../config/store";
 import { update as updateADC } from "../../store/adc";
 import { update as updateGeophone } from "../../store/geophone";
+import { update as updateStation } from "../../store/station";
 import mapStateToProps from "../../helpers/utils/mapStateToProps";
 import { WithTranslation, withTranslation } from "react-i18next";
 
@@ -127,11 +128,7 @@ class Home extends Component<ReduxStoreProps & WithTranslation, HomeState> {
                         backgroundColor: "#22c55e",
                         lineWidth: 5,
                         height: 250,
-                        series: {
-                            type: "line",
-                            color: "#fff",
-                            data: [],
-                        },
+                        series: { type: "line", color: "#fff", data: [] },
                     },
                 },
                 {
@@ -147,11 +144,7 @@ class Home extends Component<ReduxStoreProps & WithTranslation, HomeState> {
                         backgroundColor: "#06b6d4",
                         lineWidth: 5,
                         height: 250,
-                        series: {
-                            type: "line",
-                            color: "#fff",
-                            data: [],
-                        },
+                        series: { type: "line", color: "#fff", data: [] },
                     },
                 },
             ],
@@ -198,17 +191,18 @@ class Home extends Component<ReduxStoreProps & WithTranslation, HomeState> {
         const banner = setBanner(res);
 
         if (!error) {
-            // Update ADC & Geophone
-            const { adc, geophone } = res.data;
-            const { updateADC, updateGeophone } = this.props;
+            // Update ADC, Geophone, Station
+            const { adc, geophone, station } = res.data;
+            const { updateADC, updateGeophone, updateStation } = this.props;
             // Update status labels
             const map = setMap(this.state.map, res);
             const labels = setLabels(this.state.labels, res);
             const areas = setAreas(this.state.areas, res, CHART_RETENTION);
             // Update component state
             this.setState({ labels, areas, map });
-            // Apply ADC & Geophone parameters to Redux store
+            // Apply ADC, Geophone, Station parameters to Redux store
             updateGeophone && updateGeophone(geophone);
+            updateStation && updateStation(station);
             updateADC && updateADC(adc);
         }
 
@@ -272,4 +266,5 @@ class Home extends Component<ReduxStoreProps & WithTranslation, HomeState> {
 export default connect(mapStateToProps, {
     updateGeophone,
     updateADC,
+    updateStation,
 })(withTranslation()(Home));

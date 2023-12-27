@@ -341,7 +341,45 @@ const docTemplate = `{
                 }
             }
         },
-        "station.ADC": {
+        "station.System": {
+            "type": "object",
+            "properties": {
+                "adc": {
+                    "$ref": "#/definitions/station.adcModel"
+                },
+                "cpu": {
+                    "$ref": "#/definitions/station.cpuModel"
+                },
+                "disk": {
+                    "$ref": "#/definitions/station.diskModel"
+                },
+                "geophone": {
+                    "$ref": "#/definitions/station.geophoneModel"
+                },
+                "memory": {
+                    "$ref": "#/definitions/station.memoryModel"
+                },
+                "os": {
+                    "$ref": "#/definitions/station.osModel"
+                },
+                "position": {
+                    "$ref": "#/definitions/station.positionModel"
+                },
+                "station": {
+                    "$ref": "#/definitions/station.stationModel"
+                },
+                "status": {
+                    "$ref": "#/definitions/publisher.System"
+                },
+                "timestamp": {
+                    "type": "integer"
+                },
+                "uptime": {
+                    "type": "integer"
+                }
+            }
+        },
+        "station.adcModel": {
             "type": "object",
             "properties": {
                 "fullscale": {
@@ -352,7 +390,7 @@ const docTemplate = `{
                 }
             }
         },
-        "station.CPU": {
+        "station.cpuModel": {
             "type": "object",
             "properties": {
                 "model": {
@@ -363,7 +401,7 @@ const docTemplate = `{
                 }
             }
         },
-        "station.Disk": {
+        "station.diskModel": {
             "type": "object",
             "properties": {
                 "free": {
@@ -380,7 +418,7 @@ const docTemplate = `{
                 }
             }
         },
-        "station.Geophone": {
+        "station.geophoneModel": {
             "type": "object",
             "properties": {
                 "ehe": {
@@ -394,21 +432,7 @@ const docTemplate = `{
                 }
             }
         },
-        "station.Location": {
-            "type": "object",
-            "properties": {
-                "elevation": {
-                    "type": "number"
-                },
-                "latitude": {
-                    "type": "number"
-                },
-                "longitude": {
-                    "type": "number"
-                }
-            }
-        },
-        "station.Memory": {
+        "station.memoryModel": {
             "type": "object",
             "properties": {
                 "free": {
@@ -425,7 +449,7 @@ const docTemplate = `{
                 }
             }
         },
-        "station.OS": {
+        "station.osModel": {
             "type": "object",
             "properties": {
                 "arch": {
@@ -442,41 +466,34 @@ const docTemplate = `{
                 }
             }
         },
-        "station.System": {
+        "station.positionModel": {
             "type": "object",
             "properties": {
-                "adc": {
-                    "$ref": "#/definitions/station.ADC"
+                "elevation": {
+                    "type": "number"
                 },
-                "cpu": {
-                    "$ref": "#/definitions/station.CPU"
+                "latitude": {
+                    "type": "number"
                 },
-                "disk": {
-                    "$ref": "#/definitions/station.Disk"
-                },
-                "geophone": {
-                    "$ref": "#/definitions/station.Geophone"
-                },
+                "longitude": {
+                    "type": "number"
+                }
+            }
+        },
+        "station.stationModel": {
+            "type": "object",
+            "properties": {
                 "location": {
-                    "$ref": "#/definitions/station.Location"
+                    "type": "string"
                 },
-                "memory": {
-                    "$ref": "#/definitions/station.Memory"
+                "name": {
+                    "type": "string"
                 },
-                "os": {
-                    "$ref": "#/definitions/station.OS"
+                "network": {
+                    "type": "string"
                 },
                 "station": {
                     "type": "string"
-                },
-                "status": {
-                    "$ref": "#/definitions/publisher.System"
-                },
-                "timestamp": {
-                    "type": "integer"
-                },
-                "uptime": {
-                    "type": "integer"
                 },
                 "uuid": {
                     "type": "string"

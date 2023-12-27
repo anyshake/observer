@@ -2,20 +2,20 @@ package station
 
 import "github.com/shirou/gopsutil/disk"
 
-func getDisk() Disk {
+func getDisk() diskModel {
 	partitions, err := disk.Partitions(false)
 	if err != nil {
 		panic(err)
 	}
 
-	disks := make([]Disk, 0)
+	disks := make([]diskModel, 0)
 	for _, partition := range partitions {
 		usage, err := disk.Usage(partition.Mountpoint)
 		if err != nil {
 			panic(err)
 		}
 
-		disks = append(disks, Disk{
+		disks = append(disks, diskModel{
 			Total:   usage.Total,
 			Free:    usage.Free,
 			Used:    usage.Used,

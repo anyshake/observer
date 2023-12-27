@@ -13,8 +13,8 @@ import (
 func getMiniSEEDList(conf *config.Conf) ([]MiniSEEDFile, error) {
 	var (
 		basePath  = conf.MiniSEED.Path
-		station   = conf.MiniSEED.Station
-		network   = conf.MiniSEED.Network
+		station   = conf.Station.Station
+		network   = conf.Station.Network
 		LifeCycle = conf.MiniSEED.LifeCycle
 	)
 

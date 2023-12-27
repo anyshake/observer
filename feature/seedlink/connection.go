@@ -10,7 +10,7 @@ import (
 )
 
 func (s *SeedLink) handleConnection(options *feature.FeatureOptions, conn net.Conn) {
-	station := options.Config.SeedLink.Station
+	station := options.Config.Station.Station
 	scanner := bufio.NewScanner(conn)
 	for scanner.Scan() {
 		msg := strings.ToUpper(scanner.Text())

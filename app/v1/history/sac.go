@@ -66,11 +66,17 @@ func getSACBytes(data []publisher.Geophone, channel string, options *app.ServerO
 		return "", nil, err
 	}
 
-	// Return filename and bytes
-	filename := fmt.Sprintf(
-		"%s_%d_%d.sac", channel,
-		startTime.UnixMilli(),
-		endTime.UnixMilli(),
+	// Return filename and bytes (e.g. 2023.193.14.22.51.0317.AS.SHAKE.00.EHZ.D.sac)
+	filename := fmt.Sprintf("%s.%s.%s.%s.%s.%04d.%s.%s.%s.%s.D.sac",
+		startTime.Format("2006"),
+		startTime.Format("002"),
+		startTime.Format("15"),
+		startTime.Format("04"),
+		startTime.Format("05"),
+		// Get the current millisecond
+		startTime.Nanosecond()/1000000,
+		station, network,
+		location, channel,
 	)
 	return filename, sacBytes, nil
 }

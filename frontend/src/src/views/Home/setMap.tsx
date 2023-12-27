@@ -2,8 +2,8 @@ import { ApiResponse } from "../../helpers/request/restfulApiByTag";
 import { HomeMap } from ".";
 
 const setMap = (obj: HomeMap, res: ApiResponse): HomeMap => {
-    const { location } = res.data;
-    const { longitude, latitude, elevation } = location;
+    const { position } = res.data;
+    const { longitude, latitude, elevation } = position;
     return {
         ...obj,
         area: {

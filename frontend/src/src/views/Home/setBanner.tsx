@@ -5,7 +5,8 @@ import { ApiResponse } from "../../helpers/request/restfulApiByTag";
 const setBanner = (res?: ApiResponse): BannerProps => {
     // Parse response, empty response means error
     const { error } = res || {};
-    const { uuid, station, uptime, os } = res?.data || {};
+    const { station, uptime, os } = res?.data || {};
+    const { uuid, name } = station || "Unknown";
 
     // Error banner by default
     let label = { id: "views.home.banner.error.label" } as I18nTranslation;
@@ -14,7 +15,7 @@ const setBanner = (res?: ApiResponse): BannerProps => {
     if (!error) {
         label = {
             id: "views.home.banner.success.label",
-            format: { station },
+            format: { station: name },
         };
         text = {
             id: "views.home.banner.success.text",
