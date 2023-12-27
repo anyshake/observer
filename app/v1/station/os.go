@@ -7,9 +7,9 @@ import (
 	"github.com/wille/osutil"
 )
 
-func getOS() OS {
+func getOS() osModel {
 	hostname, _ := os.Hostname()
-	osInfo := OS{
+	osInfo := osModel{
 		OS:       runtime.GOOS,
 		Arch:     runtime.GOARCH,
 		Distro:   osutil.Name,

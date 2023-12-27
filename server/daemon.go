@@ -58,8 +58,9 @@ func StartDaemon(host string, port int, options *app.ServerOptions) error {
 		response.Error(c, http.StatusNotFound)
 	})
 
-	RegisterRouter(r.Group(
-		fmt.Sprintf("/%s/%s", options.APIPrefix, options.Version),
+	// Register API v1 routers
+	RegisterRouterV1(r.Group(
+		fmt.Sprintf("/%s/v1", options.APIPrefix),
 	), options)
 
 	r.Use(static.ServeEmbed(&static.LocalFileSystem{

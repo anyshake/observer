@@ -4,17 +4,17 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/app"
-	"github.com/anyshake/observer/app/devel"
-	"github.com/anyshake/observer/app/history"
-	"github.com/anyshake/observer/app/mseed"
-	"github.com/anyshake/observer/app/socket"
-	"github.com/anyshake/observer/app/station"
-	"github.com/anyshake/observer/app/trace"
+	"github.com/anyshake/observer/app/v1/devel"
+	"github.com/anyshake/observer/app/v1/history"
+	"github.com/anyshake/observer/app/v1/mseed"
+	"github.com/anyshake/observer/app/v1/socket"
+	"github.com/anyshake/observer/app/v1/station"
+	"github.com/anyshake/observer/app/v1/trace"
 	"github.com/anyshake/observer/server/middleware/limit"
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRouter(rg *gin.RouterGroup, options *app.ServerOptions) {
+func RegisterRouterV1(rg *gin.RouterGroup, options *app.ServerOptions) {
 	rg.Use(limit.RateLimit(time.Second, CAPACITY, CAPACITY))
 	services := []ApiServices{
 		&station.Station{},

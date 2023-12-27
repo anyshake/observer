@@ -27,6 +27,7 @@ import GLOBAL_CONFIG, { fallbackScale } from "../../config/global";
 import { ReduxStoreProps } from "../../config/store";
 import { update as updateADC } from "../../store/adc";
 import { update as updateGeophone } from "../../store/geophone";
+import { update as updateStation } from "../../store/station";
 import { connect } from "react-redux";
 import mapStateToProps from "../../helpers/utils/mapStateToProps";
 import Area, { AreaProps } from "../../components/Area";
@@ -36,6 +37,8 @@ import getRouterParam from "../../helpers/router/getRouterParam";
 import getRouterUri from "../../helpers/router/getRouterUri";
 import axios, { CancelTokenSource } from "axios";
 import userDebounce from "../../helpers/utils/userDebounce";
+import setStation from "./setStation";
+import getDayOfYear from "../../helpers/utils/getDayOfYear";
 
 export interface HistoryArea {
     readonly tag: string;
@@ -82,9 +85,7 @@ class History extends Component<
         super(props);
         this.state = {
             tokens: [],
-            trace: {
-                source: "show",
-            },
+            trace: { source: "show" },
             history: {
                 start: 0,
                 end: 0,
@@ -161,15 +162,6 @@ class History extends Component<
                 values: [],
                 title: { id: "views.history.modals.choose_event.title" },
             },
-            geophone: {
-                ehz: 1,
-                ehe: 1,
-                ehn: 1,
-            },
-            adc: {
-                fullscale: 1,
-                resolution: 1,
-            },
             labels: [
                 {
                     tag: "ehz-pga",
@@ -208,6 +200,8 @@ class History extends Component<
                     value: "-",
                 },
             ],
+            adc: { fullscale: 1, resolution: 1 },
+            geophone: { ehz: 1, ehe: 1, ehn: 1 },
             scale: fallbackScale.property(),
         };
     }
@@ -219,6 +213,7 @@ class History extends Component<
         let { geophone } = this.props.geophone;
         const { ehz, ehe, ehn } = geophone;
         const { scale: scaleValue } = this.props.scale;
+        let { station } = this.props.station;
 
         // Query again from server if value is not set
         if (resolution === -1 || ehz * ehe * ehn === 0) {
@@ -228,10 +223,12 @@ class History extends Component<
             if (res.data) {
                 // Get new formatted state
                 geophone = setGeophone(res);
+                station = setStation(res);
                 adc = setADC(res);
                 // Apply to Redux store
                 const { updateADC, updateGeophone } = this.props;
                 updateGeophone && updateGeophone(geophone);
+                updateStation && updateStation(station);
                 updateADC && updateADC(adc);
             } else {
                 // Show error and return if failed
@@ -304,12 +301,37 @@ class History extends Component<
         tokens.push(cancelToken);
 
         // Auto detect format and filename
+        const startTimeObj = new Date(start);
+        const { station: StationObj } = this.props.station;
+        const { station, network, location } = StationObj;
+        const filename = `${startTimeObj.getUTCFullYear()}.${getDayOfYear(
+            startTimeObj
+        )
+            .toString()
+            .padStart(3, "0")}.${startTimeObj
+            .getUTCHours()
+            .toString()
+            .padStart(2, "0")}.${startTimeObj
+            .getUTCMinutes()
+            .toString()
+            .padStart(2, "0")}.${startTimeObj
+            .getUTCSeconds()
+            .toString()
+            .padStart(2, "0")}.${startTimeObj
+            .getUTCMilliseconds()
+            .toString()
+            .padStart(4, "0")}.${network.slice(0, 2)}.${station.slice(
+            0,
+            5
+        )}.${location.slice(0, 2)}.${channel}.D.sac`;
+
+        // Send request to server
         const { error, data } = await restfulApiByTag({
+            filename,
             cancelToken,
             body: history,
             tag: "history",
             blob: format === "sac",
-            filename: `${channel}_${start}_${end}.${format}`,
         });
         if (error) {
             const { t } = this.props;
@@ -723,4 +745,5 @@ class History extends Component<
 export default connect(mapStateToProps, {
     updateGeophone,
     updateADC,
+    updateStation,
 })(withTranslation()(History));

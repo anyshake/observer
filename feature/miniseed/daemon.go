@@ -7,11 +7,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bclswl0827/mseedio"
 	"github.com/anyshake/observer/feature"
 	"github.com/anyshake/observer/publisher"
 	"github.com/anyshake/observer/utils/duration"
 	"github.com/anyshake/observer/utils/logger"
+	"github.com/anyshake/observer/utils/text"
+	"github.com/bclswl0827/mseedio"
 	"github.com/fatih/color"
 )
 
@@ -24,9 +25,10 @@ func (m *MiniSEED) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 	// Get MiniSEED info & options
 	var (
 		basePath  = options.Config.MiniSEED.Path
-		station   = options.Config.MiniSEED.Station
-		network   = options.Config.MiniSEED.Network
 		lifeCycle = options.Config.MiniSEED.LifeCycle
+		station   = text.TruncateString(options.Config.Station.Station, 5)
+		network   = text.TruncateString(options.Config.Station.Network, 2)
+		location  = text.TruncateString(options.Config.Station.Location, 2)
 	)
 
 	// Start cleanup routine if life cycle bigger than 0
@@ -40,16 +42,10 @@ func (m *MiniSEED) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 		time.Sleep(50 * time.Millisecond)
 	}
 
-	// Get initial file path
-	currentTime, _ := duration.Timestamp(options.Status.System.Offset)
-	filePath := fmt.Sprintf(
-		"%s/%s_%s_%s.mseed",
-		basePath, station, network,
-		currentTime.Format("20060102"),
-	)
-
 	// Get sequence number if file exists
 	var seqNumber int64
+	currentTime, _ := duration.Timestamp(options.Status.System.Offset)
+	filePath := getFilePath(basePath, station, network, location, currentTime)
 	_, err := os.Stat(filePath)
 	if err == nil {
 		// Get last sequence number
@@ -89,8 +85,8 @@ func (m *MiniSEED) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 		EHE:       &channelBuffer{},
 		EHN:       &channelBuffer{},
 		BasePath:  options.Config.MiniSEED.Path,
-		Station:   options.Config.MiniSEED.Station,
-		Network:   options.Config.MiniSEED.Network,
+		Station:   options.Config.Station.Station,
+		Network:   options.Config.Station.Network,
 	}
 	m.OnStart(options, "service has started")
 

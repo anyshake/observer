@@ -1,7 +1,10 @@
 {
     "station_settings": {
         "uuid": "a373e39c-8e15-44ae-a1ad-6fb622bc49e6",
-        "name": "Test Station",
+        "name": "AnyShake Station",
+        "station": "SHAKE",
+        "network": "AS",
+        "location": "00",
         "latitude": 39.9,
         "longitude": 116.3,
         "elevation": 0
@@ -56,16 +59,12 @@
     "miniseed_settings": {
         "enable": false,
         "path": "/data/miniseed",
-        "station": "TEST",
-        "network": "XX",
         "lifecycle": 10
     },
     "seedlink_settings": {
         "enable": false,
         "host": "0.0.0.0",
         "port": 18000,
-        "station": "TEST",
-        "network": "XX",
         "buffer": "/data/seedlink",
         "size": 1000
     }

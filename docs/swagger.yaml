@@ -57,21 +57,46 @@ definitions:
       time:
         type: string
     type: object
-  station.ADC:
+  station.System:
+    properties:
+      adc:
+        $ref: '#/definitions/station.adcModel'
+      cpu:
+        $ref: '#/definitions/station.cpuModel'
+      disk:
+        $ref: '#/definitions/station.diskModel'
+      geophone:
+        $ref: '#/definitions/station.geophoneModel'
+      memory:
+        $ref: '#/definitions/station.memoryModel'
+      os:
+        $ref: '#/definitions/station.osModel'
+      position:
+        $ref: '#/definitions/station.positionModel'
+      station:
+        $ref: '#/definitions/station.stationModel'
+      status:
+        $ref: '#/definitions/publisher.System'
+      timestamp:
+        type: integer
+      uptime:
+        type: integer
+    type: object
+  station.adcModel:
     properties:
       fullscale:
         type: number
       resolution:
         type: integer
     type: object
-  station.CPU:
+  station.cpuModel:
     properties:
       model:
         type: string
       percent:
         type: number
     type: object
-  station.Disk:
+  station.diskModel:
     properties:
       free:
         type: integer
@@ -82,7 +107,7 @@ definitions:
       used:
         type: integer
     type: object
-  station.Geophone:
+  station.geophoneModel:
     properties:
       ehe:
         type: number
@@ -91,16 +116,7 @@ definitions:
       ehz:
         type: number
     type: object
-  station.Location:
-    properties:
-      elevation:
-        type: number
-      latitude:
-        type: number
-      longitude:
-        type: number
-    type: object
-  station.Memory:
+  station.memoryModel:
     properties:
       free:
         type: integer
@@ -111,7 +127,7 @@ definitions:
       used:
         type: integer
     type: object
-  station.OS:
+  station.osModel:
     properties:
       arch:
         type: string
@@ -122,30 +138,25 @@ definitions:
       os:
         type: string
     type: object
-  station.System:
+  station.positionModel:
     properties:
-      adc:
-        $ref: '#/definitions/station.ADC'
-      cpu:
-        $ref: '#/definitions/station.CPU'
-      disk:
-        $ref: '#/definitions/station.Disk'
-      geophone:
-        $ref: '#/definitions/station.Geophone'
+      elevation:
+        type: number
+      latitude:
+        type: number
+      longitude:
+        type: number
+    type: object
+  station.stationModel:
+    properties:
       location:
-        $ref: '#/definitions/station.Location'
-      memory:
-        $ref: '#/definitions/station.Memory'
-      os:
-        $ref: '#/definitions/station.OS'
+        type: string
+      name:
+        type: string
+      network:
+        type: string
       station:
         type: string
-      status:
-        $ref: '#/definitions/publisher.System'
-      timestamp:
-        type: integer
-      uptime:
-        type: integer
       uuid:
         type: string
     type: object

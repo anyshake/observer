@@ -3,9 +3,12 @@ package config
 type station struct {
 	UUID      string  `json:"uuid"`
 	Name      string  `json:"name"`
+	Station   string  `json:"station"`
+	Network   string  `json:"network"`
+	Location  string  `json:"location"`
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
-	Elevation  float64 `json:"elevation"`
+	Elevation float64 `json:"elevation"`
 }
 
 type serial struct {
@@ -52,19 +55,15 @@ type server struct {
 type miniseed struct {
 	Enable    bool   `json:"enable"`
 	Path      string `json:"path"`
-	Station   string `json:"station"`
-	Network   string `json:"network"`
 	LifeCycle int    `json:"lifecycle"`
 }
 
 type seedlink struct {
-	Enable  bool   `json:"enable"`
-	Host    string `json:"host"`
-	Port    int    `json:"port"`
-	Station string `json:"station"`
-	Network string `json:"network"`
-	Buffer  string `json:"buffer"`
-	Size    int    `json:"size"`
+	Enable bool   `json:"enable"`
+	Host   string `json:"host"`
+	Port   int    `json:"port"`
+	Buffer string `json:"buffer"`
+	Size   int    `json:"size"`
 }
 
 type Compensation struct {

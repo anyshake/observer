@@ -87,7 +87,6 @@ func main() {
 			Gzip:           9,
 			WebPrefix:      WEB_PREFIX,
 			APIPrefix:      API_PREFIX,
-			Version:        API_VERSION,
 			FeatureOptions: featureOptions,
 			CORS:           conf.Server.CORS,
 		})

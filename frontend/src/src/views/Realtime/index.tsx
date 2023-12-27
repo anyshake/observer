@@ -25,8 +25,10 @@ import { ReduxStoreProps } from "../../config/store";
 import { connect } from "react-redux";
 import { update as updateADC } from "../../store/adc";
 import { update as updateGeophone } from "../../store/geophone";
+import { update as updateStation } from "../../store/station";
 import mapStateToProps from "../../helpers/utils/mapStateToProps";
 import { WithTranslation, withTranslation } from "react-i18next";
+import setStation from "./setStation";
 // import * as seismograph from "seisplotjs/src/seismograph";
 // import * as seismographconfig from "seisplotjs/src/seismographconfig";
 
@@ -135,15 +137,8 @@ class Realtime extends Component<
                     },
                 },
             ],
-            geophone: {
-                ehz: 1,
-                ehe: 1,
-                ehn: 1,
-            },
-            adc: {
-                fullscale: 1,
-                resolution: 1,
-            },
+            adc: { fullscale: 1, resolution: 1 },
+            geophone: { ehz: 1, ehe: 1, ehn: 1 },
             scale: fallbackScale.property(),
         };
         // Some initializations
@@ -221,12 +216,13 @@ class Realtime extends Component<
         window.addEventListener("resize", this.setChartHeight);
         this.setChartHeight();
 
-        // Get ADC, Geophone, scale standard from Redux
+        // Get ADC, Geophone, Station, scale standard from Redux
         let { adc } = this.props.adc;
         const { resolution } = adc;
         let { geophone } = this.props.geophone;
         const { ehz, ehe, ehn } = geophone;
         const { scale: scaleValue } = this.props.scale;
+        let { station } = this.props.station;
 
         // Query again from server if value is not set
         if (resolution === -1 || ehz * ehe * ehn === 0) {
@@ -236,10 +232,12 @@ class Realtime extends Component<
             if (res.data) {
                 // Get new formatted state
                 geophone = setGeophone(res);
+                station = setStation(res);
                 adc = setADC(res);
                 // Apply to Redux store
-                const { updateADC, updateGeophone } = this.props;
+                const { updateADC, updateGeophone, updateStation } = this.props;
                 updateGeophone && updateGeophone(geophone);
+                updateStation && updateStation(station);
                 updateADC && updateADC(adc);
             } else {
                 // Show error and return if failed
@@ -314,4 +312,5 @@ class Realtime extends Component<
 export default connect(mapStateToProps, {
     updateGeophone,
     updateADC,
+    updateStation,
 })(withTranslation()(Realtime));

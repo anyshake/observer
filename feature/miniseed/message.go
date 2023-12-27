@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bclswl0827/mseedio"
 	"github.com/anyshake/observer/feature"
 	"github.com/anyshake/observer/publisher"
+	"github.com/anyshake/observer/utils/text"
+	"github.com/bclswl0827/mseedio"
 )
 
 func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.FeatureOptions, buffer *miniSEEDBuffer) error {
@@ -14,9 +15,10 @@ func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.Featur
 		ehz       = gp.EHZ
 		ehe       = gp.EHE
 		ehn       = gp.EHN
-		station   = options.Config.MiniSEED.Station
-		network   = options.Config.MiniSEED.Network
 		timestamp = time.UnixMilli(gp.TS).UTC()
+		station   = text.TruncateString(options.Config.Station.Station, 5)
+		network   = text.TruncateString(options.Config.Station.Network, 2)
+		location  = text.TruncateString(options.Config.Station.Location, 2)
 	)
 
 	// Append EHZ channel to buffer
@@ -34,11 +36,6 @@ func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.Featur
 		// Init MiniSEED data
 		var miniseed mseedio.MiniSeedData
 		miniseed.Init(ENCODING_TYPE, BIT_ORDER)
-		// Set basic data
-		filePath := fmt.Sprintf(
-			"%s/%s_%s_%s.mseed", buffer.BasePath,
-			station, network, timestamp.Format("20060102"),
-		)
 		// Append channels to MiniSEED
 		for _, v := range []string{"EHZ", "EHE", "EHN"} {
 			var (
@@ -53,6 +50,7 @@ func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.Featur
 					SequenceNumber: seq,
 					StationCode:    station,
 					NetworkCode:    network,
+					LocationCode:   location,
 					StartTime:      buffer.TimeStamp,
 					SampleRate:     float64(buffer.EHZ.SampleRate),
 				})
@@ -63,6 +61,7 @@ func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.Featur
 					SequenceNumber: seq,
 					StationCode:    station,
 					NetworkCode:    network,
+					LocationCode:   location,
 					StartTime:      buffer.TimeStamp,
 					SampleRate:     float64(buffer.EHE.SampleRate),
 				})
@@ -73,6 +72,7 @@ func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.Featur
 					SequenceNumber: seq,
 					StationCode:    station,
 					NetworkCode:    network,
+					LocationCode:   location,
 					StartTime:      buffer.TimeStamp,
 					SampleRate:     float64(buffer.EHN.SampleRate),
 				})
@@ -90,6 +90,7 @@ func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.Featur
 				return err
 			}
 			// Append bytes to file
+			filePath := getFilePath(buffer.BasePath, station, network, location, timestamp)
 			err = miniseed.Write(filePath, mseedio.APPEND, dataBytes)
 			if err != nil {
 				m.OnError(options, err)

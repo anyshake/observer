@@ -13,6 +13,6 @@ import (
 // @Success 200 {object} response.HttpResponse{data=System} "Successfully read station status"
 func (s *Station) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) {
 	rg.GET("/station", func(c *gin.Context) {
-		response.Message(c, "Successfully read station status", getStation(options.FeatureOptions))
+		response.Message(c, "Successfully read station information", getSystem(options.FeatureOptions))
 	})
 }
