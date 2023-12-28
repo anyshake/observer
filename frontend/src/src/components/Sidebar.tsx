@@ -75,7 +75,7 @@ class Sidebar extends Component<WithTranslation, SidebarState> {
 
                 <div
                     className={`mt-20 flex flex-col space-y-2 w-full h-full ${
-                        isOpen && `hidden`
+                        isOpen ? `hidden` : ``
                     }`}
                 >
                     {list.map(({ uri, icon }, index) => (

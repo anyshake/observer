@@ -27,7 +27,9 @@ class Card extends Component<CardProps> {
                     </div>
 
                     <div
-                        className={`p-4 m-2 flex flex-col justify-center gap-4 ${className}`}
+                        className={`p-4 m-2 flex flex-col justify-center gap-4 ${
+                            className ?? ""
+                        }`}
                     >
                         {childrenArr.map((item, index) => (
                             <div key={index}>{item}</div>

@@ -11,7 +11,7 @@
 
 AnyShake Observer is an open-source, cross-platform software that can be used to monitor, archive, and export seismic data from [AnyShake Explorer](https://github.com/anyshake/explorer) via serial port. It provides a user-friendly web-based interface to visualize and analyze the seismic data. For more professional users, it supports exporting the data to SAC or MiniSEED format for further analysis.
 
-This software is written in Go and TypeScript, which means it can easily port to a variety of OS and CPU architectures, even embedded Linux devices, AnyShake Observer also supports PostgreSQL, MariaDB (MySQL), SQLite, and SQL Server as seismic data archiving engines. We're currently trying to integrate the SEEDLink server on this software (Using pure Go implementation).
+This software is written in Go and TypeScript, which means it can easily port to a variety of OS and CPU architectures, even embedded Linux devices, AnyShake Observer also supports PostgreSQL, MariaDB (MySQL) and SQL Server as seismic data archiving engines. We're currently trying to integrate the SEEDLink server on this software (Using pure Go implementation).
 
 As of the release of the software documentation, AnyShake has successfully captured more than 40 earthquake events, the furthest captured earthquake event is [M 7.1 - 180 km NNE of Gili Air, Indonesia](https://earthquake.usgs.gov/earthquakes/eventpage/us7000krjx/executive), approximately 4,210 km, by the station located in Chongqing, China.
 

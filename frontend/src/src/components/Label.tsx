@@ -16,7 +16,7 @@ class Label extends Component<LabelProps & WithTranslation> {
     render() {
         const { t, className, icon, label, value, unit, color } = this.props;
         return (
-            <div className={`w-full p-2 ${className}`}>
+            <div className={`w-full p-2 ${className ?? ""}`}>
                 <div
                     className={`flex flex-row bg-gradient-to-r rounded-md p-4 shadow-xl ${
                         color
@@ -33,7 +33,9 @@ class Label extends Component<LabelProps & WithTranslation> {
                     )}
 
                     <div
-                        className={`flex flex-col flex-grow ${icon && `ml-5`}`}
+                        className={`flex flex-col flex-grow ${
+                            icon ? `ml-5` : ""
+                        }`}
                     >
                         <div
                             className={`text-sm whitespace-nowrap ${

@@ -8,8 +8,9 @@ import (
 
 func Open(host string, port int, engine, username, password, database string) (*gorm.DB, error) {
 	engines := []dbEngine{
-		&PostgreSQL{}, &MariaDB{},
-		&SQLite{}, &SQLServer{},
+		&PostgreSQL{},
+		&MariaDB{},
+		&SQLServer{},
 	}
 	for _, e := range engines {
 		if e.isCompatible(engine) {

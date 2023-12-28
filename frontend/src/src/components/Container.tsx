@@ -21,7 +21,9 @@ export default class Container extends Component<ContainerProps> {
         }
 
         return (
-            <div className={`${layoutClassName} ${className}`}>{children}</div>
+            <div className={`${layoutClassName} ${className ?? ""}`}>
+                {children}
+            </div>
         );
     }
 }
