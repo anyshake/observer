@@ -5,7 +5,6 @@ import (
 
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlite"
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -50,19 +49,6 @@ func (m *MariaDB) openDBConn(host string, port int, username, password, database
 		int(DB_TIMEOUT.Seconds()),
 	)
 	return gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger:                 logger.Default.LogMode(logger.Silent),
-		SkipDefaultTransaction: true, // Disable transaction to improve performance
-	})
-}
-
-type SQLite struct{}
-
-func (s *SQLite) isCompatible(engine string) bool {
-	return engine == "sqlite" || engine == "sqlite3"
-}
-
-func (s *SQLite) openDBConn(host string, port int, username, password, database string) (*gorm.DB, error) {
-	return gorm.Open(sqlite.Open(database), &gorm.Config{
 		Logger:                 logger.Default.LogMode(logger.Silent),
 		SkipDefaultTransaction: true, // Disable transaction to improve performance
 	})

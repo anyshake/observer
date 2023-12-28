@@ -12,6 +12,7 @@ export interface MapBoxProps {
     readonly tile: string;
     readonly center: [number, number];
     readonly marker?: [number, number];
+    readonly scrollWheelZoom?: boolean;
     readonly zoomControl?: boolean;
     readonly flyTo?: boolean;
     readonly dragging?: boolean;
@@ -48,21 +49,22 @@ export default class MapBox extends Component<MapBoxProps, MapBoxState> {
             marker,
             dragging,
             zoomControl,
+            scrollWheelZoom,
         } = this.props;
         const { map } = this.state;
         const icon = new L.Icon({
             iconUrl: LocationIcon,
-            iconAnchor: [13, 28],
+            iconAnchor: [9, 24],
             iconSize: [18, 25],
         });
 
         return (
             <MapContainer
                 ref={map}
-                className={`z-0 w-full ${className}`}
+                className={`z-0 w-full ${className || ""}`}
+                scrollWheelZoom={scrollWheelZoom}
                 zoomControl={zoomControl}
                 attributionControl={false}
-                scrollWheelZoom={false}
                 doubleClickZoom={false}
                 dragging={dragging}
                 maxZoom={maxZoom}

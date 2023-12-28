@@ -39,7 +39,7 @@ export default class Scroller extends Component<{}, ScrollerState> {
             <button
                 onClick={this.scrollToTop}
                 className={`fixed bg-purple-500 hover:bg-purple-600 duration-300 w-10 h-10 rounded-full bottom-16 right-3 flex justify-center items-center ${
-                    showButton || "hidden"
+                    showButton ? "" : "hidden"
                 }`}
             >
                 <img className="w-4 h-4" src={ScrollIcon} alt="" />

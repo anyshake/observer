@@ -2,12 +2,14 @@ package request
 
 import (
 	"bytes"
+	"crypto/tls"
 	"fmt"
 	"net/http"
 	"time"
 )
 
 func GET(url string, timeout, retryInterval time.Duration, maxRetries int, trimSpace bool, customTransport http.RoundTripper, headers ...map[string]string) ([]byte, error) {
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	client := http.Client{Timeout: timeout, Transport: customTransport}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

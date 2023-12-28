@@ -20,7 +20,9 @@ class Button extends Component<ButtonProps> {
         const { t, className, label, onClick } = this.props;
         return (
             <button
-                className={`w-full text-white font-medium text-sm shadow-lg rounded-lg py-2 ${className}`}
+                className={`w-full text-white font-medium text-sm shadow-lg rounded-lg py-2 ${
+                    className ?? ""
+                }`}
                 onClick={onClick}
             >
                 {t(label.id, label.format)}

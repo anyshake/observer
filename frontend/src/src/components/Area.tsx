@@ -48,7 +48,9 @@ class Area extends Component<AreaProps & WithTranslation, AreaState> {
                 <div className="p-4">
                     <h6
                         className={`text-md font-bold text-gray-800 flex ${
-                            collapse_is_enabled && "cursor-pointer select-none"
+                            collapse_is_enabled
+                                ? "cursor-pointer select-none"
+                                : ""
                         }`}
                         onClick={() =>
                             collapse_is_enabled &&
@@ -57,7 +59,9 @@ class Area extends Component<AreaProps & WithTranslation, AreaState> {
                     >
                         {collapse_is_enabled && (
                             <img
-                                className={`mx-1 ${collapsed && "rotate-180"}`}
+                                className={`mx-1 ${
+                                    collapsed ? "rotate-180" : ""
+                                }`}
                                 src={CollapseIcon}
                                 alt=""
                             />
