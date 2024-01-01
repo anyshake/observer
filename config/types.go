@@ -62,8 +62,6 @@ type seedlink struct {
 	Enable bool   `json:"enable"`
 	Host   string `json:"host"`
 	Port   int    `json:"port"`
-	Buffer string `json:"buffer"`
-	Size   int    `json:"size"`
 }
 
 type Compensation struct {

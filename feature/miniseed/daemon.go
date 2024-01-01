@@ -84,9 +84,6 @@ func (m *MiniSEED) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 		EHZ:       &channelBuffer{},
 		EHE:       &channelBuffer{},
 		EHN:       &channelBuffer{},
-		BasePath:  options.Config.MiniSEED.Path,
-		Station:   options.Config.Station.Station,
-		Network:   options.Config.Station.Network,
 	}
 	m.OnStart(options, "service has started")
 
