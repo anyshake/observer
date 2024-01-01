@@ -36,6 +36,8 @@ github.com/bytedance/sonic v1.8.0/go.mod h1:i736AoUSYt75HyZLoJW9ERYxcy6eaN6h4BZX
 github.com/chenzhuoyu/base64x v0.0.0-20211019084208-fb5309c8db06/go.mod h1:DH46F32mSOjUmXrMHnKwZdA8wcEefY7UVqBKYGjpdQY=
 github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 h1:qSGYFH7+jGhDF8vLC+iwCD4WpbV1EBDSzWkJODFLams=
 github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311/go.mod h1:b583jCggY9gE99b6G5LEC39OIiVsWj+R97kbl5odCEk=
+github.com/clbanning/anyxml v1.2.2 h1:EqBXr26KEC7tuGLDH7ZSeFmaE3yft0h386m5uydpNbU=
+github.com/clbanning/anyxml v1.2.2/go.mod h1:m8+zXuK8aS9lnXzfpSLUUjXoqcZ41osGX+JXr09eOjY=
 github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be h1:J5BL2kskAlV9ckgEsNQXscjIaLiOYiZ75d4e94E6dcQ=
 github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be/go.mod h1:mk5IQ+Y0ZeO87b858TlA645sVcEcbiX6YqP98kt+7+w=
 github.com/creack/goselect v0.1.3-0.20221130125424-8eac7f782437 h1:vR0VDJLclKuJceyXLWbj8ZFPvUvOkSSQ6fJ63R4pzRY=

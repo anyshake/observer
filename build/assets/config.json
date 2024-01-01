@@ -62,10 +62,8 @@
         "lifecycle": 10
     },
     "seedlink_settings": {
-        "enable": false,
+        "enable": true,
         "host": "0.0.0.0",
-        "port": 18000,
-        "buffer": "/data/seedlink",
-        "size": 1000
+        "port": 18000
     }
 }

@@ -23,9 +23,6 @@ type channelBuffer struct {
 
 type miniSEEDBuffer struct {
 	SeqNum    int64
-	Station   string
-	Network   string
-	BasePath  string
 	TimeStamp time.Time
 	EHZ       *channelBuffer
 	EHE       *channelBuffer

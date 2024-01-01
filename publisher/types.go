@@ -1,12 +1,12 @@
 package publisher
 
-type int32Array []int32
+type Int32Array []int32
 
 type Geophone struct {
 	TS  int64      `json:"ts" gorm:"ts;index;not null"`
-	EHZ int32Array `json:"ehz" gorm:"ehz;type:text;not null"`
-	EHE int32Array `json:"ehe" gorm:"ehe;type:text;not null"`
-	EHN int32Array `json:"ehn" gorm:"ehn;type:text;not null"`
+	EHZ Int32Array `json:"ehz" gorm:"ehz;type:text;not null"`
+	EHE Int32Array `json:"ehe" gorm:"ehe;type:text;not null"`
+	EHN Int32Array `json:"ehn" gorm:"ehn;type:text;not null"`
 }
 
 type System struct {

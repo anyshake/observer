@@ -15,6 +15,7 @@ func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.Featur
 		ehz       = gp.EHZ
 		ehe       = gp.EHE
 		ehn       = gp.EHN
+		basePath  = options.Config.MiniSEED.Path
 		timestamp = time.UnixMilli(gp.TS).UTC()
 		station   = text.TruncateString(options.Config.Station.Station, 5)
 		network   = text.TruncateString(options.Config.Station.Network, 2)
@@ -90,7 +91,7 @@ func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.Featur
 				return err
 			}
 			// Append bytes to file
-			filePath := getFilePath(buffer.BasePath, station, network, location, timestamp)
+			filePath := getFilePath(basePath, station, network, location, timestamp)
 			err = miniseed.Write(filePath, mseedio.APPEND, dataBytes)
 			if err != nil {
 				m.OnError(options, err)

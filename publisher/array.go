@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func (i *int32Array) Scan(val any) error {
+func (i *Int32Array) Scan(val any) error {
 	var strArr []string
 	switch v := val.(type) {
 	case string:
@@ -30,7 +30,7 @@ func (i *int32Array) Scan(val any) error {
 	return nil
 }
 
-func (i int32Array) Value() (driver.Value, error) {
+func (i Int32Array) Value() (driver.Value, error) {
 	var rawText string
 	for ii, vv := range i {
 		rawText += strconv.Itoa(int(vv))

@@ -16,7 +16,7 @@ func (s *SeedLink) OnStop(options *feature.FeatureOptions, v ...any) {
 }
 
 func (s *SeedLink) OnReady(options *feature.FeatureOptions, v ...any) {
-	logger.Print(MODULE, "1 record has been append", color.FgGreen, false)
+	logger.Print(MODULE, text.Concat(v...), color.FgGreen, false)
 }
 
 func (s *SeedLink) OnError(options *feature.FeatureOptions, err error) {

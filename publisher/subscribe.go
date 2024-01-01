@@ -22,6 +22,6 @@ func Subscribe(gp *Geophone, onMessage func(gp *Geophone) error) {
 			lastTime = gp.TS
 		}
 
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(10 * time.Millisecond)
 	}
 }
