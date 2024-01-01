@@ -2,6 +2,12 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.5.1
+
+ - Some efforts to make SeedLink protocol work properly
+ - Disable SeedLink by default
+ - Update README to introduce SeedLink protocol
+
 ## v2.5.0
 
  - Basic Go implementation of SeedLink

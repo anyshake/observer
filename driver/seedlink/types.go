@@ -26,11 +26,6 @@ const (
 	RES_ERR = "ERROR\r\n"
 )
 
-const (
-	WORKINGMODE_CMD = iota
-	WORKINGMODE_STREAM
-)
-
 // SeedLink main daemon config & state
 type SeedLinkGlobal struct {
 	SeedLinkState
@@ -82,16 +77,16 @@ type SeedLinkCommand struct {
 
 // SeedLink client state
 type SeedLinkClient struct {
-	WorkingMode int
-	Network     string
-	Station     string
-	Channel     string
-	Location    string
-	StartTime   time.Time
-	EndTime     time.Time
+	StreamMode bool
+	Network    string
+	Station    string
+	Channel    string
+	Location   string
+	StartTime  time.Time
+	EndTime    time.Time
 }
 
-type SeedLinkStreamer func(pub *publisher.Geophone, conn net.Conn, channel, network, station, location string, mode *int)
+type SeedLinkStreamer func(pub *publisher.Geophone, conn net.Conn, channel, network, station, location string, seqNum *int64) error
 
 // Interface for SeedLink command callback & fallback
 type SeedLinkCommandCallback interface {

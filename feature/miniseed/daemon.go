@@ -88,8 +88,10 @@ func (m *MiniSEED) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 	m.OnStart(options, "service has started")
 
 	// Append and write when new message arrived
+	expressionForSubscribe := true
 	publisher.Subscribe(
 		&options.Status.Geophone,
+		&expressionForSubscribe,
 		func(gp *publisher.Geophone) error {
 			return m.handleMessage(gp, options, buffer)
 		},

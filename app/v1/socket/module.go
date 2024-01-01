@@ -28,8 +28,11 @@ func (s *Socket) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions)
 			return
 		}
 
+		// Flag to indicate (un)subscribe
+		expressionForSubscribe := true
+
 		// Properly close connection
-		go func() {
+		go func(exp *bool) {
 			for {
 				_, _, err := conn.ReadMessage()
 				if err != nil {
@@ -37,12 +40,14 @@ func (s *Socket) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions)
 				}
 			}
 
+			*exp = false
 			conn.Close()
-		}()
+		}(&expressionForSubscribe)
 
 		// Write when new message arrived
 		publisher.Subscribe(
 			&options.FeatureOptions.Status.Geophone,
+			&expressionForSubscribe,
 			func(gp *publisher.Geophone) error {
 				return s.handleMessage(gp, conn)
 			},

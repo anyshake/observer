@@ -8,7 +8,7 @@ import (
 )
 
 func (s *SeedLink) InitClient(slClient *seedlink.SeedLinkClient) {
-	slClient.WorkingMode = seedlink.WORKINGMODE_CMD
+	slClient.StreamMode = false
 }
 
 func (s *SeedLink) InitGlobal(slGlobal *seedlink.SeedLinkGlobal, currentTime time.Time, station, network, location string) {
