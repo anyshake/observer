@@ -73,21 +73,21 @@ func (s *SeedLink) handleCommand(options *feature.FeatureOptions, slGlobal *seed
 			s.OnReady(options, fmt.Sprintf("RECV OK: %s <%s>", conn.RemoteAddr().String(), clientMessage))
 		}
 
-		// Reset working mode to CMD
-		slClient.WorkingMode = seedlink.WORKINGMODE_CMD
+		// Exit from stream mode
+		slClient.StreamMode = false
 
 		// Check for extra arguments
 		if isCommandValid && cmd.HasExtraArgs {
 			if len(argumentList) == 0 {
 				conn.Write([]byte(seedlink.RES_ERR))
 			} else {
-				err = cmd.Callback(slGlobal, slClient, options, s.Streamer, conn, argumentList[1:]...)
+				err = cmd.Callback(slGlobal, slClient, options, s.handleMessage, conn, argumentList[1:]...)
 				if err != nil {
 					cmd.Fallback(slGlobal, slClient, options, conn, argumentList[1:]...)
 				}
 			}
 		} else if isCommandValid {
-			err = cmd.Callback(slGlobal, slClient, options, s.Streamer, conn)
+			err = cmd.Callback(slGlobal, slClient, options, s.handleMessage, conn)
 			if err != nil {
 				cmd.Fallback(slGlobal, slClient, options, conn)
 			}

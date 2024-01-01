@@ -47,9 +47,11 @@ func (a *Archiver) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 	options.Database = pdb
 
 	// Archive when new message arrived
+	expressionForSubscribe := true
 	go func() {
 		publisher.Subscribe(
 			&options.Status.Geophone,
+			&expressionForSubscribe,
 			func(gp *publisher.Geophone) error {
 				return a.handleMessage(gp, options, pdb)
 			},
