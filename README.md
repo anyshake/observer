@@ -9,7 +9,7 @@
 
 ## Overview
 
-AnyShake Observer is an open-source, cross-platform software that can be used to monitor, archive, and export seismic data from [AnyShake Explorer](https://github.com/anyshake/explorer) via serial port. It provides a user-friendly web-based interface to visualize and analyze the seismic data. For more professional users, it supports exporting the data to SAC or MiniSEED format for further analysis.
+AnyShake Observer is an open-source, cross-platform software that can be used to monitor, archive, and export seismic data from [AnyShake Explorer](https://github.com/anyshake/explorer) via serial port. It provides a user-friendly web-based interface to visualize and analyze the seismic data. For more professional users, it supports streaming via SeedLink protocol and exporting the data to SAC or MiniSEED format for further analysis.
 
 This software is written in Go and TypeScript, which means it can easily port to a variety of OS and CPU architectures, even embedded Linux devices, AnyShake Observer also supports PostgreSQL, MariaDB (MySQL) and SQL Server as seismic data archiving engines. We're currently trying to integrate the SEEDLink server on this software (Using pure Go implementation).
 
