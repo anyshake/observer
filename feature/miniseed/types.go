@@ -17,7 +17,7 @@ const (
 type MiniSEED struct{}
 
 type channelBuffer struct {
-	SampleRate int32
+	Samples    int32
 	DataBuffer []int32
 }
 

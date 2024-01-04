@@ -2,6 +2,11 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.5.2
+
+ - Fix MiniSEED sample rate calculation error under unstable data link
+ - Use the timestamp of the first packet as reference time in each MiniSEED record
+
 ## v2.5.1
 
  - Some efforts to make SeedLink protocol work properly
