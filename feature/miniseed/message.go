@@ -2,6 +2,7 @@ package miniseed
 
 import (
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/anyshake/observer/feature"
@@ -24,65 +25,44 @@ func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.Featur
 
 	// Append EHZ channel to buffer
 	buffer.EHZ.DataBuffer = append(buffer.EHZ.DataBuffer, ehz...)
-	buffer.EHZ.SampleRate = (buffer.EHZ.SampleRate + int32(len(ehz))) / 2
+	buffer.EHZ.Samples += int32(len(ehz))
 	// Append EHE channel to buffer
 	buffer.EHE.DataBuffer = append(buffer.EHE.DataBuffer, ehe...)
-	buffer.EHE.SampleRate = (buffer.EHE.SampleRate + int32(len(ehe))) / 2
+	buffer.EHE.Samples += int32(len(ehe))
 	// Append EHN channel to buffer
 	buffer.EHN.DataBuffer = append(buffer.EHN.DataBuffer, ehn...)
-	buffer.EHN.SampleRate = (buffer.EHN.SampleRate + int32(len(ehn))) / 2
+	buffer.EHN.Samples += int32(len(ehn))
 
 	// Check if buffer is ready to write to file
-	if timestamp.Sub(buffer.TimeStamp).Seconds() >= MAX_DURATION {
+	timeDiffSec := timestamp.Sub(buffer.TimeStamp).Seconds()
+	if timeDiffSec >= MAX_DURATION {
 		// Init MiniSEED data
 		var miniseed mseedio.MiniSeedData
 		miniseed.Init(ENCODING_TYPE, BIT_ORDER)
+		// Get sequence number in string
+		seqNum := fmt.Sprintf("%06d", buffer.SeqNum)
+		buffer.SeqNum++
 		// Append channels to MiniSEED
-		for _, v := range []string{"EHZ", "EHE", "EHN"} {
-			var (
-				err error
-				seq = fmt.Sprintf("%06d", buffer.SeqNum)
-			)
-			switch v {
-			case "EHZ":
-				// Append EHZ channel
-				err = miniseed.Append(buffer.EHZ.DataBuffer, &mseedio.AppendOptions{
-					ChannelCode:    v,
-					SequenceNumber: seq,
-					StationCode:    station,
-					NetworkCode:    network,
-					LocationCode:   location,
-					StartTime:      buffer.TimeStamp,
-					SampleRate:     float64(buffer.EHZ.SampleRate),
-				})
-			case "EHE":
-				// Append EHZ channel
-				err = miniseed.Append(buffer.EHE.DataBuffer, &mseedio.AppendOptions{
-					ChannelCode:    v,
-					SequenceNumber: seq,
-					StationCode:    station,
-					NetworkCode:    network,
-					LocationCode:   location,
-					StartTime:      buffer.TimeStamp,
-					SampleRate:     float64(buffer.EHE.SampleRate),
-				})
-			case "EHN":
-				// Append EHZ channel
-				err = miniseed.Append(buffer.EHN.DataBuffer, &mseedio.AppendOptions{
-					ChannelCode:    v,
-					SequenceNumber: seq,
-					StationCode:    station,
-					NetworkCode:    network,
-					LocationCode:   location,
-					StartTime:      buffer.TimeStamp,
-					SampleRate:     float64(buffer.EHN.SampleRate),
-				})
-			}
+		for i, v := range map[string]*channelBuffer{
+			"EHZ": buffer.EHZ,
+			"EHE": buffer.EHE,
+			"EHN": buffer.EHN,
+		} {
+			// Get sample rate
+			sampleRate := math.Round(float64(v.Samples) / timeDiffSec)
+			// Append channel data
+			err := miniseed.Append(v.DataBuffer, &mseedio.AppendOptions{
+				ChannelCode:    i,
+				SequenceNumber: seqNum,
+				StationCode:    station,
+				NetworkCode:    network,
+				LocationCode:   location,
+				StartTime:      timestamp,
+				SampleRate:     sampleRate,
+			})
 			if err != nil {
 				m.OnError(options, err)
 				return err
-			} else {
-				buffer.SeqNum++
 			}
 			// Encode record to bytes
 			dataBytes, err := miniseed.Encode(mseedio.APPEND, BIT_ORDER)
@@ -101,9 +81,9 @@ func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.Featur
 		// Reset buffer
 		m.OnReady(options, "write")
 		buffer.TimeStamp = timestamp
-		buffer.EHZ.DataBuffer = []int32{}
-		buffer.EHE.DataBuffer = []int32{}
-		buffer.EHN.DataBuffer = []int32{}
+		buffer.EHZ = &channelBuffer{}
+		buffer.EHE = &channelBuffer{}
+		buffer.EHN = &channelBuffer{}
 	} else {
 		m.OnReady(options, "append")
 	}
