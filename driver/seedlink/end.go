@@ -15,15 +15,15 @@ func (*END) Callback(sl *SeedLinkGlobal, cl *SeedLinkClient, options *feature.Fe
 	cl.StreamMode = true // Enter stream mode
 	var (
 		seqNum   int64 = 0
-		channel        = text.TruncateString(cl.Channel, 3)
-		network        = text.TruncateString(cl.Network, 2)
+		channels       = cl.Channels
+		location       = cl.Location
 		station        = text.TruncateString(cl.Station, 5)
-		location       = text.TruncateString(cl.Location, 2)
+		network        = text.TruncateString(cl.Network, 2)
 	)
 	go publisher.Subscribe(
 		&options.Status.Geophone, &cl.StreamMode,
 		func(gp *publisher.Geophone) error {
-			return streamer(gp, conn, channel, network, station, location, &seqNum)
+			return streamer(gp, conn, channels, network, station, location, &seqNum)
 		},
 	)
 	return nil

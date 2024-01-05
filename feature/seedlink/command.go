@@ -52,6 +52,11 @@ func (s *SeedLink) handleCommand(options *feature.FeatureOptions, slGlobal *seed
 			return
 		}
 
+		// Exit from stream mode
+		if clientMessage != "END" {
+			slClient.StreamMode = false
+		}
+
 		// Check if command is whitelisted
 		var (
 			isCommandValid = true
@@ -73,9 +78,6 @@ func (s *SeedLink) handleCommand(options *feature.FeatureOptions, slGlobal *seed
 			s.OnReady(options, fmt.Sprintf("RECV OK: %s <%s>", conn.RemoteAddr().String(), clientMessage))
 		}
 
-		// Exit from stream mode
-		slClient.StreamMode = false
-
 		// Check for extra arguments
 		if isCommandValid && cmd.HasExtraArgs {
 			if len(argumentList) == 0 {
@@ -91,6 +93,11 @@ func (s *SeedLink) handleCommand(options *feature.FeatureOptions, slGlobal *seed
 			if err != nil {
 				cmd.Fallback(slGlobal, slClient, options, conn)
 			}
+		}
+
+		// Clear selected channels
+		if clientMessage == "END" {
+			slClient.Channels = []string{}
 		}
 	}
 }

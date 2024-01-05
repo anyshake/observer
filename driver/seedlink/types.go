@@ -80,13 +80,13 @@ type SeedLinkClient struct {
 	StreamMode bool
 	Network    string
 	Station    string
-	Channel    string
 	Location   string
+	Channels   []string
 	StartTime  time.Time
 	EndTime    time.Time
 }
 
-type SeedLinkStreamer func(pub *publisher.Geophone, conn net.Conn, channel, network, station, location string, seqNum *int64) error
+type SeedLinkStreamer func(pub *publisher.Geophone, conn net.Conn, channels []string, network, station, location string, seqNum *int64) error
 
 // Interface for SeedLink command callback & fallback
 type SeedLinkCommandCallback interface {

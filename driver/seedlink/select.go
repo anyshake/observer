@@ -19,7 +19,7 @@ func (*SELECT) Callback(sl *SeedLinkGlobal, cl *SeedLinkClient, options *feature
 			return err
 		} else {
 			cl.Location = args[0][:2]
-			cl.Channel = args[0][2:5]
+			cl.Channels = append(cl.Channels, args[0][2:5])
 		}
 	}
 	_, err := conn.Write([]byte(RES_OK))
