@@ -2,6 +2,10 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.5.3
+
+ - Support channel multi-selection in SeedLink protocol
+
 ## v2.5.2
 
  - Fix MiniSEED sample rate calculation error under unstable data link
