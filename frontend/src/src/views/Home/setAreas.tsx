@@ -8,11 +8,12 @@ const setAreas = (
     res: ApiResponse,
     length: number
 ): HomeArea[] => {
+    const { timestamp } = res.data;
     for (let i of obj) {
         // Get percent by tag
         const percent = res.data[i.tag].percent as number;
         // Create new array, get source array
-        const newArr = [Date.now(), percent];
+        const newArr = [timestamp ?? Date.now(), percent];
         const srcArr = obj.find((item) => item.tag === i.tag)?.chart.series
             ?.data;
         // Merge new array with source array
