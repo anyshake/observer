@@ -2,10 +2,11 @@
   <img src="https://raw.githubusercontent.com/anyshake/logotype/master/banner_observer.png" width="500"/>
 </p>
 
-[![Build Status](https://github.com/anyshake/observer/actions/workflows/release.yml/badge.svg)](https://github.com/anyshake/observer/actions/workflows/release.yml)
+[![MIT License](https://img.shields.io/badge/license-MIT-green)](https://github.com/anyshake/observer/blob/master/LICENSE)
 [![Downloads](https://img.shields.io/github/downloads/anyshake/observer/total.svg)](https://github.com/anyshake/observer/releases/latest)
-[![Latest Release](https://img.shields.io/github/release/anyshake/observer.svg?style=flat-square)](https://github.com/anyshake/observer/releases/latest)
-[![Go Report Card](https://goreportcard.com/badge/github.com/anyshake/observer?style=flat-square)](https://goreportcard.com/report/github.com/anyshake/observer)
+[![Go Report Card](https://goreportcard.com/badge/github.com/anyshake/observer)](https://goreportcard.com/report/github.com/anyshake/observer)
+[![Build Status](https://github.com/anyshake/observer/actions/workflows/release.yml/badge.svg)](https://github.com/anyshake/observer/actions/workflows/release.yml)
+[![Latest Release](https://img.shields.io/github/release/anyshake/observer.svg)](https://github.com/anyshake/observer/releases/latest)
 
 ## Overview
 
