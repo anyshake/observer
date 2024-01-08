@@ -10,7 +10,7 @@ DIST_DIR=./dist
 ASSETS_DIR=./assets
 
 BUILD_ARCH=arm arm64 386 amd64 ppc64le riscv64 \
-	mips mips64le mips64 mipsle loong64 s390x
+	mips mips64le mipsle loong64 s390x
 BUILD_FLAGS=-s -w -X main.version=$(VERSION) \
 	-X main.release=$(COMMIT)-$(RELEASE)
 BUILD_ARGS=-trimpath
