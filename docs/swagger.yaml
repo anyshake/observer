@@ -201,7 +201,9 @@ paths:
     post:
       consumes:
       - application/x-www-form-urlencoded
-      description: Get waveform count data in specified time range, channel and format
+      description: Get waveform count data in specified time range, channel and format,
+        the maximum duration of the waveform data to be exported is 24 hours for JSON
+        and 1 hour for SAC
       parameters:
       - description: Start timestamp of the waveform data to be queried, in milliseconds
         in: formData
@@ -250,7 +252,7 @@ paths:
           description: Failed to export waveform data due to failed to read data source
           schema:
             $ref: '#/definitions/response.HttpResponse'
-      summary: Observer waveform history
+      summary: AnyShake Observer waveform history
   /mseed:
     post:
       consumes:
@@ -297,7 +299,7 @@ paths:
             error
           schema:
             $ref: '#/definitions/response.HttpResponse'
-      summary: Observer MiniSEED data
+      summary: AnyShake Observer MiniSEED data
   /station:
     get:
       description: Get Observer station status including system information, memory
@@ -315,7 +317,7 @@ paths:
                 data:
                   $ref: '#/definitions/station.System'
               type: object
-      summary: Observer station status
+      summary: AnyShake Observer station status
   /trace:
     post:
       consumes:
@@ -352,5 +354,5 @@ paths:
             data source
           schema:
             $ref: '#/definitions/response.HttpResponse'
-      summary: Observer event trace
+      summary: AnyShake Observer event trace
 swagger: "2.0"

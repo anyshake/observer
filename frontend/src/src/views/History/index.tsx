@@ -286,8 +286,8 @@ class History extends Component<
         const { history } = this.state;
         const { start, end, format, channel } = history;
 
-        // Check if start time is earlier than end time
-        if (end - start <= 0 || !start || !end) {
+        // Check if start time is earlier than end time or exceed 1 hour
+        if (end - start <= 0 || end - start > 3600000 || !start || !end) {
             const { t } = this.props;
             const error = t("views.history.toasts.duration_error");
             toast.error(error);

@@ -8,8 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary Observer waveform history
-// @Description Get waveform count data in specified time range, channel and format
+// @Summary AnyShake Observer waveform history
+// @Description Get waveform count data in specified time range, channel and format, the maximum duration of the waveform data to be exported is 24 hours for JSON and 1 hour for SAC
 // @Router /history [post]
 // @Accept application/x-www-form-urlencoded
 // @Produce application/json
@@ -30,17 +30,21 @@ func (h *History) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions
 			return
 		}
 
-		data, err := filterHistory(binding.Start, binding.End, options)
-		if err != nil {
-			response.Error(c, http.StatusGone)
-			return
-		}
-
 		switch binding.Format {
 		case "json":
+			data, err := filterHistory(binding.Start, binding.End, JSON_DURATION, options)
+			if err != nil {
+				response.Error(c, http.StatusGone)
+				return
+			}
 			response.Message(c, "The waveform data was successfully filtered", data)
 			return
 		case "sac":
+			data, err := filterHistory(binding.Start, binding.End, SAC_DURATION, options)
+			if err != nil {
+				response.Error(c, http.StatusGone)
+				return
+			}
 			fileName, dataBytes, err := getSACBytes(data, binding.Channel, options)
 			if err != nil {
 				response.Error(c, http.StatusInternalServerError)

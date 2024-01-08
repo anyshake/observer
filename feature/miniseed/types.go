@@ -17,14 +17,12 @@ const (
 type MiniSEED struct{}
 
 type channelBuffer struct {
-	Samples    int32
 	DataBuffer []int32
+	Samples    int32
+	SeqNum     int64
 }
 
 type miniSEEDBuffer struct {
-	SeqNum    int64
-	TimeStamp time.Time
-	EHZ       *channelBuffer
-	EHE       *channelBuffer
-	EHN       *channelBuffer
+	TimeStamp     time.Time
+	ChannelBuffer map[string]*channelBuffer
 }

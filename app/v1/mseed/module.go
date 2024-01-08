@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary Observer MiniSEED data
+// @Summary AnyShake Observer MiniSEED data
 // @Description List MiniSEED data if action is `show`, or export MiniSEED data in .mseed format if action is `export`
 // @Router /mseed [post]
 // @Accept application/x-www-form-urlencoded
