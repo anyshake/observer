@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary Observer station status
+// @Summary AnyShake Observer station status
 // @Description Get Observer station status including system information, memory usage, disk usage, CPU usage, ADC information, geophone information, and location information
 // @Router /station [get]
 // @Produce application/json

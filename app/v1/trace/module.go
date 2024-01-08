@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary Observer event trace
+// @Summary AnyShake Observer event trace
 // @Description Get list of earthquake events data source and earthquake events from specified data source
 // @Router /trace [post]
 // @Accept application/x-www-form-urlencoded

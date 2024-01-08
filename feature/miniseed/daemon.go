@@ -42,48 +42,48 @@ func (m *MiniSEED) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 		time.Sleep(50 * time.Millisecond)
 	}
 
-	// Get sequence number if file exists
-	var seqNumber int64
+	// Init MiniSEED archiving buffer
 	currentTime, _ := duration.Timestamp(options.Status.System.Offset)
-	filePath := getFilePath(basePath, station, network, location, currentTime)
-	_, err := os.Stat(filePath)
-	if err == nil {
-		// Get last sequence number
-		logger.Print(MODULE, "starting from last record", color.FgYellow, false)
+	miniSEEDBuffer := &miniSEEDBuffer{
+		TimeStamp: currentTime,
+		ChannelBuffer: map[string]*channelBuffer{
+			"EHZ": {}, "EHE": {}, "EHN": {},
+		},
+	}
 
-		// Read MiniSEED file
-		var ms mseedio.MiniSeedData
-		err := ms.Read(filePath)
-		if err != nil {
-			m.OnError(options, err)
-			return
-		}
+	// Get sequence number if file exists
+	for i, v := range miniSEEDBuffer.ChannelBuffer {
+		filePath := getFilePath(basePath, station, network, location, i, currentTime)
+		_, err := os.Stat(filePath)
+		if err == nil {
+			// Get last sequence number
+			logger.Print(MODULE, fmt.Sprintf("starting %s from last record", i), color.FgYellow, false)
 
-		// Get last sequence number
-		recordLength := len(ms.Series)
-		if recordLength > 0 {
-			lastRecord := ms.Series[recordLength-1]
-			lastSeqNum := lastRecord.FixedSection.SequenceNumber
-			n, err := strconv.Atoi(lastSeqNum)
+			// Read MiniSEED file
+			var ms mseedio.MiniSeedData
+			err := ms.Read(filePath)
 			if err != nil {
 				m.OnError(options, err)
 				return
 			}
-			// Set current sequence number
-			seqNumber = int64(n)
-		}
-	} else {
-		// Create new file with sequence number 0
-		logger.Print(MODULE, "starting from a new file", color.FgYellow, false)
-	}
 
-	// Init MiniSEED archiving buffer
-	buffer := &miniSEEDBuffer{
-		TimeStamp: currentTime,
-		SeqNum:    seqNumber,
-		EHZ:       &channelBuffer{},
-		EHE:       &channelBuffer{},
-		EHN:       &channelBuffer{},
+			// Get last sequence number
+			recordLength := len(ms.Series)
+			if recordLength > 0 {
+				lastRecord := ms.Series[recordLength-1]
+				lastSeqNum := lastRecord.FixedSection.SequenceNumber
+				n, err := strconv.Atoi(lastSeqNum)
+				if err != nil {
+					m.OnError(options, err)
+					return
+				}
+				// Set current sequence number
+				v.SeqNum = int64(n)
+			}
+		} else {
+			// Create new file with sequence number 0
+			logger.Print(MODULE, fmt.Sprintf("starting %s from a new file", i), color.FgYellow, false)
+		}
 	}
 	m.OnStart(options, "service has started")
 
@@ -93,10 +93,10 @@ func (m *MiniSEED) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 		&options.Status.Geophone,
 		&expressionForSubscribe,
 		func(gp *publisher.Geophone) error {
-			return m.handleMessage(gp, options, buffer)
+			return m.handleMessage(gp, options, miniSEEDBuffer)
 		},
 	)
 
-	err = fmt.Errorf("service exited with an error")
+	err := fmt.Errorf("service exited with an error")
 	m.OnError(options, err)
 }

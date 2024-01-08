@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/history": {
             "post": {
-                "description": "Get waveform count data in specified time range, channel and format",
+                "description": "Get waveform count data in specified time range, channel and format, the maximum duration of the waveform data to be exported is 24 hours for JSON and 1 hour for SAC",
                 "consumes": [
                     "application/x-www-form-urlencoded"
                 ],
@@ -25,7 +25,7 @@ const docTemplate = `{
                     "application/json",
                     "application/octet-stream"
                 ],
-                "summary": "Observer waveform history",
+                "summary": "AnyShake Observer waveform history",
                 "parameters": [
                     {
                         "type": "integer",
@@ -108,7 +108,7 @@ const docTemplate = `{
                     "application/json",
                     "application/octet-stream"
                 ],
-                "summary": "Observer MiniSEED data",
+                "summary": "AnyShake Observer MiniSEED data",
                 "parameters": [
                     {
                         "type": "string",
@@ -173,7 +173,7 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Observer station status",
+                "summary": "AnyShake Observer station status",
                 "responses": {
                     "200": {
                         "description": "Successfully read station status",
@@ -205,7 +205,7 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Observer event trace",
+                "summary": "AnyShake Observer event trace",
                 "parameters": [
                     {
                         "type": "string",
