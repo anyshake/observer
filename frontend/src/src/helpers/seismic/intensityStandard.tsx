@@ -47,8 +47,8 @@ class JMAIntensityStandard implements IntensityStandard {
 class CWAIntensityStandard implements IntensityStandard {
     property(): IntensityStandardProperty {
         return {
-            name: "交通部中央氣象局地震震度分級",
-            value: "CWB",
+            name: "交通部中央氣象署地震震度分級",
+            value: "CWA",
         };
     }
 

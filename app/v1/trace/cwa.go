@@ -22,7 +22,7 @@ type CWA struct {
 }
 
 func (c *CWA) Property() string {
-	return "交通部中央氣象局"
+	return "交通部中央氣象署"
 }
 
 func (c *CWA) createGFWBypasser() *http.Transport {
