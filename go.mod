@@ -49,7 +49,7 @@ require (
 )
 
 require (
-	github.com/bclswl0827/mseedio v1.0.8
+	github.com/bclswl0827/mseedio v1.0.9
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 )

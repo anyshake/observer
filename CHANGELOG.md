@@ -2,6 +2,10 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.6.1
+
+ - Fixed a depencency issue in MiniSEED data processing
+
 ## v2.6.0
 
  - Simple implementation of SeedLink buffer
