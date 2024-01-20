@@ -84,20 +84,12 @@ const restfulApiByTag = async ({
         if (blob) {
             const { "content-disposition": contentDisposition } = headers;
             if (contentDisposition) {
-                const filename = contentDisposition
+                filename = contentDisposition
                     .split(";")
                     .find((item: string) => item.includes("filename="))
                     ?.split("=")[1];
-                if (filename) {
-                    fileDownload(data, filename);
-                } else {
-                    fileDownload(data, "stream");
-                }
-            } else if (filename) {
-                fileDownload(data, filename);
-            } else {
-                fileDownload(data, "stream");
             }
+            fileDownload(data, filename ?? "stream");
 
             const time = new Date().toISOString();
             return {

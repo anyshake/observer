@@ -39,14 +39,14 @@ func (m *MiniSEED) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 	// Wait for time syncing
 	for !options.Status.IsReady {
 		logger.Print(MODULE, "waiting for time alignment", color.FgYellow, false)
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(1 * time.Second)
 	}
 
 	// Init MiniSEED archiving buffer
 	currentTime, _ := duration.Timestamp(options.Status.System.Offset)
-	miniSEEDBuffer := &miniSEEDBuffer{
+	miniSEEDBuffer := &publisher.SegmentBuffer{
 		TimeStamp: currentTime,
-		ChannelBuffer: map[string]*channelBuffer{
+		ChannelBuffer: map[string]*publisher.ChannelSegmentBuffer{
 			"EHZ": {}, "EHE": {}, "EHN": {},
 		},
 	}

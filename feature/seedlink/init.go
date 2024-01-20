@@ -28,6 +28,8 @@ func (s *SeedLink) InitGlobal(slGlobal *seedlink.SeedLinkGlobal, currentTime tim
 		{Name: "window-extraction"}, {Name: "info:connections"},
 		{Name: "info:capabilities"}, {Name: "info:stations"},
 	}
+	// Station field are not used by SeedLink, but are required by the protocol to differentiate between stations
+	slGlobal.SeedLinkBuffer = seedlink.SeedLinkBuffer{Size: SEEDLINK_BUFFERSIZE}
 	slGlobal.Streams = []seedlink.SeedLinkStream{
 		{BeginTime: currentTimeString, EndTime: streamEndTimeString, SeedName: "EHZ", Location: location, Type: "D", Station: station},
 		{BeginTime: currentTimeString, EndTime: streamEndTimeString, SeedName: "EHE", Location: location, Type: "D", Station: station},

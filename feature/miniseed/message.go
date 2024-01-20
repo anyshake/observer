@@ -11,7 +11,7 @@ import (
 	"github.com/bclswl0827/mseedio"
 )
 
-func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.FeatureOptions, buffer *miniSEEDBuffer) error {
+func (m *MiniSEED) handleMessage(gp *publisher.Geophone, options *feature.FeatureOptions, buffer *publisher.SegmentBuffer) error {
 	var (
 		basePath   = options.Config.MiniSEED.Path
 		timestamp  = time.UnixMilli(gp.TS).UTC()

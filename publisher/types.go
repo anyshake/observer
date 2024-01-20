@@ -1,5 +1,7 @@
 package publisher
 
+import "time"
+
 type Int32Array []int32
 
 type Geophone struct {
@@ -23,4 +25,15 @@ type Status struct {
 	Buffer   *Geophone // Buffer area, should not be externally accessed
 	System   *System
 	Geophone Geophone
+}
+
+type ChannelSegmentBuffer struct {
+	DataBuffer []int32
+	Samples    int32
+	SeqNum     int64
+}
+
+type SegmentBuffer struct {
+	TimeStamp     time.Time
+	ChannelBuffer map[string]*ChannelSegmentBuffer
 }
