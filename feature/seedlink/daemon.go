@@ -11,6 +11,7 @@ import (
 
 	"github.com/anyshake/observer/driver/seedlink"
 	"github.com/anyshake/observer/feature"
+	"github.com/anyshake/observer/publisher"
 	"github.com/anyshake/observer/utils/logger"
 	"github.com/anyshake/observer/utils/text"
 	"github.com/fatih/color"
@@ -59,6 +60,12 @@ func (s *SeedLink) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 			go s.handleCommand(options, &slGlobal, &slClient, conn)
 		}
 	}()
+
+	// Subscribe to publisher to append buffer
+	expressionForSubscribe := true
+	go publisher.Subscribe(&options.Status.Geophone, &expressionForSubscribe, func(gp *publisher.Geophone) error {
+		return s.handleBuffer(gp, &slGlobal.SeedLinkBuffer)
+	})
 
 	// Receive interrupt signals
 	sigCh := make(chan os.Signal, 1)

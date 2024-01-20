@@ -18,7 +18,7 @@ func (g *Geophone) Read(port io.ReadWriteCloser, conf *config.Conf, packet *Pack
 
 	// Read data frame
 	checksumLen := len(packet.Checksum)
-	buf := make([]byte, g.getSize(packetLen, checksumLen))
+	buf := make([]byte, g.getPacketSize(packetLen, checksumLen))
 	n, err := serial.Read(port, buf, TIMEOUT_THRESHOLD)
 	if err != nil {
 		return err

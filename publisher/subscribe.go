@@ -4,10 +4,10 @@ import (
 	"time"
 )
 
-func Subscribe(gp *Geophone, exp *bool, onMessage func(gp *Geophone) error) {
+func Subscribe(gp *Geophone, enable *bool, onMessage func(gp *Geophone) error) {
 	lastTime := time.Now().UTC().UnixMilli()
 
-	for *exp {
+	for *enable {
 		var (
 			ehz = gp.EHZ
 			ehe = gp.EHE

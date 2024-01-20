@@ -53,7 +53,9 @@ func (s *SeedLink) handleCommand(options *feature.FeatureOptions, slGlobal *seed
 		}
 
 		// Exit from stream mode
-		if clientMessage != "END" {
+		if clientMessage != "END" &&
+			// An exception for INFO command
+			!strings.Contains(clientMessage, "INFO ") {
 			slClient.StreamMode = false
 		}
 

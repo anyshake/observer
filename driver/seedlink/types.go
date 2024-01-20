@@ -29,9 +29,16 @@ const (
 // SeedLink main daemon config & state
 type SeedLinkGlobal struct {
 	SeedLinkState
+	SeedLinkBuffer
 	Streams      []SeedLinkStream
 	Stations     []SeedLinkStation
 	Capabilities []SeedLinkCapability
+}
+
+// SeedLink data buffer
+type SeedLinkBuffer struct {
+	Size int
+	Data []publisher.Geophone
 }
 
 // SeedLink basic state
