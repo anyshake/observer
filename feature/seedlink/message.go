@@ -31,12 +31,14 @@ func (s *SeedLink) handleMessage(gp *publisher.Geophone, conn net.Conn, channels
 			return err
 		}
 
-		_, err = conn.Write(dataBytes)
-		if err != nil {
-			return err
-		}
+		if len(dataBytes) > 0 {
+			_, err = conn.Write(dataBytes)
+			if err != nil {
+				return err
+			}
 
-		*seqNum++
+			*seqNum++
+		}
 	}
 
 	s.OnReady(nil, "SENT OK: ", conn.RemoteAddr().String())

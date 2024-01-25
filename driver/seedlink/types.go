@@ -10,6 +10,7 @@ import (
 )
 
 const (
+	PACKET_SIZE  int    = 512
 	ORGANIZATION string = "anyshake.org"
 	RELEASE      string = "SeedLink v3.1 AnyShake Edition (Very basic implementation in Go) :: SLPROTO:3.1 CAP EXTREPLY NSWILDCARD BATCH WS:13 :: Constructing Realtime Seismic Network Ambitiously."
 )

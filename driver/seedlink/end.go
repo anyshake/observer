@@ -43,12 +43,14 @@ func (*END) Callback(sl *SeedLinkGlobal, cl *SeedLinkClient, options *feature.Fe
 						return err
 					}
 
-					_, err = conn.Write(dataBytes)
-					if err != nil {
-						return err
-					}
+					if len(dataBytes) > 0 {
+						_, err = conn.Write(dataBytes)
+						if err != nil {
+							return err
+						}
 
-					seqNum++
+						seqNum++
+					}
 				}
 			}
 		}
