@@ -28,10 +28,11 @@ func CreateSLPacket(count []int32, ts, seq int64, network, station, channel, loc
 	}
 
 	// Get MiniSEED bytes
-	miniseed.Series[0].BlocketteSection.RecordLength = 9
 	dataBytes, err := miniseed.Encode(mseedio.OVERWRITE, mseedio.MSBFIRST)
 	if err != nil {
 		return nil, err
+	} else if len(dataBytes) != PACKET_SIZE {
+		return nil, nil
 	}
 
 	// Return SeedLink packet
