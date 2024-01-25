@@ -38,6 +38,7 @@ type SeedLinkGlobal struct {
 // SeedLink data buffer
 type SeedLinkBuffer struct {
 	Size int
+	File string
 	Data []publisher.Geophone
 }
 

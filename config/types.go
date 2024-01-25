@@ -61,7 +61,9 @@ type miniseed struct {
 type seedlink struct {
 	Enable bool   `json:"enable"`
 	Host   string `json:"host"`
+	Buffer string `json:"buffer"`
 	Port   int    `json:"port"`
+	Size   int    `json:"size"`
 }
 
 type Compensation struct {
