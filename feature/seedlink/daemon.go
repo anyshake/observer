@@ -38,13 +38,18 @@ func (s *SeedLink) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 
 	// Init SeedLink global state
 	var (
+		slGlobal    seedlink.SeedLinkGlobal
 		currentTime = time.Now().UTC()
 		station     = text.TruncateString(options.Config.Station.Station, 5)
 		network     = text.TruncateString(options.Config.Station.Network, 2)
 		location    = text.TruncateString(options.Config.Station.Location, 2)
 	)
-	var slGlobal seedlink.SeedLinkGlobal
-	s.InitGlobal(&slGlobal, currentTime, station, network, location)
+	bufferPath, bufferSize := options.Config.SeedLink.Buffer, options.Config.SeedLink.Size
+	err = s.InitGlobal(&slGlobal, currentTime, station, network, location, bufferPath, bufferSize)
+	if err != nil {
+		s.OnError(options, err)
+		return
+	}
 
 	// Accept incoming connections
 	s.OnStart(options, "service has started")
