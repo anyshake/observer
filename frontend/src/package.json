@@ -7,18 +7,15 @@
     "@mui/material": "^5.14.11",
     "@mui/x-date-pickers": "^6.16.0",
     "@reduxjs/toolkit": "^1.9.6",
-    "@types/node": "^16.18.38",
-    "@types/react": "^18.2.14",
-    "@types/react-dom": "^18.2.6",
     "axios": "^1.5.1",
     "date-fns": "^2.30.0",
     "eslint-config-react-app": "^7.0.1",
+    "file-saver": "^2.0.5",
     "highcharts": "^11.1.0",
     "highcharts-react-official": "^3.2.1",
     "i18next": "^23.5.1",
     "i18next-browser-languagedetector": "^7.1.0",
     "i18next-http-backend": "^2.2.2",
-    "js-file-download": "^0.4.12",
     "leaflet": "^1.9.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -31,13 +28,11 @@
     "react-scripts": "5.0.1",
     "redux": "^4.2.1",
     "redux-persist": "^6.0.0",
-    "seisplotjs": "^3.1.1",
     "typescript": "^4.9.5"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "cross-env BROWSER=none GENERATE_SOURCEMAP=false react-scripts start",
+    "build": "cross-env GENERATE_SOURCEMAP=false react-scripts build",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -59,8 +54,13 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@types/file-saver": "^2.0.7",
     "@types/leaflet": "^1.9.6",
+    "@types/node": "^16.18.38",
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
     "@types/redux-persist": "^4.3.1",
+    "cross-env": "^7.0.3",
     "tailwindcss": "^3.3.3"
   }
 }

@@ -2,6 +2,10 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.7.1
+
+ - Update frontend dependencies
+
 ## v2.7.0
 
  - Support SeedLink buffer size customization

@@ -9,8 +9,8 @@ import axios, {
 import API_CONFIG from "../../config/api";
 import getBackend from "../app/getBackend";
 import getApiUrl from "../app/getApiUrl";
-import fileDownload from "js-file-download";
 import GLOBAL_CONFIG from "../../config/global";
+import { saveAs } from "file-saver";
 
 export interface RESTfulApiByTag {
     readonly tag: string;
@@ -89,7 +89,7 @@ const restfulApiByTag = async ({
                     .find((item: string) => item.includes("filename="))
                     ?.split("=")[1];
             }
-            fileDownload(data, filename ?? "stream");
+            saveAs(data, filename ?? "stream");
 
             const time = new Date().toISOString();
             return {
