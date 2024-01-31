@@ -13,27 +13,15 @@ import station from "../store/station";
 import { Station } from "./station";
 
 const scalePersistConfig = persistReducer(
-    {
-        storage,
-        key: "scale",
-        whitelist: ["scale"],
-    },
+    { storage, key: "scale", whitelist: ["scale"] },
     scale
 );
 const durationPersistConfig = persistReducer(
-    {
-        storage,
-        key: "duration",
-        whitelist: ["duration"],
-    },
+    { storage, key: "duration", whitelist: ["duration"] },
     duration
 );
 const retentionPersistConfig = persistReducer(
-    {
-        storage,
-        key: "retention",
-        whitelist: ["retention"],
-    },
+    { storage, key: "retention", whitelist: ["retention"] },
     retention
 );
 
@@ -47,11 +35,10 @@ const reducer = combineReducers({
 });
 const REDUX_STORE = configureStore({
     reducer,
-    middleware: (getDefaultMiddleware) => {
-        return getDefaultMiddleware({
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
             serializableCheck: false,
-        });
-    },
+        }),
 });
 const REDUX_PRESIST = persistStore(REDUX_STORE);
 
