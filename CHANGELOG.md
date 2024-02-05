@@ -5,6 +5,7 @@ Starting from v2.2.5, all notable changes to this project will be documented in 
 ## v2.7.1
 
  - Update frontend dependencies
+ - Ensure encoded SeedLink packet length is 512 bytes
 
 ## v2.7.0
 
