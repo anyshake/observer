@@ -50,6 +50,7 @@ type server struct {
 	Port  int    `json:"port"`
 	CORS  bool   `json:"cors"`
 	Debug bool   `json:"debug"`
+	Rate  int    `json:"rate"`
 }
 
 type miniseed struct {

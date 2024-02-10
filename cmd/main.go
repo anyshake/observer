@@ -89,6 +89,7 @@ func main() {
 			APIPrefix:      API_PREFIX,
 			FeatureOptions: featureOptions,
 			CORS:           conf.Server.CORS,
+			RateFactor:     conf.Server.Rate,
 		})
 
 	// Receive interrupt signals

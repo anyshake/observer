@@ -15,7 +15,10 @@ import (
 )
 
 func RegisterRouterV1(rg *gin.RouterGroup, options *app.ServerOptions) {
-	rg.Use(limit.RateLimit(time.Second, CAPACITY, CAPACITY))
+	if options.RateFactor > 0 {
+		rateFactor := int64(options.RateFactor)
+		rg.Use(limit.RateLimit(time.Second, rateFactor, rateFactor))
+	}
 	services := []ApiServices{
 		&station.Station{},
 		&history.History{},
