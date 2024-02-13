@@ -2,6 +2,10 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.8.1
+
+ - Show disk usage of current working directory
+
 ## v2.8.0
 
  - Allow setting rate limitation for API endpoints

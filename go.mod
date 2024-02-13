@@ -19,7 +19,6 @@ require (
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/swag v1.16.2
 	github.com/wille/osutil v0.0.0-20230417145339-416c15a22a77
-	golang.org/x/time v0.5.0
 	gorm.io/driver/mysql v1.5.2
 	gorm.io/driver/postgres v1.5.4
 	gorm.io/driver/sqlserver v1.5.2
