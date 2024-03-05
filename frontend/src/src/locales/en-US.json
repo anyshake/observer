@@ -240,7 +240,6 @@
                 "fetch_waveform_error": "Historical waveform data query failed",
                 "copy_link_success": "Share link has copied to clipboard",
                 "copy_link_error": "Failed to copy share link to clipboard",
-                "duration_excceed": "The event duration exceeds the limit. Please manually query according to the arrival time of P/S waves at the station, or change the earthquake event",
                 "event_select_success": "Event selection successful"
             }
         },
@@ -281,7 +280,8 @@
                 "select_scale": "Seismic Scale",
                 "purge_cache": "Reset Application",
                 "waveform_retention": "Waveform Settings",
-                "query_duration": "Query Settings"
+                "query_duration": "Query Settings",
+                "station_inventory": "SeisComp XML Inventory"
             },
             "selects": {
                 "choose_scale": {

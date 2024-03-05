@@ -35,9 +35,7 @@ export const handleSetLabels = (
                 return getVoltageArr(arr, adc.resolution, adc.fullscale);
             });
             const velocityDataArr = voltageDataArr.map((arr) => {
-                const sensitivity = geophone[
-                    key as keyof typeof geophone
-                ] as number;
+                const sensitivity = geophone.sensitivity / 100;
                 return getVelocityArr(arr, sensitivity);
             });
             const accelerationDataArr = velocityDataArr.map((arr) => {

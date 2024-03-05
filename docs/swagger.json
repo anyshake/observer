@@ -90,6 +90,44 @@
                 }
             }
         },
+        "/inventory": {
+            "get": {
+                "description": "Get SeisComP XML inventory, which contains meta data of the station",
+                "produces": [
+                    "application/json",
+                    "application/xml"
+                ],
+                "summary": "AnyShake Observer station inventory",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Format of the inventory, either `json` or `xml`",
+                        "name": "format",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully get SeisComP XML inventory",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.HttpResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/mseed": {
             "post": {
                 "description": "List MiniSEED data if action is `show`, or export MiniSEED data in .mseed format if action is `export`",

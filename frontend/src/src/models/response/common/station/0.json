@@ -41,9 +41,8 @@
             "percent": 0
         },
         "geophone": {
-            "ehz": 0.288,
-            "ehe": 0.288,
-            "ehn": 0.288
+            "sensitivity": 28.8,
+            "frequency": 4.5
         },
         "position": {
             "latitude": 0,

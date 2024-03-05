@@ -253,6 +253,28 @@ paths:
           schema:
             $ref: '#/definitions/response.HttpResponse'
       summary: AnyShake Observer waveform history
+  /inventory:
+    get:
+      description: Get SeisComP XML inventory, which contains meta data of the station
+      parameters:
+      - description: Format of the inventory, either `json` or `xml`
+        in: query
+        name: format
+        type: string
+      produces:
+      - application/json
+      - application/xml
+      responses:
+        "200":
+          description: Successfully get SeisComP XML inventory
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.HttpResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: AnyShake Observer station inventory
   /mseed:
     post:
       consumes:

@@ -62,12 +62,7 @@ func (g *Geophone) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 				lastRead = time.Now().UTC()
 				continue
 			} else {
-				g.OnReady(
-					options, packet,
-					options.Config.Geophone.EHZ,
-					options.Config.Geophone.EHE,
-					options.Config.Geophone.EHN,
-				)
+				g.OnReady(options, packet)
 			}
 
 			// Reset device if reached TIMEOUT_THRESHOLD

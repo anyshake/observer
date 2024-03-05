@@ -63,7 +63,15 @@ export const requestRestApi = async <
         }
 
         const protocol = getProtocol(true);
-        const reqPath = `${protocol}//${backend}${endpoint.path}`;
+        let reqPath = `${protocol}//${backend}${endpoint.path}`;
+        const query = new URLSearchParams();
+        if (endpoint.method === "get" && !!payload) {
+            Object.entries(payload).forEach(([key, value]) => {
+                query.set(key, value as string);
+            });
+            reqPath += `?${query.toString()}`;
+        }
+
         const { data, headers } = await _axios.request({
             url: reqPath,
             headers: header,
@@ -88,7 +96,7 @@ export const requestRestApi = async <
         }
 
         return { ...response.common, ...data };
-    } catch {
+    } catch (e) {
         const result = response.error ?? response.common;
         if (throwError) {
             return Promise.reject(result);

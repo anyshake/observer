@@ -37,7 +37,7 @@ func (m *MiniSEED) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 	}
 
 	// Wait for time syncing
-	for !options.Status.IsReady {
+	for options.Status.ReadyTime.IsZero() {
 		logger.Print(MODULE, "waiting for time alignment", color.FgYellow, false)
 		time.Sleep(1 * time.Second)
 	}

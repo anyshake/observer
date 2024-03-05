@@ -107,9 +107,7 @@ export const handleSetCharts = (
                 adc.fullscale
             );
             const { geophone } = store.getState().geophone;
-            const sensitivity = geophone[
-                key as keyof typeof geophone
-            ] as number;
+            const sensitivity = geophone.sensitivity / 100;
             const velocityArr = getVelocityArr(voltageArr, sensitivity);
             const channelDataSpanMS = 1000 / channelData.length;
             const accelerationArr = getAccelerationArr(

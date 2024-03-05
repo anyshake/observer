@@ -10,9 +10,8 @@ type adcModel struct {
 }
 
 type geophoneModel struct {
-	EHZ float64 `json:"ehz"`
-	EHE float64 `json:"ehe"`
-	EHN float64 `json:"ehn"`
+	Sensitivity float64 `json:"sensitivity"`
+	Frequency   float64 `json:"frequency"`
 }
 
 type memoryModel struct {

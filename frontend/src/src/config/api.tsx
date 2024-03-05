@@ -12,6 +12,9 @@ import mseedRequestModel0 from "../models/request/mseed/0.json";
 import mseedRequestModel1 from "../models/request/mseed/1.json";
 import mseedCommonResponseModel0 from "../models/response/common/mseed/0.json";
 import mseedErrorResponseModel from "../models/response/error/mseed.json";
+import inventoryRequestModel0 from "../models/request/inventory/0.json";
+import inventoryCommonResponseModel0 from "../models/response/common/inventory/0.json";
+import inventoryErrorResponseModel from "../models/response/error/mseed.json";
 import socketRequestModel0 from "../models/request/socket/0.json";
 import socketCommonResponseModel0 from "../models/response/common/socket/0.json";
 
@@ -143,6 +146,29 @@ const socket: Endpoint<
     },
 };
 
+export {
+    inventoryRequestModel0,
+    inventoryCommonResponseModel0,
+    inventoryErrorResponseModel,
+};
+
+const inventory: Endpoint<
+    typeof inventoryRequestModel0,
+    typeof inventoryCommonResponseModel0,
+    typeof inventoryErrorResponseModel
+> = {
+    path: "/api/v1/inventory",
+    method: "get",
+    type: "http",
+    model: {
+        request: { ...inventoryRequestModel0 },
+        response: {
+            common: { ...inventoryCommonResponseModel0 },
+            error: inventoryErrorResponseModel,
+        },
+    },
+};
+
 export const apiConfig = {
     backend:
         process.env.NODE_ENV === "production"
@@ -154,5 +180,6 @@ export const apiConfig = {
         trace,
         mseed,
         socket,
+        inventory,
     },
 };

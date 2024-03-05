@@ -6,6 +6,10 @@ type station struct {
 	Station   string  `json:"station"`
 	Network   string  `json:"network"`
 	Location  string  `json:"location"`
+	Country   string  `json:"country"`
+	Region    string  `json:"region"`
+	City      string  `json:"city"`
+	Owner     string  `json:"owner"`
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 	Elevation float64 `json:"elevation"`
@@ -23,9 +27,8 @@ type adc struct {
 }
 
 type geophone struct {
-	EHZ Compensation `json:"ehz"`
-	EHE Compensation `json:"ehe"`
-	EHN Compensation `json:"ehn"`
+	Frequency   float64 `json:"frequency"`
+	Sensitivity float64 `json:"sensitivity"`
 }
 
 type ntpclient struct {
@@ -65,12 +68,6 @@ type seedlink struct {
 	Buffer string `json:"buffer"`
 	Port   int    `json:"port"`
 	Size   int    `json:"size"`
-}
-
-type Compensation struct {
-	Damping     float64 `json:"damping"`
-	Frequency   float64 `json:"frequency"`
-	Sensitivity float64 `json:"sensitivity"`
 }
 
 type Conf struct {

@@ -81,8 +81,8 @@ const App = () => {
         });
         if (res?.data) {
             const initialized = true;
-            const { ehz, ehe, ehn } = res.data.geophone;
-            dispatch(UpdateGeophone({ ehz, ehe, ehn, initialized }));
+            const { sensitivity, frequency } = res.data.geophone;
+            dispatch(UpdateGeophone({ sensitivity, frequency, initialized }));
             const { resolution, fullscale } = res.data.adc;
             dispatch(UpdateADC({ resolution, fullscale, initialized }));
             const { station, network, location } = res.data.station;

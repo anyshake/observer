@@ -7,24 +7,15 @@
         "location": "00",
         "latitude": 39.9,
         "longitude": 116.3,
-        "elevation": 0
+        "elevation": 0,
+        "region": "Asia",
+        "country": "China",
+        "city": "Beijing",
+        "owner": "Lee"
     },
     "geophone_settings": {
-        "ehz": {
-            "sensitivity": 0.288,
-            "damping": 0.56,
-            "frequency": 4.5
-        },
-        "ehe": {
-            "sensitivity": 0.288,
-            "damping": 0.56,
-            "frequency": 4.5
-        },
-        "ehn": {
-            "sensitivity": 0.288,
-            "damping": 0.56,
-            "frequency": 4.5
-        }
+        "sensitivity": 28.8,
+        "frequency": 4.5
     },
     "adc_settings": {
         "resolution": 27,

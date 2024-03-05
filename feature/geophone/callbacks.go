@@ -19,7 +19,7 @@ func (g *Geophone) OnStop(options *feature.FeatureOptions, v ...any) {
 }
 
 func (g *Geophone) OnReady(options *feature.FeatureOptions, v ...any) {
-	if options.Status.IsReady {
+	if !options.Status.ReadyTime.IsZero() {
 		var (
 			packet         = v[0].(Packet)
 			lastTime       = time.UnixMilli(options.Status.Buffer.TS).UTC()

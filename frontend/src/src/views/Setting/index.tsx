@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container } from "../../components/Container";
 import { Button } from "../../components/Button";
 import { Panel } from "../../components/Panel";
 import { useTranslation } from "react-i18next";
-// import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-// import theme from "react-syntax-highlighter/dist/esm/styles/prism/atom-dark";
-// import { metadata } from "./metadata";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import theme from "react-syntax-highlighter/dist/esm/styles/prism/atom-dark";
 import { sendUserAlert } from "../../helpers/interact/sendUserAlert";
 import { sendUserConfirm } from "../../helpers/interact/sendUserConfirm";
 import { useSelector, useDispatch } from "react-redux";
@@ -15,6 +14,8 @@ import { Form, FormProps } from "../../components/Form";
 import { onUpdate as updateRetention } from "../../stores/retention";
 import { Select, SelectProps } from "../../components/Select";
 import { onUpdate as updateScale } from "../../stores/scale";
+import { apiConfig } from "../../config/api";
+import { requestRestApi } from "../../helpers/request/requestRestApi";
 
 const Settings = () => {
     const { t } = useTranslation();
@@ -183,6 +184,27 @@ const Settings = () => {
         },
     ]);
 
+    const [stationInventory, setStationInventory] = useState<string>();
+
+    const getStationInventory = async () => {
+        const { backend, endpoints } = apiConfig;
+        const payload = { format: "json" };
+        const res = await requestRestApi({
+            backend,
+            payload,
+            timeout: 30,
+            endpoint: endpoints.inventory,
+        });
+        if (!res?.data) {
+            return;
+        }
+        setStationInventory(res.data);
+    };
+
+    useEffect(() => {
+        getStationInventory();
+    }, []);
+
     return (
         <>
             <Container className="gap-4 grid md:grid-cols-2">
@@ -224,11 +246,13 @@ const Settings = () => {
                     title={t(select.title ?? "")}
                 />
             </Container>
-            {/* <Panel label="Station Metadata" sublabel="SeisComP XML Inventory">
-                <SyntaxHighlighter language="xml" style={theme}>
-                    {metadata}
-                </SyntaxHighlighter>
-            </Panel> */}
+            {!!stationInventory?.length && (
+                <Panel label={t("views.setting.panels.station_inventory")}>
+                    <SyntaxHighlighter language="xml" style={theme}>
+                        {stationInventory}
+                    </SyntaxHighlighter>
+                </Panel>
+            )}
         </>
     );
 };

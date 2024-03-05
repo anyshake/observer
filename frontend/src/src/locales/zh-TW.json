@@ -240,7 +240,6 @@
                 "fetch_waveform_error": "歷史波形資料查詢失敗",
                 "copy_link_success": "分享連結已複製到剪貼簿",
                 "copy_link_error": "分享連結複製失敗",
-                "duration_excceed": "事件時間跨度超出限制，請根據 P/S 波到達測站時間點手動進行查詢，或更換地震事件",
                 "event_select_success": "事件選擇成功"
             }
         },
@@ -281,7 +280,8 @@
                 "select_scale": "烈度標準",
                 "purge_cache": "重置應用",
                 "waveform_retention": "波形設定",
-                "query_duration": "查詢設定"
+                "query_duration": "查詢設定",
+                "station_inventory": "SeisComp 詮釋資料"
             },
             "selects": {
                 "choose_scale": {
