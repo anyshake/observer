@@ -34,8 +34,8 @@ const History = (props: RouterComponentProps) => {
     const { t } = useTranslation();
 
     const { station } = useSelector(({ station }: ReduxStoreProps) => station);
-    const { retention } = useSelector(
-        ({ retention }: ReduxStoreProps) => retention
+    const { duration } = useSelector(
+        ({ duration }: ReduxStoreProps) => duration
     );
 
     const [isCurrentBusy, setIsCurrentBusy] = useState(!station.initialized);
@@ -53,7 +53,7 @@ const History = (props: RouterComponentProps) => {
     }>({
         start: searchParams.has("start")
             ? Number(searchParams.get("start"))
-            : currentTimestamp - 1000 * retention,
+            : currentTimestamp - 1000 * duration,
         end: searchParams.has("end")
             ? Number(searchParams.get("end"))
             : currentTimestamp,
@@ -218,7 +218,7 @@ const History = (props: RouterComponentProps) => {
 
     const handleQueryWaveform = async () => {
         const { start, end } = queryDuration;
-        if (start >= end || end - start < 0 || end - start > 1000 * retention) {
+        if (!start || !end || start >= end) {
             sendUserAlert(t("views.history.toasts.duration_error"), true);
             return;
         }
@@ -249,7 +249,7 @@ const History = (props: RouterComponentProps) => {
 
     const handleExportSACFile = () => {
         const { start, end } = queryDuration;
-        if (start >= end || end - start < 0 || end - start > 1000 * retention) {
+        if (!start || !end || start >= end) {
             sendUserAlert(t("views.history.toasts.duration_error"), true);
             return;
         }
@@ -343,18 +343,9 @@ const History = (props: RouterComponentProps) => {
                 return;
             }
 
-            const handleSelectEvent = (duration: string) => {
+            const handleSelectEvent = (value: string) => {
                 setSelect((prev) => ({ ...prev, open: false }));
-
-                const [start, end] = duration.split("|").map(Number);
-                if ((end - start) / 1000 > 3600) {
-                    sendUserAlert(
-                        t("views.history.toasts.duration_excceed"),
-                        true
-                    );
-                    return;
-                }
-
+                const [start, end] = value.split("|").map(Number);
                 setQueryDuration({ start, end });
                 sendUserAlert(t("views.history.toasts.event_select_success"));
             };
@@ -413,6 +404,11 @@ const History = (props: RouterComponentProps) => {
 
     const handleGetShareLink = async () => {
         const { start, end } = queryDuration;
+        if (!start || !end || start >= end) {
+            sendUserAlert(t("views.history.toasts.duration_error"), true);
+            return;
+        }
+
         const newSearchParams = new URLSearchParams();
         newSearchParams.set("start", String(start));
         newSearchParams.set("end", String(end));

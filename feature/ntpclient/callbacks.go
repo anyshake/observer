@@ -2,6 +2,7 @@ package ntpclient
 
 import (
 	"github.com/anyshake/observer/feature"
+	"github.com/anyshake/observer/utils/duration"
 	"github.com/anyshake/observer/utils/logger"
 	"github.com/anyshake/observer/utils/text"
 	"github.com/fatih/color"
@@ -17,7 +18,7 @@ func (n *NTPClient) OnStop(options *feature.FeatureOptions, v ...any) {
 
 func (n *NTPClient) OnReady(options *feature.FeatureOptions, v ...any) {
 	options.Status.System.Offset = v[0].(float64)
-	options.Status.IsReady = true
+	options.Status.ReadyTime, _ = duration.Timestamp(options.Status.System.Offset)
 	logger.Print(MODULE, "time alignment succeed", color.FgGreen, false)
 }
 

@@ -21,10 +21,10 @@ type System struct {
 }
 
 type Status struct {
-	IsReady  bool      // If false, stuck to wait for time syncing
-	Buffer   *Geophone // Buffer area, should not be externally accessed
-	System   *System
-	Geophone Geophone
+	ReadyTime time.Time // If is zero, app will stuck to wait for time syncing
+	Buffer    *Geophone // Buffer area, should not be externally accessed
+	System    *System
+	Geophone  Geophone
 }
 
 type ChannelSegmentBuffer struct {

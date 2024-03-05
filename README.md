@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/anyshake/logotype/master/banner_observer.png" width="500"/>
+  <img src="https://raw.githubusercontent.com/anyshake/logotype/master/banner_observer.png" width="500" alt="banner" />
 </p>
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green)](https://github.com/anyshake/observer/blob/master/LICENSE)
@@ -23,23 +23,23 @@ Please visit [anyshake.org/docs/introduction](https://anyshake.org/docs/introduc
 
 ## Features
 
- - User-friendly web-based interface
- - Mobile / Tablet friendly interface
- - Query seismic waveform by time range
- - Query seismic waveform by known event
- - Link to share the seismic waveform
- - Real-time seismic waveform display
- - Swagger generated API documentation
- - Support multiple database engines
- - Support multiple languages, detected by browser
- - Multiple seismic intensity standards, default to JMA
- - Cross-platform, runs on Linux, Windows, macOS
- - Ability to stream seismic data via SeedLink protocol
- - Ability to export data to SAC or MiniSEED format
- - AnyShake Explorer data checksum verification
- - Auto reset AnyShake Explorer on error
- - Flexible channel packet read length
- - Variable serial port baud rate
+- User-friendly web-based interface
+- Mobile / Tablet friendly interface
+- Query seismic waveform by time range
+- Query seismic waveform by known event
+- Link to share the seismic waveform
+- Real-time seismic waveform display
+- Swagger generated API documentation
+- Support multiple database engines
+- Support multiple languages, detected by browser
+- Multiple seismic intensity standards, default to JMA
+- Cross-platform, runs on Linux, Windows, macOS
+- Ability to stream seismic data via SeedLink protocol
+- Ability to export data to SAC or MiniSEED format
+- AnyShake Explorer data checksum verification
+- Auto reset AnyShake Explorer on error
+- Flexible channel packet read length
+- Variable serial port baud rate
 
 ## Preview
 
@@ -57,57 +57,64 @@ Thanks to the following tools and libraries, AnyShake Observer is made possible!
 
 ### Backend
 
- - [github.com/PuerkitoBio/goquery](https://github.com/PuerkitoBio/goquery)
- - [github.com/bclswl0827/go-serial](https://github.com/bclswl0827/go-serial)
- - [github.com/bclswl0827/sacio](https://github.com/bclswl0827/sacio)
- - [github.com/beevik/ntp](https://github.com/beevik/ntp)
- - [github.com/common-nighthawk/go-figure](https://github.com/common-nighthawk/go-figure)
- - [github.com/gin-contrib/gzip](https://github.com/gin-contrib/gzip)
- - [github.com/gin-gonic/gin](https://github.com/gin-gonic/gin)
- - [github.com/gorilla/websocket](https://github.com/gorilla/websocket)
- - [github.com/juju/ratelimit](https://github.com/juju/ratelimit)
- - [github.com/mackerelio/go-osstat](https://github.com/mackerelio/go-osstat)
- - [github.com/sbabiv/xml2map](https://github.com/sbabiv/xml2map)
- - [github.com/shirou/gopsutil](https://github.com/shirou/gopsutil)
- - [github.com/swaggo/files](https://github.com/swaggo/files)
- - [github.com/swaggo/swag](https://github.com/swaggo/swag)
- - [github.com/wille/osutil](https://github.com/wille/osutil)
- - [gorm.io/driver/mysql](https://github.com/go-gorm/mysql)
- - [gorm.io/driver/postgres](https://github.com/go-gorm/postgres)
- - [gorm.io/driver/sqlite](https://github.com/go-gorm/sqlite)
- - [gorm.io/driver/sqlserver](https://github.com/go-gorm/sqlserver)
- - [gorm.io/gorm](https://gorm.io/)
- - [github.com/bclswl0827/mseedio](https://github.com/bclswl0827/mseedio)
- - [github.com/fatih/color](https://github.com/fatih/color)
- - [github.com/json-iterator/go](https://github.com/json-iterator/go)
- - [github.com/swaggo/gin-swagger](https://github.com/swaggo/gin-swagger)
+- [github.com/PuerkitoBio/goquery](https://github.com/PuerkitoBio/goquery)
+- [github.com/bclswl0827/go-serial](https://github.com/bclswl0827/go-serial)
+- [github.com/bclswl0827/sacio](https://github.com/bclswl0827/sacio)
+- [github.com/beevik/ntp](https://github.com/beevik/ntp)
+- [github.com/common-nighthawk/go-figure](https://github.com/common-nighthawk/go-figure)
+- [github.com/gin-contrib/gzip](https://github.com/gin-contrib/gzip)
+- [github.com/gin-gonic/gin](https://github.com/gin-gonic/gin)
+- [github.com/gorilla/websocket](https://github.com/gorilla/websocket)
+- [github.com/juju/ratelimit](https://github.com/juju/ratelimit)
+- [github.com/mackerelio/go-osstat](https://github.com/mackerelio/go-osstat)
+- [github.com/sbabiv/xml2map](https://github.com/sbabiv/xml2map)
+- [github.com/shirou/gopsutil](https://github.com/shirou/gopsutil)
+- [github.com/swaggo/files](https://github.com/swaggo/files)
+- [github.com/swaggo/swag](https://github.com/swaggo/swag)
+- [github.com/wille/osutil](https://github.com/wille/osutil)
+- [gorm.io/driver/mysql](https://github.com/go-gorm/mysql)
+- [gorm.io/driver/postgres](https://github.com/go-gorm/postgres)
+- [gorm.io/driver/sqlite](https://github.com/go-gorm/sqlite)
+- [gorm.io/driver/sqlserver](https://github.com/go-gorm/sqlserver)
+- [gorm.io/gorm](https://gorm.io/)
+- [github.com/bclswl0827/mseedio](https://github.com/bclswl0827/mseedio)
+- [github.com/fatih/color](https://github.com/fatih/color)
+- [github.com/json-iterator/go](https://github.com/json-iterator/go)
+- [github.com/swaggo/gin-swagger](https://github.com/swaggo/gin-swagger)
 
 ### Frontend
 
- - [axios](https://axios-http.com/)
- - [date-fns](https://date-fns.org/)
- - [highcharts](https://www.highcharts.com/)
- - [i18next](https://www.i18next.com/)
- - [i18next-browser-languagedetector](https://github.com/i18next/i18next-browser-languageDetector)
- - [i18next-http-backend](https://github.com/i18next/i18next-http-backend)
- - [js-file-download](https://github.com/kennethjiang/js-file-download)
- - [leaflet](https://leafletjs.com/)
- - [mui](https://mui.com/)
- - [react](https://reactjs.org/)
- - [react-dom](https://reactjs.org/)
- - [react-hot-toast](https://react-hot-toast.com/)
- - [react-i18next](https://react.i18next.com/)
- - [react-leaflet](https://react-leaflet.js.org/)
- - [react-polling](https://github.com/vivek12345/react-polling)
- - [react-redux](https://react-redux.js.org/)
- - [react-router-dom](https://reactrouter.com/)
- - [react-scripts](https://github.com/facebook/create-react-app/tree/main/packages/react-scripts)
- - [redux](https://react-redux.js.org/)
- - [redux-persist](https://github.com/rt2zz/redux-persist)
- - [seisplotjs](https://github.com/crotwell/seisplotjs)
- - [tailwindcss](https://tailwindcss.com/)
- - [typescript](https://www.typescriptlang.org/)
+- [emotion](https://github.com/emotion-js/emotion)
+- [mui](https://mui.com/)
+- [reduxjs/toolkit](https://redux-toolkit.js.org/)
+- [axios](https://axios-http.com/)
+- [date-fns](https://date-fns.org/)
+- [file-saver](https://github.com/eligrey/FileSaver.js)
+- [highcharts](https://www.highcharts.com/)
+- [highcharts-react-official](https://github.com/highcharts/highcharts-react)
+- [i18next](https://www.i18next.com/)
+- [i18next-browser-languagedetector](https://github.com/i18next/i18next-browser-languageDetector)
+- [leaflet](https://leafletjs.com/)
+- [oregondsp](https://github.com/crotwell/OregonDSP-kotlin)
+- [react](https://reactjs.org/)
+- [react-dom](https://reactjs.org/)
+- [react-hot-toast](https://react-hot-toast.com/)
+- [react-i18next](https://react.i18next.com/)
+- [react-leaflet](https://react-leaflet.js.org/)
+- [react-polling](https://github.com/vivek12345/react-polling)
+- [react-redux](https://react-redux.js.org/)
+- [react-router-dom](https://reactrouter.com/)
+- [react-scripts](https://github.com/facebook/create-react-app/tree/main/packages/react-scripts)
+- [react-syntax-highlighter](https://github.com/react-syntax-highlighter/react-syntax-highlighter)
+- [redux](https://react-redux.js.org/)
+- [redux-persist](https://github.com/rt2zz/redux-persist)
+- [cross-env](https://github.com/kentcdodds/cross-env)
+- [tailwindcss](https://tailwindcss.com/)
+- [tailwindcss-animated](https://tailwindcss-animated.com/)
+- [typescript](https://www.typescriptlang.org/)
 
 ## License
 
 [The MIT License (MIT)](https://raw.githubusercontent.com/anyshake/observer/master/LICENSE)
+
+![Star History Chart](https://api.star-history.com/svg?repos=anyshake/observer&type=Date)

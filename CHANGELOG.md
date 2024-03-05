@@ -2,6 +2,13 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.10.0
+
+ - Update frontend dependencies credits in README
+ - Fixed the validation error of the datetime picker in the frontend
+ - New API endpoint `/api/v1/inventory` to get SeisComP3 XML inventory data
+ - Removed unused configuration fields, change geophone sensitivity unit to `V/m/s`
+
 ## v2.9.0
 
  - Frontend refactoring: use functional components and hooks

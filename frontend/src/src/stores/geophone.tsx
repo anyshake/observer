@@ -1,16 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 export interface Geophone {
-    readonly ehz: number;
-    readonly ehe: number;
-    readonly ehn: number;
+    readonly frequency: number;
+    readonly sensitivity: number;
     readonly initialized: boolean;
 }
 
 const initialGeophone: Geophone = {
-    ehz: 0.288,
-    ehe: 0.288,
-    ehn: 0.288,
+    frequency: 4.5,
+    sensitivity: 28.8,
     initialized: false,
 };
 
