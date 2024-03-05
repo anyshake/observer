@@ -2,6 +2,13 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.9.0
+
+ - Frontend refactoring: use functional components and hooks
+ - Support Butterworth bandpass filter in frontend waveform data processing
+ - API /api/v1/mseed: use unix timestamp as file modification time response
+ - Check for remote server error before parsing earthquake event data from SCEA API
+
 ## v2.8.1
 
  - Show disk usage of current working directory

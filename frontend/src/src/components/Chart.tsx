@@ -1,38 +1,58 @@
-import { Component, createRef } from "react";
-import * as Highcharts from "highcharts";
+import { ForwardedRef, forwardRef, useEffect, useState } from "react";
+import HighCharts from "highcharts/highcharts";
 import {
     HighchartsReact,
     HighchartsReactRefObject,
 } from "highcharts-react-official";
 import HighchartsBoost from "highcharts/modules/boost";
-import { Options } from "highcharts";
-import { WithTranslation, withTranslation } from "react-i18next";
-HighchartsBoost(Highcharts);
+import { Options, SeriesOptionsType } from "highcharts";
+import { useTranslation } from "react-i18next";
+
+const hasWebGLSupport = () => {
+    if (window.WebGLRenderingContext) {
+        const canvas = document.createElement("canvas");
+        const names = [
+            "webgl",
+            "experimental-webgl",
+            "webgl2",
+            "moz-webgl",
+            "webkit-3d",
+        ];
+        return names.some((name) => {
+            try {
+                return !!canvas.getContext(name);
+            } catch (e) {
+                return false;
+            }
+        });
+    }
+
+    return false;
+};
 
 export interface ChartProps {
-    readonly sort?: boolean;
+    readonly boost?: boolean;
+    readonly title?: string;
     readonly height?: number;
     readonly legend?: boolean;
-    readonly zooming?: boolean;
     readonly tooltip?: boolean;
+    readonly zooming?: boolean;
     readonly lineWidth?: number;
     readonly lineColor?: string;
     readonly animation?: boolean;
     readonly tickInterval?: number;
     readonly tickPrecision?: number;
     readonly backgroundColor?: string;
-    // See https://github.com/highcharts/highcharts/issues/12242
-    readonly series: Record<string, any>;
-    readonly [key: string]: any;
+    readonly series: SeriesOptionsType;
 }
 
-export interface ChartState extends Options {}
-
-class Chart extends Component<ChartProps & WithTranslation, ChartState> {
-    chartRef: React.RefObject<HighchartsReactRefObject> = createRef();
-    constructor(props: ChartProps & WithTranslation) {
-        super(props);
+export const Chart = forwardRef(
+    (props: ChartProps, ref: ForwardedRef<HighchartsReactRefObject>) => {
+        const pixelRatio = window.devicePixelRatio * 0.65;
         const {
+            boost,
+            title,
+            series,
             height,
             legend,
             tooltip,
@@ -43,29 +63,21 @@ class Chart extends Component<ChartProps & WithTranslation, ChartState> {
             tickPrecision,
             lineColor,
             backgroundColor,
-        } = this.props;
-        this.state = {
-            accessibility: { enabled: false },
-            boost: {
-                enabled: true,
-                seriesThreshold: 3,
-            },
+        } = props;
+
+        const [supportWebGL, setSupportWebGL] = useState(false);
+
+        useEffect(() => {
+            setSupportWebGL(hasWebGLSupport());
+        }, []);
+
+        const [chartOptions, setChartOptions] = useState<Options>({
             chart: {
                 zooming: zooming ? { type: "x" } : {},
                 marginTop: 20,
-                height: height,
-                animation: animation,
-                backgroundColor: backgroundColor,
-            },
-            legend: {
-                enabled: legend,
-                itemStyle: { color: "#fff" },
-            },
-            plotOptions: {
-                series: {
-                    lineWidth: lineWidth,
-                    states: { hover: { enabled: false } },
-                },
+                height,
+                animation,
+                backgroundColor,
             },
             xAxis: {
                 labels: {
@@ -74,7 +86,7 @@ class Chart extends Component<ChartProps & WithTranslation, ChartState> {
                 },
                 type: "datetime",
                 tickColor: "#fff",
-                lineColor: lineColor,
+                lineColor,
             },
             yAxis: {
                 labels: {
@@ -85,8 +97,8 @@ class Chart extends Component<ChartProps & WithTranslation, ChartState> {
                 },
                 title: { text: "" },
                 opposite: true,
-                lineColor: lineColor,
-                tickInterval: tickInterval,
+                lineColor,
+                tickInterval,
             },
             tooltip: {
                 enabled: tooltip,
@@ -95,61 +107,60 @@ class Chart extends Component<ChartProps & WithTranslation, ChartState> {
                 xDateFormat: "%Y-%m-%d %H:%M:%S",
                 padding: 12,
             },
+            legend: { enabled: legend, itemStyle: { color: "#fff" } },
+            plotOptions: {
+                series: {
+                    lineWidth,
+                    turboThreshold: boost ? 10 : 0,
+                    boostThreshold: boost ? 1 : 0,
+                    states: { hover: { enabled: false } },
+                },
+            },
+            title: {
+                text: title,
+                style: {
+                    color: "#fff",
+                    fontSize: "10px",
+                    fontWeight: "normal",
+                },
+            },
+            boost: { enabled: supportWebGL, pixelRatio },
+            accessibility: { enabled: false },
             credits: { enabled: false },
             time: { useUTC: false },
-            title: { text: "" },
-        };
-    }
-
-    componentDidUpdate(): void {
-        const { t, series, sort, height } = this.props;
-        Highcharts.setOptions({
-            lang: {
-                resetZoom: t("components.chart.reset_zoom"),
-                resetZoomTitle: t("components.chart.reset_zoom_title"),
-            },
+            series: [series],
         });
-        const { current } = this.chartRef;
-        if (current) {
-            const chart = current.chart;
-            if (chart) {
-                if (height !== chart.chartHeight) {
-                    chart.update({ chart: { height } });
-                }
-                if (sort) {
-                    if (series.data) {
-                        series.data.sort((a: any, b: any) => {
-                            return a[0] - b[0];
-                        });
-                    } else if (series.length) {
-                        for (let i of series as any[]) {
-                            i.data.sort((a: any, b: any) => {
-                                return a[0] - b[0];
-                            });
-                        }
-                    }
-                }
-                if (chart.series.length) {
-                    for (let i of chart.series) {
-                        i.setData(series.data);
-                    }
-                } else {
-                    chart.addSeries(series as any);
-                }
-            }
-        }
-    }
 
-    render() {
-        const { state: options, chartRef } = this;
+        const { t } = useTranslation();
+
+        useEffect(() => {
+            HighchartsBoost(HighCharts);
+        }, []);
+
+        useEffect(() => {
+            HighCharts.setOptions({
+                lang: {
+                    resetZoom: t("components.chart.reset_zoom"),
+                    resetZoomTitle: t("components.chart.reset_zoom_title"),
+                },
+            });
+        }, [t]);
+
+        useEffect(() => {
+            setChartOptions((prev) => ({
+                ...prev,
+                chart: { ...prev.chart, height },
+                title: { ...prev.title, text: title },
+                boost: { ...prev.boost, enabled: supportWebGL },
+            }));
+        }, [height, title, supportWebGL]);
+
         return (
             <HighchartsReact
-                ref={chartRef}
-                options={options}
-                highcharts={Highcharts}
+                ref={ref}
+                options={chartOptions}
+                highcharts={HighCharts}
             />
         );
     }
-}
-
-export default withTranslation()(Chart);
+);

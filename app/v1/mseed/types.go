@@ -9,7 +9,7 @@ type Binding struct {
 
 type MiniSEEDFile struct {
 	TTL  int    `json:"ttl"`
-	Time string `json:"time"`
+	Time int64  `json:"time"`
 	Size string `json:"size"`
 	Name string `json:"name"`
 }

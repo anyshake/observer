@@ -18,7 +18,7 @@ func (s *SeedLink) handleBuffer(gp *publisher.Geophone, buffer *seedlink.SeedLin
 
 	// Write buffer to file every 10 minutes
 	if time.Now().UTC().Minute()%10 == 0 {
-		file, err := os.OpenFile(buffer.File, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+		file, err := os.OpenFile(buffer.File, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 		if err != nil {
 			return err
 		}

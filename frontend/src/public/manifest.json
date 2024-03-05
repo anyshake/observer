@@ -1,6 +1,6 @@
 {
-  "short_name": "G-Observer",
-  "name": "G-Observer 测站面板",
+  "short_name": "AnyShake Observer",
+  "name": "AnyShake: An open-source & low-cost solution to 3-component seismograph.",
   "icons": [
     {
       "src": "favicon.ico",

@@ -1,38 +1,29 @@
-import createI18n from "../helpers/i18n/createI18n";
+import { createI18n } from "../helpers/i18n/createI18n";
+import enUS from "../locales/en-US.json";
+import zhTW from "../locales/zh-TW.json";
+import zhCN from "../locales/zh-CN.json";
+import { ResourceLanguage } from "i18next";
 
-const I18N_CONFIG: I18nConfig = {
-    fallback: "zh-CN",
+interface I18nConfig {
+    key: string;
+    fallback: string;
+    resources: Record<string, { label: string; translation: ResourceLanguage }>;
+}
+
+export const i18nConfig: I18nConfig = {
     key: "i18n",
-    list: [
-        { name: "简体中文", value: "zh-CN" },
-        { name: "正體中文", value: "zh-TW" },
-        { name: "English", value: "en-US" },
-        { name: "한국어", value: "ko-KR" },
-        { name: "日本語", value: "ja-JP" },
-    ],
-    uri: "/i18n/{{lng}}.json",
+    fallback: "en-US",
+    resources: {
+        "en-US": { label: "US English", translation: enUS },
+        "zh-TW": { label: "正體中文", translation: zhTW },
+        "zh-CN": { label: "简体中文", translation: zhCN },
+    },
 };
 
-export interface I18nTranslation {
-    readonly id: string;
-    readonly format?: { [key: string]: string };
-}
-
-export interface I18nConfigItem {
-    readonly name: string;
-    readonly value: string;
-}
-
-export interface I18nConfig {
-    readonly key: string;
-    readonly uri: string;
-    readonly fallback: string;
-    readonly list: I18nConfigItem[];
-}
-
-export default I18N_CONFIG;
-export const i18n = createI18n(
-    I18N_CONFIG.uri,
-    I18N_CONFIG.fallback,
-    I18N_CONFIG.key
+const i18n = createI18n(
+    i18nConfig.fallback,
+    i18nConfig.key,
+    i18nConfig.resources
 );
+
+export default i18n;

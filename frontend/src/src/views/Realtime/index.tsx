@@ -1,316 +1,274 @@
-import { Component } from "react";
-import Header from "../../components/Header";
-import Sidebar from "../../components/Sidebar";
-import Content from "../../components/Content";
-import Navbar from "../../components/Navbar";
-import View from "../../components/View";
-import Scroller from "../../components/Scroller";
-import Banner, { BannerProps } from "../../components/Banner";
-import Footer from "../../components/Footer";
-import Area, { AreaProps, CollapseMode } from "../../components/Area";
-import Container from "../../components/Container";
-import Chart, { ChartProps } from "../../components/Chart";
-import restfulApiByTag from "../../helpers/request/restfulApiByTag";
-import setADC from "./setADC";
-import setGeophone from "./setGeophone";
-import websocketByTag from "../../helpers/request/websocketByTag";
-import toast, { Toaster } from "react-hot-toast";
-import setBanner from "./setBanner";
-import setAreas from "./setAreas";
-import { Geophone } from "../../config/geophone";
-import { ADC } from "../../config/adc";
-import { IntensityStandardProperty } from "../../helpers/seismic/intensityStandard";
-import GLOBAL_CONFIG, { fallbackScale } from "../../config/global";
-import { ReduxStoreProps } from "../../config/store";
-import { connect } from "react-redux";
-import { update as updateADC } from "../../store/adc";
-import { update as updateGeophone } from "../../store/geophone";
-import { update as updateStation } from "../../store/station";
-import mapStateToProps from "../../helpers/utils/mapStateToProps";
-import { WithTranslation, withTranslation } from "react-i18next";
-import setStation from "./setStation";
-// import * as seismograph from "seisplotjs/src/seismograph";
-// import * as seismographconfig from "seisplotjs/src/seismographconfig";
+import { Container } from "../../components/Container";
+import { CollapseMode, Holder, HolderProps } from "../../components/Holder";
+import { Banner, BannerProps } from "../../components/Banner";
+import { RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { Chart, ChartProps } from "../../components/Chart";
+import { HighchartsReactRefObject } from "highcharts-react-official";
+import { useTranslation } from "react-i18next";
+import { apiConfig } from "../../config/api";
+import { SocketUpdates, getSocketUpdates } from "./getSocketUpdates";
+import { sendUserAlert } from "../../helpers/interact/sendUserAlert";
+import { handleSetBanner } from "./handleSetBanner";
+import { handleSetCharts } from "./handleSetCharts";
+import { Button } from "../../components/Button";
+import { useSocket } from "../../helpers/hook/useSocket";
+import { Panel } from "../../components/Panel";
+import { Input } from "../../components/Input";
+import { userThrottle } from "../../helpers/utils/userThrottle";
 
-export interface RealtimeArea {
-    readonly tag: string;
-    readonly area: AreaProps;
-    readonly chart: ChartProps;
-}
+const Realtime = () => {
+    const { t } = useTranslation();
 
-interface RealtimeState {
-    readonly adc: ADC;
-    readonly banner: BannerProps;
-    readonly areas: RealtimeArea[];
-    readonly geophone: Geophone;
-    readonly scale: IntensityStandardProperty;
-}
-
-class Realtime extends Component<
-    ReduxStoreProps & WithTranslation,
-    RealtimeState
-> {
-    prevTs: number;
-    websocket: WebSocket | null | {};
-    constructor(props: ReduxStoreProps & WithTranslation) {
-        super(props);
-        this.state = {
-            banner: {
-                type: "warning",
-                label: { id: "views.realtime.banner.warning.label" },
-                text: { id: "views.realtime.banner.warning.text" },
+    const [banner, setBanner] = useState<
+        BannerProps & { values?: Record<string, string> }
+    >({
+        type: "warning",
+        title: "views.realtime.banner.warning.label",
+        content: "views.realtime.banner.warning.text",
+    });
+    const [charts, setCharts] = useState<
+        Record<
+            string,
+            {
+                chart: ChartProps & {
+                    buffer: { ts: number; data: number[] }[];
+                    ref: RefObject<HighchartsReactRefObject>;
+                    filter: {
+                        enabled: boolean;
+                        lowCorner?: number;
+                        highCorner?: number;
+                    };
+                };
+                holder: HolderProps & { values: Record<string, string> };
+            }
+        >
+    >({
+        ehz: {
+            holder: {
+                collapse: CollapseMode.COLLAPSE_HIDE,
+                label: "views.realtime.charts.ehz.label",
+                text: "views.realtime.charts.ehz.text",
+                values: { pga: "0.00000", pgv: "0.00000", intensity: "-" },
             },
-            areas: [
-                {
-                    tag: "ehz",
-                    area: {
-                        collapse: CollapseMode.COLLAPSE_HIDE,
-                        label: { id: "views.realtime.areas.ehz.label" },
-                        text: {
-                            id: "views.realtime.areas.ehz.text",
-                            format: {
-                                pga: "0.00000",
-                                pgv: "0.00000",
-                                intensity: "-",
-                            },
-                        },
-                    },
-                    chart: {
-                        backgroundColor: "#d97706",
-                        lineWidth: 1,
-                        series: {
-                            name: "EHZ",
-                            type: "line",
-                            color: "#f1f5f9",
-                            data: [],
-                        },
-                    },
-                },
-                {
-                    tag: "ehe",
-                    area: {
-                        collapse: CollapseMode.COLLAPSE_HIDE,
-                        label: { id: "views.realtime.areas.ehe.label" },
-                        text: {
-                            id: "views.realtime.areas.ehe.text",
-                            format: {
-                                pga: "0.00000",
-                                pgv: "0.00000",
-                                intensity: "-",
-                            },
-                        },
-                    },
-                    chart: {
-                        backgroundColor: "#10b981",
-                        lineWidth: 1,
-                        series: {
-                            name: "EHE",
-                            type: "line",
-                            color: "#f1f5f9",
-                            data: [],
-                        },
-                    },
-                },
-                {
-                    tag: "ehn",
-                    area: {
-                        collapse: CollapseMode.COLLAPSE_HIDE,
-                        label: { id: "views.realtime.areas.ehn.label" },
-                        text: {
-                            id: "views.realtime.areas.ehn.text",
-                            format: {
-                                pga: "0.00000",
-                                pgv: "0.00000",
-                                intensity: "-",
-                            },
-                        },
-                    },
-                    chart: {
-                        backgroundColor: "#0ea5e9",
-                        lineWidth: 1,
-                        series: {
-                            name: "EHN",
-                            type: "line",
-                            color: "#f1f5f9",
-                            data: [],
-                        },
-                    },
-                },
-            ],
-            adc: { fullscale: 1, resolution: 1 },
-            geophone: { ehz: 1, ehe: 1, ehn: 1 },
-            scale: fallbackScale.property(),
-        };
-        // Some initializations
-        this.websocket = null;
-        this.prevTs = 0;
-    }
+            chart: {
+                buffer: [],
+                backgroundColor: "#d97706",
+                filter: { enabled: false },
+                ref: useRef<HighchartsReactRefObject>(null),
+                series: { name: "EHZ", type: "line", color: "#f1f5f9" },
+            },
+        },
+        ehe: {
+            holder: {
+                collapse: CollapseMode.COLLAPSE_HIDE,
+                label: "views.realtime.charts.ehe.label",
+                text: "views.realtime.charts.ehe.text",
+                values: { pga: "0.00000", pgv: "0.00000", intensity: "-" },
+            },
+            chart: {
+                buffer: [],
+                filter: { enabled: false },
+                backgroundColor: "#10b981",
+                ref: useRef<HighchartsReactRefObject>(null),
+                series: { name: "EHE", type: "line", color: "#f1f5f9" },
+            },
+        },
+        ehn: {
+            holder: {
+                collapse: CollapseMode.COLLAPSE_HIDE,
+                label: "views.realtime.charts.ehn.label",
+                text: "views.realtime.charts.ehn.text",
+                values: { pga: "0.00000", pgv: "0.00000", intensity: "-" },
+            },
+            chart: {
+                buffer: [],
+                backgroundColor: "#0ea5e9",
+                filter: { enabled: false },
+                ref: useRef<HighchartsReactRefObject>(null),
+                series: { name: "EHE", type: "line", color: "#f1f5f9" },
+            },
+        },
+    });
 
-    // WebSocket OnOpen handler
-    handleWebsocketOpen = (): void => {
-        // Display success message after connection established
-        setTimeout(() => {
-            const { t } = this.props;
-            toast.success(t("views.realtime.toasts.websocket_connected"));
-        }, 500);
-    };
+    const handleSocketOpen = () =>
+        sendUserAlert(t("views.realtime.toasts.websocket_connected"));
 
-    // WebSocket OnClose handler
-    handleWebsocketClose = (): void => {
-        // Reconnect to server if websocket closed
-        // Unless leaving the component, the ref will be {}
-        // So we can use instanceof to check if still in component
-        if (this.websocket && this.websocket instanceof WebSocket) {
-            // setBanner returns error when no arguments passed
-            const banner = setBanner();
-            this.setState({ banner });
-            // Reconnect to server
-            this.websocket = websocketByTag({
-                tag: "socket",
-                onData: this.handleWebsocketData,
-                onOpen: this.handleWebsocketOpen,
-                onClose: this.handleWebsocketClose,
-            }) as WebSocket;
-        }
-    };
-
-    // WebSocket OnData handler
-    handleWebsocketData = (event: MessageEvent): void => {
-        const jsonData = JSON.parse(event.data);
-        const { adc, geophone, scale } = this.state;
-        const banner = setBanner(jsonData, this.prevTs, scale);
-        // Get waveform retention time from global config
-        const { retention } = this.props.retention;
-        const areas = setAreas(
-            this.state.areas,
-            jsonData,
-            this.prevTs,
-            retention,
-            adc,
-            geophone,
-            scale
+    const handleSocketData = ({ data }: MessageEvent<SocketUpdates>) =>
+        getSocketUpdates(
+            data,
+            (data) => handleSetBanner(data, setBanner),
+            (data) => handleSetCharts(data, setCharts)
         );
 
-        this.prevTs = jsonData.ts;
-        this.setState({ banner, areas });
-    };
+    const handleSocketError = () =>
+        setBanner({
+            type: "error",
+            title: "views.realtime.banner.error.label",
+            content: "views.realtime.banner.error.text",
+        });
 
-    // Set height of each chart by window height
-    setChartHeight = (): void => {
-        const { areas } = this.state;
-        const innerHeight = window.innerHeight;
-        let height = Math.round((innerHeight * 0.6) / areas.length);
+    useSocket({
+        backend: apiConfig.backend,
+        endpoint: apiConfig.endpoints.socket,
+        onData: handleSocketData,
+        onError: handleSocketError,
+        onClose: handleSocketError,
+        onOpen: handleSocketOpen,
+    });
+
+    const [chartHeight, setChartHeight] = useState<number>(150);
+
+    const setChartHeightToState = useCallback(() => {
+        let height = Math.round(
+            (window.innerHeight * 0.6) / Object.keys(charts).length
+        );
         if (height < 150) {
             height = 150;
+        } else if (height > 500) {
+            height = 500;
         }
-        this.setState({
-            areas: areas.map((item) => ({
-                ...item,
-                chart: { ...item.chart, height },
-            })),
-        });
-    };
+        setChartHeight(height);
+    }, [charts]);
 
-    async componentDidMount(): Promise<void> {
-        // Listen to window resize event
-        window.addEventListener("resize", this.setChartHeight);
-        this.setChartHeight();
+    const handleWindowResize = userThrottle(
+        () => setChartHeightToState(),
+        2000
+    );
 
-        // Get ADC, Geophone, Station, scale standard from Redux
-        let { adc } = this.props.adc;
-        const { resolution } = adc;
-        let { geophone } = this.props.geophone;
-        const { ehz, ehe, ehn } = geophone;
-        const { scale: scaleValue } = this.props.scale;
-        let { station } = this.props.station;
+    useEffect(() => {
+        setChartHeightToState();
+        window.addEventListener("resize", handleWindowResize);
+        return () => window.removeEventListener("resize", handleWindowResize);
+    }, [setChartHeightToState, handleWindowResize]);
 
-        // Query again from server if value is not set
-        if (resolution === -1 || ehz * ehe * ehn === 0) {
-            const res = await restfulApiByTag({
-                tag: "station",
-            });
-            if (res.data) {
-                // Get new formatted state
-                geophone = setGeophone(res);
-                station = setStation(res);
-                adc = setADC(res);
-                // Apply to Redux store
-                const { updateADC, updateGeophone, updateStation } = this.props;
-                updateGeophone && updateGeophone(geophone);
-                updateStation && updateStation(station);
-                updateADC && updateADC(adc);
-            } else {
-                // Show error and return if failed
-                const { t } = this.props;
-                toast.error(t("views.realtime.toasts.fetch_metadata_error"));
-                return;
-            }
-        }
+    const handleSetCornerFreq = (
+        chartKey: string,
+        lowCorner: boolean,
+        value: number
+    ) =>
+        setCharts((charts) => ({
+            ...charts,
+            [chartKey]: {
+                ...charts[chartKey],
+                chart: {
+                    ...charts[chartKey].chart,
+                    filter: {
+                        ...charts[chartKey].chart.filter,
+                        [lowCorner ? "lowCorner" : "highCorner"]: value,
+                    },
+                },
+            },
+        }));
 
-        // Get scale standard by value
-        const { scales } = GLOBAL_CONFIG.app_settings;
-        const scale =
-            scales
-                .find((item) => item.property().value === scaleValue)
-                ?.property() || fallbackScale.property();
-        // Apply to component state
-        this.setState({ adc, geophone, scale });
-        // Establish websocket connection
-        this.websocket = websocketByTag({
-            tag: "socket",
-            onData: this.handleWebsocketData,
-            onOpen: this.handleWebsocketOpen,
-            onClose: this.handleWebsocketClose,
-        }) as WebSocket;
-    }
+    const handleSwitchFilter = (chartKey: string) =>
+        setCharts((charts) => ({
+            ...charts,
+            [chartKey]: {
+                ...charts[chartKey],
+                chart: {
+                    ...charts[chartKey].chart,
+                    filter: {
+                        ...charts[chartKey].chart.filter,
+                        enabled: !charts[chartKey].chart.filter.enabled,
+                    },
+                },
+            },
+        }));
 
-    componentWillUnmount(): void {
-        // Remove event listener
-        window.removeEventListener("resize", this.setChartHeight);
+    return (
+        <>
+            <Banner
+                type={banner.type}
+                title={t(banner.title, { ...banner.values })}
+                content={t(banner.content, { ...banner.values })}
+            />
 
-        // Close websocket connection when leaving
-        if (this.websocket instanceof WebSocket) {
-            this.websocket?.close();
-            this.websocket = {};
-        }
-    }
+            <Container className="pt-1">
+                {Object.keys(charts).map((key) => (
+                    <Holder
+                        {...charts[key].holder}
+                        key={charts[key].holder.label}
+                        label={t(charts[key].holder.label)}
+                        text={t(charts[key].holder.text ?? "", {
+                            ...charts[key].holder.values,
+                        })}
+                        advanced={
+                            <Container className="max-w-96">
+                                <Panel
+                                    label={t(
+                                        `views.realtime.charts.${key}.advanced.panels.butterworth_filter.title`
+                                    )}
+                                    embedded={true}
+                                >
+                                    <Container className="flex flex-col md:flex-row gap-4">
+                                        <Input
+                                            onValueChange={(value) =>
+                                                handleSetCornerFreq(
+                                                    key,
+                                                    true,
+                                                    Number(value)
+                                                )
+                                            }
+                                            defaultValue={0.1}
+                                            type="number"
+                                            disabled={
+                                                charts[key].chart.filter.enabled
+                                            }
+                                            numberLimit={{ max: 100, min: 0.1 }}
+                                            label={t(
+                                                `views.realtime.charts.${key}.advanced.panels.butterworth_filter.low_corner_freq`
+                                            )}
+                                        />
+                                        <Input
+                                            onValueChange={(value) =>
+                                                handleSetCornerFreq(
+                                                    key,
+                                                    false,
+                                                    Number(value)
+                                                )
+                                            }
+                                            defaultValue={10}
+                                            type="number"
+                                            disabled={
+                                                charts[key].chart.filter.enabled
+                                            }
+                                            numberLimit={{ max: 100, min: 0.1 }}
+                                            label={t(
+                                                `views.realtime.charts.${key}.advanced.panels.butterworth_filter.high_corner_freq`
+                                            )}
+                                        />
+                                    </Container>
+                                    <Button
+                                        label={t(
+                                            `views.realtime.charts.${key}.advanced.panels.butterworth_filter.${
+                                                charts[key].chart.filter.enabled
+                                                    ? "disable_filter"
+                                                    : "enable_filter"
+                                            }`
+                                        )}
+                                        className="bg-indigo-600 hover:bg-indigo-700"
+                                        onClick={() => handleSwitchFilter(key)}
+                                    />
+                                </Panel>
+                            </Container>
+                        }
+                    >
+                        <Chart
+                            {...charts[key].chart}
+                            boost={true}
+                            lineWidth={1}
+                            tooltip={true}
+                            zooming={true}
+                            animation={false}
+                            tickPrecision={1}
+                            tickInterval={100}
+                            height={chartHeight}
+                        />
+                    </Holder>
+                ))}
+            </Container>
+        </>
+    );
+};
 
-    render() {
-        const { areas, banner } = this.state;
-        return (
-            <View>
-                <Header />
-                <Sidebar />
-
-                <Content>
-                    <Navbar />
-                    <Banner {...banner} />
-                    <Container layout="none">
-                        {areas.map(({ area, chart }, index) => (
-                            <Area key={index} {...area}>
-                                <Chart
-                                    {...chart}
-                                    tooltip={true}
-                                    zooming={true}
-                                    animation={false}
-                                    tickPrecision={1}
-                                    tickInterval={1000}
-                                />
-                            </Area>
-                        ))}
-                    </Container>
-                </Content>
-
-                <Scroller />
-                <Footer />
-                <Toaster position="top-center" />
-            </View>
-        );
-    }
-}
-
-export default connect(mapStateToProps, {
-    updateGeophone,
-    updateADC,
-    updateStation,
-})(withTranslation()(Realtime));
+export default Realtime;

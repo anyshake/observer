@@ -1,15 +1,12 @@
-const userThrottle = <T extends (...args: any[]) => void>(
-    func: T,
-    delay: number = 1000
-): ((...args: Parameters<T>) => void) => {
-    let lastTime = Date.now();
-    return (...args) => {
-        let currentTime = Date.now();
-        if (currentTime - lastTime >= delay) {
-            func.apply(null, args);
-            lastTime = Date.now();
+export const userThrottle = (fn: (...args: any[]) => void, wait: number) => {
+    let timerId: number | null = null;
+    return (...args: any[]) => {
+        if (timerId !== null) {
+            return;
         }
+        timerId = window.setTimeout(() => {
+            timerId = null;
+            return fn(...args);
+        }, wait);
     };
 };
-
-export default userThrottle;

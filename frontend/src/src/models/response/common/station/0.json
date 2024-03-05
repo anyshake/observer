@@ -1,0 +1,62 @@
+{
+    "time": "1970-01-01T23:59:59Z",
+    "status": 200,
+    "error": false,
+    "path": "/api/v1/station",
+    "message": "Successfully read station information",
+    "data": {
+        "timestamp": 0,
+        "uptime": 0,
+        "station": {
+            "uuid": "00000000-0000-0000-0000-000000000000",
+            "name": "AnyShake Station",
+            "station": "SHAKE",
+            "network": "AS",
+            "location": "00"
+        },
+        "memory": {
+            "total": 0,
+            "free": 0,
+            "used": 0,
+            "percent": 0
+        },
+        "disk": {
+            "total": 0,
+            "free": 0,
+            "used": 0,
+            "percent": 0
+        },
+        "adc": {
+            "resolution": 24,
+            "fullscale": 5
+        },
+        "os": {
+            "os": "*",
+            "arch": "*",
+            "distro": "*",
+            "hostname": "*"
+        },
+        "cpu": {
+            "model": "*",
+            "percent": 0
+        },
+        "geophone": {
+            "ehz": 0.288,
+            "ehe": 0.288,
+            "ehn": 0.288
+        },
+        "position": {
+            "latitude": 0,
+            "longitude": 0,
+            "elevation": 0
+        },
+        "status": {
+            "messages": 0,
+            "pushed": 0,
+            "errors": 0,
+            "failures": 0,
+            "queued": 0,
+            "offset": 0
+        }
+    }
+}

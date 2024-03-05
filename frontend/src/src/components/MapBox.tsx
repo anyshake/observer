@@ -1,4 +1,4 @@
-import { Component, RefObject, createRef } from "react";
+import { useEffect, useRef } from "react";
 import { MapContainer, Marker, TileLayer } from "react-leaflet";
 import LocationIcon from "../assets/icons/location-dot-solid.svg";
 import "leaflet/dist/leaflet.css";
@@ -18,66 +18,54 @@ export interface MapBoxProps {
     readonly dragging?: boolean;
 }
 
-export interface MapBoxState {
-    readonly map: RefObject<L.Map> | undefined;
-}
+export const MapBox = (props: MapBoxProps) => {
+    const {
+        className,
+        minZoom,
+        flyTo,
+        maxZoom,
+        zoom,
+        tile,
+        center,
+        marker,
+        scrollWheelZoom,
+        zoomControl,
+        dragging,
+    } = props;
+    const icon = new L.Icon({
+        iconUrl: LocationIcon,
+        iconAnchor: [9, 24],
+        iconSize: [18, 25],
+    });
 
-export default class MapBox extends Component<MapBoxProps, MapBoxState> {
-    constructor(props: MapBoxProps) {
-        super(props);
-        this.state = {
-            map: createRef(),
-        };
-    }
+    const mapRef = useRef<L.Map>(null);
 
-    componentDidUpdate(): void {
-        const { center, flyTo, zoom } = this.props;
-        const map = this.state.map?.current;
-        if (map && flyTo) {
-            map?.flyTo(center, zoom);
+    useEffect(() => {
+        const map = mapRef.current;
+        if (map) {
+            map.flyTo(center, zoom);
         }
-    }
+    }, [center, zoom, flyTo]);
 
-    render() {
-        const {
-            className,
-            minZoom,
-            maxZoom,
-            center,
-            zoom,
-            tile,
-            marker,
-            dragging,
-            zoomControl,
-            scrollWheelZoom,
-        } = this.props;
-        const { map } = this.state;
-        const icon = new L.Icon({
-            iconUrl: LocationIcon,
-            iconAnchor: [9, 24],
-            iconSize: [18, 25],
-        });
-
-        return (
-            <MapContainer
-                ref={map}
-                className={`z-0 w-full ${className || ""}`}
-                scrollWheelZoom={scrollWheelZoom}
-                zoomControl={zoomControl}
-                attributionControl={false}
-                doubleClickZoom={false}
-                dragging={dragging}
-                maxZoom={maxZoom}
-                minZoom={minZoom}
-                center={center}
-                zoom={zoom}
-                style={{
-                    cursor: "default",
-                }}
-            >
-                <TileLayer url={tile} />
-                {marker && <Marker position={marker} icon={icon} />}
-            </MapContainer>
-        );
-    }
-}
+    return (
+        <MapContainer
+            ref={mapRef}
+            className={`z-0 w-full ${className ?? ""}`}
+            scrollWheelZoom={scrollWheelZoom}
+            zoomControl={zoomControl}
+            attributionControl={false}
+            doubleClickZoom={false}
+            dragging={dragging}
+            maxZoom={maxZoom}
+            minZoom={minZoom}
+            center={center}
+            zoom={zoom}
+            style={{
+                cursor: "default",
+            }}
+        >
+            <TileLayer url={tile} />
+            {marker && <Marker position={marker} icon={icon} />}
+        </MapContainer>
+    );
+};

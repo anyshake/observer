@@ -1,5 +1,3 @@
-const getVersion = (): string => {
+export const getVersion = () => {
     return process.env.REACT_APP_VERSION || "unknown";
 };
-
-export default getVersion;

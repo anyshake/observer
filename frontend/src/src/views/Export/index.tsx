@@ -1,189 +1,151 @@
-import { Component } from "react";
-import Content from "../../components/Content";
-import Header from "../../components/Header";
-import Navbar from "../../components/Navbar";
-import Sidebar from "../../components/Sidebar";
-import View from "../../components/View";
-import Scroller from "../../components/Scroller";
-import Footer from "../../components/Footer";
-import toast, { Toaster } from "react-hot-toast";
-import Card from "../../components/Card";
-import Container from "../../components/Container";
-import Table, { TableData, TableProps } from "../../components/Table";
+import { useTranslation } from "react-i18next";
+import { Container } from "../../components/Container";
+import { Panel } from "../../components/Panel";
+import { Table, TableData, TableProps } from "../../components/Table";
+import { useEffect, useRef, useState } from "react";
+import { useInterval } from "../../helpers/hook/useInterval";
+import { getExportsUpdates } from "./getExportsUpdates";
+import { handleSetTable } from "./handleSetTable";
 import ExportIcon from "../../assets/icons/download-solid.svg";
-import { WithTranslation, withTranslation } from "react-i18next";
-import restfulApiByTag from "../../helpers/request/restfulApiByTag";
-import Progress, { ProgressProps } from "../../components/Progress";
-import getSortedArray from "../../helpers/array/getSortedArray";
-import axios, { CancelTokenSource } from "axios";
-import userDebounce from "../../helpers/utils/userDebounce";
+import { Progress } from "../../components/Progress";
+import { requestRestApi } from "../../helpers/request/requestRestApi";
+import { apiConfig } from "../../config/api";
+import { sendUserAlert } from "../../helpers/interact/sendUserAlert";
 
-interface ExportState {
-    readonly table: TableProps;
-    readonly tasks: ProgressProps[];
-    readonly tokens: CancelTokenSource[];
-}
+const Export = () => {
+    const { t } = useTranslation();
 
-class Export extends Component<WithTranslation, ExportState> {
-    constructor(props: WithTranslation) {
-        super(props);
-        this.state = {
-            tokens: [],
-            tasks: [],
-            table: {
-                data: [],
-                actions: [],
-                columns: [
-                    {
-                        key: "name",
-                        label: { id: "views.export.table.columns.name" },
-                    },
-                    {
-                        key: "size",
-                        label: { id: "views.export.table.columns.size" },
-                    },
-                    {
-                        key: "time",
-                        label: { id: "views.export.table.columns.time" },
-                    },
-                    {
-                        key: "ttl",
-                        label: { id: "views.export.table.columns.ttl" },
-                    },
-                ],
-                placeholder: { id: "views.export.table.placeholder" },
-            },
+    // Little hack to force update the component
+    const [, forceUpdateKey] = useState(false);
+    const forceUpdate = () => forceUpdateKey((prev) => !prev);
+
+    const exportTasksRef = useRef<
+        Record<
+            string,
+            {
+                fileName: string;
+                progress: number;
+                abortController?: AbortController;
+            }
+        >
+    >({});
+
+    const handleExportProgress = (name: string, progress: number) => {
+        exportTasksRef.current[name] = {
+            ...exportTasksRef.current[name],
+            progress,
         };
-    }
-
-    // Update export task progress by name
-    updateTaskProgress = (name: string, value: number): void => {
-        // Check if task is new
-        const { tasks } = this.state;
-        const taskIndex = tasks.findIndex(({ label }) => label === name);
-        if (taskIndex === -1) {
-            // Add new task if not found
-            tasks.push({ label: name, value });
-        } else if (value === 100) {
-            // Remove task if completed
-            setTimeout(() => {
-                tasks.splice(taskIndex, 1);
-                this.setState({ tasks });
-            }, 1000);
-        } else {
-            // Update task progress
-            tasks[taskIndex].value = value;
-            this.setState({ tasks });
+        if (progress === 100) {
+            delete exportTasksRef.current[name];
+            sendUserAlert(t("views.export.toasts.export_mseed_success"));
         }
+        forceUpdate();
     };
 
-    // Export specified MiniSEED file
-    exportMiniSEED = userDebounce(
-        async ({ name }: TableData): Promise<void> => {
-            // Return if task is already in progress
-            const { tasks } = this.state;
-            const taskIndex = tasks.findIndex(({ label }) => label === name);
-            if (taskIndex !== -1) {
-                return;
-            }
-
-            // Create cancel token and add to list
-            const { tokens } = this.state;
-            const { source } = axios.CancelToken;
-            const cancelToken = source();
-            tokens.push(cancelToken);
-
-            // Show toast and update task progress
-            const { t } = this.props;
-            await toast.promise(
-                restfulApiByTag({
-                    cancelToken,
-                    blob: true,
-                    tag: "mseed",
-                    timeout: 3600,
-                    filename: name,
-                    body: { action: "export", name },
-                    onDownload: ({ progress }) =>
-                        this.updateTaskProgress(name, (progress || 0) * 100),
-                }),
-                {
-                    loading: t("views.export.toasts.is_exporting_mseed"),
-                    success: t("views.export.toasts.export_mseed_success"),
-                    error: t("views.export.toasts.export_mseed_error"),
-                }
-            );
+    const handleExportRequest = async (data: TableData) => {
+        const { name } = data;
+        if (name in exportTasksRef.current) {
+            return;
         }
+
+        const abortController = new AbortController();
+        exportTasksRef.current[name] = {
+            fileName: name as string,
+            abortController,
+            progress: 0,
+        };
+
+        forceUpdate();
+        sendUserAlert(t("views.export.toasts.is_exporting_mseed"));
+
+        const { backend, endpoints } = apiConfig;
+        await requestRestApi<
+            typeof endpoints.mseed.model.request,
+            typeof endpoints.mseed.model.response.common,
+            typeof endpoints.mseed.model.response.error
+        >({
+            blobOptions: {
+                filename: name as string,
+                onDownload: ({ progress }) =>
+                    handleExportProgress(name as string, (progress ?? 0) * 100),
+            },
+            payload: { action: "export", name: name as string },
+            endpoint: endpoints.mseed,
+            abortController,
+            timeout: 3600,
+            backend,
+        });
+    };
+
+    const handleExportCancel = (fileName: string) => {
+        const { abortController } = exportTasksRef.current[fileName];
+        abortController?.abort();
+        delete exportTasksRef.current[fileName];
+        forceUpdate();
+    };
+
+    useEffect(
+        () => () =>
+            Object.values(exportTasksRef.current).forEach(
+                ({ abortController }) => abortController?.abort()
+            ),
+        []
     );
 
-    // Fetch available MiniSEED files from server
-    async componentDidMount(): Promise<void> {
-        const { t } = this.props;
-        const { table } = this.state;
+    const [table, setTable] = useState<TableProps>({
+        columns: [
+            { key: "name", label: "views.export.table.columns.name" },
+            { key: "size", label: "views.export.table.columns.size" },
+            { key: "time", label: "views.export.table.columns.time" },
+            { key: "ttl", label: "views.export.table.columns.ttl" },
+        ],
+        actions: [
+            {
+                icon: ExportIcon,
+                onClick: handleExportRequest,
+                label: "views.export.table.actions.export",
+            },
+        ],
+        rowsLimit: 10,
+        loadMoreText: "views.export.table.load_more",
+        placeholder: "views.export.table.placeholder.is_fetching_mseed",
+    });
 
-        // Read MiniSEED file list from server
-        const { data } = await restfulApiByTag({
-            tag: "mseed",
-            body: { action: "show" },
-        });
-        if (!data || !data.length) {
-            // Show error toast if no MiniSEED files found
-            const err = "views.export.toasts.fetch_mseed_error";
-            toast.error(t(err));
-            this.setState({
-                table: { ...table, placeholder: { id: err } },
-            });
-        } else {
-            // Sort files by time and show success toast
-            toast.success(t("views.export.toasts.fetch_mseed_success"));
-            getSortedArray(data, "time", "datetime", "desc");
-            // Append export action and update table
-            const actions = [
-                {
-                    icon: ExportIcon,
-                    onClick: this.exportMiniSEED,
-                    label: { id: "views.export.table.actions.export" },
-                },
-            ];
-            this.setState({ table: { ...table, data, actions } });
-        }
-    }
+    useInterval(
+        () => getExportsUpdates((res) => handleSetTable(res, setTable)),
+        5000,
+        true
+    );
 
-    // Cancel all pending requests
-    componentWillUnmount(): void {
-        const { tokens } = this.state;
-        tokens.forEach(({ cancel }) => cancel());
-    }
+    return (
+        <Container>
+            <Panel label={t("views.export.panels.file_list")}>
+                {Object.values(exportTasksRef.current).map(
+                    ({ fileName, progress }) => (
+                        <Progress
+                            key={fileName}
+                            value={progress}
+                            label={fileName}
+                            onCancel={() => handleExportCancel(fileName)}
+                        />
+                    )
+                )}
+                <Table
+                    {...table}
+                    placeholder={t(table.placeholder)}
+                    loadMoreText={t(table.loadMoreText ?? "")}
+                    columns={table.columns.map((column) => ({
+                        ...column,
+                        label: t(column.label),
+                    }))}
+                    actions={table.actions.map((action) => ({
+                        ...action,
+                        label: t(action.label),
+                    }))}
+                />
+            </Panel>
+        </Container>
+    );
+};
 
-    render() {
-        const { table, tasks } = this.state;
-
-        return (
-            <View>
-                <Header />
-                <Sidebar />
-
-                <Content>
-                    <Navbar />
-
-                    <Container layout="none">
-                        <Card label={{ id: "views.export.cards.file_list" }}>
-                            {tasks.map(
-                                (item, index) =>
-                                    !!item.value && (
-                                        <Progress key={index} {...item} />
-                                    )
-                            )}
-                            <Table {...table} />
-                        </Card>
-                    </Container>
-                </Content>
-
-                <Scroller />
-                <Footer />
-                <Toaster position="top-center" />
-            </View>
-        );
-    }
-}
-
-export default withTranslation()(Export);
+export default Export;

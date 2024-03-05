@@ -1,37 +1,43 @@
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
-import { Component } from "react";
+import cancelIcon from "../assets/icons/xmark-solid.svg";
 
 export interface ProgressProps {
     readonly precision?: number;
     readonly label?: string;
-    value: number;
+    readonly value: number;
+    readonly onCancel?: () => void;
 }
 
-export default class Progress extends Component<ProgressProps> {
-    render() {
-        const { value, label, precision } = this.props;
-        return (
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Box sx={{ width: "100%", my: 1, mx: 2 }}>
-                    <LinearProgress
-                        className="rounded-lg"
-                        variant="determinate"
-                        color="secondary"
-                        value={value}
-                    />
-                </Box>
-                <Box sx={{ minWidth: 100 }}>
-                    <Typography
-                        className="overflow-scroll"
-                        color="text.secondary"
-                        variant="body2"
-                    >{`[${value.toFixed(
-                        precision || 2
-                    )}%] ${label}`}</Typography>
-                </Box>
+export const Progress = (props: ProgressProps) => {
+    const { value, label, precision, onCancel } = props;
+
+    return (
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+            <div
+                className="cursor-pointer px-1 rounded-lg bg-gray-100 hover:bg-gray-300"
+                onClick={onCancel}
+            >
+                <img className="size-5" src={cancelIcon} alt="" />
+            </div>
+            <Box sx={{ width: "100%", mx: 1 }}>
+                <LinearProgress
+                    className="rounded-full"
+                    variant="determinate"
+                    color="secondary"
+                    value={value}
+                />
             </Box>
-        );
-    }
-}
+            <Box sx={{ minWidth: 100 }}>
+                <Typography
+                    className="overflow-scroll p-2"
+                    color="text.secondary"
+                    variant="body2"
+                >
+                    {`[${value.toFixed(precision ?? 2)}%] ${label}`}
+                </Typography>
+            </Box>
+        </Box>
+    );
+};
