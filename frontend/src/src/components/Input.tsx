@@ -1,6 +1,5 @@
 import { TextField } from "@mui/material";
 import { ChangeEvent, InputHTMLAttributes } from "react";
-import { userThrottle } from "../helpers/utils/userThrottle";
 
 interface InputProps {
     readonly label: string;
@@ -23,34 +22,29 @@ export const Input = (props: InputProps) => {
         onValueChange,
     } = props;
 
-    const handleOnChange = userThrottle(
-        ({ target }: ChangeEvent<HTMLTextAreaElement>) => {
-            if (!onValueChange) {
+    const handleOnChange = ({ target }: ChangeEvent<HTMLTextAreaElement>) => {
+        if (!onValueChange) {
+            return;
+        }
+        const { value } = target;
+        if (type === "number") {
+            const numberValue = Number(value);
+            if (isNaN(numberValue)) {
+                onValueChange(defaultValue);
                 return;
             }
-            const { value } = target;
-            if (type === "number") {
-                const numberValue = Number(value);
-                if (isNaN(numberValue)) {
-                    target.value = defaultValue.toString();
+            if (numberLimit) {
+                const { max, min } = numberLimit;
+                if (numberValue > max || numberValue < min) {
                     onValueChange(defaultValue);
                     return;
                 }
-                if (numberLimit) {
-                    const { max, min } = numberLimit;
-                    if (numberValue > max || numberValue < min) {
-                        target.value = defaultValue.toString();
-                        onValueChange(defaultValue);
-                        return;
-                    }
-                }
-                onValueChange(numberValue);
-            } else {
-                onValueChange(value);
             }
-        },
-        1000
-    );
+            onValueChange(numberValue);
+        } else {
+            onValueChange(value);
+        }
+    };
 
     return (
         <TextField
