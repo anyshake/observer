@@ -1,29 +1,29 @@
-import { Component, ReactNode } from "react";
+import { ForwardedRef, ReactNode, forwardRef } from "react";
+import { Toaster } from "react-hot-toast";
 
-export interface ContainerProps {
+export interface ContainerProps<T = ReactNode> {
+    readonly children: T;
+    readonly main?: boolean;
+    readonly toaster?: boolean;
     readonly className?: string;
-    readonly layout: "none" | "grid" | "flex";
-    readonly children?: ReactNode;
 }
 
-export default class Container extends Component<ContainerProps> {
-    render() {
-        const { layout, className, children } = this.props;
-
-        let layoutClassName = "mt-5";
-        switch (layout) {
-            case "flex":
-                layoutClassName = "mt-5 flex flex-wrap";
-                break;
-            case "grid":
-                layoutClassName = "mt-5 gap-4 grid grid-cols-1 md:grid-cols-2";
-                break;
-        }
+export const Container = forwardRef(
+    (props: ContainerProps, ref: ForwardedRef<HTMLDivElement>) => {
+        const { main, className, toaster, children } = props;
 
         return (
-            <div className={`${layoutClassName} ${className ?? ""}`}>
+            <div
+                className={
+                    main
+                        ? "bg-gray-50 min-h-screen ml-10 p-20 px-4 flex flex-col space-y-3"
+                        : className ?? ""
+                }
+                ref={ref}
+            >
                 {children}
+                {toaster && <Toaster />}
             </div>
         );
     }
-}
+);

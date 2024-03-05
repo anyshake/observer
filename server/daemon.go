@@ -59,9 +59,11 @@ func StartDaemon(host string, port int, options *app.ServerOptions) error {
 	})
 
 	// Register API v1 routers
-	RegisterRouterV1(r.Group(
+	registerRouterV1(r.Group(
 		fmt.Sprintf("/%s/v1", options.APIPrefix),
 	), options)
+	// Register FDSNWS routers
+	// registerRouterFDSNWS(r.Group("/fdsnws"), options)
 
 	r.Use(static.ServeEmbed(&static.LocalFileSystem{
 		Root: options.WebPrefix, Prefix: options.WebPrefix,

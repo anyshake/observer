@@ -1,24 +1,35 @@
-import { Component } from "react";
-import GLOBAL_CONFIG from "../config/global";
-import { WithTranslation, withTranslation } from "react-i18next";
+import { useState } from "react";
+import { i18nConfig } from "../config/i18n";
+import repositoryIcon from "../assets/icons/github.svg";
+import { Link } from "react-router-dom";
 
-class Footer extends Component<WithTranslation> {
-    render() {
-        const { t } = this.props;
-        const { author, description } = GLOBAL_CONFIG.app_settings;
-
-        return (
-            <footer className="w-full bg-gray-200 text-gray-500 flex flex-col px-6 py-2 sm:flex-row justify-between">
-                <span className="text-xs text-center ml-8 md:ml-12">
-                    {t(description)}
-                </span>
-
-                <span className="text-sm text-center justify-center">
-                    {`© ${new Date().getFullYear()} ${t(author)}`}
-                </span>
-            </footer>
-        );
-    }
+interface FooterProps {
+    readonly author: string;
+    readonly homepage: string;
+    readonly repository: string;
+    readonly currentLocale: string;
+    readonly description: Record<keyof typeof i18nConfig.resources, string>;
 }
 
-export default withTranslation()(Footer);
+export const Footer = (props: FooterProps) => {
+    const { description, homepage, currentLocale, author, repository } = props;
+    const [currentYear] = useState(new Date().getFullYear());
+
+    return (
+        <footer className="w-full bg-gray-200 text-gray-500 flex flex-col px-6 py-2 sm:flex-row justify-between">
+            <span className="text-xs text-center md:ml-12">
+                {description[currentLocale]}
+            </span>
+            <div className="inline-flex text-center justify-center">
+                <Link
+                    className="text-sm hover:underline"
+                    to={homepage}
+                    target="_blank"
+                >{`© ${currentYear} ${author}`}</Link>
+                <Link to={repository} target="_blank">
+                    <img className="mx-3 size-5" src={repositoryIcon} alt="" />
+                </Link>
+            </div>
+        </footer>
+    );
+};

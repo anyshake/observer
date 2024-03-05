@@ -1,5 +1,5 @@
 /* eslint-disable no-useless-escape */
-const getAsciiArt = (): string => {
+export const getAsciiArt = () => {
     const data = `
    ____  __                                  
   / __ \/ /_  ________  ______   _____  _____
@@ -9,5 +9,3 @@ const getAsciiArt = (): string => {
 `;
     return data;
 };
-
-export default getAsciiArt;

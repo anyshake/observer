@@ -41,8 +41,10 @@ func (s *SCEA_B) Parse(data []byte) (map[string]any, error) {
 	var result map[string]any
 	err := json.Unmarshal(data, &result)
 	if err != nil {
-		fmt.Println(result)
 		return nil, err
+	}
+	if result["code"].(float64) != 0 {
+		return nil, fmt.Errorf("server error: %s", result["msg"])
 	}
 
 	return result, nil

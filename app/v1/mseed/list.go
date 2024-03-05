@@ -39,7 +39,7 @@ func getMiniSEEDList(conf *config.Conf) ([]MiniSEEDFile, error) {
 			files = append(files, MiniSEEDFile{
 				TTL:  fileTTL,
 				Name: info.Name(),
-				Time: modTime.Format(time.RFC3339),
+				Time: modTime.UnixMilli(),
 				Size: fmt.Sprintf("%d MB", info.Size()/1024/1024),
 			})
 		}

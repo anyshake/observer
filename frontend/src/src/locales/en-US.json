@@ -1,0 +1,325 @@
+{
+    "components": {
+        "chart": {
+            "reset_zoom": "Reset Zoom",
+            "reset_zoom_title": "Reset Zoom to Default"
+        }
+    },
+    "views": {
+        "home": {
+            "banner": {
+                "warning": {
+                    "title": "Connecting to Server",
+                    "content": "Please wait..."
+                },
+                "success": {
+                    "title": "{{ station }} Connected",
+                    "content": "Server Uptime: {{ uptime }} seconds\nServer Architecture: {{ arch }}/{{ os }}\nUUID: {{ uuid }}"
+                },
+                "error": {
+                    "title": "Connection Failed",
+                    "content": "Unable to connect to the server. Please try refreshing the page or changing your network."
+                }
+            },
+            "charts": {
+                "cpu": {
+                    "label": "CPU Usage",
+                    "text": "Current usage: {{ usage }}%"
+                },
+                "memory": {
+                    "label": "Memory Usage",
+                    "text": "Current usage: {{ usage }}%"
+                }
+            },
+            "map": {
+                "label": "Station Location",
+                "text": "Longitude: {{ longitude }} °\nLatitude: {{ latitude }} °\nElevation: {{ elevation }} m"
+            },
+            "labels": {
+                "messages": {
+                    "label": "Decoded Messages",
+                    "unit": "messages"
+                },
+                "errors": {
+                    "label": "Frame Errors",
+                    "unit": "errors"
+                },
+                "pushed": {
+                    "label": "Pushed Messages",
+                    "unit": "messages"
+                },
+                "failures": {
+                    "label": "Push Failures",
+                    "unit": "failures"
+                },
+                "queued": {
+                    "label": "Queued Messages",
+                    "unit": "messages"
+                },
+                "offset": {
+                    "label": "System Time Offset",
+                    "unit": "seconds"
+                }
+            }
+        },
+        "realtime": {
+            "banner": {
+                "warning": {
+                    "label": "Connecting to Server",
+                    "text": "Please wait..."
+                },
+                "success": {
+                    "label": "Current Sampling Rate {{ sampleRate }} Sps",
+                    "text": "Current Seismic Scale {{ scale }}\nData updated at {{ time }}"
+                },
+                "error": {
+                    "label": "Connection Failed",
+                    "text": "Unable to connect to the server, please refresh the page or change your network."
+                }
+            },
+            "charts": {
+                "ehz": {
+                    "label": "EHZ Channel Waveform Count",
+                    "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} kine\nIntensity: {{ intensity }}",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth Filter",
+                                "low_corner_freq": "Low Corner Freq. (Hz)",
+                                "high_corner_freq": "High Corner Freq. (Hz)",
+                                "enable_filter": "Enable Filter",
+                                "disable_filter": "Disable Filter"
+                            }
+                        }
+                    }
+                },
+                "ehe": {
+                    "label": "EHE Channel Waveform Count",
+                    "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} kine\nIntensity: {{ intensity }}",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth Filter",
+                                "low_corner_freq": "Low Corner Freq. (Hz)",
+                                "high_corner_freq": "High Corner Freq. (Hz)",
+                                "enable_filter": "Enable Filter",
+                                "disable_filter": "Disable Filter"
+                            }
+                        }
+                    }
+                },
+                "ehn": {
+                    "label": "EHN Channel Waveform Count",
+                    "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} kine\nIntensity: {{ intensity }}",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth Filter",
+                                "low_corner_freq": "Low Corner Freq. (Hz)",
+                                "high_corner_freq": "High Corner Freq. (Hz)",
+                                "enable_filter": "Enable Filter",
+                                "disable_filter": "Disable Filter"
+                            }
+                        }
+                    }
+                }
+            },
+            "toasts": {
+                "websocket_connected": "WebSocket connection opened"
+            }
+        },
+        "history": {
+            "selects": {
+                "choose_event": {
+                    "title": "Select an Earthquake Event",
+                    "template": "[M{{ magnitude }}] {{ event }}\nTime: {{ time }}\nDepth: {{ depth }} km\nDistance: {{ distance }} km\nEstimated P-Wave Arrival: {{ p_wave }} sec\nEstimated S-Wave Arrival: {{ s_wave }} sec"
+                }
+            },
+            "forms": {
+                "choose_channel": {
+                    "title": "Select Channel to Export",
+                    "placeholder": "Channel code",
+                    "submit": "Submit",
+                    "cancel": "Cancel"
+                },
+                "choose_source": {
+                    "title": "Select Earthquake Data Source",
+                    "placeholder": "Data source",
+                    "submit": "Submit",
+                    "cancel": "Cancel"
+                }
+            },
+            "charts": {
+                "ehz": {
+                    "label": "EHZ Channel Waveform Count",
+                    "text": "Click to setup filter",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth Filter",
+                                "low_corner_freq": "Low Corner Freq. (Hz)",
+                                "high_corner_freq": "High Corner Freq. (Hz)",
+                                "enable_filter": "Enable Filter",
+                                "disable_filter": "Disable Filter"
+                            }
+                        }
+                    }
+                },
+                "ehe": {
+                    "label": "EHE Channel Waveform Count",
+                    "text": "Click to setup filter",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth Filter",
+                                "low_corner_freq": "Low Corner Freq. (Hz)",
+                                "high_corner_freq": "High Corner Freq. (Hz)",
+                                "enable_filter": "Enable Filter",
+                                "disable_filter": "Disable Filter"
+                            }
+                        }
+                    }
+                },
+                "ehn": {
+                    "label": "EHN Channel Waveform Count",
+                    "text": "Click to setup filter",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth Filter",
+                                "low_corner_freq": "Low Corner Freq. (Hz)",
+                                "high_corner_freq": "High Corner Freq. (Hz)",
+                                "enable_filter": "Enable Filter",
+                                "disable_filter": "Disable Filter"
+                            }
+                        }
+                    }
+                }
+            },
+            "panels": {
+                "query_history": "History Query",
+                "analyze_history": "Data Analysis"
+            },
+            "buttons": {
+                "query_waveform": "Retrieve Waveforms",
+                "query_sac_file": "Download Data",
+                "query_source": "Event Lookup",
+                "get_share_link": "Get Share Link"
+            },
+            "labels": {
+                "ehz_detail": {
+                    "label": "EHZ Details",
+                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                },
+                "ehe_detail": {
+                    "label": "EHE Details",
+                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                },
+                "ehn_detail": {
+                    "label": "EHN Details",
+                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                }
+            },
+            "time_pickers": {
+                "start_time": "Select Start Time",
+                "end_time": "Select End Time"
+            },
+            "toasts": {
+                "duration_error": "Please select the correct time range",
+                "is_exporting_sac": "Exporting SAC format waveforms, please wait...",
+                "export_sac_success": "SAC format waveform data export successful",
+                "export_sac_error": "SAC format waveform data export failed",
+                "is_fetching_source": "Fetching event data source, please wait...",
+                "fetch_source_success": "Event data source retrieval successful",
+                "fetch_source_error": "Event data source retrieval failed",
+                "is_fetching_events": "Querying earthquake event data, please wait...",
+                "fetch_events_success": "Earthquake event query successful",
+                "fetch_events_error": "Earthquake event query failed",
+                "is_fetching_waveform": "Querying historical waveform data, please wait...",
+                "fetch_waveform_success": "Historical waveform data query successful",
+                "fetch_waveform_error": "Historical waveform data query failed",
+                "copy_link_success": "Share link has copied to clipboard",
+                "copy_link_error": "Failed to copy share link to clipboard",
+                "duration_excceed": "The event duration exceeds the limit. Please manually query according to the arrival time of P/S waves at the station, or change the earthquake event",
+                "event_select_success": "Event selection successful"
+            }
+        },
+        "export": {
+            "panels": {
+                "file_list": "File List"
+            },
+            "table": {
+                "columns": {
+                    "name": "File Name",
+                    "size": "File Size",
+                    "time": "Modified Date",
+                    "ttl": "TTL (in days)"
+                },
+                "actions": {
+                    "export": "Export"
+                },
+                "placeholder": {
+                    "is_fetching_mseed": "Fetching, please wait...",
+                    "fetch_mseed_error": "Empty or fetch failed"
+                },
+                "load_more": "Load More"
+            },
+            "toasts": {
+                "is_exporting_mseed": "Exporting MiniSEED format file, it may take some time",
+                "export_mseed_success": "MiniSEED format file exported successfully",
+                "is_fetching_mseed": "Fetching MiniSEED format file list, please wait..."
+            }
+        },
+        "setting": {
+            "buttons": {
+                "select_scale": "Select Seismic Scale",
+                "purge_cache": "Clear Application Cache",
+                "waveform_retention": "Set Waveform Retention Time",
+                "query_duration": "Set Query Range"
+            },
+            "panels": {
+                "select_scale": "Seismic Scale",
+                "purge_cache": "Reset Application",
+                "waveform_retention": "Waveform Settings",
+                "query_duration": "Query Settings"
+            },
+            "selects": {
+                "choose_scale": {
+                    "title": "Select Intensity Scale"
+                }
+            },
+            "forms": {
+                "waveform_retention": {
+                    "title": "Real-time waveform retention time",
+                    "placeholder": "Enter retention time",
+                    "content": "Please enter an integer greater than {{ minimum }} and less than {{ maximum }} in seconds.",
+                    "submit": "Submit",
+                    "cancel": "Cancel"
+                },
+                "query_duration": {
+                    "title": "Historical query default range",
+                    "placeholder": "Enter default query range",
+                    "content": "Please enter an integer greater than {{ minimum }} and less than {{ maximum }} in seconds.",
+                    "submit": "Submit",
+                    "cancel": "Cancel"
+                }
+            },
+            "toasts": {
+                "confirm_title": "Confirmation",
+                "confirm_button": "OK",
+                "cancel_button": "Cancel",
+                "confirm_purge": "App cache will be cleared, click OK to continue.",
+                "cache_purged": "App cache has been cleared, page will refresh soon",
+                "scale_changed": "Intensity scale has been changed to {{ scale }}, page will refresh soon",
+                "retention_set": "Real-time waveform retention time has been set to {{ current }} s, page will refresh soon",
+                "duration_set": "Historical waveform default range has been set to {{ current }} s, page will refresh soon"
+            },
+            "contents": {
+                "select_scale": "Current intensity scale: {{ scale }}\nIntensity scale is a standard used to measure the intensity of an earthquake. Different scales can lead to different magnitude values.",
+                "purge_cache": "If the app is experiencing problems, you can try resetting app preferences.\nAfter resetting, browser preferences will be cleared, but it will not affect the backend server.",
+                "waveform_retention": "This setting determines the amount of time that waveforms will be retained on the real-time waveform page. The current value is {{ current }} s.\nValues must be greater than {{ minimum }} and less than {{ maximum }}. Otherwise, the value will be reset to the default of {{ default }} s.",
+                "query_duration": "This setting determines the time range that is automatically filled in on the historical query page. The current value is {{ current }} s.\nValues must be greater than {{ minimum }} and less than {{ maximum }}. Otherwise, the value will be reset to the default of {{ default }} s."
+            }
+        }
+    }
+}

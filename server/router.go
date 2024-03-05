@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRouterV1(rg *gin.RouterGroup, options *app.ServerOptions) {
+func registerRouterV1(rg *gin.RouterGroup, options *app.ServerOptions) {
 	if options.RateFactor > 0 {
 		rateFactor := int64(options.RateFactor)
 		rg.Use(limit.RateLimit(time.Second, rateFactor, rateFactor))
@@ -31,3 +31,7 @@ func RegisterRouterV1(rg *gin.RouterGroup, options *app.ServerOptions) {
 		s.RegisterModule(rg, options)
 	}
 }
+
+// TODO: Support FDSNWS
+// func registerRouterFDSNWS(rg *gin.RouterGroup, options *app.ServerOptions) {
+// }

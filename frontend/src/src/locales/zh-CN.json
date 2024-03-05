@@ -1,0 +1,325 @@
+{
+    "components": {
+        "chart": {
+            "reset_zoom": "重置视图",
+            "reset_zoom_title": "重置为初始视图"
+        }
+    },
+    "views": {
+        "home": {
+            "banner": {
+                "warning": {
+                    "title": "正在连接服务器",
+                    "content": "请稍等..."
+                },
+                "success": {
+                    "title": "{{ station }} 已连接",
+                    "content": "服务器在线时长 {{ uptime }} 秒\n服务器采用架构 {{ arch }}/{{ os }}\nUUID {{ uuid }}"
+                },
+                "error": {
+                    "title": "连接失败",
+                    "content": "无法连接到服务器，请尝试刷新页面或更换网络"
+                }
+            },
+            "charts": {
+                "cpu": {
+                    "label": "CPU 使用率",
+                    "text": "当前占用率 {{ usage }}%"
+                },
+                "memory": {
+                    "label": "内存使用率",
+                    "text": "当前占用率 {{ usage }}%"
+                }
+            },
+            "map": {
+                "label": "测站所在位置",
+                "text": "经度 {{ longitude }} °\n纬度 {{ latitude }} °\n海拔 {{ elevation }} 米"
+            },
+            "labels": {
+                "messages": {
+                    "label": "已解码讯息量",
+                    "unit": "条"
+                },
+                "errors": {
+                    "label": "帧错误讯息量",
+                    "unit": "条"
+                },
+                "pushed": {
+                    "label": "已推送讯息量",
+                    "unit": "条"
+                },
+                "failures": {
+                    "label": "推送失败讯息量",
+                    "unit": "条"
+                },
+                "queued": {
+                    "label": "等待推送讯息量",
+                    "unit": "条"
+                },
+                "offset": {
+                    "label": "系统时间偏移量",
+                    "unit": "秒"
+                }
+            }
+        },
+        "realtime": {
+            "banner": {
+                "warning": {
+                    "label": "正在连接服务器",
+                    "text": "请稍等..."
+                },
+                "success": {
+                    "label": "当前采样率 {{ sampleRate }} Sps",
+                    "text": "当前烈度标准 {{ scale }}\n数据更新于 {{ time }}"
+                },
+                "error": {
+                    "label": "连接失败",
+                    "text": "无法连接到服务器，请刷新页面或更换网络"
+                }
+            },
+            "charts": {
+                "ehz": {
+                    "label": "EHZ 通道波形",
+                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth 滤波器",
+                                "low_corner_freq": "下限截止频率 Hz",
+                                "high_corner_freq": "上限截止频率 Hz",
+                                "enable_filter": "开启滤波器",
+                                "disable_filter": "禁用滤波器"
+                            }
+                        }
+                    }
+                },
+                "ehe": {
+                    "label": "EHE 通道波形",
+                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth 滤波器",
+                                "low_corner_freq": "下限截止频率 Hz",
+                                "high_corner_freq": "上限截止频率 Hz",
+                                "enable_filter": "开启滤波器",
+                                "disable_filter": "禁用滤波器"
+                            }
+                        }
+                    }
+                },
+                "ehn": {
+                    "label": "EHN 通道波形",
+                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth 滤波器",
+                                "low_corner_freq": "下限截止频率 Hz",
+                                "high_corner_freq": "上限截止频率 Hz",
+                                "enable_filter": "开启滤波器",
+                                "disable_filter": "禁用滤波器"
+                            }
+                        }
+                    }
+                }
+            },
+            "toasts": {
+                "websocket_connected": "Websocket 连线已经打开"
+            }
+        },
+        "history": {
+            "selects": {
+                "choose_event": {
+                    "title": "选择一个地震事件",
+                    "template": "[M{{ magnitude }}] {{ event }}\n震发时间 {{ time }}\n震源深度 {{ depth }} 公里\n震央距离 {{ distance }} 公里\nP 波到站 {{ p_wave }} 秒\nS 波到站 {{ s_wave }} 秒"
+                }
+            },
+            "forms": {
+                "choose_channel": {
+                    "title": "选择要导出的通道",
+                    "placeholder": "通道名称",
+                    "submit": "提交",
+                    "cancel": "取消"
+                },
+                "choose_source": {
+                    "title": "选择地震数据来源",
+                    "placeholder": "数据源",
+                    "submit": "提交",
+                    "cancel": "取消"
+                }
+            },
+            "charts": {
+                "ehz": {
+                    "label": "EHZ 通道波形",
+                    "text": "点击下方按钮设定滤波器",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth 滤波器",
+                                "low_corner_freq": "下限截止频率 Hz",
+                                "high_corner_freq": "上限截止频率 Hz",
+                                "enable_filter": "开启滤波器",
+                                "disable_filter": "禁用滤波器"
+                            }
+                        }
+                    }
+                },
+                "ehe": {
+                    "label": "EHE 通道波形",
+                    "text": "点击下方按钮设定滤波器",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth 滤波器",
+                                "low_corner_freq": "下限截止频率 Hz",
+                                "high_corner_freq": "上限截止频率 Hz",
+                                "enable_filter": "开启滤波器",
+                                "disable_filter": "禁用滤波器"
+                            }
+                        }
+                    }
+                },
+                "ehn": {
+                    "label": "EHN 通道波形",
+                    "text": "点击下方按钮设定滤波器",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth 滤波器",
+                                "low_corner_freq": "下限截止频率 Hz",
+                                "high_corner_freq": "上限截止频率 Hz",
+                                "enable_filter": "开启滤波器",
+                                "disable_filter": "禁用滤波器"
+                            }
+                        }
+                    }
+                }
+            },
+            "panels": {
+                "query_history": "历史查询",
+                "analyze_history": "数据分析"
+            },
+            "buttons": {
+                "query_waveform": "调阅波形",
+                "query_sac_file": "数据下载",
+                "query_source": "事件反查",
+                "get_share_link": "分享链接"
+            },
+            "labels": {
+                "ehz_detail": {
+                    "label": "EHZ 通道详情",
+                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                },
+                "ehe_detail": {
+                    "label": "EHE 通道详情",
+                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                },
+                "ehn_detail": {
+                    "label": "EHN 通道详情",
+                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                }
+            },
+            "time_pickers": {
+                "start_time": "选择起始时间",
+                "end_time": "选择结束时间"
+            },
+            "toasts": {
+                "duration_error": "请选择正确的时间范围",
+                "is_exporting_sac": "正在导出 SAC 格式波形，请稍等...",
+                "export_sac_success": "SAC 格式波形数据导出成功",
+                "export_sac_error": "SAC 格式波形数据导出失败",
+                "is_fetching_source": "正在获取事件数据源，请稍等...",
+                "fetch_source_success": "事件数据源获取成功",
+                "fetch_source_error": "事件数据源获取失败",
+                "is_fetching_events": "正在查询地震事件数据，请稍等...",
+                "fetch_events_success": "地震事件查询成功",
+                "fetch_events_error": "地震事件查询失败",
+                "is_fetching_waveform": "正在查询历史波形数据，请稍等...",
+                "fetch_waveform_success": "历史波形数据查询成功",
+                "fetch_waveform_error": "历史波形数据查询失败",
+                "copy_link_success": "分享链接已复制到剪贴板",
+                "copy_link_error": "分享链接复制失败",
+                "duration_excceed": "事件时间跨度超出限制，请根据 P/S 波到达测站时间点手动进行查询，或更换地震事件",
+                "event_select_success": "事件选择成功"
+            }
+        },
+        "export": {
+            "panels": {
+                "file_list": "文件列表"
+            },
+            "table": {
+                "columns": {
+                    "name": "文件名称",
+                    "size": "文件大小",
+                    "time": "修改日期",
+                    "ttl": "有效期（天）"
+                },
+                "actions": {
+                    "export": "导出"
+                },
+                "placeholder": {
+                    "is_fetching_mseed": "正在获取，请稍等...",
+                    "fetch_mseed_error": "列表为空或获取失败"
+                },
+                "load_more": "加载更多"
+            },
+            "toasts": {
+                "is_exporting_mseed": "正在导出 MiniSEED 格式文件，这可能需要一些时间",
+                "export_mseed_success": "MiniSEED 格式文件导出成功",
+                "is_fetching_mseed": "正在获取 MiniSEED 格式文件列表，请稍等..."
+            }
+        },
+        "setting": {
+            "buttons": {
+                "select_scale": "选择烈度标准",
+                "purge_cache": "清除应用缓存",
+                "waveform_retention": "设定波形保留时间",
+                "query_duration": "设定查询范围"
+            },
+            "panels": {
+                "select_scale": "烈度标准",
+                "purge_cache": "重置应用",
+                "waveform_retention": "波形设定",
+                "query_duration": "查询设定"
+            },
+            "selects": {
+                "choose_scale": {
+                    "title": "选择烈度标准"
+                }
+            },
+            "forms": {
+                "waveform_retention": {
+                    "title": "实时波形保留时间",
+                    "placeholder": "请输入保留时间",
+                    "content": "请以秒为单位，输入一个大于 {{ minimum }} 且小于 {{ maximum }} 的整数",
+                    "submit": "提交",
+                    "cancel": "取消"
+                },
+                "query_duration": {
+                    "title": "历史查询默认范围",
+                    "placeholder": "请输入默认查询范围",
+                    "content": "请以秒为单位，输入一个大于 {{ minimum }} 且小于 {{ maximum }} 的整数",
+                    "submit": "提交",
+                    "cancel": "取消"
+                }
+            },
+            "toasts": {
+                "confirm_title": "确认操作",
+                "confirm_button": "确定",
+                "cancel_button": "取消",
+                "confirm_purge": "应用缓存将被清除，确认要继续吗？",
+                "cache_purged": "应用缓存已清除，页面即将刷新",
+                "scale_changed": "烈度标准已更改为 {{ scale }}，页面即将刷新",
+                "retention_set": "实时波形保留时间已更改为 {{ current }} s，页面即将刷新",
+                "duration_set": "历史波形默认查询范围已更改为 {{ current }} s，页面即将刷新"
+            },
+            "contents": {
+                "select_scale": "当前烈度标准 {{ scale }}\n烈度标准是用来衡量地震烈度的标准，不同的标准会导致不同的烈度值。",
+                "purge_cache": "应用出现问题时，可尝试重置应用偏好。\n执行重置后，浏览器中的偏好将被清理，不会对后端服务器产生影响。",
+                "waveform_retention": "此项设定实时波形页面的波形会保留的时间，当前 {{ current }} s。\n以秒为单位，需要大于 {{ minimum }} 且小于 {{ maximum }}，否则将会被重置为默认值 {{ default }} 秒。",
+                "query_duration": "此项设定历史查询页面自动填写的时间范围，当前 {{ current }} s。\n以秒为单位，需要大于 {{ minimum }} 且小于 {{ maximum }}，否则将会被重置为默认值 {{ default }} 秒。"
+            }
+        }
+    }
+}

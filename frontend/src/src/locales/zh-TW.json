@@ -1,0 +1,325 @@
+{
+    "components": {
+        "chart": {
+            "reset_zoom": "重置視圖",
+            "reset_zoom_title": "重置為初始視圖"
+        }
+    },
+    "views": {
+        "home": {
+            "banner": {
+                "warning": {
+                    "title": "正在連線伺服器",
+                    "content": "請稍等..."
+                },
+                "success": {
+                    "title": "{{ station }} 已連線",
+                    "content": "伺服器在線時長 {{ uptime }} 秒\n伺服器採用架構 {{ arch }}/{{ os }}\nUUID {{ uuid }}"
+                },
+                "error": {
+                    "title": "連線失敗",
+                    "content": "無法連線到伺服器，請嘗試重新整理頁面或更換網路"
+                }
+            },
+            "charts": {
+                "cpu": {
+                    "label": "CPU 使用率",
+                    "text": "目前佔用率 {{ usage }}%"
+                },
+                "memory": {
+                    "label": "記憶體使用率",
+                    "text": "目前佔用率 {{ usage }}%"
+                }
+            },
+            "map": {
+                "label": "站點所在位置",
+                "text": "經度 {{ longitude }} °\n緯度 {{ latitude }} °\n海拔 {{ elevation }} 公尺"
+            },
+            "labels": {
+                "messages": {
+                    "label": "已解碼訊息量",
+                    "unit": "筆"
+                },
+                "errors": {
+                    "label": "幀錯誤訊息量",
+                    "unit": "筆"
+                },
+                "pushed": {
+                    "label": "已推送訊息量",
+                    "unit": "筆"
+                },
+                "failures": {
+                    "label": "推送失敗訊息量",
+                    "unit": "筆"
+                },
+                "queued": {
+                    "label": "等待推送訊息量",
+                    "unit": "筆"
+                },
+                "offset": {
+                    "label": "系統時間偏移量",
+                    "unit": "秒"
+                }
+            }
+        },
+        "realtime": {
+            "banner": {
+                "warning": {
+                    "label": "正在連線伺服器",
+                    "text": "請稍等..."
+                },
+                "success": {
+                    "label": "目前取樣率 {{ sampleRate }} Sps",
+                    "text": "目前烈度標準 {{ scale }}\n資料更新於 {{ time }}"
+                },
+                "error": {
+                    "label": "連線失敗",
+                    "text": "無法連線到伺服器，請嘗試重新整理頁面或更換網路"
+                }
+            },
+            "charts": {
+                "ehz": {
+                    "label": "EHZ 通道波形",
+                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth 濾波器",
+                                "low_corner_freq": "下限截止頻率 Hz",
+                                "high_corner_freq": "上限截止頻率 Hz",
+                                "enable_filter": "啟動濾波器",
+                                "disable_filter": "禁用濾波器"
+                            }
+                        }
+                    }
+                },
+                "ehe": {
+                    "label": "EHE 通道波形",
+                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth 濾波器",
+                                "low_corner_freq": "下限截止頻率 Hz",
+                                "high_corner_freq": "上限截止頻率 Hz",
+                                "enable_filter": "啟動濾波器",
+                                "disable_filter": "禁用濾波器"
+                            }
+                        }
+                    }
+                },
+                "ehn": {
+                    "label": "EHN 通道波形",
+                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth 濾波器",
+                                "low_corner_freq": "下限截止頻率 Hz",
+                                "high_corner_freq": "上限截止頻率 Hz",
+                                "enable_filter": "啟動濾波器",
+                                "disable_filter": "禁用濾波器"
+                            }
+                        }
+                    }
+                }
+            },
+            "toasts": {
+                "websocket_connected": "WebSocket 連線已經打開"
+            }
+        },
+        "history": {
+            "selects": {
+                "choose_event": {
+                    "title": "選擇一個地震事件",
+                    "template": "[M{{ magnitude }}] {{ event }}\n震發時間 {{ time }}\n震央深度 {{ depth }} 公里\n震央距离 {{ distance }} 公里\nP 波到站 {{ p_wave }} 秒\nS 波到站 {{ s_wave }} 秒"
+                }
+            },
+            "forms": {
+                "choose_channel": {
+                    "title": "選擇要匯出的通道",
+                    "placeholder": "通道名稱",
+                    "submit": "送出",
+                    "cancel": "取消"
+                },
+                "choose_source": {
+                    "title": "選擇地震資料來源",
+                    "placeholder": "資料來源",
+                    "submit": "送出",
+                    "cancel": "取消"
+                }
+            },
+            "charts": {
+                "ehz": {
+                    "label": "EHZ 通道波形",
+                    "text": "點擊下方按鈕設定濾波器",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth 濾波器",
+                                "low_corner_freq": "下限截止頻率 Hz",
+                                "high_corner_freq": "上限截止頻率 Hz",
+                                "enable_filter": "啟動濾波器",
+                                "disable_filter": "禁用濾波器"
+                            }
+                        }
+                    }
+                },
+                "ehe": {
+                    "label": "EHE 通道波形",
+                    "text": "點擊下方按鈕設定濾波器",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth 濾波器",
+                                "low_corner_freq": "下限截止頻率 Hz",
+                                "high_corner_freq": "上限截止頻率 Hz",
+                                "enable_filter": "啟動濾波器",
+                                "disable_filter": "禁用濾波器"
+                            }
+                        }
+                    }
+                },
+                "ehn": {
+                    "label": "EHN 通道波形",
+                    "text": "點擊下方按鈕設定濾波器",
+                    "advanced": {
+                        "panels": {
+                            "butterworth_filter": {
+                                "title": "Butterworth 濾波器",
+                                "low_corner_freq": "下限截止頻率 Hz",
+                                "high_corner_freq": "上限截止頻率 Hz",
+                                "enable_filter": "啟動濾波器",
+                                "disable_filter": "禁用濾波器"
+                            }
+                        }
+                    }
+                }
+            },
+            "panels": {
+                "query_history": "歷史查詢",
+                "analyze_history": "資料分析"
+            },
+            "buttons": {
+                "query_waveform": "調閱波形",
+                "query_sac_file": "資料下載",
+                "query_source": "事件反查",
+                "get_share_link": "分享連結"
+            },
+            "labels": {
+                "ehz_detail": {
+                    "label": "EHZ 通道資訊",
+                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                },
+                "ehe_detail": {
+                    "label": "EHE 通道資訊",
+                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                },
+                "ehn_detail": {
+                    "label": "EHN 通道資訊",
+                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                }
+            },
+            "time_pickers": {
+                "start_time": "選擇起始時間",
+                "end_time": "選擇結束時間"
+            },
+            "toasts": {
+                "duration_error": "請選擇正確的時間範圍",
+                "is_exporting_sac": "正在匯出 SAC 格式波形，請稍候...",
+                "export_sac_success": "SAC 格式波形資料匯出成功",
+                "export_sac_error": "SAC 格式波形資料匯出失敗",
+                "is_fetching_source": "正在取得事件資料源，請稍候...",
+                "fetch_source_success": "事件資料源取得成功",
+                "fetch_source_error": "事件資料源取得失敗",
+                "is_fetching_events": "正在查詢地震事件資料，請稍候...",
+                "fetch_events_success": "地震事件查詢成功",
+                "fetch_events_error": "地震事件查詢失敗",
+                "is_fetching_waveform": "正在查詢歷史波形資料，請稍候...",
+                "fetch_waveform_success": "歷史波形資料查詢成功",
+                "fetch_waveform_error": "歷史波形資料查詢失敗",
+                "copy_link_success": "分享連結已複製到剪貼簿",
+                "copy_link_error": "分享連結複製失敗",
+                "duration_excceed": "事件時間跨度超出限制，請根據 P/S 波到達測站時間點手動進行查詢，或更換地震事件",
+                "event_select_success": "事件選擇成功"
+            }
+        },
+        "export": {
+            "panels": {
+                "file_list": "檔案清單"
+            },
+            "table": {
+                "columns": {
+                    "name": "檔案名稱",
+                    "size": "檔案大小",
+                    "time": "修改日期",
+                    "ttl": "有效期（天）"
+                },
+                "actions": {
+                    "export": "匯出"
+                },
+                "placeholder": {
+                    "is_fetching_mseed": "正在取得中，請稍等...",
+                    "fetch_mseed_error": "清單為空或取得失敗"
+                },
+                "load_more": "載入更多"
+            },
+            "toasts": {
+                "is_exporting_mseed": "正在匯出 MiniSEED 格式檔案，這可能需要一些時間",
+                "export_mseed_success": "MiniSEED 格式檔案匯出成功",
+                "is_fetching_mseed": "正在取得 MiniSEED 格式檔案清單，請稍等..."
+            }
+        },
+        "setting": {
+            "buttons": {
+                "select_scale": "選擇烈度標準",
+                "purge_cache": "清除應用快取",
+                "waveform_retention": "設定波形保留時間",
+                "query_duration": "設定查詢範圍"
+            },
+            "panels": {
+                "select_scale": "烈度標準",
+                "purge_cache": "重置應用",
+                "waveform_retention": "波形設定",
+                "query_duration": "查詢設定"
+            },
+            "selects": {
+                "choose_scale": {
+                    "title": "選擇烈度標準"
+                }
+            },
+            "forms": {
+                "waveform_retention": {
+                    "title": "即時波形保留時間",
+                    "placeholder": "請輸入保留時間",
+                    "content": "請以秒為單位，輸入一個大於 {{ minimum }} 且小於 {{ maximum }} 的整數",
+                    "submit": "送出",
+                    "cancel": "取消"
+                },
+                "query_duration": {
+                    "title": "歷史查詢預設範圍",
+                    "placeholder": "請輸入預設查詢範圍",
+                    "content": "請以秒為單位，輸入一個大於 {{ minimum }} 且小於 {{ maximum }} 的整數",
+                    "submit": "送出",
+                    "cancel": "取消"
+                }
+            },
+            "toasts": {
+                "confirm_title": "確認操作",
+                "confirm_button": "確認",
+                "cancel_button": "取消",
+                "confirm_purge": "應用快取將被清除，確定要繼續嗎？",
+                "cache_purged": "應用快取已清除，頁面即將刷新",
+                "scale_changed": "烈度標準已更改為 {{ scale }}，頁面即將刷新",
+                "retention_set": "即時波形保留時間已更改為 {{ current }} 秒，頁面即將刷新",
+                "duration_set": "歷史波形預設查詢範圍已更改為 {{ current }} 秒，頁面即將刷新"
+            },
+            "contents": {
+                "select_scale": "目前烈度標準 {{ scale }}\n烈度標準是用來衡量地震烈度的標準，不同的標準會導致不同的烈度值。",
+                "purge_cache": "應用出現問題時，可嘗試重置應用偏好。\n執行重置後，瀏覽器中的偏好將被清理，不會對後端伺服器產生影響。",
+                "waveform_retention": "此項設定即時波形頁面的波形會保留的時間，目前 {{ current }} 秒。\n以秒為單位，需要大於 {{ minimum }} 且小於 {{ maximum }}，否則將會被重置為預設值 {{ default }} 秒。",
+                "query_duration": "此項設定歷史查詢頁面自動填寫的時間範圍，目前 {{ current }} 秒。\n以秒為單位，需要大於 {{ minimum }} 且小於 {{ maximum }}，否則將會被重置為預設值 {{ default }} 秒。"
+            }
+        }
+    }
+}

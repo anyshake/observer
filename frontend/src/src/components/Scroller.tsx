@@ -1,49 +1,36 @@
-import { Component } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ScrollIcon from "../assets/icons/arrow-up-solid.svg";
 
-export interface ScrollerState {
-    readonly showButton: boolean;
+interface ScrollerProps {
+    readonly threshold: number;
 }
 
-export default class Scroller extends Component<{}, ScrollerState> {
-    constructor(props: {}) {
-        super(props);
-        this.state = {
-            showButton: false,
-        };
-    }
+export const Scroller = (props: ScrollerProps) => {
+    const { threshold = 100 } = props;
+    const [showButton, setShowButton] = useState(false);
 
-    componentDidMount() {
-        document.addEventListener("scroll", this.toggleButton);
-    }
+    const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-    componentWillUnmount() {
-        document.removeEventListener("scroll", this.toggleButton);
-    }
+    const toggleButton = useCallback(
+        () => setShowButton(window.scrollY > threshold),
+        [threshold]
+    );
 
-    toggleButton = (): void => {
-        if (window.scrollY > 100) {
-            this.setState({ showButton: true });
-        } else {
-            this.setState({ showButton: false });
-        }
-    };
+    useEffect(() => {
+        document.addEventListener("scroll", toggleButton);
+        return () => document.removeEventListener("scroll", toggleButton);
+    }, [toggleButton]);
 
-    scrollToTop = (): void => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
-    render() {
-        const { showButton } = this.state;
-        return (
-            <button
-                onClick={this.scrollToTop}
-                className={`fixed bg-purple-500 hover:bg-purple-600 duration-300 w-10 h-10 rounded-full bottom-16 right-3 flex justify-center items-center ${
-                    showButton ? "" : "hidden"
-                }`}
-            >
-                <img className="w-4 h-4" src={ScrollIcon} alt="" />
-            </button>
-        );
-    }
-}
+    return (
+        <button
+            className={`bg-purple-500 hover:bg-purple-600 duration-300 size-10 rounded-full bottom-16 right-3 flex justify-center items-center ${
+                showButton
+                    ? "fixed animate-fade-left animate-duration-300"
+                    : "hidden"
+            }`}
+            onClick={scrollToTop}
+        >
+            <img className="size-4" src={ScrollIcon} alt="" />
+        </button>
+    );
+};

@@ -264,7 +264,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "time": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "ttl": {
                     "type": "integer"
