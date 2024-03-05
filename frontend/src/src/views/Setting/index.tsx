@@ -3,8 +3,6 @@ import { Container } from "../../components/Container";
 import { Button } from "../../components/Button";
 import { Panel } from "../../components/Panel";
 import { useTranslation } from "react-i18next";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import theme from "react-syntax-highlighter/dist/esm/styles/prism/atom-dark";
 import { sendUserAlert } from "../../helpers/interact/sendUserAlert";
 import { sendUserConfirm } from "../../helpers/interact/sendUserConfirm";
 import { useSelector, useDispatch } from "react-redux";
@@ -16,6 +14,7 @@ import { Select, SelectProps } from "../../components/Select";
 import { onUpdate as updateScale } from "../../stores/scale";
 import { apiConfig } from "../../config/api";
 import { requestRestApi } from "../../helpers/request/requestRestApi";
+import { Code } from "../../components/Code";
 
 const Settings = () => {
     const { t } = useTranslation();
@@ -248,9 +247,9 @@ const Settings = () => {
             </Container>
             {!!stationInventory?.length && (
                 <Panel label={t("views.setting.panels.station_inventory")}>
-                    <SyntaxHighlighter language="xml" style={theme}>
+                    <Code language="xml" fileName="inventory.xml">
                         {stationInventory}
-                    </SyntaxHighlighter>
+                    </Code>
                 </Panel>
             )}
         </>

@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "./static/css/main.87b912ec.css",
-    "main.js": "./static/js/main.32c8bafa.js",
+    "main.css": "./static/css/main.50ae3ccb.css",
+    "main.js": "./static/js/main.2fc451e2.js",
     "static/css/398.d6bfd15f.chunk.css": "./static/css/398.d6bfd15f.chunk.css",
     "static/js/398.bbc69a64.chunk.js": "./static/js/398.bbc69a64.chunk.js",
     "static/js/73.f0938384.chunk.js": "./static/js/73.f0938384.chunk.js",
-    "static/js/263.532e9a13.chunk.js": "./static/js/263.532e9a13.chunk.js",
+    "static/js/154.feff0980.chunk.js": "./static/js/154.feff0980.chunk.js",
     "static/js/600.a3645b48.chunk.js": "./static/js/600.a3645b48.chunk.js",
-    "static/js/45.e41248a6.chunk.js": "./static/js/45.e41248a6.chunk.js",
+    "static/js/708.29f6a2d2.chunk.js": "./static/js/708.29f6a2d2.chunk.js",
     "static/js/699.e75d4402.chunk.js": "./static/js/699.e75d4402.chunk.js",
     "static/js/654.18cf5201.chunk.js": "./static/js/654.18cf5201.chunk.js",
     "static/js/548.b98bfbf6.chunk.js": "./static/js/548.b98bfbf6.chunk.js",
@@ -33,10 +33,12 @@
     "static/media/folder-open-regular.svg": "./static/media/folder-open-regular.db4ef4ac307b2a72056b659ae4f7dac9.svg",
     "static/media/file-waveform-solid.svg": "./static/media/file-waveform-solid.c48c7f768376cd38d8254b34614dfd9a.svg",
     "static/media/server-solid.svg": "./static/media/server-solid.4f75c3131b23af426eabd5c91035829b.svg",
+    "static/media/clipboard-regular.svg": "./static/media/clipboard-regular.6bd933b3e893d26be6fdd983a9e9238e.svg",
     "static/media/paper-plane-solid.svg": "./static/media/paper-plane-solid.e1f40db20eab51657c5490a69c103292.svg",
     "static/media/rss-solid.svg": "./static/media/rss-solid.167813b1d681372ed1d98e45b6b6c0f7.svg",
     "static/media/square-caret-up-solid.svg": "./static/media/square-caret-up-solid.0573794ec033f5ce25c1076e3ac596e3.svg",
     "static/media/circle-xmark-solid.svg": "./static/media/circle-xmark-solid.ea0857c87457d25b161c3a37ad4e3845.svg",
+    "static/media/floppy-disk-solid.svg": "./static/media/floppy-disk-solid.b3781b6d57b29b808731b06740c8fd0c.svg",
     "static/media/wave-square-solid.svg": "./static/media/wave-square-solid.9a0bef3f9e813a5716a30eed4fa8020e.svg",
     "static/media/xmark-solid.svg": "./static/media/xmark-solid.33c889ee6afa3ed57684011608af6238.svg",
     "static/media/arrow-up-solid.svg": "./static/media/arrow-up-solid.25f1775e7ee2dd4c2bc2f2c3c07116bf.svg",
@@ -45,10 +47,11 @@
     "static/media/clock-solid.svg": "./static/media/clock-solid.23025348eaec720a2439930b37d677ee.svg",
     "static/media/angle-right-solid.svg": "./static/media/angle-right-solid.cda594ece7082478d17a05a0a0e148f5.svg",
     "static/media/location-dot-solid.svg": "./static/media/location-dot-solid.763794361437464c10451de38cd290f7.svg",
+    "static/media/check-solid.svg": "./static/media/check-solid.17a9f46c0eeda6a44cf65e9d0edc62e0.svg",
     "static/media/ellipsis-solid.svg": "./static/media/ellipsis-solid.e3aced2a80c2b888104322b1ae60b47f.svg"
   },
   "entrypoints": [
-    "static/css/main.87b912ec.css",
-    "static/js/main.32c8bafa.js"
+    "static/css/main.50ae3ccb.css",
+    "static/js/main.2fc451e2.js"
   ]
 }
