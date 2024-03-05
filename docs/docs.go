@@ -459,13 +459,10 @@ const docTemplate = `{
         "station.geophoneModel": {
             "type": "object",
             "properties": {
-                "ehe": {
+                "frequency": {
                     "type": "number"
                 },
-                "ehn": {
-                    "type": "number"
-                },
-                "ehz": {
+                "sensitivity": {
                     "type": "number"
                 }
             }

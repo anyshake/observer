@@ -109,11 +109,9 @@ definitions:
     type: object
   station.geophoneModel:
     properties:
-      ehe:
+      frequency:
         type: number
-      ehn:
-        type: number
-      ehz:
+      sensitivity:
         type: number
     type: object
   station.memoryModel:
