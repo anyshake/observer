@@ -63,11 +63,10 @@ type miniseed struct {
 }
 
 type seedlink struct {
-	Enable bool   `json:"enable"`
-	Host   string `json:"host"`
-	Buffer string `json:"buffer"`
-	Port   int    `json:"port"`
-	Size   int    `json:"size"`
+	Enable   bool   `json:"enable"`
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	Duration int    `json:"duration"`
 }
 
 type Conf struct {

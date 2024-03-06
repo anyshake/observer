@@ -7,10 +7,11 @@ import (
 
 	"github.com/anyshake/observer/feature"
 	"github.com/anyshake/observer/publisher"
+	c "github.com/ostafen/clover/v2"
 )
 
 const (
-	PACKET_SIZE  int    = 512
+	CHUNK_SIZE   int    = 100
 	ORGANIZATION string = "anyshake.org"
 	RELEASE      string = "SeedLink v3.1 AnyShake Edition (Very basic implementation in Go) :: SLPROTO:3.1 CAP EXTREPLY NSWILDCARD BATCH WS:13 :: Constructing Realtime Seismic Network Ambitiously."
 )
@@ -38,9 +39,9 @@ type SeedLinkGlobal struct {
 
 // SeedLink data buffer
 type SeedLinkBuffer struct {
-	Size int
-	File string
-	Data []publisher.Geophone
+	Collection string
+	Duration   time.Duration
+	Database   *c.DB
 }
 
 // SeedLink basic state

@@ -8,9 +8,6 @@ import { Chart, ChartProps } from "../../components/Chart";
 import { MapBox, MapBoxProps } from "../../components/MapBox";
 import CheckIcon from "../../assets/icons/circle-check-solid.svg";
 import BugIcon from "../../assets/icons/bug-solid.svg";
-import PlaneIcon from "../../assets/icons/paper-plane-solid.svg";
-import ErrorIcon from "../../assets/icons/circle-xmark-solid.svg";
-import TimerIcon from "../../assets/icons/hourglass-half-solid.svg";
 import ClockIcon from "../../assets/icons/clock-solid.svg";
 import { getStationUpdates } from "./getStationUpdates";
 import { useInterval } from "../../helpers/hook/useInterval";
@@ -42,27 +39,6 @@ const Home = () => {
             icon: BugIcon,
             unit: "views.home.labels.errors.unit",
             label: "views.home.labels.errors.label",
-        },
-        pushed: {
-            color: true,
-            value: "0",
-            icon: PlaneIcon,
-            unit: "views.home.labels.pushed.unit",
-            label: "views.home.labels.pushed.label",
-        },
-        failures: {
-            color: true,
-            value: "0",
-            icon: ErrorIcon,
-            unit: "views.home.labels.failures.unit",
-            label: "views.home.labels.failures.label",
-        },
-        queued: {
-            color: true,
-            value: "0",
-            icon: TimerIcon,
-            unit: "views.home.labels.queued.unit",
-            label: "views.home.labels.queued.label",
         },
         offset: {
             color: true,
@@ -154,14 +130,13 @@ const Home = () => {
                 content={t(banner.content, { ...banner.values })}
             />
 
-            <Container className="mt-5 flex flex-wrap">
+            <Container className="mt-5 grid lg:grid-cols-3">
                 {Object.values(labels).map(({ label, unit, ...item }) => (
                     <Label
                         {...item}
                         key={label}
                         label={t(label)}
                         unit={t(unit ?? "")}
-                        className="md:w-1/2 lg:w-1/3"
                     />
                 ))}
             </Container>

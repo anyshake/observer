@@ -1,8 +1,6 @@
 package geophone
 
 import (
-	"time"
-
 	"github.com/anyshake/observer/feature"
 	"github.com/anyshake/observer/utils/duration"
 	"github.com/anyshake/observer/utils/logger"
@@ -22,7 +20,6 @@ func (g *Geophone) OnReady(options *feature.FeatureOptions, v ...any) {
 	if !options.Status.ReadyTime.IsZero() {
 		var (
 			packet         = v[0].(Packet)
-			lastTime       = time.UnixMilli(options.Status.Buffer.TS).UTC()
 			currentTime, _ = duration.Timestamp(options.Status.System.Offset)
 		)
 
@@ -34,11 +31,13 @@ func (g *Geophone) OnReady(options *feature.FeatureOptions, v ...any) {
 		}
 
 		// Archive approximately 1 second has passed
-		timeDiff := duration.Difference(currentTime, lastTime)
+		timeDiff := duration.Difference(currentTime, options.Status.LastRecvTime)
 		if timeDiff >= READY_THRESHOLD {
-			// Set packet timestamp
+			// Set packet timestamp, note that the timestamp in buffer is the start of the packet
+			options.Status.Buffer.TS = currentTime.UnixMilli() - timeDiff.Milliseconds()
+			// Set last received time is the current timestamp
+			options.Status.LastRecvTime = currentTime
 			options.Status.System.Messages++
-			options.Status.Buffer.TS = currentTime.UnixMilli()
 			// Copy buffer and reset
 			options.Status.Geophone = *options.Status.Buffer
 			options.Status.Buffer.EHZ = []int32{}

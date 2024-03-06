@@ -26,18 +26,9 @@ func (s *SeedLink) handleMessage(gp *publisher.Geophone, conn net.Conn, channels
 			return err
 		}
 
-		dataBytes, err := seedlink.CreateSLPacket(data, gp.TS, *seqNum, network, station, channel, location)
+		err := seedlink.SendSLPacket(conn, data, gp.TS, seqNum, network, station, channel, location)
 		if err != nil {
 			return err
-		}
-
-		if len(dataBytes) > 0 {
-			_, err = conn.Write(dataBytes)
-			if err != nil {
-				return err
-			}
-
-			*seqNum++
 		}
 	}
 

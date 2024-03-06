@@ -10,14 +10,8 @@ type STATION struct{}
 
 // Callback of "STATION <...> <...>" command, implements SeedLinkCommandCallback interface
 func (*STATION) Callback(sl *SeedLinkGlobal, cl *SeedLinkClient, options *feature.FeatureOptions, streamer SeedLinkStreamer, conn net.Conn, args ...string) error {
-	if len(args) < 3 {
-		_, err := conn.Write([]byte(RES_ERR))
-		return err
-	} else {
-		cl.Station = args[1]
-		cl.Network = args[2]
-	}
-
+	cl.Station = args[0]
+	cl.Network = args[1]
 	_, err := conn.Write([]byte(RES_OK))
 	return err
 }

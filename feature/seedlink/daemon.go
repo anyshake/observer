@@ -38,14 +38,14 @@ func (s *SeedLink) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 
 	// Init SeedLink global state
 	var (
-		slGlobal    seedlink.SeedLinkGlobal
-		currentTime = time.Now().UTC()
-		station     = text.TruncateString(options.Config.Station.Station, 5)
-		network     = text.TruncateString(options.Config.Station.Network, 2)
-		location    = text.TruncateString(options.Config.Station.Location, 2)
+		slGlobal         seedlink.SeedLinkGlobal
+		station          = text.TruncateString(options.Config.Station.Station, 5)
+		network          = text.TruncateString(options.Config.Station.Network, 2)
+		location         = text.TruncateString(options.Config.Station.Location, 2)
+		bufferDuration   = options.Config.SeedLink.Duration
+		currentLocalTime = time.Now().UTC()
 	)
-	bufferPath, bufferSize := options.Config.SeedLink.Buffer, options.Config.SeedLink.Size
-	err = s.InitGlobal(&slGlobal, currentTime, station, network, location, bufferPath, bufferSize)
+	err = s.InitGlobal(&slGlobal, currentLocalTime, station, network, location, bufferDuration)
 	if err != nil {
 		s.OnError(options, err)
 		return
@@ -78,5 +78,6 @@ func (s *SeedLink) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 
 	// Wait for interrupt signals
 	<-sigCh
-	logger.Print(MODULE, "releasing TCP listener", color.FgBlue, true)
+	logger.Print(MODULE, "closing buffer area", color.FgBlue, true)
+	slGlobal.SeedLinkBuffer.Database.Close()
 }

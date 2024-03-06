@@ -1,20 +1,21 @@
 package seedlink
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
+	"log"
 	"time"
 
 	"github.com/anyshake/observer/driver/seedlink"
-	"github.com/anyshake/observer/publisher"
+	"github.com/dgraph-io/badger/v4"
+	c "github.com/ostafen/clover/v2"
+	badgerstore "github.com/ostafen/clover/v2/store/badger"
 )
 
 func (s *SeedLink) InitClient(slClient *seedlink.SeedLinkClient) {
 	slClient.StreamMode = false
 }
 
-func (s *SeedLink) InitGlobal(slGlobal *seedlink.SeedLinkGlobal, currentTime time.Time, station, network, location, bufferFile string, bufferSize int) error {
+func (s *SeedLink) InitGlobal(slGlobal *seedlink.SeedLinkGlobal, currentTime time.Time, station, network, location string, bufferDuration int) error {
 	var (
 		streamEndTimeString = "9999-12-31 23:59:59"
 		currentTimeString   = currentTime.Format("2006-01-02 15:04:01")
@@ -43,36 +44,31 @@ func (s *SeedLink) InitGlobal(slGlobal *seedlink.SeedLinkGlobal, currentTime tim
 		{BeginSequence: "000000", EndSequence: "FFFFFF", Station: station, Network: network, Description: fmt.Sprintf("%s station", network)},
 	}
 
-	// Check buffer file existence
-	stat, err := os.Stat(bufferFile)
-	if err != nil {
-		_, err = os.Create(bufferFile)
-		if err != nil {
-			return err
-		}
-	} else if stat.IsDir() {
-		return fmt.Errorf("buffer file is a directory")
-	}
-
-	// Read buffer file
-	file, err := os.Open(bufferFile)
+	// Create buffer store
+	const collectionName = "observer"
+	badgerstoreOptions := badger.DefaultOptions("").WithInMemory(true)
+	badgerstoreOptions.Logger = nil
+	store, err := badgerstore.OpenWithOptions(badgerstoreOptions)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
-	var (
-		records []publisher.Geophone
-		decoder = json.NewDecoder(file)
-	)
-	decoder.Decode(&records)
+	db, err := c.OpenWithStore(store)
+	if err != nil {
+		return err
+	}
+
+	// Create collection
+	collectionExists, err := db.HasCollection(collectionName)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if !collectionExists {
+		db.CreateCollection(collectionName)
+	}
 
 	// Initialize ring buffer
-	if len(records) >= bufferSize {
-		slGlobal.SeedLinkBuffer.Data = records[len(records)-bufferSize:]
-	} else {
-		slGlobal.SeedLinkBuffer.Data = records
-	}
-	slGlobal.SeedLinkBuffer = seedlink.SeedLinkBuffer{Size: bufferSize, File: bufferFile}
+	duration := time.Duration(bufferDuration) * time.Second
+	slGlobal.SeedLinkBuffer = seedlink.SeedLinkBuffer{Collection: collectionName, Duration: duration, Database: db}
 
 	return nil
 }

@@ -32,7 +32,7 @@ func getInventoryString(config *config.Conf, status *publisher.Status) string {
 		</responsePAZ>
 		<network publicID="Network@AnyShake" code="%s">
 			<start>%s</start>
-			<description>AnyShake_Project_Seismic_Network</description>
+			<description>AnyShake seismic network</description>
 			<institutions>AnyShake Project</institutions>
 			<region>%s</region>
 			<shared>true</shared>

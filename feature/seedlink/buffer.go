@@ -1,35 +1,35 @@
 package seedlink
 
 import (
-	"os"
 	"time"
 
 	"github.com/anyshake/observer/driver/seedlink"
 	"github.com/anyshake/observer/publisher"
-	jsonutil "github.com/multiprocessio/go-json"
+	"github.com/ostafen/clover/v2/document"
+	"github.com/ostafen/clover/v2/query"
 )
 
 func (s *SeedLink) handleBuffer(gp *publisher.Geophone, buffer *seedlink.SeedLinkBuffer) error {
-	if len(buffer.Data) < buffer.Size {
-		buffer.Data = append(buffer.Data, *gp)
-	} else {
-		buffer.Data = append(buffer.Data[1:], *gp)
+	currentTime := time.UnixMilli(gp.TS).UTC()
+	if currentTime.Minute()%10 == 0 && currentTime.Second() == 0 {
+		expireThreshold := currentTime.Add(-buffer.Duration).UnixMilli()
+		buffer.Database.Delete(query.NewQuery(buffer.Collection).Where(query.Field("ts").Lt(expireThreshold)))
 	}
 
-	// Write buffer to file every 10 minutes
-	if time.Now().UTC().Minute()%10 == 0 {
-		file, err := os.OpenFile(buffer.File, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
+	var (
+		ehz, _ = gp.EHZ.Value()
+		ehe, _ = gp.EHE.Value()
+		ehn, _ = gp.EHN.Value()
+	)
+	doc := document.NewDocument()
+	doc.Set("ehz", ehz.(string))
+	doc.Set("ehe", ehe.(string))
+	doc.Set("ehn", ehn.(string))
+	doc.Set("ts", gp.TS)
 
-		err = jsonutil.Encode(file, buffer.Data)
-		if err != nil {
-			return err
-		}
-
-		s.OnReady(nil, "buffer file updated successfully")
+	_, err := buffer.Database.InsertOne(buffer.Collection, doc)
+	if err != nil {
+		return err
 	}
 
 	s.OnReady(nil, "1 record added to buffer")

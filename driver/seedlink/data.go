@@ -10,7 +10,7 @@ type DATA struct{}
 
 // Callback of "DATA" command, implements SeedLinkCommandCallback interface
 func (*DATA) Callback(sl *SeedLinkGlobal, cl *SeedLinkClient, options *feature.FeatureOptions, streamer SeedLinkStreamer, conn net.Conn, args ...string) error {
-	_, err := conn.Write([]byte(RES_OK))
+	_, err := conn.Write([]byte(RES_ERR))
 	return err
 }
 
