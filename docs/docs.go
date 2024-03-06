@@ -341,20 +341,11 @@ const docTemplate = `{
                 "errors": {
                     "type": "integer"
                 },
-                "failures": {
-                    "type": "integer"
-                },
                 "messages": {
                     "type": "integer"
                 },
                 "offset": {
                     "type": "number"
-                },
-                "pushed": {
-                    "type": "integer"
-                },
-                "queued": {
-                    "type": "integer"
                 }
             }
         },

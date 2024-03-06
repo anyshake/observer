@@ -85,9 +85,15 @@ func (s *SeedLink) handleCommand(options *feature.FeatureOptions, slGlobal *seed
 			if len(argumentList) == 0 {
 				conn.Write([]byte(seedlink.RES_ERR))
 			} else {
-				err = cmd.Callback(slGlobal, slClient, options, s.handleMessage, conn, argumentList[1:]...)
+				args := argumentList[1:]
+				for i := 0; i < len(args); i++ {
+					if len(args[i]) == 0 {
+						args = append(args[:i], args[i+1:]...)
+					}
+				}
+				err = cmd.Callback(slGlobal, slClient, options, s.handleMessage, conn, args...)
 				if err != nil {
-					cmd.Fallback(slGlobal, slClient, options, conn, argumentList[1:]...)
+					cmd.Fallback(slGlobal, slClient, options, conn, args...)
 				}
 			}
 		} else if isCommandValid {

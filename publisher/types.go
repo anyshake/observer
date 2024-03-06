@@ -13,18 +13,16 @@ type Geophone struct {
 
 type System struct {
 	Messages int64   `json:"messages"`
-	Pushed   int64   `json:"pushed"`
 	Errors   int64   `json:"errors"`
-	Failures int64   `json:"failures"`
-	Queued   int64   `json:"queued"`
 	Offset   float64 `json:"offset"`
 }
 
 type Status struct {
-	ReadyTime time.Time // If is zero, app will stuck to wait for time syncing
-	Buffer    *Geophone // Buffer area, should not be externally accessed
-	System    *System
-	Geophone  Geophone
+	LastRecvTime time.Time // Timestamp of last received packet
+	ReadyTime    time.Time // If is zero, app will stuck to wait for time syncing
+	Geophone     Geophone  // Geophone data of nearest 1 second
+	Buffer       *Geophone // Buffer area, should not be externally accessed
+	System       *System
 }
 
 type ChannelSegmentBuffer struct {

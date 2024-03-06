@@ -2,6 +2,14 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.11.0
+
+- Using NoSQL database as SeedLink ring buffer backend
+- Fix SeedLink command parsing issue which causes some clients to be unable to connect
+- Fragmenting SeedLink packets to accommodate higher sampling rates
+- Remove redundant `status` fields in `/api/v1/station` response
+- Fix timestamp issue in geophone data collecting module
+
 ## v2.10.2
 
 - Input component optimization

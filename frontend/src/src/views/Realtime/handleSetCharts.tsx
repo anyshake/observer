@@ -88,7 +88,7 @@ export const handleSetCharts = (
                         : data;
                     const dataSpanMS = 1000 / filteredData.length;
                     return filteredData.map((value, index) => [
-                        ts - dataSpanMS * (filteredData.length - index),
+                        ts + dataSpanMS * index,
                         value,
                     ]);
                 })

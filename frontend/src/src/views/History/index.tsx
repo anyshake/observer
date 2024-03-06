@@ -188,7 +188,7 @@ const History = (props: RouterComponentProps) => {
                         : data;
                     const dataSpanMS = 1000 / filteredData.length;
                     return filteredData.map((value, index) => [
-                        ts - dataSpanMS * (filteredData.length - index),
+                        ts + dataSpanMS * index,
                         value,
                     ]);
                 })
@@ -429,7 +429,7 @@ const History = (props: RouterComponentProps) => {
     return (
         <>
             <Container
-                className={`my-6 gap-4 grid md:grid-cols-2 ${
+                className={`my-6 gap-4 grid lg:grid-cols-2 ${
                     isCurrentBusy ? "cursor-progress" : ""
                 }`}
             >
