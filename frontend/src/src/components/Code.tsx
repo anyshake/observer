@@ -39,7 +39,7 @@ export const Code = (props: CodeProps) => {
                 <div
                     className="opacity-60 hover:opacity-100 transition-all cursor-pointer"
                     onClick={() => {
-                        handleCopy(children);
+                        void handleCopy(children);
                     }}
                 >
                     <img
