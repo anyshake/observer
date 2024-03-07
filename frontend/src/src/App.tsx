@@ -50,7 +50,7 @@ const App = () => {
     const [currentLocale, setCurrentLocale] = useState(fallback);
 
     const setCurrentLocaleToState = async () => {
-        void setCurrentLocale(await getCurrentLocale(i18n));
+        setCurrentLocale(await getCurrentLocale(i18n));
     };
 
     const getCurrentTitle = useCallback(() => {
@@ -98,7 +98,7 @@ const App = () => {
     }, [getStationAttributes]);
 
     const handleSwitchLocale = (locale: string) => {
-        setUserLocale(i18n, locale);
+        void setUserLocale(i18n, locale);
     };
 
     const locales = Object.entries(resources).reduce((acc, [key, value]) => {
