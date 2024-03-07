@@ -22,8 +22,12 @@ export const useInterval = (
         if (delay === null || delay === false) {
             return;
         }
-        const tick = () => savedCallback.current();
+        const tick = () => {
+            savedCallback.current();
+        };
         const id = setInterval(tick, delay);
-        return () => clearInterval(id);
+        return () => {
+            clearInterval(id);
+        };
     }, [delay]);
 };

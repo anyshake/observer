@@ -90,22 +90,29 @@ const Realtime = () => {
         },
     });
 
-    const handleSocketOpen = () =>
+    const handleSocketOpen = () => {
         sendUserAlert(t("views.realtime.toasts.websocket_connected"));
+    };
 
-    const handleSocketData = ({ data }: MessageEvent<SocketUpdates>) =>
-        getSocketUpdates(
+    const handleSocketData = ({ data }: MessageEvent<SocketUpdates>) => {
+        void getSocketUpdates(
             data,
-            (data) => handleSetBanner(data, setBanner),
-            (data) => handleSetCharts(data, setCharts)
+            (data) => {
+                handleSetBanner(data, setBanner);
+            },
+            (data) => {
+                handleSetCharts(data, setCharts);
+            }
         );
+    };
 
-    const handleSocketError = () =>
+    const handleSocketError = () => {
         setBanner({
             type: "error",
             title: "views.realtime.banner.error.label",
             content: "views.realtime.banner.error.text",
         });
+    };
 
     useSocket({
         backend: apiConfig.backend,
@@ -130,15 +137,16 @@ const Realtime = () => {
         setChartHeight(height);
     }, [charts]);
 
-    const handleWindowResize = userThrottle(
-        () => setChartHeightToState(),
-        2000
-    );
+    const handleWindowResize = userThrottle(() => {
+        setChartHeightToState();
+    }, 2000);
 
     useEffect(() => {
         setChartHeightToState();
         window.addEventListener("resize", handleWindowResize);
-        return () => window.removeEventListener("resize", handleWindowResize);
+        return () => {
+            window.removeEventListener("resize", handleWindowResize);
+        };
     }, [setChartHeightToState, handleWindowResize]);
 
     const handleSetCornerFreq = (
@@ -160,7 +168,7 @@ const Realtime = () => {
             },
         }));
 
-    const handleSwitchFilter = (chartKey: string) =>
+    const handleSwitchFilter = (chartKey: string) => {
         setCharts((charts) => ({
             ...charts,
             [chartKey]: {
@@ -174,6 +182,7 @@ const Realtime = () => {
                 },
             },
         }));
+    };
 
     return (
         <>

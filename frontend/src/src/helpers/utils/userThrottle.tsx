@@ -6,7 +6,7 @@ export const userThrottle = (fn: (...args: any[]) => void, wait: number) => {
         }
         timerId = window.setTimeout(() => {
             timerId = null;
-            return fn(...args);
+            fn(...args);
         }, wait);
     };
 };

@@ -23,11 +23,11 @@ export const Holder = (props: HolderProps) => {
     const [advancedOpen, setAdvancedOpen] = useState<boolean>(false);
 
     useEffect(() => {
-        const initCollapse = collapse || CollapseMode.COLLAPSE_DISABLE;
+        const initCollapse = collapse ?? CollapseMode.COLLAPSE_DISABLE;
         setCollapsed(initCollapse === CollapseMode.COLLAPSE_HIDE);
     }, [collapse]);
 
-    const currentCollapse = collapse || CollapseMode.COLLAPSE_DISABLE;
+    const currentCollapse = collapse ?? CollapseMode.COLLAPSE_DISABLE;
     const collapse_is_enabled =
         currentCollapse !== CollapseMode.COLLAPSE_DISABLE;
 
@@ -42,9 +42,9 @@ export const Holder = (props: HolderProps) => {
                     className={`text-md font-bold text-gray-800 flex ${
                         collapse_is_enabled ? "cursor-pointer select-none" : ""
                     }`}
-                    onClick={() =>
-                        collapse_is_enabled && setCollapsed(!collapsed)
-                    }
+                    onClick={() => {
+                        collapse_is_enabled && setCollapsed(!collapsed);
+                    }}
                 >
                     {collapse_is_enabled && (
                         <img
@@ -70,7 +70,9 @@ export const Holder = (props: HolderProps) => {
                     >
                         <div
                             className="mx-1 cursor-pointer"
-                            onClick={() => setAdvancedOpen(!advancedOpen)}
+                            onClick={() => {
+                                setAdvancedOpen(!advancedOpen);
+                            }}
                         >
                             <img
                                 className={`size-4 ${

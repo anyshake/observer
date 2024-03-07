@@ -6,4 +6,8 @@ export type SocketUpdates =
 export const getSocketUpdates = async (
     res: SocketUpdates,
     ...fn: ((res: SocketUpdates) => void)[]
-) => fn.forEach((f) => f(res));
+) => {
+    fn.forEach((f) => {
+        f(res);
+    });
+};

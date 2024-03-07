@@ -55,7 +55,7 @@ export const TimePicker = (props: TimePickerProps) => {
                         seconds: renderTimeViewClock,
                     }}
                     onChange={(value) => {
-                        let val = value?.valueOf() ?? 0;
+                        let val = value ?? 0;
                         if (isNaN(val)) {
                             val = 0;
                         }

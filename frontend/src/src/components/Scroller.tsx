@@ -9,16 +9,19 @@ export const Scroller = (props: ScrollerProps) => {
     const { threshold = 100 } = props;
     const [showButton, setShowButton] = useState(false);
 
-    const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 
-    const toggleButton = useCallback(
-        () => setShowButton(window.scrollY > threshold),
-        [threshold]
-    );
+    const toggleButton = useCallback(() => {
+        setShowButton(window.scrollY > threshold);
+    }, [threshold]);
 
     useEffect(() => {
         document.addEventListener("scroll", toggleButton);
-        return () => document.removeEventListener("scroll", toggleButton);
+        return () => {
+            document.removeEventListener("scroll", toggleButton);
+        };
     }, [toggleButton]);
 
     return (

@@ -2,6 +2,10 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.11.1
+
+- Some frontend code style improvements
+
 ## v2.11.0
 
 - Using NoSQL database as SeedLink ring buffer backend

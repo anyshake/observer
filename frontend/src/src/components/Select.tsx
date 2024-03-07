@@ -14,7 +14,7 @@ import {
 export interface SelectProps {
     readonly open: boolean;
     readonly title?: string;
-    readonly options?: (string)[][];
+    readonly options?: string[][];
     readonly onClose?: () => void;
     readonly onSelect?: (value: string) => void;
 }
@@ -43,9 +43,9 @@ export const Select = (props: SelectProps) => {
                                 <div key={item[1]}>
                                     <ListItem>
                                         <ListItemButton
-                                            onClick={() =>
-                                                onSelect && onSelect(item[1])
-                                            }
+                                            onClick={() => {
+                                                onSelect && onSelect(item[1]);
+                                            }}
                                         >
                                             <ListItemText
                                                 primary={item[0]}
