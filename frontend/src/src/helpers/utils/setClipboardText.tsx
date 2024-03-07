@@ -10,8 +10,8 @@ export const setClipboardText = async (text: string) => {
         },
     };
 
-    if (clipboard) {
-        clipboard.writeText(text);
+    if (!!clipboard) {
+        await clipboard.writeText(text);
         return true;
     }
 

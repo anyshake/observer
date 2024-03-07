@@ -17,7 +17,9 @@ const Export = () => {
 
     // Little hack to force update the component
     const [, forceUpdateKey] = useState(false);
-    const forceUpdate = () => forceUpdateKey((prev) => !prev);
+    const forceUpdate = () => {
+        forceUpdateKey((prev) => !prev);
+    };
 
     const exportTasksRef = useRef<
         Record<
@@ -65,9 +67,10 @@ const Export = () => {
             typeof endpoints.mseed.model.response.error
         >({
             blobOptions: {
-                filename: name as string,
-                onDownload: ({ progress }) =>
-                    handleExportProgress(name as string, (progress ?? 0) * 100),
+                fileName: String(name),
+                onDownload: ({ progress }) => {
+                    handleExportProgress(name as string, (progress ?? 0) * 100);
+                },
             },
             payload: { action: "export", name: name as string },
             endpoint: endpoints.mseed,
@@ -85,10 +88,13 @@ const Export = () => {
     };
 
     useEffect(
-        () => () =>
+        () => () => {
             Object.values(exportTasksRef.current).forEach(
-                ({ abortController }) => abortController?.abort()
-            ),
+                ({ abortController }) => {
+                    abortController?.abort();
+                }
+            );
+        },
         []
     );
 
@@ -112,7 +118,11 @@ const Export = () => {
     });
 
     useInterval(
-        () => getExportsUpdates((res) => handleSetTable(res, setTable)),
+        () => {
+            getExportsUpdates((res) => {
+                handleSetTable(res, setTable);
+            });
+        },
         5000,
         true
     );
@@ -126,7 +136,9 @@ const Export = () => {
                             key={fileName}
                             value={progress}
                             label={fileName}
-                            onCancel={() => handleExportCancel(fileName)}
+                            onCancel={() => {
+                                handleExportCancel(fileName);
+                            }}
                         />
                     )
                 )}

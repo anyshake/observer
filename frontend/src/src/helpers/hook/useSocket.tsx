@@ -21,12 +21,18 @@ export const useSocket = <APIRequest, APICommonResponse>(
                 onClose: (e) => {
                     socketRef.current = null;
                     optionsRef.current?.onClose?.(e);
-                    reconnect && setTimeout(() => connect(), 1000);
+                    reconnect &&
+                        setTimeout(() => {
+                            connect();
+                        }, 1000);
                 },
                 onError: (e) => {
                     socketRef.current = null;
                     optionsRef.current?.onError?.(e);
-                    reconnect && setTimeout(() => connect(), 1000);
+                    reconnect &&
+                        setTimeout(() => {
+                            connect();
+                        }, 1000);
                 },
             });
         };

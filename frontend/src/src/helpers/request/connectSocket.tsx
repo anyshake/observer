@@ -31,9 +31,9 @@ export const connectSocket = <APIRequest, APICommonResponse>({
             const data = JSON.parse(event.data);
             onData({ ...event, data } as MessageEvent<APICommonResponse>);
         };
-        websocket.onopen = onOpen || (() => {});
-        websocket.onclose = onClose || (() => {});
-        websocket.onerror = onError || (() => {});
+        websocket.onopen = onOpen ?? null;
+        websocket.onclose = onClose ?? null;
+        websocket.onerror = onError ?? null;
 
         return websocket;
     } catch {

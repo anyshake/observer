@@ -35,7 +35,9 @@ export const Sidebar = (props: SidebarProps) => {
             </div>
             <div
                 className="-right-6 cursor-pointer duration-500 border-4 border-white bg-gray-800 hover:bg-purple-500 absolute top-2 p-3 rounded-full hover:rotate-45"
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                onClick={() => {
+                    setIsSidebarOpen(!isSidebarOpen);
+                }}
             >
                 <img className="size-4" src={MenuIcon} alt="" />
             </div>

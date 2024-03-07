@@ -142,6 +142,6 @@ export class CSISIntensityStandard implements IntensityStandard {
             II = 12;
         }
 
-        return `${II.toFixed(0)}`;
+        return II.toFixed(0);
     };
 }

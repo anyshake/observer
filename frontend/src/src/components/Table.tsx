@@ -6,9 +6,9 @@ export interface TableColumn {
     label: string;
 }
 
-export type TableData = {
+export interface TableData {
     [key: TableColumn["key"]]: string | number;
-};
+}
 
 export interface TableAction {
     icon: string;
@@ -31,8 +31,9 @@ export const Table = (props: TableProps) => {
 
     const [rowsLength, setRowsLength] = useState(rowsLimit ?? -1);
 
-    const loadMoreRows = () =>
+    const loadMoreRows = () => {
         setRowsLength((currentLength) => currentLength + (rowsLimit ?? 0));
+    };
 
     return (
         <div className="flex flex-col overflow-x-auto">
@@ -97,9 +98,10 @@ export const Table = (props: TableProps) => {
                                                 <td
                                                     key={label}
                                                     className="px-6 py-4 whitespace-nowrap text-sm font-medium"
-                                                    onClick={() =>
-                                                        onClick && onClick(item)
-                                                    }
+                                                    onClick={() => {
+                                                        onClick &&
+                                                            onClick(item);
+                                                    }}
                                                 >
                                                     <img
                                                         className="w-5 h-5 cursor-pointer transition-all duration-200 hover:scale-125"

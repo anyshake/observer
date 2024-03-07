@@ -15,8 +15,7 @@ export const handleSetTable = (
         return;
     }
 
-    const { data } = res;
-    const tableData = data
+    const tableData = res.data
         .sort((a, b) => b.time - a.time)
         .map((item) => {
             const timeString = getTimeString(new Date(item.time).getTime());

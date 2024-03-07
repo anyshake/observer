@@ -38,7 +38,9 @@ export const Code = (props: CodeProps) => {
             <div className="flex justify-end space-x-3 px-4">
                 <div
                     className="opacity-60 hover:opacity-100 transition-all cursor-pointer"
-                    onClick={() => handleCopy(children)}
+                    onClick={() => {
+                        handleCopy(children);
+                    }}
                 >
                     <img
                         className={`size-4 ${isCopied ? "hidden" : "block"}`}
@@ -54,7 +56,9 @@ export const Code = (props: CodeProps) => {
                 {!!fileName?.length && (
                     <div
                         className="opacity-60 hover:opacity-100 transition-all cursor-pointer"
-                        onClick={() => handleDownload(children)}
+                        onClick={() => {
+                            handleDownload(children);
+                        }}
                     >
                         <img className="size-4" src={saveIcon} alt="" />
                     </div>

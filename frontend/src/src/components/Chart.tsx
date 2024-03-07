@@ -9,7 +9,7 @@ import { Options, SeriesOptionsType } from "highcharts";
 import { useTranslation } from "react-i18next";
 
 const hasWebGLSupport = () => {
-    if (window.WebGLRenderingContext) {
+    if (!!window.WebGLRenderingContext) {
         const canvas = document.createElement("canvas");
         const names = [
             "webgl",

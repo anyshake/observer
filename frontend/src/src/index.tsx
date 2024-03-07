@@ -9,9 +9,7 @@ import App from "./App";
 import "./config/i18n";
 import "./index.css";
 
-const root = ReactDOM.createRoot(
-    document.getElementById("root") as HTMLElement
-);
+const root = ReactDOM.createRoot(document.getElementById("root")!);
 root.render(
     <Provider store={store}>
         <PersistGate loading={null} persistor={REDUX_PRESIST}>

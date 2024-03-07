@@ -15,5 +15,7 @@ export const getExportsUpdates = async (
         endpoint: endpoints.mseed,
         payload: { action: "show", name: "" },
     });
-    fn.forEach((f) => f(data));
+    fn.forEach((f) => {
+        f(data);
+    });
 };

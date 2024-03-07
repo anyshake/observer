@@ -14,5 +14,7 @@ export const getStationUpdates = async (
         timeout: 30,
         endpoint: endpoints.station,
     });
-    fn.forEach((f) => f(data));
+    fn.forEach((f) => {
+        f(data);
+    });
 };

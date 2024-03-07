@@ -71,9 +71,9 @@ export const Form = (props: FormProps) => {
                             labelId="select"
                             label={placeholder}
                             defaultValue={selectOptions?.[0].value}
-                            onChange={({ target }) =>
-                                setSelectValue(target?.value)
-                            }
+                            onChange={({ target }) => {
+                                setSelectValue(target.value);
+                            }}
                         >
                             {selectOptions?.map(({ value, label }) => (
                                 <MenuItem key={value} value={value}>

@@ -49,8 +49,9 @@ const App = () => {
     const [currentTitle, setCurrentTitle] = useState(title);
     const [currentLocale, setCurrentLocale] = useState(fallback);
 
-    const setCurrentLocaleToState = async () =>
-        setCurrentLocale(await getCurrentLocale(i18n));
+    const setCurrentLocaleToState = async () => {
+        void setCurrentLocale(await getCurrentLocale(i18n));
+    };
 
     const getCurrentTitle = useCallback(() => {
         for (const key in routes) {
@@ -64,7 +65,7 @@ const App = () => {
     }, [routes, pathname, currentLocale]);
 
     useEffect(() => {
-        setCurrentLocaleToState();
+        void setCurrentLocaleToState();
         const subtitle = getCurrentTitle();
         setCurrentTitle(subtitle);
         document.title = `${subtitle} - ${title}`;
@@ -79,7 +80,7 @@ const App = () => {
             timeout: 30,
             endpoint: endpoints.station,
         });
-        if (res?.data) {
+        if (!!res?.data) {
             const initialized = true;
             const { sensitivity, frequency } = res.data.geophone;
             dispatch(UpdateGeophone({ sensitivity, frequency, initialized }));
@@ -93,10 +94,12 @@ const App = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        getStationAttributes();
+        void getStationAttributes();
     }, [getStationAttributes]);
 
-    const handleSwitchLocale = (locale: string) => setUserLocale(i18n, locale);
+    const handleSwitchLocale = (locale: string) => {
+        setUserLocale(i18n, locale);
+    };
 
     const locales = Object.entries(resources).reduce((acc, [key, value]) => {
         acc[key] = value.label;

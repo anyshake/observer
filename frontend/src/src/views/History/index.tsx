@@ -71,11 +71,15 @@ const History = (props: RouterComponentProps) => {
         FormProps & { values?: Record<string, string | number> }
     >({ open: false, inputType: "select" });
 
-    const handleCloseForm = () => setForm({ ...form, open: false });
+    const handleCloseForm = () => {
+        setForm({ ...form, open: false });
+    };
 
     const [select, setSelect] = useState<SelectProps>({ open: false });
 
-    const handleCloseSelect = () => setSelect({ ...select, open: false });
+    const handleCloseSelect = () => {
+        setSelect({ ...select, open: false });
+    };
 
     const [labels, setLabels] = useState<
         Record<string, LabelProps & { values?: Record<string, string> }>
@@ -272,7 +276,7 @@ const History = (props: RouterComponentProps) => {
                     timeout: 120,
                     throwError: true,
                     endpoint: apiConfig.endpoints.history,
-                    blobOptions: { filename: sacFileName },
+                    blobOptions: { fileName: sacFileName },
                 }),
                 t("views.history.toasts.is_exporting_sac"),
                 t("views.history.toasts.export_sac_success"),

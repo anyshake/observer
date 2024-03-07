@@ -21,7 +21,7 @@ interface Options<APIRequest, APICommonResponse, APIErrorResponse> {
         APIErrorResponse
     >;
     readonly blobOptions?: {
-        readonly filename: string;
+        readonly fileName: string;
         readonly onDownload?: (progressEvent: AxiosProgressEvent) => void;
     };
 }
@@ -47,7 +47,7 @@ export const requestRestApi = async <
     });
     _axios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
         if (!blobOptions) {
-            config.headers["Accept"] = "application/json";
+            config.headers.Accept = "application/json";
         }
         return config;
     });
@@ -83,25 +83,21 @@ export const requestRestApi = async <
         });
         if (blobOptions) {
             const { "content-disposition": contentDisposition } = headers;
-            let filename = blobOptions.filename;
+            let fileName = blobOptions.fileName;
             if (contentDisposition) {
-                filename = contentDisposition
+                fileName = contentDisposition
                     .split(";")
                     .find((item: string) => item.includes("filename="))
                     ?.split("=")[1];
             }
 
-            saveAs(data, !filename.length ? "stream" : filename);
+            saveAs(data, !fileName.length ? "stream" : fileName);
             return response.common;
         }
 
         return { ...response.common, ...data };
     } catch (e) {
         const result = response.error ?? response.common;
-        if (throwError) {
-            return Promise.reject(result);
-        }
-
-        return result;
+        return throwError ? Promise.reject(e) : result;
     }
 };

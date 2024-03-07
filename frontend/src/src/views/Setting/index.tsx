@@ -21,13 +21,19 @@ const Settings = () => {
     const dispatch = useDispatch();
 
     const { retention, duration, scales } = globalConfig;
-    const handleReload = () => setTimeout(() => window.location.reload(), 2500);
+    const handleReload = () => {
+        setTimeout(() => {
+            window.location.reload();
+        }, 2500);
+    };
 
     const [form, setForm] = useState<
         FormProps & { values?: Record<string, string | number> }
     >({ open: false, inputType: "number" });
 
-    const handleCloseForm = () => setForm({ ...form, open: false });
+    const handleCloseForm = () => {
+        setForm({ ...form, open: false });
+    };
 
     const handleRetentionChange = (newValue?: string) => {
         if (!!newValue?.length) {
@@ -88,7 +94,9 @@ const Settings = () => {
 
     const [select, setSelect] = useState<SelectProps>({ open: false });
 
-    const handleCloseSelect = () => setSelect({ ...select, open: false });
+    const handleCloseSelect = () => {
+        setSelect({ ...select, open: false });
+    };
 
     const handleSelectScale = (newValue?: string) => {
         if (!!newValue?.length) {
@@ -201,7 +209,7 @@ const Settings = () => {
     };
 
     useEffect(() => {
-        getStationInventory();
+        void getStationInventory();
     }, []);
 
     return (
@@ -224,8 +232,8 @@ const Settings = () => {
                                 ))}
                             <Button
                                 label={t(button)}
+                                onClick={onClick}
                                 className={className}
-                                onClick={() => onClick()}
                             />
                         </Panel>
                     )

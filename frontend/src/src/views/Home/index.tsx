@@ -111,10 +111,18 @@ const Home = () => {
     useInterval(
         () =>
             getStationUpdates(
-                (res) => handleSetBanner(res, setBanner),
-                (res) => handleSetLabels(res, setLabels),
-                (res) => handleSetCharts(res, setCharts),
-                (res) => handleSetMap(res, setMap)
+                (res) => {
+                    handleSetBanner(res, setBanner);
+                },
+                (res) => {
+                    handleSetLabels(res, setLabels);
+                },
+                (res) => {
+                    handleSetCharts(res, setCharts);
+                },
+                (res) => {
+                    handleSetMap(res, setMap);
+                }
             ),
         2000,
         true

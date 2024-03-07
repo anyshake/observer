@@ -2,8 +2,8 @@ import toast from "react-hot-toast";
 
 export const sendUserAlert = (
     message: string,
-    error: boolean = false,
-    duration: number = 2000
+    error = false,
+    duration = 2000
 ) => {
     if (error) {
         toast.error(message, { duration });
