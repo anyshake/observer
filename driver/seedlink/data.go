@@ -12,12 +12,7 @@ type DATA struct{}
 
 // Callback of "DATA" command, implements SeedLinkCommandCallback interface
 func (*DATA) Callback(sl *SeedLinkGlobal, cl *SeedLinkClient, options *feature.FeatureOptions, streamer SeedLinkStreamer, conn net.Conn, args ...string) error {
-	switch len(args) {
-	case 3:
-		fallthrough
-	case 2:
-		fallthrough
-	case 1:
+	if len(args) > 0 {
 		seq, err := strconv.ParseInt(args[0], 16, 64)
 		if err != nil {
 			conn.Write([]byte(RES_ERR))
@@ -25,9 +20,6 @@ func (*DATA) Callback(sl *SeedLinkGlobal, cl *SeedLinkClient, options *feature.F
 		}
 		cl.Sequence = seq + 1
 		cl.StartTime, _ = duration.Timestamp(options.Status.System.Offset)
-	default:
-		_, err := conn.Write([]byte(RES_ERR))
-		return err
 	}
 	_, err := conn.Write([]byte(RES_OK))
 	return err
