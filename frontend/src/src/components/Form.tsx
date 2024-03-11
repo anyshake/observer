@@ -11,7 +11,7 @@ import {
     Select,
     TextField,
 } from "@mui/material";
-import { HTMLInputTypeAttribute, useEffect, useRef, useState } from "react";
+import { HTMLInputTypeAttribute, useEffect, useState } from "react";
 
 export interface FormProps {
     readonly open: boolean;
@@ -42,7 +42,7 @@ export const Form = (props: FormProps) => {
         selectOptions,
     } = props;
 
-    const inputRef = useRef<HTMLInputElement>(null);
+    const [inputValue, setInputValue] = useState("");
     const [selectValue, setSelectValue] = useState("");
 
     useEffect(() => {
@@ -54,47 +54,54 @@ export const Form = (props: FormProps) => {
             <DialogTitle>{title}</DialogTitle>
             <DialogContent>
                 {content && <DialogContentText>{content}</DialogContentText>}
-                {inputType !== "select" ? (
-                    <TextField
-                        autoFocus
-                        fullWidth
-                        ref={inputRef}
-                        className="mt-8"
-                        type={inputType}
+                <TextField
+                    autoFocus
+                    fullWidth
+                    className="mt-8"
+                    type={inputType}
+                    label={placeholder}
+                    defaultValue={defaultValue}
+                    style={{
+                        display: inputType !== "select" ? "block" : "none",
+                    }}
+                    onChange={({ target }) => {
+                        setInputValue(target.value);
+                    }}
+                />
+                <FormControl
+                    fullWidth
+                    sx={{ my: 2 }}
+                    style={{
+                        display: inputType === "select" ? "block" : "none",
+                    }}
+                >
+                    <InputLabel id="select">{placeholder}</InputLabel>
+                    <Select
+                        labelId="select"
                         label={placeholder}
-                        defaultValue={defaultValue}
-                    />
-                ) : (
-                    <FormControl sx={{ my: 2 }} fullWidth>
-                        <InputLabel id="select">{placeholder}</InputLabel>
-                        <Select
-                            labelId="select"
-                            label={placeholder}
-                            defaultValue={selectOptions?.[0].value}
-                            onChange={({ target }) => {
-                                setSelectValue(target.value);
-                            }}
-                        >
-                            {selectOptions?.map(({ value, label }) => (
-                                <MenuItem key={value} value={value}>
-                                    {label}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                )}
+                        onChange={({ target }) => {
+                            setSelectValue(target.value);
+                        }}
+                        defaultValue={selectOptions?.[0].value ?? ""}
+                    >
+                        {selectOptions?.map(({ value, label }) => (
+                            <MenuItem key={value} value={value}>
+                                {label}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
             </DialogContent>
             <DialogActions>
                 {cancelText && <Button onClick={onClose}>{cancelText}</Button>}
                 <Button
                     onClick={() => {
-                        if (onSubmit) {
-                            if (inputType === "select") {
-                                onSubmit(selectValue);
-                            } else {
-                                onSubmit(inputRef.current?.value ?? "");
-                            }
-                        }
+                        onSubmit &&
+                            onSubmit(
+                                inputType === "select"
+                                    ? selectValue
+                                    : inputValue
+                            );
                     }}
                 >
                     {submitText}

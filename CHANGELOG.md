@@ -2,6 +2,12 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.11.2
+
+- Code style improvements again
+- Basic implementation of SeedLink DATA command
+- Fix frontend issue where the input component does not update its value
+
 ## v2.11.1
 
 - Some frontend code style improvements

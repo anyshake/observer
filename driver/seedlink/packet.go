@@ -8,34 +8,34 @@ import (
 	"github.com/bclswl0827/mseedio"
 )
 
-func SendSLPacket(conn net.Conn, count []int32, ts int64, seq *int64, network, station, channel, location string) error {
+func SendSLPacket(conn net.Conn, client *SeedLinkClient, data SeedLinkPacket) error {
 	// Create data chunks to adapt to SeedLink packet size
 	var countGroup [][]int32
-	if len(count) > CHUNK_SIZE {
-		for i := 0; i < len(count); i += CHUNK_SIZE {
-			if i+CHUNK_SIZE > len(count) {
-				countGroup = append(countGroup, count[i:])
+	if len(data.Count) > CHUNK_SIZE {
+		for i := 0; i < len(data.Count); i += CHUNK_SIZE {
+			if i+CHUNK_SIZE > len(data.Count) {
+				countGroup = append(countGroup, data.Count[i:])
 			} else {
-				countGroup = append(countGroup, count[i:i+CHUNK_SIZE])
+				countGroup = append(countGroup, data.Count[i:i+CHUNK_SIZE])
 			}
 		}
 	} else {
-		countGroup = append(countGroup, count)
+		countGroup = append(countGroup, data.Count)
 	}
 
-	dataSpanMs := 1000 / float64(len(count))
+	dataSpanMs := 1000 / float64(len(data.Count))
 	for i, c := range countGroup {
 		// Generate MiniSEED record
 		var miniseed mseedio.MiniSeedData
 		miniseed.Init(mseedio.STEIM2, mseedio.MSBFIRST)
 		err := miniseed.Append(c, &mseedio.AppendOptions{
-			StationCode:    station,
-			LocationCode:   location,
-			ChannelCode:    channel,
-			NetworkCode:    network,
-			SampleRate:     float64(len(count)),
-			SequenceNumber: fmt.Sprintf("%06d", *seq),
-			StartTime:      time.UnixMilli(ts + int64(float64(i*CHUNK_SIZE)*dataSpanMs)).UTC(),
+			ChannelCode:    data.Channel,
+			StationCode:    client.Station,
+			LocationCode:   client.Location,
+			NetworkCode:    client.Network,
+			SampleRate:     float64(len(data.Count)),
+			SequenceNumber: fmt.Sprintf("%06d", client.Sequence),
+			StartTime:      time.UnixMilli(data.Timestamp + int64(float64(i*CHUNK_SIZE)*dataSpanMs)).UTC(),
 		})
 		if err != nil {
 			return err
@@ -49,7 +49,7 @@ func SendSLPacket(conn net.Conn, count []int32, ts int64, seq *int64, network, s
 		}
 
 		// Prepend and send SeedLink sequence number
-		slSeq := []byte(fmt.Sprintf("SL%06X", *seq))
+		slSeq := []byte(fmt.Sprintf("SL%06X", client.Sequence))
 		_, err = conn.Write(slSeq)
 		if err != nil {
 			return err
@@ -61,7 +61,7 @@ func SendSLPacket(conn net.Conn, count []int32, ts int64, seq *int64, network, s
 			return err
 		}
 
-		*seq++
+		client.Sequence++
 	}
 
 	return nil

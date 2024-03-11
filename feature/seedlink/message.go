@@ -8,8 +8,13 @@ import (
 	"github.com/anyshake/observer/publisher"
 )
 
-func (s *SeedLink) handleMessage(gp *publisher.Geophone, conn net.Conn, channels []string, network, station, location string, seqNum *int64) error {
+func (s *SeedLink) handleMessage(conn net.Conn, client *seedlink.SeedLinkClient, gp *publisher.Geophone) error {
+	if len(client.Channels) == 0 {
+		return fmt.Errorf("no channels selected")
+	}
+
 	var (
+		ts    = gp.TS
 		ehz   = gp.EHZ
 		ehe   = gp.EHE
 		ehn   = gp.EHN
@@ -18,15 +23,17 @@ func (s *SeedLink) handleMessage(gp *publisher.Geophone, conn net.Conn, channels
 		}
 	)
 
-	for _, channel := range channels {
-		data, ok := chMap[channel]
+	for _, channel := range client.Channels {
+		countData, ok := chMap[channel]
 		if !ok {
 			conn.Write([]byte(seedlink.RES_ERR))
 			err := fmt.Errorf("channel %s not found", channel)
 			return err
 		}
 
-		err := seedlink.SendSLPacket(conn, data, gp.TS, seqNum, network, station, channel, location)
+		err := seedlink.SendSLPacket(conn, client, seedlink.SeedLinkPacket{
+			Channel: channel, Timestamp: ts, Count: countData,
+		})
 		if err != nil {
 			return err
 		}
