@@ -12,7 +12,7 @@ import (
 )
 
 func (s *SeedLink) InitClient(slClient *seedlink.SeedLinkClient) {
-	slClient.StreamMode = false
+	slClient.Streaming = false
 }
 
 func (s *SeedLink) InitGlobal(slGlobal *seedlink.SeedLinkGlobal, currentTime time.Time, station, network, location string, bufferDuration int) error {

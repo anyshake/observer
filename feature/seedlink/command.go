@@ -56,7 +56,7 @@ func (s *SeedLink) handleCommand(options *feature.FeatureOptions, slGlobal *seed
 		if clientMessage != "END" &&
 			// An exception for INFO command
 			!strings.Contains(clientMessage, "INFO ") {
-			slClient.StreamMode = false
+			slClient.Streaming = false
 		}
 
 		// Check if command is whitelisted
@@ -101,11 +101,6 @@ func (s *SeedLink) handleCommand(options *feature.FeatureOptions, slGlobal *seed
 			if err != nil {
 				cmd.Fallback(slGlobal, slClient, options, conn)
 			}
-		}
-
-		// Clear selected channels
-		if clientMessage == "END" {
-			slClient.Channels = []string{}
 		}
 	}
 }

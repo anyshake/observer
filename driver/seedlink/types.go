@@ -87,16 +87,24 @@ type SeedLinkCommand struct {
 
 // SeedLink client state
 type SeedLinkClient struct {
-	StreamMode bool
-	Network    string
-	Station    string
-	Location   string
-	Channels   []string
-	StartTime  time.Time
-	EndTime    time.Time
+	Streaming bool
+	Sequence  int64
+	Network   string
+	Station   string
+	Location  string
+	Channels  []string
+	StartTime time.Time
+	EndTime   time.Time
 }
 
-type SeedLinkStreamer func(pub *publisher.Geophone, conn net.Conn, channels []string, network, station, location string, seqNum *int64) error
+// SeedLink data packet model
+type SeedLinkPacket struct {
+	Count     []int32
+	Channel   string
+	Timestamp int64
+}
+
+type SeedLinkStreamer func(conn net.Conn, client *SeedLinkClient, pub *publisher.Geophone) error
 
 // Interface for SeedLink command callback & fallback
 type SeedLinkCommandCallback interface {
