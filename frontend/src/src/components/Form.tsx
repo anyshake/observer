@@ -69,15 +69,14 @@ export const Form = (props: FormProps) => {
                     }}
                 />
                 <FormControl
-                    fullWidth
                     sx={{ my: 2 }}
                     style={{
                         display: inputType === "select" ? "block" : "none",
                     }}
                 >
-                    <InputLabel id="select">{placeholder}</InputLabel>
+                    <InputLabel>{placeholder}</InputLabel>
                     <Select
-                        labelId="select"
+                        fullWidth
                         label={placeholder}
                         onChange={({ target }) => {
                             setSelectValue(target.value);

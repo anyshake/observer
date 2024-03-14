@@ -365,9 +365,11 @@ const History = (props: RouterComponentProps) => {
                     estimation,
                 }) => [
                     region,
-                    `${timestamp + estimation.p * 1000}|${
-                        timestamp + estimation.s * 1000
-                    }`,
+                    `${Math.round(
+                        timestamp + estimation.p * 1000 - duration * 500
+                    )}|${Math.round(
+                        timestamp + estimation.s * 1000 + duration * 500
+                    )}`,
                     t("views.history.selects.choose_event.template", {
                         event,
                         time: getTimeString(timestamp),
