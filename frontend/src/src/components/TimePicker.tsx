@@ -55,11 +55,9 @@ export const TimePicker = (props: TimePickerProps) => {
                         seconds: renderTimeViewClock,
                     }}
                     onChange={(value) => {
-                        let val = value ?? 0;
-                        if (isNaN(val)) {
-                            val = 0;
-                        }
-                        onChange(val);
+                        const dateObj = new Date(value ?? 0);
+                        const dateTs = dateObj.getTime();
+                        onChange(isNaN(dateTs) ? 0 : dateTs);
                     }}
                     slotProps={{
                         field: { clearable: true },
