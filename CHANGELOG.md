@@ -2,6 +2,10 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.11.7
+
+- Support earthquake event source API of Korea Meteorological Administration
+
 ## v2.11.6
 
 - Ensure that there is only one Websocket connection after reconnecting

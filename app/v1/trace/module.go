@@ -22,6 +22,7 @@ func (t *Trace) RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions) 
 		"CWA":    &CWA{},
 		"HKO":    &HKO{},
 		"JMA":    &JMA{},
+		"KMA":    &KMA{},
 		"CEIC":   &CEIC{},
 		"USGS":   &USGS{},
 		"SCEA_E": &SCEA_E{},
