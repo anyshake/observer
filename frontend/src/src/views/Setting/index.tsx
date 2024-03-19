@@ -10,6 +10,7 @@ import { ReduxStoreProps } from "../../config/store";
 import { globalConfig } from "../../config/global";
 import { Form, FormProps } from "../../components/Form";
 import { onUpdate as updateRetention } from "../../stores/retention";
+import { onUpdate as updateDuration } from "../../stores/duration";
 import { Select, SelectProps } from "../../components/Select";
 import { onUpdate as updateScale } from "../../stores/scale";
 import { apiConfig } from "../../config/api";
@@ -67,14 +68,14 @@ const Settings = () => {
     const handleDurationChange = (newValue?: string) => {
         if (!!newValue?.length) {
             const value = parseInt(newValue);
-            const { maximum, minimum } = retention;
+            const { maximum, minimum } = duration;
             if (isNaN(value) || value < minimum || value > maximum) {
                 return;
             }
             sendUserAlert(
                 t("views.setting.toasts.duration_set", { current: value })
             );
-            dispatch(updateRetention(value));
+            dispatch(updateDuration(value));
             handleCloseForm();
             handleReload();
         } else {
@@ -82,7 +83,7 @@ const Settings = () => {
                 ...form,
                 open: true,
                 values: { ...duration },
-                onSubmit: handleRetentionChange,
+                onSubmit: handleDurationChange,
                 cancelText: "views.setting.forms.query_duration.cancel",
                 submitText: "views.setting.forms.query_duration.submit",
                 title: "views.setting.forms.query_duration.title",

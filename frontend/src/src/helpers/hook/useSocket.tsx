@@ -5,42 +5,57 @@ export const useSocket = <APIRequest, APICommonResponse>(
     options: SocketOptions<APIRequest, APICommonResponse>,
     reconnect = true
 ) => {
-    const optionsRef = useRef<SocketOptions<
-        APIRequest,
-        APICommonResponse
-    > | null>(options);
-    const socketRef = useRef<WebSocket | null>();
+    const optionsRef = useRef<SocketOptions<APIRequest, APICommonResponse> | null>(options);
+    const socketRef = useRef<WebSocket | null>(null);
+    const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         const connect = () => {
-            if (!optionsRef.current) {
+            if (!optionsRef.current || socketRef.current) {
                 return;
             }
+
             socketRef.current = connectSocket<APIRequest, APICommonResponse>({
                 ...optionsRef.current,
                 onClose: (e) => {
-                    socketRef.current = null;
                     optionsRef.current?.onClose?.(e);
-                    reconnect &&
-                        setTimeout(() => {
+                    if (reconnect) {
+                        if (reconnectTimeoutRef.current) {
+                            clearTimeout(reconnectTimeoutRef.current);
+                        }
+                        reconnectTimeoutRef.current = setTimeout(() => {
+                            socketRef.current = null;
                             connect();
                         }, 1000);
+                    } else {
+                        socketRef.current = null;
+                    }
                 },
                 onError: (e) => {
-                    socketRef.current = null;
                     optionsRef.current?.onError?.(e);
-                    reconnect &&
-                        setTimeout(() => {
+                    if (reconnect) {
+                        if (reconnectTimeoutRef.current) {
+                            clearTimeout(reconnectTimeoutRef.current);
+                        }
+                        reconnectTimeoutRef.current = setTimeout(() => {
+                            socketRef.current = null;
                             connect();
                         }, 1000);
+                    } else {
+                        socketRef.current = null;
+                    }
                 },
             });
         };
         connect();
 
         return () => {
+            if (reconnectTimeoutRef.current) {
+                clearTimeout(reconnectTimeoutRef.current);
+            }
             socketRef.current?.close();
             optionsRef.current = null;
+            socketRef.current = null;
         };
     }, [reconnect]);
 };
