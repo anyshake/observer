@@ -2,8 +2,6 @@ package seedlink
 
 import (
 	"net"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/anyshake/observer/feature"
@@ -51,16 +49,12 @@ func (*END) Callback(sl *SeedLinkGlobal, client *SeedLinkClient, options *featur
 				bufTime   = time.UnixMilli(timestamp).UTC()
 			)
 			if bufTime.After(client.StartTime.UTC()) && bufTime.Before(client.EndTime.UTC()) {
-				var countData []int32
-				for _, v := range strings.Split(data, "|") {
-					intData, err := strconv.Atoi(v)
-					if err != nil {
-						return err
-					}
-					countData = append(countData, int32(intData))
+				countDataArr, err := publisher.DecodeInt32Array(data)
+				if err != nil {
+					return err
 				}
-				err := SendSLPacket(conn, client, SeedLinkPacket{
-					Channel: channel, Timestamp: timestamp, Count: countData,
+				err = SendSLPacket(conn, client, SeedLinkPacket{
+					Channel: channel, Timestamp: timestamp, Count: countDataArr,
 				})
 				if err != nil {
 					return err
