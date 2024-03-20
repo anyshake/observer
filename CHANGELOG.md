@@ -2,9 +2,15 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.11.8
+
+- Add earthquake event source API support of CEA and INGV
+- Reuse of int32 array encoding and decoding functions
+- Specify the minimun TLS version to 1.0 in HTTP client
+
 ## v2.11.7
 
-- Support earthquake event source API of Korea Meteorological Administration
+- Add earthquake event source API support of KMA
 
 ## v2.11.6
 
