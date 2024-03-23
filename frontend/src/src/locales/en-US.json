@@ -14,7 +14,7 @@
                 },
                 "success": {
                     "title": "{{ station }} Connected",
-                    "content": "Server Uptime: {{ uptime }} seconds\nServer Architecture: {{ arch }}/{{ os }}\nUUID: {{ uuid }}"
+                    "content": "Uptime: {{ uptime }} s\nFree disk: {{ disk }}%\nArchitecture: {{ arch }}/{{ os }}"
                 },
                 "error": {
                     "title": "Connection Failed",
