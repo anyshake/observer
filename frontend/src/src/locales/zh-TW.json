@@ -14,7 +14,7 @@
                 },
                 "success": {
                     "title": "{{ station }} 已連線",
-                    "content": "伺服器在線時長 {{ uptime }} 秒\n伺服器採用架構 {{ arch }}/{{ os }}\nUUID {{ uuid }}"
+                    "content": "在線時長 {{ uptime }} 秒\n硬碟可用空間 {{ disk }}%\n伺服器架構 {{ arch }}/{{ os }}"
                 },
                 "error": {
                     "title": "連線失敗",

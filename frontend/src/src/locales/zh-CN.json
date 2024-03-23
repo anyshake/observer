@@ -14,7 +14,7 @@
                 },
                 "success": {
                     "title": "{{ station }} 已连接",
-                    "content": "服务器在线时长 {{ uptime }} 秒\n服务器采用架构 {{ arch }}/{{ os }}\nUUID {{ uuid }}"
+                    "content": "服务器在线 {{ uptime }} 秒\n磁盘剩余容量 {{ disk }}%\n服务器架构 {{ arch }}/{{ os }}"
                 },
                 "error": {
                     "title": "连接失败",

@@ -5,7 +5,7 @@ import { StationUpdates } from "./getStationUpdates";
 export const handleSetBanner = (
     res: StationUpdates,
     stateFn: Dispatch<
-        SetStateAction<BannerProps & { values?: Record<string, string> }>
+        SetStateAction<BannerProps & { values?: Record<string, string>; }>
     >
 ) => {
     if (!res?.data) {
@@ -16,9 +16,10 @@ export const handleSetBanner = (
         });
         return;
     }
-    const { station, uptime, os } = res.data;
+    const { station, uptime, os, disk } = res.data;
     const { uuid, name } = station;
     const { arch, distro } = os;
+    const { percent } = disk;
     stateFn({
         title: "views.home.banner.success.title",
         content: "views.home.banner.success.content",
@@ -29,6 +30,7 @@ export const handleSetBanner = (
             os: distro,
             uuid,
             arch,
+            disk: (100 - percent).toFixed(2),
         },
     });
 };
