@@ -33,7 +33,7 @@ const App = () => {
         author,
         repository,
         homepage,
-        description,
+        footer,
         version,
         release,
     } = globalConfig;
@@ -137,10 +137,10 @@ const App = () => {
 
             <Scroller threshold={100} />
             <Footer
+                text={footer}
                 author={author}
                 homepage={homepage}
                 repository={repository}
-                description={description}
                 currentLocale={currentLocale}
             />
         </Container>

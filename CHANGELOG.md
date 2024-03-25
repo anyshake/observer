@@ -2,6 +2,11 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.11.10
+
+- Set minimum TLS version to 1.2 for HTTP request utility
+- Update frontend dependencies
+
 ## v2.11.9
 
 - Show free disk space in banner instead of station UUID

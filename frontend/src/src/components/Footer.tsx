@@ -8,17 +8,17 @@ interface FooterProps {
     readonly homepage: string;
     readonly repository: string;
     readonly currentLocale: string;
-    readonly description: Record<keyof typeof i18nConfig.resources, string>;
+    readonly text: Record<keyof typeof i18nConfig.resources, string>;
 }
 
 export const Footer = (props: FooterProps) => {
-    const { description, homepage, currentLocale, author, repository } = props;
+    const { text, homepage, currentLocale, author, repository } = props;
     const [currentYear] = useState(new Date().getFullYear());
 
     return (
         <footer className="w-full bg-gray-200 text-gray-500 flex flex-col px-6 py-2 sm:flex-row justify-between">
             <span className="text-xs text-center md:ml-12">
-                {description[currentLocale]}
+                {text[currentLocale]}
             </span>
             <div className="inline-flex text-center justify-center">
                 <Link
