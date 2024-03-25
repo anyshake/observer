@@ -28,7 +28,7 @@ interface GlobalConfig {
         readonly minimum: number;
     };
     readonly scales: IntensityStandard[];
-    readonly description: Record<keyof typeof i18nConfig.resources, string>;
+    readonly footer: Record<keyof typeof i18nConfig.resources, string>;
 }
 
 const version = getVersion();
@@ -51,7 +51,7 @@ export const globalConfig: GlobalConfig = {
     repository: "https://github.com/AnyShake",
     duration: { default: 300, maximum: 3600, minimum: 10 },
     retention: { default: 180, maximum: 600, minimum: 10 },
-    description: {
+    footer: {
         "en-US": "Constructing Realtime Seismic Network Ambitiously.",
         "zh-CN": "雄心勃勃，致力于构建实时地震网络",
         "zh-TW": "雄心勃勃，致力於建置即時地震網路",

@@ -16,26 +16,37 @@ export interface TimePickerProps {
     readonly onChange: (value: number) => void;
 }
 
-const languageConfig: Record<string, { theme: object; adapterLocale: Locale }> =
-    {
-        "zh-CN": { theme: XDatePickers.zhCN, adapterLocale: DateFnsLang.zhCN },
-        "zh-TW": { theme: XDatePickers.zhHK, adapterLocale: DateFnsLang.zhTW },
-        "en-US": { theme: XDatePickers.enUS, adapterLocale: DateFnsLang.enUS },
-        "ja-JP": { theme: XDatePickers.jaJP, adapterLocale: DateFnsLang.ja },
-        "ko-KR": { theme: XDatePickers.koKR, adapterLocale: DateFnsLang.ko },
-    };
-
 export const TimePicker = (props: TimePickerProps) => {
     const { label, onChange, value, defaultValue, currentLocale } = props;
 
+    const themeRecords = Object.entries(XDatePickers).reduce(
+        (acc, [locale, value]) => {
+            acc[locale] = value;
+            return acc;
+        },
+        {} as Record<string, any>
+    );
+    const adapterLocaleRecords = Object.entries(DateFnsLang).reduce(
+        (acc, [locale, value]) => {
+            acc[locale] = value;
+            return acc;
+        },
+        {} as Record<string, any>
+    );
+
+    let locale4Component = currentLocale.replaceAll(/[^a-z0-9]/gi, "");
+    if (!themeRecords[locale4Component] || !adapterLocaleRecords[locale4Component]) {
+        locale4Component = "enUS"
+    }
+
+    const theme = createTheme({}, themeRecords[locale4Component]);
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const theme = createTheme({}, languageConfig[currentLocale].theme);
 
     return (
         <ThemeProvider theme={theme}>
             <LocalizationProvider
                 dateAdapter={AdapterDateFns}
-                adapterLocale={languageConfig[currentLocale].adapterLocale}
+                adapterLocale={adapterLocaleRecords[locale4Component]}
             >
                 <DateTimePicker
                     format="yyyy-MM-dd HH:mm:ss"
