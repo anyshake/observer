@@ -46,6 +46,12 @@ func (a *Archiver) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 	}
 	options.Database = pdb
 
+	// Start cleanup routine if life cycle bigger than 0
+	lifeCycle := options.Config.MiniSEED.LifeCycle
+	if lifeCycle > 0 {
+		go a.handleCleanup(options.Status, pdb, lifeCycle)
+	}
+
 	// Archive when new message arrived
 	expressionForSubscribe := true
 	go func() {
