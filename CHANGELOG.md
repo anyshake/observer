@@ -2,6 +2,10 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.12.0
+
+- Support lifecycle configuration for records in database
+
 ## v2.11.10
 
 - Set minimum TLS version to 1.2 for HTTP request utility
@@ -9,7 +13,7 @@ Starting from v2.2.5, all notable changes to this project will be documented in 
 
 ## v2.11.9
 
-- Show free disk space in banner instead of station UUID
+- Show disk free space in banner instead of station UUID
 
 ## v2.11.8
 

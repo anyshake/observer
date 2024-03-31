@@ -39,13 +39,14 @@ type ntpclient struct {
 }
 
 type archiver struct {
-	Engine   string `json:"engine"`
-	Enable   bool   `json:"enable"`
-	Host     string `json:"host"`
-	Port     int    `json:"port"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Database string `json:"database"`
+	Engine    string `json:"engine"`
+	Enable    bool   `json:"enable"`
+	Host      string `json:"host"`
+	Port      int    `json:"port"`
+	LifeCycle int    `json:"lifecycle"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	Database  string `json:"database"`
 }
 
 type server struct {

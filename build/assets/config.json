@@ -39,7 +39,8 @@
         "port": 5432,
         "username": "postgres",
         "password": "passw0rd",
-        "database": "observer"
+        "database": "observer",
+        "lifecycle": 10
     },
     "server_settings": {
         "host": "0.0.0.0",
