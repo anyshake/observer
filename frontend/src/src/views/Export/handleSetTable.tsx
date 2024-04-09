@@ -16,7 +16,7 @@ export const handleSetTable = (
     }
 
     const tableData = res.data
-        .sort((a, b) => b.time - a.time)
+        .sort((a, b) => Math.floor(b.time / 1000) - Math.floor(a.time / 1000))
         .map((item) => {
             const timeString = getTimeString(new Date(item.time).getTime());
             return { ...item, time: timeString };

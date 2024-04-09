@@ -2,6 +2,12 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.12.1
+
+- Sort earthquake event source API by name in frontend
+- Fix intensity calculation issue of CSIS in frontend
+- Removal of unused utility functions
+
 ## v2.12.0
 
 - Support lifecycle configuration for records in database
