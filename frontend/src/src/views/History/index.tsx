@@ -394,12 +394,24 @@ const History = (props: RouterComponentProps) => {
         setForm((prev) => ({
             ...prev,
             open: true,
-            selectOptions: res.data.map((source) => {
-                if ("name" in source && "value" in source) {
-                    return { label: source.name, value: source.value };
-                }
-                return { label: "", value: "" };
-            }),
+            selectOptions: res.data
+                .sort((a, b) => {
+                    if (
+                        "name" in a &&
+                        "value" in a &&
+                        "name" in b &&
+                        "value" in b
+                    ) {
+                        return a.name.localeCompare(b.name);
+                    }
+                    return 0;
+                })
+                .map((source) => {
+                    if ("name" in source && "value" in source) {
+                        return { label: source.name, value: source.value };
+                    }
+                    return { label: "", value: "" };
+                }),
             onSubmit: handleSubmitForm,
             title: "views.history.forms.choose_source.title",
             cancelText: "views.history.forms.choose_source.cancel",

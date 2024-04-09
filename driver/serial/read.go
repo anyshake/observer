@@ -14,7 +14,7 @@ func Read(r io.Reader, buf []byte, timeout time.Duration) (n int, err error) {
 	}
 
 	start := time.Now()
-	for n < min && err == nil {
+	for n < min {
 		if time.Since(start) > timeout {
 			return 0, fmt.Errorf("timeout due to no response")
 		}

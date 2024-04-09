@@ -126,6 +126,9 @@ export class CSISIntensityStandard implements IntensityStandard {
         { currentPGA: pga, currentPGV: pgv }: GetIntensityData,
         _attributes: GetIntensityAttributes
     ) => {
+        pga /= 100;
+        pgv /= 100;
+
         const IA = 3.17 * Math.log10(pga) + 6.59;
         const IV = 3 * Math.log10(pgv) + 9.77;
 
