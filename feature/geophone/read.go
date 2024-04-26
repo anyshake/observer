@@ -11,7 +11,7 @@ import (
 
 func (g *Geophone) Read(port io.ReadWriteCloser, conf *config.Conf, packet *Packet, packetLen int) error {
 	// Filter frame header
-	_, err := serial.Filter(port, SYNC_WORD[:], 128)
+	_, err := serial.Filter(port, SYNC_WORD[:])
 	if err != nil {
 		return err
 	}

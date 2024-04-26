@@ -12,6 +12,6 @@ func (g *Geophone) Reset(port io.ReadWriteCloser) error {
 		return err
 	}
 
-	serial.Filter(port, ACK_WORD[:], 128)
+	serial.Filter(port, ACK_WORD[:])
 	return nil
 }

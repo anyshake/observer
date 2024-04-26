@@ -4,16 +4,23 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"math"
+	"time"
 )
 
-func Filter(port io.ReadWriteCloser, signature []byte, retry int) ([]byte, error) {
+func Filter(port io.ReadWriteCloser, signature []byte) ([]byte, error) {
 	header := make([]byte, len(signature))
 
-	for i := 0; i < retry; i++ {
-		port.Read(header)
+	for i := 0; i < math.MaxUint8; i++ {
+		_, err := port.Read(header)
+		if err != nil {
+			return nil, err
+		}
 
 		if bytes.Equal(header, signature) {
-			return nil, nil
+			return header, nil
+		} else {
+			time.Sleep(time.Millisecond)
 		}
 	}
 
