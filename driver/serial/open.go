@@ -8,11 +8,11 @@ import (
 
 func Open(device string, baud int) (io.ReadWriteCloser, error) {
 	port, err := serial.Open(device,
-		serial.WithHUPCL(false),
+		serial.WithHUPCL(true),
 		serial.WithDataBits(8),
 		serial.WithBaudrate(baud),
-		serial.WithReadTimeout(500),
-		serial.WithWriteTimeout(500),
+		serial.WithReadTimeout(5),
+		serial.WithWriteTimeout(5),
 		serial.WithParity(serial.NoParity),
 		serial.WithStopBits(serial.OneStopBit),
 	)

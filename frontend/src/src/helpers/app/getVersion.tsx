@@ -1,3 +1,3 @@
 export const getVersion = () => {
-    return process.env.REACT_APP_VERSION || "unknown";
+    return process.env.REACT_APP_VERSION ?? "custom build";
 };
