@@ -50,6 +50,7 @@ func (s *SeedLink) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 		s.OnError(options, err)
 		return
 	}
+	defer slGlobal.SeedLinkBuffer.Database.Close()
 
 	// Accept incoming connections
 	s.OnStart(options, "service has started")
@@ -79,5 +80,4 @@ func (s *SeedLink) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 	// Wait for interrupt signals
 	<-sigCh
 	logger.Print(MODULE, "closing buffer area", color.FgBlue, true)
-	slGlobal.SeedLinkBuffer.Database.Close()
 }

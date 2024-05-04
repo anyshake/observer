@@ -45,6 +45,7 @@ func (a *Archiver) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 		os.Exit(1)
 	}
 	options.Database = pdb
+	defer dao.Close(pdb)
 
 	// Start cleanup routine if life cycle bigger than 0
 	lifeCycle := options.Config.MiniSEED.LifeCycle
@@ -75,5 +76,4 @@ func (a *Archiver) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 	// Wait for interrupt signals
 	<-sigCh
 	logger.Print(MODULE, "closing database connection", color.FgBlue, true)
-	dao.Close(pdb)
 }
