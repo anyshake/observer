@@ -20,7 +20,9 @@ var (
 	ACK_WORD = [...]byte{0xFC, 0x2B}
 )
 
-type Geophone struct{}
+type Geophone struct {
+	Ticker *time.Ticker
+}
 
 type Packet struct {
 	EHZ      []int32 // Vertical

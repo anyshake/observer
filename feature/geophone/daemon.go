@@ -32,6 +32,9 @@ func (g *Geophone) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 	}
 	defer serial.Close(port)
 
+	g.Ticker = time.NewTicker(READY_THRESHOLD)
+	defer g.Ticker.Stop()
+
 	go func() {
 		// Initialize geophone packet
 		var packet Packet
@@ -80,6 +83,24 @@ func (g *Geophone) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 		}
 	}()
 
+	go func() {
+		for {
+			<-g.Ticker.C
+			currentTime, _ := duration.Timestamp(options.Status.System.Offset)
+			// Set packet timestamp, note that the timestamp in buffer is the start of the packet
+			options.Status.Buffer.TS = currentTime.UnixMilli() - time.Second.Milliseconds()
+			// Set last received time is the current timestamp
+			options.Status.LastRecvTime = currentTime
+			options.Status.System.Messages++
+			// Copy and reset buffer
+			options.Status.Geophone = *options.Status.Buffer
+			options.Status.Buffer.EHZ = []int32{}
+			options.Status.Buffer.EHE = []int32{}
+			options.Status.Buffer.EHN = []int32{}
+			g.OnReady(options)
+		}
+	}()
+
 	// Receive interrupt signals
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
@@ -87,5 +108,4 @@ func (g *Geophone) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 	// Wait for interrupt signals
 	<-sigCh
 	g.OnStop(options, "closing serial connection")
-	serial.Close(port)
 }

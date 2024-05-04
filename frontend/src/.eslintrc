@@ -1,0 +1,30 @@
+{
+	"root": true,
+	"parser": "@typescript-eslint/parser",
+	"plugins": ["@typescript-eslint", "simple-import-sort"],
+	"extends": [
+		"react-app",
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:@typescript-eslint/eslint-recommended"
+	],
+	"rules": {
+		"no-unused-vars": "off",
+		"simple-import-sort/imports": "error",
+		"simple-import-sort/exports": "error",
+		"@typescript-eslint/no-non-null-assertion": "off",
+		"no-empty": "error",
+		"no-undef": "error",
+		"block-scoped-var": "error",
+		"eqeqeq": "error",
+		"no-else-return": "error",
+		"linebreak-style": ["error", "unix"],
+		"no-console": "warn",
+		"no-fallthrough": "error",
+		"no-octal": "error",
+		"camelcase": "error"
+	},
+	"globals": {
+		"NodeJS": true
+	}
+}
