@@ -98,7 +98,7 @@ const Home = () => {
 			flyTo: true,
 			center: [0, 0],
 			dragging: false,
-			tile: "/tiles/{z}/{x}/{y}/tile.webp"
+			tile: "/tiles/{z}/{x}/{y}.webp"
 		},
 		holder: {
 			label: "views.home.map.label",
