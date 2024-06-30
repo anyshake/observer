@@ -2,6 +2,10 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v2.12.6
+
+- Fix gaps and Sample rate issue
+
 ## v2.12.5
 
 - Fix gaps in MiniSEED records

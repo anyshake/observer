@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"math"
-	"time"
 )
 
 func Filter(port io.ReadWriteCloser, signature []byte) ([]byte, error) {
@@ -19,8 +18,6 @@ func Filter(port io.ReadWriteCloser, signature []byte) ([]byte, error) {
 
 		if bytes.Equal(header, signature) {
 			return header, nil
-		} else {
-			time.Sleep(time.Millisecond)
 		}
 	}
 

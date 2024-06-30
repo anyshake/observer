@@ -87,9 +87,8 @@ func (g *Geophone) Run(options *feature.FeatureOptions, waitGroup *sync.WaitGrou
 		for {
 			<-g.Ticker.C
 			currentTime, _ := duration.Timestamp(options.Status.System.Offset)
-			timeDiff := duration.Difference(currentTime, options.Status.LastRecvTime)
 			// Set packet timestamp, note that the timestamp in buffer is the start of the packet
-			options.Status.Buffer.TS = currentTime.UnixMilli() - timeDiff.Milliseconds()
+			options.Status.Buffer.TS = currentTime.UnixMilli() - time.Second.Milliseconds()
 			// Set last received time is the current timestamp
 			options.Status.LastRecvTime = currentTime
 			options.Status.System.Messages++
