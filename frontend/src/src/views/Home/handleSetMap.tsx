@@ -16,8 +16,8 @@ export const handleSetMap = (
 	if (!res?.data) {
 		return;
 	}
-	const { position } = res.data;
-	const { longitude, latitude, elevation } = position;
+	const { explorer } = res.data;
+	const { longitude, latitude, elevation } = explorer;
 	stateFn((prev) => ({
 		...prev,
 		mapbox: {

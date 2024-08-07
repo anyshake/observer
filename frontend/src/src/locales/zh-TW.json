@@ -56,8 +56,8 @@
                     "label": "等待推送訊息量",
                     "unit": "筆"
                 },
-                "offset": {
-                    "label": "系統時間偏移量",
+                "elapsed": {
+                    "label": "Explorer 連線時間",
                     "unit": "秒"
                 }
             }
@@ -78,8 +78,8 @@
                 }
             },
             "charts": {
-                "ehz": {
-                    "label": "EHZ 通道波形",
+                "z_axis": {
+                    "label": "{{channel}}Z 通道波形",
                     "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
                     "advanced": {
                         "panels": {
@@ -93,8 +93,8 @@
                         }
                     }
                 },
-                "ehe": {
-                    "label": "EHE 通道波形",
+                "e_axis": {
+                    "label": "{{channel}}E 通道波形",
                     "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
                     "advanced": {
                         "panels": {
@@ -108,8 +108,8 @@
                         }
                     }
                 },
-                "ehn": {
-                    "label": "EHN 通道波形",
+                "n_axis": {
+                    "label": "{{channel}}N 通道波形",
                     "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
                     "advanced": {
                         "panels": {
@@ -150,8 +150,8 @@
                 }
             },
             "charts": {
-                "ehz": {
-                    "label": "EHZ 通道波形",
+                "z_axis": {
+                    "label": "{{channel}}Z 通道波形",
                     "text": "點擊下方按鈕設定濾波器",
                     "advanced": {
                         "panels": {
@@ -165,8 +165,8 @@
                         }
                     }
                 },
-                "ehe": {
-                    "label": "EHE 通道波形",
+                "e_axis": {
+                    "label": "{{channel}}E 通道波形",
                     "text": "點擊下方按鈕設定濾波器",
                     "advanced": {
                         "panels": {
@@ -180,8 +180,8 @@
                         }
                     }
                 },
-                "ehn": {
-                    "label": "EHN 通道波形",
+                "n_axis": {
+                    "label": "{{channel}}N 通道波形",
                     "text": "點擊下方按鈕設定濾波器",
                     "advanced": {
                         "panels": {
@@ -207,16 +207,16 @@
                 "get_share_link": "分享連結"
             },
             "labels": {
-                "ehz_detail": {
-                    "label": "EHZ 通道資訊",
+                "z_axis_detail": {
+                    "label": "{{channel}}Z 通道資訊",
                     "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
                 },
-                "ehe_detail": {
-                    "label": "EHE 通道資訊",
+                "e_axis_detail": {
+                    "label": "{{channel}}E 通道資訊",
                     "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
                 },
-                "ehn_detail": {
-                    "label": "EHN 通道資訊",
+                "n_axis_detail": {
+                    "label": "{{channel}}N 通道資訊",
                     "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
                 }
             },

@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func (c *Conf) Read(path string) error {
+func (c *Config) Read(path string) error {
 	file, err := os.Open(path)
 	if err != nil {
 		return err

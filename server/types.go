@@ -1,10 +1,15 @@
 package server
 
 import (
-	"github.com/anyshake/observer/app"
-	"github.com/gin-gonic/gin"
+	"github.com/anyshake/observer/services"
 )
 
-type ApiServices interface {
-	RegisterModule(rg *gin.RouterGroup, options *app.ServerOptions)
+type Options struct {
+	CORS            bool
+	DebugMode       bool
+	GzipLevel       int
+	RateFactor      int
+	WebPrefix       string
+	ApiPrefix       string
+	ServicesOptions *services.Options
 }

@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"runtime"
 	"time"
-
-	"github.com/anyshake/observer/utils/text"
-	"github.com/fatih/color"
 )
 
 var (
@@ -16,14 +13,11 @@ var (
 )
 
 func printVersion() {
-	var (
-		copyright = "© AnyShake " + fmt.Sprintf("%d", time.Now().Year()) + ". All Rights Reversed."
-		version   = text.Concat(
-			"Observer ", version, " (", description, ")\nRelease: ", version, "-", release, " ",
-			runtime.Version(), " ", runtime.GOOS, "/", runtime.GOARCH, "\n", copyright,
-		)
+	copyright := "© AnyShake " + fmt.Sprintf("%d", time.Now().Year()) + ". All Rights Reversed."
+	version = concat(
+		"Observer ", version, " (", description, ")\nRelease: ", version, "-", release, " ",
+		runtime.Version(), " ", runtime.GOOS, "/", runtime.GOARCH, "\n", copyright,
 	)
 
-	w := color.New(color.FgHiCyan).SprintFunc()
-	fmt.Println(w(version))
+	fmt.Println(version)
 }

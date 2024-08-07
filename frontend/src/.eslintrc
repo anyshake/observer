@@ -21,8 +21,7 @@
 		"linebreak-style": ["error", "unix"],
 		"no-console": "warn",
 		"no-fallthrough": "error",
-		"no-octal": "error",
-		"camelcase": "error"
+		"no-octal": "error"
 	},
 	"globals": {
 		"NodeJS": true

@@ -6,7 +6,7 @@ export const getProtocol = (http: boolean) => {
 		return window.location.protocol === "https:" ? "wss:" : "ws:";
 	}
 	if (http) {
-		return process.env.REACT_APP_BACKEND_TLS ? "https:" : "http:";
+		return process.env.REACT_APP_BACKEND_TLS === "true" ? "https:" : "http:";
 	}
-	return process.env.REACT_APP_BACKEND_TLS ? "wss:" : "ws:";
+	return process.env.REACT_APP_BACKEND_TLS === "true" ? "wss:" : "ws:";
 };

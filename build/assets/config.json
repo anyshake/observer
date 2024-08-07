@@ -1,63 +1,67 @@
 {
     "station_settings": {
-        "uuid": "a373e39c-8e15-44ae-a1ad-6fb622bc49e6",
         "name": "AnyShake Station",
-        "station": "SHAKE",
-        "network": "AS",
-        "location": "00",
-        "latitude": 39.9,
-        "longitude": 116.3,
-        "elevation": 0,
+        "owner": "Lee",
         "region": "Asia",
         "country": "China",
-        "city": "Beijing",
-        "owner": "Lee"
+        "city": "Beijing"
     },
-    "geophone_settings": {
+    "location_settings": {
+        "latitude": 39.9,
+        "longitude": 116.4,
+        "elevation": 50.0
+    },
+    "explorer_settings": {
+        "dsn": "transport:///dev/ttyUSB0?baudrate=115200",
+        "engine": "serial",
+        "legacy": false
+    },
+    "sensor_settings": {
+        "frequency": 4.5,
         "sensitivity": 28.8,
-        "frequency": 4.5
+        "velocity": true,
+        "vref": 5.0,
+        "fullscale": 10.0,
+        "resolution": 32
     },
-    "adc_settings": {
-        "resolution": 27,
-        "fullscale": 5.0
-    },
-    "serial_settings": {
-        "packet": 4,
-        "baud": 19200,
-        "device": "/dev/ttyUSB0"
+    "stream_settings": {
+        "network": "AS",
+        "station": "SHAKE",
+        "location": "00",
+        "channel": "EH"
     },
     "ntpclient_settings": {
-        "host": "0.pool.ntp.org",
-        "port": 123,
-        "timeout": 3,
-        "interval": 5
+        "host": "pool.ntp.org",
+        "port": 123
     },
-    "archiver_settings": {
-        "enable": false,
-        "engine": "postgresql",
-        "host": "127.0.0.1",
-        "port": 5432,
-        "username": "postgres",
-        "password": "passw0rd",
-        "database": "observer",
-        "lifecycle": 10
+    "database_settings": {
+        "engine": "sqlite",
+        "host": "",
+        "port": 0,
+        "username": "",
+        "password": "",
+        "database": "/home/yuki/observer.db"
     },
     "server_settings": {
         "host": "0.0.0.0",
         "port": 8073,
         "cors": true,
-        "debug": false,
+        "debug": true,
         "rate": 30
     },
-    "miniseed_settings": {
-        "enable": false,
-        "path": "/data/miniseed",
-        "lifecycle": 10
+    "logger_settings": {
+        "level": "info",
+        "dump": "/home/yuki/observer.log"
     },
-    "seedlink_settings": {
-        "enable": false,
-        "host": "0.0.0.0",
-        "port": 18000,
-        "duration": 86400
+    "services_settings": {
+        "miniseed": {
+            "enable": true,
+            "lifecycle": 10,
+            "path": "/home/yuki/miniseed"
+        },
+        "archiver": {
+            "enable": true,
+            "lifecycle": 10
+        }
     }
 }

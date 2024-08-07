@@ -10,7 +10,7 @@ export const handleSetBanner = (
 	res: SocketUpdates,
 	stateFn: Dispatch<SetStateAction<BannerProps & { values?: Record<string, string> }>>
 ) => {
-	if (!res.ts) {
+	if (!res.timestamp) {
 		return;
 	}
 
@@ -19,7 +19,7 @@ export const handleSetBanner = (
 	const scaleName =
 		globalConfig.scales.find((s) => s.property().value === scaleId)?.property().name ??
 		"Unknown";
-	const time = getTimeString(res.ts);
+	const time = getTimeString(res.timestamp);
 
 	// Get sample rate in average
 	const channels = Object.values(res).filter((v) => Array.isArray(v)) as number[][];

@@ -24,6 +24,5 @@ _testmain.go
 *.test
 *.prof
 
-# AnyShake Observer build files
-build/dist*
-build/release*
+build/dist
+frontend/dist

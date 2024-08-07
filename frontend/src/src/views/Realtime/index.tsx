@@ -1,6 +1,7 @@
 import { HighchartsReactRefObject } from "highcharts-react-official";
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
 
 import { Banner, BannerProps } from "../../components/Banner";
 import { Button } from "../../components/Button";
@@ -10,6 +11,7 @@ import { CollapseMode, Holder, HolderProps } from "../../components/Holder";
 import { Input } from "../../components/Input";
 import { Panel } from "../../components/Panel";
 import { apiConfig } from "../../config/api";
+import { ReduxStoreProps } from "../../config/store";
 import { useSocket } from "../../helpers/hook/useSocket";
 import { sendUserAlert } from "../../helpers/interact/sendUserAlert";
 import { userThrottle } from "../../helpers/utils/userThrottle";
@@ -19,6 +21,8 @@ import { handleSetCharts } from "./handleSetCharts";
 
 const Realtime = () => {
 	const { t } = useTranslation();
+
+	const { station } = useSelector(({ station }: ReduxStoreProps) => station);
 
 	const [banner, setBanner] = useState<BannerProps & { values?: Record<string, string> }>({
 		type: "warning",
@@ -30,7 +34,7 @@ const Realtime = () => {
 			string,
 			{
 				chart: ChartProps & {
-					buffer: { ts: number; data: number[] }[];
+					buffer: { timestamp: number; data: number[] }[];
 					ref: RefObject<HighchartsReactRefObject>;
 					filter: {
 						enabled: boolean;
@@ -42,11 +46,11 @@ const Realtime = () => {
 			}
 		>
 	>({
-		ehz: {
+		z_axis: {
 			holder: {
 				collapse: CollapseMode.COLLAPSE_HIDE,
-				label: "views.realtime.charts.ehz.label",
-				text: "views.realtime.charts.ehz.text",
+				label: "views.realtime.charts.z_axis.label",
+				text: "views.realtime.charts.z_axis.text",
 				values: { pga: "0.00000", pgv: "0.00000", intensity: "-" }
 			},
 			chart: {
@@ -54,14 +58,14 @@ const Realtime = () => {
 				backgroundColor: "#d97706",
 				filter: { enabled: false },
 				ref: useRef<HighchartsReactRefObject>(null),
-				series: { name: "EHZ", type: "line", color: "#f1f5f9" }
+				series: { name: `${station.channel}Z`, type: "line", color: "#f1f5f9" }
 			}
 		},
-		ehe: {
+		e_axis: {
 			holder: {
 				collapse: CollapseMode.COLLAPSE_HIDE,
-				label: "views.realtime.charts.ehe.label",
-				text: "views.realtime.charts.ehe.text",
+				label: "views.realtime.charts.e_axis.label",
+				text: "views.realtime.charts.e_axis.text",
 				values: { pga: "0.00000", pgv: "0.00000", intensity: "-" }
 			},
 			chart: {
@@ -69,14 +73,14 @@ const Realtime = () => {
 				filter: { enabled: false },
 				backgroundColor: "#10b981",
 				ref: useRef<HighchartsReactRefObject>(null),
-				series: { name: "EHE", type: "line", color: "#f1f5f9" }
+				series: { name: `${station.channel}E`, type: "line", color: "#f1f5f9" }
 			}
 		},
-		ehn: {
+		n_axis: {
 			holder: {
 				collapse: CollapseMode.COLLAPSE_HIDE,
-				label: "views.realtime.charts.ehn.label",
-				text: "views.realtime.charts.ehn.text",
+				label: "views.realtime.charts.n_axis.label",
+				text: "views.realtime.charts.n_axis.text",
 				values: { pga: "0.00000", pgv: "0.00000", intensity: "-" }
 			},
 			chart: {
@@ -84,7 +88,7 @@ const Realtime = () => {
 				backgroundColor: "#0ea5e9",
 				filter: { enabled: false },
 				ref: useRef<HighchartsReactRefObject>(null),
-				series: { name: "EHE", type: "line", color: "#f1f5f9" }
+				series: { name: `${station.channel}N`, type: "line", color: "#f1f5f9" }
 			}
 		}
 	});
@@ -190,7 +194,7 @@ const Realtime = () => {
 					<Holder
 						{...charts[key].holder}
 						key={charts[key].holder.label}
-						label={t(charts[key].holder.label)}
+						label={t(charts[key].holder.label, { channel: station.channel })}
 						text={t(charts[key].holder.text ?? "", {
 							...charts[key].holder.values
 						})}

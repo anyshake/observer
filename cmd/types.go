@@ -1,6 +1,12 @@
 package main
 
 const (
-	API_PREFIX string = "/api"
-	WEB_PREFIX string = "/"
+	GZIP_LEVEL = 9
+	WEB_PREFIX = "/"
+	API_PREFIX = "/api"
 )
+
+type arguments struct {
+	Path    string // Path to config file
+	Version bool   // Show version information
+}

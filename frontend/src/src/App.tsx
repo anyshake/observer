@@ -17,6 +17,7 @@ import i18n, { i18nConfig } from "./config/i18n";
 import { menuConfig } from "./config/menu";
 import { routerConfig } from "./config/router";
 import { getAsciiArt } from "./helpers/app/getAsciiArt";
+import { hideLoading } from "./helpers/app/hideLoading";
 import { getCurrentLocale } from "./helpers/i18n/getCurrentLocale";
 import { setUserLocale } from "./helpers/i18n/setUserLocale";
 import { requestRestApi } from "./helpers/request/requestRestApi";
@@ -31,7 +32,7 @@ const App = () => {
 	const { name, title, author, repository, homepage, footer, version, release } = globalConfig;
 
 	useEffect(() => {
-		document.querySelector(".public-loading")?.remove();
+		hideLoading();
 		const asciiArt = getAsciiArt();
 		// eslint-disable-next-line no-console
 		console.info(`%c${asciiArt}`, "color: #0891b2;");
@@ -76,12 +77,12 @@ const App = () => {
 		});
 		if (res?.data) {
 			const initialized = true;
-			const { sensitivity, frequency } = res.data.geophone;
+			const { sensitivity, frequency } = res.data.sensor;
 			dispatch(UpdateGeophone({ sensitivity, frequency, initialized }));
-			const { resolution, fullscale } = res.data.adc;
+			const { resolution, fullscale } = res.data.sensor;
 			dispatch(UpdateADC({ resolution, fullscale, initialized }));
-			const { station, network, location } = res.data.station;
-			dispatch(UpdateStation({ station, network, location, initialized }));
+			const { station, network, location, channel } = res.data.stream;
+			dispatch(UpdateStation({ station, network, location, initialized, channel }));
 		}
 	}, [dispatch]);
 

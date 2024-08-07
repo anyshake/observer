@@ -39,12 +39,12 @@ const Home = () => {
 			unit: "views.home.labels.errors.unit",
 			label: "views.home.labels.errors.label"
 		},
-		offset: {
+		elapsed: {
 			color: true,
 			value: "0",
 			icon: ClockIcon,
-			unit: "views.home.labels.offset.unit",
-			label: "views.home.labels.offset.label"
+			unit: "views.home.labels.elapsed.unit",
+			label: "views.home.labels.elapsed.label"
 		}
 	});
 	const [charts, setCharts] = useState<

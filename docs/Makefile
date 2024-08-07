@@ -1,7 +1,9 @@
-.PHONY: build
+.PHONY: gen
 
-build:
+gen:
 ifeq ($(shell command -v swag 2> /dev/null),)
-	$(error "Swagger is not installed. Run go install github.com/swaggo/swag/cmd/swag@latest first")
+	@echo "Installing Swagger..."
+	@go get github.com/swaggo/swag/cmd/swag
+	@go install github.com/swaggo/swag/cmd/swag
 endif
-	@swag init -g ../cmd/main.go -d ../app,../server,../publisher -o ./
+	@swag init -g ../cmd/main.go -d ../api,../config,../drivers/explorer,../server -o ./

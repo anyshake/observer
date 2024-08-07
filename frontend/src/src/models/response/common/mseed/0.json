@@ -6,10 +6,11 @@
     "message": "Successfully get MiniSEED file list",
     "data": [
         {
-            "ttl": 0,
-            "time": 0,
-            "size": "null",
-            "name": "null"
+            "ttl": 10,
+            "time": 1723038095845,
+            "size": "1 MB",
+            "name": "AS.SHAKE.00.EHZ.D.2024.220.mseed",
+            "sha256": "16b7479c164d41d9416bbbe72e6d54475c798540a8c03ad8b9456024ad3d8bd0"
         }
     ]
 }

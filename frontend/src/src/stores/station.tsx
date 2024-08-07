@@ -4,6 +4,7 @@ export interface Station {
 	readonly station: string;
 	readonly network: string;
 	readonly location: string;
+	readonly channel: string;
 	readonly initialized: boolean;
 }
 
@@ -11,6 +12,7 @@ const initialStation: Station = {
 	station: "SHAKE",
 	network: "AS",
 	location: "00",
+	channel: "EH",
 	initialized: false
 };
 

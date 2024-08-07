@@ -44,13 +44,13 @@ const History = (props: RouterComponentProps) => {
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const [queryDuration, setQueryDuration] = useState<{
-		start: number;
-		end: number;
+		start_time: number;
+		end_time: number;
 	}>({
-		start: searchParams.has("start")
+		start_time: searchParams.has("start")
 			? Number(searchParams.get("start"))
 			: currentTimestamp - 1000 * duration,
-		end: searchParams.has("end") ? Number(searchParams.get("end")) : currentTimestamp
+		end_time: searchParams.has("end") ? Number(searchParams.get("end")) : currentTimestamp
 	});
 
 	const handleTimeChange = (value: number, end: boolean) =>
@@ -79,9 +79,18 @@ const History = (props: RouterComponentProps) => {
 	const [labels, setLabels] = useState<
 		Record<string, LabelProps & { values?: Record<string, string> }>
 	>({
-		ehz: { label: "views.history.labels.ehz_detail.label", value: "-" },
-		ehe: { label: "views.history.labels.ehe_detail.label", value: "-" },
-		ehn: { label: "views.history.labels.ehn_detail.label", value: "-" }
+		z_axis: {
+			label: "views.history.labels.z_axis_detail.label",
+			value: "-"
+		},
+		e_axis: {
+			label: "views.history.labels.e_axis_detail.label",
+			value: "-"
+		},
+		n_axis: {
+			label: "views.history.labels.n_axis_detail.label",
+			value: "-"
+		}
 	});
 
 	const [charts, setCharts] = useState<
@@ -89,58 +98,54 @@ const History = (props: RouterComponentProps) => {
 			string,
 			{
 				chart: ChartProps & {
-					buffer: { ts: number; data: number[] }[];
+					buffer: { timestamp: number; data: number[] }[];
 					ref: RefObject<HighchartsReactRefObject>;
-					filter: {
-						enabled: boolean;
-						lowCorner?: number;
-						highCorner?: number;
-					};
+					filter: { enabled: boolean; lowCorner?: number; highCorner?: number };
 				};
 				holder: HolderProps;
 			}
 		>
 	>({
-		ehz: {
+		z_axis: {
 			holder: {
 				collapse: CollapseMode.COLLAPSE_HIDE,
-				label: "views.history.charts.ehz.label",
-				text: "views.history.charts.ehz.text"
+				label: "views.history.charts.z_axis.label",
+				text: "views.history.charts.z_axis.text"
 			},
 			chart: {
 				buffer: [],
 				backgroundColor: "#d97706",
 				filter: { enabled: false },
 				ref: useRef<HighchartsReactRefObject>(null),
-				series: { name: "EHZ", type: "line", color: "#f1f5f9" }
+				series: { name: `${station.channel}Z`, type: "line", color: "#f1f5f9" }
 			}
 		},
-		ehe: {
+		e_axis: {
 			holder: {
 				collapse: CollapseMode.COLLAPSE_SHOW,
-				label: "views.history.charts.ehe.label",
-				text: "views.history.charts.ehe.text"
+				label: "views.history.charts.e_axis.label",
+				text: "views.history.charts.e_axis.text"
 			},
 			chart: {
 				buffer: [],
 				backgroundColor: "#10b981",
 				filter: { enabled: false },
 				ref: useRef<HighchartsReactRefObject>(null),
-				series: { name: "EHE", type: "line", color: "#f1f5f9" }
+				series: { name: `${station.channel}E`, type: "line", color: "#f1f5f9" }
 			}
 		},
-		ehn: {
+		n_axis: {
 			holder: {
 				collapse: CollapseMode.COLLAPSE_SHOW,
-				label: "views.history.charts.ehn.label",
-				text: "views.history.charts.ehn.text"
+				label: "views.history.charts.n_axis.label",
+				text: "views.history.charts.n_axis.text"
 			},
 			chart: {
 				buffer: [],
 				backgroundColor: "#0ea5e9",
 				filter: { enabled: false },
 				ref: useRef<HighchartsReactRefObject>(null),
-				series: { name: "EHN", type: "line", color: "#f1f5f9" }
+				series: { name: `${station.channel}N`, type: "line", color: "#f1f5f9" }
 			}
 		}
 	});
@@ -171,7 +176,7 @@ const History = (props: RouterComponentProps) => {
 
 			// Get filtered values and apply to chart data
 			const chartData = prev[chartKey].chart.buffer
-				.map(({ ts, data }) => {
+				.map(({ timestamp, data }) => {
 					const filteredData = filterEnabled
 						? getFilteredCounts(data, {
 								poles: 4,
@@ -182,7 +187,10 @@ const History = (props: RouterComponentProps) => {
 							})
 						: data;
 					const dataSpanMS = 1000 / filteredData.length;
-					return filteredData.map((value, index) => [ts + dataSpanMS * index, value]);
+					return filteredData.map((value, index) => [
+						timestamp + dataSpanMS * index,
+						value
+					]);
 				})
 				.reduce((acc, curArr) => acc.concat(curArr), []);
 			const { current: chartObj } = prev[chartKey].chart.ref;
@@ -207,14 +215,14 @@ const History = (props: RouterComponentProps) => {
 	};
 
 	const handleQueryWaveform = async () => {
-		const { start, end } = queryDuration;
-		if (!start || !end || start >= end) {
+		const { start_time, end_time } = queryDuration;
+		if (!start_time || !end_time || start_time >= end_time) {
 			sendUserAlert(t("views.history.toasts.duration_error"), true);
 			return;
 		}
 
 		const { backend } = apiConfig;
-		const payload = { start, end, channel: "", format: "json" };
+		const payload = { start_time, end_time, channel: "", format: "json" };
 
 		const res = await sendPromiseAlert(
 			requestRestApi<
@@ -238,18 +246,22 @@ const History = (props: RouterComponentProps) => {
 	};
 
 	const handleExportSACFile = () => {
-		const { start, end } = queryDuration;
-		if (!start || !end || start >= end) {
+		const { start_time, end_time } = queryDuration;
+		if (!start_time || !end_time || start_time >= end_time) {
 			sendUserAlert(t("views.history.toasts.duration_error"), true);
 			return;
 		}
 
-		const handleSubmitForm = async (channel: string) => {
+		const handleSubmitForm = async (channelCode: string) => {
 			setForm((prev) => ({ ...prev, open: false }));
 
 			const { backend } = apiConfig;
-			const payload = { start, end, channel, format: "sac" };
-			const sacFileName = getSACFileName(start, channel, station);
+			const payload = { start_time, end_time, channel: channelCode, format: "sac" };
+			const sacFileName = getSACFileName(
+				start_time,
+				`${station.channel}${channelCode}`,
+				station
+			);
 
 			await sendPromiseAlert(
 				requestRestApi<
@@ -274,9 +286,9 @@ const History = (props: RouterComponentProps) => {
 			...prev,
 			open: true,
 			selectOptions: [
-				{ label: "EHZ", value: "EHZ" },
-				{ label: "EHE", value: "EHE" },
-				{ label: "EHN", value: "EHN" }
+				{ label: "Z Axis", value: "Z" },
+				{ label: "E Axis", value: "E" },
+				{ label: "N Axis", value: "N" }
 			],
 			onSubmit: handleSubmitForm,
 			title: "views.history.forms.choose_channel.title",
@@ -335,8 +347,8 @@ const History = (props: RouterComponentProps) => {
 
 			const handleSelectEvent = (value: string) => {
 				setSelect((prev) => ({ ...prev, open: false }));
-				const [start, end] = value.split("|").map(Number);
-				setQueryDuration({ start, end });
+				const [start_time, end_time] = value.split("|").map(Number);
+				setQueryDuration({ start_time, end_time });
 				sendUserAlert(t("views.history.toasts.event_select_success"));
 			};
 
@@ -394,15 +406,15 @@ const History = (props: RouterComponentProps) => {
 	};
 
 	const handleGetShareLink = async () => {
-		const { start, end } = queryDuration;
-		if (!start || !end || start >= end) {
+		const { start_time, end_time } = queryDuration;
+		if (!start_time || !end_time || start_time >= end_time) {
 			sendUserAlert(t("views.history.toasts.duration_error"), true);
 			return;
 		}
 
 		const newSearchParams = new URLSearchParams();
-		newSearchParams.set("start", String(start));
-		newSearchParams.set("end", String(end));
+		newSearchParams.set("start", String(start_time));
+		newSearchParams.set("end", String(end_time));
 		setSearchParams(newSearchParams);
 		const newFullUrl = window.location.href;
 		const success = await setClipboardText(newFullUrl);
@@ -426,13 +438,13 @@ const History = (props: RouterComponentProps) => {
 			>
 				<Panel label={t("views.history.panels.query_history")}>
 					<TimePicker
-						value={queryDuration.start}
+						value={queryDuration.start_time}
 						currentLocale={locale ?? fallbackLocale}
 						label={t("views.history.time_pickers.start_time")}
 						onChange={(value) => handleTimeChange(value, false)}
 					/>
 					<TimePicker
-						value={queryDuration.end}
+						value={queryDuration.end_time}
 						currentLocale={locale ?? fallbackLocale}
 						label={t("views.history.time_pickers.end_time")}
 						onChange={(value) => handleTimeChange(value, true)}
@@ -486,7 +498,12 @@ const History = (props: RouterComponentProps) => {
 
 				<Panel className="" label={t("views.history.panels.analyze_history")}>
 					{Object.values(labels).map(({ label, value, values, ...rest }) => (
-						<Label {...rest} key={label} label={t(label)} value={t(value, values)} />
+						<Label
+							{...rest}
+							key={label}
+							value={t(value, values)}
+							label={t(label, { channel: station.channel })}
+						/>
 					))}
 				</Panel>
 
@@ -506,7 +523,7 @@ const History = (props: RouterComponentProps) => {
 				<Holder
 					key={charts[key].holder.label}
 					text={t(charts[key].holder.text ?? "")}
-					label={t(charts[key].holder.label ?? "")}
+					label={t(charts[key].holder.label ?? "", { channel: station.channel })}
 					advanced={
 						<Container className="max-w-96">
 							<Panel

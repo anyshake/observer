@@ -1,8 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is Observer RESTful API documentation, please set `server_settings.debug` to `false` in `config.json` when deploying to production environment in case of any security issues.",
-        "title": "Observer RESTful API documentation",
+        "description": "This is APIv1 documentation for AnyShake Observer, please set `server_settings.debug` to `false` in `config.json` when deploying to production environment in case of any security issues.",
+        "title": "AnyShake Observer APIv1",
         "contact": {}
     },
     "basePath": "/api/v1",
@@ -21,15 +21,15 @@
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Start timestamp of the waveform data to be queried, in milliseconds",
-                        "name": "start",
+                        "description": "Start timestamp of the waveform data to be queried, in milliseconds (unix timestamp)",
+                        "name": "start_time",
                         "in": "formData",
                         "required": true
                     },
                     {
                         "type": "integer",
-                        "description": "End timestamp of the waveform data to be queried, in milliseconds",
-                        "name": "end",
+                        "description": "End timestamp of the waveform data to be queried, in milliseconds (unix timestamp)",
+                        "name": "end_time",
                         "in": "formData",
                         "required": true
                     },
@@ -42,7 +42,7 @@
                     },
                     {
                         "type": "string",
-                        "description": "Channel of the waveform, `EHZ`, `EHE` or `EHN`, reuqired when format is `sac`",
+                        "description": "Channel of the waveform, `Z`, `E` or `N`, reuqired when format is `sac`",
                         "name": "channel",
                         "in": "formData"
                     }
@@ -61,7 +61,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/publisher.Geophone"
+                                                "$ref": "#/definitions/explorer.ExplorerData"
                                             }
                                         }
                                     }
@@ -168,7 +168,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/mseed.MiniSEEDFile"
+                                                "$ref": "#/definitions/mseed.miniSeedFileInfo"
                                             }
                                         }
                                     }
@@ -206,7 +206,7 @@
                 "summary": "AnyShake Observer station status",
                 "responses": {
                     "200": {
-                        "description": "Successfully read station status",
+                        "description": "Successfully read station information",
                         "schema": {
                             "allOf": [
                                 {
@@ -216,7 +216,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/station.System"
+                                            "$ref": "#/definitions/station.stationInfo"
                                         }
                                     }
                                 }
@@ -259,7 +259,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/trace.Event"
+                                                "$ref": "#/definitions/trace.seismicEvent"
                                             }
                                         }
                                     }
@@ -284,7 +284,96 @@
         }
     },
     "definitions": {
-        "mseed.MiniSEEDFile": {
+        "config.Sensor": {
+            "type": "object",
+            "properties": {
+                "frequency": {
+                    "type": "number"
+                },
+                "fullscale": {
+                    "type": "number"
+                },
+                "resolution": {
+                    "type": "integer"
+                },
+                "sensitivity": {
+                    "type": "number"
+                },
+                "velocity": {
+                    "type": "boolean"
+                },
+                "vref": {
+                    "type": "number"
+                }
+            }
+        },
+        "config.Station": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "owner": {
+                    "type": "string"
+                },
+                "region": {
+                    "type": "string"
+                }
+            }
+        },
+        "config.Stream": {
+            "type": "object",
+            "properties": {
+                "channel": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "network": {
+                    "type": "string"
+                },
+                "station": {
+                    "type": "string"
+                }
+            }
+        },
+        "explorer.ExplorerData": {
+            "type": "object",
+            "properties": {
+                "e_axis": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "n_axis": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "sample_rate": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "integer"
+                },
+                "z_axis": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "mseed.miniSeedFileInfo": {
             "type": "object",
             "properties": {
                 "name": {
@@ -298,46 +387,6 @@
                 },
                 "ttl": {
                     "type": "integer"
-                }
-            }
-        },
-        "publisher.Geophone": {
-            "type": "object",
-            "properties": {
-                "ehe": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "ehn": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "ehz": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "ts": {
-                    "type": "integer"
-                }
-            }
-        },
-        "publisher.System": {
-            "type": "object",
-            "properties": {
-                "errors": {
-                    "type": "integer"
-                },
-                "messages": {
-                    "type": "integer"
-                },
-                "offset": {
-                    "type": "number"
                 }
             }
         },
@@ -362,56 +411,7 @@
                 }
             }
         },
-        "station.System": {
-            "type": "object",
-            "properties": {
-                "adc": {
-                    "$ref": "#/definitions/station.adcModel"
-                },
-                "cpu": {
-                    "$ref": "#/definitions/station.cpuModel"
-                },
-                "disk": {
-                    "$ref": "#/definitions/station.diskModel"
-                },
-                "geophone": {
-                    "$ref": "#/definitions/station.geophoneModel"
-                },
-                "memory": {
-                    "$ref": "#/definitions/station.memoryModel"
-                },
-                "os": {
-                    "$ref": "#/definitions/station.osModel"
-                },
-                "position": {
-                    "$ref": "#/definitions/station.positionModel"
-                },
-                "station": {
-                    "$ref": "#/definitions/station.stationModel"
-                },
-                "status": {
-                    "$ref": "#/definitions/publisher.System"
-                },
-                "timestamp": {
-                    "type": "integer"
-                },
-                "uptime": {
-                    "type": "integer"
-                }
-            }
-        },
-        "station.adcModel": {
-            "type": "object",
-            "properties": {
-                "fullscale": {
-                    "type": "number"
-                },
-                "resolution": {
-                    "type": "integer"
-                }
-            }
-        },
-        "station.cpuModel": {
+        "station.cpuInfo": {
             "type": "object",
             "properties": {
                 "model": {
@@ -422,7 +422,7 @@
                 }
             }
         },
-        "station.diskModel": {
+        "station.diskInfo": {
             "type": "object",
             "properties": {
                 "free": {
@@ -439,18 +439,36 @@
                 }
             }
         },
-        "station.geophoneModel": {
+        "station.explorerInfo": {
             "type": "object",
             "properties": {
-                "frequency": {
+                "device_id": {
+                    "type": "integer"
+                },
+                "elapsed": {
+                    "type": "integer"
+                },
+                "elevation": {
                     "type": "number"
                 },
-                "sensitivity": {
+                "errors": {
+                    "type": "integer"
+                },
+                "latitude": {
                     "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "received": {
+                    "type": "integer"
+                },
+                "sample_rate": {
+                    "type": "integer"
                 }
             }
         },
-        "station.memoryModel": {
+        "station.memoryInfo": {
             "type": "object",
             "properties": {
                 "free": {
@@ -467,7 +485,7 @@
                 }
             }
         },
-        "station.osModel": {
+        "station.osInfo": {
             "type": "object",
             "properties": {
                 "arch": {
@@ -481,44 +499,45 @@
                 },
                 "os": {
                     "type": "string"
+                },
+                "timestamp": {
+                    "type": "integer"
+                },
+                "uptime": {
+                    "type": "integer"
                 }
             }
         },
-        "station.positionModel": {
+        "station.stationInfo": {
             "type": "object",
             "properties": {
-                "elevation": {
-                    "type": "number"
+                "cpu": {
+                    "$ref": "#/definitions/station.cpuInfo"
                 },
-                "latitude": {
-                    "type": "number"
+                "disk": {
+                    "$ref": "#/definitions/station.diskInfo"
                 },
-                "longitude": {
-                    "type": "number"
-                }
-            }
-        },
-        "station.stationModel": {
-            "type": "object",
-            "properties": {
-                "location": {
-                    "type": "string"
+                "explorer": {
+                    "$ref": "#/definitions/station.explorerInfo"
                 },
-                "name": {
-                    "type": "string"
+                "memory": {
+                    "$ref": "#/definitions/station.memoryInfo"
                 },
-                "network": {
-                    "type": "string"
+                "os": {
+                    "$ref": "#/definitions/station.osInfo"
+                },
+                "sensor": {
+                    "$ref": "#/definitions/config.Sensor"
                 },
                 "station": {
-                    "type": "string"
+                    "$ref": "#/definitions/config.Station"
                 },
-                "uuid": {
-                    "type": "string"
+                "stream": {
+                    "$ref": "#/definitions/config.Stream"
                 }
             }
         },
-        "trace.Event": {
+        "trace.seismicEvent": {
             "type": "object",
             "properties": {
                 "depth": {
@@ -528,7 +547,7 @@
                     "type": "number"
                 },
                 "estimation": {
-                    "$ref": "#/definitions/trace.estimation"
+                    "$ref": "#/definitions/trace.seismicEventEstimation"
                 },
                 "event": {
                     "type": "string"
@@ -553,7 +572,7 @@
                 }
             }
         },
-        "trace.estimation": {
+        "trace.seismicEventEstimation": {
             "type": "object",
             "properties": {
                 "p": {

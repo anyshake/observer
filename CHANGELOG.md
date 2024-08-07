@@ -2,6 +2,31 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.0.0
+
+### Breaking Changes
+
+- **Data Protocol**: The AnyShake Explorer data protocol has been entirely refactored. **Please rebuild and flash the firmware of AnyShake Explorer to the latest version.**
+- **Configuration File**: The configuration file layout has been completely overhauled. The old configuration file format is no longer supported.
+- **SeedLink Server**: The SeedLink service has been temporarily removed and will be re-implemented in a future release.
+- **API Endpoints**: Some request and response fields have been modified in API v1. Please refer to the built-in Swagger API documentation for details.
+
+### New Features
+
+- Added support for accessing AnyShake Explorer via a serial-to-Ethernet converter.
+- Introduced custom channel prefixes (e.g., HH*, SH*, EH*).
+- Added log dumping functionality with multiple output levels.
+- Enhanced data processing and storage efficiency.
+- Improved the accuracy of reading time from the Internet NTP server.
+- Refined component lifecycle management using dependency injection for better module decoupling.
+- Implemented an asynchronous message bus to optimize application execution efficiency.
+- Established a GraphQL-based routing endpoint in preparation for API v2.
+- Dockerized the application for easier and faster deployment.
+
+### Bug Fixes
+
+- Completely resolved the gap issue in MiniSEED records.
+
 ## v2.12.5
 
 - Fix gaps in MiniSEED records

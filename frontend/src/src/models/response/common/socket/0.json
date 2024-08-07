@@ -1,12 +1,13 @@
 {
-    "ts": 0,
-    "ehz": [
+    "sample_rate": 125,
+    "timestamp": 1723043090281,
+    "z_axis": [
         0
     ],
-    "ehe": [
+    "e_axis": [
         0
     ],
-    "ehn": [
+    "n_axis": [
         0
     ]
 }

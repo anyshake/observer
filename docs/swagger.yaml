@@ -1,6 +1,64 @@
 basePath: /api/v1
 definitions:
-  mseed.MiniSEEDFile:
+  config.Sensor:
+    properties:
+      frequency:
+        type: number
+      fullscale:
+        type: number
+      resolution:
+        type: integer
+      sensitivity:
+        type: number
+      velocity:
+        type: boolean
+      vref:
+        type: number
+    type: object
+  config.Station:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      name:
+        type: string
+      owner:
+        type: string
+      region:
+        type: string
+    type: object
+  config.Stream:
+    properties:
+      channel:
+        type: string
+      location:
+        type: string
+      network:
+        type: string
+      station:
+        type: string
+    type: object
+  explorer.ExplorerData:
+    properties:
+      e_axis:
+        items:
+          type: integer
+        type: array
+      n_axis:
+        items:
+          type: integer
+        type: array
+      sample_rate:
+        type: integer
+      timestamp:
+        type: integer
+      z_axis:
+        items:
+          type: integer
+        type: array
+    type: object
+  mseed.miniSeedFileInfo:
     properties:
       name:
         type: string
@@ -10,32 +68,6 @@ definitions:
         type: integer
       ttl:
         type: integer
-    type: object
-  publisher.Geophone:
-    properties:
-      ehe:
-        items:
-          type: integer
-        type: array
-      ehn:
-        items:
-          type: integer
-        type: array
-      ehz:
-        items:
-          type: integer
-        type: array
-      ts:
-        type: integer
-    type: object
-  publisher.System:
-    properties:
-      errors:
-        type: integer
-      messages:
-        type: integer
-      offset:
-        type: number
     type: object
   response.HttpResponse:
     properties:
@@ -51,46 +83,14 @@ definitions:
       time:
         type: string
     type: object
-  station.System:
-    properties:
-      adc:
-        $ref: '#/definitions/station.adcModel'
-      cpu:
-        $ref: '#/definitions/station.cpuModel'
-      disk:
-        $ref: '#/definitions/station.diskModel'
-      geophone:
-        $ref: '#/definitions/station.geophoneModel'
-      memory:
-        $ref: '#/definitions/station.memoryModel'
-      os:
-        $ref: '#/definitions/station.osModel'
-      position:
-        $ref: '#/definitions/station.positionModel'
-      station:
-        $ref: '#/definitions/station.stationModel'
-      status:
-        $ref: '#/definitions/publisher.System'
-      timestamp:
-        type: integer
-      uptime:
-        type: integer
-    type: object
-  station.adcModel:
-    properties:
-      fullscale:
-        type: number
-      resolution:
-        type: integer
-    type: object
-  station.cpuModel:
+  station.cpuInfo:
     properties:
       model:
         type: string
       percent:
         type: number
     type: object
-  station.diskModel:
+  station.diskInfo:
     properties:
       free:
         type: integer
@@ -101,14 +101,26 @@ definitions:
       used:
         type: integer
     type: object
-  station.geophoneModel:
+  station.explorerInfo:
     properties:
-      frequency:
+      device_id:
+        type: integer
+      elapsed:
+        type: integer
+      elevation:
         type: number
-      sensitivity:
+      errors:
+        type: integer
+      latitude:
         type: number
+      longitude:
+        type: number
+      received:
+        type: integer
+      sample_rate:
+        type: integer
     type: object
-  station.memoryModel:
+  station.memoryInfo:
     properties:
       free:
         type: integer
@@ -119,7 +131,7 @@ definitions:
       used:
         type: integer
     type: object
-  station.osModel:
+  station.osInfo:
     properties:
       arch:
         type: string
@@ -129,37 +141,38 @@ definitions:
         type: string
       os:
         type: string
+      timestamp:
+        type: integer
+      uptime:
+        type: integer
     type: object
-  station.positionModel:
+  station.stationInfo:
     properties:
-      elevation:
-        type: number
-      latitude:
-        type: number
-      longitude:
-        type: number
-    type: object
-  station.stationModel:
-    properties:
-      location:
-        type: string
-      name:
-        type: string
-      network:
-        type: string
+      cpu:
+        $ref: '#/definitions/station.cpuInfo'
+      disk:
+        $ref: '#/definitions/station.diskInfo'
+      explorer:
+        $ref: '#/definitions/station.explorerInfo'
+      memory:
+        $ref: '#/definitions/station.memoryInfo'
+      os:
+        $ref: '#/definitions/station.osInfo'
+      sensor:
+        $ref: '#/definitions/config.Sensor'
       station:
-        type: string
-      uuid:
-        type: string
+        $ref: '#/definitions/config.Station'
+      stream:
+        $ref: '#/definitions/config.Stream'
     type: object
-  trace.Event:
+  trace.seismicEvent:
     properties:
       depth:
         type: number
       distance:
         type: number
       estimation:
-        $ref: '#/definitions/trace.estimation'
+        $ref: '#/definitions/trace.seismicEventEstimation'
       event:
         type: string
       latitude:
@@ -175,7 +188,7 @@ definitions:
       verfied:
         type: boolean
     type: object
-  trace.estimation:
+  trace.seismicEventEstimation:
     properties:
       p:
         type: number
@@ -184,10 +197,10 @@ definitions:
     type: object
 info:
   contact: {}
-  description: This is Observer RESTful API documentation, please set `server_settings.debug`
+  description: This is APIv1 documentation for AnyShake Observer, please set `server_settings.debug`
     to `false` in `config.json` when deploying to production environment in case of
     any security issues.
-  title: Observer RESTful API documentation
+  title: AnyShake Observer APIv1
 paths:
   /history:
     post:
@@ -198,13 +211,15 @@ paths:
         and 1 hour for SAC
       parameters:
       - description: Start timestamp of the waveform data to be queried, in milliseconds
+          (unix timestamp)
         in: formData
-        name: start
+        name: start_time
         required: true
         type: integer
       - description: End timestamp of the waveform data to be queried, in milliseconds
+          (unix timestamp)
         in: formData
-        name: end
+        name: end_time
         required: true
         type: integer
       - description: Format of the waveform data to be queried, `json` or `sac`
@@ -212,8 +227,8 @@ paths:
         name: format
         required: true
         type: string
-      - description: Channel of the waveform, `EHZ`, `EHE` or `EHN`, reuqired when
-          format is `sac`
+      - description: Channel of the waveform, `Z`, `E` or `N`, reuqired when format
+          is `sac`
         in: formData
         name: channel
         type: string
@@ -229,7 +244,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/publisher.Geophone'
+                    $ref: '#/definitions/explorer.ExplorerData'
                   type: array
               type: object
         "400":
@@ -295,7 +310,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/mseed.MiniSEEDFile'
+                    $ref: '#/definitions/mseed.miniSeedFileInfo'
                   type: array
               type: object
         "400":
@@ -323,13 +338,13 @@ paths:
       - application/json
       responses:
         "200":
-          description: Successfully read station status
+          description: Successfully read station information
           schema:
             allOf:
             - $ref: '#/definitions/response.HttpResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/station.System'
+                  $ref: '#/definitions/station.stationInfo'
               type: object
       summary: AnyShake Observer station status
   /trace:
@@ -356,7 +371,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/trace.Event'
+                    $ref: '#/definitions/trace.seismicEvent'
                   type: array
               type: object
         "400":

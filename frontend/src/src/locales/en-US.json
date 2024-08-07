@@ -44,20 +44,8 @@
                     "label": "Frame Errors",
                     "unit": "errors"
                 },
-                "pushed": {
-                    "label": "Pushed Messages",
-                    "unit": "messages"
-                },
-                "failures": {
-                    "label": "Push Failures",
-                    "unit": "failures"
-                },
-                "queued": {
-                    "label": "Queued Messages",
-                    "unit": "messages"
-                },
-                "offset": {
-                    "label": "System Time Offset",
+                "elapsed": {
+                    "label": "Explorer Connected",
                     "unit": "seconds"
                 }
             }
@@ -78,8 +66,8 @@
                 }
             },
             "charts": {
-                "ehz": {
-                    "label": "EHZ Channel Waveform Count",
+                "z_axis": {
+                    "label": "{{channel}}Z Channel Waveform Count",
                     "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} kine\nIntensity: {{ intensity }}",
                     "advanced": {
                         "panels": {
@@ -93,8 +81,8 @@
                         }
                     }
                 },
-                "ehe": {
-                    "label": "EHE Channel Waveform Count",
+                "e_axis": {
+                    "label": "{{channel}}E Channel Waveform Count",
                     "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} kine\nIntensity: {{ intensity }}",
                     "advanced": {
                         "panels": {
@@ -108,8 +96,8 @@
                         }
                     }
                 },
-                "ehn": {
-                    "label": "EHN Channel Waveform Count",
+                "n_axis": {
+                    "label": "{{channel}}N Channel Waveform Count",
                     "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} kine\nIntensity: {{ intensity }}",
                     "advanced": {
                         "panels": {
@@ -150,8 +138,8 @@
                 }
             },
             "charts": {
-                "ehz": {
-                    "label": "EHZ Channel Waveform Count",
+                "z_axis": {
+                    "label": "{{channel}}Z Channel Waveform Count",
                     "text": "Click to setup filter",
                     "advanced": {
                         "panels": {
@@ -165,8 +153,8 @@
                         }
                     }
                 },
-                "ehe": {
-                    "label": "EHE Channel Waveform Count",
+                "e_axis": {
+                    "label": "{{channel}}E Channel Waveform Count",
                     "text": "Click to setup filter",
                     "advanced": {
                         "panels": {
@@ -180,8 +168,8 @@
                         }
                     }
                 },
-                "ehn": {
-                    "label": "EHN Channel Waveform Count",
+                "n_axis": {
+                    "label": "{{channel}}N Channel Waveform Count",
                     "text": "Click to setup filter",
                     "advanced": {
                         "panels": {
@@ -207,16 +195,16 @@
                 "get_share_link": "Get Share Link"
             },
             "labels": {
-                "ehz_detail": {
-                    "label": "EHZ Details",
+                "z_axis_detail": {
+                    "label": "{{channel}}Z Details",
                     "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
                 },
-                "ehe_detail": {
-                    "label": "EHE Details",
+                "e_axis_detail": {
+                    "label": "{{channel}}E Details",
                     "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
                 },
-                "ehn_detail": {
-                    "label": "EHN Details",
+                "n_axis_detail": {
+                    "label": "{{channel}}N Details",
                     "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
                 }
             },

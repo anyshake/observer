@@ -17,7 +17,7 @@ export const handleSetCharts = (
 				{
 					chart: ChartProps & {
 						buffer: {
-							ts: number;
+							timestamp: number;
 							data: number[];
 						}[];
 						ref: RefObject<HighchartsReactRefObject>;
@@ -43,9 +43,9 @@ export const handleSetCharts = (
 			}
 
 			// Set channel buffer from API response
-			const buffer = res.data.map(({ ts, ...channels }) => ({
-				data: channels[key as keyof typeof channels],
-				ts
+			const buffer = res.data.map(({ timestamp, ...channels }) => ({
+				data: channels[key as keyof typeof channels] as number[],
+				timestamp
 			}));
 			prev[key].chart.buffer = buffer;
 
@@ -62,7 +62,7 @@ export const handleSetCharts = (
 
 			// Get filtered values and apply to chart data
 			const chartData = buffer
-				.map(({ ts, data }) => {
+				.map(({ timestamp, data }) => {
 					const filteredData = filterEnabled
 						? getFilteredCounts(data, {
 								poles: 4,
@@ -73,7 +73,10 @@ export const handleSetCharts = (
 							})
 						: data;
 					const dataSpanMS = 1000 / filteredData.length;
-					return filteredData.map((value, index) => [ts + dataSpanMS * index, value]);
+					return filteredData.map((value, index) => [
+						timestamp + dataSpanMS * index,
+						value
+					]);
 				})
 				.reduce((acc, curArr) => acc.concat(curArr), []);
 			const { current: chartObj } = prev[key].chart.ref;

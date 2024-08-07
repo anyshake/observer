@@ -1,19 +1,33 @@
 {
-    "time": "1970-01-01T23:59:59Z",
+    "time": "2024-08-07T13:57:15Z",
     "status": 200,
     "error": false,
     "path": "/api/v1/history",
     "message": "The waveform data was successfully filtered",
     "data": [
         {
-            "ts": 0,
-            "ehz": [
+            "sample_rate": 125,
+            "timestamp": 1723039025571,
+            "z_axis": [
                 0
             ],
-            "ehe": [
+            "e_axis": [
                 0
             ],
-            "ehn": [
+            "n_axis": [
+                0
+            ]
+        },
+        {
+            "sample_rate": 125,
+            "timestamp": 1723039026571,
+            "z_axis": [
+                0
+            ],
+            "e_axis": [
+                0
+            ],
+            "n_axis": [
                 0
             ]
         }

@@ -44,20 +44,8 @@
                     "label": "帧错误讯息量",
                     "unit": "条"
                 },
-                "pushed": {
-                    "label": "已推送讯息量",
-                    "unit": "条"
-                },
-                "failures": {
-                    "label": "推送失败讯息量",
-                    "unit": "条"
-                },
-                "queued": {
-                    "label": "等待推送讯息量",
-                    "unit": "条"
-                },
-                "offset": {
-                    "label": "系统时间偏移量",
+                "elapsed": {
+                    "label": "Explorer 连线时间",
                     "unit": "秒"
                 }
             }
@@ -78,8 +66,8 @@
                 }
             },
             "charts": {
-                "ehz": {
-                    "label": "EHZ 通道波形",
+                "z_axis": {
+                    "label": "{{channel}}Z 通道波形",
                     "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
                     "advanced": {
                         "panels": {
@@ -93,8 +81,8 @@
                         }
                     }
                 },
-                "ehe": {
-                    "label": "EHE 通道波形",
+                "e_axis": {
+                    "label": "{{channel}}E 通道波形",
                     "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
                     "advanced": {
                         "panels": {
@@ -108,8 +96,8 @@
                         }
                     }
                 },
-                "ehn": {
-                    "label": "EHN 通道波形",
+                "n_axis": {
+                    "label": "{{channel}}N 通道波形",
                     "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
                     "advanced": {
                         "panels": {
@@ -150,8 +138,8 @@
                 }
             },
             "charts": {
-                "ehz": {
-                    "label": "EHZ 通道波形",
+                "z_axis": {
+                    "label": "{{channel}}Z 通道波形",
                     "text": "点击下方按钮设定滤波器",
                     "advanced": {
                         "panels": {
@@ -165,8 +153,8 @@
                         }
                     }
                 },
-                "ehe": {
-                    "label": "EHE 通道波形",
+                "e_axis": {
+                    "label": "{{channel}}E 通道波形",
                     "text": "点击下方按钮设定滤波器",
                     "advanced": {
                         "panels": {
@@ -180,8 +168,8 @@
                         }
                     }
                 },
-                "ehn": {
-                    "label": "EHN 通道波形",
+                "n_axis": {
+                    "label": "{{channel}}N 通道波形",
                     "text": "点击下方按钮设定滤波器",
                     "advanced": {
                         "panels": {
@@ -207,16 +195,16 @@
                 "get_share_link": "分享链接"
             },
             "labels": {
-                "ehz_detail": {
-                    "label": "EHZ 通道详情",
+                "z_axis_detail": {
+                    "label": "{{channel}}Z 通道详情",
                     "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
                 },
-                "ehe_detail": {
-                    "label": "EHE 通道详情",
+                "e_axis_detail": {
+                    "label": "{{channel}}E 通道详情",
                     "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
                 },
-                "ehn_detail": {
-                    "label": "EHN 通道详情",
+                "n_axis_detail": {
+                    "label": "{{channel}}N 通道详情",
                     "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
                 }
             },

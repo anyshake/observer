@@ -19,13 +19,9 @@ export const handleSetCharts = (
 				string,
 				{
 					chart: ChartProps & {
-						buffer: { ts: number; data: number[] }[];
+						buffer: { timestamp: number; data: number[] }[];
 						ref: RefObject<HighchartsReactRefObject>;
-						filter: {
-							enabled: boolean;
-							lowCorner?: number;
-							highCorner?: number;
-						};
+						filter: { enabled: boolean; lowCorner?: number; highCorner?: number };
 					};
 					holder: HolderProps & { values: Record<string, string> };
 				}
@@ -33,23 +29,24 @@ export const handleSetCharts = (
 		>
 	>
 ) => {
-	if (!res.ts) {
+	if (!res.timestamp) {
 		return;
 	}
 	stateFn((prev) => {
-		const { ts, ...channels } = res;
+		const { timestamp, sample_rate, ...channels } = res;
 		const { retention } = store.getState().retention;
+
 		Object.keys(prev).forEach((key) => {
 			if (!(key in res)) {
 				return;
 			}
 
 			// Append new data to buffer and remove expired data
-			const channelData = channels[key as keyof typeof channels];
+			const channelData = channels[key as keyof typeof channels] as number[];
 			const { buffer } = prev[key].chart;
-			buffer.push({ ts, data: channelData });
-			const timeoutThreshold = ts - retention * 1000;
-			while (buffer[0].ts < timeoutThreshold) {
+			buffer.push({ timestamp, data: channelData });
+			const timeoutThreshold = timestamp - retention * 1000;
+			while (buffer[0].timestamp < timeoutThreshold) {
 				buffer.shift();
 			}
 
@@ -68,7 +65,7 @@ export const handleSetCharts = (
 
 			// Get filtered values and apply to chart data
 			const chartData = buffer
-				.map(({ ts, data }) => {
+				.map(({ timestamp, data }) => {
 					const filteredData = filterEnabled
 						? getFilteredCounts(data, {
 								poles: 4,
@@ -79,7 +76,10 @@ export const handleSetCharts = (
 							})
 						: data;
 					const dataSpanMS = 1000 / filteredData.length;
-					return filteredData.map((value, index) => [ts + dataSpanMS * index, value]);
+					return filteredData.map((value, index) => [
+						timestamp + dataSpanMS * index,
+						value
+					]);
 				})
 				.reduce((acc, curArr) => acc.concat(curArr), []);
 			const { current: chartObj } = prev[key].chart.ref;

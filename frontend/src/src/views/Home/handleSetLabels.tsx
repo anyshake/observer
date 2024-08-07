@@ -10,14 +10,12 @@ export const handleSetLabels = (
 	if (!res?.data) {
 		return;
 	}
-	const { status } = res.data;
+
+	const { errors, received, elapsed } = res.data.explorer;
 	stateFn((prev) => {
-		Object.keys(status).forEach((key) => {
-			if (key in prev) {
-				const newValue = status[key as keyof typeof status];
-				prev[key] = { ...prev[key], value: String(newValue) };
-			}
-		});
+		prev.errors = { ...prev.errors, value: String(errors) };
+		prev.messages = { ...prev.messages, value: String(received) };
+		prev.elapsed = { ...prev.elapsed, value: String(elapsed) };
 
 		return prev;
 	});
