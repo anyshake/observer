@@ -6,10 +6,11 @@ import (
 )
 
 const (
-	MINISEED_BIT_ORDER        = mseedio.MSBFIRST
-	MINISEED_ENCODE_TYPE      = mseedio.STEIM2
-	MINISEED_WRITE_INTERVAL   = 5
-	MINISEED_CLEANUP_INTERVAL = 60
+	MINISEED_BIT_ORDER         = mseedio.MSBFIRST
+	MINISEED_ENCODE_TYPE       = mseedio.STEIM2
+	MINISEED_WRITE_INTERVAL    = 5
+	MINISEED_CLEANUP_INTERVAL  = 60
+	MINISEED_ALLOWED_JITTER_MS = 10
 )
 
 type MiniSeedService struct {
@@ -18,6 +19,7 @@ type MiniSeedService struct {
 	writeBufferCountDown int
 	cleanUpCountDown     int
 	lifeCycle            int
+	legacyMode           bool
 	basePath             string
 	stationCode          string
 	networkCode          string

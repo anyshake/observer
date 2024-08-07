@@ -2,6 +2,7 @@ package miniseed
 
 import (
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/anyshake/observer/drivers/explorer"
@@ -14,17 +15,18 @@ func (m *MiniSeedService) handleWrite() error {
 		startSampleRate = m.miniseedBuffer[0].SampleRate
 	)
 
-	// Check if the timestamp is continuous
+	// Check if the timestamp is within the allowed jitter
 	for i := 1; i < len(m.miniseedBuffer); i++ {
-		if m.miniseedBuffer[i].Timestamp != startTimestamp+int64(i*1000) {
+		if math.Abs(float64(m.miniseedBuffer[i].Timestamp-startTimestamp-int64(i*1000))) > 1000+MINISEED_ALLOWED_JITTER_MS {
 			return fmt.Errorf("timestamp is not continuous, expected %d, got %d", startTimestamp+int64(i*1000), m.miniseedBuffer[i].Timestamp)
 		}
 	}
 
-	// Check if sample rate is the same
-	for i := 1; i < len(m.miniseedBuffer); i++ {
-		if m.miniseedBuffer[i].SampleRate != startSampleRate {
-			return fmt.Errorf("sample rate is not the same, expected %d, got %d", startSampleRate, m.miniseedBuffer[i].SampleRate)
+	if !m.legacyMode {
+		for i := 1; i < len(m.miniseedBuffer); i++ {
+			if m.miniseedBuffer[i].SampleRate != startSampleRate {
+				return fmt.Errorf("sample rate is not the same, expected %d, got %d", startSampleRate, m.miniseedBuffer[i].SampleRate)
+			}
 		}
 	}
 

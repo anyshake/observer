@@ -36,6 +36,7 @@ func (m *MiniSeedService) Start(options *services.Options, waitGroup *sync.WaitG
 		explorer.EXPLORER_CHANNEL_CODE_E: 0,
 		explorer.EXPLORER_CHANNEL_CODE_N: 0,
 	}
+	m.legacyMode = options.Config.Explorer.Legacy
 	m.cleanUpCountDown = MINISEED_CLEANUP_INTERVAL
 	m.writeBufferCountDown = MINISEED_WRITE_INTERVAL
 

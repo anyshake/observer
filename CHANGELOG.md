@@ -2,11 +2,17 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.0.1
+
+### Bug Fixes
+
+- Fixed the issue where MiniSEED recording in legacy mode would be interrupted due to sampling rate jitter
+
 ## v3.0.0
 
 ### Breaking Changes
 
-- **Data Protocol**: The AnyShake Explorer data protocol has been entirely refactored. **Please rebuild and flash the firmware of AnyShake Explorer to the latest version.**
+- **Data Protocol**: The AnyShake Explorer data protocol has been entirely refactored. **Please rebuild and burn the firmware of AnyShake Explorer to the latest version.**
 - **Configuration File**: The configuration file layout has been completely overhauled. The old configuration file format is no longer supported.
 - **SeedLink Server**: The SeedLink service has been temporarily removed and will be re-implemented in a future release.
 - **API Endpoints**: Some request and response fields have been modified in API v1. Please refer to the built-in Swagger API documentation for details.

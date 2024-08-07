@@ -35,12 +35,12 @@
         "port": 123
     },
     "database_settings": {
-        "engine": "sqlite",
-        "host": "",
-        "port": 0,
-        "username": "",
-        "password": "",
-        "database": "/home/yuki/observer.db"
+        "engine": "postgresql",
+        "host": "127.0.0.1",
+        "port": 5432,
+        "username": "postgres",
+        "password": "passw0rd",
+        "database": "observer"
     },
     "server_settings": {
         "host": "0.0.0.0",
