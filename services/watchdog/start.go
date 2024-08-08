@@ -34,8 +34,6 @@ func (s *WatchdogService) Start(options *services.Options, waitGroup *sync.WaitG
 		case <-ticker.C:
 			if prevUpdatedAt == explorerDeps.Health.UpdatedAt {
 				logger.GetLogger(s.GetServiceName()).Warnf("device is not responding, checking again in next %d seconds", int(CHECK_INTERVAL.Seconds()))
-			} else {
-				logger.GetLogger(s.GetServiceName()).Infof("device works perfectly, checking again in next %d seconds", int(CHECK_INTERVAL.Seconds()))
 			}
 			prevUpdatedAt = explorerDeps.Health.UpdatedAt
 		}

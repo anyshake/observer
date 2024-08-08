@@ -53,12 +53,12 @@ const History = (props: RouterComponentProps) => {
 		end_time: searchParams.has("end") ? Number(searchParams.get("end")) : currentTimestamp
 	});
 
-	const handleTimeChange = (value: number, end: boolean) =>
+	const handleTimeChange = (value: number, is_end_time: boolean) =>
 		setQueryDuration((prev) => {
-			if (end) {
-				return { ...prev, end: value };
+			if (is_end_time) {
+				return { ...prev, end_time: value };
 			}
-			return { ...prev, start: value };
+			return { ...prev, start_time: value };
 		});
 
 	const [form, setForm] = useState<FormProps & { values?: Record<string, string | number> }>({

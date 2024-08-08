@@ -77,6 +77,7 @@ func init() {
 // @description This is APIv1 documentation for AnyShake Observer, please set `server_settings.debug` to `false` in `config.json` when deploying to production environment in case of any security issues.
 func main() {
 	args := parseCommandLine()
+	printVersion()
 
 	var conf config.Config
 	err := conf.Read(args.Path)

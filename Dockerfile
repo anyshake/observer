@@ -8,7 +8,7 @@ RUN apk update && apk add --no-cache git bash wget curl make npm && \
     npm install && make && \
     cd ../../docs && make && \
     cd ../cmd && go mod tidy && \
-    go build -ldflags "-s -w -X main.version=$VERSION -X main.release=docker_build" -trimpath -o /tmp/observer *.go
+    go build -ldflags "-s -w -X main.version=$VERSION -X main.release=dockerbuild" -trimpath -o /tmp/observer *.go
 
 FROM alpine:latest
 

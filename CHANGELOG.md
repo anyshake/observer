@@ -2,6 +2,12 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.0.4
+
+### Bug Fixes
+
+- Fixed an issue where the timepicker component in the frontend would not update the selected time when the time range was changed.
+
 ## v3.0.3
 
 ### Bug Fixes
