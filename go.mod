@@ -30,7 +30,7 @@ require (
 	github.com/wille/osutil v0.0.0-20240729075835-ba7d4216ffe2
 	go.uber.org/dig v1.17.1
 	gorm.io/driver/mysql v1.5.2
-	gorm.io/driver/postgres v1.5.4
+	gorm.io/driver/postgres v1.5.7
 	gorm.io/driver/sqlserver v1.5.2
 	gorm.io/gorm v1.25.10
 )

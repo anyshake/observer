@@ -220,8 +220,9 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
 
 	// Read data from the FIFO buffer continuously
 	var (
-		dataBuffer = []legacyPacket{}
-		ticker     = time.NewTicker(1 * time.Second)
+		dataBuffer  = []legacyPacket{}
+		prevTime, _ = deps.FallbackTime.GetTime()
+		ticker      = time.NewTicker(1 * time.Second)
 	)
 	for {
 		select {
@@ -231,7 +232,14 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
 			if len(dataBuffer) > 0 {
 				deps.Health.Received++
 				deps.Health.UpdatedAt = time.Now()
+
+				// Fix jitter in the timestamp
 				t, _ := deps.FallbackTime.GetTime()
+				if time.Duration(math.Abs(float64(t.Sub(prevTime).Milliseconds()))) <= EXPLORER_GENERAL_JITTER {
+					t = deps.FallbackTime.Fix(t, prevTime, time.Second)
+				}
+				prevTime = t
+
 				var (
 					z_axis_count []int32
 					e_axis_count []int32
@@ -276,6 +284,8 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
 }
 
 func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency) {
+	prevTime, _ := deps.FallbackTime.GetTime()
+
 	for {
 		select {
 		case <-deps.CancelToken.Done():
@@ -345,8 +355,12 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency) 
 			if e.mainlinePacketHeader.timestamp != 0 {
 				finalPacket.Timestamp = e.mainlinePacketHeader.timestamp
 			} else {
+				// Fix jitter in the timestamp
 				t, _ := deps.FallbackTime.GetTime()
-				finalPacket.Timestamp = t.UTC().UnixMilli()
+				if time.Duration(math.Abs(float64(t.Sub(prevTime).Milliseconds()))) <= EXPLORER_GENERAL_JITTER {
+					t = deps.FallbackTime.Fix(t, prevTime, time.Second)
+				}
+				prevTime = t
 			}
 			deps.messageBus.Publish("explorer", &finalPacket)
 			deps.Health.UpdatedAt = time.Now()

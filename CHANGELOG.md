@@ -2,11 +2,24 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.0.2
+
+### New Features
+
+- Added ability to automatically fix time jitter when using internet NTP server as time source.
+
+### Bug Fixes
+
+- Fixed "insufficient arguments" error when using PostgreSQL as the database backend (see https://github.com/go-gorm/gorm/issues/6832#issuecomment-1946211186).
+- Never check for sample rate consistency in MiniSEED and SAC records when in legacy mode.
+- Send history buffer only if client requests in WebSocket API to avoid flooding the client.
+- Lowered `MINISEED_ALLOWED_JITTER_MS` constant to 2 ms for better jitter tolerance.
+
 ## v3.0.1
 
 ### Bug Fixes
 
-- Fixed the issue where MiniSEED recording in legacy mode would be interrupted due to sampling rate jitter
+- Fixed the issue where MiniSEED recording in legacy mode would be interrupted due to sampling rate jitter.
 
 ## v3.0.0
 

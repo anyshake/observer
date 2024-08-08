@@ -61,6 +61,7 @@ func (h *History) Register(rg *gin.RouterGroup, resolver *v1.Resolver) error {
 			}
 			fileName, dataBytes, err := h.getSACBytes(
 				result,
+				resolver.Config.Explorer.Legacy,
 				resolver.Config.Stream.Station,
 				resolver.Config.Stream.Network,
 				resolver.Config.Stream.Location,

@@ -10,6 +10,8 @@ import (
 	messagebus "github.com/vardius/message-bus"
 )
 
+const EXPLORER_GENERAL_JITTER = 2 * time.Millisecond
+
 const (
 	EXPLORER_CHANNEL_CODE_Z = "Z"
 	EXPLORER_CHANNEL_CODE_E = "E"

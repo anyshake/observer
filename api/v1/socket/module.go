@@ -3,7 +3,6 @@ package socket
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	v1 "github.com/anyshake/observer/api/v1"
 	"github.com/anyshake/observer/drivers/explorer"
@@ -36,7 +35,7 @@ func (s *Socket) Register(rg *gin.RouterGroup, resolver *v1.Resolver) error {
 		func(data *explorer.ExplorerData) {
 			s.messageBus.Publish(s.GetApiName(), data)
 			s.historyBuffer[s.historyBufferIndex] = *data
-			s.historyBufferIndex = (s.historyBufferIndex + 1) % EXPLORER_BUFFER_SIZE
+			s.historyBufferIndex = (s.historyBufferIndex + 1) % HISTORY_BUFFER_SIZE
 		},
 	)
 
@@ -56,25 +55,6 @@ func (s *Socket) Register(rg *gin.RouterGroup, resolver *v1.Resolver) error {
 			return
 		}
 		defer conn.Close()
-
-		// Send history buffer to the client
-		for _, buffer := range s.historyBuffer {
-			if buffer.Timestamp == 0 {
-				continue
-			}
-			dataBytes, err := json.Marshal(buffer)
-			if err != nil {
-				logger.GetLogger(s.GetApiName()).Errorln(err)
-				return
-			}
-			err = conn.WriteMessage(websocket.TextMessage, dataBytes)
-			if err != nil {
-				logger.GetLogger(s.GetApiName()).Errorln(err)
-				return
-			}
-			// To prevent flooding the client
-			time.Sleep(time.Millisecond * 10)
-		}
 
 		// Subscribe to the internal message bus
 		clienrId := conn.RemoteAddr().String()
@@ -99,9 +79,27 @@ func (s *Socket) Register(rg *gin.RouterGroup, resolver *v1.Resolver) error {
 
 		// Listen for incoming messages
 		for {
-			_, _, err := conn.ReadMessage()
+			_, dataBytes, err := conn.ReadMessage()
 			if err != nil {
 				return
+			}
+			// Respond with history buffer if the client sends a "client hello" message
+			if string(dataBytes) == "client hello" {
+				for _, buffer := range s.historyBuffer {
+					if buffer.Timestamp == 0 {
+						continue
+					}
+					dataBytes, err := json.Marshal(buffer)
+					if err != nil {
+						logger.GetLogger(s.GetApiName()).Errorln(err)
+						return
+					}
+					err = conn.WriteMessage(websocket.TextMessage, dataBytes)
+					if err != nil {
+						logger.GetLogger(s.GetApiName()).Errorln(err)
+						return
+					}
+				}
 			}
 		}
 	})

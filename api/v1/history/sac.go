@@ -2,13 +2,14 @@ package history
 
 import (
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/anyshake/observer/drivers/explorer"
 	"github.com/bclswl0827/sacio"
 )
 
-func (h *History) getSACBytes(data []explorer.ExplorerData, stationCode, networkCode, locationCode, channelPrefix, channelCode string) (string, []byte, error) {
+func (h *History) getSACBytes(data []explorer.ExplorerData, legacyMode bool, stationCode, networkCode, locationCode, channelPrefix, channelCode string) (string, []byte, error) {
 	var (
 		startSampleRate = data[0].SampleRate
 		startTimestamp  = data[0].Timestamp
@@ -19,14 +20,17 @@ func (h *History) getSACBytes(data []explorer.ExplorerData, stationCode, network
 
 	var channelBuffer []int32
 	for index, record := range data {
+
 		// Make sure timestamp is continuous
-		if record.Timestamp != startTimestamp+int64(index*1000) {
+		if math.Abs(float64(record.Timestamp-startTimestamp-int64(index*1000))) != 0 {
 			return "", nil, fmt.Errorf("timestamp is not continuous")
 		}
 
-		// Make sure sample rate is the same
-		if record.SampleRate != startSampleRate {
-			return "", nil, fmt.Errorf("sample rate is not the same")
+		if !legacyMode {
+			// Make sure sample rate is the same
+			if record.SampleRate != startSampleRate {
+				return "", nil, fmt.Errorf("sample rate is not the same")
+			}
 		}
 
 		switch channelCode {
