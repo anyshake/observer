@@ -2,6 +2,13 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.0.3
+
+### Bug Fixes
+
+- Fixed an issue on the frontend where the CPU and memory usage percentages were not displayed correctly.
+- Resolved a backend issue where the timestamp, latitude, longitude, and elevation values were always 0 when fallback values were expected.
+
 ## v3.0.2
 
 ### New Features

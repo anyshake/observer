@@ -230,8 +230,8 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
 			return
 		case <-ticker.C:
 			if len(dataBuffer) > 0 {
-				deps.Health.Received++
 				deps.Health.UpdatedAt = time.Now()
+				deps.Health.Received++
 
 				// Fix jitter in the timestamp
 				t, _ := deps.FallbackTime.GetTime()
@@ -308,7 +308,7 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency) 
 				deps.Health.Errors++
 				continue
 			}
-			if deps.Config.Latitude != 0 && deps.Config.Longitude != 0 && deps.Config.Elevation != 0 {
+			if e.mainlinePacketHeader.latitude != 0 && e.mainlinePacketHeader.longitude != 0 && e.mainlinePacketHeader.elevation != 0 {
 				deps.Config.Latitude = float64(e.mainlinePacketHeader.latitude)
 				deps.Config.Longitude = float64(e.mainlinePacketHeader.longitude)
 				deps.Config.Elevation = float64(e.mainlinePacketHeader.elevation)
@@ -360,6 +360,7 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency) 
 				if time.Duration(math.Abs(float64(t.Sub(prevTime).Milliseconds()))) <= EXPLORER_GENERAL_JITTER {
 					t = deps.FallbackTime.Fix(t, prevTime, time.Second)
 				}
+				finalPacket.Timestamp = t.UnixMilli()
 				prevTime = t
 			}
 			deps.messageBus.Publish("explorer", &finalPacket)

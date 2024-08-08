@@ -40,6 +40,10 @@ export const handleSetCharts = (
 				timestamp - initTimestamp >= RETENTION_THRESHOLD_MS
 			);
 		}
+		prev.cpu.holder.values = {
+			...prev.cpu.holder.values,
+			usage: cpuPercent.toFixed(2)
+		};
 
 		// Set memory usage chart
 		const { percent: memoryPercent } = res.data.memory;
@@ -54,6 +58,10 @@ export const handleSetCharts = (
 				timestamp - initTimestamp >= RETENTION_THRESHOLD_MS
 			);
 		}
+		prev.memory.holder.values = {
+			...prev.memory.holder.values,
+			usage: memoryPercent.toFixed(2)
+		};
 
 		return prev;
 	});

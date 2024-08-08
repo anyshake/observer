@@ -7,7 +7,7 @@ import (
 
 type AdcCount struct {
 	dao.BaseModel
-	Timestamp  int64            `gorm:"column:timestamp;not null;index"`
+	Timestamp  int64            `gorm:"column:timestamp;index;not null;unique"`
 	Z_Axis     array.Int32Array `gorm:"column:z_axis;type:text"`
 	E_Axis     array.Int32Array `gorm:"column:e_axis;type:text"`
 	N_Axis     array.Int32Array `gorm:"column:n_axis;type:text"`
