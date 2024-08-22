@@ -2,6 +2,17 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.0.5
+
+### New Features
+
+- Update network time at 00:00:00 every day to avoid time drift.
+
+### Bug Fixes
+
+- Alleviated the problem of frequent jitter in sampling rate.
+- Fixed the time offset of up to several hours caused by external compensation of timestamp.
+
 ## v3.0.4
 
 ### Bug Fixes

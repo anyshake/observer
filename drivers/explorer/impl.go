@@ -218,27 +218,30 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
 		}
 	}()
 
+	// reference: https://stackoverflow.com/a/51424566
+	// Calculate the duration to the next whole second to allivate the drift
+	calcDuration := func(currentTime time.Time, duration time.Duration) time.Duration {
+		return currentTime.Round(duration).Add(duration).Sub(currentTime)
+	}
+
 	// Read data from the FIFO buffer continuously
 	var (
-		dataBuffer  = []legacyPacket{}
-		prevTime, _ = deps.FallbackTime.GetTime()
-		ticker      = time.NewTicker(1 * time.Second)
+		dataBuffer = []legacyPacket{}
+		ticker     = time.NewTimer(calcDuration(time.Now(), time.Second))
 	)
 	for {
 		select {
 		case <-deps.CancelToken.Done():
 			return
-		case <-ticker.C:
+		case currentTick := <-ticker.C:
 			if len(dataBuffer) > 0 {
-				deps.Health.UpdatedAt = time.Now()
-				deps.Health.Received++
-
-				// Fix jitter in the timestamp
-				t, _ := deps.FallbackTime.GetTime()
-				if time.Duration(math.Abs(float64(t.Sub(prevTime).Milliseconds()))) <= EXPLORER_GENERAL_JITTER {
-					t = deps.FallbackTime.Fix(t, prevTime, time.Second)
+				currentTime, err := deps.FallbackTime.Get()
+				if err != nil {
+					continue
 				}
-				prevTime = t
+
+				deps.Health.UpdatedAt = currentTime
+				deps.Health.Received++
 
 				var (
 					z_axis_count []int32
@@ -258,13 +261,14 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
 					Z_Axis:     z_axis_count,
 					E_Axis:     e_axis_count,
 					N_Axis:     n_axis_count,
-					Timestamp:  t.UTC().UnixMilli(),
+					Timestamp:  currentTime.UTC().UnixMilli(),
 				}
 				deps.messageBus.Publish("explorer", &finalPacket)
-
 				dataBuffer = []legacyPacket{}
+
+				ticker.Reset(calcDuration(currentTick, time.Second))
 			}
-		default:
+		case <-time.After(2 * time.Millisecond):
 			for {
 				dat, err := fifoBuffer.Read(legacy_packet_frame_header, len(legacy_packet_frame_header)+e.legacyPacket.length())
 				if err != nil {
@@ -284,8 +288,6 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
 }
 
 func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency) {
-	prevTime, _ := deps.FallbackTime.GetTime()
-
 	for {
 		select {
 		case <-deps.CancelToken.Done():
@@ -344,27 +346,27 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency) 
 				continue
 			}
 
+			// Get current timestamp
+			if e.mainlinePacketHeader.timestamp == 0 {
+				t, err := deps.FallbackTime.Get()
+				if err != nil {
+					continue
+				}
+				e.mainlinePacketHeader.timestamp = t.UnixMilli()
+			}
+
 			// Publish the data to the message bus
 			deps.Health.SampleRate = sampleRate
 			finalPacket := ExplorerData{
 				SampleRate: sampleRate,
+				Timestamp:  e.mainlinePacketHeader.timestamp,
 				Z_Axis:     e.mainlinePacketChannel.z_axis,
 				E_Axis:     e.mainlinePacketChannel.e_axis,
 				N_Axis:     e.mainlinePacketChannel.n_axis,
 			}
-			if e.mainlinePacketHeader.timestamp != 0 {
-				finalPacket.Timestamp = e.mainlinePacketHeader.timestamp
-			} else {
-				// Fix jitter in the timestamp
-				t, _ := deps.FallbackTime.GetTime()
-				if time.Duration(math.Abs(float64(t.Sub(prevTime).Milliseconds()))) <= EXPLORER_GENERAL_JITTER {
-					t = deps.FallbackTime.Fix(t, prevTime, time.Second)
-				}
-				finalPacket.Timestamp = t.UnixMilli()
-				prevTime = t
-			}
 			deps.messageBus.Publish("explorer", &finalPacket)
-			deps.Health.UpdatedAt = time.Now()
+
+			deps.Health.UpdatedAt = time.UnixMilli(e.mainlinePacketHeader.timestamp)
 			deps.Health.Received++
 		}
 	}
@@ -385,8 +387,12 @@ func (e *ExplorerDriverImpl) IsAvailable(deps *ExplorerDependency) bool {
 }
 
 func (e *ExplorerDriverImpl) Init(deps *ExplorerDependency) error {
-	deps.Health.StartTime, _ = deps.FallbackTime.GetTime()
+	currentTime, err := deps.FallbackTime.Get()
+	if err != nil {
+		return err
+	}
 
+	deps.Health.StartTime = currentTime
 	deps.subscribers = cmap.New[ExplorerEventHandler]()
 	deps.messageBus = messagebus.New(1024)
 	deps.Config.DeviceId = math.MaxUint32

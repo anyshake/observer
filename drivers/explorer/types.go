@@ -10,7 +10,7 @@ import (
 	messagebus "github.com/vardius/message-bus"
 )
 
-const EXPLORER_GENERAL_JITTER = 10 * time.Millisecond
+const EXPLORER_ALLOWED_JITTER_MS = 2
 
 const (
 	EXPLORER_CHANNEL_CODE_Z = "Z"
@@ -36,9 +36,9 @@ type ExplorerConfig struct {
 }
 
 type ExplorerDependency struct {
+	FallbackTime *timesource.Source
 	Health       ExplorerHealth
 	Config       ExplorerConfig
-	FallbackTime timesource.Source
 	CancelToken  context.Context
 	Transport    transport.TransportDriver
 	messageBus   messagebus.MessageBus

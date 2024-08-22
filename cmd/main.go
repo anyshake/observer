@@ -22,12 +22,12 @@ import (
 	service_archiver "github.com/anyshake/observer/services/archiver"
 
 	service_miniseed "github.com/anyshake/observer/services/miniseed"
+	service_timesync "github.com/anyshake/observer/services/timesync"
 	service_watchdog "github.com/anyshake/observer/services/watchdog"
 	"github.com/anyshake/observer/startups"
 	startup_explorer "github.com/anyshake/observer/startups/explorer"
 	"github.com/anyshake/observer/utils/logger"
 	"github.com/anyshake/observer/utils/timesource"
-	"github.com/beevik/ntp"
 	"github.com/common-nighthawk/go-figure"
 )
 
@@ -95,13 +95,10 @@ func main() {
 
 	// Create time source with NTP server
 	logger.GetLogger(main).Infof("querying NTP server at %s:%d", conf.NtpClient.Host, conf.NtpClient.Port)
-	res, err := ntp.QueryWithOptions(conf.NtpClient.Host, ntp.QueryOptions{
-		Port: conf.NtpClient.Port, Timeout: 10 * time.Second,
-	})
+	timeSource, err := timesource.New(conf.NtpClient.Host, conf.NtpClient.Port, 10*time.Second)
 	if err != nil {
 		logger.GetLogger(main).Fatalln(err)
 	}
-	timeSource := timesource.New(time.Now(), res.Time)
 	logger.GetLogger(main).Info("time source has been created")
 
 	// Connect to database
@@ -138,7 +135,7 @@ func main() {
 		Config:     &conf,
 		Database:   databaseConn,
 		Dependency: depsContainer,
-		TimeSource: timeSource,
+		TimeSource: &timeSource,
 	}
 	runCleanerTasks := func() {
 		for _, t := range cleanerTasks {
@@ -156,7 +153,7 @@ func main() {
 	startupOptions := &startups.Options{
 		Config:     &conf,
 		Database:   databaseConn,
-		TimeSource: timeSource,
+		TimeSource: &timeSource,
 	}
 	for _, t := range startupTasks {
 		taskName := t.GetTaskName()
@@ -179,12 +176,13 @@ func main() {
 		&service_watchdog.WatchdogService{},
 		&service_archiver.ArchiverService{},
 		&service_miniseed.MiniSeedService{},
+		&service_timesync.TimeSyncService{},
 	}
 	serviceOptions := &services.Options{
 		Config:      &conf,
 		Database:    databaseConn,
 		Dependency:  depsContainer,
-		TimeSource:  timeSource,
+		TimeSource:  &timeSource,
 		CancelToken: cancelToken,
 	}
 	var waitGroup sync.WaitGroup

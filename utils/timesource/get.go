@@ -5,7 +5,10 @@ import (
 	"time"
 )
 
-func (g *Source) GetTime() (time.Time, error) {
+func (g *Source) Get() (time.Time, error) {
+	g.rwMutex.RLock()
+	defer g.rwMutex.RUnlock()
+
 	if g.LocalBaseTime.IsZero() || g.ReferenceTime.IsZero() {
 		return time.Now().UTC(), errors.New("empty BaseTime or RefTime is not allowed")
 	}

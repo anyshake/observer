@@ -11,7 +11,7 @@ type Options struct {
 	Config     *config.Config
 	Database   *gorm.DB
 	Dependency *dig.Container
-	TimeSource timesource.Source
+	TimeSource *timesource.Source
 }
 
 type CleanerTask interface {

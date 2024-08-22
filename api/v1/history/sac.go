@@ -20,17 +20,19 @@ func (h *History) getSACBytes(data []explorer.ExplorerData, legacyMode bool, sta
 
 	var channelBuffer []int32
 	for index, record := range data {
-
 		// Make sure timestamp is continuous
-		if math.Abs(float64(record.Timestamp-startTimestamp-int64(index*1000))) != 0 {
-			return "", nil, fmt.Errorf("timestamp is not continuous")
+		if math.Abs(float64(record.Timestamp-startTimestamp-int64(index*1000))) >= explorer.EXPLORER_ALLOWED_JITTER_MS {
+			return "", nil, fmt.Errorf(
+				"timestamp is not within allowed jitter %d ms, expected %d, got %d",
+				explorer.EXPLORER_ALLOWED_JITTER_MS,
+				startTimestamp+int64(index*1000),
+				record.Timestamp,
+			)
 		}
 
-		if !legacyMode {
-			// Make sure sample rate is the same
-			if record.SampleRate != startSampleRate {
-				return "", nil, fmt.Errorf("sample rate is not the same")
-			}
+		// Make sure sample rate is the same
+		if record.SampleRate != startSampleRate {
+			return "", nil, fmt.Errorf("sample rate is not the same, expected %d, got %d", startSampleRate, record.SampleRate)
 		}
 
 		switch channelCode {

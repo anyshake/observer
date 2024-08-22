@@ -10,7 +10,7 @@ import (
 type Options struct {
 	Config     *config.Config
 	Database   *gorm.DB
-	TimeSource timesource.Source
+	TimeSource *timesource.Source
 }
 
 type StartupTask interface {

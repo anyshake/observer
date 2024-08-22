@@ -9,7 +9,7 @@ import (
 	"github.com/wille/osutil"
 )
 
-func (o *osInfo) get(timeSource timesource.Source) error {
+func (o *osInfo) get(timeSource *timesource.Source) error {
 	hostname, err := os.Hostname()
 	if err != nil {
 		return err
@@ -20,7 +20,7 @@ func (o *osInfo) get(timeSource timesource.Source) error {
 		return err
 	}
 
-	timestamp, err := timeSource.GetTime()
+	timestamp, err := timeSource.Get()
 	if err != nil {
 		return err
 	}

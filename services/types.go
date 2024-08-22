@@ -14,7 +14,7 @@ type Options struct {
 	Config      *config.Config
 	Dependency  *dig.Container
 	Database    *gorm.DB
-	TimeSource  timesource.Source
+	TimeSource  *timesource.Source
 	CancelToken context.Context
 }
 

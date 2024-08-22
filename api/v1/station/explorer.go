@@ -5,14 +5,14 @@ import (
 	"github.com/anyshake/observer/utils/timesource"
 )
 
-func (e *explorerInfo) get(timeSource timesource.Source, explorerDeps *explorer.ExplorerDependency) error {
+func (e *explorerInfo) get(timeSource *timesource.Source, explorerDeps *explorer.ExplorerDependency) error {
 	e.DeviceId = explorerDeps.Config.DeviceId
 	e.Elevation = explorerDeps.Config.Elevation
 	e.Errors = explorerDeps.Health.Errors
 	e.Received = explorerDeps.Health.Received
 	e.SampleRate = explorerDeps.Health.SampleRate
 
-	currentTime, err := timeSource.GetTime()
+	currentTime, err := timeSource.Get()
 	if err != nil {
 		return err
 	}
