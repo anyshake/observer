@@ -2,6 +2,15 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.1.0
+
+### New Features
+
+- Added support for forwarding raw messages via TCP.
+- Re-support for the SeedLink protocol.
+- Updated Go version to v1.23.0.
+- Updated Gin version to v1.10.0.
+
 ## v3.0.5
 
 ### New Features

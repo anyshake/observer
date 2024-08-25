@@ -10,7 +10,7 @@ import (
 	messagebus "github.com/vardius/message-bus"
 )
 
-const EXPLORER_ALLOWED_JITTER_MS = 2
+const EXPLORER_ALLOWED_JITTER_MS = 5
 
 const (
 	EXPLORER_CHANNEL_CODE_Z = "Z"

@@ -75,7 +75,7 @@ func (s *Socket) Register(rg *gin.RouterGroup, resolver *v1.Resolver) error {
 			logger.GetLogger(s.GetApiName()).Errorln(err)
 			return
 		}
-		defer s.Unsubscribe(clienrId)
+		defer s.unsubscribe(clienrId)
 
 		// Listen for incoming messages
 		for {

@@ -46,20 +46,22 @@ func (g *legacyPacket) decode(data []byte) error {
 
 	// Using XOR algorithm
 	calc_checksum := [3]uint8{0, 0, 0}
-	z_axis_offset := 0
-	e_axis_offset := int(unsafe.Sizeof(int32(0)) * legacy_packet_channel_size)
-	n_axis_offset := int(unsafe.Sizeof(int32(0)) * legacy_packet_channel_size * 2)
-	for i := z_axis_offset; i < e_axis_offset; i++ {
+	z_axis_offset := int(unsafe.Sizeof(g.Z_Axis))
+	for i := 0; i < z_axis_offset; i++ {
 		calc_checksum[0] ^= data[i]
 	}
-	for i := e_axis_offset; i < n_axis_offset; i++ {
+	e_axis_offset := z_axis_offset + int(unsafe.Sizeof(g.E_Axis))
+	for i := z_axis_offset; i < e_axis_offset; i++ {
 		calc_checksum[1] ^= data[i]
 	}
-	for i := e_axis_offset; i < len(data)-int(unsafe.Sizeof([3]uint8{})); i++ {
+	n_axis_offset := e_axis_offset + int(unsafe.Sizeof(g.N_Axis))
+	for i := e_axis_offset; i < n_axis_offset; i++ {
 		calc_checksum[2] ^= data[i]
 	}
-	if bytes.Equal(g.Checksum[:], calc_checksum[:]) {
-		return fmt.Errorf("checksum mismatch, expected %v, got %v", g.Checksum, calc_checksum)
+	for i := 0; i < len(calc_checksum); i++ {
+		if calc_checksum[i] != g.Checksum[i] {
+			return fmt.Errorf("checksum mismatch, expected %v, got %v", g.Checksum, calc_checksum)
+		}
 	}
 
 	return nil
@@ -123,7 +125,7 @@ type mainlinePacketChannel struct {
 
 func (g *mainlinePacketChannel) length(sampleRate int) int {
 	return 3*sampleRate*int(unsafe.Sizeof(int32(0))) + // Z, E, N axis data
-		int(unsafe.Sizeof(uint32(0))) // Checksum of Z, E, N axis
+		int(unsafe.Sizeof(g.checksum)) // Checksum of Z, E, N axis
 }
 
 func (g *mainlinePacketChannel) decode(data []byte, sampleRate int) error {
@@ -198,11 +200,11 @@ type ExplorerDriverImpl struct {
 }
 
 func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
-	fifoBuffer := fifo.New(16384)
+	fifoBuffer := fifo.New(e.legacyPacket.length() * 512)
 
 	// Read data from the transport continuously
 	go func() {
-		buf := make([]byte, 1024)
+		buf := make([]byte, e.legacyPacket.length())
 		for {
 			select {
 			case <-deps.CancelToken.Done():
@@ -218,7 +220,7 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
 		}
 	}()
 
-	// reference: https://stackoverflow.com/a/51424566
+	// Reference: https://stackoverflow.com/a/51424566
 	// Calculate the duration to the next whole second to allivate the drift
 	calcDuration := func(currentTime time.Time, duration time.Duration) time.Duration {
 		return currentTime.Round(duration).Add(duration).Sub(currentTime)
@@ -268,13 +270,9 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
 
 				ticker.Reset(calcDuration(currentTick, time.Second))
 			}
-		case <-time.After(2 * time.Millisecond):
-			for {
-				dat, err := fifoBuffer.Read(legacy_packet_frame_header, len(legacy_packet_frame_header)+e.legacyPacket.length())
-				if err != nil {
-					break
-				}
-
+		case <-time.After(500 * time.Microsecond):
+			dat, err := fifoBuffer.Read(legacy_packet_frame_header, len(legacy_packet_frame_header)+e.legacyPacket.length())
+			if err == nil {
 				// Read the packet data
 				err = e.legacyPacket.decode(dat[len(legacy_packet_frame_header):])
 				if err != nil {

@@ -40,7 +40,8 @@ func (a *ArchiverService) Start(options *services.Options, waitGroup *sync.WaitG
 	explorerDriver.Subscribe(explorerDeps, a.GetServiceName(), a.handleExplorerEvent)
 
 	logger.GetLogger(a.GetServiceName()).Infoln("service has been started")
+	defer logger.GetLogger(a.GetServiceName()).Infoln("service has been stopped")
+
 	<-options.CancelToken.Done()
 	explorerDriver.Unsubscribe(explorerDeps, a.GetServiceName())
-	logger.GetLogger(a.GetServiceName()).Infoln("service has been stopped")
 }

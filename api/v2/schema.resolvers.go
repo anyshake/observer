@@ -6,12 +6,12 @@ package v2
 
 import (
 	"context"
-	"fmt"
 )
 
-// Test is the resolver for the test field.
-func (r *queryResolver) Test(ctx context.Context) (*bool, error) {
-	panic(fmt.Errorf("not implemented: Test - test"))
+// Ping is the resolver for the ping field.
+func (r *queryResolver) Ping(ctx context.Context) (*string, error) {
+	res := "pong"
+	return &res, nil
 }
 
 // Query returns QueryResolver implementation.

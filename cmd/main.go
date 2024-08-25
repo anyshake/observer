@@ -21,7 +21,9 @@ import (
 	"github.com/anyshake/observer/services"
 	service_archiver "github.com/anyshake/observer/services/archiver"
 
+	service_forwarder "github.com/anyshake/observer/services/forwarder"
 	service_miniseed "github.com/anyshake/observer/services/miniseed"
+	service_seedlink "github.com/anyshake/observer/services/seedlink"
 	service_timesync "github.com/anyshake/observer/services/timesync"
 	service_watchdog "github.com/anyshake/observer/services/watchdog"
 	"github.com/anyshake/observer/startups"
@@ -177,6 +179,8 @@ func main() {
 		&service_archiver.ArchiverService{},
 		&service_miniseed.MiniSeedService{},
 		&service_timesync.TimeSyncService{},
+		&service_seedlink.SeedLinkService{},
+		&service_forwarder.ForwarderService{},
 	}
 	serviceOptions := &services.Options{
 		Config:      &conf,

@@ -58,7 +58,7 @@ func (m *MiniSeedService) Start(options *services.Options, waitGroup *sync.WaitG
 		)
 		_, err := os.Stat(filePath)
 		if err == nil {
-			logger.GetLogger(m.GetServiceName()).Infof("starting %s from last record", channelName)
+			logger.GetLogger(m.GetServiceName()).Infof("reading existing record from %s", filePath)
 
 			// Get last sequence number from file
 			var ms mseedio.MiniSeedData
@@ -78,6 +78,7 @@ func (m *MiniSeedService) Start(options *services.Options, waitGroup *sync.WaitG
 
 				// Set current sequence number
 				m.miniseedSequence[channelCode] = n
+				logger.GetLogger(m.GetServiceName()).Infof("starting %s from last record, sequence %d", channelName, n)
 			}
 		}
 	}
@@ -96,7 +97,8 @@ func (m *MiniSeedService) Start(options *services.Options, waitGroup *sync.WaitG
 	explorerDriver.Subscribe(explorerDeps, m.GetServiceName(), m.handleExplorerEvent)
 
 	logger.GetLogger(m.GetServiceName()).Infoln("service has been started")
+	defer logger.GetLogger(m.GetServiceName()).Infoln("service has been stopped")
+
 	<-options.CancelToken.Done()
 	explorerDriver.Unsubscribe(explorerDeps, m.GetServiceName())
-	logger.GetLogger(m.GetServiceName()).Infoln("service has been stopped")
 }

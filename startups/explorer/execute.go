@@ -35,7 +35,7 @@ func (t *ExplorerStartupTask) Execute(depsContainer *dig.Container, options *sta
 	if !explorerDeps.Config.LegacyMode {
 		logger.GetLogger(t.GetTaskName()).Infof("handshake successful, device ID: %08X", explorerDeps.Config.DeviceId)
 	} else {
-		logger.GetLogger(t.GetTaskName()).Warnln("device is in legacy mode, keep an eye on the CPU usage")
+		logger.GetLogger(t.GetTaskName()).Warnln("device is in legacy mode, this is for backward compatibility only")
 	}
 	return nil
 }
