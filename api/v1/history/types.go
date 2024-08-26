@@ -13,6 +13,6 @@ type History struct{}
 type historyBinding struct {
 	StartTime int64  `form:"start_time" json:"start_time" xml:"start_time" binding:"required,numeric"`
 	EndTime   int64  `form:"end_time" json:"end_time" xml:"end_time" binding:"required,numeric"`
-	Format    string `form:"format" json:"format" xml:"format" binding:"required,oneof=json sac"`
+	Format    string `form:"format" json:"format" xml:"format" binding:"required,oneof=json sac miniseed"`
 	Channel   string `form:"channel" json:"channel" xml:"channel" binding:"omitempty"`
 }

@@ -142,6 +142,12 @@
                     "submit": "送出",
                     "cancel": "取消"
                 },
+                "choose_format": {
+                    "title": "選擇匯出格式",
+                    "placeholder": "匯出格式",
+                    "submit": "匯出",
+                    "cancel": "取消"
+                },
                 "choose_source": {
                     "title": "選擇地震資料來源",
                     "placeholder": "資料來源",
@@ -202,7 +208,7 @@
             },
             "buttons": {
                 "query_waveform": "調閱波形",
-                "query_sac_file": "資料下載",
+                "exoprt_as_file": "資料下載",
                 "query_source": "事件反查",
                 "get_share_link": "分享連結"
             },
@@ -226,9 +232,9 @@
             },
             "toasts": {
                 "duration_error": "請選擇正確的時間範圍",
-                "is_exporting_sac": "正在匯出 SAC 格式波形，請稍候...",
-                "export_sac_success": "SAC 格式波形資料匯出成功",
-                "export_sac_error": "SAC 格式波形資料匯出失敗",
+                "is_exporting_file": "正在匯出波形，請稍候...",
+                "export_file_success": "波形資料匯出成功",
+                "export_file_error": "波形資料匯出失敗",
                 "is_fetching_source": "正在取得事件資料源，請稍候...",
                 "fetch_source_success": "事件資料源取得成功",
                 "fetch_source_error": "事件資料源取得失敗",

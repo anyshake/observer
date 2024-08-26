@@ -1,7 +1,7 @@
 package history
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 
 	v1 "github.com/anyshake/observer/api/v1"
@@ -19,8 +19,8 @@ import (
 // @Produce application/octet-stream
 // @Param start_time formData int true "Start timestamp of the waveform data to be queried, in milliseconds (unix timestamp)"
 // @Param end_time formData int true "End timestamp of the waveform data to be queried, in milliseconds (unix timestamp)"
-// @Param format formData string true "Format of the waveform data to be queried, `json` or `sac`"
-// @Param channel formData string false "Channel of the waveform, `Z`, `E` or `N`, reuqired when format is `sac`"
+// @Param format formData string true "Format of the waveform data to be queried, `json`, `sac` or `miniseed`"
+// @Param channel formData string false "Channel of the waveform, `Z`, `E` or `N`, reuqired when format is `sac` and `miniseed`"
 // @Failure 400 {object} response.HttpResponse "Failed to export waveform data due to invalid format or channel"
 // @Failure 410 {object} response.HttpResponse "Failed to export waveform data due to no data available"
 // @Failure 500 {object} response.HttpResponse "Failed to export waveform data due to failed to read data source"
@@ -54,14 +54,44 @@ func (h *History) Register(rg *gin.RouterGroup, resolver *v1.Resolver) error {
 			if binding.Channel != explorer.EXPLORER_CHANNEL_CODE_Z &&
 				binding.Channel != explorer.EXPLORER_CHANNEL_CODE_E &&
 				binding.Channel != explorer.EXPLORER_CHANNEL_CODE_N {
-				err := fmt.Errorf("no channel was selected")
+				err := errors.New("no channel was selected")
 				logger.GetLogger(h.GetApiName()).Errorln(err)
 				response.Error(c, http.StatusBadRequest)
 				return
 			}
 			fileName, dataBytes, err := h.getSACBytes(
 				result,
-				resolver.Config.Explorer.Legacy,
+				resolver.Config.Stream.Station,
+				resolver.Config.Stream.Network,
+				resolver.Config.Stream.Location,
+				resolver.Config.Stream.Channel,
+				binding.Channel,
+			)
+			if err != nil {
+				logger.GetLogger(h.GetApiName()).Errorln(err)
+				response.Error(c, http.StatusInternalServerError)
+				return
+			}
+
+			response.File(c, fileName, dataBytes)
+			return
+		case "miniseed":
+			result, err := h.filterHistory(binding.StartTime, binding.EndTime, SAC_MAX_DURATION, resolver)
+			if err != nil {
+				logger.GetLogger(h.GetApiName()).Errorln(err)
+				response.Error(c, http.StatusGone)
+				return
+			}
+			if binding.Channel != explorer.EXPLORER_CHANNEL_CODE_Z &&
+				binding.Channel != explorer.EXPLORER_CHANNEL_CODE_E &&
+				binding.Channel != explorer.EXPLORER_CHANNEL_CODE_N {
+				err := errors.New("no channel was selected")
+				logger.GetLogger(h.GetApiName()).Errorln(err)
+				response.Error(c, http.StatusBadRequest)
+				return
+			}
+			fileName, dataBytes, err := h.getMiniSeedBytes(
+				result,
 				resolver.Config.Stream.Station,
 				resolver.Config.Stream.Network,
 				resolver.Config.Stream.Location,

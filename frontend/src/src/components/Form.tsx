@@ -23,7 +23,7 @@ export interface FormProps {
 	readonly defaultValue?: string;
 	readonly onClose?: () => void;
 	readonly onSubmit?: (value: string) => void;
-	readonly inputType?: HTMLInputTypeAttribute | "select";
+	readonly inputType?: HTMLInputTypeAttribute | "select" | "textarea";
 	readonly selectOptions?: { value: string; label: string }[];
 }
 
@@ -53,11 +53,11 @@ export const Form = (props: FormProps) => {
 		<Dialog onClose={onClose} open={open}>
 			<DialogTitle>{title}</DialogTitle>
 			<DialogContent>
-				{content && <DialogContentText>{content}</DialogContentText>}
+				{content && <DialogContentText sx={{ py: 2 }}>{content}</DialogContentText>}
 				<TextField
 					autoFocus
 					fullWidth
-					className="mt-8"
+					sx={{ my: 2 }}
 					type={inputType}
 					label={placeholder}
 					defaultValue={defaultValue}
@@ -67,6 +67,7 @@ export const Form = (props: FormProps) => {
 					onChange={({ target }) => {
 						setInputValue(target.value);
 					}}
+					multiline={inputType === "textarea"}
 				/>
 				<FormControl
 					sx={{ my: 2 }}
@@ -95,7 +96,13 @@ export const Form = (props: FormProps) => {
 				{cancelText && <Button onClick={onClose}>{cancelText}</Button>}
 				<Button
 					onClick={() => {
-						onSubmit && onSubmit(inputType === "select" ? selectValue : inputValue);
+						onSubmit?.(
+							inputType === "select"
+								? selectValue
+								: inputValue.length
+									? inputValue
+									: defaultValue ?? ""
+						);
 					}}
 				>
 					{submitText}

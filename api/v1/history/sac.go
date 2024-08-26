@@ -9,7 +9,7 @@ import (
 	"github.com/bclswl0827/sacio"
 )
 
-func (h *History) getSACBytes(data []explorer.ExplorerData, legacyMode bool, stationCode, networkCode, locationCode, channelPrefix, channelCode string) (string, []byte, error) {
+func (h *History) getSACBytes(data []explorer.ExplorerData, stationCode, networkCode, locationCode, channelPrefix, channelCode string) (string, []byte, error) {
 	var (
 		startSampleRate = data[0].SampleRate
 		startTimestamp  = data[0].Timestamp
@@ -54,6 +54,11 @@ func (h *History) getSACBytes(data []explorer.ExplorerData, legacyMode bool, sta
 	sac.SetInfo(networkCode, stationCode, locationCode, channelName)
 	sac.SetBody(h.int32ToFloat32(channelBuffer), startSampleRate)
 
+	dataBytes, err := sac.Encode(sacio.MSBFIRST)
+	if err != nil {
+		return "", nil, err
+	}
+
 	// Return filename and bytes (e.g. 2023.193.14.22.51.0317.AS.SHAKE.00.EHZ.D.sac)
 	filename := fmt.Sprintf("%s.%s.%s.%s.%s.%04d.%s.%s.%s.%s.D.sac",
 		startTime.Format("2006"),
@@ -66,11 +71,6 @@ func (h *History) getSACBytes(data []explorer.ExplorerData, legacyMode bool, sta
 		stationCode, networkCode,
 		locationCode, channelName,
 	)
-	dataBytes, err := sac.Encode(sacio.MSBFIRST)
-	if err != nil {
-		return "", nil, err
-	}
-
 	return filename, dataBytes, nil
 }
 

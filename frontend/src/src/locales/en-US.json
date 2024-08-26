@@ -130,6 +130,12 @@
                     "submit": "Submit",
                     "cancel": "Cancel"
                 },
+                "choose_format": {
+                    "title": "Select Export Format",
+                    "placeholder": "Export format",
+                    "submit": "Export",
+                    "cancel": "Cancel"
+                },
                 "choose_source": {
                     "title": "Select Earthquake Data Source",
                     "placeholder": "Data source",
@@ -190,7 +196,7 @@
             },
             "buttons": {
                 "query_waveform": "Retrieve Waveforms",
-                "query_sac_file": "Download Data",
+                "exoprt_as_file": "Download Data",
                 "query_source": "Event Lookup",
                 "get_share_link": "Get Share Link"
             },
@@ -214,9 +220,9 @@
             },
             "toasts": {
                 "duration_error": "Please select the correct time range",
-                "is_exporting_sac": "Exporting SAC format waveforms, please wait...",
-                "export_sac_success": "SAC format waveform data export successful",
-                "export_sac_error": "SAC format waveform data export failed",
+                "is_exporting_file": "Exporting waveform to file, please wait...",
+                "export_file_success": "Waveform data export successful",
+                "export_file_error": "Failed to export waveform data",
                 "is_fetching_source": "Fetching event data source, please wait...",
                 "fetch_source_success": "Event data source retrieval successful",
                 "fetch_source_error": "Event data source retrieval failed",

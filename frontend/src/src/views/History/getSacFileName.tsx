@@ -1,7 +1,7 @@
 import { getDayOfYear } from "../../helpers/utils/getDayOfYear";
 import { Station } from "../../stores/station";
 
-export const getSACFileName = (
+export const getSacFileName = (
 	startTimeMS: number,
 	channelName: string,
 	{ network, station, location }: Station

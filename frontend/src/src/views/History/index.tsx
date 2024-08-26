@@ -22,9 +22,11 @@ import { sendPromiseAlert } from "../../helpers/interact/sendPromiseAlert";
 import { sendUserAlert } from "../../helpers/interact/sendUserAlert";
 import { requestRestApi } from "../../helpers/request/requestRestApi";
 import { FilterPassband, getFilteredCounts } from "../../helpers/seismic/getFilteredCounts";
+import { asyncSleep } from "../../helpers/utils/asyncSleep";
 import { getTimeString } from "../../helpers/utils/getTimeString";
 import { setClipboardText } from "../../helpers/utils/setClipboardText";
-import { getSACFileName } from "./getSACFileName";
+import { getMiniSeedFileName } from "./getMiniSeedFileName";
+import { getSacFileName } from "./getSacFileName";
 import { handleSetCharts } from "./handleSetCharts";
 import { handleSetLabels } from "./handleSetLabels";
 
@@ -245,19 +247,21 @@ const History = (props: RouterComponentProps) => {
 		handleSetCharts(res, setCharts);
 	};
 
-	const handleExportSACFile = () => {
+	const handleExportAsFile = () => {
 		const { start_time, end_time } = queryDuration;
 		if (!start_time || !end_time || start_time >= end_time) {
 			sendUserAlert(t("views.history.toasts.duration_error"), true);
 			return;
 		}
 
-		const handleSubmitForm = async (channelCode: string) => {
+		const handleSubmitForm = async (format: string, channelCode: string) => {
 			setForm((prev) => ({ ...prev, open: false }));
 
 			const { backend } = apiConfig;
-			const payload = { start_time, end_time, channel: channelCode, format: "sac" };
-			const sacFileName = getSACFileName(
+			const payload = { start_time, end_time, channel: channelCode, format };
+
+			const miniSeedFileName = getMiniSeedFileName();
+			const sacFileName = getSacFileName(
 				start_time,
 				`${station.channel}${channelCode}`,
 				station
@@ -274,12 +278,33 @@ const History = (props: RouterComponentProps) => {
 					timeout: 120,
 					throwError: true,
 					endpoint: apiConfig.endpoints.history,
-					blobOptions: { fileName: sacFileName }
+					blobOptions: {
+						fileName: format === "miniseed" ? miniSeedFileName : sacFileName
+					}
 				}),
-				t("views.history.toasts.is_exporting_sac"),
-				t("views.history.toasts.export_sac_success"),
-				t("views.history.toasts.export_sac_error")
+				t("views.history.toasts.is_exporting_file"),
+				t("views.history.toasts.export_file_success"),
+				t("views.history.toasts.export_file_error")
 			);
+		};
+
+		const handleChooseFormat = async (channel: string) => {
+			setForm((prev) => ({ ...prev, open: false }));
+			await asyncSleep(300);
+
+			setForm((prev) => ({
+				...prev,
+				open: true,
+				selectOptions: [
+					{ label: "MiniSEED", value: "miniseed" },
+					{ label: "SAC", value: "sac" }
+				],
+				onSubmit: (format) => handleSubmitForm(format, channel),
+				title: "views.history.forms.choose_format.title",
+				cancelText: "views.history.forms.choose_format.cancel",
+				submitText: "views.history.forms.choose_format.submit",
+				placeholder: "views.history.forms.choose_format.placeholder"
+			}));
 		};
 
 		setForm((prev) => ({
@@ -290,7 +315,7 @@ const History = (props: RouterComponentProps) => {
 				{ label: "E Axis", value: "E" },
 				{ label: "N Axis", value: "N" }
 			],
-			onSubmit: handleSubmitForm,
+			onSubmit: handleChooseFormat,
 			title: "views.history.forms.choose_channel.title",
 			cancelText: "views.history.forms.choose_channel.cancel",
 			submitText: "views.history.forms.choose_channel.submit",
@@ -470,11 +495,11 @@ const History = (props: RouterComponentProps) => {
 						onClick={() => {
 							if (!isCurrentBusy) {
 								setIsCurrentBusy(true);
-								handleExportSACFile();
+								handleExportAsFile();
 								setIsCurrentBusy(false);
 							}
 						}}
-						label={t("views.history.buttons.query_sac_file")}
+						label={t("views.history.buttons.exoprt_as_file")}
 					/>
 					<Button
 						className={`bg-yellow-700 hover:bg-yellow-800 ${

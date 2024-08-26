@@ -222,13 +222,13 @@ paths:
         name: end_time
         required: true
         type: integer
-      - description: Format of the waveform data to be queried, `json` or `sac`
+      - description: Format of the waveform data to be queried, `json`, `sac` or `miniseed`
         in: formData
         name: format
         required: true
         type: string
       - description: Channel of the waveform, `Z`, `E` or `N`, reuqired when format
-          is `sac`
+          is `sac` and `miniseed`
         in: formData
         name: channel
         type: string

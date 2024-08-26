@@ -35,14 +35,14 @@
                     },
                     {
                         "type": "string",
-                        "description": "Format of the waveform data to be queried, `json` or `sac`",
+                        "description": "Format of the waveform data to be queried, `json`, `sac` or `miniseed`",
                         "name": "format",
                         "in": "formData",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Channel of the waveform, `Z`, `E` or `N`, reuqired when format is `sac`",
+                        "description": "Channel of the waveform, `Z`, `E` or `N`, reuqired when format is `sac` and `miniseed`",
                         "name": "channel",
                         "in": "formData"
                     }
