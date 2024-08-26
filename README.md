@@ -51,65 +51,11 @@ Please visit [anyshake.org/docs/introduction](https://anyshake.org/docs/introduc
 
 AnyShake Observer is designed and developed by [@bclswl0827](https://github.com/bclswl0827), test work is done by [@TenkyuChimata](https://github.com/TenkyuChimata).
 
-Thanks to the following tools and libraries, AnyShake Observer is made possible!
+The success of AnyShake Observer is inseparable from the following core libraries:
 
-### Backend
-
-- [github.com/PuerkitoBio/goquery](https://github.com/PuerkitoBio/goquery)
-- [github.com/bclswl0827/go-serial](https://github.com/bclswl0827/go-serial)
-- [github.com/bclswl0827/sacio](https://github.com/bclswl0827/sacio)
-- [github.com/beevik/ntp](https://github.com/beevik/ntp)
-- [github.com/common-nighthawk/go-figure](https://github.com/common-nighthawk/go-figure)
-- [github.com/gin-contrib/gzip](https://github.com/gin-contrib/gzip)
-- [github.com/gin-gonic/gin](https://github.com/gin-gonic/gin)
-- [github.com/gorilla/websocket](https://github.com/gorilla/websocket)
-- [github.com/juju/ratelimit](https://github.com/juju/ratelimit)
-- [github.com/mackerelio/go-osstat](https://github.com/mackerelio/go-osstat)
-- [github.com/sbabiv/xml2map](https://github.com/sbabiv/xml2map)
-- [github.com/shirou/gopsutil](https://github.com/shirou/gopsutil)
-- [github.com/swaggo/files](https://github.com/swaggo/files)
-- [github.com/swaggo/swag](https://github.com/swaggo/swag)
-- [github.com/wille/osutil](https://github.com/wille/osutil)
-- [gorm.io/driver/mysql](https://github.com/go-gorm/mysql)
-- [gorm.io/driver/postgres](https://github.com/go-gorm/postgres)
-- [gorm.io/driver/sqlite](https://github.com/go-gorm/sqlite)
-- [gorm.io/driver/sqlserver](https://github.com/go-gorm/sqlserver)
-- [gorm.io/gorm](https://gorm.io/)
-- [github.com/bclswl0827/mseedio](https://github.com/bclswl0827/mseedio)
-- [github.com/fatih/color](https://github.com/fatih/color)
-- [github.com/json-iterator/go](https://github.com/json-iterator/go)
-- [github.com/swaggo/gin-swagger](https://github.com/swaggo/gin-swagger)
-
-### Frontend
-
-- [emotion](https://github.com/emotion-js/emotion)
-- [mui](https://mui.com/)
-- [reduxjs/toolkit](https://redux-toolkit.js.org/)
-- [axios](https://axios-http.com/)
-- [date-fns](https://date-fns.org/)
-- [file-saver](https://github.com/eligrey/FileSaver.js)
-- [highcharts](https://www.highcharts.com/)
-- [highcharts-react-official](https://github.com/highcharts/highcharts-react)
-- [i18next](https://www.i18next.com/)
-- [i18next-browser-languagedetector](https://github.com/i18next/i18next-browser-languageDetector)
-- [leaflet](https://leafletjs.com/)
-- [oregondsp](https://github.com/crotwell/OregonDSP-kotlin)
-- [react](https://reactjs.org/)
-- [react-dom](https://reactjs.org/)
-- [react-hot-toast](https://react-hot-toast.com/)
-- [react-i18next](https://react.i18next.com/)
-- [react-leaflet](https://react-leaflet.js.org/)
-- [react-polling](https://github.com/vivek12345/react-polling)
-- [react-redux](https://react-redux.js.org/)
-- [react-router-dom](https://reactrouter.com/)
-- [react-scripts](https://github.com/facebook/create-react-app/tree/main/packages/react-scripts)
-- [react-syntax-highlighter](https://github.com/react-syntax-highlighter/react-syntax-highlighter)
-- [redux](https://react-redux.js.org/)
-- [redux-persist](https://github.com/rt2zz/redux-persist)
-- [cross-env](https://github.com/kentcdodds/cross-env)
-- [tailwindcss](https://tailwindcss.com/)
-- [tailwindcss-animated](https://tailwindcss-animated.com/)
-- [typescript](https://www.typescriptlang.org/)
+- [github.com/bclswl0827/mseedio](https://github.com/bclswl0827/mseedio): Pure Go library for reading and writing MiniSEED data.
+- [github.com/bclswl0827/sacio](https://github.com/bclswl0827/sacio): Pure Go library for reading and writing SAC data.
+- [github.com/bclswl0827/slgo](https://github.com/bclswl0827/slgo): Pure Go library used to build SeedLink server.
 
 ## License
 
