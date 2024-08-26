@@ -8,17 +8,17 @@ import (
 const (
 	MINISEED_BIT_ORDER        = mseedio.MSBFIRST
 	MINISEED_ENCODE_TYPE      = mseedio.STEIM2
-	MINISEED_WRITE_INTERVAL   = 3
+	MINISEED_WRITE_INTERVAL   = 5
 	MINISEED_CLEANUP_INTERVAL = 60
 )
 
 type MiniSeedService struct {
-	miniseedBuffer       [MINISEED_WRITE_INTERVAL]explorer.ExplorerData
+	miniseedBuffer       []explorer.ExplorerData
 	miniseedSequence     map[string]int // Indepedent sequence number for Z, E, N
+	writeBufferInterval  int
 	writeBufferCountDown int
 	cleanUpCountDown     int
 	lifeCycle            int
-	legacyMode           bool
 	basePath             string
 	stationCode          string
 	networkCode          string

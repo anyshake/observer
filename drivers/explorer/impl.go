@@ -200,7 +200,7 @@ type ExplorerDriverImpl struct {
 }
 
 func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
-	fifoBuffer := fifo.New(e.legacyPacket.length() * 512)
+	fifoBuffer := fifo.New((len(legacy_packet_frame_header) + e.legacyPacket.length()) * 4096)
 
 	// Read data from the transport continuously
 	go func() {

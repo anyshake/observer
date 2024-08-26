@@ -101,37 +101,49 @@ func (p *provider) QueryHistory(startTime, endTime time.Time, channels []string)
 	if err != nil {
 		return nil, err
 	}
+	if len(adcCountData) == 0 {
+		return nil, nil
+	}
 
 	// Convert ADC count data to SeedLink data packets
 	var dataPacketArr []handlers.SeedLinkDataPacket
 	for _, channel := range channels {
+		prevSampleRate := adcCountData[0].SampleRate
 		switch channel {
 		case fmt.Sprintf("%sZ", p.channelPrefix):
 			for _, adcCount := range adcCountData {
-				dataPacketArr = append(dataPacketArr, handlers.SeedLinkDataPacket{
-					Timestamp:  adcCount.Timestamp,
-					SampleRate: adcCount.SampleRate,
-					Channel:    channel,
-					DataArr:    adcCount.Z_Axis,
-				})
+				if adcCount.SampleRate == prevSampleRate {
+					dataPacketArr = append(dataPacketArr, handlers.SeedLinkDataPacket{
+						Timestamp:  adcCount.Timestamp,
+						SampleRate: adcCount.SampleRate,
+						Channel:    channel,
+						DataArr:    adcCount.Z_Axis,
+					})
+				}
+				prevSampleRate = adcCount.SampleRate
 			}
 		case fmt.Sprintf("%sE", p.channelPrefix):
 			for _, adcCount := range adcCountData {
-				dataPacketArr = append(dataPacketArr, handlers.SeedLinkDataPacket{
-					Timestamp:  adcCount.Timestamp,
-					SampleRate: adcCount.SampleRate,
-					Channel:    channel,
-					DataArr:    adcCount.E_Axis,
-				})
+				if adcCount.SampleRate == prevSampleRate {
+					dataPacketArr = append(dataPacketArr, handlers.SeedLinkDataPacket{
+						Timestamp:  adcCount.Timestamp,
+						SampleRate: adcCount.SampleRate,
+						Channel:    channel,
+						DataArr:    adcCount.E_Axis,
+					})
+				}
+				prevSampleRate = adcCount.SampleRate
 			}
 		case fmt.Sprintf("%sN", p.channelPrefix):
 			for _, adcCount := range adcCountData {
-				dataPacketArr = append(dataPacketArr, handlers.SeedLinkDataPacket{
-					Timestamp:  adcCount.Timestamp,
-					SampleRate: adcCount.SampleRate,
-					Channel:    channel,
-					DataArr:    adcCount.N_Axis,
-				})
+				if adcCount.SampleRate == prevSampleRate {
+					dataPacketArr = append(dataPacketArr, handlers.SeedLinkDataPacket{
+						Timestamp:  adcCount.Timestamp,
+						SampleRate: adcCount.SampleRate,
+						Channel:    channel,
+						DataArr:    adcCount.N_Axis,
+					})
+				}
 			}
 		}
 	}

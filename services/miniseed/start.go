@@ -36,9 +36,18 @@ func (m *MiniSeedService) Start(options *services.Options, waitGroup *sync.WaitG
 		explorer.EXPLORER_CHANNEL_CODE_E: 0,
 		explorer.EXPLORER_CHANNEL_CODE_N: 0,
 	}
-	m.legacyMode = options.Config.Explorer.Legacy
 	m.cleanUpCountDown = MINISEED_CLEANUP_INTERVAL
-	m.writeBufferCountDown = MINISEED_WRITE_INTERVAL
+
+	// Set write interval to 1 if legacy mode is enabled
+	// This is a simple solution to sample rate jittering
+	// However, this will increase the disk I/O and file size
+	if options.Config.Explorer.Legacy {
+		m.writeBufferInterval = 1
+	} else {
+		m.writeBufferInterval = MINISEED_WRITE_INTERVAL
+	}
+	m.writeBufferCountDown = m.writeBufferInterval
+	m.miniseedBuffer = make([]explorer.ExplorerData, m.writeBufferInterval)
 
 	// Get sequence number if file exists
 	currentTime, _ := options.TimeSource.Get()
