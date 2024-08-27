@@ -6,11 +6,11 @@ Starting from v2.2.5, all notable changes to this project will be documented in 
 
 ### New Features
 
-- Support export history waveform as MiniSEED
+- Support export history waveform as MiniSEED.
 
 ### Bug Fixes
 
-- Discard records with different sample rate for SeedLink history
+- Discard records with different sample rate for SeedLink history.
 
 ## v3.1.0
 

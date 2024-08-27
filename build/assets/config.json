@@ -51,6 +51,9 @@
     },
     "logger_settings": {
         "level": "info",
+        "rotation": 7,
+        "lifecycle": 3,
+        "size": 5,
         "dump": "/home/yuki/observer.log"
     },
     "services_settings": {

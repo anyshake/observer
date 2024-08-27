@@ -234,6 +234,7 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
 	for {
 		select {
 		case <-deps.CancelToken.Done():
+			ticker.Stop()
 			return
 		case currentTick := <-ticker.C:
 			if len(dataBuffer) > 0 {
@@ -242,8 +243,8 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
 					continue
 				}
 
-				deps.Health.UpdatedAt = currentTime
-				deps.Health.Received++
+				deps.Health.SetUpdatedAt(currentTime)
+				deps.Health.SetReceived(deps.Health.GetReceived() + 1)
 
 				var (
 					z_axis_count []int32
@@ -257,7 +258,7 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
 				}
 
 				sampleRate := len(dataBuffer) * legacy_packet_channel_size
-				deps.Health.SampleRate = sampleRate
+				deps.Health.SetSampleRate(sampleRate)
 				finalPacket := ExplorerData{
 					SampleRate: sampleRate,
 					Z_Axis:     z_axis_count,
@@ -276,7 +277,7 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
 				// Read the packet data
 				err = e.legacyPacket.decode(dat[len(legacy_packet_frame_header):])
 				if err != nil {
-					deps.Health.Errors++
+					deps.Health.SetErrors(deps.Health.GetErrors() + 1)
 				} else {
 					dataBuffer = append(dataBuffer, e.legacyPacket)
 				}
@@ -305,13 +306,13 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency) 
 			}
 			err = e.mainlinePacketHeader.decode(headerBuf)
 			if err != nil {
-				deps.Health.Errors++
+				deps.Health.SetErrors(deps.Health.GetErrors() + 1)
 				continue
 			}
 			if e.mainlinePacketHeader.latitude != 0 && e.mainlinePacketHeader.longitude != 0 && e.mainlinePacketHeader.elevation != 0 {
-				deps.Config.Latitude = float64(e.mainlinePacketHeader.latitude)
-				deps.Config.Longitude = float64(e.mainlinePacketHeader.longitude)
-				deps.Config.Elevation = float64(e.mainlinePacketHeader.elevation)
+				deps.Config.SetLatitude(float64(e.mainlinePacketHeader.latitude))
+				deps.Config.SetLongitude(float64(e.mainlinePacketHeader.longitude))
+				deps.Config.SetElevation(float64(e.mainlinePacketHeader.elevation))
 			}
 
 			// Get data section packet size and read the channel data
@@ -323,7 +324,7 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency) 
 			}
 			err = e.mainlinePacketChannel.decode(dataBuf, sampleRate)
 			if err != nil {
-				deps.Health.Errors++
+				deps.Health.SetErrors(deps.Health.GetErrors() + 1)
 				continue
 			}
 
@@ -335,12 +336,12 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency) 
 			}
 			frameTailSliceIndex := len(tailBuf) - len(mainline_packet_frame_tail)
 			if !bytes.Equal(tailBuf[frameTailSliceIndex:], mainline_packet_frame_tail) {
-				deps.Health.Errors++
+				deps.Health.SetErrors(deps.Health.GetErrors() + 1)
 				continue
 			}
 			err = e.mainlinePacketTail.decode(tailBuf[:frameTailSliceIndex])
 			if err != nil {
-				deps.Health.Errors++
+				deps.Health.SetErrors(deps.Health.GetErrors() + 1)
 				continue
 			}
 
@@ -354,7 +355,7 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency) 
 			}
 
 			// Publish the data to the message bus
-			deps.Health.SampleRate = sampleRate
+			deps.Health.SetSampleRate(sampleRate)
 			finalPacket := ExplorerData{
 				SampleRate: sampleRate,
 				Timestamp:  e.mainlinePacketHeader.timestamp,
@@ -364,14 +365,14 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency) 
 			}
 			deps.messageBus.Publish("explorer", &finalPacket)
 
-			deps.Health.UpdatedAt = time.UnixMilli(e.mainlinePacketHeader.timestamp)
-			deps.Health.Received++
+			deps.Health.SetUpdatedAt(time.UnixMilli(e.mainlinePacketHeader.timestamp))
+			deps.Health.SetReceived(deps.Health.GetReceived() + 1)
 		}
 	}
 }
 
 func (e *ExplorerDriverImpl) readerDaemon(deps *ExplorerDependency) {
-	if deps.Config.LegacyMode {
+	if deps.Config.GetLegacyMode() {
 		e.handleReadLegacyPacket(deps)
 	} else {
 		e.handleReadMainlinePacket(deps)
@@ -390,13 +391,13 @@ func (e *ExplorerDriverImpl) Init(deps *ExplorerDependency) error {
 		return err
 	}
 
-	deps.Health.StartTime = currentTime
+	deps.Health.SetStartTime(currentTime)
 	deps.subscribers = cmap.New[ExplorerEventHandler]()
 	deps.messageBus = messagebus.New(1024)
-	deps.Config.DeviceId = math.MaxUint32
+	deps.Config.SetDeviceId(math.MaxUint32)
 
 	// Get device ID in EEPROM
-	if !deps.Config.LegacyMode {
+	if !deps.Config.GetLegacyMode() {
 		readTimeout := 5 * time.Second
 		startTime := time.Now()
 		for time.Since(startTime) < readTimeout {
@@ -413,7 +414,7 @@ func (e *ExplorerDriverImpl) Init(deps *ExplorerDependency) error {
 			if err != nil {
 				continue
 			}
-			deps.Config.DeviceId = e.mainlinePacketHeader.deviceId
+			deps.Config.SetDeviceId(e.mainlinePacketHeader.deviceId)
 			break
 		}
 		if time.Since(startTime) >= readTimeout {

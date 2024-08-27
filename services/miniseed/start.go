@@ -15,18 +15,30 @@ import (
 func (m *MiniSeedService) Start(options *services.Options, waitGroup *sync.WaitGroup) {
 	defer waitGroup.Done()
 
-	// Get lifecycle from configuration
-	serviceConfig, ok := options.Config.Services[m.GetServiceName()]
-	if !ok {
-		logger.GetLogger(m.GetServiceName()).Errorln("service configuration not found")
+	enabled, err := options.Config.Services.GetValue(m.GetServiceName(), "enable", "bool")
+	if err != nil {
+		logger.GetLogger(m.GetServiceName()).Errorln(err)
 		return
 	}
-	if !serviceConfig.(map[string]any)["enable"].(bool) {
+	if !enabled.(bool) {
 		logger.GetLogger(m.GetServiceName()).Infoln("service has been disabled")
 		return
 	}
-	m.lifeCycle = int(serviceConfig.(map[string]any)["lifecycle"].(float64))
-	m.basePath = serviceConfig.(map[string]any)["path"].(string)
+
+	lifecycle, err := options.Config.Services.GetValue(m.GetServiceName(), "lifecycle", "int")
+	if err != nil {
+		logger.GetLogger(m.GetServiceName()).Errorln(err)
+		return
+	}
+	m.lifeCycle = lifecycle.(int)
+
+	basePath, err := options.Config.Services.GetValue(m.GetServiceName(), "path", "string")
+	if err != nil {
+		logger.GetLogger(m.GetServiceName()).Errorln(err)
+		return
+	}
+	m.basePath = basePath.(string)
+
 	m.stationCode = options.Config.Stream.Station
 	m.networkCode = options.Config.Stream.Network
 	m.locationCode = options.Config.Stream.Location
@@ -94,7 +106,7 @@ func (m *MiniSeedService) Start(options *services.Options, waitGroup *sync.WaitG
 
 	// Subscribe to Explorer events
 	var explorerDeps *explorer.ExplorerDependency
-	err := options.Dependency.Invoke(func(deps *explorer.ExplorerDependency) error {
+	err = options.Dependency.Invoke(func(deps *explorer.ExplorerDependency) error {
 		explorerDeps = deps
 		return nil
 	})

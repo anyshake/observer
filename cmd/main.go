@@ -46,7 +46,7 @@ func parseCommandLine() (args arguments) {
 	return args
 }
 
-func setupLogger(level, dumpPath string) {
+func setupLogger(level, dumpPath string, maxSize, rotation, lifeCycle int) {
 	var err error
 	switch level {
 	case "info":
@@ -58,20 +58,19 @@ func setupLogger(level, dumpPath string) {
 	default:
 		err = logger.SetLevel(logger.INFO)
 	}
-
 	if err != nil {
 		logger.GetLogger(main).Fatalln(err)
 	}
 
 	if len(dumpPath) != 0 {
-		logger.SetFile(dumpPath)
+		logger.SetFile(dumpPath, maxSize, rotation, lifeCycle)
 	}
 }
 
 func init() {
 	t := figure.NewFigure("Observer", "standard", true).String()
 	fmt.Println(t)
-	logger.Initialize()
+	logger.Init()
 }
 
 // @BasePath /api/v1
@@ -92,12 +91,18 @@ func main() {
 	}
 
 	// Setup logger with given configuration
-	setupLogger(conf.Logger.Level, conf.Logger.Dump)
+	setupLogger(
+		conf.Logger.Level,
+		conf.Logger.Dump,
+		conf.Logger.Size,
+		conf.Logger.Rotation,
+		conf.Logger.LifeCycle,
+	)
 	logger.GetLogger(main).Info("global configuration has been loaded")
 
 	// Create time source with NTP server
 	logger.GetLogger(main).Infof("querying NTP server at %s:%d", conf.NtpClient.Host, conf.NtpClient.Port)
-	timeSource, err := timesource.New(conf.NtpClient.Host, conf.NtpClient.Port, 10*time.Second)
+	timeSource, err := timesource.New(conf.NtpClient.Host, conf.NtpClient.Port, 5, 5*time.Second)
 	if err != nil {
 		logger.GetLogger(main).Fatalln(err)
 	}

@@ -19,7 +19,6 @@ require (
 	github.com/juju/ratelimit v1.0.2
 	github.com/mackerelio/go-osstat v0.2.5
 	github.com/orcaman/concurrent-map/v2 v2.0.1
-	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/sbabiv/xml2map v1.2.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/sirupsen/logrus v1.9.3
@@ -30,6 +29,7 @@ require (
 	github.com/vektah/gqlparser/v2 v2.5.16
 	github.com/wille/osutil v0.0.0-20240729075835-ba7d4216ffe2
 	go.uber.org/dig v1.17.1
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.5.2
 	gorm.io/driver/postgres v1.5.7
 	gorm.io/driver/sqlserver v1.5.2

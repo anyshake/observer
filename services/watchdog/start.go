@@ -23,19 +23,21 @@ func (s *WatchdogService) Start(options *services.Options, waitGroup *sync.WaitG
 		return
 	}
 
-	prevUpdatedAt := explorerDeps.Health.UpdatedAt
+	prevUpdatedAt := explorerDeps.Health.GetUpdatedAt()
 	ticker := time.NewTicker(CHECK_INTERVAL)
 
 	for {
 		select {
 		case <-options.CancelToken.Done():
+			ticker.Stop()
 			logger.GetLogger(s.GetServiceName()).Infoln("service has been stopped")
 			return
 		case <-ticker.C:
-			if prevUpdatedAt == explorerDeps.Health.UpdatedAt {
+			currentUpdatedAt := explorerDeps.Health.GetUpdatedAt()
+			if prevUpdatedAt == currentUpdatedAt {
 				logger.GetLogger(s.GetServiceName()).Warnf("device is not responding, checking again in next %d seconds", int(CHECK_INTERVAL.Seconds()))
 			}
-			prevUpdatedAt = explorerDeps.Health.UpdatedAt
+			prevUpdatedAt = currentUpdatedAt
 		}
 	}
 }

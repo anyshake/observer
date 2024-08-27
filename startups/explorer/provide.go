@@ -25,16 +25,18 @@ func (t *ExplorerStartupTask) Provide(container *dig.Container, options *startup
 
 	logger.GetLogger(t.GetTaskName()).Infoln("device has been opened successfully")
 	return container.Provide(func() *explorer.ExplorerDependency {
+		var explorerConfig explorer.ExplorerConfig
+		explorerConfig.SetLegacyMode(options.Config.Explorer.Legacy)
+		explorerConfig.SetLatitude(options.Config.Location.Latitude)
+		explorerConfig.SetLongitude(options.Config.Location.Longitude)
+		explorerConfig.SetElevation(options.Config.Location.Elevation)
+
 		return &explorer.ExplorerDependency{
 			FallbackTime: options.TimeSource,
 			CancelToken:  t.CancelToken,
 			Transport:    explorerTransport,
-			Config: explorer.ExplorerConfig{
-				Latitude:   options.Config.Location.Latitude,
-				Longitude:  options.Config.Location.Longitude,
-				Elevation:  options.Config.Location.Elevation,
-				LegacyMode: options.Config.Explorer.Legacy,
-			},
+			Config:       &explorerConfig,
+			Health:       &explorer.ExplorerHealth{},
 		}
 	})
 }

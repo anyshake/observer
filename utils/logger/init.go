@@ -5,7 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Initialize() {
+func Init() {
 	logrus.SetFormatter(&nested.Formatter{
 		TimestampFormat: TIMESTAMP_FORMAT,
 		FieldsOrder:     []string{"module"},

@@ -15,17 +15,27 @@ import (
 func (a *ForwarderService) Start(options *services.Options, waitGroup *sync.WaitGroup) {
 	defer waitGroup.Done()
 
-	serviceConfig, ok := options.Config.Services[a.GetServiceName()]
-	if !ok {
-		logger.GetLogger(a.GetServiceName()).Errorln("service configuration not found")
+	enabled, err := options.Config.Services.GetValue(a.GetServiceName(), "enable", "bool")
+	if err != nil {
+		logger.GetLogger(a.GetServiceName()).Errorln(err)
 		return
 	}
-	if !serviceConfig.(map[string]any)["enable"].(bool) {
+	if !enabled.(bool) {
 		logger.GetLogger(a.GetServiceName()).Infoln("service has been disabled")
 		return
 	}
-	serverHost := serviceConfig.(map[string]any)["host"].(string)
-	serverPort := int(serviceConfig.(map[string]any)["port"].(float64))
+
+	serverHost, err := options.Config.Services.GetValue(a.GetServiceName(), "host", "string")
+	if err != nil {
+		logger.GetLogger(a.GetServiceName()).Errorln(err)
+		return
+	}
+	serverPort, err := options.Config.Services.GetValue(a.GetServiceName(), "port", "int")
+	if err != nil {
+		logger.GetLogger(a.GetServiceName()).Errorln(err)
+		return
+	}
+
 	a.stationCode = options.Config.Stream.Station
 	a.networkCode = options.Config.Stream.Network
 	a.locationCode = options.Config.Stream.Location
@@ -36,7 +46,7 @@ func (a *ForwarderService) Start(options *services.Options, waitGroup *sync.Wait
 
 	// Forward events to internal message bus
 	var explorerDeps *explorer.ExplorerDependency
-	err := options.Dependency.Invoke(func(deps *explorer.ExplorerDependency) error {
+	err = options.Dependency.Invoke(func(deps *explorer.ExplorerDependency) error {
 		explorerDeps = deps
 		return nil
 	})
@@ -52,7 +62,7 @@ func (a *ForwarderService) Start(options *services.Options, waitGroup *sync.Wait
 	)
 
 	// Create TCP server to forward events
-	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", serverHost, serverPort))
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", serverHost.(string), serverPort.(int)))
 	if err != nil {
 		logger.GetLogger(a.GetServiceName()).Errorln(err)
 		return

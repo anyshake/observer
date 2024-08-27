@@ -14,23 +14,33 @@ import (
 func (s *SeedLinkService) Start(options *services.Options, waitGroup *sync.WaitGroup) {
 	defer waitGroup.Done()
 
-	serviceConfig, ok := options.Config.Services[s.GetServiceName()]
-	if !ok {
-		logger.GetLogger(s.GetServiceName()).Errorln("service configuration not found")
+	enabled, err := options.Config.Services.GetValue(s.GetServiceName(), "enable", "bool")
+	if err != nil {
+		logger.GetLogger(s.GetServiceName()).Errorln(err)
 		return
 	}
-	if !serviceConfig.(map[string]any)["enable"].(bool) {
+	if !enabled.(bool) {
 		logger.GetLogger(s.GetServiceName()).Infoln("service has been disabled")
 		return
 	}
-	serverHost := serviceConfig.(map[string]any)["host"].(string)
-	serverPort := int(serviceConfig.(map[string]any)["port"].(float64))
+
+	serverHost, err := options.Config.Services.GetValue(s.GetServiceName(), "host", "string")
+	if err != nil {
+		logger.GetLogger(s.GetServiceName()).Errorln(err)
+		return
+	}
+	serverPort, err := options.Config.Services.GetValue(s.GetServiceName(), "port", "int")
+	if err != nil {
+		logger.GetLogger(s.GetServiceName()).Errorln(err)
+		return
+	}
+
 	currentTime, _ := options.TimeSource.Get()
 	messageBus := messagebus.New(65535)
 
 	// Subscribe to Explorer events
 	var explorerDeps *explorer.ExplorerDependency
-	err := options.Dependency.Invoke(func(deps *explorer.ExplorerDependency) error {
+	err = options.Dependency.Invoke(func(deps *explorer.ExplorerDependency) error {
 		explorerDeps = deps
 		return nil
 	})
@@ -76,7 +86,7 @@ func (s *SeedLinkService) Start(options *services.Options, waitGroup *sync.WaitG
 			serviceName: s.GetServiceName(),
 		},
 	)
-	go server.Start(serverHost, serverPort)
+	go server.Start(serverHost.(string), serverPort.(int))
 	logger.GetLogger(s.GetServiceName()).Infof("seedlink is listening on %s:%d", serverHost, serverPort)
 
 	logger.GetLogger(s.GetServiceName()).Infoln("service has been started")

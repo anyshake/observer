@@ -11,24 +11,29 @@ import (
 func (a *ArchiverService) Start(options *services.Options, waitGroup *sync.WaitGroup) {
 	defer waitGroup.Done()
 
-	// Get lifecycle from configuration
-	serviceConfig, ok := options.Config.Services[a.GetServiceName()]
-	if !ok {
-		logger.GetLogger(a.GetServiceName()).Errorln("service configuration not found")
+	enabled, err := options.Config.Services.GetValue(a.GetServiceName(), "enable", "bool")
+	if err != nil {
+		logger.GetLogger(a.GetServiceName()).Errorln(err)
 		return
 	}
-	if !serviceConfig.(map[string]any)["enable"].(bool) {
+	if !enabled.(bool) {
 		logger.GetLogger(a.GetServiceName()).Infoln("service has been disabled")
 		return
 	}
-	a.lifeCycle = int(serviceConfig.(map[string]any)["lifecycle"].(float64))
+	lifecycle, err := options.Config.Services.GetValue(a.GetServiceName(), "lifecycle", "int")
+	if err != nil {
+		logger.GetLogger(a.GetServiceName()).Errorln(err)
+		return
+	}
+
+	a.lifeCycle = lifecycle.(int)
 	a.cleanupCountDown = CLEANUP_COUNTDOWN
 	a.insertCountDown = INSERT_COUNTDOWN
 	a.databaseConn = options.Database
 
 	// Subscribe to Explorer events
 	var explorerDeps *explorer.ExplorerDependency
-	err := options.Dependency.Invoke(func(deps *explorer.ExplorerDependency) error {
+	err = options.Dependency.Invoke(func(deps *explorer.ExplorerDependency) error {
 		explorerDeps = deps
 		return nil
 	})

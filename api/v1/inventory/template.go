@@ -105,17 +105,22 @@ func (i *Inventory) getInventoryString(config *config.Config, explorerDeps *expl
 </seiscomp>
 `
 
-	sensorHighFrequency := explorerDeps.Health.SampleRate / 2
+	var (
+		currentSampleRate = explorerDeps.Health.GetSampleRate()
+		startTime         = explorerDeps.Health.GetStartTime()
+	)
+
+	sensorHighFrequency := currentSampleRate / 2
 	dataloggerGain := math.Pow(2, float64(config.Sensor.Resolution-1)) / config.Sensor.FullScale
-	dataloggerSampleRateNumerator := explorerDeps.Health.SampleRate
+	dataloggerSampleRateNumerator := currentSampleRate
 	responsePAZGain := config.Sensor.Sensitivity
 	responsePAZGainFrequency := config.Sensor.Frequency
 	responsePAZGainNormalizationFrequency := config.Sensor.Frequency
 	networkCode := config.Stream.Network
-	networkStart := explorerDeps.Health.StartTime.UTC().Format("2006-01-02T15:04:05.0000Z")
+	networkStart := startTime.UTC().Format("2006-01-02T15:04:05.0000Z")
 	networkRegion := config.Station.Region
 	stationCode := config.Stream.Station
-	stationStart := explorerDeps.Health.StartTime.UTC().Format("2006-01-02T15:04:05.0000Z")
+	stationStart := startTime.UTC().Format("2006-01-02T15:04:05.0000Z")
 	stationDescription := fmt.Sprintf("AnyShake Station in %s", config.Station.City)
 	stationLatitude := config.Location.Latitude
 	stationLongitude := config.Location.Longitude
@@ -124,14 +129,14 @@ func (i *Inventory) getInventoryString(config *config.Config, explorerDeps *expl
 	stationCountry := config.Station.Country
 	stationAffiliation := config.Station.Owner
 	sensorLocationCode := config.Stream.Location
-	sensorLocationStart := explorerDeps.Health.StartTime.UTC().Format("2006-01-02T15:04:05.0000Z")
+	sensorLocationStart := startTime.UTC().Format("2006-01-02T15:04:05.0000Z")
 	sensorLocationLatitude := config.Location.Latitude
 	sensorLocationLongitude := config.Location.Longitude
 	sensorLocationElevation := config.Location.Elevation
 
 	// Stream settings
-	streamStart := explorerDeps.Health.StartTime.UTC().Format("2006-01-02T15:04:05.0000Z")
-	streamSampleRateNumerator := explorerDeps.Health.SampleRate
+	streamStart := startTime.UTC().Format("2006-01-02T15:04:05.0000Z")
+	streamSampleRateNumerator := currentSampleRate
 	streamGain := dataloggerGain * config.Sensor.Sensitivity
 
 	return fmt.Sprintf(

@@ -2,6 +2,7 @@ package explorer
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/anyshake/observer/drivers/transport"
@@ -19,26 +20,27 @@ const (
 )
 
 type ExplorerHealth struct {
-	SampleRate int
-	Errors     int64
-	Received   int64
-	StartTime  time.Time
-	UpdatedAt  time.Time // Last local system time the health information was updated
+	mutex      sync.RWMutex
+	sampleRate int
+	errors     int64
+	received   int64
+	startTime  time.Time
+	updatedAt  time.Time // Last local system time the health information was updated
 }
 
 type ExplorerConfig struct {
-	NoGeophone bool
-	LegacyMode bool
-	DeviceId   uint32
-	Latitude   float64
-	Longitude  float64
-	Elevation  float64
+	mutex      sync.RWMutex
+	legacyMode bool
+	deviceId   uint32
+	latitude   float64
+	longitude  float64
+	elevation  float64
 }
 
 type ExplorerDependency struct {
 	FallbackTime *timesource.Source
-	Health       ExplorerHealth
-	Config       ExplorerConfig
+	Health       *ExplorerHealth
+	Config       *ExplorerConfig
 	CancelToken  context.Context
 	Transport    transport.TransportDriver
 	messageBus   messagebus.MessageBus

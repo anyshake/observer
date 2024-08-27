@@ -75,8 +75,8 @@ func (t *Trace) Register(rg *gin.RouterGroup, resolver *v1.Resolver) error {
 		}
 		var (
 			source, ok = sources[binding.Source]
-			latitude   = explorerDeps.Config.Latitude
-			longitude  = explorerDeps.Config.Longitude
+			latitude   = explorerDeps.Config.GetLatitude()
+			longitude  = explorerDeps.Config.GetLongitude()
 		)
 		if ok {
 			events, err := source.List(latitude, longitude)

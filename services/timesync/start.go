@@ -17,6 +17,7 @@ func (s *TimeSyncService) Start(options *services.Options, waitGroup *sync.WaitG
 	for {
 		select {
 		case <-options.CancelToken.Done():
+			ticker.Stop()
 			logger.GetLogger(s.GetServiceName()).Infoln("service has been stopped")
 			return
 		case <-ticker.C:

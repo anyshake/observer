@@ -6,20 +6,20 @@ import (
 )
 
 func (e *explorerInfo) get(timeSource *timesource.Source, explorerDeps *explorer.ExplorerDependency) error {
-	e.DeviceId = explorerDeps.Config.DeviceId
-	e.Elevation = explorerDeps.Config.Elevation
-	e.Errors = explorerDeps.Health.Errors
-	e.Received = explorerDeps.Health.Received
-	e.SampleRate = explorerDeps.Health.SampleRate
+	e.DeviceId = explorerDeps.Config.GetDeviceId()
+	e.Elevation = explorerDeps.Config.GetElevation()
+	e.Errors = explorerDeps.Health.GetErrors()
+	e.Received = explorerDeps.Health.GetReceived()
+	e.SampleRate = explorerDeps.Health.GetSampleRate()
 
 	currentTime, err := timeSource.Get()
 	if err != nil {
 		return err
 	}
-	e.Elapsed = int64(currentTime.Sub(explorerDeps.Health.StartTime).Seconds())
+	e.Elapsed = int64(currentTime.Sub(explorerDeps.Health.GetStartTime()).Seconds())
 
-	e.Latitude = float64(int(explorerDeps.Config.Latitude*1000)) / 1000
-	e.Longitude = float64(int(explorerDeps.Config.Longitude*1000)) / 1000
+	e.Latitude = float64(int(explorerDeps.Config.GetLatitude()*1000)) / 1000
+	e.Longitude = float64(int(explorerDeps.Config.GetLongitude()*1000)) / 1000
 
 	return nil
 }
