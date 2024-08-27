@@ -5,6 +5,7 @@ go 1.23.0
 require (
 	github.com/99designs/gqlgen v0.17.49
 	github.com/PuerkitoBio/goquery v1.9.2
+	github.com/alphadose/haxmap v1.4.0
 	github.com/antonfisher/nested-logrus-formatter v1.3.1
 	github.com/bclswl0827/go-serial v0.0.1
 	github.com/bclswl0827/mseedio v1.0.9
@@ -18,7 +19,6 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/juju/ratelimit v1.0.2
 	github.com/mackerelio/go-osstat v0.2.5
-	github.com/orcaman/concurrent-map/v2 v2.0.1
 	github.com/sbabiv/xml2map v1.2.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/sirupsen/logrus v1.9.3
@@ -81,6 +81,7 @@ require (
 	github.com/tklauser/go-sysconf v0.3.14 // indirect
 	github.com/tklauser/numcpus v0.8.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
+	golang.org/x/exp v0.0.0-20221031165847-c99f073a8326 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 )
 

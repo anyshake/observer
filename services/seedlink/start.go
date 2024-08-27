@@ -3,11 +3,11 @@ package seedlink
 import (
 	"sync"
 
+	"github.com/alphadose/haxmap"
 	"github.com/anyshake/observer/drivers/explorer"
 	"github.com/anyshake/observer/services"
 	"github.com/anyshake/observer/utils/logger"
 	"github.com/bclswl0827/slgo"
-	cmap "github.com/orcaman/concurrent-map/v2"
 	messagebus "github.com/vardius/message-bus"
 )
 
@@ -80,7 +80,7 @@ func (s *SeedLinkService) Start(options *services.Options, waitGroup *sync.WaitG
 			channelPrefix: options.Config.Stream.Channel,
 			serviceName:   s.GetServiceName(),
 			messageBus:    messageBus,
-			subscribers:   cmap.New[explorer.ExplorerEventHandler](),
+			subscribers:   haxmap.New[string, explorer.ExplorerEventHandler](),
 		},
 		&hooks{
 			serviceName: s.GetServiceName(),

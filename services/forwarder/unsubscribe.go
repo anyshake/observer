@@ -9,7 +9,6 @@ func (s *ForwarderService) unsubscribe(clientId string) error {
 	if !ok {
 		return errors.New("this client has not subscribed")
 	}
-	s.messageBus.Unsubscribe(s.GetServiceName(), fn)
-	s.subscribers.Remove(clientId)
-	return nil
+	s.subscribers.Del(clientId)
+	return s.messageBus.Unsubscribe(s.GetServiceName(), fn)
 }

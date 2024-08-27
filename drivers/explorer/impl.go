@@ -9,8 +9,8 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/alphadose/haxmap"
 	"github.com/anyshake/observer/utils/fifo"
-	cmap "github.com/orcaman/concurrent-map/v2"
 	messagebus "github.com/vardius/message-bus"
 )
 
@@ -392,7 +392,7 @@ func (e *ExplorerDriverImpl) Init(deps *ExplorerDependency) error {
 	}
 
 	deps.Health.SetStartTime(currentTime)
-	deps.subscribers = cmap.New[ExplorerEventHandler]()
+	deps.subscribers = haxmap.New[string, ExplorerEventHandler]()
 	deps.messageBus = messagebus.New(1024)
 	deps.Config.SetDeviceId(math.MaxUint32)
 
@@ -440,7 +440,7 @@ func (e *ExplorerDriverImpl) Unsubscribe(deps *ExplorerDependency, clientId stri
 	if !ok {
 		return errors.New("this client has not subscribed")
 	}
-	deps.messageBus.Unsubscribe("explorer", fn)
-	deps.subscribers.Remove(clientId)
-	return nil
+
+	deps.subscribers.Del(clientId)
+	return deps.messageBus.Unsubscribe("explorer", fn)
 }

@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/alphadose/haxmap"
 	"github.com/anyshake/observer/drivers/explorer"
 	"github.com/bclswl0827/slgo/handlers"
-	cmap "github.com/orcaman/concurrent-map/v2"
 	messagebus "github.com/vardius/message-bus"
 )
 
@@ -14,7 +14,7 @@ type consumer struct {
 	channelPrefix string
 	serviceName   string
 	messageBus    messagebus.MessageBus // An independent message bus for the socket module
-	subscribers   cmap.ConcurrentMap[string, explorer.ExplorerEventHandler]
+	subscribers   *haxmap.Map[string, func(data *explorer.ExplorerData)]
 }
 
 func (c *consumer) Subscribe(clientId string, channels []string, eventHandler func(handlers.SeedLinkDataPacket)) error {
@@ -58,7 +58,7 @@ func (c *consumer) Unsubscribe(clientId string) error {
 	if !ok {
 		return errors.New("this client has not subscribed")
 	}
-	c.messageBus.Unsubscribe(c.serviceName, fn)
-	c.subscribers.Remove(clientId)
-	return nil
+
+	c.subscribers.Del(clientId)
+	return c.messageBus.Unsubscribe(c.serviceName, fn)
 }

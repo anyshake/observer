@@ -5,10 +5,10 @@ import (
 	"net"
 	"sync"
 
+	"github.com/alphadose/haxmap"
 	"github.com/anyshake/observer/drivers/explorer"
 	"github.com/anyshake/observer/services"
 	"github.com/anyshake/observer/utils/logger"
-	cmap "github.com/orcaman/concurrent-map/v2"
 	messagebus "github.com/vardius/message-bus"
 )
 
@@ -41,7 +41,7 @@ func (a *ForwarderService) Start(options *services.Options, waitGroup *sync.Wait
 	a.locationCode = options.Config.Stream.Location
 	a.channelPrefix = options.Config.Stream.Channel
 
-	a.subscribers = cmap.New[explorer.ExplorerEventHandler]()
+	a.subscribers = haxmap.New[string, explorer.ExplorerEventHandler]()
 	a.messageBus = messagebus.New(65535)
 
 	// Forward events to internal message bus

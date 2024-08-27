@@ -4,18 +4,18 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/alphadose/haxmap"
 	v1 "github.com/anyshake/observer/api/v1"
 	"github.com/anyshake/observer/drivers/explorer"
 	"github.com/anyshake/observer/server/response"
 	"github.com/anyshake/observer/utils/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	cmap "github.com/orcaman/concurrent-map/v2"
 	messagebus "github.com/vardius/message-bus"
 )
 
 func (s *Socket) Register(rg *gin.RouterGroup, resolver *v1.Resolver) error {
-	s.subscribers = cmap.New[explorer.ExplorerEventHandler]()
+	s.subscribers = haxmap.New[string, explorer.ExplorerEventHandler]()
 	s.messageBus = messagebus.New(65535)
 
 	// Forward events to internal message bus

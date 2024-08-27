@@ -5,9 +5,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/alphadose/haxmap"
 	"github.com/anyshake/observer/drivers/transport"
 	"github.com/anyshake/observer/utils/timesource"
-	cmap "github.com/orcaman/concurrent-map/v2"
 	messagebus "github.com/vardius/message-bus"
 )
 
@@ -44,7 +44,7 @@ type ExplorerDependency struct {
 	CancelToken  context.Context
 	Transport    transport.TransportDriver
 	messageBus   messagebus.MessageBus
-	subscribers  cmap.ConcurrentMap[string, ExplorerEventHandler]
+	subscribers  *haxmap.Map[string, func(data *ExplorerData)]
 }
 
 type ExplorerData struct {
