@@ -9,13 +9,13 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-type SQLServer struct{}
+type _SQLServer struct{}
 
-func (s *SQLServer) match(engine string) bool {
+func (s *_SQLServer) match(engine string) bool {
 	return engine == "sqlserver" || engine == "mssql"
 }
 
-func (s *SQLServer) open(host string, port int, username, password, database string, timeout time.Duration) (*gorm.DB, error) {
+func (s *_SQLServer) open(host string, port int, username, password, database string, timeout time.Duration) (*gorm.DB, error) {
 	dsn := fmt.Sprintf(
 		"sqlserver://%s:%s@%s:%d?database=%s",
 		username, password, host, port, database,

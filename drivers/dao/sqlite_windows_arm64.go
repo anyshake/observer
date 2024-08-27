@@ -1,6 +1,3 @@
-//go:build !mips && !mips64 && !mipsle && !mips64le && !windows
-// +build !mips,!mips64,!mipsle,!mips64le,!windows
-
 package dao
 
 import (

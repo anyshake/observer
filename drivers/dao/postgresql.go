@@ -9,13 +9,13 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-type PostgreSQL struct{}
+type _PostgreSQL struct{}
 
-func (p *PostgreSQL) match(engine string) bool {
+func (p *_PostgreSQL) match(engine string) bool {
 	return engine == "postgres" || engine == "postgresql"
 }
 
-func (p *PostgreSQL) open(host string, port int, username, password, database string, timeout time.Duration) (*gorm.DB, error) {
+func (p *_PostgreSQL) open(host string, port int, username, password, database string, timeout time.Duration) (*gorm.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable connect_timeout=%d TimeZone=Etc/GMT",
 		host, port, username, password, database, int(timeout.Seconds()),
