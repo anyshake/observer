@@ -32,7 +32,9 @@
     },
     "ntpclient_settings": {
         "host": "pool.ntp.org",
-        "port": 123
+        "port": 123,
+        "timeout": 5,
+        "retry": 5
     },
     "database_settings": {
         "engine": "postgresql",
@@ -51,9 +53,9 @@
     },
     "logger_settings": {
         "level": "info",
-        "rotation": 7,
+        "rotation": 5,
         "lifecycle": 3,
-        "size": 5,
+        "size": 0,
         "dump": "/home/yuki/observer.log"
     },
     "services_settings": {

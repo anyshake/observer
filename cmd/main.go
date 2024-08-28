@@ -102,7 +102,12 @@ func main() {
 
 	// Create time source with NTP server
 	logger.GetLogger(main).Infof("querying NTP server at %s:%d", conf.NtpClient.Host, conf.NtpClient.Port)
-	timeSource, err := timesource.New(conf.NtpClient.Host, conf.NtpClient.Port, 5, 5*time.Second)
+	timeSource, err := timesource.New(
+		conf.NtpClient.Host,
+		conf.NtpClient.Port,
+		conf.NtpClient.Retry,
+		time.Duration(conf.NtpClient.Timeout)*time.Second,
+	)
 	if err != nil {
 		logger.GetLogger(main).Fatalln(err)
 	}

@@ -37,8 +37,10 @@ type Stream struct {
 }
 
 type ntpclient struct {
-	Host string `json:"host"`
-	Port int    `json:"port" validate:"min=1,max=65535"`
+	Host    string `json:"host"`
+	Port    int    `json:"port" validate:"min=1,max=65535"`
+	Timeout int    `json:"timeout" validate:"gte=0"`
+	Retry   int    `json:"retry" validate:"gte=0"`
 }
 
 type database struct {

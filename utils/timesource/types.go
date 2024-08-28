@@ -9,7 +9,7 @@ type Source struct {
 	rwMutex       sync.RWMutex
 	ntpHost       string
 	ntpPort       int
-	queryAttempts int
+	queryRetries  int
 	queryTimeout  time.Duration
 	LocalBaseTime time.Time
 	ReferenceTime time.Time

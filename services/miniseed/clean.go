@@ -8,6 +8,10 @@ import (
 )
 
 func (m *MiniSeedService) handleClean() error {
+	if m.lifeCycle == 0 {
+		return nil
+	}
+
 	expiredFiles := []string{}
 	walkFn := func(path string, info os.FileInfo, err error) error {
 		if err != nil {

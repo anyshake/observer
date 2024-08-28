@@ -11,7 +11,7 @@ func (s *Source) Update() error {
 	s.rwMutex.Lock()
 	defer s.rwMutex.Unlock()
 
-	for i := 0; i < s.queryAttempts; i++ {
+	for i := 0; i <= s.queryRetries; i++ {
 		res, err := ntp.QueryWithOptions(s.ntpHost, ntp.QueryOptions{
 			Port: s.ntpPort, Timeout: s.queryTimeout,
 		})

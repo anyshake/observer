@@ -7,8 +7,8 @@ import (
 	"github.com/beevik/ntp"
 )
 
-func New(ntpHost string, ntpPort, attempts int, timeout time.Duration) (Source, error) {
-	for i := 0; i < attempts; i++ {
+func New(ntpHost string, ntpPort, retries int, timeout time.Duration) (Source, error) {
+	for i := 0; i <= retries; i++ {
 		res, err := ntp.QueryWithOptions(ntpHost, ntp.QueryOptions{
 			Port: ntpPort, Timeout: timeout,
 		})
@@ -18,7 +18,7 @@ func New(ntpHost string, ntpPort, attempts int, timeout time.Duration) (Source, 
 		return Source{
 			ntpHost:       ntpHost,
 			ntpPort:       ntpPort,
-			queryAttempts: attempts,
+			queryRetries:  retries,
 			queryTimeout:  timeout,
 			LocalBaseTime: time.Now().UTC(),
 			ReferenceTime: res.Time,
