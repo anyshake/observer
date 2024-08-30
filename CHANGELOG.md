@@ -2,6 +2,21 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.2.0
+
+### New Features
+
+- Support custom NTP query retry times and timeout.
+- Retry querying NTP server when the first attempt fails.
+- Support rotating log files by day or by size.
+- Validate the configuration file before starting the application.
+
+### Bug Fixes
+
+- Fixed potential data race issues.
+- Replace concurrent-map with haxmap to avoid OOM.
+- Fixed build failure on windows/386, linux/mips* architectures.
+
 ## v3.1.1
 
 ### New Features
