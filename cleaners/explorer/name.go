@@ -1,5 +1,5 @@
 package explorer
 
 func (t *ExplorerCleanerTask) GetTaskName() string {
-	return "explorer"
+	return "cleaner_explorer"
 }

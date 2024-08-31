@@ -57,10 +57,15 @@ type ExplorerData struct {
 
 type ExplorerEventHandler = func(data *ExplorerData)
 
+type ExplorerLogger interface {
+	Infof(format string, args ...any)
+	Warnf(format string, args ...any)
+	Errorf(format string, args ...any)
+}
+
 type ExplorerDriver interface {
 	readerDaemon(deps *ExplorerDependency)
-	IsAvailable(deps *ExplorerDependency) bool
-	Init(deps *ExplorerDependency) error
+	Init(deps *ExplorerDependency, logger ExplorerLogger) error
 	Subscribe(deps *ExplorerDependency, clientId string, handler ExplorerEventHandler) error
 	Unsubscribe(deps *ExplorerDependency, clientId string) error
 }

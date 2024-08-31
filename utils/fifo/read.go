@@ -2,31 +2,22 @@ package fifo
 
 import (
 	"fmt"
+	"time"
 )
 
-func (b *Buffer) Read(header []byte, size int) ([]byte, error) {
-	b.mutex.Lock()
-	defer b.mutex.Unlock()
-
-	for {
+func (b *Buffer) Read(size int, wait bool) ([]byte, error) {
+	if wait {
+		for (b.writeIndex-b.readIndex+b.capacity)%b.capacity < size {
+			time.Sleep(time.Millisecond)
+		}
+	} else {
 		if (b.writeIndex-b.readIndex+b.capacity)%b.capacity < size {
 			return nil, fmt.Errorf("not enough data")
 		}
-
-		isHeaderFind := true
-		for i := 0; i < len(header); i++ {
-			if b.data[(b.readIndex+i)%b.capacity] != header[i] {
-				isHeaderFind = false
-				break
-			}
-		}
-
-		if isHeaderFind {
-			break
-		}
-
-		b.readIndex = (b.readIndex + 1) % b.capacity
 	}
+
+	b.mutex.RLock()
+	defer b.mutex.RUnlock()
 
 	packet := make([]byte, size)
 	for i := 0; i < size; i++ {

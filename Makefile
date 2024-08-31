@@ -25,18 +25,21 @@ $(BUILD_ARCH):
 	@cp -r $(ASSETS_DIR) $(DIST_DIR)/$@
 
 windows:
-	@echo "Building Windows 32-bit, 64-bit, ARM64 ..."
-	@mkdir -p $(DIST_DIR)/win32 $(DIST_DIR)/win64 $(DIST_DIR)/winarm
-	@rm -rf $(DIST_DIR)/win32/* $(DIST_DIR)/win64/* $(DIST_DIR)/winarm/*
+	@echo "Building Windows 32-bit, 64-bit, arm, arm64 ..."
+	@mkdir -p $(DIST_DIR)/win32 $(DIST_DIR)/win64 $(DIST_DIR)/winarm $(DIST_DIR)/winarm64
+	@rm -rf $(DIST_DIR)/win32/* $(DIST_DIR)/win64/* $(DIST_DIR)/winarm/* $(DIST_DIR)/winarm64/*
 	@CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -ldflags="$(BUILD_FLAGS)" \
 		$(BUILD_ARGS) -o $(DIST_DIR)/win32/$(BINARY).exe $(SRC_DIR)/*.go
 	@CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="$(BUILD_FLAGS)" \
 		$(BUILD_ARGS) -o $(DIST_DIR)/win64/$(BINARY).exe $(SRC_DIR)/*.go
-	@CGO_ENABLED=0 GOOS=windows GOARCH=arm64 go build -ldflags="$(BUILD_FLAGS)" \
+	@CGO_ENABLED=0 GOOS=windows GOARCH=arm go build -ldflags="$(BUILD_FLAGS)" \
 		$(BUILD_ARGS) -o $(DIST_DIR)/winarm/$(BINARY).exe $(SRC_DIR)/*.go
+	@CGO_ENABLED=0 GOOS=windows GOARCH=arm64 go build -ldflags="$(BUILD_FLAGS)" \
+		$(BUILD_ARGS) -o $(DIST_DIR)/winarm64/$(BINARY).exe $(SRC_DIR)/*.go
 	@cp -r $(ASSETS_DIR) $(DIST_DIR)/win32
 	@cp -r $(ASSETS_DIR) $(DIST_DIR)/win64
 	@cp -r $(ASSETS_DIR) $(DIST_DIR)/winarm
+	@cp -r $(ASSETS_DIR) $(DIST_DIR)/winarm64
 
 gen:
 ifeq ($(shell command -v gqlgen 2> /dev/null),)

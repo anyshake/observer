@@ -21,11 +21,11 @@ func (h *History) getSACBytes(data []explorer.ExplorerData, stationCode, network
 	var channelBuffer []int32
 	for index, record := range data {
 		// Make sure timestamp is continuous
-		if math.Abs(float64(record.Timestamp-startTimestamp-int64(index*1000))) >= explorer.EXPLORER_ALLOWED_JITTER_MS {
+		if math.Abs(float64(record.Timestamp-startTimestamp-int64(index*int(time.Second.Milliseconds())))) >= explorer.EXPLORER_ALLOWED_JITTER_MS {
 			return "", nil, fmt.Errorf(
 				"timestamp is not within allowed jitter %d ms, expected %d, got %d",
 				explorer.EXPLORER_ALLOWED_JITTER_MS,
-				startTimestamp+int64(index*1000),
+				startTimestamp+int64(index*int(time.Second.Milliseconds())),
 				record.Timestamp,
 			)
 		}

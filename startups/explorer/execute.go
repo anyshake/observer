@@ -1,8 +1,6 @@
 package explorer
 
 import (
-	"errors"
-
 	"github.com/anyshake/observer/drivers/explorer"
 	"github.com/anyshake/observer/startups"
 	"github.com/anyshake/observer/utils/logger"
@@ -20,13 +18,8 @@ func (t *ExplorerStartupTask) Execute(depsContainer *dig.Container, options *sta
 	}
 	explorerDriver := explorer.ExplorerDriver(&explorer.ExplorerDriverImpl{})
 
-	logger.GetLogger(t.GetTaskName()).Infoln("checking availability of opened device")
-	if !explorerDriver.IsAvailable(explorerDeps) {
-		return errors.New("opened device is not working, check the connection or modes")
-	}
-
 	logger.GetLogger(t.GetTaskName()).Infoln("device is being initialized, please wait")
-	err = explorerDriver.Init(explorerDeps)
+	err = explorerDriver.Init(explorerDeps, &explorerLoggerImpl{moduleName: "explorer_driver"})
 	if err != nil {
 		return err
 	}

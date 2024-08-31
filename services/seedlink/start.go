@@ -59,7 +59,7 @@ func (s *SeedLinkService) Start(options *services.Options, waitGroup *sync.WaitG
 			if s.prevSampleRate == data.SampleRate {
 				messageBus.Publish(s.GetServiceName(), data)
 			} else {
-				logger.GetLogger(s.GetServiceName()).Warnf("sample rate is not the same, expected %d, got %d", s.prevSampleRate, data.SampleRate)
+				logger.GetLogger(s.GetServiceName()).Warnf("sample rate is not the same, previous %d, current %d", s.prevSampleRate, data.SampleRate)
 			}
 			s.prevSampleRate = data.SampleRate
 		},

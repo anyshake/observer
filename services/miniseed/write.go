@@ -15,13 +15,13 @@ func (m *MiniSeedService) handleWrite() error {
 		startSampleRate = m.miniseedBuffer[0].SampleRate
 	)
 
-	for i := 1; i < len(m.miniseedBuffer); i++ {
+	for i := int64(1); i < int64(len(m.miniseedBuffer)); i++ {
 		// Make sure timestamp is increasing by 1000 ms with allowed jitter
-		if math.Abs(float64(m.miniseedBuffer[i].Timestamp-startTimestamp-int64(i*1000))) >= explorer.EXPLORER_ALLOWED_JITTER_MS {
+		if math.Abs(float64(m.miniseedBuffer[i].Timestamp-startTimestamp-(i*time.Second.Milliseconds()))) >= explorer.EXPLORER_ALLOWED_JITTER_MS {
 			return fmt.Errorf(
 				"timestamp is not within allowed jitter %d ms, expected %d, got %d",
 				explorer.EXPLORER_ALLOWED_JITTER_MS,
-				startTimestamp+int64(i*1000),
+				startTimestamp+(i*time.Second.Milliseconds()),
 				m.miniseedBuffer[i].Timestamp,
 			)
 		}

@@ -1,5 +1,5 @@
 package database
 
 func (t *DatabaseCleanerTask) GetTaskName() string {
-	return "database"
+	return "cleaner_database"
 }

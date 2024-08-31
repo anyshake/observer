@@ -7,5 +7,5 @@ type Buffer struct {
 	readIndex  int
 	writeIndex int
 	capacity   int
-	mutex      sync.Mutex
+	mutex      sync.RWMutex
 }

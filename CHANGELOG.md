@@ -2,6 +2,24 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.2.1
+
+### Breaking Changes
+
+- **Data Protocol**: The AnyShake Explorer mainline data protocol has been updated again. **If you are using AnyShake Explorer implemented by STM32, please rebuild and burn the firmware to the latest version, if you are using AnyShake Explorer implemented by ESP8266, just ignore this message.**
+
+### New Features
+
+- Print log messages from AnyShake Explorer driver.
+- Improved the stability of the legacy data protocol.
+- Support Windows ARM32 architecture.
+
+### Bug Fixes
+
+- Fix SQLite "out of memory" issue on Windows release build.
+- Fix release names in the GitHub Actions workflow.
+- Use `time.NewTimer` instead of `time.After` to avoid memory leak.
+
 ## v3.2.0
 
 ### New Features

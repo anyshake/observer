@@ -1,6 +1,8 @@
 package archiver
 
 import (
+	"time"
+
 	"github.com/anyshake/observer/drivers/dao/tables"
 	"github.com/anyshake/observer/drivers/explorer"
 	"github.com/anyshake/observer/utils/logger"
@@ -39,7 +41,7 @@ func (a *ArchiverService) handleExplorerEvent(data *explorer.ExplorerData) {
 	if a.cleanupCountDown == 0 {
 		err := a.databaseConn.
 			Table(adcCountModel.GetName()).
-			Where("timestamp < ?", data.Timestamp-int64(a.lifeCycle*86400*1000)).
+			Where("timestamp < ?", data.Timestamp-int64(a.lifeCycle*int(time.Hour.Milliseconds())*24)).
 			Delete(&tables.AdcCount{}).
 			Error
 		if err != nil {

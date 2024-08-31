@@ -15,22 +15,21 @@ import (
 )
 
 var (
-	legacy_packet_frame_header   = []byte{0xFC, 0x1B}
-	mainline_packet_frame_header = []byte{0xF1, 0xD9}
-	mainline_packet_frame_tail   = []byte{0xD9, 0xF1}
+	LEGACY_PACKET_FRAME_HEADER   = []byte{0xFC, 0x1B}
+	MAINLINE_PACKET_FRAME_HEADER = []byte{0xFA, 0xDE}
 )
 
 // In legacy mode, each packet contains 3 channels, n samples per channel.
 // The packet is sent at an interval of (1000 / sample rate) milliseconds.
 // Set n = 5 (also in Explorer) fits the common sample rates (25, 50, 100, 125 Hz).
-const legacy_packet_channel_size = 5
+const LEGACY_PACKET_CHANNEL_SIZE = 5
 
 // Legacy packet structure, fixed size.
 // Each channel has a checksum, which is the XOR of all bytes in the channel.
 type legacyPacket struct {
-	Z_Axis   [legacy_packet_channel_size]int32
-	E_Axis   [legacy_packet_channel_size]int32
-	N_Axis   [legacy_packet_channel_size]int32
+	Z_Axis   [LEGACY_PACKET_CHANNEL_SIZE]int32
+	E_Axis   [LEGACY_PACKET_CHANNEL_SIZE]int32
+	N_Axis   [LEGACY_PACKET_CHANNEL_SIZE]int32
 	Checksum [3]uint8
 }
 
@@ -45,174 +44,120 @@ func (g *legacyPacket) decode(data []byte) error {
 	}
 
 	// Using XOR algorithm
-	calc_checksum := [3]uint8{0, 0, 0}
-	z_axis_offset := int(unsafe.Sizeof(g.Z_Axis))
-	for i := 0; i < z_axis_offset; i++ {
-		calc_checksum[0] ^= data[i]
+	calcChecksum := [3]uint8{0, 0, 0}
+	zAxisOffset := int(unsafe.Sizeof(g.Z_Axis))
+	for i := 0; i < zAxisOffset; i++ {
+		calcChecksum[0] ^= data[i]
 	}
-	e_axis_offset := z_axis_offset + int(unsafe.Sizeof(g.E_Axis))
-	for i := z_axis_offset; i < e_axis_offset; i++ {
-		calc_checksum[1] ^= data[i]
+	eAxisOffset := zAxisOffset + int(unsafe.Sizeof(g.E_Axis))
+	for i := zAxisOffset; i < eAxisOffset; i++ {
+		calcChecksum[1] ^= data[i]
 	}
-	n_axis_offset := e_axis_offset + int(unsafe.Sizeof(g.N_Axis))
-	for i := e_axis_offset; i < n_axis_offset; i++ {
-		calc_checksum[2] ^= data[i]
+	nAxisOffset := eAxisOffset + int(unsafe.Sizeof(g.N_Axis))
+	for i := eAxisOffset; i < nAxisOffset; i++ {
+		calcChecksum[2] ^= data[i]
 	}
-	for i := 0; i < len(calc_checksum); i++ {
-		if calc_checksum[i] != g.Checksum[i] {
-			return fmt.Errorf("checksum mismatch, expected %v, got %v", g.Checksum, calc_checksum)
+	for i := 0; i < len(calcChecksum); i++ {
+		if calcChecksum[i] != g.Checksum[i] {
+			return fmt.Errorf("checksum mismatch, expected %v, got %v", g.Checksum, calcChecksum)
 		}
 	}
 
 	return nil
 }
+
+// In mainline mode, each packet contains 3 channels, n samples per channel.
+// The packet is sent at an interval of (1000 / sample rate) milliseconds.
+// Set n = 5 (also in Explorer) fits the common sample rates (25, 50, 100, 125 Hz).
+const MAINLINE_PACKET_CHANNEL_SIZE = 5
 
 // Mainline packet header structure, fixed size.
-// 34 bytes of header data without the frame header bytes.
-type mainlinePacketHeader struct {
-	sampleRate uint16
-	timestamp  int64
-	deviceId   uint32
-	latitude   float32
-	longitude  float32
-	elevation  float32
-	reserved   uint64
-	checksum   uint8
+// The VariableData be Device ID, Latitude, Longitude, Elevation in int32 / float32 format.
+type mainlinePacket struct {
+	Timestamp    int64
+	VariableData [4]byte // Can be int32 or float32
+	VariableName string  // Exclude from length calculation
+	Z_axis       [MAINLINE_PACKET_CHANNEL_SIZE]int32
+	E_axis       [MAINLINE_PACKET_CHANNEL_SIZE]int32
+	N_axis       [MAINLINE_PACKET_CHANNEL_SIZE]int32
+	Checksum     uint8
 }
 
-func (g *mainlinePacketHeader) length() int {
-	return int(unsafe.Sizeof(g.sampleRate) +
-		unsafe.Sizeof(g.timestamp) +
-		unsafe.Sizeof(g.deviceId) +
-		unsafe.Sizeof(g.latitude) +
-		unsafe.Sizeof(g.longitude) +
-		unsafe.Sizeof(g.elevation) +
-		unsafe.Sizeof(g.reserved) +
-		unsafe.Sizeof(g.checksum))
+func (g *mainlinePacket) length() int {
+	return int(unsafe.Sizeof(g.Timestamp) +
+		unsafe.Sizeof(g.VariableData) +
+		unsafe.Sizeof(g.Z_axis) +
+		unsafe.Sizeof(g.E_axis) +
+		unsafe.Sizeof(g.N_axis) +
+		unsafe.Sizeof(g.Checksum))
 }
 
-func (g *mainlinePacketHeader) decode(data []byte) error {
-	g.checksum = data[len(data)-1]
+func (g *mainlinePacket) decode(data []byte) error {
+	// Restore header checksum, note that the byte order is little-endian
+	checksumIndex := len(data) - int(unsafe.Sizeof(g.Checksum))
+	g.Checksum = data[checksumIndex]
 
-	// Using XOR algorithm
-	calc_checksum := uint8(0)
-	for i := 0; i < len(data[:34]); i++ {
-		calc_checksum ^= data[i]
+	// Using XOR algorithm to calculate the header checksum
+	calcHeaderChecksum := uint8(0)
+	for i := 0; i < checksumIndex; i++ {
+		calcHeaderChecksum ^= data[i]
 	}
-	if calc_checksum != g.checksum {
-		return fmt.Errorf("checksum mismatch, expected %d, got %d", g.checksum, calc_checksum)
-	}
-
-	g.sampleRate = binary.LittleEndian.Uint16(data[:2])
-	g.timestamp = int64(binary.LittleEndian.Uint64(data[2:10]))
-	g.deviceId = binary.LittleEndian.Uint32(data[10:14])
-	g.latitude = math.Float32frombits(binary.LittleEndian.Uint32(data[14:18]))
-	g.longitude = math.Float32frombits(binary.LittleEndian.Uint32(data[18:22]))
-	g.elevation = math.Float32frombits(binary.LittleEndian.Uint32(data[22:26]))
-	g.reserved = binary.LittleEndian.Uint64(data[26:34])
-
-	return nil
-}
-
-// Mainline packet channel structure, variable number of samples.
-// Flexibly sized packet channel depending on the sample rate.
-type mainlinePacketChannel struct {
-	z_axis   []int32
-	e_axis   []int32
-	n_axis   []int32
-	checksum uint32
-}
-
-func (g *mainlinePacketChannel) length(sampleRate int) int {
-	return 3*sampleRate*int(unsafe.Sizeof(int32(0))) + // Z, E, N axis data
-		int(unsafe.Sizeof(g.checksum)) // Checksum of Z, E, N axis
-}
-
-func (g *mainlinePacketChannel) decode(data []byte, sampleRate int) error {
-	g.checksum = binary.LittleEndian.Uint32(data[len(data)-4:])
-
-	// Convert little-endian to big-endian for checksum calculation
-	for i := 0; i < len(data)-4; i += 4 {
-		data[i], data[i+1], data[i+2], data[i+3] = data[i+3], data[i+2], data[i+1], data[i]
+	if calcHeaderChecksum != g.Checksum {
+		return fmt.Errorf("header checksum mismatch, expected %d, got %d", g.Checksum, calcHeaderChecksum)
 	}
 
-	// Using CRC-32/MPEG-2 algorithm
-	calc_checksum := uint32(0xFFFFFFFF)
-	for _, v := range data[:len(data)-4] {
-		calc_checksum ^= uint32(v) << 24
-		for i := 0; i < 8; i++ {
-			if (calc_checksum & 0x80000000) != 0 {
-				calc_checksum = (calc_checksum << 1) ^ 0x04C11DB7
-			} else {
-				calc_checksum <<= 1
-			}
-		}
+	// Restore the header data, note that the byte order is little-endian
+	switch (g.Timestamp / time.Second.Milliseconds()) % 4 {
+	case 0:
+		g.VariableName = "device_id"
+	case 1:
+		g.VariableName = "latitude"
+	case 2:
+		g.VariableName = "longitude"
+	case 3:
+		g.VariableName = "elevation"
 	}
-	if calc_checksum != g.checksum {
-		return fmt.Errorf("checksum mismatch, expected %d, got %d", g.checksum, calc_checksum)
+	variableDataIndex := int(unsafe.Sizeof(g.Timestamp) + unsafe.Sizeof(g.VariableData))
+	copy(g.VariableData[:], data[unsafe.Sizeof(g.Timestamp):variableDataIndex])
+	g.Timestamp = int64(binary.LittleEndian.Uint64(data[:unsafe.Sizeof(g.Timestamp)]))
+
+	// Restore the channel data, note that the byte order is little-endian
+	zAxisOffset := variableDataIndex + int(unsafe.Sizeof(g.Z_axis))
+	err := binary.Read(bytes.NewReader(data[variableDataIndex:zAxisOffset]), binary.LittleEndian, g.Z_axis[:])
+	if err != nil {
+		return err
 	}
-
-	// Restore the original data, note that the byte order is big-endian
-	g.z_axis = make([]int32, sampleRate)
-	binary.Read(bytes.NewReader(data[:sampleRate*int(unsafe.Sizeof(int32(0)))]), binary.BigEndian, g.z_axis)
-	g.e_axis = make([]int32, sampleRate)
-	binary.Read(bytes.NewReader(data[sampleRate*int(unsafe.Sizeof(int32(0))):2*sampleRate*int(unsafe.Sizeof(int32(0)))]), binary.BigEndian, g.e_axis)
-	g.n_axis = make([]int32, sampleRate)
-	binary.Read(bytes.NewReader(data[2*sampleRate*int(unsafe.Sizeof(int32(0))):3*sampleRate*int(unsafe.Sizeof(int32(0)))]), binary.BigEndian, g.n_axis)
-
-	return nil
-}
-
-// Mainline packet tail structure, fixed size
-// 9 bytes of tail data without the frame tail bytes
-type mainlinePacketTail struct {
-	reserved uint64
-	checksum uint8
-}
-
-func (g *mainlinePacketTail) length() int {
-	return int(unsafe.Sizeof(g.reserved) + unsafe.Sizeof(g.checksum))
-}
-
-func (g *mainlinePacketTail) decode(data []byte) error {
-	g.checksum = data[8]
-
-	// Using XOR algorithm
-	calc_checksum := uint8(0)
-	for i := 0; i < len(data); i++ {
-		calc_checksum ^= data[i]
+	eAxisOffset := zAxisOffset + int(unsafe.Sizeof(g.E_axis))
+	err = binary.Read(bytes.NewReader(data[zAxisOffset:eAxisOffset]), binary.LittleEndian, g.E_axis[:])
+	if err != nil {
+		return err
 	}
-	if calc_checksum != g.checksum {
-		return fmt.Errorf("checksum mismatch, expected %d, got %d", g.checksum, calc_checksum)
-	}
-
-	g.reserved = binary.LittleEndian.Uint64(data[:8])
-	return nil
+	nAxisOffset := eAxisOffset + int(unsafe.Sizeof(g.N_axis))
+	return binary.Read(bytes.NewReader(data[eAxisOffset:nAxisOffset]), binary.LittleEndian, g.N_axis[:])
 }
 
 type ExplorerDriverImpl struct {
-	// Dependencies for legacy mode
-	legacyPacket legacyPacket
-	// Dependencies for mainline mode
-	mainlinePacketHeader  mainlinePacketHeader
-	mainlinePacketChannel mainlinePacketChannel
-	mainlinePacketTail    mainlinePacketTail
+	logger         ExplorerLogger
+	legacyPacket   legacyPacket
+	mainlinePacket mainlinePacket
 }
 
-func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
-	fifoBuffer := fifo.New((len(legacy_packet_frame_header) + e.legacyPacket.length()) * 4096)
+func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency, fifoBuffer *fifo.Buffer) {
+	recvSize := len(LEGACY_PACKET_FRAME_HEADER) + e.legacyPacket.length()
 
 	// Read data from the transport continuously
 	go func() {
-		buf := make([]byte, e.legacyPacket.length())
+		buf := make([]byte, recvSize/2)
 		for {
 			select {
 			case <-deps.CancelToken.Done():
+				e.logger.Infof("cancelling read data from transport")
 				return
 			default:
-				n, err := deps.Transport.Read(buf, 10*time.Millisecond, false)
+				n, err := deps.Transport.Read(buf, 100*time.Millisecond, false)
 				if err != nil {
-					return
+					e.logger.Errorf("failed to read data from transport: %v", err)
+					continue
 				}
 
 				fifoBuffer.Write(buf[:n])
@@ -228,16 +173,19 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
 
 	// Read data from the FIFO buffer continuously
 	var (
-		dataBuffer = []legacyPacket{}
-		ticker     = time.NewTimer(calcDuration(time.Now(), time.Second))
+		packetBuffer = []legacyPacket{}
+		ticker       = time.NewTimer(calcDuration(time.Now(), time.Second))
+		timer        = time.NewTimer(time.Millisecond)
 	)
 	for {
+		timer.Reset(time.Millisecond)
+
 		select {
 		case <-deps.CancelToken.Done():
 			ticker.Stop()
 			return
 		case currentTick := <-ticker.C:
-			if len(dataBuffer) > 0 {
+			if len(packetBuffer) > 0 {
 				currentTime, err := deps.FallbackTime.Get()
 				if err != nil {
 					continue
@@ -251,141 +199,177 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency) {
 					e_axis_count []int32
 					n_axis_count []int32
 				)
-				for _, packet := range dataBuffer {
+				for _, packet := range packetBuffer {
 					z_axis_count = append(z_axis_count, packet.Z_Axis[:]...)
 					e_axis_count = append(e_axis_count, packet.E_Axis[:]...)
 					n_axis_count = append(n_axis_count, packet.N_Axis[:]...)
 				}
 
-				sampleRate := len(dataBuffer) * legacy_packet_channel_size
+				sampleRate := len(packetBuffer) * LEGACY_PACKET_CHANNEL_SIZE
 				deps.Health.SetSampleRate(sampleRate)
 				finalPacket := ExplorerData{
 					SampleRate: sampleRate,
 					Z_Axis:     z_axis_count,
 					E_Axis:     e_axis_count,
 					N_Axis:     n_axis_count,
-					Timestamp:  currentTime.UTC().UnixMilli(),
+					Timestamp:  currentTime.UTC().Add(-time.Second).UnixMilli(),
 				}
 				deps.messageBus.Publish("explorer", &finalPacket)
-				dataBuffer = []legacyPacket{}
+				packetBuffer = []legacyPacket{}
 
 				ticker.Reset(calcDuration(currentTick, time.Second))
 			}
-		case <-time.After(500 * time.Microsecond):
-			dat, err := fifoBuffer.Read(legacy_packet_frame_header, len(legacy_packet_frame_header)+e.legacyPacket.length())
-			if err == nil {
-				// Read the packet data
-				err = e.legacyPacket.decode(dat[len(legacy_packet_frame_header):])
-				if err != nil {
-					deps.Health.SetErrors(deps.Health.GetErrors() + 1)
-				} else {
-					dataBuffer = append(dataBuffer, e.legacyPacket)
-				}
+		case <-timer.C:
+			dat, err := fifoBuffer.Peek(LEGACY_PACKET_FRAME_HEADER, recvSize)
+			if err != nil {
+				continue
+			}
+
+			// Read the packet data
+			err = e.legacyPacket.decode(dat[len(LEGACY_PACKET_FRAME_HEADER):])
+			if err != nil {
+				e.logger.Warnf("failed to decode legacy packet: %v", err)
+				deps.Health.SetErrors(deps.Health.GetErrors() + 1)
+			} else {
+				packetBuffer = append(packetBuffer, e.legacyPacket)
 			}
 		}
 	}
 }
 
-func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency) {
+func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency, fifoBuffer *fifo.Buffer) {
+	recvSize := len(MAINLINE_PACKET_FRAME_HEADER) + e.mainlinePacket.length()
+
+	// Read data from the transport continuously
+	go func() {
+		buf := make([]byte, recvSize/2)
+		for {
+			select {
+			case <-deps.CancelToken.Done():
+				e.logger.Infof("cancelling read data from transport")
+				return
+			default:
+				n, err := deps.Transport.Read(buf, 100*time.Millisecond, false)
+				if err != nil {
+					e.logger.Errorf("failed to read data from transport: %v", err)
+					continue
+				}
+
+				fifoBuffer.Write(buf[:n])
+			}
+		}
+	}()
+
+	// Read data from the FIFO buffer continuously
+	var (
+		packetBuffer = []mainlinePacket{}
+		nextTick     = int64(0)
+		timer        = time.NewTimer(time.Millisecond)
+	)
 	for {
+		timer.Reset(time.Millisecond)
+
 		select {
 		case <-deps.CancelToken.Done():
 			return
-		default:
-			// Find the header sync bytes
-			ok, _ := deps.Transport.Filter(mainline_packet_frame_header, 2*time.Second)
-			if !ok {
-				continue
-			}
-
-			// Read header section and update dependency data
-			headerBuf := make([]byte, e.mainlinePacketHeader.length())
-			_, err := deps.Transport.Read(headerBuf, time.Second, false)
+		case <-timer.C:
+			dat, err := fifoBuffer.Peek(MAINLINE_PACKET_FRAME_HEADER, recvSize)
 			if err != nil {
 				continue
 			}
-			err = e.mainlinePacketHeader.decode(headerBuf)
+			err = e.mainlinePacket.decode(dat[len(MAINLINE_PACKET_FRAME_HEADER):])
 			if err != nil {
-				deps.Health.SetErrors(deps.Health.GetErrors() + 1)
-				continue
-			}
-			if e.mainlinePacketHeader.latitude != 0 && e.mainlinePacketHeader.longitude != 0 && e.mainlinePacketHeader.elevation != 0 {
-				deps.Config.SetLatitude(float64(e.mainlinePacketHeader.latitude))
-				deps.Config.SetLongitude(float64(e.mainlinePacketHeader.longitude))
-				deps.Config.SetElevation(float64(e.mainlinePacketHeader.elevation))
-			}
-
-			// Get data section packet size and read the channel data
-			sampleRate := int(e.mainlinePacketHeader.sampleRate)
-			dataBuf := make([]byte, e.mainlinePacketChannel.length(sampleRate))
-			_, err = deps.Transport.Read(dataBuf, time.Second, false)
-			if err != nil {
-				continue
-			}
-			err = e.mainlinePacketChannel.decode(dataBuf, sampleRate)
-			if err != nil {
+				e.logger.Warnf("failed to decode mainline packet: %v", err)
 				deps.Health.SetErrors(deps.Health.GetErrors() + 1)
 				continue
 			}
 
-			// Get tail section data, check tail bytes of the packet
-			tailBuf := make([]byte, e.mainlinePacketTail.length()+len(mainline_packet_frame_tail))
-			_, err = deps.Transport.Read(tailBuf, time.Second, false)
-			if err != nil {
-				continue
-			}
-			frameTailSliceIndex := len(tailBuf) - len(mainline_packet_frame_tail)
-			if !bytes.Equal(tailBuf[frameTailSliceIndex:], mainline_packet_frame_tail) {
-				deps.Health.SetErrors(deps.Health.GetErrors() + 1)
-				continue
-			}
-			err = e.mainlinePacketTail.decode(tailBuf[:frameTailSliceIndex])
-			if err != nil {
-				deps.Health.SetErrors(deps.Health.GetErrors() + 1)
-				continue
+			// Update the device ID, latitude, longitude, elevation
+			switch e.mainlinePacket.VariableName {
+			case "device_id":
+				deps.Config.SetDeviceId(binary.LittleEndian.Uint32(e.mainlinePacket.VariableData[:]))
+			case "latitude":
+				latitude := math.Float32frombits(binary.LittleEndian.Uint32(e.mainlinePacket.VariableData[:]))
+				if latitude >= -90 && latitude <= 90 {
+					deps.Config.SetLatitude(float64(latitude))
+				}
+			case "longitude":
+				longitude := math.Float32frombits(binary.LittleEndian.Uint32(e.mainlinePacket.VariableData[:]))
+				if longitude >= -180 && longitude <= 180 {
+					deps.Config.SetLongitude(float64(longitude))
+				}
+			case "elevation":
+				elevation := math.Float32frombits(binary.LittleEndian.Uint32(e.mainlinePacket.VariableData[:]))
+				if elevation >= 0 {
+					deps.Config.SetElevation(float64(elevation))
+				}
 			}
 
-			// Get current timestamp
-			if e.mainlinePacketHeader.timestamp == 0 {
-				t, err := deps.FallbackTime.Get()
-				if err != nil {
+			// Append the packet to the buffer
+			if nextTick == 0 {
+				nextTick = e.mainlinePacket.Timestamp
+			} else {
+				packetBuffer = append(packetBuffer, e.mainlinePacket)
+			}
+
+			if math.Abs(float64(e.mainlinePacket.Timestamp-nextTick)) <= EXPLORER_ALLOWED_JITTER_MS {
+				// Update the next tick even if the buffer is empty
+				nextTick = e.mainlinePacket.Timestamp + time.Second.Milliseconds()
+				if len(packetBuffer) == 0 {
 					continue
 				}
-				e.mainlinePacketHeader.timestamp = t.UnixMilli()
-			}
 
-			// Publish the data to the message bus
-			deps.Health.SetSampleRate(sampleRate)
-			finalPacket := ExplorerData{
-				SampleRate: sampleRate,
-				Timestamp:  e.mainlinePacketHeader.timestamp,
-				Z_Axis:     e.mainlinePacketChannel.z_axis,
-				E_Axis:     e.mainlinePacketChannel.e_axis,
-				N_Axis:     e.mainlinePacketChannel.n_axis,
-			}
-			deps.messageBus.Publish("explorer", &finalPacket)
+				// Merge the packet buffer into a single packet
+				var (
+					z_axis_count []int32
+					e_axis_count []int32
+					n_axis_count []int32
+				)
+				for _, packet := range packetBuffer {
+					z_axis_count = append(z_axis_count, packet.Z_axis[:]...)
+					e_axis_count = append(e_axis_count, packet.E_axis[:]...)
+					n_axis_count = append(n_axis_count, packet.N_axis[:]...)
+				}
 
-			deps.Health.SetUpdatedAt(time.UnixMilli(e.mainlinePacketHeader.timestamp))
-			deps.Health.SetReceived(deps.Health.GetReceived() + 1)
+				// Publish the final packet
+				sampleRate := len(packetBuffer) * MAINLINE_PACKET_CHANNEL_SIZE
+				finalPacket := ExplorerData{
+					SampleRate: sampleRate,
+					Z_Axis:     z_axis_count,
+					E_Axis:     e_axis_count,
+					N_Axis:     n_axis_count,
+					Timestamp:  e.mainlinePacket.Timestamp - time.Second.Milliseconds(),
+				}
+				deps.messageBus.Publish("explorer", &finalPacket)
+
+				// Update the health status
+				deps.Health.SetSampleRate(sampleRate)
+				deps.Health.SetReceived(deps.Health.GetReceived() + 1)
+				deps.Health.SetUpdatedAt(time.UnixMilli(e.mainlinePacket.Timestamp).UTC())
+
+				packetBuffer = []mainlinePacket{}
+			} else if e.mainlinePacket.Timestamp-nextTick > EXPLORER_ALLOWED_JITTER_MS {
+				// Update the next tick, clear the buffer if the jitter exceeds the threshold
+				nextTick = e.mainlinePacket.Timestamp + time.Second.Milliseconds()
+				packetBuffer = []mainlinePacket{}
+			}
 		}
 	}
 }
 
 func (e *ExplorerDriverImpl) readerDaemon(deps *ExplorerDependency) {
+	fifoBuffer := fifo.New(65536)
+
 	if deps.Config.GetLegacyMode() {
-		e.handleReadLegacyPacket(deps)
+		e.handleReadLegacyPacket(deps, &fifoBuffer)
 	} else {
-		e.handleReadMainlinePacket(deps)
+		e.handleReadMainlinePacket(deps, &fifoBuffer)
 	}
 }
 
-func (e *ExplorerDriverImpl) IsAvailable(deps *ExplorerDependency) bool {
-	buf := make([]byte, 128)
-	_, err := deps.Transport.Read(buf, 2*time.Second, true)
-	return err == nil
-}
+func (e *ExplorerDriverImpl) Init(deps *ExplorerDependency, logger ExplorerLogger) error {
+	e.logger = logger
 
-func (e *ExplorerDriverImpl) Init(deps *ExplorerDependency) error {
 	currentTime, err := deps.FallbackTime.Get()
 	if err != nil {
 		return err
@@ -398,26 +382,30 @@ func (e *ExplorerDriverImpl) Init(deps *ExplorerDependency) error {
 
 	// Get device ID in EEPROM
 	if !deps.Config.GetLegacyMode() {
-		readTimeout := 5 * time.Second
-		startTime := time.Now()
-		for time.Since(startTime) < readTimeout {
-			ok, _ := deps.Transport.Filter(mainline_packet_frame_header, 2*time.Second)
+		var (
+			startTime   = time.Now()
+			readTimeout = 5 * time.Second
+		)
+		for time.Since(startTime) <= readTimeout {
+			ok, _ := deps.Transport.Filter(MAINLINE_PACKET_FRAME_HEADER, time.Second)
 			if !ok {
 				continue
 			}
-			headerBuf := make([]byte, e.mainlinePacketHeader.length())
+			headerBuf := make([]byte, e.mainlinePacket.length())
 			_, err := deps.Transport.Read(headerBuf, time.Second, false)
 			if err != nil {
 				continue
 			}
-			err = e.mainlinePacketHeader.decode(headerBuf)
+			err = e.mainlinePacket.decode(headerBuf)
 			if err != nil {
 				continue
 			}
-			deps.Config.SetDeviceId(e.mainlinePacketHeader.deviceId)
-			break
+			if e.mainlinePacket.VariableName == "device_id" {
+				deps.Config.SetDeviceId(binary.LittleEndian.Uint32(e.mainlinePacket.VariableData[:]))
+				break
+			}
 		}
-		if time.Since(startTime) >= readTimeout {
+		if time.Since(startTime) > readTimeout {
 			return errors.New("failed to get device ID, please check the device")
 		}
 	}
