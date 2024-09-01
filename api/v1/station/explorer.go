@@ -12,10 +12,7 @@ func (e *explorerInfo) get(timeSource *timesource.Source, explorerDeps *explorer
 	e.Received = explorerDeps.Health.GetReceived()
 	e.SampleRate = explorerDeps.Health.GetSampleRate()
 
-	currentTime, err := timeSource.Get()
-	if err != nil {
-		return err
-	}
+	currentTime := timeSource.Get()
 	e.Elapsed = int64(currentTime.Sub(explorerDeps.Health.GetStartTime()).Seconds())
 
 	e.Latitude = float64(int(explorerDeps.Config.GetLatitude()*1000)) / 1000

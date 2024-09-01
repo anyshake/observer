@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/utils/request"
+	"github.com/corpix/uarand"
 	"github.com/sbabiv/xml2map"
 )
 
@@ -25,6 +26,7 @@ func (h *HKO) Fetch() ([]byte, error) {
 	res, err := request.GET(
 		"https://www.hko.gov.hk/gts/QEM/eq_app-30d_uc.xml",
 		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
 	)
 	if err != nil {
 		return nil, err

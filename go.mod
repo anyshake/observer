@@ -14,6 +14,7 @@ require (
 	github.com/bclswl0827/sqlite v1.11.1-0.20240613172512-9e6ac9861470
 	github.com/beevik/ntp v1.4.3
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
+	github.com/corpix/uarand v0.2.0
 	github.com/gin-contrib/gzip v0.0.6
 	github.com/gin-gonic/gin v1.10.0
 	github.com/gorilla/websocket v1.5.0
@@ -108,6 +109,6 @@ require (
 	golang.org/x/crypto v0.24.0 // indirect
 	golang.org/x/net v0.26.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
-	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/text v0.16.0
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

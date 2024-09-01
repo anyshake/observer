@@ -186,11 +186,7 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency, fi
 			return
 		case currentTick := <-ticker.C:
 			if len(packetBuffer) > 0 {
-				currentTime, err := deps.FallbackTime.Get()
-				if err != nil {
-					continue
-				}
-
+				currentTime := deps.FallbackTime.Get()
 				deps.Health.SetUpdatedAt(currentTime)
 				deps.Health.SetReceived(deps.Health.GetReceived() + 1)
 
@@ -260,10 +256,19 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency, 
 		}
 	}()
 
+	// When device ID was set to 19890604 (dummy value), the device is running without GNSS module.
+	// In this case, the latitude, longitude, elevation will not be updated.
+	// The timestamp will be replaced with the NTP time.
+	noGnssMode := false
+	if deps.Config.GetDeviceId() == 19890604 {
+		noGnssMode = true
+	}
+
 	// Read data from the FIFO buffer continuously
 	var (
 		packetBuffer = []mainlinePacket{}
-		nextTick     = int64(0)
+		nextTick     = int64(0) // Expected timestamp for the next published data on message bus
+		timeDiff     = int64(0) // For non-GNSS mode, we need time difference between the packet and NTP time
 		timer        = time.NewTimer(time.Millisecond)
 	)
 	for {
@@ -287,21 +292,31 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency, 
 			// Update the device ID, latitude, longitude, elevation
 			switch e.mainlinePacket.VariableName {
 			case "device_id":
-				deps.Config.SetDeviceId(binary.LittleEndian.Uint32(e.mainlinePacket.VariableData[:]))
+				if !noGnssMode {
+					deps.Config.SetDeviceId(binary.LittleEndian.Uint32(e.mainlinePacket.VariableData[:]))
+				}
 			case "latitude":
 				latitude := math.Float32frombits(binary.LittleEndian.Uint32(e.mainlinePacket.VariableData[:]))
-				if latitude >= -90 && latitude <= 90 {
+				if latitude >= -90 && latitude <= 90 && !noGnssMode {
 					deps.Config.SetLatitude(float64(latitude))
 				}
 			case "longitude":
 				longitude := math.Float32frombits(binary.LittleEndian.Uint32(e.mainlinePacket.VariableData[:]))
-				if longitude >= -180 && longitude <= 180 {
+				if longitude >= -180 && longitude <= 180 && !noGnssMode {
 					deps.Config.SetLongitude(float64(longitude))
 				}
 			case "elevation":
 				elevation := math.Float32frombits(binary.LittleEndian.Uint32(e.mainlinePacket.VariableData[:]))
-				if elevation >= 0 {
+				if elevation >= 0 && !noGnssMode {
 					deps.Config.SetElevation(float64(elevation))
+				}
+			}
+
+			if noGnssMode {
+				// Update time difference at the first packet or everyday at 00:00:00 UTC
+				currentTime := deps.FallbackTime.Get()
+				if nextTick == 0 || currentTime.Unix()%(int64(time.Hour.Seconds())*24) == 0 {
+					timeDiff = currentTime.UTC().UnixMilli() - e.mainlinePacket.Timestamp
 				}
 			}
 
@@ -338,7 +353,7 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency, 
 					Z_Axis:     z_axis_count,
 					E_Axis:     e_axis_count,
 					N_Axis:     n_axis_count,
-					Timestamp:  e.mainlinePacket.Timestamp - time.Second.Milliseconds(),
+					Timestamp:  (e.mainlinePacket.Timestamp - time.Second.Milliseconds()) + timeDiff,
 				}
 				deps.messageBus.Publish("explorer", &finalPacket)
 
@@ -370,11 +385,7 @@ func (e *ExplorerDriverImpl) readerDaemon(deps *ExplorerDependency) {
 func (e *ExplorerDriverImpl) Init(deps *ExplorerDependency, logger ExplorerLogger) error {
 	e.logger = logger
 
-	currentTime, err := deps.FallbackTime.Get()
-	if err != nil {
-		return err
-	}
-
+	currentTime := deps.FallbackTime.Get()
 	deps.Health.SetStartTime(currentTime)
 	deps.subscribers = haxmap.New[string, ExplorerEventHandler]()
 	deps.messageBus = messagebus.New(1024)

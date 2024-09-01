@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/utils/request"
+	"github.com/corpix/uarand"
 )
 
 type SCEA_E struct {
@@ -23,6 +24,7 @@ func (s *SCEA_E) Fetch() ([]byte, error) {
 	res, err := request.GET(
 		"http://118.113.105.29:8002/api/earlywarning/jsonPageList?pageSize=100",
 		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
 	)
 	if err != nil {
 		return nil, err

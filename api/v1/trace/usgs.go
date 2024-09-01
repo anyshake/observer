@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/utils/request"
+	"github.com/corpix/uarand"
 )
 
 type USGS struct {
@@ -24,6 +25,7 @@ func (u *USGS) Fetch() ([]byte, error) {
 	res, err := request.GET(
 		"https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson",
 		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
 	)
 	if err != nil {
 		return nil, err

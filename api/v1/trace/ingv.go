@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/utils/request"
+	"github.com/corpix/uarand"
 )
 
 type INGV struct {
@@ -25,6 +26,7 @@ func (c *INGV) Fetch() ([]byte, error) {
 	res, err := request.GET(
 		"https://webservices.ingv.it/fdsnws/event/1/query?minmag=-1&format=text&timezone=UTC",
 		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
 	)
 	if err != nil {
 		return nil, err

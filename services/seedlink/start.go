@@ -35,7 +35,7 @@ func (s *SeedLinkService) Start(options *services.Options, waitGroup *sync.WaitG
 		return
 	}
 
-	currentTime, _ := options.TimeSource.Get()
+	currentTime := options.TimeSource.Get()
 	messageBus := messagebus.New(65535)
 
 	// Subscribe to Explorer events

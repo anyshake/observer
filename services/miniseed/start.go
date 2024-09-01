@@ -62,7 +62,7 @@ func (m *MiniSeedService) Start(options *services.Options, waitGroup *sync.WaitG
 	m.miniseedBuffer = make([]explorer.ExplorerData, m.writeBufferInterval)
 
 	// Get sequence number if file exists
-	currentTime, _ := options.TimeSource.Get()
+	currentTime := options.TimeSource.Get()
 	for _, channelCode := range []string{
 		explorer.EXPLORER_CHANNEL_CODE_Z,
 		explorer.EXPLORER_CHANNEL_CODE_E,

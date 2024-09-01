@@ -8,6 +8,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/anyshake/observer/utils/request"
+	"github.com/corpix/uarand"
 )
 
 type KMA struct {
@@ -26,6 +27,7 @@ func (k *KMA) Fetch() ([]byte, error) {
 	res, err := request.GET(
 		"https://www.weather.go.kr/w/eqk-vol/search/korea.do",
 		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
 	)
 	if err != nil {
 		return nil, err

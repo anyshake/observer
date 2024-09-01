@@ -12,6 +12,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/anyshake/observer/utils/request"
+	"github.com/corpix/uarand"
 )
 
 const HOST_IP_TO_BYPASS_GFW = "168.95.246.1:443"
@@ -41,6 +42,7 @@ func (c *CWA) Fetch() ([]byte, error) {
 		"https://www.cwa.gov.tw/V8/C/E/MOD/MAP_LIST.html",
 		10*time.Second, time.Second, 3, false,
 		c.createGFWBypasser(),
+		map[string]string{"User-Agent": uarand.GetRandom()},
 	)
 	if err != nil {
 		return nil, err

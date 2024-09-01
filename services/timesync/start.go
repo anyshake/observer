@@ -21,15 +21,11 @@ func (s *TimeSyncService) Start(options *services.Options, waitGroup *sync.WaitG
 			logger.GetLogger(s.GetServiceName()).Infoln("service has been stopped")
 			return
 		case <-ticker.C:
-			currentTime, err := options.TimeSource.Get()
-			if err != nil {
-				logger.GetLogger(s.GetServiceName()).Errorln(err)
-				continue
-			}
-
 			// Update time source at 00:00:00 UTC every day
+			currentTime := options.TimeSource.Get()
 			if currentTime.Unix()%86400 == 0 {
-				if err = options.TimeSource.Update(); err != nil {
+				err := options.TimeSource.Update()
+				if err != nil {
 					logger.GetLogger(s.GetServiceName()).Errorln(err)
 				} else {
 					logger.GetLogger(s.GetServiceName()).Info("time source has been updated")

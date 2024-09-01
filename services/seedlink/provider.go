@@ -29,7 +29,7 @@ func (p *provider) GetStartTime() time.Time {
 }
 
 func (p *provider) GetCurrentTime() time.Time {
-	currentTime, _ := p.timeSource.Get()
+	currentTime := p.timeSource.Get()
 	return currentTime
 }
 

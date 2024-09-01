@@ -2,6 +2,13 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.2.2
+
+### New Features
+
+- Enable mainline data protocol support for AnyShake Explorer without GNSS module.
+- Added earthquake event source API support of EQZT.
+
 ## v3.2.1
 
 ### Breaking Changes

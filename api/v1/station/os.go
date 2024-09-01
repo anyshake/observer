@@ -20,16 +20,12 @@ func (o *osInfo) get(timeSource *timesource.Source) error {
 		return err
 	}
 
-	timestamp, err := timeSource.Get()
-	if err != nil {
-		return err
-	}
-
+	currentTime := timeSource.Get()
 	o.Uptime = int64(up.Seconds())
 	o.OS = runtime.GOOS
 	o.Arch = runtime.GOARCH
 	o.Distro = osutil.Name
 	o.Hostname = hostname
-	o.Timestamp = timestamp.UnixMilli()
+	o.Timestamp = currentTime.UnixMilli()
 	return nil
 }

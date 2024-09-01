@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/utils/request"
+	"github.com/corpix/uarand"
 )
 
 type CEIC struct {
@@ -23,6 +24,7 @@ func (c *CEIC) Fetch() ([]byte, error) {
 	res, err := request.GET(
 		"https://news.ceic.ac.cn/ajax/google",
 		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
 	)
 	if err != nil {
 		return nil, err

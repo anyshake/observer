@@ -9,6 +9,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/anyshake/observer/utils/request"
+	"github.com/corpix/uarand"
 )
 
 type CEA_DASE struct {
@@ -27,6 +28,7 @@ func (c *CEA_DASE) Fetch() ([]byte, error) {
 	res, err := request.GET(
 		"https://www-dase.cea.fr/evenement/derniers_evenements.php",
 		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
 	)
 	if err != nil {
 		return nil, err

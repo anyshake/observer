@@ -31,6 +31,7 @@ func (t *Trace) Register(rg *gin.RouterGroup, resolver *v1.Resolver) error {
 		"SCEA_E":   &SCEA_E{},
 		"SCEA_B":   &SCEA_B{},
 		"CEA_DASE": &CEA_DASE{},
+		"EQZT":     &EQZT{},
 	}
 
 	var explorerDeps *explorer.ExplorerDependency
