@@ -142,8 +142,8 @@ func (j *EQZT) List(latitude, longitude float64) ([]seismicEvent, error) {
 }
 
 func (j *EQZT) getTimestamp(text string) int64 {
-	timestamp, _ := time.Parse("2006-01-02 15:04:05", text)
-	return timestamp.UnixMilli()
+	t, _ := time.Parse("2006-01-02 15:04:05", text)
+	return t.Add(-8 * time.Hour).UnixMilli()
 }
 
 func (j *EQZT) getLatitude(text string) float64 {
