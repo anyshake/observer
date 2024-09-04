@@ -22,7 +22,7 @@ jobs:
                   check-latest: true
 
             - name: Checkout source code
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
               with:
                   fetch-depth: 0
 
@@ -31,7 +31,7 @@ jobs:
               run: |
                   cd frontend/src
                   npm install
-                  make
+                  npm run build
                   echo "::set-output name=status::success"
 
             - name: Build Swagger docs
@@ -48,7 +48,7 @@ jobs:
               if: steps.build_docs.outputs.status == 'success'
               run: |
                   go mod download
-                  make -j$(nproc)
+                  make all -j$(nproc)
                   echo "::set-output name=status::success"
 
             - name: Package release binaries

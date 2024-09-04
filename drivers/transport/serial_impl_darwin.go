@@ -1,6 +1,3 @@
-//go:build !darwin
-// +build !darwin
-
 package transport
 
 import (
@@ -12,11 +9,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bclswl0827/go-serial"
+	"go.bug.st/serial"
 )
 
 type TransportDriverSerialImpl struct {
-	conn  *serial.Port
+	conn  serial.Port
 	mutex sync.Mutex
 }
 
@@ -38,12 +35,12 @@ func (t *TransportDriverSerialImpl) Open(deps *TransportDependency) error {
 
 	conn, err := serial.Open(
 		deviceName,
-		serial.WithHUPCL(true),
-		serial.WithDataBits(8),
-		serial.WithWriteTimeout(10),
-		serial.WithBaudrate(baudrate),
-		serial.WithParity(serial.NoParity),
-		serial.WithStopBits(serial.OneStopBit),
+		&serial.Mode{
+			BaudRate: baudrate,
+			DataBits: 8,
+			Parity:   serial.NoParity,
+			StopBits: serial.OneStopBit,
+		},
 	)
 	if err != nil {
 		return fmt.Errorf("%v %s", err, deviceName)
@@ -78,7 +75,7 @@ func (t *TransportDriverSerialImpl) Read(buf []byte, timeout time.Duration, flus
 	if flush {
 		t.conn.ResetInputBuffer()
 	}
-	t.conn.SetReadTimeout(int(timeout.Milliseconds()))
+	t.conn.SetReadTimeout(timeout)
 	return t.conn.Read(buf)
 }
 
@@ -104,7 +101,7 @@ func (t *TransportDriverSerialImpl) Filter(signature []byte, timeout time.Durati
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
-	t.conn.SetReadTimeout(int(timeout.Milliseconds()))
+	t.conn.SetReadTimeout(timeout)
 
 	t.conn.ResetInputBuffer()
 	t.conn.ResetOutputBuffer()

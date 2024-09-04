@@ -1,5 +1,3 @@
-import { getRelease } from "../helpers/app/getRelease";
-import { getVersion } from "../helpers/app/getVersion";
 import {
 	CSISIntensityStandard,
 	CWAIntensityStandard,
@@ -13,8 +11,6 @@ interface GlobalConfig {
 	readonly name: string;
 	readonly title: string;
 	readonly author: string;
-	readonly version: string;
-	readonly release: string;
 	readonly homepage: string;
 	readonly repository: string;
 	readonly duration: {
@@ -31,8 +27,6 @@ interface GlobalConfig {
 	readonly footer: Record<keyof typeof i18nConfig.resources, string>;
 }
 
-const version = getVersion();
-const release = getRelease();
 const scales = [
 	new JMAIntensityStandard(),
 	new CWAIntensityStandard(),
@@ -42,8 +36,6 @@ const scales = [
 
 export const globalConfig: GlobalConfig = {
 	scales,
-	version,
-	release,
 	name: "Observer",
 	author: "AnyShake",
 	title: "AnyShake Observer",

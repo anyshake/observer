@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	release     = "unknown"
+	tag         = "unknown"
 	version     = "custombuild"
 	description = "Constructing Real-time Seismic Network Ambitiously"
 )
@@ -15,7 +15,7 @@ var (
 func printVersion() {
 	copyright := "© AnyShake " + fmt.Sprintf("%d", time.Now().Year()) + ". All Rights Reversed."
 	version = concat(
-		"AnyShake Observer ", version, " (", description, ")\nRelease: ", version, "-", release, " ",
+		"AnyShake Observer ", version, " (", description, ")\nRelease: ", version, "-", tag, " ",
 		runtime.Version(), " ", runtime.GOOS, "/", runtime.GOARCH, "\n", copyright, "\n",
 	)
 

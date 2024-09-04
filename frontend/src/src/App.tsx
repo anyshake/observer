@@ -16,7 +16,6 @@ import { globalConfig } from "./config/global";
 import i18n, { i18nConfig } from "./config/i18n";
 import { menuConfig } from "./config/menu";
 import { routerConfig } from "./config/router";
-import { getAsciiArt } from "./helpers/app/getAsciiArt";
 import { hideLoading } from "./helpers/app/hideLoading";
 import { getCurrentLocale } from "./helpers/i18n/getCurrentLocale";
 import { setUserLocale } from "./helpers/i18n/setUserLocale";
@@ -29,16 +28,13 @@ const App = () => {
 	const { t } = useTranslation();
 	const { routes, basename } = routerConfig;
 	const { fallback, resources } = i18nConfig;
-	const { name, title, author, repository, homepage, footer, version, release } = globalConfig;
+	const { name, title, author, repository, homepage, footer } = globalConfig;
 
 	useEffect(() => {
 		hideLoading();
-		const asciiArt = getAsciiArt();
 		// eslint-disable-next-line no-console
-		console.info(`%c${asciiArt}`, "color: #0891b2;");
-		// eslint-disable-next-line no-console
-		console.info(`%c${version}-${release}`, "color: #0369a1;");
-	}, [version, release]);
+		console.log(`%c${process.env.BUILD_TAG ?? "custom build"}`, "color: #0369a1;");
+	}, []);
 
 	const { pathname } = useLocation();
 	const [currentTitle, setCurrentTitle] = useState(title);

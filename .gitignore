@@ -23,6 +23,3 @@ _testmain.go
 *.exe
 *.test
 *.prof
-
-build/dist
-frontend/dist

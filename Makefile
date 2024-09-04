@@ -1,9 +1,9 @@
-.PHONY: build clean gen docs version run windows
+.PHONY: build all clean gen docs version run windows
 
 BINARY=observer
-VERSION=$(shell cat ./VERSION)
-RELEASE=$(shell date +%Y%m%d%H%M%S)
 COMMIT=$(shell git rev-parse --short HEAD)
+VERSION=$(shell cat ./VERSION)
+BUILD_TIME=$(shell date +%s%3N)
 
 SRC_DIR=./cmd
 DIST_DIR=./build/dist
@@ -12,10 +12,16 @@ ASSETS_DIR=./build/assets
 BUILD_ARCH=arm arm64 386 amd64 ppc64le riscv64 \
 	mips mips64le mipsle loong64 s390x
 BUILD_FLAGS=-s -w -X main.version=$(VERSION) \
-	-X main.release=$(COMMIT)-$(RELEASE)
+	-X main.tag=$(COMMIT)-$(BUILD_TIME)
 BUILD_ARGS=-trimpath
 
-build: clean windows $(BUILD_ARCH)
+build: clean
+	@echo "Building $(BINARY) ..."
+	@mkdir -p $(DIST_DIR)
+	@go build -ldflags="$(BUILD_FLAGS)" $(BUILD_ARGS) -o $(DIST_DIR)/$(BINARY) $(SRC_DIR)/*.go
+	@cp -r $(ASSETS_DIR) $(DIST_DIR)
+
+all: clean windows $(BUILD_ARCH)
 $(BUILD_ARCH):
 	@echo "Building Linux $@ ..."
 	@mkdir -p $(DIST_DIR)/$@

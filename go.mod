@@ -29,6 +29,7 @@ require (
 	github.com/vardius/message-bus v1.1.5
 	github.com/vektah/gqlparser/v2 v2.5.16
 	github.com/wille/osutil v0.0.0-20240729075835-ba7d4216ffe2
+	go.bug.st/serial v1.6.2
 	go.uber.org/dig v1.17.1
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.5.2

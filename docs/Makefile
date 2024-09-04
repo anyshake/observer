@@ -1,6 +1,6 @@
-.PHONY: gen
+.PHONY: build
 
-gen:
+build:
 ifeq ($(shell command -v swag 2> /dev/null),)
 	@echo "Installing Swagger..."
 	@go get github.com/swaggo/swag/cmd/swag

@@ -32,8 +32,8 @@
         "redux-persist": "^6.0.0"
     },
     "scripts": {
-        "start": "cross-env BROWSER=none GENERATE_SOURCEMAP=false react-scripts start",
-        "build": "cross-env GENERATE_SOURCEMAP=false react-scripts build"
+        "start": "cross-env BROWSER=none GENERATE_SOURCEMAP=false craco start",
+        "build": "cross-env GENERATE_SOURCEMAP=false craco build"
     },
     "browserslist": {
         "production": [
@@ -49,6 +49,7 @@
     },
     "devDependencies": {
         "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+        "@craco/craco": "^7.1.0",
         "@types/file-saver": "^2.0.7",
         "@types/leaflet": "^1.9.6",
         "@types/node": "^16.18.38",
