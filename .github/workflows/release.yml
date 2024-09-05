@@ -93,6 +93,11 @@ jobs:
                     - linux_ppc64le
                     - linux_riscv64
                     - linux_s390x
+                    - openbsd_386
+                    - openbsd_amd64
+                    - openbsd_arm32_v6
+                    - openbsd_arm32_v7a
+                    - openbsd_arm64_v8a
                     - windows_386
                     - windows_amd64
                     - windows_arm32_v7a
@@ -214,7 +219,15 @@ jobs:
                                   ]
                               },
                               {
-                                  "title": "## Other Changes",
+                                  "title":"## Dependency Updates",
+                                  "labels": [
+                                      "deps",
+                                      "dependencies",
+                                      "dependency"
+                                  ]
+                              },
+                              {
+                                  "title": "## Chore",
                                   "labels": [
                                       "chore",
                                       "docs",
@@ -231,7 +244,7 @@ jobs:
                           ],
                           "label_extractor":[
                               {
-                                  "pattern":"^(break|major|incompatible|feat|feature|fix|bug|build|chore|ci|docs|perf|refactor|revert|style|test){1}(\\([\\w\\-\\.]+\\))?(!)?: ([\\w ])+([\\s\\S]*)",
+                                  "pattern":"^(break|major|incompatible|feat|feature|fix|bug|build|ci|test|deps|dependencies|dependency|chore|docs|perf|refactor|revert|style){1}(\\([\\w\\-\\.]+\\))?(!)?: ([\\w ])+([\\s\\S]*)",
                                   "target":"$1"
                               }
                           ]
