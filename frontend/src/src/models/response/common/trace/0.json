@@ -1,13 +1,19 @@
 {
-    "time": "1970-01-01T23:59:59Z",
+    "time": "2024-09-05T19:26:27Z",
     "status": 200,
     "error": false,
     "path": "/api/v1/trace",
-    "message": "Successfully read available data source list",
+    "message": "Successfully read available data source properties",
     "data": [
         {
-            "name": "null",
-            "value": "null"
+            "id": "hko",
+            "country": "HK",
+            "default": "en-US",
+            "locales": {
+                "en-US": "Hong Kong Observatory",
+                "zh-TW": "天文台全球地震資訊網",
+                "zh-CN": "天文台全球地震信息网"
+            }
         }
     ]
 }
