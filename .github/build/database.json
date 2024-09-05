@@ -215,6 +215,46 @@
         "gomips": "",
         "name": "linux-s390x"
     },
+    "openbsd_386": {
+        "toolchain": "stable",
+        "goos": "openbsd",
+        "goarch": "386",
+        "goarm": "",
+        "gomips": "",
+        "name": "openbsd-386"
+    },
+    "openbsd_amd64": {
+        "toolchain": "stable",
+        "goos": "openbsd",
+        "goarch": "amd64",
+        "goarm": "",
+        "gomips": "",
+        "name": "openbsd-amd64"
+    },
+    "openbsd_arm32_v6": {
+        "toolchain": "stable",
+        "goos": "openbsd",
+        "goarch": "arm",
+        "goarm": "6",
+        "gomips": "",
+        "name": "openbsd-arm32-v6"
+    },
+    "openbsd_arm32_v7a": {
+        "toolchain": "stable",
+        "goos": "openbsd",
+        "goarch": "arm",
+        "goarm": "7",
+        "gomips": "",
+        "name": "openbsd-arm32-v7a"
+    },
+    "openbsd_arm64_v8a": {
+        "toolchain": "stable",
+        "goos": "openbsd",
+        "goarch": "arm64",
+        "goarm": "",
+        "gomips": "",
+        "name": "openbsd-arm64-v8a"
+    },
     "windows_386": {
         "toolchain": "stable",
         "goos": "windows",
