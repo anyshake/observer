@@ -18,6 +18,7 @@ import { apiConfig, traceCommonResponseModel1 } from "../../config/api";
 import { i18nConfig } from "../../config/i18n";
 import { RouterComponentProps } from "../../config/router";
 import { ReduxStoreProps } from "../../config/store";
+import { getFlagByCountry } from "../../helpers/i18n/getFlagByCountry";
 import { sendPromiseAlert } from "../../helpers/interact/sendPromiseAlert";
 import { sendUserAlert } from "../../helpers/interact/sendUserAlert";
 import { requestRestApi } from "../../helpers/request/requestRestApi";
@@ -31,6 +32,8 @@ import { handleSetCharts } from "./handleSetCharts";
 import { handleSetLabels } from "./handleSetLabels";
 
 const History = (props: RouterComponentProps) => {
+	const { fallback: fallbackLocale } = i18nConfig;
+	const { locale } = props;
 	const { t } = useTranslation();
 
 	const { station } = useSelector(({ station }: ReduxStoreProps) => station);
@@ -406,28 +409,47 @@ const History = (props: RouterComponentProps) => {
 			}));
 		};
 
-		setForm((prev) => ({
-			...prev,
-			open: true,
-			selectOptions: res.data
-				.sort((a, b) => {
-					if ("name" in a && "value" in a && "name" in b && "value" in b) {
-						return a.name.localeCompare(b.name);
-					}
-					return 0;
-				})
-				.map((source) => {
-					if ("name" in source && "value" in source) {
-						return { label: source.name, value: source.value };
-					}
-					return { label: "", value: "" };
-				}),
-			onSubmit: handleSubmitForm,
-			title: "views.history.forms.choose_source.title",
-			cancelText: "views.history.forms.choose_source.cancel",
-			submitText: "views.history.forms.choose_source.submit",
-			placeholder: "views.history.forms.choose_source.placeholder"
-		}));
+		setForm((prev) => {
+			const currentLocale = locale ?? fallbackLocale;
+			return {
+				...prev,
+				open: true,
+				selectOptions: res.data
+					.sort((a, b) => {
+						if ("locales" in a && "locales" in b) {
+							const aLocale =
+								a.locales[currentLocale as keyof typeof a.locales] ??
+								a.locales[a.default as keyof typeof a.locales];
+							const bLocale =
+								b.locales[currentLocale as keyof typeof b.locales] ??
+								b.locales[b.default as keyof typeof b.locales];
+							return aLocale.localeCompare(bLocale);
+						}
+						return 0;
+					})
+					.map((seisSource) => {
+						if ("locales" in seisSource) {
+							const source =
+								seisSource.locales[
+									currentLocale as keyof typeof seisSource.locales
+								] ??
+								seisSource.locales[
+									seisSource.default as keyof typeof seisSource.locales
+								];
+							return {
+								label: `${getFlagByCountry(seisSource.country)} ${source}`,
+								value: seisSource.id
+							};
+						}
+						return { label: "", value: "" };
+					}),
+				onSubmit: handleSubmitForm,
+				title: "views.history.forms.choose_source.title",
+				cancelText: "views.history.forms.choose_source.cancel",
+				submitText: "views.history.forms.choose_source.submit",
+				placeholder: "views.history.forms.choose_source.placeholder"
+			};
+		});
 	};
 
 	const handleGetShareLink = async () => {
@@ -450,9 +472,6 @@ const History = (props: RouterComponentProps) => {
 			!success
 		);
 	};
-
-	const { locale } = props;
-	const { fallback: fallbackLocale } = i18nConfig;
 
 	return (
 		<>
