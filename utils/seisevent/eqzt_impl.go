@@ -1,0 +1,151 @@
+package seisevent
+
+import (
+	"bytes"
+	"fmt"
+	"io"
+	"regexp"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/anyshake/observer/utils/cache"
+	"github.com/anyshake/observer/utils/request"
+	"github.com/corpix/uarand"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
+)
+
+type EQZT struct {
+	cache cache.BytesCache
+}
+
+func (j *EQZT) GetProperty() DataSourceProperty {
+	return DataSourceProperty{
+		ID:      EQZT_ID,
+		Country: "CN",
+		Deafult: "en-US",
+		Locales: map[string]string{
+			"en-US": "Zhao Tong Seismic Information System",
+			"zh-TW": "昭通市地震資訊系統",
+			"zh-CN": "昭通市地震信息系统",
+		},
+	}
+}
+
+func (j *EQZT) GetEvents(latitude, longitude float64) ([]Event, error) {
+	if j.cache.Valid() {
+		res, err := request.GET(
+			"http://www.eqzt.com/eqzt/seis/view_sbml.php?dzml=sbml",
+			10*time.Second, time.Second, 3, false, nil,
+			map[string]string{"User-Agent": uarand.GetRandom()},
+		)
+		if err != nil {
+			return nil, err
+		}
+		j.cache.Set(res)
+	}
+
+	// Convert GB18030 to UTF-8
+	dataBytes, err := io.ReadAll(transform.NewReader(bytes.NewReader(j.cache.Get()), simplifiedchinese.GB18030.NewDecoder()))
+	if err != nil {
+		return nil, err
+	}
+
+	// Parse EQZT HTML response
+	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(dataBytes))
+	if err != nil {
+		return nil, err
+	}
+
+	var resultArr []Event
+	htmlDoc.Find("table").Each(func(i int, s *goquery.Selection) {
+		if val, ok := s.Attr("align"); !ok || val != "center" {
+			return
+		}
+		s.Find("tr").Each(func(i int, s *goquery.Selection) {
+			if i == 0 {
+				return
+			}
+
+			var seisEvent Event
+			s.Find("td").Each(func(i int, s *goquery.Selection) {
+				if val, ok := s.Attr("colspan"); ok && val == "8" {
+					return
+				}
+				textValue := s.Text()
+				switch i {
+				case 0:
+					seisEvent.Depth = -1
+					seisEvent.Verfied = true
+					seisEvent.Timestamp = j.getTimestamp(textValue)
+				case 1:
+					seisEvent.Latitude = j.getLatitude(textValue)
+				case 2:
+					seisEvent.Longitude = j.getLongitude(textValue)
+				case 4:
+					seisEvent.Magnitude = j.getMagnitude(textValue)
+				case 5:
+					// Remove non-breaking space
+					trimVal := strings.TrimFunc(textValue, func(r rune) bool { return r == ' ' })
+					seisEvent.Region = fmt.Sprintf("云南及周边区域 - %s", trimVal)
+					seisEvent.Event = trimVal
+				}
+			})
+			seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
+			seisEvent.Estimation = getSeismicEstimation(seisEvent.Depth, seisEvent.Distance)
+
+			resultArr = append(resultArr, seisEvent)
+		})
+	})
+
+	return sortSeismicEvents(resultArr), nil
+}
+
+func (j *EQZT) getTimestamp(text string) int64 {
+	t, _ := time.Parse("2006-01-02 15:04:05", text)
+	return t.Add(-8 * time.Hour).UnixMilli()
+}
+
+func (j *EQZT) getLatitude(text string) float64 {
+	text = strings.ReplaceAll(text, "°", " ")
+	text = strings.ReplaceAll(text, "′", "")
+
+	parts := strings.Fields(text)
+	if len(parts) != 2 {
+		return 0.0
+	}
+
+	degrees, err1 := strconv.ParseFloat(parts[0], 64)
+	minutes, err2 := strconv.ParseFloat(parts[1], 64)
+	if err1 != nil || err2 != nil {
+		return 0.0
+	}
+
+	return degrees + minutes/60
+}
+
+func (j *EQZT) getLongitude(text string) float64 {
+	text = strings.ReplaceAll(text, "°", " ")
+	text = strings.ReplaceAll(text, "′", "")
+
+	parts := strings.Fields(text)
+	if len(parts) != 2 {
+		return 0.0
+	}
+
+	degrees, err1 := strconv.ParseFloat(parts[0], 64)
+	minutes, err2 := strconv.ParseFloat(parts[1], 64)
+	if err1 != nil || err2 != nil {
+		return 0.0
+	}
+
+	return degrees + minutes/60
+}
+
+func (j *EQZT) getMagnitude(text string) float64 {
+	re := regexp.MustCompile(`\d+(\.\d+)?`)
+	text = re.FindString(text)
+	return string2Float(text)
+}
