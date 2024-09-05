@@ -2,11 +2,13 @@ package trace
 
 import (
 	"net/http"
+	"time"
 
 	v1 "github.com/anyshake/observer/api/v1"
 	"github.com/anyshake/observer/drivers/explorer"
 	"github.com/anyshake/observer/server/response"
 	"github.com/anyshake/observer/utils/logger"
+	"github.com/anyshake/observer/utils/seisevent"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,22 +20,8 @@ import (
 // @Param source formData string true "Use `show` to get available sources first, then choose one and request again to get events"
 // @Failure 400 {object} response.HttpResponse "Failed to read earthquake event list due to invalid data source"
 // @Failure 500 {object} response.HttpResponse "Failed to read earthquake event list due to failed to read data source"
-// @Success 200 {object} response.HttpResponse{data=[]seismicEvent} "Successfully read the list of earthquake events"
+// @Success 200 {object} response.HttpResponse{data=[]seisevent.Event} "Successfully read the list of earthquake events"
 func (t *Trace) Register(rg *gin.RouterGroup, resolver *v1.Resolver) error {
-	sources := map[string]dataSource{
-		"CWA":      &CWA{},
-		"HKO":      &HKO{},
-		"JMA":      &JMA{},
-		"KMA":      &KMA{},
-		"CEIC":     &CEIC{},
-		"USGS":     &USGS{},
-		"INGV":     &INGV{},
-		"SCEA_E":   &SCEA_E{},
-		"SCEA_B":   &SCEA_B{},
-		"CEA_DASE": &CEA_DASE{},
-		"EQZT":     &EQZT{},
-	}
-
 	var explorerDeps *explorer.ExplorerDependency
 	err := resolver.Dependency.Invoke(func(deps *explorer.ExplorerDependency) error {
 		explorerDeps = deps
@@ -42,6 +30,8 @@ func (t *Trace) Register(rg *gin.RouterGroup, resolver *v1.Resolver) error {
 	if err != nil {
 		return err
 	}
+
+	seisSources := seisevent.New(30 * time.Second)
 
 	rg.POST("/trace", func(c *gin.Context) {
 		var binding traceBinding
@@ -52,21 +42,12 @@ func (t *Trace) Register(rg *gin.RouterGroup, resolver *v1.Resolver) error {
 		}
 
 		if binding.Source == "show" {
-			type availableSources struct {
-				Name  string `json:"name"`
-				Value string `json:"value"`
+			var properties []seisevent.DataSourceProperty
+			for _, source := range seisSources {
+				properties = append(properties, source.GetProperty())
 			}
 
-			var list []availableSources
-			for k, v := range sources {
-				name := v.Property()
-				list = append(list, availableSources{
-					Name:  name,
-					Value: k,
-				})
-			}
-
-			response.Message(c, "Successfully read available data source list", list)
+			response.Message(c, "Successfully read available data source properties", properties)
 			return
 		}
 
@@ -75,19 +56,19 @@ func (t *Trace) Register(rg *gin.RouterGroup, resolver *v1.Resolver) error {
 			return
 		}
 		var (
-			source, ok = sources[binding.Source]
+			source, ok = seisSources[binding.Source]
 			latitude   = explorerDeps.Config.GetLatitude()
 			longitude  = explorerDeps.Config.GetLongitude()
 		)
 		if ok {
-			events, err := source.List(latitude, longitude)
+			events, err := source.GetEvents(latitude, longitude)
 			if err != nil {
 				logger.GetLogger(t.GetApiName()).Errorln(err)
 				response.Error(c, http.StatusInternalServerError)
 				return
 			}
 
-			response.Message(c, "Successfully read the list of earthquake events", sortSeismicEvents(events))
+			response.Message(c, "Successfully read the list of earthquake events", events)
 			return
 		}
 

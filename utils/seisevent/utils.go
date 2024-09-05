@@ -1,11 +1,46 @@
-package trace
+package seisevent
 
 import (
 	"math"
 	"sort"
+	"strconv"
 )
 
-func sortSeismicEvents(events []seismicEvent) []seismicEvent {
+func string2Float(num string) float64 {
+	r, err := strconv.ParseFloat(num, 64)
+	if err != nil {
+		return 0.0
+	}
+
+	return r
+}
+
+func isMapKeysEmpty(m map[string]any, keys []string) bool {
+	for _, key := range keys {
+		switch m[key].(type) {
+		case string:
+			if len(m[key].(string)) == 0 {
+				return false
+			}
+		default:
+			continue
+		}
+	}
+
+	return true
+}
+
+func isMapHasKeys(m map[string]any, keys []string) bool {
+	for _, key := range keys {
+		if _, ok := m[key]; !ok {
+			return false
+		}
+	}
+
+	return true
+}
+
+func sortSeismicEvents(events []Event) []Event {
 	sort.Slice(events, func(i, j int) bool {
 		return events[i].Timestamp > events[j].Timestamp
 	})
@@ -32,7 +67,7 @@ func getDistance(lat1, lat2, lng1, lng2 float64) float64 {
 	return result
 }
 
-func getSeismicEstimation(depth, distance float64) seismicEventEstimation {
+func getSeismicEstimation(depth, distance float64) Estimation {
 	var (
 		INTERCEPT = []float64{8.567052, 7.5333714, 6.667651, 8.562906, 7.877903, 7.191011, 6.5055184}
 		SLOPE     = []float64{0.23335281, 0.23347212, 0.23335606, 0.23335613, 0.23335539, 0.23335367, 0.23335291}
@@ -126,9 +161,9 @@ func getSeismicEstimation(depth, distance float64) seismicEventEstimation {
 		sWave = distance / 3.5
 	)
 	if depth == -1 {
-		return seismicEventEstimation{P: pWave, S: sWave}
+		return Estimation{P_Wave: pWave, S_Wave: sWave}
 	} else if distance <= 0 {
-		return seismicEventEstimation{P: 0, S: 0}
+		return Estimation{P_Wave: 0, S_Wave: 0}
 	}
 
 	i := (int)(depth / 5.0)
@@ -144,11 +179,11 @@ func getSeismicEstimation(depth, distance float64) seismicEventEstimation {
 		length = len(fArr2) - 1
 	)
 	if distance > fArr2[length] {
-		return seismicEventEstimation{P: pWave, S: (SLOPE[i] * distance) + INTERCEPT[i]}
+		return Estimation{P_Wave: pWave, S_Wave: (SLOPE[i] * distance) + INTERCEPT[i]}
 	}
 
 	if math.Abs(distance-fArr2[length]) < 0.0 {
-		return seismicEventEstimation{P: pWave, S: fArr3[len(fArr3)-1]}
+		return Estimation{P_Wave: pWave, S_Wave: fArr3[len(fArr3)-1]}
 	}
 	for i2 < length && distance >= fArr2[i2] {
 		i2++
@@ -158,5 +193,5 @@ func getSeismicEstimation(depth, distance float64) seismicEventEstimation {
 		i3 = i2 - 1
 		i4 = i3 + 1
 	)
-	return seismicEventEstimation{P: pWave, S: fArr3[i3] + ((fArr3[i4] - fArr3[i3]) * ((distance - fArr2[i3]) / (fArr2[i4] - fArr2[i3])))}
+	return Estimation{P_Wave: pWave, S_Wave: fArr3[i3] + ((fArr3[i4] - fArr3[i3]) * ((distance - fArr2[i3]) / (fArr2[i4] - fArr2[i3])))}
 }
