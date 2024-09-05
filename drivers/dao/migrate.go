@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Migrate[T any](dbObj *gorm.DB, tableImpl ITable[T]) error {
+func Migrate(dbObj *gorm.DB, tableImpl Table[any]) error {
 	tableRecord := tableImpl.GetModel()
 	return dbObj.Table(tableImpl.GetName()).AutoMigrate(&tableRecord)
 }

@@ -31,12 +31,16 @@ definitions:
   config.Stream:
     properties:
       channel:
+        maxLength: 3
         type: string
       location:
+        maxLength: 2
         type: string
       network:
+        maxLength: 2
         type: string
       station:
+        maxLength: 5
         type: string
     type: object
   explorer.ExplorerData:

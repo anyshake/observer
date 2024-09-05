@@ -7,10 +7,5 @@ import (
 )
 
 func migrate(databaseConn *gorm.DB) error {
-	err := dao.Migrate(databaseConn, tables.AdcCount{})
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return dao.Migrate(databaseConn, &tables.AdcCount{})
 }

@@ -6,7 +6,7 @@ import (
 )
 
 type AdcCount struct {
-	dao.BaseModel
+	dao.BaseTable
 	Timestamp  int64            `gorm:"column:timestamp;index;not null;unique"`
 	Z_Axis     array.Int32Array `gorm:"column:z_axis;type:text"`
 	E_Axis     array.Int32Array `gorm:"column:e_axis;type:text"`
@@ -14,8 +14,8 @@ type AdcCount struct {
 	SampleRate int              `gorm:"column:sample_rate;not null"`
 }
 
-func (t AdcCount) GetModel() AdcCount {
-	return AdcCount{}
+func (t AdcCount) GetModel() any {
+	return t
 }
 
 func (t AdcCount) GetName() string {

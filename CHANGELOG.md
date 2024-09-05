@@ -2,6 +2,20 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.2.3
+
+### CI/CD Changes
+
+- Deprecated `.env` file based versioning in frontend, use `craco.config.js` to generate version info.
+- Support Multi-platform Docker image build.
+- Build and release more easily with GitHub Actions.
+- Some Dockerfile optimizations to reduce image size.
+
+### Bug Fixes
+
+- Fixed time offset in EQZT data source
+- Fixed Windows 7 compatibility issue.
+
 ## v3.2.2
 
 ### New Features

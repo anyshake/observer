@@ -339,16 +339,20 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "channel": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 3
                 },
                 "location": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 2
                 },
                 "network": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 2
                 },
                 "station": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 5
                 }
             }
         },

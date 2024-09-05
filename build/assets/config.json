@@ -14,7 +14,7 @@
     "explorer_settings": {
         "dsn": "transport:///dev/ttyUSB0?baudrate=115200",
         "engine": "serial",
-        "legacy": false
+        "legacy": true
     },
     "sensor_settings": {
         "frequency": 4.5,

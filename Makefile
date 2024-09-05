@@ -1,65 +1,54 @@
-.PHONY: build all clean gen docs version run windows
+.PHONY: build digest clean run gen
 
 BINARY=observer
-COMMIT=$(shell git rev-parse --short HEAD)
-VERSION=$(shell cat ./VERSION)
-BUILD_TIME=$(shell date +%s%3N)
+ifeq (${GOOS}, windows)
+    BINARY := $(BINARY).exe
+endif
 
 SRC_DIR=./cmd
 DIST_DIR=./build/dist
 ASSETS_DIR=./build/assets
+LICENSE_PATH=./LICENSE
 
-BUILD_ARCH=arm arm64 386 amd64 ppc64le riscv64 \
-	mips mips64le mipsle loong64 s390x
-BUILD_FLAGS=-s -w -X main.version=$(VERSION) \
-	-X main.tag=$(COMMIT)-$(BUILD_TIME)
-BUILD_ARGS=-trimpath
+COMMIT=$(shell git rev-parse --short HEAD)
+VERSION=$(shell cat ./VERSION)
+
+BUILD_FLAGS=-s -w -X main.version=$(VERSION) -X main.tag=$(COMMIT)-$(shell date +%s)
+BUILD_ARGS=-v -trimpath
 
 build: clean
-	@echo "Building $(BINARY) ..."
+	@echo "[Info] Building project, output file path: $(DIST_DIR)/$(BINARY)"
 	@mkdir -p $(DIST_DIR)
-	@go build -ldflags="$(BUILD_FLAGS)" $(BUILD_ARGS) -o $(DIST_DIR)/$(BINARY) $(SRC_DIR)/*.go
+	CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} GOARM=${GOARM} GOMIPS=${GOMIPS} \
+		go build -ldflags="$(BUILD_FLAGS)" $(BUILD_ARGS) -o $(DIST_DIR)/$(BINARY) $(SRC_DIR)/*.go
 	@cp -r $(ASSETS_DIR) $(DIST_DIR)
+	@cp $(LICENSE_PATH) $(DIST_DIR)
+	@echo "[Info] Build completed."
 
-all: clean windows $(BUILD_ARCH)
-$(BUILD_ARCH):
-	@echo "Building Linux $@ ..."
-	@mkdir -p $(DIST_DIR)/$@
-	@rm -rf $(DIST_DIR)/$@/*
-	@CGO_ENABLED=0 GOOS=linux GOARCH=$@ go build -ldflags="$(BUILD_FLAGS)" \
-		$(BUILD_ARGS) -o $(DIST_DIR)/$@/$(BINARY) $(SRC_DIR)/*.go
-	@cp -r $(ASSETS_DIR) $(DIST_DIR)/$@
+digest:
+ifneq ($(wildcard $(DIST_DIR)/$(BINARY)),)
+	@openssl dgst -md5 $(DIST_DIR)/$(BINARY)* | awk '{print "MD5=" $$2}'
+	@openssl dgst -sha1 $(DIST_DIR)/$(BINARY)* | awk '{print "SHA1=" $$2}'
+	@openssl dgst -sha256 $(DIST_DIR)/$(BINARY)* | awk '{print "SHA2-256=" $$2}'
+	@openssl dgst -sha512 $(DIST_DIR)/$(BINARY)* | awk '{print "SHA2-512=" $$2}'
+else
+	@echo "[Error] Binary $(DIST_DIR)/$(BINARY) not found, please build first."
+	@exit 1
+endif
 
-windows:
-	@echo "Building Windows 32-bit, 64-bit, arm, arm64 ..."
-	@mkdir -p $(DIST_DIR)/win32 $(DIST_DIR)/win64 $(DIST_DIR)/winarm $(DIST_DIR)/winarm64
-	@rm -rf $(DIST_DIR)/win32/* $(DIST_DIR)/win64/* $(DIST_DIR)/winarm/* $(DIST_DIR)/winarm64/*
-	@CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -ldflags="$(BUILD_FLAGS)" \
-		$(BUILD_ARGS) -o $(DIST_DIR)/win32/$(BINARY).exe $(SRC_DIR)/*.go
-	@CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="$(BUILD_FLAGS)" \
-		$(BUILD_ARGS) -o $(DIST_DIR)/win64/$(BINARY).exe $(SRC_DIR)/*.go
-	@CGO_ENABLED=0 GOOS=windows GOARCH=arm go build -ldflags="$(BUILD_FLAGS)" \
-		$(BUILD_ARGS) -o $(DIST_DIR)/winarm/$(BINARY).exe $(SRC_DIR)/*.go
-	@CGO_ENABLED=0 GOOS=windows GOARCH=arm64 go build -ldflags="$(BUILD_FLAGS)" \
-		$(BUILD_ARGS) -o $(DIST_DIR)/winarm64/$(BINARY).exe $(SRC_DIR)/*.go
-	@cp -r $(ASSETS_DIR) $(DIST_DIR)/win32
-	@cp -r $(ASSETS_DIR) $(DIST_DIR)/win64
-	@cp -r $(ASSETS_DIR) $(DIST_DIR)/winarm
-	@cp -r $(ASSETS_DIR) $(DIST_DIR)/winarm64
+run:
+	@echo "[Info] Running project..."
+	go run $(SRC_DIR)/*.go --config $(ASSETS_DIR)/config.json
+
+clean:
+	@echo "[Warn] Cleaning up project..."
+	@rm -rf $(DIST_DIR)/*
 
 gen:
 ifeq ($(shell command -v gqlgen 2> /dev/null),)
-	@echo "Installing gqlgen..."
+	@echo "[Info] Installing gqlgen..."
 	@go get github.com/99designs/gqlgen
 	@go install github.com/99designs/gqlgen
 endif
+	@echo "[Info] Generating GraphQL code..."
 	@gqlgen generate
-
-version:
-	@go run $(SRC_DIR)/*.go --version
-
-run:
-	@go run $(SRC_DIR)/*.go --config $(ASSETS_DIR)/config.json
-
-clean:
-	@rm -rf $(DIST_DIR)/*

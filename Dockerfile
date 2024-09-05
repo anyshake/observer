@@ -1,10 +1,18 @@
-FROM node:alpine AS frontend
+FROM alpine:latest AS frontend
+# Uncomment the following line to use a mirror of APT repository
+# ENV APK_SOURCE_HOST="mirrors.bfsu.edu.cn"
 # Uncomment the following line to use a mirror of npm registry
-# ENV NPM_REGISTRY="https://registry.npmmirror.com"
+# ENV NPM_REGISTRY_HOST="registry.npmmirror.com"
 COPY . /build_src
 WORKDIR /build_src/frontend/src
 RUN if [ ! -d "../dist" ]; then \
-    npm config set registry $NPM_REGISTRY \
+    if [ "x${APK_SOURCE_HOST}" != "x" ]; then \
+    sed -i "s/dl-cdn.alpinelinux.org/$APK_SOURCE_HOST/g" /etc/apk/repositories; \
+    fi \
+    && apk add --update --no-cache nodejs npm \
+    && if [ "x${NPM_REGISTRY_HOST}" != "x" ]; then \
+    npm config set registry https://$NPM_REGISTRY_HOST; \
+    fi \
     && npm config set loglevel=http \
     && npm install \
     && npm run build; \

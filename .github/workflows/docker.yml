@@ -8,10 +8,11 @@ on:
 
 env:
     REGISTRY: ghcr.io
-    IMAGE: anyshake/observer
+    ORGANIZATION: anyshake
+    PACKAGE: observer
 
 jobs:
-    build_docker_images:
+    build_docker_image:
         runs-on: ubuntu-latest
 
         permissions:
@@ -19,24 +20,28 @@ jobs:
             contents: read
 
         strategy:
-            fail-fast: false
             matrix:
                 platform:
+                    - linux/386
                     - linux/amd64
                     - linux/arm/v6
                     - linux/arm/v7
                     - linux/arm64
+                    - linux/ppc64le
+                    - linux/riscv64
+                    - linux/s390x
+            fail-fast: false
 
         steps:
-            - name: Set up Node.js version
-              uses: actions/setup-node@v3
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
               with:
                   node-version: "18.14.0"
 
             - name: Checkout source code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
               with:
-                  fetch-depth: 0
+                  fetch-depth: 1
 
             - name: Build frontend
               working-directory: frontend/src
@@ -48,18 +53,22 @@ jobs:
               run: |
                   platform=${{ matrix.platform }}
                   echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
+                  echo "BUILD_PLATFORMS=${{ strategy.job-total }}" >> $GITHUB_ENV
 
             - name: Docker meta
               id: meta
               uses: docker/metadata-action@v5
               with:
-                  images: ${{ env.REGISTRY }}/${{ env.IMAGE }}
+                  images: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.PACKAGE }}
 
             - name: Set up QEMU
               uses: docker/setup-qemu-action@v3
 
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v3
+              with:
+                  version: latest
+                  driver-opts: "image=moby/buildkit:v0.10.5"
 
             - name: Login to Registry
               uses: docker/login-action@v3
@@ -75,7 +84,7 @@ jobs:
                   context: .
                   platforms: ${{ matrix.platform }}
                   labels: ${{ steps.meta.outputs.labels }}
-                  outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
+                  outputs: type=image,name=${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.PACKAGE }},push-by-digest=true,name-canonical=true,push=true
 
             - name: Export digest
               run: |
@@ -99,7 +108,7 @@ jobs:
             contents: read
 
         needs:
-            - build_docker_images
+            - build_docker_image
         steps:
             - name: Download digests
               uses: actions/download-artifact@v4
@@ -115,7 +124,7 @@ jobs:
               id: meta
               uses: docker/metadata-action@v5
               with:
-                  images: ${{ env.REGISTRY }}/${{ env.IMAGE }}
+                  images: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.PACKAGE }}
 
             - name: Login to Registry
               uses: docker/login-action@v3
@@ -128,8 +137,16 @@ jobs:
               working-directory: /tmp/digests
               run: |
                   docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-                    $(printf '${{ env.REGISTRY }}/${{ env.IMAGE }}@sha256:%s ' *)
+                    $(printf '${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.PACKAGE }}@sha256:%s ' *)
 
             - name: Inspect image
               run: |
-                  docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ steps.meta.outputs.version }}
+                  docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.PACKAGE }}:${{ steps.meta.outputs.version }}
+
+            - name: Remove untagged images
+              uses: actions/delete-package-versions@v5
+              with:
+                  package-name: ${{ env.PACKAGE }}
+                  package-type: "container"
+                  delete-only-untagged-versions: "true"
+                  min-versions-to-keep: ${{ env.BUILD_PLATFORMS }}

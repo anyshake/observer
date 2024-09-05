@@ -1,0 +1,266 @@
+{
+    "android_arm64_v8a": {
+        "toolchain": "stable",
+        "goos": "android",
+        "goarch": "arm64",
+        "goarm": "",
+        "gomips": "",
+        "name": "android-arm64-v8a"
+    },
+    "darwin_amd64": {
+        "toolchain": "stable",
+        "goos": "darwin",
+        "goarch": "amd64",
+        "goarm": "",
+        "gomips": "",
+        "name": "darwin-amd64"
+    },
+    "darwin_arm64_v8a": {
+        "toolchain": "stable",
+        "goos": "darwin",
+        "goarch": "arm64",
+        "goarm": "",
+        "gomips": "",
+        "name": "darwin-arm64-v8a"
+    },
+    "freebsd_386": {
+        "toolchain": "stable",
+        "goos": "freebsd",
+        "goarch": "386",
+        "goarm": "",
+        "gomips": "",
+        "name": "freebsd-386"
+    },
+    "freebsd_amd64": {
+        "toolchain": "stable",
+        "goos": "freebsd",
+        "goarch": "amd64",
+        "goarm": "",
+        "gomips": "",
+        "name": "freebsd-amd64"
+    },
+    "freebsd_arm32_v6": {
+        "toolchain": "stable",
+        "goos": "freebsd",
+        "goarch": "arm",
+        "goarm": "6",
+        "gomips": "",
+        "name": "freebsd-arm32-v6"
+    },
+    "freebsd_arm32_v7a": {
+        "toolchain": "stable",
+        "goos": "freebsd",
+        "goarch": "arm",
+        "goarm": "7",
+        "gomips": "",
+        "name": "freebsd-arm32-v7a"
+    },
+    "freebsd_arm64_v8a": {
+        "toolchain": "stable",
+        "goos": "freebsd",
+        "goarch": "arm64",
+        "goarm": "",
+        "gomips": "",
+        "name": "freebsd-arm64-v8a"
+    },
+    "freebsd_riscv64": {
+        "toolchain": "stable",
+        "goos": "freebsd",
+        "goarch": "riscv64",
+        "goarm": "",
+        "gomips": "",
+        "name": "freebsd-riscv64"
+    },
+    "linux_386": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "386",
+        "goarm": "",
+        "gomips": "",
+        "name": "linux-386"
+    },
+    "linux_amd64": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "amd64",
+        "goarm": "",
+        "gomips": "",
+        "name": "linux-amd64"
+    },
+    "linux_arm32_v6": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "arm",
+        "goarm": "6",
+        "gomips": "",
+        "name": "linux-arm32-v6"
+    },
+    "linux_arm32_v7a": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "arm",
+        "goarm": "7",
+        "gomips": "",
+        "name": "linux-arm32-v7a"
+    },
+    "linux_arm64_v8a": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "arm64",
+        "goarm": "",
+        "gomips": "",
+        "name": "linux-arm64-v8a"
+    },
+    "linux_loong64": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "loong64",
+        "goarm": "",
+        "gomips": "",
+        "name": "linux-loong64"
+    },
+    "linux_mips": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "mips",
+        "goarm": "",
+        "gomips": "hardfloat",
+        "name": "linux-mips"
+    },
+    "linux_mips_softfloat": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "mips",
+        "goarm": "",
+        "gomips": "softfloat",
+        "name": "linux-mips-softfloat"
+    },
+    "linux_mips64": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "mips64",
+        "goarm": "",
+        "gomips": "hardfloat",
+        "name": "linux-mips64"
+    },
+    "linux_mips64_softfloat": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "mips64",
+        "goarm": "",
+        "gomips": "softfloat",
+        "name": "linux-mips64-softfloat"
+    },
+    "linux_mips64le": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "mips64le",
+        "goarm": "",
+        "gomips": "hardfloat",
+        "name": "linux-mips64le"
+    },
+    "linux_mips64le_softfloat": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "mips64le",
+        "goarm": "",
+        "gomips": "softfloat",
+        "name": "linux-mips64le-softfloat"
+    },
+    "linux_mipsle": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "mipsle",
+        "goarm": "",
+        "gomips": "hardfloat",
+        "name": "linux-mipsle"
+    },
+    "linux_mipsle_softfloat": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "mipsle",
+        "goarm": "",
+        "gomips": "softfloat",
+        "name": "linux-mipsle-softfloat"
+    },
+    "linux_ppc64": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "ppc64",
+        "goarm": "",
+        "gomips": "",
+        "name": "linux-ppc64"
+    },
+    "linux_ppc64le": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "ppc64le",
+        "goarm": "",
+        "gomips": "",
+        "name": "linux-ppc64le"
+    },
+    "linux_riscv64": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "riscv64",
+        "goarm": "",
+        "gomips": "",
+        "name": "linux-riscv64"
+    },
+    "linux_s390x": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "s390x",
+        "goarm": "",
+        "gomips": "",
+        "name": "linux-s390x"
+    },
+    "windows_386": {
+        "toolchain": "stable",
+        "goos": "windows",
+        "goarch": "386",
+        "goarm": "",
+        "gomips": "",
+        "name": "windows-386"
+    },
+    "windows_amd64": {
+        "toolchain": "stable",
+        "goos": "windows",
+        "goarch": "amd64",
+        "goarm": "",
+        "gomips": "",
+        "name": "windows-amd64"
+    },
+    "windows_arm32_v7a": {
+        "toolchain": "stable",
+        "goos": "windows",
+        "goarch": "arm",
+        "goarm": "7",
+        "gomips": "",
+        "name": "windows-arm32-v7a"
+    },
+    "windows_arm64_v8a": {
+        "toolchain": "stable",
+        "goos": "windows",
+        "goarch": "arm64",
+        "goarm": "",
+        "gomips": "",
+        "name": "windows-arm64-v8a"
+    },
+    "windows7_386": {
+        "toolchain": "1.20",
+        "goos": "windows",
+        "goarch": "386",
+        "goarm": "",
+        "gomips": "",
+        "name": "windows7-386"
+    },
+    "windows7_amd64": {
+        "toolchain": "1.20",
+        "goos": "windows",
+        "goarch": "amd64",
+        "goarm": "",
+        "gomips": "",
+        "name": "windows7-amd64"
+    }
+}
