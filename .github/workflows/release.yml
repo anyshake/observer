@@ -50,18 +50,6 @@ jobs:
               with:
                   fetch-depth: 1
 
-            - name: Build API documentation
-              working-directory: docs
-              run: |
-                  make
-                  tar -zcf ../api_docs.tar.gz *
-
-            - name: Upload build artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                  name: api-docs
-                  path: api_docs.tar.gz
-
     build_release:
         runs-on: ubuntu-latest
 
@@ -116,21 +104,6 @@ jobs:
               with:
                   fetch-depth: 1
 
-            - name: Set up workflow env
-              run: |
-                  TOOLCHAIN=$(jq ".[\"${{ matrix.target_id }}\"].toolchain" -r < .github/build/database.json)
-                  echo "TOOLCHAIN=$TOOLCHAIN" >> $GITHUB_ENV
-                  GOOS=$(jq ".[\"${{ matrix.target_id }}\"].goos" -r < .github/build/database.json)
-                  echo "GOOS=$GOOS" >> $GITHUB_ENV
-                  GOARCH=$(jq ".[\"${{ matrix.target_id }}\"].goarch" -r < .github/build/database.json)
-                  echo "GOARCH=$GOARCH" >> $GITHUB_ENV
-                  GOARM=$(jq ".[\"${{ matrix.target_id }}\"].goarm" -r < .github/build/database.json)
-                  echo "GOARM=$GOARM" >> $GITHUB_ENV
-                  GOMIPS=$(jq ".[\"${{ matrix.target_id }}\"].gomips" -r < .github/build/database.json)
-                  echo "GOMIPS=$GOMIPS" >> $GITHUB_ENV
-                  RELEASE_NAME=$(jq ".[\"${{ matrix.target_id }}\"].name" -r < .github/build/database.json)
-                  echo "RELEASE_NAME=$RELEASE_NAME" >> $GITHUB_ENV
-
             - name: Set up Golang
               uses: actions/setup-go@v5
               with:
@@ -150,17 +123,24 @@ jobs:
                   tar -zxf frontend_dist.tar.gz
                   rm -f frontend_dist.tar.gz
 
-            - name: Download documentation artifacts
-              uses: actions/download-artifact@v4
-              with:
-                  name: api-docs
-                  path: docs
-
-            - name: Extract documentation artifacts
-              working-directory: docs
+            - name: Build API documentation
               run: |
-                  tar -zxf api_docs.tar.gz
-                  rm -f api_docs.tar.gz
+                  make docs
+
+            - name: Set up workflow env
+              run: |
+                  TOOLCHAIN=$(jq ".[\"${{ matrix.target_id }}\"].toolchain" -r < .github/build/database.json)
+                  echo "TOOLCHAIN=$TOOLCHAIN" >> $GITHUB_ENV
+                  GOOS=$(jq ".[\"${{ matrix.target_id }}\"].goos" -r < .github/build/database.json)
+                  echo "GOOS=$GOOS" >> $GITHUB_ENV
+                  GOARCH=$(jq ".[\"${{ matrix.target_id }}\"].goarch" -r < .github/build/database.json)
+                  echo "GOARCH=$GOARCH" >> $GITHUB_ENV
+                  GOARM=$(jq ".[\"${{ matrix.target_id }}\"].goarm" -r < .github/build/database.json)
+                  echo "GOARM=$GOARM" >> $GITHUB_ENV
+                  GOMIPS=$(jq ".[\"${{ matrix.target_id }}\"].gomips" -r < .github/build/database.json)
+                  echo "GOMIPS=$GOMIPS" >> $GITHUB_ENV
+                  RELEASE_NAME=$(jq ".[\"${{ matrix.target_id }}\"].name" -r < .github/build/database.json)
+                  echo "RELEASE_NAME=$RELEASE_NAME" >> $GITHUB_ENV
 
             - name: Build core application
               run: |

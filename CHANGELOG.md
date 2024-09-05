@@ -2,6 +2,19 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.2.4
+
+### CI/CD Changes
+
+- Merge API docs Makefile into the main Makefile.
+- Add support for OpenBSD builds.
+
+### New Features
+
+- Add SQLite support on all architectures.
+- Provide i18n support for earthquake event data source.
+- Show flags next to earthquake data sources.
+
 ## v3.2.3
 
 ### CI/CD Changes

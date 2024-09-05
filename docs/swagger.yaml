@@ -87,6 +87,36 @@ definitions:
       time:
         type: string
     type: object
+  seisevent.Estimation:
+    properties:
+      p:
+        type: number
+      s:
+        type: number
+    type: object
+  seisevent.Event:
+    properties:
+      depth:
+        type: number
+      distance:
+        type: number
+      estimation:
+        $ref: '#/definitions/seisevent.Estimation'
+      event:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      magnitude:
+        type: number
+      region:
+        type: string
+      timestamp:
+        type: integer
+      verfied:
+        type: boolean
+    type: object
   station.cpuInfo:
     properties:
       model:
@@ -168,36 +198,6 @@ definitions:
         $ref: '#/definitions/config.Station'
       stream:
         $ref: '#/definitions/config.Stream'
-    type: object
-  trace.seismicEvent:
-    properties:
-      depth:
-        type: number
-      distance:
-        type: number
-      estimation:
-        $ref: '#/definitions/trace.seismicEventEstimation'
-      event:
-        type: string
-      latitude:
-        type: number
-      longitude:
-        type: number
-      magnitude:
-        type: number
-      region:
-        type: string
-      timestamp:
-        type: integer
-      verfied:
-        type: boolean
-    type: object
-  trace.seismicEventEstimation:
-    properties:
-      p:
-        type: number
-      s:
-        type: number
     type: object
 info:
   contact: {}
@@ -375,7 +375,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/trace.seismicEvent'
+                    $ref: '#/definitions/seisevent.Event'
                   type: array
               type: object
         "400":
