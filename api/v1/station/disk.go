@@ -3,7 +3,7 @@ package station
 import (
 	"os"
 
-	"github.com/shirou/gopsutil/disk"
+	"github.com/shirou/gopsutil/v4/disk"
 )
 
 func (d *diskInfo) get() error {

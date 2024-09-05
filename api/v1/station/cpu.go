@@ -1,7 +1,7 @@
 package station
 
 import (
-	"github.com/shirou/gopsutil/cpu"
+	"github.com/shirou/gopsutil/v4/cpu"
 )
 
 func (c *cpuInfo) get() error {

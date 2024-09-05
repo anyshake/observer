@@ -1,4 +1,4 @@
-package dao
+package sqlserver
 
 import (
 	"fmt"
@@ -9,13 +9,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-type _SQLServer struct{}
-
-func (s *_SQLServer) match(engine string) bool {
-	return engine == "sqlserver" || engine == "mssql"
-}
-
-func (s *_SQLServer) open(host string, port int, username, password, database string, timeout time.Duration) (*gorm.DB, error) {
+func (s *SQLServer) Open(host string, port int, username, password, database string, timeout time.Duration) (*gorm.DB, error) {
 	dsn := fmt.Sprintf(
 		"sqlserver://%s:%s@%s:%d?database=%s",
 		username, password, host, port, database,
