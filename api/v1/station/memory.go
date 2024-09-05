@@ -1,6 +1,6 @@
 package station
 
-import "github.com/shirou/gopsutil/mem"
+import "github.com/shirou/gopsutil/v4/mem"
 
 func (m *memoryInfo) get() error {
 	vmStat, err := mem.VirtualMemory()
