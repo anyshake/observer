@@ -1,4 +1,4 @@
-.PHONY: build digest clean run gen
+.PHONY: build digest clean run docs gen
 
 BINARY=observer
 ifeq (${GOOS}, windows)
@@ -43,6 +43,14 @@ run:
 clean:
 	@echo "[Warn] Cleaning up project..."
 	@rm -rf $(DIST_DIR)/*
+
+docs:
+ifeq ($(shell command -v swag 2> /dev/null),)
+	@echo "Installing Swagger..."
+	@go get github.com/swaggo/swag/cmd/swag
+	@go install github.com/swaggo/swag/cmd/swag
+endif
+	@swag init -d ./ -o ./docs -g ./cmd/main.go
 
 gen:
 ifeq ($(shell command -v gqlgen 2> /dev/null),)

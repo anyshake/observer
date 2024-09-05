@@ -23,10 +23,10 @@ FROM golang:alpine AS builder
 # ENV GOPROXY="https://goproxy.cn,direct"
 COPY . /build_src
 COPY --from=frontend /build_src/frontend/dist /build_src/frontend/dist
-WORKDIR /build_src/docs
+WORKDIR /build_src
 RUN go get -v github.com/swaggo/swag/cmd/swag \
     && go install -v github.com/swaggo/swag/cmd/swag \
-    && swag init -g ../cmd/main.go -d ../api,../config,../drivers/explorer,../server -o ./
+    && swag init -d ./ -o ./docs -g ./cmd/main.go
 WORKDIR /build_src/cmd
 RUN CGO_ENABLED=0 go build -ldflags "-s -w -X main.version=$(cat ../VERSION) -X main.tag=dockerbuild" \
     -v -trimpath \

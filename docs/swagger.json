@@ -259,7 +259,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/trace.seismicEvent"
+                                                "$ref": "#/definitions/seisevent.Event"
                                             }
                                         }
                                     }
@@ -415,6 +415,52 @@
                 }
             }
         },
+        "seisevent.Estimation": {
+            "type": "object",
+            "properties": {
+                "p": {
+                    "type": "number"
+                },
+                "s": {
+                    "type": "number"
+                }
+            }
+        },
+        "seisevent.Event": {
+            "type": "object",
+            "properties": {
+                "depth": {
+                    "type": "number"
+                },
+                "distance": {
+                    "type": "number"
+                },
+                "estimation": {
+                    "$ref": "#/definitions/seisevent.Estimation"
+                },
+                "event": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "magnitude": {
+                    "type": "number"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "integer"
+                },
+                "verfied": {
+                    "type": "boolean"
+                }
+            }
+        },
         "station.cpuInfo": {
             "type": "object",
             "properties": {
@@ -538,52 +584,6 @@
                 },
                 "stream": {
                     "$ref": "#/definitions/config.Stream"
-                }
-            }
-        },
-        "trace.seismicEvent": {
-            "type": "object",
-            "properties": {
-                "depth": {
-                    "type": "number"
-                },
-                "distance": {
-                    "type": "number"
-                },
-                "estimation": {
-                    "$ref": "#/definitions/trace.seismicEventEstimation"
-                },
-                "event": {
-                    "type": "string"
-                },
-                "latitude": {
-                    "type": "number"
-                },
-                "longitude": {
-                    "type": "number"
-                },
-                "magnitude": {
-                    "type": "number"
-                },
-                "region": {
-                    "type": "string"
-                },
-                "timestamp": {
-                    "type": "integer"
-                },
-                "verfied": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "trace.seismicEventEstimation": {
-            "type": "object",
-            "properties": {
-                "p": {
-                    "type": "number"
-                },
-                "s": {
-                    "type": "number"
                 }
             }
         }
