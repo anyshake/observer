@@ -11,27 +11,27 @@ import (
 	"github.com/corpix/uarand"
 )
 
-type INGV struct {
+type EMSC struct {
 	cache cache.BytesCache
 }
 
-func (c *INGV) GetProperty() DataSourceProperty {
+func (c *EMSC) GetProperty() DataSourceProperty {
 	return DataSourceProperty{
-		ID:      INGV_ID,
-		Country: "IT",
+		ID:      EMSC_ID,
+		Country: "EU",
 		Deafult: "en-US",
 		Locales: map[string]string{
-			"en-US": "National Institute of Geophysics and Volcanology",
-			"zh-TW": "國立地球物理與火山學研究所",
-			"zh-CN": "国立地球物理与火山学研究所",
+			"en-US": "European-Mediterranean Seismological Centre",
+			"zh-TW": "歐洲與地中海地震中心",
+			"zh-CN": "欧洲与地中海地震中心",
 		},
 	}
 }
 
-func (c *INGV) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (c *EMSC) GetEvents(latitude, longitude float64) ([]Event, error) {
 	if c.cache.Valid() {
 		res, err := request.GET(
-			"https://webservices.ingv.it/fdsnws/event/1/query?minmag=-1&format=text&timezone=UTC&limit=100",
+			"https://www.seismicportal.eu/fdsnws/event/1/query?minmag=-1&format=text&limit=100",
 			10*time.Second, time.Second, 3, false, nil,
 			map[string]string{"User-Agent": uarand.GetRandom()},
 		)
@@ -41,7 +41,7 @@ func (c *INGV) GetEvents(latitude, longitude float64) ([]Event, error) {
 		c.cache.Set(res)
 	}
 
-	// Parse INGV CSV response
+	// Parse EMSC CSV response
 	csvDataStr := strings.ReplaceAll(string(c.cache.Get()), ",", " - ")
 	csvDataStr = strings.ReplaceAll(csvDataStr, "|", ",")
 	csvRecords, err := csv.NewReader(strings.NewReader(csvDataStr)).ReadAll()
@@ -80,12 +80,12 @@ func (c *INGV) GetEvents(latitude, longitude float64) ([]Event, error) {
 	return sortSeismicEvents(resultArr), nil
 }
 
-func (c *INGV) getTimestamp(data string) int64 {
-	t, _ := time.Parse("2006-01-02T15:04:05.000000", data)
+func (c *EMSC) getTimestamp(data string) int64 {
+	t, _ := time.Parse("2006-01-02T15:04:05Z", data)
 	return t.UnixMilli()
 }
 
-func (c *INGV) getMagnitude(data string) float64 {
+func (c *EMSC) getMagnitude(data string) float64 {
 	m, err := strconv.ParseFloat(data, 64)
 	if err == nil {
 		return m
@@ -94,7 +94,7 @@ func (c *INGV) getMagnitude(data string) float64 {
 	return 0
 }
 
-func (c *INGV) getDepth(data string) float64 {
+func (c *EMSC) getDepth(data string) float64 {
 	d, err := strconv.ParseFloat(data, 64)
 	if err == nil {
 		return d
@@ -103,7 +103,7 @@ func (c *INGV) getDepth(data string) float64 {
 	return 0
 }
 
-func (c *INGV) getLatitude(data string) float64 {
+func (c *EMSC) getLatitude(data string) float64 {
 	lat, err := strconv.ParseFloat(data, 64)
 	if err == nil {
 		return lat
@@ -112,7 +112,7 @@ func (c *INGV) getLatitude(data string) float64 {
 	return 0
 }
 
-func (c *INGV) getLongitude(data string) float64 {
+func (c *EMSC) getLongitude(data string) float64 {
 	lng, err := strconv.ParseFloat(data, 64)
 	if err == nil {
 		return lng
