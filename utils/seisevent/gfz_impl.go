@@ -11,27 +11,27 @@ import (
 	"github.com/corpix/uarand"
 )
 
-type INGV struct {
+type GFZ struct {
 	cache cache.BytesCache
 }
 
-func (c *INGV) GetProperty() DataSourceProperty {
+func (c *GFZ) GetProperty() DataSourceProperty {
 	return DataSourceProperty{
-		ID:      INGV_ID,
-		Country: "IT",
+		ID:      GFZ_ID,
+		Country: "DE",
 		Deafult: "en-US",
 		Locales: map[string]string{
-			"en-US": "National Institute of Geophysics and Volcanology",
-			"zh-TW": "國立地球物理與火山學研究所",
-			"zh-CN": "国立地球物理与火山学研究所",
+			"en-US": "GFZ German Research Centre",
+			"zh-TW": "亥姆霍茲德國地理研究中心",
+			"zh-CN": "德国亥姆霍兹地球科学研究中心",
 		},
 	}
 }
 
-func (c *INGV) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (c *GFZ) GetEvents(latitude, longitude float64) ([]Event, error) {
 	if c.cache.Valid() {
 		res, err := request.GET(
-			"https://webservices.ingv.it/fdsnws/event/1/query?minmag=-1&format=text&timezone=UTC&limit=100",
+			"https://geofon.gfz-potsdam.de/fdsnws/event/1/query?minmag=-1&format=text&limit=100",
 			10*time.Second, time.Second, 3, false, nil,
 			map[string]string{"User-Agent": uarand.GetRandom()},
 		)
@@ -41,7 +41,7 @@ func (c *INGV) GetEvents(latitude, longitude float64) ([]Event, error) {
 		c.cache.Set(res)
 	}
 
-	// Parse INGV CSV response
+	// Parse GFZ CSV response
 	csvDataStr := strings.ReplaceAll(string(c.cache.Get()), ",", " - ")
 	csvDataStr = strings.ReplaceAll(csvDataStr, "|", ",")
 	csvRecords, err := csv.NewReader(strings.NewReader(csvDataStr)).ReadAll()
@@ -80,12 +80,12 @@ func (c *INGV) GetEvents(latitude, longitude float64) ([]Event, error) {
 	return sortSeismicEvents(resultArr), nil
 }
 
-func (c *INGV) getTimestamp(data string) int64 {
-	t, _ := time.Parse("2006-01-02T15:04:05.000000", data)
+func (c *GFZ) getTimestamp(data string) int64 {
+	t, _ := time.Parse("2006-01-02T15:04:05.99", data)
 	return t.UnixMilli()
 }
 
-func (c *INGV) getMagnitude(data string) float64 {
+func (c *GFZ) getMagnitude(data string) float64 {
 	m, err := strconv.ParseFloat(data, 64)
 	if err == nil {
 		return m
@@ -94,7 +94,7 @@ func (c *INGV) getMagnitude(data string) float64 {
 	return 0
 }
 
-func (c *INGV) getDepth(data string) float64 {
+func (c *GFZ) getDepth(data string) float64 {
 	d, err := strconv.ParseFloat(data, 64)
 	if err == nil {
 		return d
@@ -103,7 +103,7 @@ func (c *INGV) getDepth(data string) float64 {
 	return 0
 }
 
-func (c *INGV) getLatitude(data string) float64 {
+func (c *GFZ) getLatitude(data string) float64 {
 	lat, err := strconv.ParseFloat(data, 64)
 	if err == nil {
 		return lat
@@ -112,7 +112,7 @@ func (c *INGV) getLatitude(data string) float64 {
 	return 0
 }
 
-func (c *INGV) getLongitude(data string) float64 {
+func (c *GFZ) getLongitude(data string) float64 {
 	lng, err := strconv.ParseFloat(data, 64)
 	if err == nil {
 		return lng

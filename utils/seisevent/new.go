@@ -18,6 +18,8 @@ const (
 	SCEA_B_ID   = "scea_b"
 	CEA_DASE_ID = "cea_dase"
 	EQZT_ID     = "eqzt"
+	EMSC_ID     = "emsc"
+	GFZ_ID      = "gfz"
 )
 
 func New(cacheTTL time.Duration) map[string]DataSource {
@@ -33,5 +35,7 @@ func New(cacheTTL time.Duration) map[string]DataSource {
 		SCEA_B_ID:   &SCEA_B{cache: cache.New(cacheTTL)},
 		CEA_DASE_ID: &CEA_DASE{cache: cache.New(cacheTTL)},
 		EQZT_ID:     &EQZT{cache: cache.New(cacheTTL)},
+		EMSC_ID:     &EMSC{cache: cache.New(cacheTTL)},
+		GFZ_ID:      &GFZ{cache: cache.New(cacheTTL)},
 	}
 }
