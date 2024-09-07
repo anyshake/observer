@@ -16,6 +16,8 @@ import (
 	"github.com/corpix/uarand"
 )
 
+const CWA_ID = "cwa"
+
 type CWA struct {
 	cache cache.BytesCache
 }
@@ -35,7 +37,7 @@ func (c *CWA) GetProperty() DataSourceProperty {
 		Country: "TW",
 		Deafult: "en-US",
 		Locales: map[string]string{
-			"en-US": "Central Weather Administration (CWA)",
+			"en-US": "Central Weather Administration",
 			"zh-TW": "交通部中央氣象署",
 			"zh-CN": "交通部中央气象署",
 		},
@@ -43,7 +45,7 @@ func (c *CWA) GetProperty() DataSourceProperty {
 }
 
 func (c *CWA) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if c.cache.Valid() {
+	if !c.cache.Valid() {
 		res, err := request.GET(
 			"https://www.cwa.gov.tw/V8/C/E/MOD/MAP_LIST.html",
 			10*time.Second, time.Second, 3, false,
@@ -72,14 +74,18 @@ func (c *CWA) GetEvents(latitude, longitude float64) ([]Event, error) {
 		if !ok {
 			return
 		}
+		eventName, ok := s.Attr("data-name")
+		if !ok {
+			return
+		}
 
 		textValue := s.Text()
 		seisEvent := Event{
 			Verfied:   true,
+			Event:     eventName,
 			Latitude:  string2Float(eventLatitude),
 			Longitude: string2Float(eventLongitude),
 			Depth:     c.getDepth(textValue),
-			Event:     c.getEvent(textValue),
 			Region:    c.getRegion(textValue),
 			Magnitude: c.getMagnitude(textValue),
 			Timestamp: c.getTimestamp(textValue),
@@ -110,51 +116,43 @@ func (c *CWA) getDepth(data string) float64 {
 	return string2Float(result)
 }
 
-func (c *CWA) getMagnitude(data string) float64 {
+func (c *CWA) getMagnitude(data string) []Magnitude {
 	exp := regexp.MustCompile(`模\d+(\.\d{1,})|([1-9]\d*)$`)
 	if exp == nil {
-		return -1
+		return []Magnitude{}
 	}
 
 	r := exp.FindAllStringSubmatch(data, -1)
 	if len(r) == 0 || len(r[0]) == 0 {
-		return -1
+		return []Magnitude{}
 	}
 
-	zh := regexp.MustCompile("[\u4e00-\u9fa5]+")
-	result := zh.ReplaceAllString(r[0][0], "")
-	return string2Float(result)
-}
-
-func (c *CWA) getEvent(data string) string {
-	exp := regexp.MustCompile(`地點為.+方\d+(\.\d{1,}公里)|([1-9]\d*公里)`)
-	if exp == nil {
-		return "未知地震"
-	}
-
-	r := exp.FindAllStringSubmatch(data, -1)
-	if len(r) == 0 || len(r[0]) == 0 {
-		return "未知地震"
-	}
-
-	result := strings.Replace(r[0][0], "地點為", "", -1)
-	return result
+	magnitude := string2Float(regexp.MustCompile("[\u4e00-\u9fa5]+").ReplaceAllString(r[0][0], ""))
+	return []Magnitude{{Type: ParseMagnitude("ml"), Value: magnitude}}
 }
 
 func (c *CWA) getRegion(data string) string {
 	exp := regexp.MustCompile(`\(位於.+\)`)
 	if exp == nil {
-		return "未知地点"
+		return "未知地區"
 	}
-
 	r := exp.FindAllStringSubmatch(data, -1)
 	if len(r) == 0 || len(r[0]) == 0 {
-		return "未知地点"
+		return "未知地區"
 	}
+	region := regexp.MustCompile(`\(|\)|位於`).ReplaceAllString(r[0][0], "")
 
-	zh := regexp.MustCompile(`\(|\)|位於`)
-	result := zh.ReplaceAllString(r[0][0], "")
-	return result
+	exp = regexp.MustCompile(`地點為.+方\d+(\.\d{1,}公里)|([1-9]\d*公里)`)
+	if exp == nil {
+		return "未知地點"
+	}
+	r = exp.FindAllStringSubmatch(data, -1)
+	if len(r) == 0 || len(r[0]) == 0 {
+		return "未知地點"
+	}
+	location := strings.Replace(r[0][0], "地點為", "", -1)
+
+	return fmt.Sprintf("%s - %s", region, location)
 }
 
 func (c *CWA) getTimestamp(data string) int64 {

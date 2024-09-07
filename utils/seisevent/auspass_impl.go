@@ -8,30 +8,30 @@ import (
 	"github.com/corpix/uarand"
 )
 
-const GFZ_ID = "gfz"
+const AUSPASS_ID = "auspass"
 
-type GFZ struct {
+type AUSPASS struct {
 	cache cache.BytesCache
 }
 
-func (c *GFZ) GetProperty() DataSourceProperty {
+func (c *AUSPASS) GetProperty() DataSourceProperty {
 	return DataSourceProperty{
-		ID:      GFZ_ID,
-		Country: "DE",
+		ID:      AUSPASS_ID,
+		Country: "AU",
 		Deafult: "en-US",
 		Locales: map[string]string{
-			"en-US": "GFZ German Research Centre",
-			"zh-TW": "亥姆霍茲德國地理研究中心",
-			"zh-CN": "德国亥姆霍兹地球科学研究中心",
+			"en-US": "Australian Passive Seismic Server",
+			"zh-TW": "澳洲國立大學地球科學研究學院",
+			"zh-CN": "澳洲国立大学地球科学研究学院",
 		},
 	}
 }
 
-func (c *GFZ) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (c *AUSPASS) GetEvents(latitude, longitude float64) ([]Event, error) {
 	if !c.cache.Valid() {
 		res, err := request.GET(
-			"https://geofon.gfz-potsdam.de/fdsnws/event/1/query?minmag=-1&format=text&limit=300&orderby=time",
-			30*time.Second, time.Second, 3, false, nil,
+			"https://auspass.edu.au/fdsnws/event/1/query?minmag=-1&format=text&limit=300&orderby=time",
+			60*time.Second, time.Second, 3, false, nil,
 			map[string]string{"User-Agent": uarand.GetRandom()},
 		)
 		if err != nil {

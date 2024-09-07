@@ -8,29 +8,29 @@ import (
 	"github.com/corpix/uarand"
 )
 
-const GFZ_ID = "gfz"
+const SED_ID = "eida"
 
-type GFZ struct {
+type SED struct {
 	cache cache.BytesCache
 }
 
-func (c *GFZ) GetProperty() DataSourceProperty {
+func (c *SED) GetProperty() DataSourceProperty {
 	return DataSourceProperty{
-		ID:      GFZ_ID,
-		Country: "DE",
+		ID:      SED_ID,
+		Country: "CH",
 		Deafult: "en-US",
 		Locales: map[string]string{
-			"en-US": "GFZ German Research Centre",
-			"zh-TW": "亥姆霍茲德國地理研究中心",
-			"zh-CN": "德国亥姆霍兹地球科学研究中心",
+			"en-US": "Swiss Seismological Service",
+			"zh-TW": "瑞士地震局",
+			"zh-CN": "瑞士地震局",
 		},
 	}
 }
 
-func (c *GFZ) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (c *SED) GetEvents(latitude, longitude float64) ([]Event, error) {
 	if !c.cache.Valid() {
 		res, err := request.GET(
-			"https://geofon.gfz-potsdam.de/fdsnws/event/1/query?minmag=-1&format=text&limit=300&orderby=time",
+			"http://arclink.ethz.ch/fdsnws/event/1/query?minmag=-1&format=text&limit=300&orderby=time",
 			30*time.Second, time.Second, 3, false, nil,
 			map[string]string{"User-Agent": uarand.GetRandom()},
 		)

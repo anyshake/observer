@@ -10,29 +10,29 @@ import (
 	"github.com/corpix/uarand"
 )
 
-const USGS_ID = "usgs"
+const GEONET_ID = "geonet"
 
-type USGS struct {
+type GEONET struct {
 	cache cache.BytesCache
 }
 
-func (u *USGS) GetProperty() DataSourceProperty {
+func (u *GEONET) GetProperty() DataSourceProperty {
 	return DataSourceProperty{
-		ID:      USGS_ID,
-		Country: "US",
+		ID:      GEONET_ID,
+		Country: "NZ",
 		Deafult: "en-US",
 		Locales: map[string]string{
-			"en-US": "United States Geological Survey",
-			"zh-TW": "美國地質調查局",
-			"zh-CN": "美国地质调查局",
+			"en-US": "The GeoNet Project",
+			"zh-TW": "GeoNet 計畫",
+			"zh-CN": "GeoNet 计划",
 		},
 	}
 }
 
-func (u *USGS) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (u *GEONET) GetEvents(latitude, longitude float64) ([]Event, error) {
 	if !u.cache.Valid() {
 		res, err := request.GET(
-			"https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson",
+			"https://api.geonet.org.nz/quake?MMI=1",
 			10*time.Second, time.Second, 3, false, nil,
 			map[string]string{"User-Agent": uarand.GetRandom()},
 		)
@@ -42,7 +42,7 @@ func (u *USGS) GetEvents(latitude, longitude float64) ([]Event, error) {
 		u.cache.Set(res)
 	}
 
-	// Parse USGS JSON response
+	// Parse GEONET JSON response
 	var dataMap map[string]any
 	err := json.Unmarshal(u.cache.Get(), &dataMap)
 	if err != nil {
@@ -55,8 +55,8 @@ func (u *USGS) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	// Ensure the response has the expected keys and values
-	expectedKeysInDataMap := []string{"properties", "geometry", "id"}
-	expectedKeysInProperties := []string{"mag", "place", "time", "type", "title", "status", "magType"}
+	expectedKeysInDataMap := []string{"properties", "geometry"}
+	expectedKeysInProperties := []string{"publicID", "time", "depth", "magnitude", "locality"}
 	expectedKeysInGeometry := []string{"coordinates"}
 
 	var resultArr []Event
@@ -74,22 +74,19 @@ func (u *USGS) GetEvents(latitude, longitude float64) ([]Event, error) {
 		}
 
 		coordinates := geometry.(map[string]any)["coordinates"]
-		if properties.(map[string]any)["type"].(string) != "earthquake" || len(coordinates.([]any)) != 3 {
+		if len(coordinates.([]any)) != 2 {
 			continue
 		}
 
 		seisEvent := Event{
-			Depth:     coordinates.([]any)[2].(float64),
-			Verfied:   properties.(map[string]any)["status"].(string) == "reviewed",
-			Timestamp: int64(properties.(map[string]any)["time"].(float64)),
-			Event:     event.(map[string]any)["id"].(string),
-			Region:    properties.(map[string]any)["place"].(string),
+			Verfied:   true,
 			Latitude:  coordinates.([]any)[1].(float64),
 			Longitude: coordinates.([]any)[0].(float64),
-			Magnitude: u.getMagnitude(
-				properties.(map[string]any)["magType"].(string),
-				properties.(map[string]any)["mag"].(float64),
-			),
+			Depth:     properties.(map[string]any)["depth"].(float64),
+			Event:     properties.(map[string]any)["publicID"].(string),
+			Region:    properties.(map[string]any)["locality"].(string),
+			Magnitude: u.getMagnitude(properties.(map[string]any)["magnitude"].(float64)),
+			Timestamp: u.getTimestamp(properties.(map[string]any)["time"].(string)),
 		}
 		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
 		seisEvent.Estimation = getSeismicEstimation(seisEvent.Depth, seisEvent.Distance)
@@ -100,6 +97,11 @@ func (u *USGS) GetEvents(latitude, longitude float64) ([]Event, error) {
 	return sortSeismicEvents(resultArr), nil
 }
 
-func (u *USGS) getMagnitude(magType string, data float64) []Magnitude {
-	return []Magnitude{{Type: ParseMagnitude(magType), Value: data}}
+func (u *GEONET) getTimestamp(data string) int64 {
+	t, _ := time.Parse("2006-01-02T15:04:05.000Z", data)
+	return t.UnixMilli()
+}
+
+func (u *GEONET) getMagnitude(data float64) []Magnitude {
+	return []Magnitude{{Type: ParseMagnitude("M"), Value: data}}
 }

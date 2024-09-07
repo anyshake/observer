@@ -14,10 +14,15 @@
             "latitude": 0,
             "longitude": 0,
             "distance": 0,
-            "magnitude": 0,
+            "magnitude": [
+                {
+                    "type": "Mb",
+                    "value": 1
+                }
+            ],
             "estimation": {
-                "p": 0,
-                "s": 0
+                "p_wave": 0,
+                "s_wave": 0
             }
         }
     ]
