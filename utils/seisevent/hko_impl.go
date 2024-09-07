@@ -12,6 +12,8 @@ import (
 	"github.com/sbabiv/xml2map"
 )
 
+const HKO_ID = "hko"
+
 type HKO struct {
 	cache cache.BytesCache
 }
@@ -30,7 +32,7 @@ func (h *HKO) GetProperty() DataSourceProperty {
 }
 
 func (h *HKO) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if h.cache.Valid() {
+	if !h.cache.Valid() {
 		res, err := request.GET(
 			"https://www.hko.gov.hk/gts/QEM/eq_app-30d_uc.xml",
 			10*time.Second, time.Second, 3, false, nil,
@@ -53,7 +55,7 @@ func (h *HKO) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	// Ensure the response has the expected keys
-	expectedKeys := []string{"Verify", "HKTDate", "HKTTime", "City", "Region", "Lat", "Lon", "Mag"}
+	expectedKeys := []string{"EventId", "Verify", "HKTDate", "HKTTime", "City", "Region", "Lat", "Lon", "Mag"}
 
 	var resultArr []Event
 	for _, v := range dataMapEvents.([]map[string]any) {
@@ -69,12 +71,12 @@ func (h *HKO) GetEvents(latitude, longitude float64) ([]Event, error) {
 		seisEvent := Event{
 			Depth:     -1,
 			Timestamp: timestamp,
-			Event:     v["City"].(string),
+			Event:     v["EventId"].(string),
 			Verfied:   v["Verify"].(string) == "Y",
-			Region:    v["Region"].(string),
+			Region:    fmt.Sprintf("%s - %s", v["City"].(string), v["Region"].(string)),
 			Latitude:  string2Float(v["Lat"].(string)),
 			Longitude: string2Float(v["Lon"].(string)),
-			Magnitude: string2Float(v["Mag"].(string)),
+			Magnitude: h.getMagnitude(v["Mag"].(string)),
 		}
 		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
 		seisEvent.Estimation = getSeismicEstimation(seisEvent.Depth, seisEvent.Distance)
@@ -92,4 +94,10 @@ func (h *HKO) getTimestamp(timeStr string) (int64, error) {
 	}
 
 	return t.Add(-8 * time.Hour).UnixMilli(), nil
+}
+
+func (h *HKO) getMagnitude(data string) []Magnitude {
+	return []Magnitude{
+		{Type: ParseMagnitude("M"), Value: string2Float(data)},
+	}
 }

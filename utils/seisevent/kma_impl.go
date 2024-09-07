@@ -12,6 +12,8 @@ import (
 	"github.com/corpix/uarand"
 )
 
+const KMA_ID = "kma"
+
 type KMA struct {
 	cache cache.BytesCache
 }
@@ -30,7 +32,7 @@ func (k *KMA) GetProperty() DataSourceProperty {
 }
 
 func (k *KMA) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if k.cache.Valid() {
+	if !k.cache.Valid() {
 		res, err := request.GET(
 			"https://www.weather.go.kr/w/eqk-vol/search/korea.do",
 			10*time.Second, time.Second, 3, false, nil,
@@ -89,9 +91,9 @@ func (k *KMA) getTimestamp(data string) int64 {
 	return t.Add(-9 * time.Hour).UnixMilli()
 }
 
-func (k *KMA) getMagnitude(data string) float64 {
+func (k *KMA) getMagnitude(data string) []Magnitude {
 	m, _ := strconv.ParseFloat(data, 64)
-	return m
+	return []Magnitude{{Type: ParseMagnitude("ML"), Value: m}}
 }
 
 func (k *KMA) getDepth(data string) float64 {

@@ -17,6 +17,8 @@ import (
 	"golang.org/x/text/transform"
 )
 
+const EQZT_ID = "eqzt"
+
 type EQZT struct {
 	cache cache.BytesCache
 }
@@ -35,7 +37,7 @@ func (j *EQZT) GetProperty() DataSourceProperty {
 }
 
 func (j *EQZT) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if j.cache.Valid() {
+	if !j.cache.Valid() {
 		res, err := request.GET(
 			"http://www.eqzt.com/eqzt/seis/view_sbml.php?dzml=sbml",
 			10*time.Second, time.Second, 3, false, nil,
@@ -65,7 +67,7 @@ func (j *EQZT) GetEvents(latitude, longitude float64) ([]Event, error) {
 			return
 		}
 		s.Find("tr").Each(func(i int, s *goquery.Selection) {
-			if i == 0 {
+			if i < 2 || i > 16 {
 				return
 			}
 
@@ -79,18 +81,20 @@ func (j *EQZT) GetEvents(latitude, longitude float64) ([]Event, error) {
 				case 0:
 					seisEvent.Depth = -1
 					seisEvent.Verfied = true
+					seisEvent.Event = fmt.Sprintf("No. %d", len(resultArr)+1)
 					seisEvent.Timestamp = j.getTimestamp(textValue)
 				case 1:
 					seisEvent.Latitude = j.getLatitude(textValue)
 				case 2:
 					seisEvent.Longitude = j.getLongitude(textValue)
+				case 3:
+					seisEvent.Magnitude = append(seisEvent.Magnitude, j.getMagnitude("ML", textValue))
 				case 4:
-					seisEvent.Magnitude = j.getMagnitude(textValue)
+					seisEvent.Magnitude = append(seisEvent.Magnitude, j.getMagnitude("M", textValue))
 				case 5:
 					// Remove non-breaking space
 					trimVal := strings.TrimFunc(textValue, func(r rune) bool { return r == ' ' })
-					seisEvent.Region = fmt.Sprintf("云南及周边区域 - %s", trimVal)
-					seisEvent.Event = trimVal
+					seisEvent.Region = trimVal
 				}
 			})
 			seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
@@ -144,8 +148,11 @@ func (j *EQZT) getLongitude(text string) float64 {
 	return degrees + minutes/60
 }
 
-func (j *EQZT) getMagnitude(text string) float64 {
+func (j *EQZT) getMagnitude(magType, text string) Magnitude {
 	re := regexp.MustCompile(`\d+(\.\d+)?`)
 	text = re.FindString(text)
-	return string2Float(text)
+	return Magnitude{
+		Type:  ParseMagnitude(magType),
+		Value: string2Float(text),
+	}
 }

@@ -132,7 +132,7 @@
             "selects": {
                 "choose_event": {
                     "title": "選擇一個地震事件",
-                    "template": "[M{{ magnitude }}] {{ event }}\n震發時間 {{ time }}\n震央深度 {{ depth }} 公里\n震央距离 {{ distance }} 公里\nP 波到站 {{ p_wave }} 秒\nS 波到站 {{ s_wave }} 秒"
+                    "template": "震發時間 {{ time }}\n震央深度 {{ depth }} 公里\n震央距离 {{ distance }} 公里\nP 波到站 {{ p_wave }} 秒\nS 波到站 {{ s_wave }} 秒"
                 }
             },
             "forms": {

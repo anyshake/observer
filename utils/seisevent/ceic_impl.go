@@ -9,6 +9,8 @@ import (
 	"github.com/corpix/uarand"
 )
 
+const CEIC_ID = "ceic"
+
 type CEIC struct {
 	cache cache.BytesCache
 }
@@ -27,7 +29,7 @@ func (c *CEIC) GetProperty() DataSourceProperty {
 }
 
 func (c *CEIC) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if c.cache.Valid() {
+	if !c.cache.Valid() {
 		res, err := request.GET(
 			"https://news.ceic.ac.cn/ajax/google",
 			10*time.Second, time.Second, 3, false, nil,
@@ -47,7 +49,7 @@ func (c *CEIC) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	// Ensure the response has the expected keys and they are not empty
-	expectedKeys := []string{"CATA_ID", "O_TIME", "EPI_LAT", "EPI_LON", "EPI_DEPTH", "M", "LOCATION_C"}
+	expectedKeys := []string{"CATA_ID", "O_TIME", "EPI_LAT", "EPI_LON", "EPI_DEPTH", "M", "M_MS", "LOCATION_C"}
 
 	var resultArr []Event
 	for _, v := range responseMap {
@@ -68,8 +70,16 @@ func (c *CEIC) GetEvents(latitude, longitude float64) ([]Event, error) {
 			Region:    v["LOCATION_C"].(string),
 			Latitude:  string2Float(v["EPI_LAT"].(string)),
 			Longitude: string2Float(v["EPI_LON"].(string)),
-			Magnitude: string2Float(v["M"].(string)),
 		}
+
+		if v["M_MS"].(string) != "0" {
+			seisEvent.Magnitude = append(seisEvent.Magnitude, c.getMagnitude("MS", v["M_MS"].(string)))
+		} else if v["M"].(string) != "0" {
+			seisEvent.Magnitude = append(seisEvent.Magnitude, c.getMagnitude("M", v["M"].(string)))
+		} else {
+			continue
+		}
+
 		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
 		seisEvent.Estimation = getSeismicEstimation(seisEvent.Depth, seisEvent.Distance)
 
@@ -97,4 +107,9 @@ func (c *CEIC) getDepth(depth any) float64 {
 	}
 
 	return -1
+}
+
+func (c *CEIC) getMagnitude(magType, data string) Magnitude {
+	return Magnitude{Type: ParseMagnitude(magType), Value: string2Float(data)}
+
 }

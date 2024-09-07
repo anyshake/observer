@@ -375,27 +375,26 @@ const History = (props: RouterComponentProps) => {
 
 			const handleSelectEvent = (value: string) => {
 				setSelect((prev) => ({ ...prev, open: false }));
-				const [start_time, end_time] = value.split("|").map(Number);
+				const { start_time, end_time } = JSON.parse(value);
 				setQueryDuration({ start_time, end_time });
 				sendUserAlert(t("views.history.toasts.event_select_success"));
 			};
 
 			const eventList = res.data.map(
-				({ distance, magnitude, region, event, timestamp, depth, estimation }) => [
-					region,
-					`${Math.round(timestamp + estimation.p * 1000 - duration * 500)}|${Math.round(
-						timestamp + estimation.s * 1000 + duration * 500
-					)}`,
+				({ distance, magnitude, region, timestamp, depth, estimation }) => [
+					`[${magnitude.map((m) => `${m.type} ${m.value.toFixed(1)}`).join(", ")}] ${region}`,
+					JSON.stringify({
+						start_time: Math.round(
+							timestamp + estimation.p_wave * 1000 - duration * 500
+						),
+						end_time: Math.round(timestamp + estimation.s_wave * 1000 + duration * 500)
+					}),
 					t("views.history.selects.choose_event.template", {
-						event,
 						time: getTimeString(timestamp),
-						magnitude: magnitude.toFixed(1),
 						distance: distance.toFixed(1),
-						// eslint-disable-next-line camelcase
-						p_wave: estimation.p.toFixed(1),
-						// eslint-disable-next-line camelcase
-						s_wave: estimation.s.toFixed(1),
-						depth: depth !== -1 ? depth.toFixed(1) : "-"
+						p_wave: estimation.p_wave.toFixed(1),
+						s_wave: estimation.s_wave.toFixed(1),
+						depth: depth !== -1 ? depth.toFixed(1) : "?"
 					})
 				]
 			);
@@ -416,14 +415,17 @@ const History = (props: RouterComponentProps) => {
 				open: true,
 				selectOptions: res.data
 					.sort((a, b) => {
-						if ("locales" in a && "locales" in b) {
-							const aLocale =
-								a.locales[currentLocale as keyof typeof a.locales] ??
-								a.locales[a.default as keyof typeof a.locales];
-							const bLocale =
-								b.locales[currentLocale as keyof typeof b.locales] ??
-								b.locales[b.default as keyof typeof b.locales];
-							return aLocale.localeCompare(bLocale);
+						if ("country" in a && "country" in b) {
+							if (a.country === b.country) {
+								const aLocale =
+									a.locales[currentLocale as keyof typeof a.locales] ??
+									a.locales[a.default as keyof typeof a.locales];
+								const bLocale =
+									b.locales[currentLocale as keyof typeof b.locales] ??
+									b.locales[b.default as keyof typeof b.locales];
+								return aLocale.localeCompare(bLocale);
+							}
+							return a.country.localeCompare(b.country);
 						}
 						return 0;
 					})

@@ -13,13 +13,15 @@ import (
 	"github.com/corpix/uarand"
 )
 
-type CEA_DASE struct {
+const CEA_ID = "cea"
+
+type CEA struct {
 	cache cache.BytesCache
 }
 
-func (c *CEA_DASE) GetProperty() DataSourceProperty {
+func (c *CEA) GetProperty() DataSourceProperty {
 	return DataSourceProperty{
-		ID:      CEA_DASE_ID,
+		ID:      CEA_ID,
 		Country: "FR",
 		Deafult: "en-US",
 		Locales: map[string]string{
@@ -30,8 +32,8 @@ func (c *CEA_DASE) GetProperty() DataSourceProperty {
 	}
 }
 
-func (c *CEA_DASE) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if c.cache.Valid() {
+func (c *CEA) GetEvents(latitude, longitude float64) ([]Event, error) {
+	if !c.cache.Valid() {
 		res, err := request.GET(
 			"https://www-dase.cea.fr/evenement/derniers_evenements.php",
 			10*time.Second, time.Second, 3, false, nil,
@@ -84,22 +86,25 @@ func (c *CEA_DASE) GetEvents(latitude, longitude float64) ([]Event, error) {
 	return sortSeismicEvents(resultArr), nil
 }
 
-func (c *CEA_DASE) getTimestamp(data string) int64 {
+func (c *CEA) getTimestamp(data string) int64 {
 	t, _ := time.Parse("02/01/2006 15:04:05", data)
 	return t.UnixMilli()
 }
 
-func (c *CEA_DASE) getMagnitude(data string) float64 {
+func (c *CEA) getMagnitude(data string) []Magnitude {
 	m := strings.Split(data, "=")
 	if len(m) > 1 {
-		magnitude, _ := strconv.ParseFloat(m[1], 64)
-		return magnitude
+		magnitudeType := MagnitudeType(strings.ToUpper(m[0]))
+		magnitudeVal, _ := strconv.ParseFloat(m[1], 64)
+		return []Magnitude{
+			{Type: magnitudeType, Value: magnitudeVal},
+		}
 	}
 
-	return 0
+	return []Magnitude{}
 }
 
-func (c *CEA_DASE) getLatitude(data string) float64 {
+func (c *CEA) getLatitude(data string) float64 {
 	pos := strings.Split(data, ",")
 	if len(pos) > 1 {
 		latitude, _ := strconv.ParseFloat(pos[0], 64)
@@ -109,7 +114,7 @@ func (c *CEA_DASE) getLatitude(data string) float64 {
 	return 0
 }
 
-func (c *CEA_DASE) getLongitude(data string) float64 {
+func (c *CEA) getLongitude(data string) float64 {
 	pos := strings.Split(data, ",")
 	if len(pos) > 1 {
 		longitude, _ := strconv.ParseFloat(pos[1], 64)

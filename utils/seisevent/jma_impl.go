@@ -10,6 +10,8 @@ import (
 	"github.com/corpix/uarand"
 )
 
+const JMA_ID = "jma"
+
 type JMA struct {
 	cache cache.BytesCache
 }
@@ -28,7 +30,7 @@ func (j *JMA) GetProperty() DataSourceProperty {
 }
 
 func (j *JMA) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if j.cache.Valid() {
+	if !j.cache.Valid() {
 		res, err := request.GET(
 			"https://www.jma.go.jp/bosai/quake/data/list.json",
 			10*time.Second, time.Second, 3, false, nil,
@@ -48,7 +50,7 @@ func (j *JMA) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	// Ensure the response has the expected keys and values
-	expectedKeys := []string{"anm", "mag", "cod", "at"}
+	expectedKeys := []string{"eid", "anm", "mag", "cod", "at"}
 
 	var resultArr []Event
 	for _, event := range dataMapEvents {
@@ -65,11 +67,11 @@ func (j *JMA) GetEvents(latitude, longitude float64) ([]Event, error) {
 			Verfied:   true,
 			Timestamp: timestamp,
 			Depth:     j.getDepth(event["cod"].(string)),
-			Event:     event["anm"].(string),
+			Event:     event["eid"].(string),
 			Region:    event["anm"].(string),
 			Latitude:  j.getLatitude(event["cod"].(string)),
 			Longitude: j.getLongitude(event["cod"].(string)),
-			Magnitude: string2Float(event["mag"].(string)),
+			Magnitude: j.getMagnitude(event["mag"].(string)),
 		}
 		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
 		seisEvent.Estimation = getSeismicEstimation(seisEvent.Depth, seisEvent.Distance)
@@ -120,4 +122,8 @@ func (j *JMA) getLongitude(data string) float64 {
 	}
 
 	return string2Float(arr[1])
+}
+
+func (j *JMA) getMagnitude(data string) []Magnitude {
+	return []Magnitude{{Type: ParseMagnitude("M"), Value: string2Float(data)}}
 }

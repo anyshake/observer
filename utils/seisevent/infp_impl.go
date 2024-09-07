@@ -8,29 +8,29 @@ import (
 	"github.com/corpix/uarand"
 )
 
-const GFZ_ID = "gfz"
+const INFP_ID = "infp"
 
-type GFZ struct {
+type INFP struct {
 	cache cache.BytesCache
 }
 
-func (c *GFZ) GetProperty() DataSourceProperty {
+func (c *INFP) GetProperty() DataSourceProperty {
 	return DataSourceProperty{
-		ID:      GFZ_ID,
-		Country: "DE",
+		ID:      INFP_ID,
+		Country: "RO",
 		Deafult: "en-US",
 		Locales: map[string]string{
-			"en-US": "GFZ German Research Centre",
-			"zh-TW": "亥姆霍茲德國地理研究中心",
-			"zh-CN": "德国亥姆霍兹地球科学研究中心",
+			"en-US": "National Institute for Earth Physics",
+			"zh-TW": "國家地球物理研究所",
+			"zh-CN": "国家地球物理研究所",
 		},
 	}
 }
 
-func (c *GFZ) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (c *INFP) GetEvents(latitude, longitude float64) ([]Event, error) {
 	if !c.cache.Valid() {
 		res, err := request.GET(
-			"https://geofon.gfz-potsdam.de/fdsnws/event/1/query?minmag=-1&format=text&limit=300&orderby=time",
+			"https://eida-sc3.infp.ro/fdsnws/event/1/query?minmag=-1&format=text&limit=300&orderby=time",
 			30*time.Second, time.Second, 3, false, nil,
 			map[string]string{"User-Agent": uarand.GetRandom()},
 		)

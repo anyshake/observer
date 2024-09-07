@@ -8,29 +8,29 @@ import (
 	"github.com/corpix/uarand"
 )
 
-const GFZ_ID = "gfz"
+const KNMI_ID = "knmi"
 
-type GFZ struct {
+type KNMI struct {
 	cache cache.BytesCache
 }
 
-func (c *GFZ) GetProperty() DataSourceProperty {
+func (c *KNMI) GetProperty() DataSourceProperty {
 	return DataSourceProperty{
-		ID:      GFZ_ID,
-		Country: "DE",
+		ID:      KNMI_ID,
+		Country: "NL",
 		Deafult: "en-US",
 		Locales: map[string]string{
-			"en-US": "GFZ German Research Centre",
-			"zh-TW": "亥姆霍茲德國地理研究中心",
-			"zh-CN": "德国亥姆霍兹地球科学研究中心",
+			"en-US": "Royal Netherlands Meteorological Institute",
+			"zh-TW": "荷蘭皇家氣象研究所",
+			"zh-CN": "荷兰皇家气象研究所",
 		},
 	}
 }
 
-func (c *GFZ) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (c *KNMI) GetEvents(latitude, longitude float64) ([]Event, error) {
 	if !c.cache.Valid() {
 		res, err := request.GET(
-			"https://geofon.gfz-potsdam.de/fdsnws/event/1/query?minmag=-1&format=text&limit=300&orderby=time",
+			"https://rdsa.knmi.nl/fdsnws/event/1/query?minmag=-1&format=text&limit=300&orderby=time",
 			30*time.Second, time.Second, 3, false, nil,
 			map[string]string{"User-Agent": uarand.GetRandom()},
 		)

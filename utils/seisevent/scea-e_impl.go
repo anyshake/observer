@@ -11,6 +11,8 @@ import (
 	"github.com/corpix/uarand"
 )
 
+const SCEA_E_ID = "scea_e"
+
 type SCEA_E struct {
 	cache cache.BytesCache
 }
@@ -22,14 +24,14 @@ func (s *SCEA_E) GetProperty() DataSourceProperty {
 		Deafult: "en-US",
 		Locales: map[string]string{
 			"en-US": "Sichuan Earthquake Administration (Early Warning)",
-			"zh-TW": "四川地震局（预警）",
+			"zh-TW": "四川地震局（預警）",
 			"zh-CN": "四川地震局（预警）",
 		},
 	}
 }
 
 func (s *SCEA_E) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if s.cache.Valid() {
+	if !s.cache.Valid() {
 		res, err := request.GET(
 			"http://118.113.105.29:8002/api/earlywarning/jsonPageList?pageSize=100",
 			10*time.Second, time.Second, 3, false, nil,
@@ -74,7 +76,7 @@ func (s *SCEA_E) GetEvents(latitude, longitude float64) ([]Event, error) {
 			Region:    event.(map[string]any)["placeName"].(string),
 			Latitude:  event.(map[string]any)["latitude"].(float64),
 			Longitude: event.(map[string]any)["longitude"].(float64),
-			Magnitude: event.(map[string]any)["magnitude"].(float64),
+			Magnitude: s.getMagnitude(event.(map[string]any)["magnitude"].(float64)),
 			Timestamp: time.UnixMilli(int64(event.(map[string]any)["shockTime"].(float64))).UnixMilli(),
 		}
 		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
@@ -84,4 +86,8 @@ func (s *SCEA_E) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	return sortSeismicEvents(resultArr), nil
+}
+
+func (s *SCEA_E) getMagnitude(data float64) []Magnitude {
+	return []Magnitude{{Type: ParseMagnitude("M"), Value: data}}
 }

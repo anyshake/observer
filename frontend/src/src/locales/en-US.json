@@ -120,7 +120,7 @@
             "selects": {
                 "choose_event": {
                     "title": "Select an Earthquake Event",
-                    "template": "[M{{ magnitude }}] {{ event }}\nTime: {{ time }}\nDepth: {{ depth }} km\nDistance: {{ distance }} km\nEstimated P-Wave Arrival: {{ p_wave }} sec\nEstimated S-Wave Arrival: {{ s_wave }} sec"
+                    "template": "Time: {{ time }}\nDepth: {{ depth }} km\nDistance: {{ distance }} km\nEstimated P-Wave Arrival: {{ p_wave }} sec\nEstimated S-Wave Arrival: {{ s_wave }} sec"
                 }
             },
             "forms": {
