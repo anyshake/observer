@@ -1,0 +1,5 @@
+scalar Int64
+
+type Query {
+    ping: String
+}

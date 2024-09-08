@@ -1,0 +1,243 @@
+name: Build and release
+
+on:
+    workflow_dispatch:
+    push:
+        tags:
+            - "*"
+
+jobs:
+    build_frontend:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "18.14.0"
+
+            - name: Checkout source code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 1
+
+            - name: Build frontend
+              working-directory: frontend/src
+              run: |
+                  npm install
+                  npm run build
+                  tar -zcf ../frontend_dist.tar.gz ../dist
+
+            - name: Upload build artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: frontend-dist
+                  path: frontend/frontend_dist.tar.gz
+
+    build_api_docs:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Set up Golang
+              uses: actions/setup-go@v5
+              with:
+                  cache: false
+                  go-version: stable
+                  check-latest: true
+
+            - name: Checkout source code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 1
+
+    build_release:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                target_id:
+                    - android_arm64_v8a
+                    - darwin_amd64
+                    - darwin_arm64_v8a
+                    - freebsd_386
+                    - freebsd_amd64
+                    - freebsd_arm32_v6
+                    - freebsd_arm32_v7a
+                    - freebsd_arm64_v8a
+                    - linux_386
+                    - linux_amd64
+                    - linux_arm32_v6
+                    - linux_arm32_v7a
+                    - linux_arm64_v8a
+                    - linux_loong64
+                    - linux_mips
+                    - linux_mips_softfloat
+                    - linux_mips64
+                    - linux_mips64_softfloat
+                    - linux_mips64le
+                    - linux_mips64le_softfloat
+                    - linux_mipsle
+                    - linux_mipsle_softfloat
+                    - linux_ppc64le
+                    - linux_riscv64
+                    - linux_s390x
+                    - openbsd_386
+                    - openbsd_amd64
+                    - openbsd_arm32_v6
+                    - openbsd_arm32_v7a
+                    - openbsd_arm64_v8a
+                    - windows_386
+                    - windows_amd64
+                    - windows_arm32_v7a
+                    - windows_arm64_v8a
+                    - windows7_386
+                    - windows7_amd64
+            fail-fast: false
+
+        needs:
+            - build_frontend
+            - build_api_docs
+
+        steps:
+            - name: Checkout source code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 1
+
+            - name: Set up Golang
+              uses: actions/setup-go@v5
+              with:
+                  cache: false
+                  go-version: ${{ env.TOOLCHAIN }}
+                  check-latest: true
+
+            - name: Download frontend artifacts
+              uses: actions/download-artifact@v4
+              with:
+                  name: frontend-dist
+                  path: frontend
+
+            - name: Extract frontend artifacts
+              working-directory: frontend
+              run: |
+                  tar -zxf frontend_dist.tar.gz
+                  rm -f frontend_dist.tar.gz
+
+            - name: Build API documentation
+              run: |
+                  make docs
+
+            - name: Set up workflow env
+              run: |
+                  TOOLCHAIN=$(jq ".[\"${{ matrix.target_id }}\"].toolchain" -r < .github/build/database.json)
+                  echo "TOOLCHAIN=$TOOLCHAIN" >> $GITHUB_ENV
+                  GOOS=$(jq ".[\"${{ matrix.target_id }}\"].goos" -r < .github/build/database.json)
+                  echo "GOOS=$GOOS" >> $GITHUB_ENV
+                  GOARCH=$(jq ".[\"${{ matrix.target_id }}\"].goarch" -r < .github/build/database.json)
+                  echo "GOARCH=$GOARCH" >> $GITHUB_ENV
+                  GOARM=$(jq ".[\"${{ matrix.target_id }}\"].goarm" -r < .github/build/database.json)
+                  echo "GOARM=$GOARM" >> $GITHUB_ENV
+                  GOMIPS=$(jq ".[\"${{ matrix.target_id }}\"].gomips" -r < .github/build/database.json)
+                  echo "GOMIPS=$GOMIPS" >> $GITHUB_ENV
+                  RELEASE_NAME=$(jq ".[\"${{ matrix.target_id }}\"].name" -r < .github/build/database.json)
+                  echo "RELEASE_NAME=$RELEASE_NAME" >> $GITHUB_ENV
+
+            - name: Build core application
+              run: |
+                  GOOS=${{ env.GOOS }} \
+                  GOARCH=${{ env.GOARCH }} \
+                  GOARM=${{ env.GOARM }} \
+                  GOMIPS=${{ env.GOMIPS }} \
+                  make build
+
+            - name: Create release digest
+              run: |
+                  make digest | tee build/${{ matrix.target_id }}.dgst
+
+            - name: Package release to zip
+              working-directory: build/dist
+              run: |
+                  zip -r ../${{ matrix.target_id }}.zip *
+
+            - name: Create release note
+              id: release_note
+              uses: mikepenz/release-changelog-builder-action@v5
+              with:
+                  mode: "COMMIT"
+                  configurationJson: |
+                      {
+                          "template":"#{{CHANGELOG}}\n\nThis release note is automatically generated by GitHub Actions.\nPlease refer to [CHANGELOG.md](https://github.com/anyshake/observer/blob/master/CHANGELOG.md) for details.",
+                          "categories":[
+                              {
+                                  "title":"## Breaking Changes",
+                                  "labels":[
+                                      "break",
+                                      "major",
+                                      "incompatible"
+                                  ]
+                              },
+                              {
+                                  "title":"## New Features",
+                                  "labels":[
+                                      "feat",
+                                      "feature"
+                                  ]
+                              },
+                              {
+                                  "title":"## Bug Fixes",
+                                  "labels":[
+                                      "fix",
+                                      "bug"
+                                  ]
+                              },
+                              {
+                                  "title": "## CI/CD Changes",
+                                  "labels": [
+                                      "build",
+                                      "ci",
+                                      "test"
+                                  ]
+                              },
+                              {
+                                  "title":"## Dependency Updates",
+                                  "labels": [
+                                      "deps",
+                                      "dependencies",
+                                      "dependency"
+                                  ]
+                              },
+                              {
+                                  "title": "## Chore",
+                                  "labels": [
+                                      "chore",
+                                      "docs",
+                                      "perf",
+                                      "refactor",
+                                      "revert",
+                                      "style"
+                                  ]
+                              },
+                              {
+                                  "title":"## Changes",
+                                  "labels":[]
+                              }
+                          ],
+                          "label_extractor":[
+                              {
+                                  "pattern":"^(break|major|incompatible|feat|feature|fix|bug|build|ci|test|deps|dependencies|dependency|chore|docs|perf|refactor|revert|style){1}(\\([\\w\\-\\.]+\\))?(!)?: ([\\w ])+([\\s\\S]*)",
+                                  "target":"$1"
+                              }
+                          ]
+                      }
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Upload packages to release
+              uses: svenstaro/upload-release-action@v2
+              with:
+                  repo_token: ${{ secrets.GITHUB_TOKEN }}
+                  file: build/${{ matrix.target_id }}*
+                  tag: ${{ github.ref }}
+                  file_glob: true
+                  overwrite: true
+                  body: ${{ steps.release_note.outputs.changelog }}

@@ -1,0 +1,391 @@
+basePath: /api/v1
+definitions:
+  config.Sensor:
+    properties:
+      frequency:
+        type: number
+      fullscale:
+        type: number
+      resolution:
+        type: integer
+      sensitivity:
+        type: number
+      velocity:
+        type: boolean
+      vref:
+        type: number
+    type: object
+  config.Station:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      name:
+        type: string
+      owner:
+        type: string
+      region:
+        type: string
+    type: object
+  config.Stream:
+    properties:
+      channel:
+        maxLength: 3
+        type: string
+      location:
+        maxLength: 2
+        type: string
+      network:
+        maxLength: 2
+        type: string
+      station:
+        maxLength: 5
+        type: string
+    type: object
+  explorer.ExplorerData:
+    properties:
+      e_axis:
+        items:
+          type: integer
+        type: array
+      n_axis:
+        items:
+          type: integer
+        type: array
+      sample_rate:
+        type: integer
+      timestamp:
+        type: integer
+      z_axis:
+        items:
+          type: integer
+        type: array
+    type: object
+  mseed.miniSeedFileInfo:
+    properties:
+      name:
+        type: string
+      size:
+        type: string
+      time:
+        type: integer
+      ttl:
+        type: integer
+    type: object
+  response.HttpResponse:
+    properties:
+      data: {}
+      error:
+        type: boolean
+      message:
+        type: string
+      path:
+        type: string
+      status:
+        type: integer
+      time:
+        type: string
+    type: object
+  seisevent.Estimation:
+    properties:
+      p:
+        type: number
+      s:
+        type: number
+    type: object
+  seisevent.Event:
+    properties:
+      depth:
+        type: number
+      distance:
+        type: number
+      estimation:
+        $ref: '#/definitions/seisevent.Estimation'
+      event:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      magnitude:
+        type: number
+      region:
+        type: string
+      timestamp:
+        type: integer
+      verfied:
+        type: boolean
+    type: object
+  station.cpuInfo:
+    properties:
+      model:
+        type: string
+      percent:
+        type: number
+    type: object
+  station.diskInfo:
+    properties:
+      free:
+        type: integer
+      percent:
+        type: number
+      total:
+        type: integer
+      used:
+        type: integer
+    type: object
+  station.explorerInfo:
+    properties:
+      device_id:
+        type: integer
+      elapsed:
+        type: integer
+      elevation:
+        type: number
+      errors:
+        type: integer
+      latitude:
+        type: number
+      longitude:
+        type: number
+      received:
+        type: integer
+      sample_rate:
+        type: integer
+    type: object
+  station.memoryInfo:
+    properties:
+      free:
+        type: integer
+      percent:
+        type: number
+      total:
+        type: integer
+      used:
+        type: integer
+    type: object
+  station.osInfo:
+    properties:
+      arch:
+        type: string
+      distro:
+        type: string
+      hostname:
+        type: string
+      os:
+        type: string
+      timestamp:
+        type: integer
+      uptime:
+        type: integer
+    type: object
+  station.stationInfo:
+    properties:
+      cpu:
+        $ref: '#/definitions/station.cpuInfo'
+      disk:
+        $ref: '#/definitions/station.diskInfo'
+      explorer:
+        $ref: '#/definitions/station.explorerInfo'
+      memory:
+        $ref: '#/definitions/station.memoryInfo'
+      os:
+        $ref: '#/definitions/station.osInfo'
+      sensor:
+        $ref: '#/definitions/config.Sensor'
+      station:
+        $ref: '#/definitions/config.Station'
+      stream:
+        $ref: '#/definitions/config.Stream'
+    type: object
+info:
+  contact: {}
+  description: This is APIv1 documentation for AnyShake Observer, please set `server_settings.debug`
+    to `false` in `config.json` when deploying to production environment in case of
+    any security issues.
+  title: AnyShake Observer APIv1
+paths:
+  /history:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Get waveform count data in specified time range, channel and format,
+        the maximum duration of the waveform data to be exported is 24 hours for JSON
+        and 1 hour for SAC
+      parameters:
+      - description: Start timestamp of the waveform data to be queried, in milliseconds
+          (unix timestamp)
+        in: formData
+        name: start_time
+        required: true
+        type: integer
+      - description: End timestamp of the waveform data to be queried, in milliseconds
+          (unix timestamp)
+        in: formData
+        name: end_time
+        required: true
+        type: integer
+      - description: Format of the waveform data to be queried, `json`, `sac` or `miniseed`
+        in: formData
+        name: format
+        required: true
+        type: string
+      - description: Channel of the waveform, `Z`, `E` or `N`, reuqired when format
+          is `sac` and `miniseed`
+        in: formData
+        name: channel
+        type: string
+      produces:
+      - application/json
+      - application/octet-stream
+      responses:
+        "200":
+          description: Successfully exported the waveform data
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.HttpResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/explorer.ExplorerData'
+                  type: array
+              type: object
+        "400":
+          description: Failed to export waveform data due to invalid format or channel
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+        "410":
+          description: Failed to export waveform data due to no data available
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+        "500":
+          description: Failed to export waveform data due to failed to read data source
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+      summary: AnyShake Observer waveform history
+  /inventory:
+    get:
+      description: Get SeisComP XML inventory, which contains meta data of the station
+      parameters:
+      - description: Format of the inventory, either `json` or `xml`
+        in: query
+        name: format
+        type: string
+      produces:
+      - application/json
+      - application/xml
+      responses:
+        "200":
+          description: Successfully get SeisComP XML inventory
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.HttpResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: AnyShake Observer station inventory
+  /mseed:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: List MiniSEED data if action is `show`, or export MiniSEED data
+        in .mseed format if action is `export`
+      parameters:
+      - description: Action to be performed, either `show` or `export`
+        in: formData
+        name: action
+        required: true
+        type: string
+      - description: Name of MiniSEED file to be exported, end with `.mseed`
+        in: formData
+        name: name
+        type: string
+      produces:
+      - application/json
+      - application/octet-stream
+      responses:
+        "200":
+          description: Successfully get list of MiniSEED files
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.HttpResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/mseed.miniSeedFileInfo'
+                  type: array
+              type: object
+        "400":
+          description: Failed to list or export MiniSEED data due to invalid request
+            body
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+        "410":
+          description: Failed to export MiniSEED data due to invalid file name or
+            permission denied
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+        "500":
+          description: Failed to list or export MiniSEED data due to internal server
+            error
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+      summary: AnyShake Observer MiniSEED data
+  /station:
+    get:
+      description: Get Observer station status including system information, memory
+        usage, disk usage, CPU usage, ADC information, geophone information, and location
+        information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully read station information
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.HttpResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/station.stationInfo'
+              type: object
+      summary: AnyShake Observer station status
+  /trace:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Get list of earthquake events data source and earthquake events
+        from specified data source
+      parameters:
+      - description: Use `show` to get available sources first, then choose one and
+          request again to get events
+        in: formData
+        name: source
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully read the list of earthquake events
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.HttpResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/seisevent.Event'
+                  type: array
+              type: object
+        "400":
+          description: Failed to read earthquake event list due to invalid data source
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+        "500":
+          description: Failed to read earthquake event list due to failed to read
+            data source
+          schema:
+            $ref: '#/definitions/response.HttpResponse'
+      summary: AnyShake Observer event trace
+swagger: "2.0"

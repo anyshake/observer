@@ -1,0 +1,35 @@
+{
+    "time": "2024-08-07T13:57:15Z",
+    "status": 200,
+    "error": false,
+    "path": "/api/v1/history",
+    "message": "The waveform data was successfully filtered",
+    "data": [
+        {
+            "sample_rate": 125,
+            "timestamp": 1723039025571,
+            "z_axis": [
+                0
+            ],
+            "e_axis": [
+                0
+            ],
+            "n_axis": [
+                0
+            ]
+        },
+        {
+            "sample_rate": 125,
+            "timestamp": 1723039026571,
+            "z_axis": [
+                0
+            ],
+            "e_axis": [
+                0
+            ],
+            "n_axis": [
+                0
+            ]
+        }
+    ]
+}

@@ -1,0 +1,12 @@
+[Unit]
+Description=AnyShake Observer Service
+After=network.target
+
+[Service]
+User=root
+ExecStart=/usr/local/bin/observer -config /usr/local/etc/observer/config.json
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

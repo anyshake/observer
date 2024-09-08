@@ -1,0 +1,64 @@
+{
+    "time": "2024-08-07T14:53:55Z",
+    "status": 200,
+    "error": false,
+    "path": "/api/v1/station",
+    "message": "Successfully read station information",
+    "data": {
+        "explorer": {
+            "errors": 47,
+            "received": 131,
+            "sample_rate": 125,
+            "device_id": 20030813,
+            "latitude": 39.9,
+            "longitude": 116.4,
+            "elevation": 50.0,
+            "elapsed": 12
+        },
+        "station": {
+            "name": "AnyShake Station",
+            "owner": "Lee",
+            "region": "Asia",
+            "country": "China",
+            "city": "Beijing"
+        },
+        "stream": {
+            "station": "SHAKE",
+            "network": "AS",
+            "location": "00",
+            "channel": "EH"
+        },
+        "sensor": {
+            "frequency": 4.5,
+            "sensitivity": 28.8,
+            "velocity": true,
+            "vref": 5,
+            "fullscale": 10,
+            "resolution": 32
+        },
+        "cpu": {
+            "model": "11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz",
+            "percent": 20
+        },
+        "disk": {
+            "total": 983349346304,
+            "free": 544028266496,
+            "used": 389294149632,
+            "percent": 41.71057534940964
+        },
+        "memory": {
+            "total": 24898076672,
+            "free": 2693279744,
+            "used": 15624962048,
+            "percent": 62.755698979638844
+        },
+        "os": {
+            "uptime": 209226,
+            "os": "linux",
+            "arch": "amd64",
+            "distro": "Linux",
+            "hostname": "Yuki",
+            "timestamp": 1723042749771
+        }
+    }
+}
