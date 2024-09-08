@@ -1,6 +1,5 @@
-import ErrorIcon from "../assets/icons/link-slash-solid.svg";
-import WarningIcon from "../assets/icons/link-solid.svg";
-import SuccessIcon from "../assets/icons/rss-solid.svg";
+import { mdiLanConnect, mdiLanDisconnect, mdiLanPending } from "@mdi/js";
+import Icon from "@mdi/react";
 
 export interface BannerProps {
 	readonly title: string;
@@ -33,20 +32,20 @@ export const Banner = (props: BannerProps) => {
 		>
 			<div className="flex flex-col space-y-2">
 				<div className="flex gap-2 font-bold text-lg">
-					<img
+					<Icon
 						className={type === "success" ? "size-6" : "hidden"}
-						src={SuccessIcon}
-						alt=""
+						path={mdiLanConnect}
+						size={1}
 					/>
-					<img
+					<Icon
 						className={type === "warning" ? "size-6" : "hidden"}
-						src={WarningIcon}
-						alt=""
+						path={mdiLanPending}
+						size={1}
 					/>
-					<img
+					<Icon
 						className={type === "error" ? "size-6" : "hidden"}
-						src={ErrorIcon}
-						alt=""
+						path={mdiLanDisconnect}
+						size={1}
 					/>
 					<span>{title}</span>
 				</div>

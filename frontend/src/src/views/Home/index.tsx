@@ -1,10 +1,8 @@
+import { mdiBug, mdiClockTimeFour, mdiWebCheck } from "@mdi/js";
 import { HighchartsReactRefObject } from "highcharts-react-official";
 import { RefObject, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import BugIcon from "../../assets/icons/bug-solid.svg";
-import CheckIcon from "../../assets/icons/circle-check-solid.svg";
-import ClockIcon from "../../assets/icons/clock-solid.svg";
 import { Banner, BannerProps } from "../../components/Banner";
 import { Chart, ChartProps } from "../../components/Chart";
 import { Container } from "../../components/Container";
@@ -28,21 +26,21 @@ const Home = () => {
 		messages: {
 			color: true,
 			value: "0",
-			icon: CheckIcon,
+			icon: mdiWebCheck,
 			unit: "views.home.labels.messages.unit",
 			label: "views.home.labels.messages.label"
 		},
 		errors: {
 			color: true,
 			value: "0",
-			icon: BugIcon,
+			icon: mdiBug,
 			unit: "views.home.labels.errors.unit",
 			label: "views.home.labels.errors.label"
 		},
 		elapsed: {
 			color: true,
 			value: "0",
-			icon: ClockIcon,
+			icon: mdiClockTimeFour,
 			unit: "views.home.labels.elapsed.unit",
 			label: "views.home.labels.elapsed.label"
 		}

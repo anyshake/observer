@@ -1,6 +1,6 @@
+import { mdiFolderOpen } from "@mdi/js";
+import Icon from "@mdi/react";
 import { useState } from "react";
-
-import folderIcon from "../assets/icons/folder-open-regular.svg";
 
 export interface TableColumn {
 	key: string;
@@ -87,10 +87,10 @@ export const Table = (props: TableProps) => {
 													onClick && onClick(item);
 												}}
 											>
-												<img
-													className="w-5 h-5 cursor-pointer transition-all duration-200 hover:scale-125"
-													src={icon}
-													alt={label}
+												<Icon
+													className="size-6 cursor-pointer transition-all duration-200 hover:scale-125"
+													path={icon}
+													title={label}
 												/>
 											</td>
 										))}
@@ -109,7 +109,7 @@ export const Table = (props: TableProps) => {
 				</div>
 			) : (
 				<div className="flex justify-center items-center h-40 text-gray-500 space-x-2">
-					<img className="size-5 md:size-6 lg:size-8" src={folderIcon} alt="" />
+					<Icon className="size-5 md:size-6 lg:size-8" path={mdiFolderOpen} />
 					<h1 className="text-lg md:text-xl lg:text-2xl font-medium">{placeholder}</h1>
 				</div>
 			)}

@@ -1,11 +1,10 @@
+import { mdiCheck, mdiClipboardOutline, mdiContentSave } from "@mdi/js";
+import Icon from "@mdi/react";
 import { saveAs } from "file-saver";
 import { useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import theme from "react-syntax-highlighter/dist/esm/styles/prism/atom-dark";
 
-import checkIcon from "../assets/icons/check-solid.svg";
-import copyIcon from "../assets/icons/clipboard-regular.svg";
-import saveIcon from "../assets/icons/floppy-disk-solid.svg";
 import { setClipboardText } from "../helpers/utils/setClipboardText";
 
 interface CodeProps {
@@ -36,23 +35,14 @@ export const Code = (props: CodeProps) => {
 
 	return (
 		<div className="rounded-lg bg-gray-700 p-2">
-			<div className="flex justify-end space-x-3 px-4">
+			<div className="flex justify-end space-x-3 px-4 text-white">
 				<div
 					className="opacity-60 hover:opacity-100 transition-all cursor-pointer"
 					onClick={() => {
 						void handleCopy(children);
 					}}
 				>
-					<img
-						className={`size-4 ${isCopied ? "hidden" : "block"}`}
-						src={copyIcon}
-						alt=""
-					/>
-					<img
-						className={`size-4 ${isCopied ? "block" : "hidden"}`}
-						src={checkIcon}
-						alt=""
-					/>
+					<Icon path={isCopied ? mdiCheck : mdiClipboardOutline} size={0.8} />
 				</div>
 				{!!fileName?.length && (
 					<div
@@ -61,7 +51,7 @@ export const Code = (props: CodeProps) => {
 							handleDownload(children);
 						}}
 					>
-						<img className="size-4" src={saveIcon} alt="" />
+						<Icon path={mdiContentSave} size={0.8} />
 					</div>
 				)}
 			</div>

@@ -1,8 +1,8 @@
+import { mdiDelete } from "@mdi/js";
+import Icon from "@mdi/react";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
-
-import cancelIcon from "../assets/icons/xmark-solid.svg";
 
 export interface ProgressProps {
 	readonly precision?: number;
@@ -20,7 +20,7 @@ export const Progress = (props: ProgressProps) => {
 				className="cursor-pointer px-1 rounded-lg bg-gray-100 hover:bg-gray-300"
 				onClick={onCancel}
 			>
-				<img className="size-5" src={cancelIcon} alt="" />
+				<Icon path={mdiDelete} size={0.8} />
 			</div>
 			<Box sx={{ width: "100%", mx: 1 }}>
 				<LinearProgress
