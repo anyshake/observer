@@ -11,7 +11,7 @@ type explorerInfo struct {
 	Errors     int64   `json:"errors"`
 	Received   int64   `json:"received"`
 	SampleRate int     `json:"sample_rate"`
-	DeviceId   uint32  `json:"device_id"`
+	DeviceId   string  `json:"device_id"`
 	Latitude   float64 `json:"latitude"`
 	Longitude  float64 `json:"longitude"`
 	Elevation  float64 `json:"elevation"`
