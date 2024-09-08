@@ -34,7 +34,7 @@ type legacyPacket struct {
 }
 
 func (g *legacyPacket) length() int {
-	return int(unsafe.Sizeof(g.Z_Axis) + unsafe.Sizeof(g.E_Axis) + unsafe.Sizeof(g.N_Axis) + unsafe.Sizeof(g.Checksum))
+	return int(unsafe.Sizeof(*g))
 }
 
 func (g *legacyPacket) decode(data []byte) error {
@@ -147,7 +147,7 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency, fi
 
 	// Read data from the transport continuously
 	go func() {
-		buf := make([]byte, recvSize/2)
+		buf := make([]byte, recvSize)
 		for {
 			select {
 			case <-deps.CancelToken.Done():
@@ -238,7 +238,7 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency, 
 
 	// Read data from the transport continuously
 	go func() {
-		buf := make([]byte, recvSize/2)
+		buf := make([]byte, recvSize)
 		for {
 			select {
 			case <-deps.CancelToken.Done():
