@@ -1,8 +1,6 @@
+import { mdiChevronUpBox, mdiCloseCircle, mdiDotsHorizontal } from "@mdi/js";
+import Icon from "@mdi/react";
 import { ReactNode, useEffect, useState } from "react";
-
-import advancedIcon from "../assets/icons/ellipsis-solid.svg";
-import collapseIcon from "../assets/icons/square-caret-up-solid.svg";
-import closeIcon from "../assets/icons/xmark-solid.svg";
 
 export enum CollapseMode {
 	COLLAPSE_DISABLE, // Disable collapsing
@@ -45,10 +43,10 @@ export const Holder = (props: HolderProps) => {
 					}}
 				>
 					{collapseIsEnabled && (
-						<img
-							className={`mx-1 ${collapsed ? "rotate-180" : ""}`}
-							src={collapseIcon}
-							alt=""
+						<Icon
+							className={`mx-1 self-center ${collapsed ? "rotate-180" : ""}`}
+							path={mdiChevronUpBox}
+							size={0.9}
 						/>
 					)}
 					{label}
@@ -68,15 +66,9 @@ export const Holder = (props: HolderProps) => {
 								setAdvancedOpen(!advancedOpen);
 							}}
 						>
-							<img
-								className={`size-4 ${advancedOpen ? "hidden" : "block"}`}
-								src={advancedIcon}
-								alt=""
-							/>
-							<img
-								className={`size-4 ${advancedOpen ? "block" : "hidden"}`}
-								src={closeIcon}
-								alt=""
+							<Icon
+								path={advancedOpen ? mdiCloseCircle : mdiDotsHorizontal}
+								size={0.9}
 							/>
 						</div>
 						<div className={advancedOpen ? "block" : "hidden"}>{advanced}</div>

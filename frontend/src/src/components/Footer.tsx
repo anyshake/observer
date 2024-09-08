@@ -1,7 +1,8 @@
+import { mdiGithub } from "@mdi/js";
+import Icon from "@mdi/react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import repositoryIcon from "../assets/icons/github.svg";
 import { i18nConfig } from "../config/i18n";
 
 interface FooterProps {
@@ -18,15 +19,15 @@ export const Footer = (props: FooterProps) => {
 
 	return (
 		<footer className="w-full bg-gray-200 text-gray-500 flex flex-col px-6 py-2 sm:flex-row justify-between">
-			<span className="text-xs text-center md:ml-12">{text[currentLocale]}</span>
-			<div className="inline-flex text-center justify-center">
+			<span className="text-xs text-center md:ml-12 self-center">{text[currentLocale]}</span>
+			<div className="flex text-center justify-center">
 				<Link
-					className="text-sm hover:underline"
+					className="text-sm hover:underline self-center"
 					to={homepage}
 					target="_blank"
 				>{`© ${currentYear} ${author}`}</Link>
 				<Link to={repository} target="_blank">
-					<img className="mx-3 size-5" src={repositoryIcon} alt="" />
+					<Icon className="mx-2 self-center" path={mdiGithub} size={1} />
 				</Link>
 			</div>
 		</footer>

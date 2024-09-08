@@ -1,10 +1,9 @@
 import "leaflet/dist/leaflet.css";
 
-import L from "leaflet";
+import { mdiMapMarker } from "@mdi/js";
+import { divIcon, Map } from "leaflet";
 import { useEffect, useRef } from "react";
 import { MapContainer, Marker, TileLayer } from "react-leaflet";
-
-import LocationIcon from "../assets/icons/location-dot-solid.svg";
 
 export interface MapBoxProps {
 	readonly className?: string;
@@ -34,13 +33,15 @@ export const MapBox = (props: MapBoxProps) => {
 		zoomControl,
 		dragging
 	} = props;
-	const icon = new L.Icon({
-		iconUrl: LocationIcon,
-		iconAnchor: [9, 24],
-		iconSize: [18, 25]
+	const icon = divIcon({
+		className: "leaflet-data-marker",
+		html: `<svg viewBox="0 0 24 24" style="width: 32px; height: 32px; fill: #6565f1; filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.5));">
+            <path d="${mdiMapMarker}" stroke="black" stroke-width="0.7" />
+        </svg>`,
+		iconAnchor: [16, 32]
 	});
 
-	const mapRef = useRef<L.Map>(null);
+	const mapRef = useRef<Map>(null);
 
 	useEffect(() => {
 		const map = mapRef.current;
@@ -62,9 +63,7 @@ export const MapBox = (props: MapBoxProps) => {
 			minZoom={minZoom}
 			center={center}
 			zoom={zoom}
-			style={{
-				cursor: "default"
-			}}
+			style={{ cursor: "default" }}
 		>
 			<TileLayer url={tile} />
 			{marker && <Marker position={marker} icon={icon} />}

@@ -1,7 +1,7 @@
+import { mdiFileDownload } from "@mdi/js";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import ExportIcon from "../../assets/icons/download-solid.svg";
 import { Container } from "../../components/Container";
 import { Panel } from "../../components/Panel";
 import { Progress } from "../../components/Progress";
@@ -106,7 +106,7 @@ const Export = () => {
 		],
 		actions: [
 			{
-				icon: ExportIcon,
+				icon: mdiFileDownload,
 				onClick: handleExportRequest,
 				label: "views.export.table.actions.export"
 			}
