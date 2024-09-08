@@ -2,6 +2,22 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.2.5
+
+### New Features
+
+- Added more earthquake event source APIs.
+
+### Bug Fixes
+
+- Completely fixed the sampling rate jitter issue in legacy mode.
+
+### Chore
+
+- Convert device ID to hexadecimal string format.
+- Replace SVG icons with Material Design Icons in the frontend.
+- Send error message when server returned no earthquake event.
+
 ## v3.2.4
 
 ### CI/CD Changes
