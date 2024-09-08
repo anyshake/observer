@@ -1,7 +1,6 @@
+import { mdiChevronRight, mdiHome } from "@mdi/js";
+import Icon from "@mdi/react";
 import { Link } from "react-router-dom";
-
-import ArrowIcon from "../assets/icons/angle-right-solid.svg";
-import HomeIcon from "../assets/icons/house-solid.svg";
 
 interface NavbarProps {
 	title: string;
@@ -17,13 +16,13 @@ export const Navbar = (props: NavbarProps) => {
 			<ol className="text-sm font-medium text-gray-700 flex space-x-2">
 				<li className="cursor-pointer hover:text-gray-900">
 					<Link className="flex" to={"/"}>
-						<img className="my-2 w-5 h-4 mr-2" src={HomeIcon} alt="" />
+						<Icon className="self-center mr-2" path={mdiHome} size={1} />
 						<span className="my-2">/</span>
 					</Link>
 				</li>
 				{pathname !== basename && (
 					<li className="flex">
-						<img className="self-center w-4 h-4 mr-2" src={ArrowIcon} alt="" />
+						<Icon className="self-center mr-2" path={mdiChevronRight} size={1} />
 						<Link className="my-2 cursor-pointer hover:text-gray-900" to={pathname}>
 							{title}
 						</Link>

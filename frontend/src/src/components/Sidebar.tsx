@@ -1,7 +1,8 @@
+import { mdiArrowExpandAll } from "@mdi/js";
+import Icon from "@mdi/react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
-import MenuIcon from "../assets/icons/maximize-solid.svg";
 import { MenuItem } from "../config/menu";
 
 interface SidebarProps {
@@ -38,7 +39,7 @@ export const Sidebar = (props: SidebarProps) => {
 					setIsSidebarOpen(!isSidebarOpen);
 				}}
 			>
-				<img className="size-4" src={MenuIcon} alt="" />
+				<Icon path={mdiArrowExpandAll} size={0.8} />
 			</div>
 			<div
 				className={`mt-20 flex flex-col space-y-2 w-full h-full ${
@@ -55,7 +56,7 @@ export const Sidebar = (props: SidebarProps) => {
 						to={url}
 						key={url}
 					>
-						<img src={icon} className="size-4" alt="" />
+						<Icon path={icon} size={0.8} />
 						<span className="ml-4">{label[currentLocale]}</span>
 					</Link>
 				))}
@@ -69,11 +70,11 @@ export const Sidebar = (props: SidebarProps) => {
 					<Link
 						key={url}
 						to={url}
-						className={`cursor-pointer justify-end w-full bg-gray-800 p-4 rounded-full duration-300 flex ${
+						className={`cursor-pointer justify-end w-full bg-gray-800 p-3 rounded-full duration-300 flex ${
 							url === hash || url === pathname ? "ml-2" : "hover:ml-2"
 						}`}
 					>
-						<img src={icon} className="size-4" alt="" />
+						<Icon path={icon} size={0.8} />
 					</Link>
 				))}
 			</div>

@@ -1,6 +1,6 @@
+import { mdiArrowUp } from "@mdi/js";
+import Icon from "@mdi/react";
 import { useCallback, useEffect, useState } from "react";
-
-import ScrollIcon from "../assets/icons/arrow-up-solid.svg";
 
 interface ScrollerProps {
 	readonly threshold: number;
@@ -27,12 +27,12 @@ export const Scroller = (props: ScrollerProps) => {
 
 	return (
 		<button
-			className={`bg-purple-500 hover:bg-purple-600 duration-300 size-10 rounded-full bottom-16 right-3 flex justify-center items-center ${
+			className={`bg-purple-500 hover:bg-purple-600 text-white duration-300 size-10 rounded-full bottom-16 right-3 flex justify-center items-center ${
 				showButton ? "fixed animate-fade-left animate-duration-300" : "hidden"
 			}`}
 			onClick={scrollToTop}
 		>
-			<img className="size-4" src={ScrollIcon} alt="" />
+			<Icon path={mdiArrowUp} size={1} />
 		</button>
 	);
 };

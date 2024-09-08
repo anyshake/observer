@@ -1,8 +1,5 @@
-import ExportIcon from "../assets/icons/cloud-arrow-down-solid.svg";
-import HistoryIcon from "../assets/icons/file-waveform-solid.svg";
-import SettingIcon from "../assets/icons/gear-solid.svg";
-import HomeIcon from "../assets/icons/server-solid.svg";
-import RealtimeIcon from "../assets/icons/wave-square-solid.svg";
+import { mdiCog, mdiDatabaseExport, mdiFileClock, mdiServerNetwork, mdiWaveform } from "@mdi/js";
+
 import { i18nConfig } from "./i18n";
 
 export interface MenuItem {
@@ -19,7 +16,7 @@ export const menuConfig: MenuItem[] = [
 			"zh-TW": "當前站況",
 			"zh-CN": "测站状态"
 		},
-		icon: HomeIcon
+		icon: mdiServerNetwork
 	},
 	{
 		url: "/realtime",
@@ -28,7 +25,7 @@ export const menuConfig: MenuItem[] = [
 			"zh-TW": "即時波形",
 			"zh-CN": "实时波形"
 		},
-		icon: RealtimeIcon
+		icon: mdiWaveform
 	},
 	{
 		url: "/history",
@@ -37,7 +34,7 @@ export const menuConfig: MenuItem[] = [
 			"zh-TW": "歷史資料",
 			"zh-CN": "历史数据"
 		},
-		icon: HistoryIcon
+		icon: mdiFileClock
 	},
 	{
 		url: "/export",
@@ -46,7 +43,7 @@ export const menuConfig: MenuItem[] = [
 			"zh-TW": "波形匯出",
 			"zh-CN": "波形导出"
 		},
-		icon: ExportIcon
+		icon: mdiDatabaseExport
 	},
 	{
 		url: "/setting",
@@ -55,6 +52,6 @@ export const menuConfig: MenuItem[] = [
 			"zh-TW": "面板設定",
 			"zh-CN": "面板设置"
 		},
-		icon: SettingIcon
+		icon: mdiCog
 	}
 ];
