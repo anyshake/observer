@@ -9,7 +9,7 @@
             "errors": 47,
             "received": 131,
             "sample_rate": 125,
-            "device_id": 20030813,
+            "device_id": "FFFFFFFF",
             "latitude": 39.9,
             "longitude": 116.4,
             "elevation": 50.0,
