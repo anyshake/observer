@@ -369,7 +369,8 @@ const History = (props: RouterComponentProps) => {
 				t("views.history.toasts.fetch_events_success"),
 				t("views.history.toasts.fetch_events_error")
 			)) as unknown as typeof traceCommonResponseModel1;
-			if (!res?.data) {
+			if (!res?.data || res?.data?.length === 0) {
+                sendUserAlert(t("views.history.toasts.no_events_found"), true);
 				return;
 			}
 
