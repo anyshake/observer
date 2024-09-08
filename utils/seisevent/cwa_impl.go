@@ -132,27 +132,27 @@ func (c *CWA) getMagnitude(data string) []Magnitude {
 }
 
 func (c *CWA) getRegion(data string) string {
-	exp := regexp.MustCompile(`\(位於.+\)`)
+	exp := regexp.MustCompile(`地點為.+方\d+(\.\d{1,}公里)|([1-9]\d*公里)`)
 	if exp == nil {
-		return "未知地區"
+		return "未知地點"
 	}
 	r := exp.FindAllStringSubmatch(data, -1)
 	if len(r) == 0 || len(r[0]) == 0 {
-		return "未知地區"
-	}
-	region := regexp.MustCompile(`\(|\)|位於`).ReplaceAllString(r[0][0], "")
-
-	exp = regexp.MustCompile(`地點為.+方\d+(\.\d{1,}公里)|([1-9]\d*公里)`)
-	if exp == nil {
 		return "未知地點"
+	}
+	loc_1 := strings.Replace(r[0][0], "地點為", "", -1)
+
+	exp = regexp.MustCompile(`\(位於.+\)`)
+	if exp == nil {
+		return "未知地區"
 	}
 	r = exp.FindAllStringSubmatch(data, -1)
 	if len(r) == 0 || len(r[0]) == 0 {
-		return "未知地點"
+		return "未知地區"
 	}
-	location := strings.Replace(r[0][0], "地點為", "", -1)
+	loc_2 := regexp.MustCompile(`\(|\)|位於`).ReplaceAllString(r[0][0], "")
 
-	return fmt.Sprintf("%s - %s", region, location)
+	return fmt.Sprintf("%s %s", loc_1, loc_2)
 }
 
 func (c *CWA) getTimestamp(data string) int64 {

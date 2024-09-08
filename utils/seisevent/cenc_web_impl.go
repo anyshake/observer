@@ -9,29 +9,29 @@ import (
 	"github.com/corpix/uarand"
 )
 
-const CEIC_ID = "ceic"
+const CENC_WEB_ID = "cenc_web"
 
-type CEIC struct {
+type CENC_WEB struct {
 	cache cache.BytesCache
 }
 
-func (c *CEIC) GetProperty() DataSourceProperty {
+func (c *CENC_WEB) GetProperty() DataSourceProperty {
 	return DataSourceProperty{
-		ID:      CEIC_ID,
+		ID:      CENC_WEB_ID,
 		Country: "CN",
 		Deafult: "en-US",
 		Locales: map[string]string{
-			"en-US": "China Earthquake Networks Center",
-			"zh-TW": "中國地震台網中心",
-			"zh-CN": "中国地震台网中心",
+			"en-US": "China Earthquake Networks Center (Web)",
+			"zh-TW": "中國地震台網中心（網頁端）",
+			"zh-CN": "中国地震台网中心（网页端）",
 		},
 	}
 }
 
-func (c *CEIC) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (c *CENC_WEB) GetEvents(latitude, longitude float64) ([]Event, error) {
 	if !c.cache.Valid() {
 		res, err := request.GET(
-			"https://news.ceic.ac.cn/ajax/google",
+			"https://www.ceic.ac.cn/ajax/google",
 			10*time.Second, time.Second, 3, false, nil,
 			map[string]string{"User-Agent": uarand.GetRandom()},
 		)
@@ -41,9 +41,9 @@ func (c *CEIC) GetEvents(latitude, longitude float64) ([]Event, error) {
 		c.cache.Set(res)
 	}
 
-	// Parse CEIC JSON response
-	responseMap := make([]map[string]any, 0)
-	err := json.Unmarshal(c.cache.Get(), &responseMap)
+	// Parse CENC JSON response
+	var dataMapEvents []map[string]any
+	err := json.Unmarshal(c.cache.Get(), &dataMapEvents)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (c *CEIC) GetEvents(latitude, longitude float64) ([]Event, error) {
 	expectedKeys := []string{"CATA_ID", "O_TIME", "EPI_LAT", "EPI_LON", "EPI_DEPTH", "M", "M_MS", "LOCATION_C"}
 
 	var resultArr []Event
-	for _, v := range responseMap {
+	for _, v := range dataMapEvents {
 		if !isMapHasKeys(v, expectedKeys) || !isMapKeysEmpty(v, expectedKeys) {
 			continue
 		}
@@ -89,7 +89,7 @@ func (c *CEIC) GetEvents(latitude, longitude float64) ([]Event, error) {
 	return sortSeismicEvents(resultArr), nil
 }
 
-func (c *CEIC) getTimestamp(timeStr string) (int64, error) {
+func (c *CENC_WEB) getTimestamp(timeStr string) (int64, error) {
 	t, err := time.Parse("2006-01-02 15:04:05", timeStr)
 	if err != nil {
 		return 0, err
@@ -98,7 +98,7 @@ func (c *CEIC) getTimestamp(timeStr string) (int64, error) {
 	return t.Add(-8 * time.Hour).UnixMilli(), nil
 }
 
-func (c *CEIC) getDepth(depth any) float64 {
+func (c *CENC_WEB) getDepth(depth any) float64 {
 	switch d := depth.(type) {
 	case string:
 		return string2Float(d)
@@ -109,7 +109,7 @@ func (c *CEIC) getDepth(depth any) float64 {
 	return -1
 }
 
-func (c *CEIC) getMagnitude(magType, data string) Magnitude {
+func (c *CENC_WEB) getMagnitude(magType, data string) Magnitude {
 	return Magnitude{Type: ParseMagnitude(magType), Value: string2Float(data)}
 
 }
