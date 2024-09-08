@@ -1,12 +1,14 @@
 package station
 
 import (
+	"fmt"
+
 	"github.com/anyshake/observer/drivers/explorer"
 	"github.com/anyshake/observer/utils/timesource"
 )
 
 func (e *explorerInfo) get(timeSource *timesource.Source, explorerDeps *explorer.ExplorerDependency) error {
-	e.DeviceId = explorerDeps.Config.GetDeviceId()
+	e.DeviceId = fmt.Sprintf("%08X", explorerDeps.Config.GetDeviceId())
 	e.Elevation = explorerDeps.Config.GetElevation()
 	e.Errors = explorerDeps.Health.GetErrors()
 	e.Received = explorerDeps.Health.GetReceived()
