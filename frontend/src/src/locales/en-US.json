@@ -229,6 +229,7 @@
                 "is_fetching_events": "Querying earthquake event data, please wait...",
                 "fetch_events_success": "Earthquake event query successful",
                 "fetch_events_error": "Earthquake event query failed",
+                "no_events_found": "No earthquake event data available",
                 "is_fetching_waveform": "Querying historical waveform data, please wait...",
                 "fetch_waveform_success": "Historical waveform data query successful",
                 "fetch_waveform_error": "Historical waveform data query failed",
