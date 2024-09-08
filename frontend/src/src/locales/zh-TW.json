@@ -241,6 +241,7 @@
                 "is_fetching_events": "正在查詢地震事件資料，請稍候...",
                 "fetch_events_success": "地震事件查詢成功",
                 "fetch_events_error": "地震事件查詢失敗",
+                "no_events_found": "未找到地震事件",
                 "is_fetching_waveform": "正在查詢歷史波形資料，請稍候...",
                 "fetch_waveform_success": "歷史波形資料查詢成功",
                 "fetch_waveform_error": "歷史波形資料查詢失敗",
