@@ -8,6 +8,7 @@ import (
 	"github.com/alphadose/haxmap"
 	"github.com/anyshake/observer/drivers/transport"
 	"github.com/anyshake/observer/utils/timesource"
+	"github.com/sirupsen/logrus"
 	messagebus "github.com/vardius/message-bus"
 )
 
@@ -57,15 +58,9 @@ type ExplorerData struct {
 
 type ExplorerEventHandler = func(data *ExplorerData)
 
-type ExplorerLogger interface {
-	Infof(format string, args ...any)
-	Warnf(format string, args ...any)
-	Errorf(format string, args ...any)
-}
-
 type ExplorerDriver interface {
 	readerDaemon(deps *ExplorerDependency)
-	Init(deps *ExplorerDependency, logger ExplorerLogger) error
+	Init(deps *ExplorerDependency, logger *logrus.Entry) error
 	Subscribe(deps *ExplorerDependency, clientId string, handler ExplorerEventHandler) error
 	Unsubscribe(deps *ExplorerDependency, clientId string) error
 }

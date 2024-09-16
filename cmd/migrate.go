@@ -7,5 +7,16 @@ import (
 )
 
 func migrate(databaseConn *gorm.DB) error {
-	return dao.Migrate(databaseConn, &tables.AdcCount{})
+	appTables := []dao.Table{
+		&tables.AdcCount{},
+		&tables.SysUser{},
+	}
+	for _, table := range appTables {
+		err := dao.Migrate(databaseConn, table)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

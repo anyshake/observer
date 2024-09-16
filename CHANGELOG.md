@@ -2,6 +2,25 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.3.0
+
+### New Features
+
+- Added multi-user support and permission management.
+- Added earthquake event source API of BMKG.
+- Display AnyShake Explorer device serial number on home page.
+
+### Bug Fixes
+
+- Fix timezone issue on earthquake event source API of CEA.
+
+### Chore
+
+- Refined the module names in the log.
+- Add more detailed description to API documentation.
+- Replace table component with MUI in the frontend.
+- Use year provided by Cloudflare to fill the timing of earthquake event source of CWA.
+
 ## v3.2.5
 
 ### New Features
@@ -42,7 +61,7 @@ Starting from v2.2.5, all notable changes to this project will be documented in 
 
 ### Bug Fixes
 
-- Fixed time offset in EQZT data source
+- Fixed time offset in EQZT data source.
 - Fixed Windows 7 compatibility issue.
 
 ## v3.2.2

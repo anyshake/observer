@@ -8,7 +8,8 @@ import (
 
 func New(cacheTTL time.Duration) map[string]DataSource {
 	return map[string]DataSource{
-		CWA_ID:      &CWA{cache: cache.New(cacheTTL)},
+		CWA_WP_ID:   &CWA_WP{cache: cache.New(cacheTTL)},
+		CWA_API_ID:  &CWA_API{cache: cache.New(cacheTTL)},
 		HKO_ID:      &HKO{cache: cache.New(cacheTTL)},
 		JMA_ID:      &JMA{cache: cache.New(cacheTTL)},
 		KMA_ID:      &KMA{cache: cache.New(cacheTTL)},
@@ -34,5 +35,6 @@ func New(cacheTTL time.Duration) map[string]DataSource {
 		GEONET_ID:   &GEONET{cache: cache.New(cacheTTL)},
 		FJEA_ID:     &FJEA{cache: cache.New(cacheTTL)},
 		ICL_ID:      &ICL{cache: cache.New(cacheTTL)},
+		BMKG_ID:     &BMKG{cache: cache.New(cacheTTL)},
 	}
 }

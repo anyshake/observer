@@ -2,14 +2,9 @@ package server
 
 import (
 	"github.com/anyshake/observer/services"
+	"github.com/sirupsen/logrus"
 )
 
-type Options struct {
-	CORS            bool
-	DebugMode       bool
-	GzipLevel       int
-	RateFactor      int
-	WebPrefix       string
-	ApiPrefix       string
-	ServicesOptions *services.Options
+type Server interface {
+	Start(*logrus.Entry, *services.Options)
 }

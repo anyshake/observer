@@ -1,4 +1,43 @@
 {
+    "login": {
+        "forms": {
+            "username": {
+                "title": "使用者名稱",
+                "placeholder": "您的使用者名稱",
+                "error": "請輸入使用者名稱"
+            },
+            "password": {
+                "title": "密碼",
+                "placeholder": "您的密碼",
+                "error": "請輸入密碼"
+            },
+            "captcha": {
+                "title": "驗證碼",
+                "placeholder": "驗證碼",
+                "error": "請輸入驗證碼"
+            },
+            "submit": {
+                "title": "登入"
+            }
+        },
+        "toasts": {
+            "is_refreshing_captcha": "正在刷新驗證碼，請稍候...",
+            "refresh_captcha_success": "驗證碼刷新成功",
+            "refresh_captcha_error": "驗證碼刷新失敗",
+            "is_logging_in": "正在登入",
+            "login_success": "登入成功",
+            "login_error": "登入失敗，請檢查使用者名稱、密碼或驗證碼是否正確"
+        }
+    },
+    "main": {
+        "toasts": {
+            "confirm_title": "確認操作",
+            "confirm_button": "確定",
+            "cancel_button": "取消",
+            "confirm_logout": "您確定要登出嗎？",
+            "logout_success": "您已登出，請關閉瀏覽器以確保安全"
+        }
+    },
     "components": {
         "chart": {
             "reset_zoom": "重置視圖",
@@ -14,7 +53,7 @@
                 },
                 "success": {
                     "title": "{{ station }} 已連線",
-                    "content": "在線時長 {{ uptime }} 秒\n硬碟可用空間 {{ disk }}%\n伺服器架構 {{ arch }}/{{ os }}"
+                    "content": "在線時長 {{ uptime }} 秒\n硬碟可用空間 {{ disk }}%\n伺服器架構 {{ arch }}/{{ os }}\n硬體序列號 {{ serial }}"
                 },
                 "error": {
                     "title": "連線失敗",
@@ -42,18 +81,6 @@
                 },
                 "errors": {
                     "label": "幀錯誤訊息量",
-                    "unit": "筆"
-                },
-                "pushed": {
-                    "label": "已推送訊息量",
-                    "unit": "筆"
-                },
-                "failures": {
-                    "label": "推送失敗訊息量",
-                    "unit": "筆"
-                },
-                "queued": {
-                    "label": "等待推送訊息量",
                     "unit": "筆"
                 },
                 "elapsed": {
@@ -256,21 +283,21 @@
             },
             "table": {
                 "columns": {
+                    "id": "ID",
                     "name": "檔案名稱",
                     "size": "檔案大小",
                     "time": "修改日期",
-                    "ttl": "有效期（天）"
+                    "ttl": "有效期（天）",
+                    "actions": "操作"
                 },
                 "actions": {
                     "export": "匯出"
-                },
-                "placeholder": {
-                    "is_fetching_mseed": "正在取得中，請稍等...",
-                    "fetch_mseed_error": "清單為空或取得失敗"
-                },
-                "load_more": "載入更多"
+                }
             },
             "toasts": {
+                "is_fetching_files": "正在取得檔案列表，請稍等...",
+                "fetch_files_success": "檔案列表取得成功",
+                "fetch_files_error": "檔案列表取得失敗",
                 "is_exporting_mseed": "正在匯出 MiniSEED 格式檔案，這可能需要一些時間",
                 "export_mseed_success": "MiniSEED 格式檔案匯出成功",
                 "is_fetching_mseed": "正在取得 MiniSEED 格式檔案清單，請稍等..."
@@ -281,14 +308,17 @@
                 "select_scale": "選擇烈度標準",
                 "purge_cache": "清除應用快取",
                 "waveform_retention": "設定波形保留時間",
-                "query_duration": "設定查詢範圍"
+                "query_duration": "設定查詢範圍",
+                "refresh_user": "刷新使用者",
+                "create_user": "新增使用者"
             },
             "panels": {
                 "select_scale": "烈度標準",
                 "purge_cache": "重置應用",
                 "waveform_retention": "波形設定",
                 "query_duration": "查詢設定",
-                "station_inventory": "SeisComp 詮釋資料"
+                "station_inventory": "SeisComp 詮釋資料",
+                "user_management": "使用者管理"
             },
             "selects": {
                 "choose_scale": {
@@ -311,6 +341,51 @@
                     "cancel": "取消"
                 }
             },
+            "dialogs": {
+                "create_user": {
+                    "title": "建立使用者",
+                    "username": "使用者名稱",
+                    "password": "密碼",
+                    "admin": "管理員",
+                    "content": "使用者名稱不少於 4 位，由大小寫字母、數字和底線組成；密碼不少於 8 位，需包含大小寫字母、數字和特殊字元",
+                    "submit": "建立",
+                    "cancel": "取消",
+                    "yes": "是",
+                    "no": "否"
+                },
+                "edit_user": {
+                    "title": "編輯使用者",
+                    "username": "使用者名稱",
+                    "password": "密碼",
+                    "admin": "管理員",
+                    "content": "使用者名稱不少於 4 位，由大小寫字母、數字和底線組成；密碼不少於 8 位，需包含大小寫字母、數字和特殊字元；若不修改密碼，請保持密碼欄位為空",
+                    "submit": "更新",
+                    "cancel": "取消",
+                    "yes": "是",
+                    "no": "否"
+                }
+            },
+            "table": {
+                "columns": {
+                    "id": "ID",
+                    "user_id": "使用者 ID",
+                    "username": "使用者名稱",
+                    "last_login": "最後登入",
+                    "created_at": "建立於",
+                    "updated_at": "更新於",
+                    "user_ip": "登入 IP",
+                    "user_agent": "登入裝置",
+                    "admin": "管理員",
+                    "actions": "操作",
+                    "never": "從未",
+                    "yes": "是",
+                    "no": "否"
+                },
+                "actions": {
+                    "edit": "編輯",
+                    "remove": "刪除"
+                }
+            },
             "toasts": {
                 "confirm_title": "確認操作",
                 "confirm_button": "確認",
@@ -319,7 +394,20 @@
                 "cache_purged": "應用快取已清除，頁面即將刷新",
                 "scale_changed": "烈度標準已更改為 {{ scale }}，頁面即將刷新",
                 "retention_set": "即時波形保留時間已更改為 {{ current }} 秒，頁面即將刷新",
-                "duration_set": "歷史波形預設查詢範圍已更改為 {{ current }} 秒，頁面即將刷新"
+                "duration_set": "歷史波形預設查詢範圍已更改為 {{ current }} 秒，頁面即將刷新",
+                "is_creating_user": "正在建立使用者，請稍候...",
+                "create_user_success": "使用者建立成功",
+                "create_user_error": "使用者建立失敗，請檢查使用者名稱是否衝突，或密碼是否符合要求",
+                "is_editing_user": "正在更新使用者屬性，請稍候...",
+                "edit_user_success": "使用者屬性更新成功",
+                "edit_user_error": "使用者屬性更新失敗，請檢查新屬性是否符合要求",
+                "is_refreshing_user": "正在刷新使用者列表，請稍候...",
+                "refresh_user_success": "使用者列表刷新成功",
+                "refresh_user_error": "使用者列表刷新失敗",
+                "confirm_remove_user": "您確定要刪除使用者 {{ username }} 嗎？",
+                "is_removing_user": "正在刪除使用者，請稍候...",
+                "remove_user_success": "使用者刪除成功",
+                "remove_user_error": "使用者刪除失敗，或該使用者不可刪除"
             },
             "contents": {
                 "select_scale": "目前烈度標準 {{ scale }}\n烈度標準是用來衡量地震烈度的標準，不同的標準會導致不同的烈度值。",

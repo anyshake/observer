@@ -54,11 +54,12 @@ type database struct {
 }
 
 type server struct {
-	Host  string `json:"host"`
-	Port  int    `json:"port" validate:"min=1,max=65535"`
-	CORS  bool   `json:"cors"`
-	Debug bool   `json:"debug"`
-	Rate  int    `json:"rate" validate:"gte=0"`
+	Host     string `json:"host"`
+	Port     int    `json:"port" validate:"min=1,max=65535"`
+	CORS     bool   `json:"cors"`
+	Debug    bool   `json:"debug"`
+	Restrict bool   `json:"restrict"`
+	Rate     int    `json:"rate" validate:"gte=0"`
 }
 
 type logger struct {

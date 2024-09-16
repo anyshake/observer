@@ -1,4 +1,5 @@
 import { Endpoint } from "../../config/api";
+import store from "../../config/store";
 import { getProtocol } from "../app/getProtocol";
 
 export interface SocketOptions<APIRequest, APICommonResponse> {
@@ -23,8 +24,15 @@ export const connectSocket = <APIRequest, APICommonResponse>({
 			throw new Error("non-websocket protocol is not supported");
 		}
 
+		// Read bearer token from redux store
+		let bearerToken = "";
+		const { credential } = store.getState().credential;
+		if (credential?.token.length && credential.expires_at > Date.now()) {
+			bearerToken = credential.token;
+		}
+
 		const protocol = getProtocol(false);
-		const reqPath = `${protocol}//${backend}${endpoint.path}`;
+		const reqPath = `${protocol}//${backend}${endpoint.path}${bearerToken.length ? `?token=${bearerToken}` : ""}`;
 		const websocket = new WebSocket(reqPath);
 
 		websocket.onmessage = (event) => {

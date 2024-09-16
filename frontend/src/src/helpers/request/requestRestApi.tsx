@@ -7,12 +7,13 @@ import axios, {
 import { saveAs } from "file-saver";
 
 import { Endpoint } from "../../config/api";
+import store from "../../config/store";
 import { getProtocol } from "../app/getProtocol";
 
 interface Options<APIRequest, APICommonResponse, APIErrorResponse> {
 	readonly throwError?: boolean;
 	readonly backend: string;
-	readonly timeout: number;
+	readonly timeout?: number;
 	readonly payload?: APIRequest;
 	readonly header?: Record<string, string>;
 	readonly abortController?: AbortController;
@@ -31,16 +32,28 @@ export const requestRestApi = async <APIRequest, APICommonResponse, APIErrorResp
 	throwError,
 	blobOptions,
 	abortController,
-	timeout = 100
+	timeout = 100 // in seconds
 }: Options<APIRequest, APICommonResponse, APIErrorResponse>): Promise<
 	APICommonResponse | APIErrorResponse
 > => {
+	// Read bearer token from redux store
+	let bearerToken = "";
+	const { credential } = store.getState().credential;
+	if (credential?.token.length && credential.expires_at > Date.now()) {
+		bearerToken = credential.token;
+	}
+
 	const _axios = axios.create({
 		timeout: timeout * 1000
 	});
-	_axios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+	_axios.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+		// Set default headers for JSON response
 		if (!blobOptions) {
 			config.headers.Accept = "application/json";
+		}
+		// Attach bearer token if available
+		if (bearerToken?.length) {
+			config.headers.Authorization = `Bearer ${bearerToken}`;
 		}
 		return config;
 	});

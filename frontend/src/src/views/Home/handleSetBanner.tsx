@@ -16,21 +16,17 @@ export const handleSetBanner = (
 		return;
 	}
 	const { station, explorer, os, disk } = res.data;
-	const {  name } = station;
-    const { device_id } = explorer;
-	const { arch, distro } = os;
-	const { percent } = disk;
 	stateFn({
 		title: "views.home.banner.success.title",
 		content: "views.home.banner.success.content",
 		type: "success",
 		values: {
+			disk: (100 - disk.percent).toFixed(2),
+			serial: `0x${explorer.device_id}`,
 			uptime: String(os.uptime),
-			station: name,
-			os: distro,
-			arch,
-			uuid: String(device_id),
-			disk: (100 - percent).toFixed(2)
+			station: station.name,
+			arch: os.arch,
+			os: os.os
 		}
 	});
 };

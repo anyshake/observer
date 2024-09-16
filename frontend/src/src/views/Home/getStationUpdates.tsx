@@ -9,7 +9,6 @@ export const getStationUpdates = async (...fn: ((res: StationUpdates) => void)[]
 	const { endpoints, backend } = apiConfig;
 	const data = await requestRestApi({
 		backend,
-		timeout: 30,
 		endpoint: endpoints.station
 	});
 	fn.forEach((f) => {

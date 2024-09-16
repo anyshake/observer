@@ -19,7 +19,7 @@ func (t *ExplorerStartupTask) Execute(depsContainer *dig.Container, options *sta
 	explorerDriver := explorer.ExplorerDriver(&explorer.ExplorerDriverImpl{})
 
 	logger.GetLogger(t.GetTaskName()).Infoln("device is being initialized, please wait")
-	err = explorerDriver.Init(explorerDeps, &explorerLoggerImpl{moduleName: "explorer_driver"})
+	err = explorerDriver.Init(explorerDeps, logger.GetLogger("explorer_driver"))
 	if err != nil {
 		return err
 	}

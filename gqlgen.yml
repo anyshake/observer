@@ -1,17 +1,17 @@
 schema:
-  - api/v2/*.graphqls
+  - server/endpoints/v2/*.graphqls
 
 exec:
-  filename: api/v2/generated.go
+  filename: server/endpoints/v2/generated.go
   package: v2
 
 model:
-  filename: api/v2/model/models_gen.go
+  filename: server/endpoints/v2/model/models_gen.go
   package: model
 
 resolver:
   layout: follow-schema
-  dir: api/v2
+  dir: server/endpoints/v2
   package: v2
   filename_template: "{name}.resolvers.go"
 

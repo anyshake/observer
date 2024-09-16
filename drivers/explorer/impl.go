@@ -11,6 +11,7 @@ import (
 
 	"github.com/alphadose/haxmap"
 	"github.com/anyshake/observer/utils/fifo"
+	"github.com/sirupsen/logrus"
 	messagebus "github.com/vardius/message-bus"
 )
 
@@ -137,7 +138,7 @@ func (g *mainlinePacket) decode(data []byte) error {
 }
 
 type ExplorerDriverImpl struct {
-	logger         ExplorerLogger
+	logger         *logrus.Entry
 	legacyPacket   legacyPacket
 	mainlinePacket mainlinePacket
 }
@@ -224,7 +225,7 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency, fi
 			// Read the packet data
 			err = e.legacyPacket.decode(dat[len(LEGACY_PACKET_FRAME_HEADER):])
 			if err != nil {
-				e.logger.Warnf("failed to decode legacy packet: %v", err)
+				e.logger.Errorf("failed to decode legacy packet: %v", err)
 				deps.Health.SetErrors(deps.Health.GetErrors() + 1)
 			} else {
 				packetBuffer = append(packetBuffer, e.legacyPacket)
@@ -284,7 +285,7 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency, 
 			}
 			err = e.mainlinePacket.decode(dat[len(MAINLINE_PACKET_FRAME_HEADER):])
 			if err != nil {
-				e.logger.Warnf("failed to decode mainline packet: %v", err)
+				e.logger.Errorf("failed to decode mainline packet: %v", err)
 				deps.Health.SetErrors(deps.Health.GetErrors() + 1)
 				continue
 			}
@@ -382,7 +383,7 @@ func (e *ExplorerDriverImpl) readerDaemon(deps *ExplorerDependency) {
 	}
 }
 
-func (e *ExplorerDriverImpl) Init(deps *ExplorerDependency, logger ExplorerLogger) error {
+func (e *ExplorerDriverImpl) Init(deps *ExplorerDependency, logger *logrus.Entry) error {
 	e.logger = logger
 
 	currentTime := deps.FallbackTime.Get()

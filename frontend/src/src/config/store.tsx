@@ -4,6 +4,7 @@ import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 import adc, { ADC } from "../stores/adc";
+import credential, { Credential } from "../stores/credential";
 import duration from "../stores/duration";
 import geophone, { Geophone } from "../stores/geophone";
 import retention from "../stores/retention";
@@ -19,6 +20,10 @@ const retentionPersistConfig = persistReducer(
 	{ storage, key: "retention", whitelist: ["retention"] },
 	retention
 );
+const credentialPersistConfig = persistReducer(
+	{ storage, key: "credential", whitelist: ["credential"] },
+	credential
+);
 
 const reducer = combineReducers({
 	adc,
@@ -26,14 +31,12 @@ const reducer = combineReducers({
 	station,
 	scale: scalePersistConfig,
 	duration: durationPersistConfig,
-	retention: retentionPersistConfig
+	retention: retentionPersistConfig,
+	credential: credentialPersistConfig
 });
 const REDUX_STORE = configureStore({
 	reducer,
-	middleware: (getDefaultMiddleware) =>
-		getDefaultMiddleware({
-			serializableCheck: false
-		})
+	middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false })
 });
 
 export const REDUX_PRESIST = persistStore(REDUX_STORE);
@@ -51,5 +54,7 @@ export interface ReduxStoreProps {
 	readonly updateGeophone: (geophone: Geophone) => void;
 	readonly retention: ReturnType<typeof retention>;
 	readonly updateRetention: (retention: number) => void;
+	readonly credential: ReturnType<typeof credential>;
+	readonly updateCredential: (credential: Credential) => void;
 }
 export default REDUX_STORE;

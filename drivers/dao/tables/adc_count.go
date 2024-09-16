@@ -15,7 +15,7 @@ type AdcCount struct {
 }
 
 func (t AdcCount) GetModel() any {
-	return t
+	return &AdcCount{}
 }
 
 func (t AdcCount) GetName() string {

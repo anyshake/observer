@@ -1,3 +1,4 @@
+import authRequestModel0 from "../models/request/auth/0.json";
 import historyRequestModel0 from "../models/request/history/0.json";
 import inventoryRequestModel0 from "../models/request/inventory/0.json";
 import mseedRequestModel0 from "../models/request/mseed/0.json";
@@ -5,6 +6,10 @@ import mseedRequestModel1 from "../models/request/mseed/1.json";
 import socketRequestModel0 from "../models/request/socket/0.json";
 import stationRequestModel0 from "../models/request/station/0.json";
 import traceRequestModel0 from "../models/request/trace/0.json";
+import userRequestModel0 from "../models/request/user/0.json";
+import authCommonResponseModel0 from "../models/response/common/auth/0.json";
+import authCommonResponseModel1 from "../models/response/common/auth/1.json";
+import authCommonResponseModel2 from "../models/response/common/auth/2.json";
 import historyCommonResponseModel0 from "../models/response/common/history/0.json";
 import inventoryCommonResponseModel0 from "../models/response/common/inventory/0.json";
 import mseedCommonResponseModel0 from "../models/response/common/mseed/0.json";
@@ -12,11 +17,17 @@ import socketCommonResponseModel0 from "../models/response/common/socket/0.json"
 import stationCommonResponseModel0 from "../models/response/common/station/0.json";
 import traceCommonResponseModel0 from "../models/response/common/trace/0.json";
 import traceCommonResponseModel1 from "../models/response/common/trace/1.json";
+import userCommonResponseModel0 from "../models/response/common/user/0.json";
+import userCommonResponseModel1 from "../models/response/common/user/1.json";
+import userCommonResponseModel2 from "../models/response/common/user/2.json";
+import userCommonResponseModel3 from "../models/response/common/user/3.json";
+import authErrorResponseModel from "../models/response/error/auth.json";
 import historyErrorResponseModel from "../models/response/error/history.json";
 import mseedErrorResponseModel from "../models/response/error/mseed.json";
 import inventoryErrorResponseModel from "../models/response/error/mseed.json";
 import stationErrorResponseModel from "../models/response/error/station.json";
 import traceErrorResponseModel from "../models/response/error/trace.json";
+import userErrorResponseModel from "../models/response/error/user.json";
 
 export interface Endpoint<APIRequest, APICommonResponse, APIErrorResponse = null> {
 	readonly model: {
@@ -46,6 +57,36 @@ const station: Endpoint<
 		response: {
 			common: { ...stationCommonResponseModel0 },
 			error: stationErrorResponseModel
+		}
+	}
+};
+
+export {
+	authCommonResponseModel0,
+	authCommonResponseModel1,
+	authCommonResponseModel2,
+	authRequestModel0
+};
+
+const auth: Endpoint<
+	typeof authRequestModel0,
+	| typeof authCommonResponseModel0
+	| typeof authCommonResponseModel1
+	| typeof authCommonResponseModel2,
+	typeof authErrorResponseModel
+> = {
+	path: "/api/v1/auth",
+	method: "post",
+	type: "http",
+	model: {
+		request: { ...authRequestModel0 },
+		response: {
+			common: {
+				...authCommonResponseModel0,
+				...authCommonResponseModel1,
+				...authCommonResponseModel2
+			},
+			error: authErrorResponseModel
 		}
 	}
 };
@@ -150,17 +191,52 @@ const inventory: Endpoint<
 	}
 };
 
+export {
+	userCommonResponseModel0,
+	userCommonResponseModel1,
+	userCommonResponseModel2,
+	userCommonResponseModel3,
+	userRequestModel0
+};
+
+const user: Endpoint<
+	typeof userRequestModel0,
+	| typeof userCommonResponseModel0
+	| typeof userCommonResponseModel1
+	| typeof userCommonResponseModel2
+	| typeof userCommonResponseModel3,
+	typeof userErrorResponseModel
+> = {
+	path: "/api/v1/user",
+	method: "post",
+	type: "http",
+	model: {
+		request: { ...userRequestModel0 },
+		response: {
+			common: {
+				...userCommonResponseModel0,
+				...userCommonResponseModel1,
+				...userCommonResponseModel2,
+				...userCommonResponseModel3
+			},
+			error: userErrorResponseModel
+		}
+	}
+};
+
 export const apiConfig = {
 	backend:
 		process.env.NODE_ENV === "production"
 			? `${window.location.host}`
 			: `${process.env.REACT_APP_BACKEND}`,
 	endpoints: {
+		auth,
 		station,
 		history,
 		trace,
 		mseed,
 		socket,
-		inventory
+		inventory,
+		user
 	}
 };

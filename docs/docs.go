@@ -15,584 +15,278 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/history": {
+        "/auth": {
             "post": {
-                "description": "Get waveform count data in specified time range, channel and format, the maximum duration of the waveform data to be exported is 24 hours for JSON and 1 hour for SAC",
-                "consumes": [
-                    "application/x-www-form-urlencoded"
-                ],
-                "produces": [
-                    "application/json",
-                    "application/octet-stream"
-                ],
-                "summary": "AnyShake Observer waveform history",
-                "parameters": [
+                "security": [
                     {
-                        "type": "integer",
-                        "description": "Start timestamp of the waveform data to be queried, in milliseconds (unix timestamp)",
-                        "name": "start_time",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "End timestamp of the waveform data to be queried, in milliseconds (unix timestamp)",
-                        "name": "end_time",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Format of the waveform data to be queried, ` + "`" + `json` + "`" + `, ` + "`" + `sac` + "`" + ` or ` + "`" + `miniseed` + "`" + `",
-                        "name": "format",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Channel of the waveform, ` + "`" + `Z` + "`" + `, ` + "`" + `E` + "`" + ` or ` + "`" + `N` + "`" + `, reuqired when format is ` + "`" + `sac` + "`" + ` and ` + "`" + `miniseed` + "`" + `",
-                        "name": "channel",
-                        "in": "formData"
+                        "ApiKeyAuth": []
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "Successfully exported the waveform data",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.HttpResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/explorer.ExplorerData"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Failed to export waveform data due to invalid format or channel",
-                        "schema": {
-                            "$ref": "#/definitions/response.HttpResponse"
-                        }
-                    },
-                    "410": {
-                        "description": "Failed to export waveform data due to no data available",
-                        "schema": {
-                            "$ref": "#/definitions/response.HttpResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Failed to export waveform data due to failed to read data source",
-                        "schema": {
-                            "$ref": "#/definitions/response.HttpResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/inventory": {
-            "get": {
-                "description": "Get SeisComP XML inventory, which contains meta data of the station",
+                "description": "In restricted mode, the client must log in to access other APIs. This API is used to checks the server's authentication status, issues an RSA public key for credential encryption, generates a captcha, authenticates the client, and signs or refreshes the JWT token. This API requires a valid JWT token if action is ` + "`" + `refresh` + "`" + `.",
                 "produces": [
-                    "application/json",
-                    "application/xml"
+                    "application/json"
                 ],
-                "summary": "AnyShake Observer station inventory",
+                "summary": "User Authentication",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Format of the inventory, either ` + "`" + `json` + "`" + ` or ` + "`" + `xml` + "`" + `",
-                        "name": "format",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successfully get SeisComP XML inventory",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.HttpResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/mseed": {
-            "post": {
-                "description": "List MiniSEED data if action is ` + "`" + `show` + "`" + `, or export MiniSEED data in .mseed format if action is ` + "`" + `export` + "`" + `",
-                "consumes": [
-                    "application/x-www-form-urlencoded"
-                ],
-                "produces": [
-                    "application/json",
-                    "application/octet-stream"
-                ],
-                "summary": "AnyShake Observer MiniSEED data",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Action to be performed, either ` + "`" + `show` + "`" + ` or ` + "`" + `export` + "`" + `",
+                        "description": "Specifies the action to be performed. Use ` + "`" + `inspect` + "`" + ` to check the server's restriction status, ` + "`" + `preauth` + "`" + ` to get a Base64 RSA public key in PEM format and generate a Base64 captcha PNG image, ` + "`" + `login` + "`" + ` to authenticate the client using encrypted credentials, and ` + "`" + `refresh` + "`" + ` to refresh the JWT token.",
                         "name": "action",
                         "in": "formData",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Name of MiniSEED file to be exported, end with ` + "`" + `.mseed` + "`" + `",
-                        "name": "name",
+                        "description": "A unique string used to prevent replay attacks, required for the ` + "`" + `login` + "`" + ` action and left empty for other actions. The nonce is the SHA-1 hash of the RSA public key from the pre-authentication stage and becomes invalid once the request is sent. It also expires if unused within the time-to-live (TTL) period, which is set during the pre-authentication stage.",
+                        "name": "nonce",
                         "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Base64 encrypted credential using the RSA public key, required for the ` + "`" + `login` + "`" + ` action and left empty for other actions. The decrypted credential is a JSON object that includes the username, password, captcha ID, and captcha solution. Example: ` + "`" + `{ username: admin, password: admin, captcha_id: 123, captcha_solution: abc }` + "`" + `.",
+                        "name": "credential",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT token, only required for the ` + "`" + `refresh` + "`" + ` action.",
+                        "name": "Authorization",
+                        "in": "header"
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "Successfully get list of MiniSEED files",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.HttpResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/mseed.miniSeedFileInfo"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Failed to list or export MiniSEED data due to invalid request body",
-                        "schema": {
-                            "$ref": "#/definitions/response.HttpResponse"
-                        }
-                    },
-                    "410": {
-                        "description": "Failed to export MiniSEED data due to invalid file name or permission denied",
-                        "schema": {
-                            "$ref": "#/definitions/response.HttpResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Failed to list or export MiniSEED data due to internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/response.HttpResponse"
-                        }
+                "responses": {}
+            }
+        },
+        "/history": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
                     }
-                }
+                ],
+                "description": "Get seismic waveform data from database in specified time range, channel and format. This API supports 1 hour of maximum duration of the waveform data to be queried. This API requires a valid JWT token if the server is in restricted mode.",
+                "produces": [
+                    "application/json",
+                    "application/octet-stream"
+                ],
+                "summary": "Waveform History",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Start time of the waveform to be queried, unix timestamp format in milliseconds.",
+                        "name": "start_time",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "End time of the waveform to be queried, unix timestamp format in milliseconds.",
+                        "name": "end_time",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Set output format of the waveform data, available options are ` + "`" + `json` + "`" + `, ` + "`" + `sac` + "`" + `, and ` + "`" + `miniseed` + "`" + `.",
+                        "name": "format",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Channel of the waveform, available options are ` + "`" + `Z` + "`" + `, ` + "`" + `E` + "`" + ` or ` + "`" + `N` + "`" + ` (in uppercase), only reuqired when output format is set to ` + "`" + `sac` + "`" + ` and ` + "`" + `miniseed` + "`" + `.",
+                        "name": "channel",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT token, only required when the server is in restricted mode.",
+                        "name": "Authorization",
+                        "in": "header"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/inventory": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get SeisComP XML inventory, which contains meta data of the station. This API requires a valid JWT token if the server is in restricted mode.",
+                "produces": [
+                    "application/json",
+                    " application/xml"
+                ],
+                "summary": "Station Inventory",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Format of the inventory, available options are ` + "`" + `json` + "`" + ` or ` + "`" + `xml` + "`" + `",
+                        "name": "format",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT token, only required when the server is in restricted mode.",
+                        "name": "Authorization",
+                        "in": "header"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/mseed": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "This API returns a list of MiniSEED files or exports a specific MiniSEED file. This API requires a valid JWT token if the server is in restricted mode.",
+                "produces": [
+                    "application/json",
+                    "application/octet-stream"
+                ],
+                "summary": "MiniSEED Data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Action to be performed, Use ` + "`" + `list` + "`" + ` to get list of MiniSEED files, ` + "`" + `export` + "`" + ` to export a specific MiniSEED file.",
+                        "name": "action",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "A valid filename of the MiniSEED file to be exported, only required when action is ` + "`" + `export` + "`" + `.",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT token, only required when the server is in restricted mode.",
+                        "name": "Authorization",
+                        "in": "header"
+                    }
+                ],
+                "responses": {}
             }
         },
         "/station": {
             "get": {
-                "description": "Get Observer station status including system information, memory usage, disk usage, CPU usage, ADC information, geophone information, and location information",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get Observer station status including system information, memory usage, disk usage, CPU usage, ADC information, geophone information, and location information. This API requires a valid JWT token if the server is in restricted mode.",
                 "produces": [
                     "application/json"
                 ],
-                "summary": "AnyShake Observer station status",
-                "responses": {
-                    "200": {
-                        "description": "Successfully read station information",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.HttpResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/station.stationInfo"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
+                "summary": "Station Status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT token, only required when the server is in restricted mode.",
+                        "name": "Authorization",
+                        "in": "header"
                     }
-                }
+                ],
+                "responses": {}
             }
         },
         "/trace": {
             "post": {
-                "description": "Get list of earthquake events data source and earthquake events from specified data source",
-                "consumes": [
-                    "application/x-www-form-urlencoded"
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
                 ],
+                "description": "This API retrieves seismic events from the specified data source, including essential information such as event time, location, magnitude, depth and estimated distance and arrival time from the station. This API requires a valid JWT token if the server is in restricted mode.",
                 "produces": [
                     "application/json"
                 ],
-                "summary": "AnyShake Observer event trace",
+                "summary": "Seismic Trace",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Use ` + "`" + `show` + "`" + ` to get available sources first, then choose one and request again to get events",
+                        "description": "Use ` + "`" + `list` + "`" + ` to get available sources first, then choose one and request again to get events",
                         "name": "source",
                         "in": "formData",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT token, only required when the server is in restricted mode.",
+                        "name": "Authorization",
+                        "in": "header"
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "Successfully read the list of earthquake events",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.HttpResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/seisevent.Event"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
+                "responses": {}
+            }
+        },
+        "/user": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "This API is used to manage user accounts, including creating, removing, and editing user profiles. This API only available in restricted mode and requires a valid JWT token.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "User Management",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Specifies the action to be performed. Use ` + "`" + `preauth` + "`" + ` to get a Base64 RSA public key in PEM format, ` + "`" + `profile` + "`" + ` to get profile of current user, ` + "`" + `list` + "`" + ` to get list of all users (admin only), ` + "`" + `create` + "`" + ` to create a new user (admin only), ` + "`" + `remove` + "`" + ` to remove a user (admin only), and ` + "`" + `edit` + "`" + ` to edit a user (admin only).",
+                        "name": "action",
+                        "in": "formData",
+                        "required": true
                     },
-                    "400": {
-                        "description": "Failed to read earthquake event list due to invalid data source",
-                        "schema": {
-                            "$ref": "#/definitions/response.HttpResponse"
-                        }
+                    {
+                        "type": "string",
+                        "description": "A unique string used to prevent replay attacks, required for the ` + "`" + `create` + "`" + `, ` + "`" + `remove` + "`" + `, ` + "`" + `edit` + "`" + ` actions and left empty for other actions. The nonce is the SHA-1 hash of the RSA public key from the pre-authentication stage and becomes invalid once the request is sent. It also expires if unused within the time-to-live (TTL) period, which is set during the pre-authentication stage.",
+                        "name": "nonce",
+                        "in": "formData"
                     },
-                    "500": {
-                        "description": "Failed to read earthquake event list due to failed to read data source",
-                        "schema": {
-                            "$ref": "#/definitions/response.HttpResponse"
-                        }
+                    {
+                        "type": "string",
+                        "description": "The user ID to be removed or edited, required for the ` + "`" + `remove` + "`" + ` and ` + "`" + `edit` + "`" + ` actions and left empty for other actions. The user ID is encrypted with the RSA public key.",
+                        "name": "user_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Specifies whether the user is an administrator, required for the ` + "`" + `create` + "`" + ` and ` + "`" + `edit` + "`" + ` actions and set to false in other actions.",
+                        "name": "admin",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "The username of the user to be created or edited, required for the ` + "`" + `create` + "`" + ` and ` + "`" + `edit` + "`" + ` actions and left empty for other actions. The username is encrypted with the RSA public key.",
+                        "name": "username",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "The password of the user to be created or edited, required for the ` + "`" + `create` + "`" + ` and ` + "`" + `edit` + "`" + ` actions and left empty for other actions. The password is encrypted with the RSA public key.",
+                        "name": "password",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT token.",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
                     }
-                }
-            }
-        }
-    },
-    "definitions": {
-        "config.Sensor": {
-            "type": "object",
-            "properties": {
-                "frequency": {
-                    "type": "number"
-                },
-                "fullscale": {
-                    "type": "number"
-                },
-                "resolution": {
-                    "type": "integer"
-                },
-                "sensitivity": {
-                    "type": "number"
-                },
-                "velocity": {
-                    "type": "boolean"
-                },
-                "vref": {
-                    "type": "number"
-                }
-            }
-        },
-        "config.Station": {
-            "type": "object",
-            "properties": {
-                "city": {
-                    "type": "string"
-                },
-                "country": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "owner": {
-                    "type": "string"
-                },
-                "region": {
-                    "type": "string"
-                }
-            }
-        },
-        "config.Stream": {
-            "type": "object",
-            "properties": {
-                "channel": {
-                    "type": "string",
-                    "maxLength": 3
-                },
-                "location": {
-                    "type": "string",
-                    "maxLength": 2
-                },
-                "network": {
-                    "type": "string",
-                    "maxLength": 2
-                },
-                "station": {
-                    "type": "string",
-                    "maxLength": 5
-                }
-            }
-        },
-        "explorer.ExplorerData": {
-            "type": "object",
-            "properties": {
-                "e_axis": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "n_axis": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "sample_rate": {
-                    "type": "integer"
-                },
-                "timestamp": {
-                    "type": "integer"
-                },
-                "z_axis": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                }
-            }
-        },
-        "mseed.miniSeedFileInfo": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "size": {
-                    "type": "string"
-                },
-                "time": {
-                    "type": "integer"
-                },
-                "ttl": {
-                    "type": "integer"
-                }
-            }
-        },
-        "response.HttpResponse": {
-            "type": "object",
-            "properties": {
-                "data": {},
-                "error": {
-                    "type": "boolean"
-                },
-                "message": {
-                    "type": "string"
-                },
-                "path": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "integer"
-                },
-                "time": {
-                    "type": "string"
-                }
-            }
-        },
-        "seisevent.Estimation": {
-            "type": "object",
-            "properties": {
-                "p": {
-                    "type": "number"
-                },
-                "s": {
-                    "type": "number"
-                }
-            }
-        },
-        "seisevent.Event": {
-            "type": "object",
-            "properties": {
-                "depth": {
-                    "type": "number"
-                },
-                "distance": {
-                    "type": "number"
-                },
-                "estimation": {
-                    "$ref": "#/definitions/seisevent.Estimation"
-                },
-                "event": {
-                    "type": "string"
-                },
-                "latitude": {
-                    "type": "number"
-                },
-                "longitude": {
-                    "type": "number"
-                },
-                "magnitude": {
-                    "type": "number"
-                },
-                "region": {
-                    "type": "string"
-                },
-                "timestamp": {
-                    "type": "integer"
-                },
-                "verfied": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "station.cpuInfo": {
-            "type": "object",
-            "properties": {
-                "model": {
-                    "type": "string"
-                },
-                "percent": {
-                    "type": "number"
-                }
-            }
-        },
-        "station.diskInfo": {
-            "type": "object",
-            "properties": {
-                "free": {
-                    "type": "integer"
-                },
-                "percent": {
-                    "type": "number"
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "used": {
-                    "type": "integer"
-                }
-            }
-        },
-        "station.explorerInfo": {
-            "type": "object",
-            "properties": {
-                "device_id": {
-                    "type": "integer"
-                },
-                "elapsed": {
-                    "type": "integer"
-                },
-                "elevation": {
-                    "type": "number"
-                },
-                "errors": {
-                    "type": "integer"
-                },
-                "latitude": {
-                    "type": "number"
-                },
-                "longitude": {
-                    "type": "number"
-                },
-                "received": {
-                    "type": "integer"
-                },
-                "sample_rate": {
-                    "type": "integer"
-                }
-            }
-        },
-        "station.memoryInfo": {
-            "type": "object",
-            "properties": {
-                "free": {
-                    "type": "integer"
-                },
-                "percent": {
-                    "type": "number"
-                },
-                "total": {
-                    "type": "integer"
-                },
-                "used": {
-                    "type": "integer"
-                }
-            }
-        },
-        "station.osInfo": {
-            "type": "object",
-            "properties": {
-                "arch": {
-                    "type": "string"
-                },
-                "distro": {
-                    "type": "string"
-                },
-                "hostname": {
-                    "type": "string"
-                },
-                "os": {
-                    "type": "string"
-                },
-                "timestamp": {
-                    "type": "integer"
-                },
-                "uptime": {
-                    "type": "integer"
-                }
-            }
-        },
-        "station.stationInfo": {
-            "type": "object",
-            "properties": {
-                "cpu": {
-                    "$ref": "#/definitions/station.cpuInfo"
-                },
-                "disk": {
-                    "$ref": "#/definitions/station.diskInfo"
-                },
-                "explorer": {
-                    "$ref": "#/definitions/station.explorerInfo"
-                },
-                "memory": {
-                    "$ref": "#/definitions/station.memoryInfo"
-                },
-                "os": {
-                    "$ref": "#/definitions/station.osInfo"
-                },
-                "sensor": {
-                    "$ref": "#/definitions/config.Sensor"
-                },
-                "station": {
-                    "$ref": "#/definitions/config.Station"
-                },
-                "stream": {
-                    "$ref": "#/definitions/config.Stream"
-                }
+                ],
+                "responses": {}
             }
         }
     }
@@ -604,8 +298,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "AnyShake Observer APIv1",
-	Description:      "This is APIv1 documentation for AnyShake Observer, please set `server_settings.debug` to `false` in `config.json` when deploying to production environment in case of any security issues.",
+	Title:            "AnyShake Observer API v1",
+	Description:      "This is API v1 documentation for AnyShake Observer, please set `server_settings.debug` to `false` in `config.json` when deploying to production environment in case of any security issues.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
