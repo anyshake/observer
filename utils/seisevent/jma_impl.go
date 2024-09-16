@@ -58,7 +58,9 @@ func (j *JMA) GetEvents(latitude, longitude float64) ([]Event, error) {
 			continue
 		}
 
-		timestamp, err := j.getTimestamp(event["at"].(string))
+		// Second is the last 2 digits of the event ID
+		eventId := event["eid"].(string)
+		timestamp, err := j.getTimestamp(event["at"].(string), eventId[len(eventId)-2:])
 		if err != nil {
 			continue
 		}
@@ -67,7 +69,7 @@ func (j *JMA) GetEvents(latitude, longitude float64) ([]Event, error) {
 			Verfied:   true,
 			Timestamp: timestamp,
 			Depth:     j.getDepth(event["cod"].(string)),
-			Event:     event["eid"].(string),
+			Event:     eventId,
 			Region:    event["anm"].(string),
 			Latitude:  j.getLatitude(event["cod"].(string)),
 			Longitude: j.getLongitude(event["cod"].(string)),
@@ -82,13 +84,14 @@ func (j *JMA) GetEvents(latitude, longitude float64) ([]Event, error) {
 	return sortSeismicEvents(resultArr), nil
 }
 
-func (j *JMA) getTimestamp(timeStr string) (int64, error) {
+func (j *JMA) getTimestamp(timeStr, secStr string) (int64, error) {
 	t, err := time.Parse("2006-01-02T15:04:05+09:00", timeStr)
 	if err != nil {
 		return 0, err
 	}
 
-	return t.Add(-9 * time.Hour).UnixMilli(), nil
+	sec := int(string2Float(secStr))
+	return t.Add(time.Duration(sec) * time.Second).Add(-9 * time.Hour).UnixMilli(), nil
 }
 
 func (j *JMA) getDepth(data string) float64 {
