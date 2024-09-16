@@ -58,13 +58,14 @@ export const Main = ({ currentLocale, locales, onSwitchLocale, onLoginStateChang
 		}
 	}, [credential, onLoginStateChange, dispatch]);
 	useEffect(() => {
-		if (credential.expires_at) {
-			const interval = setInterval(
-				refreshToken,
-				credential.expires_at - Date.now() - 3600 * 1000
-			);
-			return () => clearInterval(interval);
+		const refreshThreshold = 1800 * 1000; // refresh before 30 minutes of expiration
+		let nextRefresh = credential.expires_at - Date.now() - refreshThreshold;
+		if (nextRefresh < 0) {
+			// Attempt to refresh in 5 seconds
+			nextRefresh = 5000;
 		}
+		const interval = setInterval(refreshToken, nextRefresh);
+		return () => clearInterval(interval);
 	}, [credential, refreshToken]);
 
 	// Get page title in the current locale
