@@ -10,7 +10,7 @@ export const Button = (props: ButtonProps) => {
 
 	return (
 		<button
-			className={`w-full text-white font-medium text-sm shadow-lg rounded-lg py-2 ${
+			className={`text-white font-medium text-sm shadow-lg rounded-lg py-2 transition-all ${
 				className ?? ""
 			}`}
 			onClick={onClick}

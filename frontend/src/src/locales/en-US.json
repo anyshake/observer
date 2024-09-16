@@ -1,4 +1,43 @@
 {
+    "login": {
+        "forms": {
+            "username": {
+                "title": "Username",
+                "placeholder": "Your username",
+                "error": "Please enter a username"
+            },
+            "password": {
+                "title": "Password",
+                "placeholder": "Your password",
+                "error": "Please enter a password"
+            },
+            "captcha": {
+                "title": "Captcha",
+                "placeholder": "Captcha",
+                "error": "Please enter the captcha"
+            },
+            "submit": {
+                "title": "Login"
+            }
+        },
+        "toasts": {
+            "is_refreshing_captcha": "Refreshing captcha, please wait...",
+            "refresh_captcha_success": "Captcha refreshed successfully",
+            "refresh_captcha_error": "Failed to refresh captcha",
+            "is_logging_in": "Logging in",
+            "login_success": "Login successful",
+            "login_error": "Login failed, please check your username, password, or captcha"
+        }
+    },
+    "main": {
+        "toasts": {
+            "confirm_title": "Confirm Action",
+            "confirm_button": "OK",
+            "cancel_button": "Cancel",
+            "confirm_logout": "Are you sure you want to log out?",
+            "logout_success": "You have logged out, please close your browser to ensure security"
+        }
+    },
     "components": {
         "chart": {
             "reset_zoom": "Reset Zoom",
@@ -14,7 +53,7 @@
                 },
                 "success": {
                     "title": "{{ station }} Connected",
-                    "content": "Uptime: {{ uptime }} s\nFree disk: {{ disk }}%\nArchitecture: {{ arch }}/{{ os }}"
+                    "content": "Uptime: {{ uptime }} s\nFree disk: {{ disk }}%\nArchitecture: {{ arch }}/{{ os }}\nHardware serial number: {{ serial }}"
                 },
                 "error": {
                     "title": "Connection Failed",
@@ -244,21 +283,21 @@
             },
             "table": {
                 "columns": {
+                    "id": "ID",
                     "name": "File Name",
                     "size": "File Size",
                     "time": "Modified Date",
-                    "ttl": "TTL (in days)"
+                    "ttl": "TTL (in days)",
+                    "actions": "Actions"
                 },
                 "actions": {
                     "export": "Export"
-                },
-                "placeholder": {
-                    "is_fetching_mseed": "Fetching, please wait...",
-                    "fetch_mseed_error": "Empty or fetch failed"
-                },
-                "load_more": "Load More"
+                }
             },
             "toasts": {
+                "is_fetching_files": "Fetching file list, please wait...",
+                "fetch_files_success": "File list retrieved successfully",
+                "fetch_files_error": "Failed to retrieve file list",
                 "is_exporting_mseed": "Exporting MiniSEED format file, it may take some time",
                 "export_mseed_success": "MiniSEED format file exported successfully",
                 "is_fetching_mseed": "Fetching MiniSEED format file list, please wait..."
@@ -269,14 +308,17 @@
                 "select_scale": "Select Seismic Scale",
                 "purge_cache": "Clear Application Cache",
                 "waveform_retention": "Set Waveform Retention Time",
-                "query_duration": "Set Query Range"
+                "query_duration": "Set Query Range",
+                "refresh_user": "Refresh User",
+                "create_user": "Create User"
             },
             "panels": {
                 "select_scale": "Seismic Scale",
                 "purge_cache": "Reset Application",
                 "waveform_retention": "Waveform Settings",
                 "query_duration": "Query Settings",
-                "station_inventory": "SeisComp XML Inventory"
+                "station_inventory": "SeisComp XML Inventory",
+                "user_management": "User Management"
             },
             "selects": {
                 "choose_scale": {
@@ -299,6 +341,51 @@
                     "cancel": "Cancel"
                 }
             },
+            "dialogs": {
+                "create_user": {
+                    "title": "Create User",
+                    "username": "Username",
+                    "password": "Password",
+                    "admin": "Administrator",
+                    "content": "Username must be at least 4 characters long, consisting of uppercase and lowercase letters, numbers, and underscores; Password must be at least 8 characters long and include uppercase and lowercase letters, numbers, and special characters",
+                    "submit": "Create",
+                    "cancel": "Cancel",
+                    "yes": "Yes",
+                    "no": "No"
+                },
+                "edit_user": {
+                    "title": "Edit User",
+                    "username": "Username",
+                    "password": "Password",
+                    "admin": "Administrator",
+                    "content": "Username must be at least 4 characters long, consisting of uppercase and lowercase letters, numbers, and underscores; Password must be at least 8 characters long and include uppercase and lowercase letters, numbers, and special characters; If not changing the password, please leave the password field blank",
+                    "submit": "Update",
+                    "cancel": "Cancel",
+                    "yes": "Yes",
+                    "no": "No"
+                }
+            },
+            "table": {
+                "columns": {
+                    "id": "ID",
+                    "user_id": "User ID",
+                    "username": "Username",
+                    "last_login": "Last Login",
+                    "created_at": "Created At",
+                    "updated_at": "Updated At",
+                    "admin": "Administrator",
+                    "actions": "Actions",
+                    "user_ip": "User IP",
+                    "user_agent": "User Agent",
+                    "never": "Never",
+                    "yes": "Yes",
+                    "no": "No"
+                },
+                "actions": {
+                    "edit": "Edit",
+                    "remove": "Delete"
+                }
+            },
             "toasts": {
                 "confirm_title": "Confirmation",
                 "confirm_button": "OK",
@@ -307,7 +394,20 @@
                 "cache_purged": "App cache has been cleared, page will refresh soon",
                 "scale_changed": "Intensity scale has been changed to {{ scale }}, page will refresh soon",
                 "retention_set": "Real-time waveform retention time has been set to {{ current }} s, page will refresh soon",
-                "duration_set": "Historical waveform default range has been set to {{ current }} s, page will refresh soon"
+                "duration_set": "Historical waveform default range has been set to {{ current }} s, page will refresh soon",
+                "is_creating_user": "Creating user, please wait...",
+                "create_user_success": "User created successfully",
+                "create_user_error": "User creation failed, please check if the username is in conflict or if the password meets the requirements",
+                "is_editing_user": "Updating user attributes, please wait...",
+                "edit_user_success": "User attributes updated successfully",
+                "edit_user_error": "User attribute update failed, please check if the new attributes meet the requirements",
+                "is_refreshing_user": "Refreshing user list, please wait...",
+                "refresh_user_success": "User list refreshed successfully",
+                "refresh_user_error": "Failed to refresh user list",
+                "confirm_remove_user": "Are you sure you want to delete user {{ username }}?",
+                "is_removing_user": "Deleting user, please wait...",
+                "remove_user_success": "User deleted successfully",
+                "remove_user_error": "Failed to delete user, or the user cannot be deleted"
             },
             "contents": {
                 "select_scale": "Current intensity scale: {{ scale }}\nIntensity scale is a standard used to measure the intensity of an earthquake. Different scales can lead to different magnitude values.",

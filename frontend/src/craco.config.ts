@@ -26,7 +26,7 @@ module.exports = {
 				} catch {
 					version = "custombuild";
 				}
-				return JSON.stringify(`${version}-${commit}-${Date.now() / 1000}`);
+				return JSON.stringify(`${version}-${commit}-${Math.floor(Date.now() / 1000)}`);
 			};
 			webpackConfig.plugins!.push(
 				new DefinePlugin({

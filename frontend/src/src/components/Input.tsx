@@ -1,34 +1,43 @@
-import { TextField } from "@mui/material";
-import { ChangeEvent, InputHTMLAttributes } from "react";
+import { FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { InputHTMLAttributes } from "react";
 
 interface InputProps {
 	readonly label: string;
 	readonly disabled?: boolean;
 	readonly className?: string;
-	readonly defaultValue: string | number;
+	readonly fullWidth?: boolean;
+	readonly defaultValue?: string | number;
 	readonly numberLimit?: { max: number; min: number };
-	readonly type: InputHTMLAttributes<unknown>["type"];
+	readonly type: InputHTMLAttributes<unknown>["type"] | "select";
 	readonly onValueChange?: (value: string | number) => void;
+	readonly selectOptions?: { value: string; label: string }[];
 }
 
-export const Input = (props: InputProps) => {
-	const { label, disabled, className, defaultValue, numberLimit, type, onValueChange } = props;
-
-	const handleOnChange = ({ target }: ChangeEvent<HTMLTextAreaElement>) => {
+export const Input = ({
+	label,
+	disabled,
+	className,
+	defaultValue,
+	fullWidth,
+	numberLimit,
+	type,
+	onValueChange,
+	selectOptions
+}: InputProps) => {
+	const handleChange = (value: string) => {
 		if (!onValueChange) {
 			return;
 		}
-		const { value } = target;
 		if (type === "number") {
 			const numberValue = Number(value);
 			if (isNaN(numberValue)) {
-				onValueChange(defaultValue);
+				onValueChange(defaultValue ?? "");
 				return;
 			}
 			if (numberLimit) {
 				const { max, min } = numberLimit;
 				if (numberValue > max || numberValue < min) {
-					onValueChange(defaultValue);
+					onValueChange(defaultValue ?? "");
 					return;
 				}
 			}
@@ -39,15 +48,36 @@ export const Input = (props: InputProps) => {
 	};
 
 	return (
-		<TextField
-			size="small"
-			type={type}
-			label={label}
-			disabled={disabled}
-			onChange={handleOnChange}
-			defaultValue={defaultValue}
-			className={`w-full ${className ?? ""}`}
-			InputLabelProps={{ shrink: true }}
-		/>
+		<FormControl fullWidth={fullWidth} sx={{ minWidth: 80 }}>
+			{type === "select" ? (
+				<>
+					<InputLabel>{label}</InputLabel>
+					<Select
+						size="small"
+						label={label}
+						disabled={disabled}
+						onChange={({ target }) => handleChange(String(target.value))}
+						defaultValue={selectOptions?.[0].value}
+					>
+						{selectOptions?.map(({ value, label }) => (
+							<MenuItem key={value} value={value}>
+								{label}
+							</MenuItem>
+						))}
+					</Select>
+				</>
+			) : (
+				<TextField
+					size="small"
+					type={type}
+					label={label}
+					disabled={disabled}
+					defaultValue={defaultValue}
+					className={`w-full ${className ?? ""}`}
+					InputLabelProps={{ shrink: true }}
+					onChange={({ target }) => handleChange(target.value)}
+				/>
+			)}
+		</FormControl>
 	);
 };

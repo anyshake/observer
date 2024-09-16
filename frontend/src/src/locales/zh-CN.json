@@ -1,4 +1,43 @@
 {
+    "login": {
+        "forms": {
+            "username": {
+                "title": "用户名",
+                "placeholder": "您的用户名",
+                "error": "请输入用户名"
+            },
+            "password": {
+                "title": "密码",
+                "placeholder": "您的密码",
+                "error": "请输入密码"
+            },
+            "captcha": {
+                "title": "验证码",
+                "placeholder": "验证码",
+                "error": "请输入验证码"
+            },
+            "submit": {
+                "title": "登入"
+            }
+        },
+        "toasts": {
+            "is_refreshing_captcha": "正在刷新验证码，请稍等...",
+            "refresh_captcha_success": "验证码刷新成功",
+            "refresh_captcha_error": "验证码刷新失败",
+            "is_logging_in": "正在登入",
+            "login_success": "登入成功",
+            "login_error": "登入失败，请检查用户名、密码或验证码是否正确"
+        }
+    },
+    "main": {
+        "toasts": {
+            "confirm_title": "确认操作",
+            "confirm_button": "确定",
+            "cancel_button": "取消",
+            "confirm_logout": "您确定要登出吗？",
+            "logout_success": "您已登出，请关闭浏览器以确保安全"
+        }
+    },
     "components": {
         "chart": {
             "reset_zoom": "重置视图",
@@ -14,7 +53,7 @@
                 },
                 "success": {
                     "title": "{{ station }} 已连接",
-                    "content": "服务器在线 {{ uptime }} 秒\n磁盘剩余容量 {{ disk }}%\n服务器架构 {{ arch }}/{{ os }}"
+                    "content": "服务器在线 {{ uptime }} 秒\n磁盘剩余容量 {{ disk }}%\n服务器架构 {{ arch }}/{{ os }}\n硬件序列号 {{ serial }}"
                 },
                 "error": {
                     "title": "连接失败",
@@ -244,21 +283,21 @@
             },
             "table": {
                 "columns": {
+                    "id": "ID",
                     "name": "文件名称",
                     "size": "文件大小",
                     "time": "修改日期",
-                    "ttl": "有效期（天）"
+                    "ttl": "有效期（天）",
+                    "actions": "操作"
                 },
                 "actions": {
                     "export": "导出"
-                },
-                "placeholder": {
-                    "is_fetching_mseed": "正在获取，请稍等...",
-                    "fetch_mseed_error": "列表为空或获取失败"
-                },
-                "load_more": "加载更多"
+                }
             },
             "toasts": {
+                "is_fetching_files": "正在获取文件列表，请稍等...",
+                "fetch_files_success": "文件列表获取成功",
+                "fetch_files_error": "文件列表获取失败",
                 "is_exporting_mseed": "正在导出 MiniSEED 格式文件，这可能需要一些时间",
                 "export_mseed_success": "MiniSEED 格式文件导出成功",
                 "is_fetching_mseed": "正在获取 MiniSEED 格式文件列表，请稍等..."
@@ -269,14 +308,17 @@
                 "select_scale": "选择烈度标准",
                 "purge_cache": "清除应用缓存",
                 "waveform_retention": "设定波形保留时间",
-                "query_duration": "设定查询范围"
+                "query_duration": "设定查询范围",
+                "refresh_user": "刷新列表",
+                "create_user": "创建用户"
             },
             "panels": {
                 "select_scale": "烈度标准",
                 "purge_cache": "重置应用",
                 "waveform_retention": "波形设定",
                 "query_duration": "查询设定",
-                "station_inventory": "SeisComp 元数据"
+                "station_inventory": "SeisComp 元数据",
+                "user_management": "用户管理"
             },
             "selects": {
                 "choose_scale": {
@@ -299,6 +341,51 @@
                     "cancel": "取消"
                 }
             },
+            "dialogs": {
+                "create_user": {
+                    "title": "创建用户",
+                    "username": "用户名",
+                    "password": "密码",
+                    "admin": "管理员",
+                    "content": "用户名不少于 4 位，由大小写字母、数字和下划线组成；密码不少于 8 位，需要包含大小写字母、数字和特殊字符",
+                    "submit": "创建",
+                    "cancel": "取消",
+                    "yes": "是",
+                    "no": "否"
+                },
+                "edit_user": {
+                    "title": "编辑用户",
+                    "username": "用户名",
+                    "password": "密码",
+                    "admin": "管理员",
+                    "content": "用户名不少于 4 位，由大小写字母、数字和下划线组成；密码不少于 8 位，需要包含大小写字母、数字和特殊字符；若不修改密码，请保持密码字段为空",
+                    "submit": "更新",
+                    "cancel": "取消",
+                    "yes": "是",
+                    "no": "否"
+                }
+            },
+            "table": {
+                "columns": {
+                    "id": "ID",
+                    "user_id": "用户 ID",
+                    "username": "用户名",
+                    "last_login": "最后登入",
+                    "created_at": "创建于",
+                    "updated_at": "更新于",
+                    "admin": "管理员",
+                    "actions": "操作",
+                    "user_ip": "登入 IP",
+                    "user_agent": "客户端",
+                    "never": "从未",
+                    "yes": "是",
+                    "no": "否"
+                },
+                "actions": {
+                    "edit": "编辑",
+                    "remove": "删除"
+                }
+            },
             "toasts": {
                 "confirm_title": "确认操作",
                 "confirm_button": "确定",
@@ -307,7 +394,20 @@
                 "cache_purged": "应用缓存已清除，页面即将刷新",
                 "scale_changed": "烈度标准已更改为 {{ scale }}，页面即将刷新",
                 "retention_set": "实时波形保留时间已更改为 {{ current }} s，页面即将刷新",
-                "duration_set": "历史波形默认查询范围已更改为 {{ current }} s，页面即将刷新"
+                "duration_set": "历史波形默认查询范围已更改为 {{ current }} s，页面即将刷新",
+                "is_creating_user": "正在创建用户，请稍等...",
+                "create_user_success": "用户创建成功",
+                "create_user_error": "用户创建失败，请检查用户名是否冲突，或密码是否符合要求",
+                "is_editing_user": "正在更新用户属性，请稍等...",
+                "edit_user_success": "用户属性更新成功",
+                "edit_user_error": "用户属性更新失败，请检查新属性是否符合要求",
+                "is_refreshing_user": "正在刷新用户列表，请稍等...",
+                "refresh_user_success": "用户列表刷新成功",
+                "refresh_user_error": "用户列表刷新失败",
+                "confirm_remove_user": "您确定要删除用户 {{ username }} 吗？",
+                "is_removing_user": "正在删除用户，请稍等...",
+                "remove_user_success": "用户删除成功",
+                "remove_user_error": "用户删除失败，或该用户不可删除"
             },
             "contents": {
                 "select_scale": "当前烈度标准 {{ scale }}\n烈度标准是用来衡量地震烈度的标准，不同的标准会导致不同的烈度值。",

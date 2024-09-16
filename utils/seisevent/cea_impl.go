@@ -61,7 +61,7 @@ func (c *CEA) GetEvents(latitude, longitude float64) ([]Event, error) {
 			textValue := strings.TrimSpace(s.Text())
 			switch i {
 			case 0:
-				seisEvent.Verfied = true
+				seisEvent.Verfied = false
 				seisEvent.Depth = -1
 				dateText = textValue
 			case 1:
@@ -88,16 +88,16 @@ func (c *CEA) GetEvents(latitude, longitude float64) ([]Event, error) {
 
 func (c *CEA) getTimestamp(data string) int64 {
 	t, _ := time.Parse("02/01/2006 15:04:05", data)
-	return t.UnixMilli()
+	return t.Add(-2 * time.Hour).UnixMilli()
 }
 
 func (c *CEA) getMagnitude(data string) []Magnitude {
 	m := strings.Split(data, "=")
 	if len(m) > 1 {
-		magnitudeType := MagnitudeType(strings.ToUpper(m[0]))
+		magnitudeType := strings.ToUpper(m[0])
 		magnitudeVal, _ := strconv.ParseFloat(m[1], 64)
 		return []Magnitude{
-			{Type: magnitudeType, Value: magnitudeVal},
+			{Type: ParseMagnitude(magnitudeType), Value: magnitudeVal},
 		}
 	}
 

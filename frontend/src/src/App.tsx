@@ -1,132 +1,111 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
-import { useLocation } from "react-router-dom";
 
 import { Container } from "./components/Container";
-import { Footer } from "./components/Footer";
-import { Header } from "./components/Header";
-import { Navbar } from "./components/Navbar";
-import { RouterView } from "./components/RouterView";
-import { Scroller } from "./components/Scroller";
-import { Sidebar } from "./components/Sidebar";
-import { Skeleton } from "./components/Skeleton";
-import { apiConfig } from "./config/api";
-import { globalConfig } from "./config/global";
+import { apiConfig, authCommonResponseModel1 } from "./config/api";
 import i18n, { i18nConfig } from "./config/i18n";
-import { menuConfig } from "./config/menu";
-import { routerConfig } from "./config/router";
 import { hideLoading } from "./helpers/app/hideLoading";
 import { getCurrentLocale } from "./helpers/i18n/getCurrentLocale";
 import { setUserLocale } from "./helpers/i18n/setUserLocale";
 import { requestRestApi } from "./helpers/request/requestRestApi";
-import { onUpdate as UpdateADC } from "./stores/adc";
-import { onUpdate as UpdateGeophone } from "./stores/geophone";
-import { onUpdate as UpdateStation } from "./stores/station";
+import { Login } from "./Login";
+import { Main } from "./Main";
+import { initialCredential, onUpdate as UpdateCredential } from "./stores/credential";
 
 const App = () => {
-	const { t } = useTranslation();
-	const { routes, basename } = routerConfig;
-	const { fallback, resources } = i18nConfig;
-	const { name, title, author, repository, homepage, footer } = globalConfig;
-
-	useEffect(() => {
-		hideLoading();
-		// eslint-disable-next-line no-console
-		console.log(`%c${process.env.BUILD_TAG ?? "custom build"}`, "color: #0369a1;");
-	}, []);
-
-	const { pathname } = useLocation();
-	const [currentTitle, setCurrentTitle] = useState(title);
-	const [currentLocale, setCurrentLocale] = useState(fallback);
-
-	const setCurrentLocaleToState = async () => {
-		setCurrentLocale(await getCurrentLocale(i18n));
-	};
-
-	const getCurrentTitle = useCallback(() => {
-		for (const key in routes) {
-			const { prefix, uri, suffix } = routes[key];
-			const fullPath = `${prefix}${uri}${suffix}`;
-			if (pathname === fullPath) {
-				return routes[key].title[currentLocale];
-			}
-		}
-		return routes.default.title[currentLocale];
-	}, [routes, pathname, currentLocale]);
-
-	useEffect(() => {
-		void setCurrentLocaleToState();
-		const subtitle = getCurrentTitle();
-		setCurrentTitle(subtitle);
-		document.title = `${subtitle} - ${title}`;
-	}, [t, getCurrentTitle, title]);
-
+	// Check if the user needs to login before loading the main page
+	const [appInspection, setAppInspection] = useState({
+		hasRestrict: false,
+		hasLoggedIn: false,
+		loadPage: false
+	});
 	const dispatch = useDispatch();
-
-	const getStationAttributes = useCallback(async () => {
+	const getAppInspection = useCallback(async () => {
 		const { backend, endpoints } = apiConfig;
-		const res = await requestRestApi({
+		const res = (await requestRestApi({
 			backend,
-			timeout: 30,
-			endpoint: endpoints.station
-		});
-		if (res?.data) {
-			const initialized = true;
-			const { sensitivity, frequency } = res.data.sensor;
-			dispatch(UpdateGeophone({ sensitivity, frequency, initialized }));
-			const { resolution, fullscale } = res.data.sensor;
-			dispatch(UpdateADC({ resolution, fullscale, initialized }));
-			const { station, network, location, channel } = res.data.stream;
-			dispatch(UpdateStation({ station, network, location, initialized, channel }));
+			endpoint: endpoints.auth,
+			payload: { action: "inspect", nonce: "", credential: "" }
+		})) as typeof authCommonResponseModel1;
+		if (res.data) {
+			// Clear credential store if not restricted
+			if (!res.data?.restrict) {
+				dispatch(UpdateCredential(initialCredential));
+			}
+			setAppInspection({
+				hasLoggedIn: !(res.data?.restrict ?? false),
+				hasRestrict: res.data?.restrict,
+				loadPage: true
+			});
 		}
 	}, [dispatch]);
-
 	useEffect(() => {
-		void getStationAttributes();
-	}, [getStationAttributes]);
+		getAppInspection();
+	}, [getAppInspection]);
 
-	const handleSwitchLocale = (locale: string) => {
-		void setUserLocale(i18n, locale);
+	// Remove spinner after inspection
+	useEffect(() => {
+		if (appInspection.loadPage && appInspection.hasLoggedIn) {
+			// eslint-disable-next-line no-console
+			console.log(`%c${process.env.BUILD_TAG ?? "custom build"}`, "color: #0369a1;");
+		}
+		if (appInspection.loadPage) {
+			hideLoading();
+		}
+	}, [appInspection]);
+
+	// Handler for login state change
+	const handleLoginStateChange = (alive: boolean) => {
+		if (!alive) {
+			dispatch(UpdateCredential(initialCredential));
+		}
+		setAppInspection({ ...appInspection, hasLoggedIn: alive, loadPage: true });
 	};
 
-	const locales = Object.entries(resources).reduce(
+	// Get current locale from i18n
+	const [currentLocale, setCurrentLocale] = useState(i18nConfig.fallback);
+	const { t } = useTranslation();
+	useEffect(() => {
+		const setCurrentLocaleToState = async () => {
+			setCurrentLocale(await getCurrentLocale(i18n));
+		};
+		setCurrentLocaleToState();
+	}, [t]);
+
+	// Locale resources and switcher
+	const locales = Object.entries(i18nConfig.resources).reduce(
 		(acc, [key, value]) => {
 			acc[key] = value.label;
 			return acc;
 		},
 		{} as Record<string, string>
 	);
+	const handleSwitchLocale = (newLocale: string) => {
+		setUserLocale(i18n, newLocale);
+	};
 
 	return (
 		<Container toaster={true}>
-			<Header
-				title={name}
-				locales={locales}
-				currentLocale={currentLocale}
-				onSwitchLocale={handleSwitchLocale}
-			/>
-			<Sidebar title={name} links={menuConfig} currentLocale={currentLocale} />
-
-			<Container main={true}>
-				<Navbar pathname={pathname} basename={basename} title={currentTitle} />
-				<RouterView
-					routes={routes}
-					suspense={<Skeleton />}
-					routerProps={{
-						locale: currentLocale
-					}}
-				/>
-			</Container>
-
-			<Scroller threshold={100} />
-			<Footer
-				text={footer}
-				author={author}
-				homepage={homepage}
-				repository={repository}
-				currentLocale={currentLocale}
-			/>
+			{appInspection.loadPage ? (
+				appInspection.hasLoggedIn ? (
+					<Main
+						onLoginStateChange={handleLoginStateChange}
+						onSwitchLocale={handleSwitchLocale}
+						currentLocale={currentLocale}
+						locales={locales}
+					/>
+				) : (
+					<Login
+						onLoginStateChange={handleLoginStateChange}
+						onSwitchLocale={handleSwitchLocale}
+						currentLocale={currentLocale}
+						locales={locales}
+					/>
+				)
+			) : (
+				<></>
+			)}
 		</Container>
 	);
 };

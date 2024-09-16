@@ -20,10 +20,8 @@ import { handleSetBanner } from "./handleSetBanner";
 import { handleSetCharts } from "./handleSetCharts";
 
 const Realtime = () => {
-	const { t } = useTranslation();
-
+	// States for the banner and charts
 	const { station } = useSelector(({ station }: ReduxStoreProps) => station);
-
 	const [banner, setBanner] = useState<BannerProps & { values?: Record<string, string> }>({
 		type: "warning",
 		title: "views.realtime.banner.warning.label",
@@ -93,12 +91,13 @@ const Realtime = () => {
 		}
 	});
 
+	// Handlers for WebSocket, passing the data to the charts
+	const { t } = useTranslation();
 	const handleSocketOpen = () => {
 		sendUserAlert(t("views.realtime.toasts.websocket_connected"));
 	};
-
 	const handleSocketData = ({ data }: MessageEvent<SocketUpdates>) => {
-		void getSocketUpdates(
+		getSocketUpdates(
 			data,
 			(data) => {
 				handleSetBanner(data, setBanner);
@@ -108,7 +107,6 @@ const Realtime = () => {
 			}
 		);
 	};
-
 	const handleSocketError = () => {
 		setBanner({
 			type: "error",
@@ -116,7 +114,6 @@ const Realtime = () => {
 			content: "views.realtime.banner.error.text"
 		});
 	};
-
 	useSocket({
 		backend: apiConfig.backend,
 		endpoint: apiConfig.endpoints.socket,
@@ -126,8 +123,8 @@ const Realtime = () => {
 		onOpen: handleSocketOpen
 	});
 
+	// Set the height of the charts automatically according to the window size
 	const [chartHeight, setChartHeight] = useState<number>(150);
-
 	const setChartHeightToState = useCallback(() => {
 		let height = Math.round((window.innerHeight * 0.6) / Object.keys(charts).length);
 		if (height < 150) {
@@ -137,11 +134,9 @@ const Realtime = () => {
 		}
 		setChartHeight(height);
 	}, [charts]);
-
 	const handleWindowResize = userThrottle(() => {
 		setChartHeightToState();
 	}, 2000);
-
 	useEffect(() => {
 		setChartHeightToState();
 		window.addEventListener("resize", handleWindowResize);
@@ -150,6 +145,7 @@ const Realtime = () => {
 		};
 	}, [setChartHeightToState, handleWindowResize]);
 
+	// Handler for setting the corner frequency of the Butterworth filter
 	const handleSetCornerFreq = (chartKey: string, lowCorner: boolean, value: number) =>
 		setCharts((charts) => ({
 			...charts,
@@ -165,6 +161,7 @@ const Realtime = () => {
 			}
 		}));
 
+	// Handler for enabling/disabling the Butterworth filter
 	const handleSwitchFilter = (chartKey: string) => {
 		setCharts((charts) => ({
 			...charts,

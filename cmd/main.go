@@ -28,6 +28,7 @@ import (
 	service_watchdog "github.com/anyshake/observer/services/watchdog"
 	"github.com/anyshake/observer/startups"
 	startup_explorer "github.com/anyshake/observer/startups/explorer"
+	startup_setup_admin "github.com/anyshake/observer/startups/setup_admin"
 	"github.com/anyshake/observer/utils/logger"
 	"github.com/anyshake/observer/utils/timesource"
 	"github.com/common-nighthawk/go-figure"
@@ -74,8 +75,8 @@ func init() {
 }
 
 // @BasePath /api/v1
-// @title AnyShake Observer APIv1
-// @description This is APIv1 documentation for AnyShake Observer, please set `server_settings.debug` to `false` in `config.json` when deploying to production environment in case of any security issues.
+// @title AnyShake Observer API v1
+// @description This is API v1 documentation for AnyShake Observer, please set `server_settings.debug` to `false` in `config.json` when deploying to production environment in case of any security issues.
 func main() {
 	args := parseCommandLine()
 	printVersion()
@@ -161,6 +162,7 @@ func main() {
 	// Setup startup tasks and provide dependencies
 	startupTasks := []startups.StartupTask{
 		&startup_explorer.ExplorerStartupTask{CancelToken: cancelToken},
+		&startup_setup_admin.SetupAdminStartupTask{CancelToken: cancelToken},
 	}
 	startupOptions := &startups.Options{
 		Config:     &conf,
@@ -206,19 +208,12 @@ func main() {
 	}
 
 	// Start HTTP server
-	go server.Serve(
-		conf.Server.Host,
-		conf.Server.Port,
-		&server.Options{
-			CORS:            conf.Server.CORS,
-			DebugMode:       conf.Server.Debug,
-			GzipLevel:       GZIP_LEVEL,
-			RateFactor:      conf.Server.Rate,
-			WebPrefix:       WEB_PREFIX,
-			ApiPrefix:       API_PREFIX,
-			ServicesOptions: serviceOptions,
-		})
-	logger.GetLogger(main).Infof("web server is listening on %s:%d", conf.Server.Host, conf.Server.Port)
+	srv := &server.ServerImpl{
+		GzipLevel: GZIP_LEVEL,
+		WebPrefix: WEB_PREFIX,
+		ApiPrefix: API_PREFIX,
+	}
+	go srv.Start(logger.GetLogger("server"), serviceOptions)
 
 	// Receive interrupt signals
 	osSignal := make(chan os.Signal, 1)

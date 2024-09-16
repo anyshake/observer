@@ -31,23 +31,18 @@ import { getSacFileName } from "./getSacFileName";
 import { handleSetCharts } from "./handleSetCharts";
 import { handleSetLabels } from "./handleSetLabels";
 
-const History = (props: RouterComponentProps) => {
-	const { fallback: fallbackLocale } = i18nConfig;
-	const { locale } = props;
-	const { t } = useTranslation();
-
+const History = ({ locale }: RouterComponentProps) => {
+	// Freezing the state of the component until the metadata is initialized
 	const { station } = useSelector(({ station }: ReduxStoreProps) => station);
-	const { duration } = useSelector(({ duration }: ReduxStoreProps) => duration);
-
 	const [isCurrentBusy, setIsCurrentBusy] = useState(!station.initialized);
-
 	useEffect(() => {
 		setIsCurrentBusy(!station.initialized);
 	}, [station.initialized]);
 
-	const currentTimestamp = Date.now();
+	// Attempt to retrieve start and end time from URL search params
+	const { duration } = useSelector(({ duration }: ReduxStoreProps) => duration);
 	const [searchParams, setSearchParams] = useSearchParams();
-
+	const currentTimestamp = Date.now();
 	const [queryDuration, setQueryDuration] = useState<{
 		start_time: number;
 		end_time: number;
@@ -58,6 +53,7 @@ const History = (props: RouterComponentProps) => {
 		end_time: searchParams.has("end") ? Number(searchParams.get("end")) : currentTimestamp
 	});
 
+	// Handler for timepicker changes (start and end time)
 	const handleTimeChange = (value: number, is_end_time: boolean) =>
 		setQueryDuration((prev) => {
 			if (is_end_time) {
@@ -66,21 +62,22 @@ const History = (props: RouterComponentProps) => {
 			return { ...prev, start_time: value };
 		});
 
+	// Basic states for form, other attributes are set on demand
 	const [form, setForm] = useState<FormProps & { values?: Record<string, string | number> }>({
 		open: false,
 		inputType: "select"
 	});
-
 	const handleCloseForm = () => {
 		setForm({ ...form, open: false });
 	};
 
+	// Basic states for select, other attributes are set on demand
 	const [select, setSelect] = useState<SelectProps>({ open: false });
-
 	const handleCloseSelect = () => {
 		setSelect({ ...select, open: false });
 	};
 
+	// States for component data (labels, charts)
 	const [labels, setLabels] = useState<
 		Record<string, LabelProps & { values?: Record<string, string> }>
 	>({
@@ -97,7 +94,6 @@ const History = (props: RouterComponentProps) => {
 			value: "-"
 		}
 	});
-
 	const [charts, setCharts] = useState<
 		Record<
 			string,
@@ -155,6 +151,7 @@ const History = (props: RouterComponentProps) => {
 		}
 	});
 
+	// Handlers for setting corner frequencies for Butterworth filter
 	const handleSetCornerFreq = (chartKey: string, lowCorner: boolean, value: number) =>
 		setCharts((charts) => ({
 			...charts,
@@ -170,6 +167,7 @@ const History = (props: RouterComponentProps) => {
 			}
 		}));
 
+	// Handler for applying Butterworth filter to chart data
 	const handleSwitchFilter = (chartKey: string) => {
 		setCharts((prev) => {
 			const filterEnabled = !prev[chartKey].chart.filter.enabled;
@@ -219,6 +217,8 @@ const History = (props: RouterComponentProps) => {
 		});
 	};
 
+	// Handler for querying waveform data, server returns waveform data in JSON format
+	const { t } = useTranslation();
 	const handleQueryWaveform = async () => {
 		const { start_time, end_time } = queryDuration;
 		if (!start_time || !end_time || start_time >= end_time) {
@@ -237,7 +237,7 @@ const History = (props: RouterComponentProps) => {
 			>({
 				backend,
 				payload,
-				timeout: 120,
+				timeout: 180,
 				throwError: true,
 				endpoint: apiConfig.endpoints.history
 			}),
@@ -250,6 +250,7 @@ const History = (props: RouterComponentProps) => {
 		handleSetCharts(res, setCharts);
 	};
 
+	// Handler for exporting waveform data as file, server returns waveform data in SAC / MiniSEED binary format
 	const handleExportAsFile = () => {
 		const { start_time, end_time } = queryDuration;
 		if (!start_time || !end_time || start_time >= end_time) {
@@ -278,7 +279,7 @@ const History = (props: RouterComponentProps) => {
 				>({
 					backend,
 					payload,
-					timeout: 120,
+					timeout: 180,
 					throwError: true,
 					endpoint: apiConfig.endpoints.history,
 					blobOptions: {
@@ -326,9 +327,11 @@ const History = (props: RouterComponentProps) => {
 		}));
 	};
 
+	// Handler for querying seismic event data and selecting its corresponding start and end time
+	const { fallback: fallbackLocale } = i18nConfig;
 	const handleQueryEvent = async () => {
 		const { backend } = apiConfig;
-		const payload = { source: "show" };
+		const payload = { source: "list" };
 
 		const res = await sendPromiseAlert(
 			requestRestApi<
@@ -338,7 +341,6 @@ const History = (props: RouterComponentProps) => {
 			>({
 				backend,
 				payload,
-				timeout: 30,
 				throwError: true,
 				endpoint: apiConfig.endpoints.trace
 			}),
@@ -360,7 +362,6 @@ const History = (props: RouterComponentProps) => {
 					typeof apiConfig.endpoints.trace.model.response.error
 				>({
 					backend,
-					timeout: 60,
 					throwError: true,
 					payload: { source },
 					endpoint: apiConfig.endpoints.trace
@@ -370,21 +371,14 @@ const History = (props: RouterComponentProps) => {
 				t("views.history.toasts.fetch_events_error")
 			)) as unknown as typeof traceCommonResponseModel1;
 			if (!res?.data || res?.data?.length === 0) {
-                sendUserAlert(t("views.history.toasts.no_events_found"), true);
+				sendUserAlert(t("views.history.toasts.no_events_found"), true);
 				return;
 			}
-
-			const handleSelectEvent = (value: string) => {
-				setSelect((prev) => ({ ...prev, open: false }));
-				const { start_time, end_time } = JSON.parse(value);
-				setQueryDuration({ start_time, end_time });
-				sendUserAlert(t("views.history.toasts.event_select_success"));
-			};
-
 			const eventList = res.data.map(
-				({ distance, magnitude, region, timestamp, depth, estimation }) => [
+				({ distance, magnitude, region, timestamp, depth, estimation }, index) => [
 					`[${magnitude.map((m) => `${m.type} ${m.value.toFixed(1)}`).join(", ")}] ${region}`,
 					JSON.stringify({
+						id: index,
 						start_time: Math.round(
 							timestamp + estimation.p_wave * 1000 - duration * 500
 						),
@@ -399,6 +393,13 @@ const History = (props: RouterComponentProps) => {
 					})
 				]
 			);
+
+			const handleSelectEvent = (value: string) => {
+				setSelect((prev) => ({ ...prev, open: false }));
+				const { start_time, end_time } = JSON.parse(value);
+				setQueryDuration({ start_time, end_time });
+				sendUserAlert(t("views.history.toasts.event_select_success"));
+			};
 			setSelect((prev) => ({
 				...prev,
 				open: true,
@@ -455,6 +456,7 @@ const History = (props: RouterComponentProps) => {
 		});
 	};
 
+	// Handler for getting share link with current query duration
 	const handleGetShareLink = async () => {
 		const { start_time, end_time } = queryDuration;
 		if (!start_time || !end_time || start_time >= end_time) {

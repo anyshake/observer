@@ -105,6 +105,7 @@ const Home = () => {
 		}
 	});
 
+	// Polling for station status updates every 2 seconds
 	useInterval(
 		() =>
 			getStationUpdates(
