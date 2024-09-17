@@ -22,7 +22,7 @@ export const handleSetBanner = (
 		type: "success",
 		values: {
 			disk: (100 - disk.percent).toFixed(2),
-			serial: `0x${explorer.device_id}`,
+			serial: explorer.device_id,
 			uptime: String(os.uptime),
 			station: station.name,
 			arch: os.arch,
