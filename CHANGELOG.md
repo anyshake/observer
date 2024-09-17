@@ -2,6 +2,22 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.3.1
+
+### Bug Fixes
+
+- Fixed the timestamp accuracy issue of event data source of JMA.
+- Fixed token refresh logic in Main component.
+
+### Refactor
+
+- Insert timestamp before buffering legacy mode packets.
+
+### Chore
+
+- Create a copy of the configuration file when executing make run.
+- Updated retention default value to 120s in global configuration.
+
 ## v3.3.0
 
 ### New Features

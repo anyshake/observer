@@ -211,15 +211,16 @@ jobs:
                                   "labels": [
                                       "chore",
                                       "docs",
-                                      "perf",
+                                      "perf"
+                                  ]
+                              },
+                              {
+                                  "title": "## Refactor",
+                                  "labels": [
                                       "refactor",
                                       "revert",
                                       "style"
                                   ]
-                              },
-                              {
-                                  "title":"## Changes",
-                                  "labels":[]
                               }
                           ],
                           "label_extractor":[
