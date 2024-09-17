@@ -16,19 +16,13 @@ func (t *ExplorerStartupTask) Execute(depsContainer *dig.Container, options *sta
 	if err != nil {
 		return err
 	}
-	explorerDriver := explorer.ExplorerDriver(&explorer.ExplorerDriverImpl{})
 
-	logger.GetLogger(t.GetTaskName()).Infoln("device is being initialized, please wait")
+	explorerDriver := explorer.ExplorerDriver(&explorer.ExplorerDriverImpl{})
 	err = explorerDriver.Init(explorerDeps, logger.GetLogger("explorer_driver"))
 	if err != nil {
 		return err
 	}
 
-	logger.GetLogger(t.GetTaskName()).Infoln("device has been initialized successfully")
-	if !explorerDeps.Config.GetLegacyMode() {
-		logger.GetLogger(t.GetTaskName()).Infof("handshake successful, device ID: %08X", explorerDeps.Config.GetDeviceId())
-	} else {
-		logger.GetLogger(t.GetTaskName()).Warnln("device is in legacy mode, this is for backward compatibility only")
-	}
+	logger.GetLogger(t.GetTaskName()).Infoln("device has been initialized")
 	return nil
 }
