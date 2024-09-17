@@ -42,7 +42,7 @@ export const globalConfig: GlobalConfig = {
 	homepage: "https://anyshake.org",
 	repository: "https://github.com/AnyShake",
 	duration: { default: 300, maximum: 3600, minimum: 10 },
-	retention: { default: 180, maximum: 600, minimum: 10 },
+	retention: { default: 120, maximum: 600, minimum: 10 },
 	footer: {
 		"en-US": "Constructing Realtime Seismic Network Ambitiously.",
 		"zh-CN": "雄心勃勃，致力于构建实时地震网络",
