@@ -25,6 +25,11 @@ func (m *MiniSeedService) handleWrite() error {
 				m.miniseedBuffer[i].Timestamp,
 			)
 		}
+
+		// Make sure sample rate is the same
+		if m.miniseedBuffer[i].SampleRate != startSampleRate {
+			return fmt.Errorf("sample rate is not the same, expected %d, got %d", startSampleRate, m.miniseedBuffer[i].SampleRate)
+		}
 	}
 
 	// Write data to file by channels

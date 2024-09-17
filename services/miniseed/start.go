@@ -50,14 +50,10 @@ func (m *MiniSeedService) Start(options *services.Options, waitGroup *sync.WaitG
 	}
 	m.cleanUpCountDown = MINISEED_CLEANUP_INTERVAL
 
-	// Set write interval to 1 if legacy mode is enabled
-	// This is a simple solution to sample rate jittering
-	// However, this will increase the disk I/O and file size
-	if options.Config.Explorer.Legacy {
-		m.writeBufferInterval = 1
-	} else {
-		m.writeBufferInterval = MINISEED_WRITE_INTERVAL
-	}
+	// In MiniSEED files, each record has a timestamp and sample rate
+	// When sample rate is fixed, we can merge multiple messages into one record
+	// This is useful to reduce disk I/O and file size, here we set the write buffer interval
+	m.writeBufferInterval = MINISEED_WRITE_INTERVAL
 	m.writeBufferCountDown = m.writeBufferInterval
 	m.miniseedBuffer = make([]explorer.ExplorerData, m.writeBufferInterval)
 
