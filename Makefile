@@ -37,8 +37,12 @@ else
 endif
 
 run:
+	@mkdir -p $(DIST_DIR)
+ifeq ($(wildcard $(DIST_DIR)/config.json.local),)
+	@cp $(ASSETS_DIR)/config.json $(DIST_DIR)/config.json.local
+endif
 	@echo "[Info] Running project..."
-	go run $(SRC_DIR)/*.go --config $(ASSETS_DIR)/config.json
+	go run $(SRC_DIR)/*.go --config $(DIST_DIR)/config.json.local
 
 clean:
 	@echo "[Warn] Cleaning up project..."
