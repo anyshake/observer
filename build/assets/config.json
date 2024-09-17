@@ -57,13 +57,13 @@
         "rotation": 5,
         "lifecycle": 3,
         "size": 0,
-        "dump": "/home/yuki/observer.log"
+        "dump": "/home/user/observer.log"
     },
     "services_settings": {
         "miniseed": {
             "enable": true,
             "lifecycle": 10,
-            "path": "/home/yuki/miniseed"
+            "path": "/home/user/miniseed"
         },
         "archiver": {
             "enable": true,
