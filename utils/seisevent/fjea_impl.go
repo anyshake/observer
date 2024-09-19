@@ -3,6 +3,7 @@ package seisevent
 import (
 	"encoding/json"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/anyshake/observer/utils/cache"
@@ -63,11 +64,19 @@ func (s *FJEA) GetEvents(latitude, longitude float64) ([]Event, error) {
 			continue
 		}
 
+		region := event.(map[string]any)["placeName"].(string)
+		if strings.HasPrefix(region, "中国") {
+			region = strings.ReplaceAll(region, "中国", "")
+		}
+		if strings.HasPrefix(region, "台湾省") {
+			region = strings.ReplaceAll(region, "台湾", "")
+		}
+
 		seisEvent := Event{
+			Region:    region,
 			Depth:     event.(map[string]any)["depth"].(float64),
 			Verfied:   event.(map[string]any)["infoTypeName"].(string) == "[正式测定]",
 			Event:     event.(map[string]any)["eventId"].(string),
-			Region:    event.(map[string]any)["placeName"].(string),
 			Latitude:  event.(map[string]any)["latitude"].(float64),
 			Longitude: event.(map[string]any)["longitude"].(float64),
 			Magnitude: s.getMagnitude(event.(map[string]any)["magnitude"].(float64)),
