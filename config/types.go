@@ -46,7 +46,7 @@ type ntpclient struct {
 type database struct {
 	Engine    string `json:"engine"`
 	Host      string `json:"host"`
-	Port      int    `json:"port" validate:"min=1,max=65535"`
+	Port      int    `json:"port" validate:"min=0,max=65535"`
 	LifeCycle int    `json:"lifecycle" validate:"gte=0"`
 	Username  string `json:"username"`
 	Password  string `json:"password"`

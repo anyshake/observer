@@ -16,7 +16,7 @@ VERSION=$(shell cat ./VERSION)
 BUILD_FLAGS=-s -w -X main.version=$(VERSION) -X main.tag=$(COMMIT)-$(shell date +%s)
 BUILD_ARGS=-v -trimpath
 
-build: clean
+build:
 	@echo "[Info] Building project, output file path: $(DIST_DIR)/$(BINARY)"
 	@mkdir -p $(DIST_DIR)
 	CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} GOARM=${GOARM} GOMIPS=${GOMIPS} \
