@@ -3,6 +3,7 @@ package seisevent
 import (
 	"encoding/json"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/anyshake/observer/utils/cache"
@@ -71,14 +72,22 @@ func (c *CENC_APP) GetEvents(latitude, longitude float64) ([]Event, error) {
 			continue
 		}
 
+		region := event["loc_name"].(string)
+		if strings.HasPrefix(region, "中国") {
+			region = strings.ReplaceAll(region, "中国", "")
+		}
+		if strings.HasPrefix(region, "台湾省") {
+			region = strings.ReplaceAll(region, "台湾", "")
+		}
+
 		seisEvent := Event{
-			Verfied:   true,
+			Region:    region,
+			Verfied:   event["eq_type"].(string) == "M",
 			Depth:     event["depth"].(float64) / 1000,
 			Event:     event["eqid"].(string),
-			Region:    event["loc_name"].(string),
 			Latitude:  event["latitude"].(float64),
 			Longitude: event["longitude"].(float64),
-			Magnitude: c.getMagnitude(event["eq_type"].(string), event["mag"].(float64)),
+			Magnitude: c.getMagnitude(event["mag"].(float64)),
 			Timestamp: time.UnixMilli(int64(event["time"].(float64))).UnixMilli(),
 		}
 
@@ -91,7 +100,7 @@ func (c *CENC_APP) GetEvents(latitude, longitude float64) ([]Event, error) {
 	return sortSeismicEvents(resultArr), nil
 }
 
-func (c *CENC_APP) getMagnitude(magType string, data float64) []Magnitude {
-	return []Magnitude{{Type: ParseMagnitude(magType), Value: data}}
+func (c *CENC_APP) getMagnitude(data float64) []Magnitude {
+	return []Magnitude{{Type: ParseMagnitude("M"), Value: data}}
 
 }
