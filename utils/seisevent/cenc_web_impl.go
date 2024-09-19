@@ -2,6 +2,7 @@ package seisevent
 
 import (
 	"encoding/json"
+	"strings"
 	"time"
 
 	"github.com/anyshake/observer/utils/cache"
@@ -62,12 +63,20 @@ func (c *CENC_WEB) GetEvents(latitude, longitude float64) ([]Event, error) {
 			continue
 		}
 
+		region := v["LOCATION_C"].(string)
+		if strings.HasPrefix(region, "中国") {
+			region = strings.ReplaceAll(region, "中国", "")
+		}
+		if strings.HasPrefix(region, "台湾省") {
+			region = strings.ReplaceAll(region, "台湾", "")
+		}
+
 		seisEvent := Event{
 			Verfied:   true,
 			Timestamp: timestamp,
+			Region:    region,
 			Depth:     c.getDepth(v["EPI_DEPTH"]),
 			Event:     v["CATA_ID"].(string),
-			Region:    v["LOCATION_C"].(string),
 			Latitude:  string2Float(v["EPI_LAT"].(string)),
 			Longitude: string2Float(v["EPI_LON"].(string)),
 		}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/anyshake/observer/utils/cache"
@@ -61,7 +62,7 @@ func (s *SCEA_B) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	// Ensure the response has the expected keys and values
-	expectedKeys := []string{"eventId", "shockTime", "longitude", "latitude", "placeName", "magnitude", "depth"}
+	expectedKeys := []string{"autoFlag", "eventId", "shockTime", "longitude", "latitude", "placeName", "magnitude", "depth"}
 
 	var resultArr []Event
 	for _, event := range dataMapEvents {
@@ -69,11 +70,19 @@ func (s *SCEA_B) GetEvents(latitude, longitude float64) ([]Event, error) {
 			continue
 		}
 
+		region := event.(map[string]any)["placeName"].(string)
+		if strings.HasPrefix(region, "中国") {
+			region = strings.ReplaceAll(region, "中国", "")
+		}
+		if strings.HasPrefix(region, "台湾省") {
+			region = strings.ReplaceAll(region, "台湾", "")
+		}
+
 		seisEvent := Event{
-			Verfied:   false,
+			Region:    region,
+			Verfied:   event.(map[string]any)["autoFlag"].(string) != "AU",
 			Depth:     event.(map[string]any)["depth"].(float64),
 			Event:     event.(map[string]any)["eventId"].(string),
-			Region:    event.(map[string]any)["placeName"].(string),
 			Latitude:  event.(map[string]any)["latitude"].(float64),
 			Longitude: event.(map[string]any)["longitude"].(float64),
 			Magnitude: s.getMagnitude(event.(map[string]any)["magnitude"].(float64)),
