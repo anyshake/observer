@@ -13,8 +13,9 @@ import (
 )
 
 type TransportDriverSerialImpl struct {
-	conn  serial.Port
-	mutex sync.Mutex
+	conn        serial.Port
+	mutex       sync.Mutex
+	readTimeout time.Duration
 }
 
 func (t *TransportDriverSerialImpl) Open(deps *TransportDependency) error {
@@ -75,7 +76,12 @@ func (t *TransportDriverSerialImpl) Read(buf []byte, timeout time.Duration, flus
 	if flush {
 		t.conn.ResetInputBuffer()
 	}
-	t.conn.SetReadTimeout(timeout)
+
+	if t.readTimeout != timeout {
+		t.conn.SetReadTimeout(timeout)
+		t.readTimeout = timeout
+	}
+
 	return t.conn.Read(buf)
 }
 
@@ -101,7 +107,10 @@ func (t *TransportDriverSerialImpl) Filter(signature []byte, timeout time.Durati
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
-	t.conn.SetReadTimeout(timeout)
+	if t.readTimeout != timeout {
+		t.conn.SetReadTimeout(timeout)
+		t.readTimeout = timeout
+	}
 
 	t.conn.ResetInputBuffer()
 	t.conn.ResetOutputBuffer()

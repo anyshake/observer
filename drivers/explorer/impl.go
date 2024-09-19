@@ -147,38 +147,70 @@ func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency, fi
 	// Set device ID to 0xFFFFFFFF to indicate legacy mode
 	deps.Config.SetDeviceId(math.MaxUint32)
 
+	findIndices := func(arr []byte, sep []byte) []int {
+		var indices []int
+		sepLen := len(sep)
+		arrLen := len(arr)
+
+		for i := 0; i <= arrLen-sepLen; i++ {
+			if bytes.Equal(arr[i:i+sepLen], sep) {
+				indices = append(indices, i)
+			}
+		}
+
+		return indices
+	}
+
 	// Read data from the transport continuously
 	go func() {
-		recvSize := len(LEGACY_PACKET_FRAME_HEADER) + e.legacyPacket.length()
-		buf := make([]byte, recvSize)
+		var (
+			recvSize        = len(LEGACY_PACKET_FRAME_HEADER) + e.legacyPacket.length()
+			timeBytes       = make([]byte, 8)                       // 8 bytes for int64 timestamp
+			recvBuf         = make([]byte, recvSize)                // Received buffer from transport
+			packetBuf       = make([]byte, recvSize+len(timeBytes)) // Packet buffer with timestamp
+			prevHeaderIndex = -1                                    // Last index of the header
+		)
 		for {
 			select {
 			case <-deps.CancelToken.Done():
 				e.logger.Infof("cancelling read data from transport")
 				return
 			default:
-				n, err := deps.Transport.Read(buf, 100*time.Millisecond, false)
+				_, err := deps.Transport.Read(recvBuf, time.Second, false)
 				if err != nil {
 					e.logger.Errorf("failed to read data from transport: %v", err)
 					continue
 				}
 
 				// Record the current time of the packet
-				timeBytes := make([]byte, 8) // 8 bytes for int64
-				binary.BigEndian.PutUint64(timeBytes, uint64(deps.FallbackTime.Get().UnixMilli()))
+				currentTime := deps.FallbackTime.Get()
+				binary.BigEndian.PutUint64(timeBytes, uint64(currentTime.UnixMilli()))
 
-				// Find header in the buffer to insert current time next to the header
-				headerIndex := bytes.Index(buf[:n], LEGACY_PACKET_FRAME_HEADER)
-				if headerIndex == -1 {
+				// Find possible header in the buffer to insert current time next to the header
+				headerIndices := findIndices(recvBuf, LEGACY_PACKET_FRAME_HEADER)
+				if len(headerIndices) == 0 {
 					continue
 				}
+				headerIndex := headerIndices[0]
+				if prevHeaderIndex == -1 {
+					prevHeaderIndex = headerIndex
+				}
 
-				// Create a new buffer to store data with the timestamp inserted
-				modifiedBuf := make([]byte, 0, n+len(timeBytes))
-				modifiedBuf = append(modifiedBuf, buf[:headerIndex+len(LEGACY_PACKET_FRAME_HEADER)]...)
-				modifiedBuf = append(modifiedBuf, timeBytes...)
-				modifiedBuf = append(modifiedBuf, buf[headerIndex+len(LEGACY_PACKET_FRAME_HEADER):n]...)
-				fifoBuffer.Write(modifiedBuf)
+				// To avoid packet loss, we need to find the "real" header
+				// Which is the header that is always equal to the previous header
+				for _, index := range headerIndices {
+					if index == prevHeaderIndex {
+						headerIndex = index
+						break
+					}
+				}
+				prevHeaderIndex = headerIndex
+
+				// Copy packet buffer with timestamp
+				copy(packetBuf, recvBuf[:headerIndex+len(LEGACY_PACKET_FRAME_HEADER)])                                                 // Copy header
+				copy(packetBuf[headerIndex+len(LEGACY_PACKET_FRAME_HEADER):headerIndex+len(LEGACY_PACKET_FRAME_HEADER)+8], timeBytes)  // Copy timestamp
+				copy(packetBuf[headerIndex+len(LEGACY_PACKET_FRAME_HEADER)+8:], recvBuf[headerIndex+len(LEGACY_PACKET_FRAME_HEADER):]) // Copy packet
+				fifoBuffer.Write(packetBuf)
 			}
 		}
 	}()
@@ -314,7 +346,7 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency, 
 				e.logger.Infof("cancelling read data from transport")
 				return
 			default:
-				n, err := deps.Transport.Read(buf, 100*time.Millisecond, false)
+				n, err := deps.Transport.Read(buf, time.Second, false)
 				if err != nil {
 					e.logger.Errorf("failed to read data from transport: %v", err)
 					continue
