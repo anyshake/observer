@@ -97,7 +97,7 @@
                 },
                 "success": {
                     "label": "当前采样率 {{ sampleRate }} Sps",
-                    "text": "当前烈度标准 {{ scale }}\n数据更新于 {{ time }}"
+                    "text": "ADC 位数 {{ adc_resolution }} bits\n传感器类型 {{ sensor_type }}\n数据更新于 {{ time }}"
                 },
                 "error": {
                     "label": "连接失败",
@@ -107,7 +107,7 @@
             "charts": {
                 "z_axis": {
                     "label": "{{channel}}Z 通道波形",
-                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
+                    "text": "最小值 {{ min }}\n最大值 {{ max }}",
                     "advanced": {
                         "panels": {
                             "butterworth_filter": {
@@ -122,7 +122,7 @@
                 },
                 "e_axis": {
                     "label": "{{channel}}E 通道波形",
-                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
+                    "text": "最小值 {{ min }}\n最大值 {{ max }}",
                     "advanced": {
                         "panels": {
                             "butterworth_filter": {
@@ -137,7 +137,7 @@
                 },
                 "n_axis": {
                     "label": "{{channel}}N 通道波形",
-                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
+                    "text": "最小值 {{ min }}\n最大值 {{ max }}",
                     "advanced": {
                         "panels": {
                             "butterworth_filter": {
@@ -241,16 +241,16 @@
             },
             "labels": {
                 "z_axis_detail": {
-                    "label": "{{channel}}Z 通道详情",
-                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                    "label": "{{channel}}Z 通道极值",
+                    "value": "{{ min }} / {{ max }}"
                 },
                 "e_axis_detail": {
-                    "label": "{{channel}}E 通道详情",
-                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                    "label": "{{channel}}E 通道极值",
+                    "value": "{{ min }} / {{ max }}"
                 },
                 "n_axis_detail": {
-                    "label": "{{channel}}N 通道详情",
-                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                    "label": "{{channel}}N 通道极值",
+                    "value": "{{ min }} / {{ max }}"
                 }
             },
             "time_pickers": {
@@ -305,7 +305,6 @@
         },
         "setting": {
             "buttons": {
-                "select_scale": "选择烈度标准",
                 "purge_cache": "清除应用缓存",
                 "waveform_retention": "设定波形保留时间",
                 "query_duration": "设定查询范围",
@@ -313,17 +312,11 @@
                 "create_user": "创建用户"
             },
             "panels": {
-                "select_scale": "烈度标准",
                 "purge_cache": "重置应用",
                 "waveform_retention": "波形设定",
                 "query_duration": "查询设定",
                 "station_inventory": "SeisComp 元数据",
                 "user_management": "用户管理"
-            },
-            "selects": {
-                "choose_scale": {
-                    "title": "选择烈度标准"
-                }
             },
             "forms": {
                 "waveform_retention": {
@@ -410,7 +403,6 @@
                 "remove_user_error": "用户删除失败，或该用户不可删除"
             },
             "contents": {
-                "select_scale": "当前烈度标准 {{ scale }}\n烈度标准是用来衡量地震烈度的标准，不同的标准会导致不同的烈度值。",
                 "purge_cache": "应用出现问题时，可尝试重置应用偏好。\n执行重置后，浏览器中的偏好将被清理，不会对后端服务器产生影响。",
                 "waveform_retention": "此项设定实时波形页面的波形会保留的时间，当前 {{ current }} s。\n以秒为单位，需要大于 {{ minimum }} 且小于 {{ maximum }}，否则将会被重置为默认值 {{ default }} 秒。",
                 "query_duration": "此项设定历史查询页面自动填写的时间范围，当前 {{ current }} s。\n以秒为单位，需要大于 {{ minimum }} 且小于 {{ maximum }}，否则将会被重置为默认值 {{ default }} 秒。"

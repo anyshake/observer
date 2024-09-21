@@ -14,7 +14,7 @@ export interface FilterOptions {
 	readonly passbandType: FilterPassband;
 }
 
-export const getFilteredCounts = (record: number[], options: FilterOptions) => {
+export const getFilteredCounts = (record: Float32Array, options: FilterOptions) => {
 	const { passbandType, poles, sampleRate, lowFreqCorner, highFreqCorner } = options;
 
 	let passband: OregonDSPTop.com.oregondsp.signalProcessing.filter.iir.PassbandType;
@@ -33,8 +33,7 @@ export const getFilteredCounts = (record: number[], options: FilterOptions) => {
 		highFreqCorner,
 		1 / sampleRate
 	);
-	const float32ArrayBuffer = new Float32Array(record);
-	butterworth.filterInPlace(float32ArrayBuffer);
+	butterworth.filterInPlace(record);
 
-	return Array.from(float32ArrayBuffer);
+	return record;
 };

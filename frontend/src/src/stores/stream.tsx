@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export interface Station {
+export interface Stream {
 	readonly station: string;
 	readonly network: string;
 	readonly location: string;
@@ -8,7 +8,7 @@ export interface Station {
 	readonly initialized: boolean;
 }
 
-const initialStation: Station = {
+const initialStation: Stream = {
 	station: "SHAKE",
 	network: "AS",
 	location: "00",
@@ -17,12 +17,12 @@ const initialStation: Station = {
 };
 
 const slice = createSlice({
-	name: "station",
-	initialState: { station: initialStation },
+	name: "stream",
+	initialState: { stream: initialStation },
 	reducers: {
 		onUpdate: (state, action) => {
 			const { payload } = action;
-			state.station = payload;
+			state.stream = payload;
 		}
 	}
 });

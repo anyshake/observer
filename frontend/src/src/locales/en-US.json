@@ -97,7 +97,7 @@
                 },
                 "success": {
                     "label": "Current Sampling Rate {{ sampleRate }} Sps",
-                    "text": "Current Seismic Scale {{ scale }}\nData updated at {{ time }}"
+                    "text": "ADC Resolution: {{ adc_resolution }} bits\nSensor Type: {{ sensor_type }}\nLast Update: {{ time }}"
                 },
                 "error": {
                     "label": "Connection Failed",
@@ -107,7 +107,7 @@
             "charts": {
                 "z_axis": {
                     "label": "{{channel}}Z Channel Waveform Count",
-                    "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} kine\nIntensity: {{ intensity }}",
+                    "text": "Minimum: {{ min }}\nMaximum: {{ max }}",
                     "advanced": {
                         "panels": {
                             "butterworth_filter": {
@@ -122,7 +122,7 @@
                 },
                 "e_axis": {
                     "label": "{{channel}}E Channel Waveform Count",
-                    "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} kine\nIntensity: {{ intensity }}",
+                    "text": "Minimum: {{ min }}\nMaximum: {{ max }}",
                     "advanced": {
                         "panels": {
                             "butterworth_filter": {
@@ -137,7 +137,7 @@
                 },
                 "n_axis": {
                     "label": "{{channel}}N Channel Waveform Count",
-                    "text": "PGA: {{ pga }} gal\nPGV: {{ pgv }} kine\nIntensity: {{ intensity }}",
+                    "text": "Minimum: {{ min }}\nMaximum: {{ max }}",
                     "advanced": {
                         "panels": {
                             "butterworth_filter": {
@@ -241,16 +241,16 @@
             },
             "labels": {
                 "z_axis_detail": {
-                    "label": "{{channel}}Z Details",
-                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                    "label": "{{channel}}Z Extremum",
+                    "value": "{{ min }} / {{ max }}"
                 },
                 "e_axis_detail": {
-                    "label": "{{channel}}E Details",
-                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                    "label": "{{channel}}E Extremum",
+                    "value": "{{ min }} / {{ max }}"
                 },
                 "n_axis_detail": {
-                    "label": "{{channel}}N Details",
-                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                    "label": "{{channel}}N Extremum",
+                    "value": "{{ min }} / {{ max }}"
                 }
             },
             "time_pickers": {
@@ -305,7 +305,6 @@
         },
         "setting": {
             "buttons": {
-                "select_scale": "Select Seismic Scale",
                 "purge_cache": "Clear Application Cache",
                 "waveform_retention": "Set Waveform Retention Time",
                 "query_duration": "Set Query Range",
@@ -313,17 +312,11 @@
                 "create_user": "Create User"
             },
             "panels": {
-                "select_scale": "Seismic Scale",
                 "purge_cache": "Reset Application",
                 "waveform_retention": "Waveform Settings",
                 "query_duration": "Query Settings",
                 "station_inventory": "SeisComp XML Inventory",
                 "user_management": "User Management"
-            },
-            "selects": {
-                "choose_scale": {
-                    "title": "Select Intensity Scale"
-                }
             },
             "forms": {
                 "waveform_retention": {
@@ -410,7 +403,6 @@
                 "remove_user_error": "Failed to delete user, or the user cannot be deleted"
             },
             "contents": {
-                "select_scale": "Current intensity scale: {{ scale }}\nIntensity scale is a standard used to measure the intensity of an earthquake. Different scales can lead to different magnitude values.",
                 "purge_cache": "If the app is experiencing problems, you can try resetting app preferences.\nAfter resetting, browser preferences will be cleared, but it will not affect the backend server.",
                 "waveform_retention": "This setting determines the amount of time that waveforms will be retained on the real-time waveform page. The current value is {{ current }} s.\nValues must be greater than {{ minimum }} and less than {{ maximum }}. Otherwise, the value will be reset to the default of {{ default }} s.",
                 "query_duration": "This setting determines the time range that is automatically filled in on the historical query page. The current value is {{ current }} s.\nValues must be greater than {{ minimum }} and less than {{ maximum }}. Otherwise, the value will be reset to the default of {{ default }} s."

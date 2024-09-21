@@ -2,6 +2,21 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+# v3.3.2
+
+### Bug Fixes
+
+- Handle auto flag properly for event data sources of China.
+- Fixed occasional checksum error in legacy mode.
+
+### Refactor
+
+- Use Web Workers to process seismic data.
+
+### Chore
+
+- chore: Update slgo dependency to v0.0.4.
+
 ## v3.3.1
 
 ### Bug Fixes

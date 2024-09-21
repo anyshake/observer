@@ -1,24 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export interface Geophone {
-	readonly frequency: number;
-	readonly sensitivity: number;
+export interface Sensor {
+	readonly resolution: number;
+	readonly velocity: boolean;
 	readonly initialized: boolean;
 }
 
-const initialGeophone: Geophone = {
-	frequency: 4.5,
-	sensitivity: 28.8,
+const initialSensor: Sensor = {
+	resolution: 24,
+	velocity: true,
 	initialized: false
 };
 
 const slice = createSlice({
-	name: "geophone",
-	initialState: { geophone: initialGeophone },
+	name: "sensor",
+	initialState: { sensor: initialSensor },
 	reducers: {
 		onUpdate: (state, action) => {
 			const { payload } = action;
-			state.geophone = payload;
+			state.sensor = payload;
 		}
 	}
 });
