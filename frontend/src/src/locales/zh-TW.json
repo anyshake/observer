@@ -97,7 +97,7 @@
                 },
                 "success": {
                     "label": "目前取樣率 {{ sampleRate }} Sps",
-                    "text": "目前烈度標準 {{ scale }}\n資料更新於 {{ time }}"
+                    "text": "ADC 位元數 {{ adc_resolution }} bits\n感測器類型 {{ sensor_type }}\n資料更新於 {{ time }}"
                 },
                 "error": {
                     "label": "連線失敗",
@@ -107,7 +107,7 @@
             "charts": {
                 "z_axis": {
                     "label": "{{channel}}Z 通道波形",
-                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
+                    "text": "最大值 {{ max }}\n最小值 {{ min }}",
                     "advanced": {
                         "panels": {
                             "butterworth_filter": {
@@ -122,7 +122,7 @@
                 },
                 "e_axis": {
                     "label": "{{channel}}E 通道波形",
-                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
+                    "text": "最大值 {{ max }}\n最小值 {{ min }}",
                     "advanced": {
                         "panels": {
                             "butterworth_filter": {
@@ -137,7 +137,7 @@
                 },
                 "n_axis": {
                     "label": "{{channel}}N 通道波形",
-                    "text": "PGA {{ pga }} gal\nPGV {{ pgv }} kine\n烈度 {{ intensity }}",
+                    "text": "最大值 {{ max }}\n最小值 {{ min }}",
                     "advanced": {
                         "panels": {
                             "butterworth_filter": {
@@ -241,16 +241,16 @@
             },
             "labels": {
                 "z_axis_detail": {
-                    "label": "{{channel}}Z 通道資訊",
-                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                    "label": "{{channel}}Z 通道極值",
+                    "value": "{{ min }} / {{ max }}"
                 },
                 "e_axis_detail": {
-                    "label": "{{channel}}E 通道資訊",
-                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                    "label": "{{channel}}E 通道極值",
+                    "value": "{{ min }} / {{ max }}"
                 },
                 "n_axis_detail": {
-                    "label": "{{channel}}N 通道資訊",
-                    "value": "PGA: {{ pga }} gal / PGV: {{ pgv }} kine"
+                    "label": "{{channel}}N 通道極值",
+                    "value": "{{ min }} / {{ max }}"
                 }
             },
             "time_pickers": {
@@ -305,7 +305,6 @@
         },
         "setting": {
             "buttons": {
-                "select_scale": "選擇烈度標準",
                 "purge_cache": "清除應用快取",
                 "waveform_retention": "設定波形保留時間",
                 "query_duration": "設定查詢範圍",
@@ -313,17 +312,11 @@
                 "create_user": "新增使用者"
             },
             "panels": {
-                "select_scale": "烈度標準",
                 "purge_cache": "重置應用",
                 "waveform_retention": "波形設定",
                 "query_duration": "查詢設定",
                 "station_inventory": "SeisComp 詮釋資料",
                 "user_management": "使用者管理"
-            },
-            "selects": {
-                "choose_scale": {
-                    "title": "選擇烈度標準"
-                }
             },
             "forms": {
                 "waveform_retention": {
@@ -373,10 +366,10 @@
                     "last_login": "最後登入",
                     "created_at": "建立於",
                     "updated_at": "更新於",
-                    "user_ip": "登入 IP",
-                    "user_agent": "登入裝置",
                     "admin": "管理員",
                     "actions": "操作",
+                    "user_ip": "登入 IP",
+                    "user_agent": "登入裝置",
                     "never": "從未",
                     "yes": "是",
                     "no": "否"
@@ -410,7 +403,6 @@
                 "remove_user_error": "使用者刪除失敗，或該使用者不可刪除"
             },
             "contents": {
-                "select_scale": "目前烈度標準 {{ scale }}\n烈度標準是用來衡量地震烈度的標準，不同的標準會導致不同的烈度值。",
                 "purge_cache": "應用出現問題時，可嘗試重置應用偏好。\n執行重置後，瀏覽器中的偏好將被清理，不會對後端伺服器產生影響。",
                 "waveform_retention": "此項設定即時波形頁面的波形會保留的時間，目前 {{ current }} 秒。\n以秒為單位，需要大於 {{ minimum }} 且小於 {{ maximum }}，否則將會被重置為預設值 {{ default }} 秒。",
                 "query_duration": "此項設定歷史查詢頁面自動填寫的時間範圍，目前 {{ current }} 秒。\n以秒為單位，需要大於 {{ minimum }} 且小於 {{ maximum }}，否則將會被重置為預設值 {{ default }} 秒。"

@@ -1,10 +1,10 @@
 import { getDayOfYear } from "../../helpers/utils/getDayOfYear";
-import { Station } from "../../stores/station";
+import { Stream } from "../../stores/stream";
 
 export const getSacFileName = (
 	startTimeMS: number,
 	channelName: string,
-	{ network, station, location }: Station
+	{ network, station, location }: Stream
 ) => {
 	const startTimeObj = new Date(startTimeMS);
 	return `${startTimeObj.getUTCFullYear()}.${getDayOfYear(startTimeObj)

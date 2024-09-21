@@ -10,7 +10,6 @@ import { Dialog, DialogProps } from "../../components/Dialog";
 import { Form, FormProps } from "../../components/Form";
 import { Input } from "../../components/Input";
 import { Panel } from "../../components/Panel";
-import { Select, SelectProps } from "../../components/Select";
 import { TableList } from "../../components/TableList";
 import {
 	apiConfig,
@@ -30,10 +29,9 @@ import { requestRestApi } from "../../helpers/request/requestRestApi";
 import { getTimeString } from "../../helpers/utils/getTimeString";
 import { onUpdate as updateDuration } from "../../stores/duration";
 import { onUpdate as updateRetention } from "../../stores/retention";
-import { onUpdate as updateScale } from "../../stores/scale";
 
 const Settings = ({ locale }: RouterComponentProps) => {
-	const { retention, duration, scales } = globalConfig;
+	const { retention, duration } = globalConfig;
 
 	// Read the station inventory from the backend
 	const [stationInventory, setStationInventory] = useState<string>();
@@ -87,12 +85,6 @@ const Settings = ({ locale }: RouterComponentProps) => {
 	});
 	const handleCloseForm = () => {
 		setForm({ ...form, open: false });
-	};
-
-	// Basic states for select, other attributes are set on demand
-	const [select, setSelect] = useState<SelectProps>({ open: false });
-	const handleCloseSelect = () => {
-		setSelect({ ...select, open: false });
 	};
 
 	// Handler for refreshing the page
@@ -158,37 +150,6 @@ const Settings = ({ locale }: RouterComponentProps) => {
 		}
 	};
 
-	// Handler for changing the display scale standard
-	const handleSelectScale = (newValue?: string) => {
-		if (newValue?.length) {
-			const isNewValueInScales = scales.some((item) => item.property().value === newValue);
-			if (isNewValueInScales) {
-				const newScaleName = scales
-					.find((item) => item.property().value === newValue)
-					?.property().name;
-				sendUserAlert(
-					t("views.setting.toasts.scale_changed", {
-						scale: newScaleName
-					})
-				);
-				dispatch(updateScale(newValue));
-				handleCloseSelect();
-				handleReload();
-			}
-		} else {
-			setSelect({
-				...select,
-				open: true,
-				onSelect: handleSelectScale,
-				title: "views.setting.selects.choose_scale.title",
-				options: scales.map(({ property }) => {
-					const { name, value } = property();
-					return [name, value];
-				})
-			});
-		}
-	};
-
 	// Handler for purging the cache
 	const handlePurgeCache = () => {
 		sendUserConfirm(t("views.setting.toasts.confirm_purge"), {
@@ -208,9 +169,6 @@ const Settings = ({ locale }: RouterComponentProps) => {
 		({ retention }: ReduxStoreProps) => retention
 	);
 	const { duration: currentDuration } = useSelector(({ duration }: ReduxStoreProps) => duration);
-	const { scale: currentScale } = useSelector(({ scale }: ReduxStoreProps) => scale);
-	const scaleName =
-		scales.find((item) => item.property().value === currentScale)?.property().name || "Unknown";
 	const [panels] = useState([
 		{
 			label: "views.setting.panels.waveform_retention",
@@ -227,14 +185,6 @@ const Settings = ({ locale }: RouterComponentProps) => {
 			className: "bg-lime-700 hover:bg-lime-800",
 			onClick: handleDurationChange,
 			values: { current: currentDuration, ...duration }
-		},
-		{
-			label: "views.setting.panels.select_scale",
-			button: "views.setting.buttons.select_scale",
-			className: "bg-sky-700 hover:bg-sky-800",
-			content: "views.setting.contents.select_scale",
-			onClick: handleSelectScale,
-			values: { scale: scaleName }
 		},
 		{
 			label: "views.setting.panels.purge_cache",
@@ -493,7 +443,7 @@ const Settings = ({ locale }: RouterComponentProps) => {
 
 	return (
 		<>
-			<Container className="gap-4 grid md:grid-cols-2">
+			<Container className="gap-4 grid md:grid-cols-3">
 				{panels.map(({ label, content, button, className, onClick, values }) => (
 					<Panel key={label} className="" label={t(label)}>
 						{t(content, { ...values })
@@ -513,7 +463,6 @@ const Settings = ({ locale }: RouterComponentProps) => {
 					placeholder={t(form.placeholder ?? "")}
 					content={t(form.content ?? "", { ...form.values })}
 				/>
-				<Select {...select} onClose={handleCloseSelect} title={t(select.title ?? "")} />
 			</Container>
 			{isAdministrator && (
 				<Panel label={t("views.setting.panels.user_management")}>
