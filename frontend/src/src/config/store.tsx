@@ -3,15 +3,12 @@ import { combineReducers } from "redux";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
-import adc, { ADC } from "../stores/adc";
 import credential, { Credential } from "../stores/credential";
 import duration from "../stores/duration";
-import geophone, { Geophone } from "../stores/geophone";
 import retention from "../stores/retention";
-import scale from "../stores/scale";
-import station, { Station } from "../stores/station";
+import sensor, { Sensor } from "../stores/sensor";
+import stream, { Stream } from "../stores/stream";
 
-const scalePersistConfig = persistReducer({ storage, key: "scale", whitelist: ["scale"] }, scale);
 const durationPersistConfig = persistReducer(
 	{ storage, key: "duration", whitelist: ["duration"] },
 	duration
@@ -26,10 +23,8 @@ const credentialPersistConfig = persistReducer(
 );
 
 const reducer = combineReducers({
-	adc,
-	geophone,
-	station,
-	scale: scalePersistConfig,
+	sensor,
+	stream,
 	duration: durationPersistConfig,
 	retention: retentionPersistConfig,
 	credential: credentialPersistConfig
@@ -42,16 +37,12 @@ const REDUX_STORE = configureStore({
 export const REDUX_PRESIST = persistStore(REDUX_STORE);
 export type ReduxStore = ReturnType<typeof reducer>;
 export interface ReduxStoreProps {
-	readonly adc: ReturnType<typeof adc>;
-	readonly updateADC: (adc: ADC) => void;
-	readonly scale: ReturnType<typeof scale>;
-	readonly updateScale: (scale: string) => void;
-	readonly station: ReturnType<typeof station>;
-	readonly updateStation: (station: Station) => void;
+	readonly sensor: ReturnType<typeof sensor>;
+	readonly updateSensor: (sensor: Sensor) => void;
+	readonly stream: ReturnType<typeof stream>;
+	readonly updateStream: (stream: Stream) => void;
 	readonly duration: ReturnType<typeof duration>;
 	readonly updateDuration: (duration: number) => void;
-	readonly geophone: ReturnType<typeof geophone>;
-	readonly updateGeophone: (geophone: Geophone) => void;
 	readonly retention: ReturnType<typeof retention>;
 	readonly updateRetention: (retention: number) => void;
 	readonly credential: ReturnType<typeof credential>;

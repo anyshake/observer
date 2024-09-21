@@ -19,10 +19,9 @@ import { ReduxStoreProps } from "./config/store";
 import { sendUserAlert } from "./helpers/interact/sendUserAlert";
 import { sendUserConfirm } from "./helpers/interact/sendUserConfirm";
 import { requestRestApi } from "./helpers/request/requestRestApi";
-import { onUpdate as UpdateADC } from "./stores/adc";
 import { onUpdate as UpdateCredential } from "./stores/credential";
-import { onUpdate as UpdateGeophone } from "./stores/geophone";
-import { onUpdate as UpdateStation } from "./stores/station";
+import { onUpdate as UpdateSensor } from "./stores/sensor";
+import { onUpdate as UpdateStation } from "./stores/stream";
 
 interface MainProps {
 	currentLocale: string;
@@ -94,13 +93,10 @@ export const Main = ({ currentLocale, locales, onSwitchLocale, onLoginStateChang
 			endpoint: endpoints.station
 		});
 		if (res?.data) {
-			const initialized = true;
-			const { sensitivity, frequency } = res.data.sensor;
-			dispatch(UpdateGeophone({ sensitivity, frequency, initialized }));
-			const { resolution, fullscale } = res.data.sensor;
-			dispatch(UpdateADC({ resolution, fullscale, initialized }));
+			const { resolution, velocity } = res.data.sensor;
+			dispatch(UpdateSensor({ resolution, velocity, initialized: true }));
 			const { station, network, location, channel } = res.data.stream;
-			dispatch(UpdateStation({ station, network, location, initialized, channel }));
+			dispatch(UpdateStation({ station, network, location, channel, initialized: true }));
 		}
 	}, [dispatch]);
 	useEffect(() => {

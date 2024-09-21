@@ -14,6 +14,7 @@ import { apiConfig } from "../../config/api";
 import { ReduxStoreProps } from "../../config/store";
 import { useSocket } from "../../helpers/hook/useSocket";
 import { sendUserAlert } from "../../helpers/interact/sendUserAlert";
+import { CircularQueue2D } from "../../helpers/utils/CircularQueue2D";
 import { userThrottle } from "../../helpers/utils/userThrottle";
 import { getSocketUpdates, SocketUpdates } from "./getSocketUpdates";
 import { handleSetBanner } from "./handleSetBanner";
@@ -21,7 +22,8 @@ import { handleSetCharts } from "./handleSetCharts";
 
 const Realtime = () => {
 	// States for the banner and charts
-	const { station } = useSelector(({ station }: ReduxStoreProps) => station);
+	const { stream } = useSelector(({ stream }: ReduxStoreProps) => stream);
+	const { retention } = useSelector(({ retention }: ReduxStoreProps) => retention);
 	const [banner, setBanner] = useState<BannerProps & { values?: Record<string, string> }>({
 		type: "warning",
 		title: "views.realtime.banner.warning.label",
@@ -32,7 +34,9 @@ const Realtime = () => {
 			string,
 			{
 				chart: ChartProps & {
-					buffer: { timestamp: number; data: number[] }[];
+					// rows: retention, columns: sampleRate
+					// The buffer stores data in the form of [timestamp, x, y, z]
+					buffer: CircularQueue2D<Float64Array>;
 					ref: RefObject<HighchartsReactRefObject>;
 					filter: {
 						enabled: boolean;
@@ -49,14 +53,14 @@ const Realtime = () => {
 				collapse: CollapseMode.COLLAPSE_HIDE,
 				label: "views.realtime.charts.z_axis.label",
 				text: "views.realtime.charts.z_axis.text",
-				values: { pga: "0.00000", pgv: "0.00000", intensity: "-" }
+				values: { max: "0", min: "0" }
 			},
 			chart: {
-				buffer: [],
+				buffer: new CircularQueue2D(retention, 0, Float64Array),
 				backgroundColor: "#d97706",
 				filter: { enabled: false },
 				ref: useRef<HighchartsReactRefObject>(null),
-				series: { name: `${station.channel}Z`, type: "line", color: "#f1f5f9" }
+				series: { name: `${stream.channel}Z`, type: "line", color: "#f1f5f9" }
 			}
 		},
 		e_axis: {
@@ -64,14 +68,14 @@ const Realtime = () => {
 				collapse: CollapseMode.COLLAPSE_HIDE,
 				label: "views.realtime.charts.e_axis.label",
 				text: "views.realtime.charts.e_axis.text",
-				values: { pga: "0.00000", pgv: "0.00000", intensity: "-" }
+				values: { max: "0", min: "0" }
 			},
 			chart: {
-				buffer: [],
+				buffer: new CircularQueue2D(retention, 0, Float64Array),
 				filter: { enabled: false },
 				backgroundColor: "#10b981",
 				ref: useRef<HighchartsReactRefObject>(null),
-				series: { name: `${station.channel}E`, type: "line", color: "#f1f5f9" }
+				series: { name: `${stream.channel}E`, type: "line", color: "#f1f5f9" }
 			}
 		},
 		n_axis: {
@@ -79,32 +83,32 @@ const Realtime = () => {
 				collapse: CollapseMode.COLLAPSE_HIDE,
 				label: "views.realtime.charts.n_axis.label",
 				text: "views.realtime.charts.n_axis.text",
-				values: { pga: "0.00000", pgv: "0.00000", intensity: "-" }
+				values: { max: "0", min: "0" }
 			},
 			chart: {
-				buffer: [],
+				buffer: new CircularQueue2D(retention, 0, Float64Array),
 				backgroundColor: "#0ea5e9",
 				filter: { enabled: false },
 				ref: useRef<HighchartsReactRefObject>(null),
-				series: { name: `${station.channel}N`, type: "line", color: "#f1f5f9" }
+				series: { name: `${stream.channel}N`, type: "line", color: "#f1f5f9" }
 			}
 		}
 	});
 
 	// Handlers for WebSocket, passing the data to the charts
 	const { t } = useTranslation();
-	const handleSocketOpen = () => {
-		sendUserAlert(t("views.realtime.toasts.websocket_connected"));
-	};
+	const { sensor } = useSelector(({ sensor }: ReduxStoreProps) => sensor);
 	const handleSocketData = ({ data }: MessageEvent<SocketUpdates>) => {
 		getSocketUpdates(
 			data,
-			(data) => {
-				handleSetBanner(data, setBanner);
-			},
-			(data) => {
-				handleSetCharts(data, setCharts);
-			}
+			(data) =>
+				handleSetBanner(
+					data,
+					sensor.resolution,
+					sensor.velocity ? "velocity" : "acceleration",
+					setBanner
+				),
+			(data) => handleSetCharts(data, setCharts)
 		);
 	};
 	const handleSocketError = () => {
@@ -113,6 +117,9 @@ const Realtime = () => {
 			title: "views.realtime.banner.error.label",
 			content: "views.realtime.banner.error.text"
 		});
+	};
+	const handleSocketOpen = () => {
+		sendUserAlert(t("views.realtime.toasts.websocket_connected"));
 	};
 	useSocket({
 		backend: apiConfig.backend,
@@ -191,7 +198,7 @@ const Realtime = () => {
 					<Holder
 						{...charts[key].holder}
 						key={charts[key].holder.label}
-						label={t(charts[key].holder.label, { channel: station.channel })}
+						label={t(charts[key].holder.label, { channel: stream.channel })}
 						text={t(charts[key].holder.text ?? "", {
 							...charts[key].holder.values
 						})}

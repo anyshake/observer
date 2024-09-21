@@ -1,25 +1,27 @@
+import { wrap } from "comlink";
 import { HighchartsReactRefObject } from "highcharts-react-official";
 import { Dispatch, RefObject, SetStateAction } from "react";
 
 import { ChartProps } from "../../components/Chart";
 import { HolderProps } from "../../components/Holder";
+import { LabelProps } from "../../components/Label";
 import { apiConfig } from "../../config/api";
-import { FilterPassband, getFilteredCounts } from "../../helpers/seismic/getFilteredCounts";
+import { CircularQueue2D } from "../../helpers/utils/CircularQueue2D";
+import HandleSetChartsWorker, { api } from "../../workers/handleSetCharts.worker";
+
+const handleSetChartsWorkerApi = wrap<typeof api>(new HandleSetChartsWorker());
 
 export const handleSetCharts = (
 	res:
 		| typeof apiConfig.endpoints.history.model.response.common
 		| typeof apiConfig.endpoints.history.model.response.error,
-	stateFn: Dispatch<
+	chartStateFn: Dispatch<
 		SetStateAction<
 			Record<
 				string,
 				{
 					chart: ChartProps & {
-						buffer: {
-							timestamp: number;
-							data: number[];
-						}[];
+						buffer: CircularQueue2D<Float64Array>;
 						ref: RefObject<HighchartsReactRefObject>;
 						filter: {
 							enabled: boolean;
@@ -31,23 +33,37 @@ export const handleSetCharts = (
 				}
 			>
 		>
+	>,
+	labelStateFn: Dispatch<
+		SetStateAction<Record<string, LabelProps & { values?: Record<string, string> }>>
 	>
 ) => {
-	if (!res?.data) {
+	if (!res?.data?.length) {
 		return;
 	}
-	stateFn((prev) => {
-		Object.keys(prev).forEach((key) => {
-			if (!res.data.every((obj) => key in obj)) {
-				return;
+
+	chartStateFn((prev) => {
+		const respData = res.data;
+		const respDataDuration = respData.length;
+		const respSampleRate = respData[0].sample_rate;
+
+		Object.keys(prev).forEach(async (key) => {
+			// Validate if the buffer size is the same as the sample rate
+			const [dataDuration, sampleRate] = prev[key].chart.buffer.getShape();
+			if (dataDuration !== respDataDuration || sampleRate !== respSampleRate + 1) {
+				prev[key].chart.buffer = new CircularQueue2D(
+					respDataDuration,
+					// plus one for timestamp
+					respSampleRate + 1,
+					Float64Array
+				);
 			}
 
-			// Set channel buffer from API response
-			const buffer = res.data.map(({ timestamp, ...channels }) => ({
-				data: channels[key as keyof typeof channels] as number[],
-				timestamp
-			}));
-			prev[key].chart.buffer = buffer;
+			// Put response data to circular buffer
+			respData.forEach(({ timestamp, ...data }) => {
+				const axisData = data[key as keyof typeof data] as number[];
+				prev[key].chart.buffer.write(new Float64Array([timestamp, ...axisData]));
+			});
 
 			// Get filter settings and apply to chart
 			const { enabled: filterEnabled, lowCorner, highCorner } = prev[key].chart.filter;
@@ -61,29 +77,37 @@ export const handleSetCharts = (
 			};
 
 			// Get filtered values and apply to chart data
-			const chartData = buffer
-				.map(({ timestamp, data }) => {
-					const filteredData = filterEnabled
-						? getFilteredCounts(data, {
-								poles: 4,
-								lowFreqCorner,
-								highFreqCorner,
-								sampleRate: data.length,
-								passbandType: FilterPassband.BAND_PASS
-							})
-						: data;
-					const dataSpanMS = 1000 / filteredData.length;
-					return filteredData.map((value, index) => [
-						timestamp + dataSpanMS * index,
-						value
-					]);
-				})
-				.reduce((acc, curArr) => acc.concat(curArr), []);
 			const { current: chartObj } = prev[key].chart.ref;
 			if (chartObj) {
-				const { series } = chartObj.chart;
-				series[0].setData(chartData, true, false, false);
+				const chartData = (
+					await Promise.all(
+						prev[key].chart.buffer
+							.readAll()
+							.map(
+								async (data) =>
+									await handleSetChartsWorkerApi.getChartAxisData(
+										data,
+										respSampleRate,
+										filterEnabled,
+										4,
+										lowFreqCorner,
+										highFreqCorner
+									)
+							)
+					)
+				).flat();
+				chartObj.chart.series[0].setData(chartData, true, false, false);
 			}
+
+			// Get label axis values and apply to label state
+			const { max, min } = await handleSetChartsWorkerApi.getLabelAxisValues(
+				prev[key].chart.buffer.readAll()
+			);
+			labelStateFn((_prev) => {
+				const _prevCopy = { ..._prev };
+				_prevCopy[key] = { ..._prev[key], values: { max, min } };
+				return _prevCopy;
+			});
 		});
 
 		return prev;

@@ -1,10 +1,3 @@
-import {
-	CSISIntensityStandard,
-	CWAIntensityStandard,
-	IntensityStandard,
-	JMAIntensityStandard,
-	MMIIntensityStandard
-} from "../helpers/seismic/intensityStandard";
 import { i18nConfig } from "./i18n";
 
 interface GlobalConfig {
@@ -23,31 +16,20 @@ interface GlobalConfig {
 		readonly maximum: number;
 		readonly minimum: number;
 	};
-	readonly scales: IntensityStandard[];
 	readonly footer: Record<keyof typeof i18nConfig.resources, string>;
 }
 
-const scales = [
-	new JMAIntensityStandard(),
-	new CWAIntensityStandard(),
-	new MMIIntensityStandard(),
-	new CSISIntensityStandard()
-];
-
 export const globalConfig: GlobalConfig = {
-	scales,
 	name: "Observer",
 	author: "AnyShake",
 	title: "AnyShake Observer",
 	homepage: "https://anyshake.org",
-	repository: "https://github.com/AnyShake",
+	repository: "https://github.com/anyshake/observer",
 	duration: { default: 300, maximum: 3600, minimum: 10 },
 	retention: { default: 120, maximum: 600, minimum: 10 },
 	footer: {
-		"en-US": "Constructing Realtime Seismic Network Ambitiously.",
-		"zh-CN": "雄心勃勃，致力于构建实时地震网络",
-		"zh-TW": "雄心勃勃，致力於建置即時地震網路"
+		"en-US": "Listen to the whispering earth.",
+		"zh-CN": "听见地球。",
+		"zh-TW": "聽見地球。",
 	}
 };
-
-export const fallbackScale = scales[0];

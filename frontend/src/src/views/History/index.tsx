@@ -23,21 +23,22 @@ import { sendPromiseAlert } from "../../helpers/interact/sendPromiseAlert";
 import { sendUserAlert } from "../../helpers/interact/sendUserAlert";
 import { requestRestApi } from "../../helpers/request/requestRestApi";
 import { FilterPassband, getFilteredCounts } from "../../helpers/seismic/getFilteredCounts";
+import { getNormalizedData } from "../../helpers/seismic/getNormalizedData";
 import { asyncSleep } from "../../helpers/utils/asyncSleep";
+import { CircularQueue2D } from "../../helpers/utils/CircularQueue2D";
 import { getTimeString } from "../../helpers/utils/getTimeString";
 import { setClipboardText } from "../../helpers/utils/setClipboardText";
 import { getMiniSeedFileName } from "./getMiniSeedFileName";
 import { getSacFileName } from "./getSacFileName";
 import { handleSetCharts } from "./handleSetCharts";
-import { handleSetLabels } from "./handleSetLabels";
 
 const History = ({ locale }: RouterComponentProps) => {
 	// Freezing the state of the component until the metadata is initialized
-	const { station } = useSelector(({ station }: ReduxStoreProps) => station);
-	const [isCurrentBusy, setIsCurrentBusy] = useState(!station.initialized);
+	const { stream } = useSelector(({ stream }: ReduxStoreProps) => stream);
+	const [isCurrentBusy, setIsCurrentBusy] = useState(!stream.initialized);
 	useEffect(() => {
-		setIsCurrentBusy(!station.initialized);
-	}, [station.initialized]);
+		setIsCurrentBusy(!stream.initialized);
+	}, [stream.initialized]);
 
 	// Attempt to retrieve start and end time from URL search params
 	const { duration } = useSelector(({ duration }: ReduxStoreProps) => duration);
@@ -83,15 +84,18 @@ const History = ({ locale }: RouterComponentProps) => {
 	>({
 		z_axis: {
 			label: "views.history.labels.z_axis_detail.label",
-			value: "-"
+			value: "views.history.labels.z_axis_detail.value",
+			values: { max: "0", min: "0" }
 		},
 		e_axis: {
 			label: "views.history.labels.e_axis_detail.label",
-			value: "-"
+			value: "views.history.labels.z_axis_detail.value",
+			values: { max: "0", min: "0" }
 		},
 		n_axis: {
 			label: "views.history.labels.n_axis_detail.label",
-			value: "-"
+			value: "views.history.labels.z_axis_detail.value",
+			values: { max: "0", min: "0" }
 		}
 	});
 	const [charts, setCharts] = useState<
@@ -99,7 +103,9 @@ const History = ({ locale }: RouterComponentProps) => {
 			string,
 			{
 				chart: ChartProps & {
-					buffer: { timestamp: number; data: number[] }[];
+					// rows: retention, columns: sampleRate
+					// The buffer stores data in the form of [timestamp, x, y, z]
+					buffer: CircularQueue2D<Float64Array>;
 					ref: RefObject<HighchartsReactRefObject>;
 					filter: { enabled: boolean; lowCorner?: number; highCorner?: number };
 				};
@@ -114,11 +120,11 @@ const History = ({ locale }: RouterComponentProps) => {
 				text: "views.history.charts.z_axis.text"
 			},
 			chart: {
-				buffer: [],
+				buffer: new CircularQueue2D(0, 0, Float64Array),
 				backgroundColor: "#d97706",
 				filter: { enabled: false },
 				ref: useRef<HighchartsReactRefObject>(null),
-				series: { name: `${station.channel}Z`, type: "line", color: "#f1f5f9" }
+				series: { name: `${stream.channel}Z`, type: "line", color: "#f1f5f9" }
 			}
 		},
 		e_axis: {
@@ -128,11 +134,11 @@ const History = ({ locale }: RouterComponentProps) => {
 				text: "views.history.charts.e_axis.text"
 			},
 			chart: {
-				buffer: [],
+				buffer: new CircularQueue2D(0, 0, Float64Array),
 				backgroundColor: "#10b981",
 				filter: { enabled: false },
 				ref: useRef<HighchartsReactRefObject>(null),
-				series: { name: `${station.channel}E`, type: "line", color: "#f1f5f9" }
+				series: { name: `${stream.channel}E`, type: "line", color: "#f1f5f9" }
 			}
 		},
 		n_axis: {
@@ -142,11 +148,11 @@ const History = ({ locale }: RouterComponentProps) => {
 				text: "views.history.charts.n_axis.text"
 			},
 			chart: {
-				buffer: [],
+				buffer: new CircularQueue2D(0, 0, Float64Array),
 				backgroundColor: "#0ea5e9",
 				filter: { enabled: false },
 				ref: useRef<HighchartsReactRefObject>(null),
-				series: { name: `${station.channel}N`, type: "line", color: "#f1f5f9" }
+				series: { name: `${stream.channel}N`, type: "line", color: "#f1f5f9" }
 			}
 		}
 	});
@@ -178,38 +184,40 @@ const History = ({ locale }: RouterComponentProps) => {
 			};
 
 			// Get filtered values and apply to chart data
-			const chartData = prev[chartKey].chart.buffer
-				.map(({ timestamp, data }) => {
-					const filteredData = filterEnabled
-						? getFilteredCounts(data, {
+			const { current: chartObj } = prev[chartKey].chart.ref;
+			if (chartObj) {
+				const chartData = prev[chartKey].chart.buffer
+					.readAll()
+					.map((item) => {
+						const timestamp = item[0];
+						const channelData = item.slice(1);
+						let normalizedData = Float32Array.from(
+							getNormalizedData(Array.from(channelData), 0)
+						);
+						if (filterEnabled) {
+							normalizedData = getFilteredCounts(normalizedData, {
 								poles: 4,
 								lowFreqCorner,
 								highFreqCorner,
-								sampleRate: data.length,
+								sampleRate: normalizedData.length,
 								passbandType: FilterPassband.BAND_PASS
-							})
-						: data;
-					const dataSpanMS = 1000 / filteredData.length;
-					return filteredData.map((value, index) => [
-						timestamp + dataSpanMS * index,
-						value
-					]);
-				})
-				.reduce((acc, curArr) => acc.concat(curArr), []);
-			const { current: chartObj } = prev[chartKey].chart.ref;
-			if (chartObj) {
-				const { series } = chartObj.chart;
-				series[0].setData(chartData, true, false, false);
+							});
+						}
+						return Array.from(normalizedData).map((value, index) => [
+							timestamp + (1000 / normalizedData.length) * index,
+							value
+						]);
+					})
+					.flat();
+				chartObj.chart.series[0].setData(chartData, true, false, false);
 			}
 
+			// Update chart state
 			const currentChart = {
 				...prev[chartKey],
 				chart: {
 					...prev[chartKey].chart,
-					filter: {
-						...prev[chartKey].chart.filter,
-						enabled: filterEnabled
-					},
+					filter: { ...prev[chartKey].chart.filter, enabled: filterEnabled },
 					title: filterEnabled ? `Band pass [${lowFreqCorner}-${highFreqCorner} Hz]` : ""
 				}
 			};
@@ -246,8 +254,7 @@ const History = ({ locale }: RouterComponentProps) => {
 			t("views.history.toasts.fetch_waveform_error")
 		);
 
-		handleSetLabels(res, setLabels);
-		handleSetCharts(res, setCharts);
+		handleSetCharts(res, setCharts, setLabels);
 	};
 
 	// Handler for exporting waveform data as file, server returns waveform data in SAC / MiniSEED binary format
@@ -267,8 +274,8 @@ const History = ({ locale }: RouterComponentProps) => {
 			const miniSeedFileName = getMiniSeedFileName();
 			const sacFileName = getSacFileName(
 				start_time,
-				`${station.channel}${channelCode}`,
-				station
+				`${stream.channel}${channelCode}`,
+				stream
 			);
 
 			await sendPromiseAlert(
@@ -551,7 +558,7 @@ const History = ({ locale }: RouterComponentProps) => {
 							{...rest}
 							key={label}
 							value={t(value, values)}
-							label={t(label, { channel: station.channel })}
+							label={t(label, { channel: stream.channel })}
 						/>
 					))}
 				</Panel>
@@ -572,7 +579,7 @@ const History = ({ locale }: RouterComponentProps) => {
 				<Holder
 					key={charts[key].holder.label}
 					text={t(charts[key].holder.text ?? "")}
-					label={t(charts[key].holder.label ?? "", { channel: station.channel })}
+					label={t(charts[key].holder.label ?? "", { channel: stream.channel })}
 					advanced={
 						<Container className="max-w-96">
 							<Panel
