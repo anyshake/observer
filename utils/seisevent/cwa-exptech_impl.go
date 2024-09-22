@@ -30,7 +30,7 @@ func (c *CWA_EXPTECH) GetProperty() DataSourceProperty {
 }
 
 func (c *CWA_EXPTECH) GetEvents(latitude, longitude float64) ([]Event, error) {
-	// Get CWA HTML response
+	// Get CWA JSON response
 	if !c.cache.Valid() {
 		addrs := []string{
 			"https://api-1.exptech.dev/api/v2/eq/report?limit=100",
