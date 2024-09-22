@@ -40,5 +40,7 @@ func New(cacheTTL time.Duration) map[string]DataSource {
 		FJEA_ID:         &FJEA{cache: cache.New(cacheTTL)},
 		ICL_ID:          &ICL{cache: cache.New(cacheTTL)},
 		BMKG_ID:         &BMKG{cache: cache.New(cacheTTL)},
+		DOST_ID:         &DOST{cache: cache.New(cacheTTL)},
+		AFAD_ID:         &AFAD{cache: cache.New(cacheTTL)},
 	}
 }
