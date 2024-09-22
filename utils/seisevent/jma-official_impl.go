@@ -10,26 +10,26 @@ import (
 	"github.com/corpix/uarand"
 )
 
-const JMA_ID = "jma"
+const JMA_OFFICIAL_ID = "jma_official"
 
-type JMA struct {
+type JMA_OFFICIAL struct {
 	cache cache.BytesCache
 }
 
-func (j *JMA) GetProperty() DataSourceProperty {
+func (j *JMA_OFFICIAL) GetProperty() DataSourceProperty {
 	return DataSourceProperty{
-		ID:      JMA_ID,
+		ID:      JMA_OFFICIAL_ID,
 		Country: "JP",
 		Deafult: "en-US",
 		Locales: map[string]string{
-			"en-US": "Japan Meteorological Agency",
-			"zh-TW": "氣象廳",
-			"zh-CN": "气象厅",
+			"en-US": "Japan Meteorological Agency (Official)",
+			"zh-TW": "氣象廳（官方）",
+			"zh-CN": "气象厅（官方）",
 		},
 	}
 }
 
-func (j *JMA) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (j *JMA_OFFICIAL) GetEvents(latitude, longitude float64) ([]Event, error) {
 	if !j.cache.Valid() {
 		res, err := request.GET(
 			"https://www.jma.go.jp/bosai/quake/data/list.json",
@@ -42,7 +42,7 @@ func (j *JMA) GetEvents(latitude, longitude float64) ([]Event, error) {
 		j.cache.Set(res)
 	}
 
-	// Parse JMA JSON response
+	// Parse JMA_OFFICIAL JSON response
 	var dataMapEvents []map[string]any
 	err := json.Unmarshal(j.cache.Get(), &dataMapEvents)
 	if err != nil {
@@ -84,7 +84,7 @@ func (j *JMA) GetEvents(latitude, longitude float64) ([]Event, error) {
 	return sortSeismicEvents(resultArr), nil
 }
 
-func (j *JMA) getTimestamp(timeStr, secStr string) (int64, error) {
+func (j *JMA_OFFICIAL) getTimestamp(timeStr, secStr string) (int64, error) {
 	t, err := time.Parse("2006-01-02T15:04:05+09:00", timeStr)
 	if err != nil {
 		return 0, err
@@ -94,7 +94,7 @@ func (j *JMA) getTimestamp(timeStr, secStr string) (int64, error) {
 	return t.Add(time.Duration(sec) * time.Second).Add(-9 * time.Hour).UnixMilli(), nil
 }
 
-func (j *JMA) getDepth(data string) float64 {
+func (j *JMA_OFFICIAL) getDepth(data string) float64 {
 	arr := strings.FieldsFunc(data, func(c rune) bool {
 		return c == '+' || c == '-' || c == '/'
 	})
@@ -105,7 +105,7 @@ func (j *JMA) getDepth(data string) float64 {
 	return string2Float(arr[2]) / 1000
 }
 
-func (j *JMA) getLatitude(data string) float64 {
+func (j *JMA_OFFICIAL) getLatitude(data string) float64 {
 	arr := strings.FieldsFunc(data, func(c rune) bool {
 		return c == '+' || c == '-' || c == '/'
 	})
@@ -116,7 +116,7 @@ func (j *JMA) getLatitude(data string) float64 {
 	return string2Float(arr[0])
 }
 
-func (j *JMA) getLongitude(data string) float64 {
+func (j *JMA_OFFICIAL) getLongitude(data string) float64 {
 	arr := strings.FieldsFunc(data, func(c rune) bool {
 		return c == '+' || c == '-' || c == '/'
 	})
@@ -127,6 +127,6 @@ func (j *JMA) getLongitude(data string) float64 {
 	return string2Float(arr[1])
 }
 
-func (j *JMA) getMagnitude(data string) []Magnitude {
+func (j *JMA_OFFICIAL) getMagnitude(data string) []Magnitude {
 	return []Magnitude{{Type: ParseMagnitude("M"), Value: string2Float(data)}}
 }
