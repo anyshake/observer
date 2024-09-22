@@ -18,10 +18,11 @@ import (
 	"golang.org/x/exp/rand"
 )
 
-const CWA_WP_ID = "cwa_webpage"
+const CWA_WP_ID = "cwa_web"
 
 type CWA_WP struct {
-	cache cache.BytesCache
+	cache     cache.BytesCache
+	cacheYear int
 }
 
 // Magic function that bypasses the Great Firewall of China
@@ -41,7 +42,7 @@ func (c *CWA_WP) GetProperty() DataSourceProperty {
 		Country: "TW",
 		Deafult: "en-US",
 		Locales: map[string]string{
-			"en-US": "Central Weather Administration (Webpage)",
+			"en-US": "Central Weather Administration (Web)",
 			"zh-TW": "交通部中央氣象署（網頁）",
 			"zh-CN": "交通部中央气象署（网页）",
 		},
@@ -49,25 +50,25 @@ func (c *CWA_WP) GetProperty() DataSourceProperty {
 }
 
 func (c *CWA_WP) GetEvents(latitude, longitude float64) ([]Event, error) {
-	// This is a workaround for the CWA webpage that does not provide the year of the events
-	res, err := request.GET(
-		"https://www.cloudflare.com/cdn-cgi/trace",
-		10*time.Second, time.Second, 3, false,
-		nil,
-		map[string]string{"User-Agent": uarand.GetRandom()},
-	)
-	if err != nil {
-		return nil, err
-	}
-	ts := regexp.MustCompile(`ts=(\d+)`).FindStringSubmatch(string(res))
-	if len(ts) == 0 {
-		return nil, errors.New("failed to get current time from Cloudflare")
-	}
-	currentYear := time.Unix(int64(string2Float(ts[1])), 0).Year()
-
-	// Get CWA HTML response
 	if !c.cache.Valid() {
+		// This is a workaround for the CWA webpage that does not provide the year of the events
 		res, err := request.GET(
+			"https://www.cloudflare.com/cdn-cgi/trace",
+			10*time.Second, time.Second, 3, false,
+			nil,
+			map[string]string{"User-Agent": uarand.GetRandom()},
+		)
+		if err != nil {
+			return nil, err
+		}
+		ts := regexp.MustCompile(`ts=(\d+)`).FindStringSubmatch(string(res))
+		if len(ts) == 0 {
+			return nil, errors.New("failed to get current time from Cloudflare")
+		}
+		c.cacheYear = time.Unix(int64(string2Float(ts[1])), 0).Year()
+
+		// Get CWA HTML response
+		res, err = request.GET(
 			"https://www.cwa.gov.tw/V8/C/E/MOD/MAP_LIST.html",
 			10*time.Second, time.Second, 3, false,
 			// HiNet CDN IP addresses
@@ -113,7 +114,7 @@ func (c *CWA_WP) GetEvents(latitude, longitude float64) ([]Event, error) {
 			Depth:     c.getDepth(textValue),
 			Region:    c.getRegion(textValue),
 			Magnitude: c.getMagnitude(textValue),
-			Timestamp: c.getTimestamp(currentYear, textValue),
+			Timestamp: c.getTimestamp(c.cacheYear, textValue),
 		}
 		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
 		seisEvent.Estimation = getSeismicEstimation(seisEvent.Depth, seisEvent.Distance)

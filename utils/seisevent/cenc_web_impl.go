@@ -8,6 +8,7 @@ import (
 	"github.com/anyshake/observer/utils/cache"
 	"github.com/anyshake/observer/utils/request"
 	"github.com/corpix/uarand"
+	"golang.org/x/exp/rand"
 )
 
 const CENC_WEB_ID = "cenc_web"
@@ -31,8 +32,12 @@ func (c *CENC_WEB) GetProperty() DataSourceProperty {
 
 func (c *CENC_WEB) GetEvents(latitude, longitude float64) ([]Event, error) {
 	if !c.cache.Valid() {
-		res, err := request.GET(
+		addrs := []string{
 			"https://www.ceic.ac.cn/ajax/google",
+			"https://news.ceic.ac.cn/ajax/google",
+		}
+		res, err := request.GET(
+			addrs[rand.Intn(len(addrs))],
 			10*time.Second, time.Second, 3, false, nil,
 			map[string]string{"User-Agent": uarand.GetRandom()},
 		)
@@ -120,5 +125,4 @@ func (c *CENC_WEB) getDepth(depth any) float64 {
 
 func (c *CENC_WEB) getMagnitude(magType, data string) Magnitude {
 	return Magnitude{Type: ParseMagnitude(magType), Value: string2Float(data)}
-
 }
