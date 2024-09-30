@@ -32,7 +32,7 @@ type ExplorerHealth struct {
 type ExplorerConfig struct {
 	mutex      sync.RWMutex
 	legacyMode bool
-	deviceId   uint32
+	deviceInfo uint32
 	latitude   float64
 	longitude  float64
 	elevation  float64

@@ -111,7 +111,7 @@ func (g *mainlinePacket) decode(data []byte) error {
 	g.Timestamp = int64(binary.LittleEndian.Uint64(data[:unsafe.Sizeof(g.Timestamp)]))
 	switch (g.Timestamp / time.Second.Milliseconds()) % 4 {
 	case 0:
-		g.VariableName = "device_id"
+		g.VariableName = "device_info"
 	case 1:
 		g.VariableName = "latitude"
 	case 2:
@@ -144,8 +144,8 @@ type ExplorerDriverImpl struct {
 }
 
 func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency, fifoBuffer *fifo.Buffer) {
-	// Set device ID to 0xFFFFFFFF to indicate legacy mode
-	deps.Config.SetDeviceId(math.MaxUint32)
+	// Set to 0xFFFFFFFF to indicate legacy mode
+	deps.Config.SetDeviceInfo(math.MaxUint32)
 
 	findIndices := func(arr []byte, sep []byte) []int {
 		var indices []int
@@ -384,17 +384,19 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency, 
 			}
 
 			// If device ID is not initialized, get the device ID from the packet
-			if deps.Config.GetDeviceId() == 0 && e.mainlinePacket.VariableName == "device_id" {
-				deviceId := binary.LittleEndian.Uint32(e.mainlinePacket.VariableData[:])
-				// When device ID was set to 19890604 (dummy value), the device is running without GNSS module.
+			_, deviceId := deps.Config.GetDeviceInfo()
+			if deviceId == 0 && e.mainlinePacket.VariableName == "device_info" {
+				deviceInfo := binary.LittleEndian.Uint32(e.mainlinePacket.VariableData[:])
+				// When the most significant bit is 0, it means the device is running without GNSS module.
 				// In this case, the latitude, longitude, elevation will not be updated.
 				// The timestamp will be replaced with the NTP time.
-				if deviceId == 19890604 {
+				if deviceInfo&0x80000000 == 0 {
 					noGnssMode = true
 				}
-				deps.Config.SetDeviceId(deviceId)
+				deps.Config.SetDeviceInfo(deviceInfo)
+				_, deviceId = deps.Config.GetDeviceInfo()
 				e.logger.Infof("got current device ID: %08X", deviceId)
-			} else if deps.Config.GetDeviceId() == 0 {
+			} else if deviceId == 0 {
 				continue
 			}
 
