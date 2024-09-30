@@ -1,5 +1,7 @@
 package explorer
 
+import "math"
+
 func (c *ExplorerConfig) SetLegacyMode(legacyMode bool) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
@@ -14,18 +16,23 @@ func (c *ExplorerConfig) GetLegacyMode() bool {
 	return c.legacyMode
 }
 
-func (c *ExplorerConfig) SetDeviceId(deviceId uint32) {
+func (c *ExplorerConfig) SetDeviceInfo(deviceInfo uint32) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	c.deviceId = deviceId
+	c.deviceInfo = deviceInfo
 }
 
-func (c *ExplorerConfig) GetDeviceId() uint32 {
+func (c *ExplorerConfig) GetDeviceInfo() (deviceInfo, deviceId uint32) {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 
-	return c.deviceId
+	// Leagcy mode
+	if deviceId == math.MaxUint32 {
+		return c.deviceInfo, c.deviceInfo & 0x7FFFFFFF
+	}
+
+	return c.deviceInfo, c.deviceInfo & 0x7FFFFFFF
 }
 
 func (c *ExplorerConfig) SetLatitude(latitude float64) {
