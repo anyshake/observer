@@ -2,7 +2,18 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
-# v3.3.2
+## v3.3.3
+
+### New Features
+
+- Added non-official event data sources (CWA, JMA, CENC).
+- Added AFAD and DOST event data sources.
+
+### Refactor
+
+- Enhanced support for devices without GNSS support.
+
+## v3.3.2
 
 ### Bug Fixes
 
