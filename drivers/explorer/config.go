@@ -27,9 +27,9 @@ func (c *ExplorerConfig) GetDeviceInfo() (deviceInfo, deviceId uint32) {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 
-	// Leagcy mode
+	// Leagcy mode is always 0xFFFFFFFF
 	if deviceId == math.MaxUint32 {
-		return c.deviceInfo, c.deviceInfo & 0x7FFFFFFF
+		return deviceId, deviceId
 	}
 
 	return c.deviceInfo, c.deviceInfo & 0x7FFFFFFF
