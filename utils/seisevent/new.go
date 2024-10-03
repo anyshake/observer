@@ -42,5 +42,6 @@ func New(cacheTTL time.Duration) map[string]DataSource {
 		BMKG_ID:         &BMKG{cache: cache.New(cacheTTL)},
 		DOST_ID:         &DOST{cache: cache.New(cacheTTL)},
 		AFAD_ID:         &AFAD{cache: cache.New(cacheTTL)},
+		KRDAE_ID:        &KRDAE{cache: cache.New(cacheTTL)},
 	}
 }

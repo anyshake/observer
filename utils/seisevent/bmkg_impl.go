@@ -43,7 +43,7 @@ func (c *BMKG) GetEvents(latitude, longitude float64) ([]Event, error) {
 		c.cache.Set(res)
 	}
 
-	// Parse CEA/DASE HTML response
+	// Parse HTML response
 	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(c.cache.Get()))
 	if err != nil {
 		return nil, err
