@@ -105,7 +105,7 @@ const History = ({ locale }: RouterComponentProps) => {
 				chart: ChartProps & {
 					// rows: retention, columns: sampleRate
 					// The buffer stores data in the form of [timestamp, x, y, z]
-					buffer: CircularQueue2D<Float64Array>;
+					buffer: CircularQueue2D;
 					ref: RefObject<HighchartsReactRefObject>;
 					filter: { enabled: boolean; lowCorner?: number; highCorner?: number };
 				};
@@ -120,7 +120,7 @@ const History = ({ locale }: RouterComponentProps) => {
 				text: "views.history.charts.z_axis.text"
 			},
 			chart: {
-				buffer: new CircularQueue2D(0, 0, Float64Array),
+				buffer: new CircularQueue2D(0, 0),
 				backgroundColor: "#d97706",
 				filter: { enabled: false },
 				ref: useRef<HighchartsReactRefObject>(null),
@@ -134,7 +134,7 @@ const History = ({ locale }: RouterComponentProps) => {
 				text: "views.history.charts.e_axis.text"
 			},
 			chart: {
-				buffer: new CircularQueue2D(0, 0, Float64Array),
+				buffer: new CircularQueue2D(0, 0),
 				backgroundColor: "#10b981",
 				filter: { enabled: false },
 				ref: useRef<HighchartsReactRefObject>(null),
@@ -148,7 +148,7 @@ const History = ({ locale }: RouterComponentProps) => {
 				text: "views.history.charts.n_axis.text"
 			},
 			chart: {
-				buffer: new CircularQueue2D(0, 0, Float64Array),
+				buffer: new CircularQueue2D(0, 0),
 				backgroundColor: "#0ea5e9",
 				filter: { enabled: false },
 				ref: useRef<HighchartsReactRefObject>(null),
@@ -191,17 +191,21 @@ const History = ({ locale }: RouterComponentProps) => {
 					.map((item) => {
 						const timestamp = item[0];
 						const channelData = item.slice(1);
-						let normalizedData = Float32Array.from(
+						const normalizedData = Float32Array.from(
 							getNormalizedData(Array.from(channelData), 0)
 						);
 						if (filterEnabled) {
-							normalizedData = getFilteredCounts(normalizedData, {
+							const filteredData = getFilteredCounts(normalizedData, {
 								poles: 4,
 								lowFreqCorner,
 								highFreqCorner,
 								sampleRate: normalizedData.length,
 								passbandType: FilterPassband.BAND_PASS
 							});
+							return Array.from(filteredData).map((value, index) => [
+								timestamp + (1000 / filteredData.length) * index,
+								value
+							]);
 						}
 						return Array.from(normalizedData).map((value, index) => [
 							timestamp + (1000 / normalizedData.length) * index,

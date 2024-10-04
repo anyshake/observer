@@ -21,7 +21,7 @@ export const handleSetCharts = (
 				string,
 				{
 					chart: ChartProps & {
-						buffer: CircularQueue2D<Float64Array>;
+						buffer: CircularQueue2D;
 						ref: RefObject<HighchartsReactRefObject>;
 						filter: {
 							enabled: boolean;
@@ -54,8 +54,7 @@ export const handleSetCharts = (
 				prev[key].chart.buffer = new CircularQueue2D(
 					respDataDuration,
 					// plus one for timestamp
-					respSampleRate + 1,
-					Float64Array
+					respSampleRate + 1
 				);
 			}
 
