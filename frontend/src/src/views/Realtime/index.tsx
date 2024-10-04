@@ -36,7 +36,7 @@ const Realtime = () => {
 				chart: ChartProps & {
 					// rows: retention, columns: sampleRate
 					// The buffer stores data in the form of [timestamp, x, y, z]
-					buffer: CircularQueue2D<Float64Array>;
+					buffer: CircularQueue2D;
 					ref: RefObject<HighchartsReactRefObject>;
 					filter: {
 						enabled: boolean;
@@ -56,7 +56,7 @@ const Realtime = () => {
 				values: { max: "0", min: "0" }
 			},
 			chart: {
-				buffer: new CircularQueue2D(retention, 0, Float64Array),
+				buffer: new CircularQueue2D(retention, 0),
 				backgroundColor: "#d97706",
 				filter: { enabled: false },
 				ref: useRef<HighchartsReactRefObject>(null),
@@ -71,7 +71,7 @@ const Realtime = () => {
 				values: { max: "0", min: "0" }
 			},
 			chart: {
-				buffer: new CircularQueue2D(retention, 0, Float64Array),
+				buffer: new CircularQueue2D(retention, 0),
 				filter: { enabled: false },
 				backgroundColor: "#10b981",
 				ref: useRef<HighchartsReactRefObject>(null),
@@ -86,7 +86,7 @@ const Realtime = () => {
 				values: { max: "0", min: "0" }
 			},
 			chart: {
-				buffer: new CircularQueue2D(retention, 0, Float64Array),
+				buffer: new CircularQueue2D(retention, 0),
 				backgroundColor: "#0ea5e9",
 				filter: { enabled: false },
 				ref: useRef<HighchartsReactRefObject>(null),

@@ -18,7 +18,7 @@ export const handleSetCharts = async (
 				string,
 				{
 					chart: ChartProps & {
-						buffer: CircularQueue2D<Float64Array>;
+						buffer: CircularQueue2D;
 						ref: RefObject<HighchartsReactRefObject>;
 						filter: {
 							enabled: boolean;
@@ -41,8 +41,7 @@ export const handleSetCharts = async (
 				prev[key].chart.buffer = new CircularQueue2D(
 					retention,
 					// plus one for timestamp
-					sample_rate + 1,
-					Float64Array
+					sample_rate + 1
 				);
 			}
 			// Put new data to circular buffer

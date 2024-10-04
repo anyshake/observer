@@ -1,39 +1,17 @@
-type TypedArray =
-	| Int8Array
-	| Uint8Array
-	| Uint8ClampedArray
-	| Int16Array
-	| Uint16Array
-	| Int32Array
-	| Uint32Array
-	| Float32Array
-	| Float64Array;
-
-export class CircularQueue2D<T extends TypedArray> {
+export class CircularQueue2D {
 	private buffer: ArrayBuffer[];
-	private views: T[];
+	private views: Float64Array[];
 	private head: number;
 	private tail: number;
 	private rows: number;
 	private columns: number;
 	private length: number;
-	private TypedArrayConstructor: { new (buffer: ArrayBuffer): T };
 
-	constructor(
-		rows: number,
-		columns: number,
-		TypedArrayConstructor: { new (buffer: ArrayBuffer): T }
-	) {
+	constructor(rows: number, columns: number) {
 		this.buffer = Array(rows)
 			.fill(null)
-			.map(
-				() =>
-					new ArrayBuffer(
-						columns * new TypedArrayConstructor(new ArrayBuffer(0)).BYTES_PER_ELEMENT
-					)
-			);
-		this.TypedArrayConstructor = TypedArrayConstructor;
-		this.views = this.buffer.map((buf) => new this.TypedArrayConstructor(buf));
+			.map(() => new ArrayBuffer(columns * Float64Array.BYTES_PER_ELEMENT));
+		this.views = this.buffer.map((buf) => new Float64Array(buf));
 		this.head = 0;
 		this.tail = 0;
 		this.rows = rows;
@@ -41,7 +19,7 @@ export class CircularQueue2D<T extends TypedArray> {
 		this.length = 0;
 	}
 
-	write = (data: T): void => {
+	write = (data: Float64Array): void => {
 		if (data.length !== this.columns) {
 			throw new Error(`Data must have ${this.columns} elements`);
 		}
@@ -56,24 +34,24 @@ export class CircularQueue2D<T extends TypedArray> {
 		}
 	};
 
-	read = (size: number): T[] => {
+	read = (size: number): Float64Array[] => {
 		if (size > this.length) {
 			throw new Error("Not enough rows to read");
 		}
-		const result: T[] = [];
+		const result: Float64Array[] = [];
 		for (let i = 0; i < size; i++) {
 			const currentIndex = (this.head + i) % this.rows;
-			const row = new this.TypedArrayConstructor(this.buffer[currentIndex]);
+			const row = new Float64Array(this.buffer[currentIndex]);
 			result.push(row);
 		}
 		return result;
 	};
 
-	readAll = (): T[] => {
-		const result: T[] = [];
+	readAll = (): Float64Array[] => {
+		const result: Float64Array[] = [];
 		for (let i = 0; i < this.length; i++) {
 			const currentIndex = (this.head + i) % this.rows;
-			const row = new this.TypedArrayConstructor(this.buffer[currentIndex]);
+			const row = new Float64Array(this.buffer[currentIndex]);
 			result.push(row);
 		}
 		return result;
