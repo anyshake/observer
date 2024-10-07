@@ -170,11 +170,11 @@ func (c *CWA_WP) getRegion(data string) string {
 
 	exp = regexp.MustCompile(`\(位於.+\)`)
 	if exp == nil {
-		return "未知地區"
+		return loc_1
 	}
 	r = exp.FindAllStringSubmatch(data, -1)
 	if len(r) == 0 || len(r[0]) == 0 {
-		return "未知地區"
+		return loc_1
 	}
 	loc_2 := regexp.MustCompile(`\(|\)|位於`).ReplaceAllString(r[0][0], "")
 
