@@ -227,6 +227,7 @@ export const Login = ({
 										className="py-2 px-3 border border-gray-300 focus:outline-none focus:ring focus:ring-opacity-50 rounded-md shadow-sm disabled:bg-gray-100 mt-1 block w-full"
 										type="text"
 										name="captcha"
+                                        disabled={!preAuthData.captcha_img.length}
 										placeholder={t("login.forms.captcha.placeholder")}
 									/>
 									{preAuthData.captcha_img && (
