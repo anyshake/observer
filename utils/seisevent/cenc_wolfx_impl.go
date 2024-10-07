@@ -49,10 +49,10 @@ func (c *CENC_WOLFX) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	// Ensure the response has the expected keys and they are not empty
-	expectedKeys := []string{"type", "time", "location", "magnitude", "depth", "latitude", "longitude"}
+	expectedKeys := []string{"EventID", "type", "time", "location", "magnitude", "depth", "latitude", "longitude"}
 
 	var resultArr []Event
-	for key, v := range dataMapEvents {
+	for _, v := range dataMapEvents {
 		event, ok := v.(map[string]any)
 		if !ok {
 			continue
@@ -68,8 +68,8 @@ func (c *CENC_WOLFX) GetEvents(latitude, longitude float64) ([]Event, error) {
 		}
 
 		seisEvent := Event{
-			Verfied:   event["type"] == "verified",
-			Event:     key,
+			Verfied:   event["type"] == "reviewed",
+			Event:     event["EventID"].(string),
 			Timestamp: timestamp,
 			Region:    event["location"].(string),
 			Depth:     string2Float(event["depth"].(string)),
