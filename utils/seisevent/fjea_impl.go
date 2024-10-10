@@ -14,7 +14,7 @@ import (
 const FJEA_ID = "fjea_e"
 
 type FJEA struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (s *FJEA) GetProperty() DataSourceProperty {
@@ -45,7 +45,7 @@ func (s *FJEA) GetEvents(latitude, longitude float64) ([]Event, error) {
 
 	// Parse FJEA JSON response
 	var dataMap map[string]any
-	err := json.Unmarshal(s.cache.Get(), &dataMap)
+	err := json.Unmarshal(s.cache.Get().([]byte), &dataMap)
 	if err != nil {
 		return nil, err
 	}

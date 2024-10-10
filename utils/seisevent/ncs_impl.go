@@ -15,7 +15,7 @@ import (
 const NCS_ID = "ncs"
 
 type NCS struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (c *NCS) GetProperty() DataSourceProperty {
@@ -45,7 +45,7 @@ func (c *NCS) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	// Parse NCS HTML response
-	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(c.cache.Get()))
+	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(c.cache.Get().([]byte)))
 	if err != nil {
 		return nil, err
 	}

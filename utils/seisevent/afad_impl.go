@@ -16,7 +16,7 @@ import (
 const AFAD_ID = "afad"
 
 type AFAD struct {
-	cache       cache.BytesCache
+	cache       cache.AnyCache
 	currentTime time.Time
 }
 
@@ -71,7 +71,7 @@ func (c *AFAD) GetEvents(latitude, longitude float64) ([]Event, error) {
 
 	// Parse AFAD JSON response
 	var dataMapEvents []map[string]any
-	err := json.Unmarshal(c.cache.Get(), &dataMapEvents)
+	err := json.Unmarshal(c.cache.Get().([]byte), &dataMapEvents)
 	if err != nil {
 		return nil, err
 	}

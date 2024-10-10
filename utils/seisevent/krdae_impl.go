@@ -16,7 +16,7 @@ import (
 const KRDAE_ID = "krdae"
 
 type KRDAE struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (c *KRDAE) GetProperty() DataSourceProperty {
@@ -46,7 +46,7 @@ func (c *KRDAE) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	// Parse HTML response
-	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(c.cache.Get()))
+	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(c.cache.Get().([]byte)))
 	if err != nil {
 		return nil, err
 	}

@@ -1,7 +1,7 @@
 package cache
 
-func (c *BytesCache) Get() []byte {
-	c.mutex.RLock()
-	defer c.mutex.RUnlock()
-	return c.cache
+func (a *AnyCache) Get() any {
+	a.mutex.RLock()
+	defer a.mutex.RUnlock()
+	return a.cache
 }

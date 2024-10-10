@@ -14,7 +14,7 @@ import (
 const SCEA_E_ID = "scea_e"
 
 type SCEA_E struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (s *SCEA_E) GetProperty() DataSourceProperty {
@@ -45,7 +45,7 @@ func (s *SCEA_E) GetEvents(latitude, longitude float64) ([]Event, error) {
 
 	// Parse SCEA_B JSON response
 	var dataMap map[string]any
-	err := json.Unmarshal(s.cache.Get(), &dataMap)
+	err := json.Unmarshal(s.cache.Get().([]byte), &dataMap)
 	if err != nil {
 		return nil, err
 	}

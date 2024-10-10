@@ -14,7 +14,7 @@ import (
 const BMKG_ID = "bmkg"
 
 type BMKG struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (c *BMKG) GetProperty() DataSourceProperty {
@@ -44,7 +44,7 @@ func (c *BMKG) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	// Parse HTML response
-	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(c.cache.Get()))
+	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(c.cache.Get().([]byte)))
 	if err != nil {
 		return nil, err
 	}

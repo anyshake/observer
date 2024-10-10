@@ -15,7 +15,7 @@ import (
 const KMA_ID = "kma"
 
 type KMA struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (k *KMA) GetProperty() DataSourceProperty {
@@ -45,7 +45,7 @@ func (k *KMA) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	// Parse KMA HTML response
-	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(k.cache.Get()))
+	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(k.cache.Get().([]byte)))
 	if err != nil {
 		return nil, err
 	}

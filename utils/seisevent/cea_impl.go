@@ -16,7 +16,7 @@ import (
 const CEA_ID = "cea"
 
 type CEA struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (c *CEA) GetProperty() DataSourceProperty {
@@ -46,7 +46,7 @@ func (c *CEA) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	// Parse CEA/DASE HTML response
-	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(c.cache.Get()))
+	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(c.cache.Get().([]byte)))
 	if err != nil {
 		return nil, err
 	}
