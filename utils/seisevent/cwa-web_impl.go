@@ -21,7 +21,7 @@ import (
 const CWA_WP_ID = "cwa_web"
 
 type CWA_WP struct {
-	cache     cache.BytesCache
+	cache     cache.AnyCache
 	cacheYear int
 }
 
@@ -85,7 +85,7 @@ func (c *CWA_WP) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	// Parse CWA HTML response
-	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(c.cache.Get()))
+	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(c.cache.Get().([]byte)))
 	if err != nil {
 		return nil, err
 	}

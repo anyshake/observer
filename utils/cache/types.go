@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-type BytesCache struct {
-	cache     []byte
+type AnyCache struct {
+	cache     any
 	ttl       time.Duration
 	createdAt time.Time
 	mutex     sync.RWMutex

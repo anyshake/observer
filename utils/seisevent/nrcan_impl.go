@@ -15,7 +15,7 @@ import (
 const NRCAN_ID = "nrcan"
 
 type NRCAN struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (s *NRCAN) GetProperty() DataSourceProperty {
@@ -45,7 +45,7 @@ func (s *NRCAN) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	// Parse NRCAN XML response
-	dataMap, err := xml2map.NewDecoder(strings.NewReader(string(s.cache.Get()))).Decode()
+	dataMap, err := xml2map.NewDecoder(strings.NewReader(string(s.cache.Get().([]byte)))).Decode()
 	if err != nil {
 		return nil, err
 	}

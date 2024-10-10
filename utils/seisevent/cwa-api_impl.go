@@ -18,7 +18,7 @@ import (
 const CWA_API_ID = "cwa_api"
 
 type CWA_API struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 // Magic function that bypasses the Great Firewall of China
@@ -72,7 +72,7 @@ func (c *CWA_API) GetEvents(latitude, longitude float64) ([]Event, error) {
 
 	// Parse CWA JSON response
 	var dataMap map[string]any
-	err := json.Unmarshal(c.cache.Get(), &dataMap)
+	err := json.Unmarshal(c.cache.Get().([]byte), &dataMap)
 	if err != nil {
 		return nil, err
 	}

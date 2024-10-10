@@ -15,7 +15,7 @@ import (
 const DOST_ID = "dost"
 
 type DOST struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (c *DOST) GetProperty() DataSourceProperty {
@@ -46,7 +46,7 @@ func (c *DOST) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	// Parse DOST HTML response
-	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(c.cache.Get()))
+	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(c.cache.Get().([]byte)))
 	if err != nil {
 		return nil, err
 	}

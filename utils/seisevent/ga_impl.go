@@ -13,7 +13,7 @@ import (
 const GA_ID = "ga"
 
 type GA struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (c *GA) GetProperty() DataSourceProperty {
@@ -44,7 +44,7 @@ func (c *GA) GetEvents(latitude, longitude float64) ([]Event, error) {
 
 	// Parse JMA JSON response
 	var dataMap map[string]any
-	err := json.Unmarshal(c.cache.Get(), &dataMap)
+	err := json.Unmarshal(c.cache.Get().([]byte), &dataMap)
 	if err != nil {
 		return nil, err
 	}

@@ -14,7 +14,7 @@ import (
 const CENC_WEB_ID = "cenc_web"
 
 type CENC_WEB struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (c *CENC_WEB) GetProperty() DataSourceProperty {
@@ -49,7 +49,7 @@ func (c *CENC_WEB) GetEvents(latitude, longitude float64) ([]Event, error) {
 
 	// Parse CENC JSON response
 	var dataMapEvents []map[string]any
-	err := json.Unmarshal(c.cache.Get(), &dataMapEvents)
+	err := json.Unmarshal(c.cache.Get().([]byte), &dataMapEvents)
 	if err != nil {
 		return nil, err
 	}

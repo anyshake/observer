@@ -15,7 +15,7 @@ import (
 const HKO_ID = "hko"
 
 type HKO struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (h *HKO) GetProperty() DataSourceProperty {
@@ -45,7 +45,7 @@ func (h *HKO) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	// Parse HKO XML response
-	dataMap, err := xml2map.NewDecoder(strings.NewReader(string(h.cache.Get()))).Decode()
+	dataMap, err := xml2map.NewDecoder(strings.NewReader(string(h.cache.Get().([]byte)))).Decode()
 	if err != nil {
 		return nil, err
 	}
