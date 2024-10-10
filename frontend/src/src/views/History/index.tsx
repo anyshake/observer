@@ -28,8 +28,7 @@ import { asyncSleep } from "../../helpers/utils/asyncSleep";
 import { CircularQueue2D } from "../../helpers/utils/CircularQueue2D";
 import { getTimeString } from "../../helpers/utils/getTimeString";
 import { setClipboardText } from "../../helpers/utils/setClipboardText";
-import { getMiniSeedFileName } from "./getMiniSeedFileName";
-import { getSacFileName } from "./getSacFileName";
+import { getExportFileName } from "./getExportFileName";
 import { handleSetCharts } from "./handleSetCharts";
 
 const History = ({ locale }: RouterComponentProps) => {
@@ -275,12 +274,13 @@ const History = ({ locale }: RouterComponentProps) => {
 			const { backend } = apiConfig;
 			const payload = { start_time, end_time, channel: channelCode, format };
 
-			const miniSeedFileName = getMiniSeedFileName();
-			const sacFileName = getSacFileName(
+			const baseFileName = getExportFileName(
 				start_time,
 				`${stream.channel}${channelCode}`,
 				stream
 			);
+			const miniSeedFileName = `${baseFileName}.mseed`;
+			const sacFileName = `${baseFileName}.sac`;
 
 			await sendPromiseAlert(
 				requestRestApi<
