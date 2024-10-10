@@ -1,7 +1,7 @@
 import { getDayOfYear } from "../../helpers/utils/getDayOfYear";
 import { Stream } from "../../stores/stream";
 
-export const getSacFileName = (
+export const getExportFileName = (
 	startTimeMS: number,
 	channelName: string,
 	{ network, station, location }: Stream
@@ -21,5 +21,5 @@ export const getSacFileName = (
 		.padStart(4, "0")}.${network.slice(0, 2)}.${station.slice(
 		0,
 		5
-	)}.${location.slice(0, 2)}.${channelName}.D.sac`;
+	)}.${location.slice(0, 2)}.${channelName}.D`;
 };
