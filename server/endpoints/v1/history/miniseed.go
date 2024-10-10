@@ -15,6 +15,7 @@ func (h *History) handleMiniSEED(data []explorer.ExplorerData, stationCode, netw
 		return "", nil, err
 	}
 
+	startTime := time.UnixMilli(data[0].Timestamp).UTC()
 	channelName := fmt.Sprintf("%s%s", channelPrefix, channelCode)
 
 	for sequence, record := range data {
@@ -59,5 +60,17 @@ func (h *History) handleMiniSEED(data []explorer.ExplorerData, stationCode, netw
 		return "", nil, err
 	}
 
-	return "query.mseed", dataBytes, nil
+	// Return filename and bytes (e.g. 2023.193.14.22.51.0317.AS.SHAKE.00.EHZ.D.mseed)
+	filename := fmt.Sprintf("%s.%s.%s.%s.%s.%04d.%s.%s.%s.%s.D.mseed",
+		startTime.Format("2006"),
+		startTime.Format("002"),
+		startTime.Format("15"),
+		startTime.Format("04"),
+		startTime.Format("05"),
+		// Get the current millisecond
+		startTime.Nanosecond()/1000000,
+		stationCode, networkCode,
+		locationCode, channelName,
+	)
+	return filename, dataBytes, nil
 }
