@@ -2,7 +2,7 @@ package cache
 
 import "time"
 
-func (c *BytesCache) Clear() {
+func (c *AnyCache) Clear() {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	c.cache = nil

@@ -2,6 +2,6 @@ package cache
 
 import "time"
 
-func New(ttl time.Duration) BytesCache {
-	return BytesCache{ttl: ttl}
+func New(ttl time.Duration) AnyCache {
+	return AnyCache{ttl: ttl}
 }

@@ -2,7 +2,7 @@ package cache
 
 import "time"
 
-func (c *BytesCache) Valid() bool {
+func (c *AnyCache) Valid() bool {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 	return time.Since(c.createdAt) < c.ttl

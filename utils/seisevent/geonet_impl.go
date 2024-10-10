@@ -13,7 +13,7 @@ import (
 const GEONET_ID = "geonet"
 
 type GEONET struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (u *GEONET) GetProperty() DataSourceProperty {
@@ -44,7 +44,7 @@ func (u *GEONET) GetEvents(latitude, longitude float64) ([]Event, error) {
 
 	// Parse GEONET JSON response
 	var dataMap map[string]any
-	err := json.Unmarshal(u.cache.Get(), &dataMap)
+	err := json.Unmarshal(u.cache.Get().([]byte), &dataMap)
 	if err != nil {
 		return nil, err
 	}

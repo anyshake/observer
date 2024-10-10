@@ -20,7 +20,7 @@ import (
 const EQZT_ID = "eqzt"
 
 type EQZT struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (j *EQZT) GetProperty() DataSourceProperty {
@@ -50,7 +50,7 @@ func (j *EQZT) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	// Convert GB18030 to UTF-8
-	dataBytes, err := io.ReadAll(transform.NewReader(bytes.NewReader(j.cache.Get()), simplifiedchinese.GB18030.NewDecoder()))
+	dataBytes, err := io.ReadAll(transform.NewReader(bytes.NewReader(j.cache.Get().([]byte)), simplifiedchinese.GB18030.NewDecoder()))
 	if err != nil {
 		return nil, err
 	}

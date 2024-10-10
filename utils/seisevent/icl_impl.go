@@ -14,7 +14,7 @@ import (
 const ICL_ID = "icl"
 
 type ICL struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (c *ICL) GetProperty() DataSourceProperty {
@@ -45,7 +45,7 @@ func (c *ICL) GetEvents(latitude, longitude float64) ([]Event, error) {
 
 	// Parse ICL JSON response
 	var dataMap map[string]any
-	err := json.Unmarshal(c.cache.Get(), &dataMap)
+	err := json.Unmarshal(c.cache.Get().([]byte), &dataMap)
 	if err != nil {
 		return nil, err
 	}

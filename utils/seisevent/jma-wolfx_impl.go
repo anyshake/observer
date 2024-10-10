@@ -13,7 +13,7 @@ import (
 const JMA_WOLFX_ID = "jma_wolfx"
 
 type JMA_WOLFX struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (j *JMA_WOLFX) GetProperty() DataSourceProperty {
@@ -44,7 +44,7 @@ func (j *JMA_WOLFX) GetEvents(latitude, longitude float64) ([]Event, error) {
 
 	// Parse JMA_WOLFX JSON response
 	var dataMapEvents map[string]any
-	err := json.Unmarshal(j.cache.Get(), &dataMapEvents)
+	err := json.Unmarshal(j.cache.Get().([]byte), &dataMapEvents)
 	if err != nil {
 		return nil, err
 	}

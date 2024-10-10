@@ -12,7 +12,7 @@ import (
 const CENC_WOLFX_ID = "cenc_wolfx"
 
 type CENC_WOLFX struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (c *CENC_WOLFX) GetProperty() DataSourceProperty {
@@ -43,7 +43,7 @@ func (c *CENC_WOLFX) GetEvents(latitude, longitude float64) ([]Event, error) {
 
 	// Parse CENC JSON response
 	var dataMapEvents map[string]any
-	err := json.Unmarshal(c.cache.Get(), &dataMapEvents)
+	err := json.Unmarshal(c.cache.Get().([]byte), &dataMapEvents)
 	if err != nil {
 		return nil, err
 	}

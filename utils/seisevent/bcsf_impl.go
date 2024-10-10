@@ -11,7 +11,7 @@ import (
 const BCSF_ID = "bcsf"
 
 type BCSF struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (c *BCSF) GetProperty() DataSourceProperty {
@@ -40,7 +40,7 @@ func (c *BCSF) GetEvents(latitude, longitude float64) ([]Event, error) {
 		c.cache.Set(res)
 	}
 
-	resultArr, err := ParseFdsnwsEvent(string(c.cache.Get()), "2006-01-02T15:04:05.000000Z", latitude, longitude)
+	resultArr, err := ParseFdsnwsEvent(string(c.cache.Get().([]byte)), "2006-01-02T15:04:05.000000Z", latitude, longitude)
 	if err != nil {
 		return nil, err
 	}

@@ -12,7 +12,7 @@ import (
 const JMA_P2PQUAKE_ID = "jma_p2pquake"
 
 type JMA_P2PQUAKE struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (j *JMA_P2PQUAKE) GetProperty() DataSourceProperty {
@@ -43,7 +43,7 @@ func (j *JMA_P2PQUAKE) GetEvents(latitude, longitude float64) ([]Event, error) {
 
 	// Parse JMA_P2PQUAKE JSON response
 	var dataMapEvents []map[string]any
-	err := json.Unmarshal(j.cache.Get(), &dataMapEvents)
+	err := json.Unmarshal(j.cache.Get().([]byte), &dataMapEvents)
 	if err != nil {
 		return nil, err
 	}

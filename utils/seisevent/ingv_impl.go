@@ -11,7 +11,7 @@ import (
 const INGV_ID = "ingv"
 
 type INGV struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (c *INGV) GetProperty() DataSourceProperty {
@@ -40,7 +40,7 @@ func (c *INGV) GetEvents(latitude, longitude float64) ([]Event, error) {
 		c.cache.Set(res)
 	}
 
-	resultArr, err := ParseFdsnwsEvent(string(c.cache.Get()), "2006-01-02T15:04:05", latitude, longitude)
+	resultArr, err := ParseFdsnwsEvent(string(c.cache.Get().([]byte)), "2006-01-02T15:04:05", latitude, longitude)
 	if err != nil {
 		return nil, err
 	}

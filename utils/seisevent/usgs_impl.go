@@ -13,7 +13,7 @@ import (
 const USGS_ID = "usgs"
 
 type USGS struct {
-	cache cache.BytesCache
+	cache cache.AnyCache
 }
 
 func (u *USGS) GetProperty() DataSourceProperty {
@@ -44,7 +44,7 @@ func (u *USGS) GetEvents(latitude, longitude float64) ([]Event, error) {
 
 	// Parse USGS JSON response
 	var dataMap map[string]any
-	err := json.Unmarshal(u.cache.Get(), &dataMap)
+	err := json.Unmarshal(u.cache.Get().([]byte), &dataMap)
 	if err != nil {
 		return nil, err
 	}
