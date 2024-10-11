@@ -72,7 +72,7 @@ func (m *MiniSeedService) handleWrite() error {
 		if err != nil {
 			return err
 		}
-		filePath := m.getFilePath(m.basePath, m.stationCode, m.networkCode, m.locationCode, channelName, startTime)
+		filePath := m.getFilePath(channelName, startTime)
 		err = miniseed.Write(filePath, mseedio.APPEND, dataBytes)
 		if err != nil {
 			return err

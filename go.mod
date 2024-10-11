@@ -11,6 +11,7 @@ require (
 	github.com/antonfisher/nested-logrus-formatter v1.3.1
 	github.com/appleboy/gin-jwt/v2 v2.10.0
 	github.com/bclswl0827/go-serial v0.0.1
+	github.com/bclswl0827/heligo v0.0.7
 	github.com/bclswl0827/mseedio v1.0.9
 	github.com/bclswl0827/sacio v1.0.6
 	github.com/bclswl0827/slgo v0.0.4
@@ -78,15 +79,22 @@ require (
 )
 
 require (
+	git.sr.ht/~sbinet/gg v0.5.0 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
+	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
+	github.com/campoy/embedmd v1.0.0 // indirect
 	github.com/clbanning/anyxml v1.2.2 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/go-fonts/liberation v0.3.1 // indirect
+	github.com/go-latex/latex v0.0.0-20230307184459-12ec69307ad9 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
+	github.com/go-pdf/fpdf v0.8.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
@@ -99,6 +107,8 @@ require (
 	github.com/tklauser/go-sysconf v0.3.14 // indirect
 	github.com/tklauser/numcpus v0.8.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
+	golang.org/x/image v0.21.0 // indirect
+	gonum.org/v1/plot v0.14.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 )
 
@@ -125,6 +135,6 @@ require (
 	golang.org/x/crypto v0.26.0
 	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/sys v0.25.0 // indirect
-	golang.org/x/text v0.18.0
+	golang.org/x/text v0.19.0
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

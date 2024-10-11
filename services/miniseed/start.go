@@ -69,14 +69,7 @@ func (m *MiniSeedService) Start(options *services.Options, waitGroup *sync.WaitG
 		explorer.EXPLORER_CHANNEL_CODE_N,
 	} {
 		channelName := fmt.Sprintf("%s%s", m.channelPrefix, channelCode)
-		filePath := m.getFilePath(
-			m.basePath,
-			m.stationCode,
-			m.networkCode,
-			m.locationCode,
-			channelName,
-			currentTime,
-		)
+		filePath := m.getFilePath(channelName, currentTime)
 		_, err := os.Stat(filePath)
 		if err == nil {
 			logger.GetLogger(m.GetServiceName()).Infof("reading existing record from %s", filePath)
