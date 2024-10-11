@@ -1,4 +1,4 @@
-package mseed
+package miniseed
 
 import (
 	"fmt"
@@ -7,11 +7,8 @@ import (
 	"strings"
 )
 
-func (m *MSeed) handleExport(basePath, fileName string) ([]byte, error) {
-	fileName = filepath.Clean(fileName)
-	fileName = strings.ReplaceAll(fileName, "/", "")
-
-	filePath := fmt.Sprintf("%s/%s", basePath, fileName)
+func (m *MiniSEED) handleExport(basePath, fileName string) ([]byte, error) {
+	filePath := fmt.Sprintf("%s/%s", basePath, strings.ReplaceAll(filepath.Clean(fileName), "/", ""))
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return nil, err
 	}

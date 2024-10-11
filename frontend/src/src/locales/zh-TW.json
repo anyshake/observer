@@ -278,29 +278,48 @@
             }
         },
         "export": {
+            "forms": {
+                "search_miniseed": {
+                    "placeholder": "輸入名稱關鍵字或時間"
+                },
+                "search_helicorder": {
+                    "placeholder": "輸入名稱關鍵字或時間"
+                }
+            },
+            "buttons": {
+                "refresh_list": "重新整理列表",
+                "reset_filter": "重設篩選條件"
+            },
             "panels": {
-                "file_list": "檔案清單"
+                "miniseed_list": "miniSEED 檔案列表",
+                "helicorder_list": "Helicorder 捲筒列表"
             },
             "table": {
                 "columns": {
                     "id": "ID",
                     "name": "檔案名稱",
                     "size": "檔案大小",
-                    "time": "修改日期",
+                    "time": "修改時間",
                     "ttl": "有效期（天）",
                     "actions": "操作"
                 },
                 "actions": {
-                    "export": "匯出"
+                    "export": "匯出",
+                    "download": "下載"
                 }
             },
             "toasts": {
-                "is_fetching_files": "正在取得檔案列表，請稍等...",
+                "is_fetching_files": "正在取得檔案列表，請稍候...",
                 "fetch_files_success": "檔案列表取得成功",
                 "fetch_files_error": "檔案列表取得失敗",
+                "search_no_result": "未找到符合的結果",
+                "search_n_results": "查詢到 {{count}} 筆結果",
+                "search_filter_reset": "已重設篩選條件",
                 "is_exporting_mseed": "正在匯出 MiniSEED 格式檔案，這可能需要一些時間",
                 "export_mseed_success": "MiniSEED 格式檔案匯出成功",
-                "is_fetching_mseed": "正在取得 MiniSEED 格式檔案清單，請稍等..."
+                "is_downloading_helicorder": "正在下載 Helicorder 捲筒檔案，這可能需要一些時間",
+                "download_helicorder_success": "Helicorder 捲筒檔案下載成功",
+                "download_helicorder_error": "Helicorder 捲筒檔案下載失敗"
             }
         },
         "setting": {

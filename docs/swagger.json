@@ -49,6 +49,43 @@
                 "responses": {}
             }
         },
+        "/helicorder": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "This API returns a list of helicorders or exports a specific helicorder image. This API requires a valid JWT token if the server is in restricted mode.",
+                "produces": [
+                    "application/json",
+                    "application/octet-stream"
+                ],
+                "summary": "Helicorder Image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Action to be performed, Use `list` to get list of helicorders, `export` to export a specific helicorder image.",
+                        "name": "action",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "A valid filename of the helicorder image to be exported, only required when action is `export`.",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT token, only required when the server is in restricted mode.",
+                        "name": "Authorization",
+                        "in": "header"
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/history": {
             "post": {
                 "security": [
@@ -130,7 +167,7 @@
                 "responses": {}
             }
         },
-        "/mseed": {
+        "/miniseed": {
             "post": {
                 "security": [
                     {

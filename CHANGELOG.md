@@ -2,6 +2,30 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.4.0
+
+### New Features
+
+- Support downloading helicorder images in frontend.
+- Plot helicorder image periodically.
+- Added event data source of KRADE.
+
+### Bug Fixes
+
+- Fixed parsing errors on data sources of CENC, CWA.
+- Fixed malformed serial number in legacy mode.
+
+### Refactor
+
+- Changed the cache data type to any.
+- Made some tricks to make TypeScript happy.
+
+### Chore
+
+- Attach station information when exporting miniSEED data.
+- Disable captcha input until captcha image is loaded.
+- Clean expired miniSEED files every hour.
+
 ## v3.3.3
 
 ### New Features

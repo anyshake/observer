@@ -53,7 +53,7 @@ export const TableList = ({
 				}
 			}}
 			initialState={{
-				pagination: { paginationModel: { page: 0, pageSize: 10 } },
+				pagination: { paginationModel: { page: 0, pageSize: 5 } },
 				sorting: { sortModel: [{ field: sortField ?? "id", sort: sortDirection ?? "asc" }] }
 			}}
 			onCellClick={({ field }, event) => {

@@ -278,29 +278,48 @@
             }
         },
         "export": {
+            "forms": {
+                "search_miniseed": {
+                    "placeholder": "Enter keyword or time"
+                },
+                "search_helicorder": {
+                    "placeholder": "Enter keyword or time"
+                }
+            },
+            "buttons": {
+                "refresh_list": "Refresh List",
+                "reset_filter": "Reset Filter"
+            },
             "panels": {
-                "file_list": "File List"
+                "miniseed_list": "miniSEED File List",
+                "helicorder_list": "Helicorder Scroll List"
             },
             "table": {
                 "columns": {
                     "id": "ID",
                     "name": "File Name",
                     "size": "File Size",
-                    "time": "Modified Date",
-                    "ttl": "TTL (in days)",
+                    "time": "Modified Time",
+                    "ttl": "Validity (Days)",
                     "actions": "Actions"
                 },
                 "actions": {
-                    "export": "Export"
+                    "export": "Export",
+                    "download": "Download"
                 }
             },
             "toasts": {
                 "is_fetching_files": "Fetching file list, please wait...",
-                "fetch_files_success": "File list retrieved successfully",
-                "fetch_files_error": "Failed to retrieve file list",
-                "is_exporting_mseed": "Exporting MiniSEED format file, it may take some time",
-                "export_mseed_success": "MiniSEED format file exported successfully",
-                "is_fetching_mseed": "Fetching MiniSEED format file list, please wait..."
+                "fetch_files_success": "File list fetched successfully",
+                "fetch_files_error": "Failed to fetch file list",
+                "search_no_result": "No matching results found",
+                "search_n_results": "{{count}} results found",
+                "search_filter_reset": "Filter reset successfully",
+                "is_exporting_mseed": "Exporting MiniSEED file, this may take a while",
+                "export_mseed_success": "MiniSEED file exported successfully",
+                "is_downloading_helicorder": "Downloading Helicorder scroll file, this may take a while",
+                "download_helicorder_success": "Helicorder scroll file downloaded successfully",
+                "download_helicorder_error": "Failed to download Helicorder scroll file"
             }
         },
         "setting": {
