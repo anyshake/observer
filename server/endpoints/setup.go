@@ -8,9 +8,10 @@ import (
 	v1 "github.com/anyshake/observer/server/endpoints/v1"
 	"github.com/anyshake/observer/server/endpoints/v1/auth"
 	"github.com/anyshake/observer/server/endpoints/v1/devel"
+	"github.com/anyshake/observer/server/endpoints/v1/helicorder"
 	"github.com/anyshake/observer/server/endpoints/v1/history"
 	"github.com/anyshake/observer/server/endpoints/v1/inventory"
-	"github.com/anyshake/observer/server/endpoints/v1/mseed"
+	"github.com/anyshake/observer/server/endpoints/v1/miniseed"
 	"github.com/anyshake/observer/server/endpoints/v1/socket"
 	"github.com/anyshake/observer/server/endpoints/v1/station"
 	"github.com/anyshake/observer/server/endpoints/v1/trace"
@@ -33,10 +34,11 @@ func SetupApiV1(routerGroup *gin.RouterGroup, jwtHandler *jwt.GinJWTMiddleware, 
 		&history.History{},
 		&socket.Socket{},
 		&trace.Trace{},
-		&mseed.MSeed{},
+		&miniseed.MiniSEED{},
 		&inventory.Inventory{},
 		&user.User{},
 		&auth.Auth{},
+		&helicorder.HeliCorder{},
 	}
 	for _, s := range services {
 		err := s.Bind(routerGroup, jwtHandler, options)

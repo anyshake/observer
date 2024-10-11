@@ -1,8 +1,10 @@
 import authRequestModel0 from "../models/request/auth/0.json";
+import helicorderRequestModel0 from "../models/request/helicorder/0.json";
+import helicorderRequestModel1 from "../models/request/helicorder/1.json";
 import historyRequestModel0 from "../models/request/history/0.json";
 import inventoryRequestModel0 from "../models/request/inventory/0.json";
-import mseedRequestModel0 from "../models/request/mseed/0.json";
-import mseedRequestModel1 from "../models/request/mseed/1.json";
+import miniseedRequestModel0 from "../models/request/miniseed/0.json";
+import miniseedRequestModel1 from "../models/request/miniseed/1.json";
 import socketRequestModel0 from "../models/request/socket/0.json";
 import stationRequestModel0 from "../models/request/station/0.json";
 import traceRequestModel0 from "../models/request/trace/0.json";
@@ -10,9 +12,10 @@ import userRequestModel0 from "../models/request/user/0.json";
 import authCommonResponseModel0 from "../models/response/common/auth/0.json";
 import authCommonResponseModel1 from "../models/response/common/auth/1.json";
 import authCommonResponseModel2 from "../models/response/common/auth/2.json";
+import helicorderCommonResponseModel0 from "../models/response/common/helicorder/0.json";
 import historyCommonResponseModel0 from "../models/response/common/history/0.json";
 import inventoryCommonResponseModel0 from "../models/response/common/inventory/0.json";
-import mseedCommonResponseModel0 from "../models/response/common/mseed/0.json";
+import miniseedCommonResponseModel0 from "../models/response/common/miniseed/0.json";
 import socketCommonResponseModel0 from "../models/response/common/socket/0.json";
 import stationCommonResponseModel0 from "../models/response/common/station/0.json";
 import traceCommonResponseModel0 from "../models/response/common/trace/0.json";
@@ -22,9 +25,10 @@ import userCommonResponseModel1 from "../models/response/common/user/1.json";
 import userCommonResponseModel2 from "../models/response/common/user/2.json";
 import userCommonResponseModel3 from "../models/response/common/user/3.json";
 import authErrorResponseModel from "../models/response/error/auth.json";
+import helicorderErrorResponseModel from "../models/response/error/helicorder.json";
 import historyErrorResponseModel from "../models/response/error/history.json";
-import mseedErrorResponseModel from "../models/response/error/mseed.json";
-import inventoryErrorResponseModel from "../models/response/error/mseed.json";
+import inventoryErrorResponseModel from "../models/response/error/inventory.json";
+import miniseedErrorResponseModel from "../models/response/error/miniseed.json";
 import stationErrorResponseModel from "../models/response/error/station.json";
 import traceErrorResponseModel from "../models/response/error/trace.json";
 import userErrorResponseModel from "../models/response/error/user.json";
@@ -138,25 +142,49 @@ const trace: Endpoint<
 };
 
 export {
-	mseedCommonResponseModel0,
-	mseedErrorResponseModel,
-	mseedRequestModel0,
-	mseedRequestModel1
+	miniseedCommonResponseModel0,
+	miniseedErrorResponseModel,
+	miniseedRequestModel0,
+	miniseedRequestModel1
 };
 
-const mseed: Endpoint<
-	typeof mseedRequestModel0 | typeof mseedRequestModel1,
-	typeof mseedCommonResponseModel0,
-	typeof mseedErrorResponseModel
+const miniseed: Endpoint<
+	typeof miniseedRequestModel0 | typeof miniseedRequestModel1,
+	typeof miniseedCommonResponseModel0,
+	typeof miniseedErrorResponseModel
 > = {
-	path: "/api/v1/mseed",
+	path: "/api/v1/miniseed",
 	method: "post",
 	type: "http",
 	model: {
-		request: { ...mseedRequestModel0, ...mseedRequestModel1 },
+		request: { ...miniseedRequestModel0, ...miniseedRequestModel1 },
 		response: {
-			common: { ...mseedCommonResponseModel0 },
-			error: mseedErrorResponseModel
+			common: { ...miniseedCommonResponseModel0 },
+			error: miniseedErrorResponseModel
+		}
+	}
+};
+
+export {
+	helicorderCommonResponseModel0,
+	helicorderErrorResponseModel,
+	helicorderRequestModel0,
+	helicorderRequestModel1
+};
+
+const helicorder: Endpoint<
+	typeof helicorderRequestModel0 | typeof helicorderRequestModel1,
+	typeof helicorderCommonResponseModel0,
+	typeof helicorderErrorResponseModel
+> = {
+	path: "/api/v1/helicorder",
+	method: "post",
+	type: "http",
+	model: {
+		request: { ...helicorderRequestModel0, ...helicorderRequestModel1 },
+		response: {
+			common: { ...helicorderCommonResponseModel0 },
+			error: helicorderErrorResponseModel
 		}
 	}
 };
@@ -234,7 +262,8 @@ export const apiConfig = {
 		station,
 		history,
 		trace,
-		mseed,
+		miniseed,
+		helicorder,
 		socket,
 		inventory,
 		user

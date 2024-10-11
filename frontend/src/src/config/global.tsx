@@ -29,7 +29,7 @@ export const globalConfig: GlobalConfig = {
 	retention: { default: 120, maximum: 600, minimum: 10 },
 	footer: {
 		"en-US": "Listen to the whispering earth.",
-		"zh-CN": "听见地球。",
-		"zh-TW": "聽見地球。",
+		"zh-CN": "听见地球",
+		"zh-TW": "聽見地球",
 	}
 };

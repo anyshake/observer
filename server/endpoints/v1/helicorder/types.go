@@ -1,15 +1,15 @@
-package mseed
+package helicorder
 
-type MSeed struct{}
+type HeliCorder struct{}
 
 type request struct {
 	Action string `form:"action" json:"action" xml:"action" binding:"required,oneof=export list"`
-	Name   string `form:"name" json:"name" xml:"name" binding:"omitempty,endswith=.mseed"`
+	Name   string `form:"name" json:"name" xml:"name" binding:"omitempty,endswith=.svg"`
 }
 
-type miniSeedFileInfo struct {
+type heliCorderFileInfo struct {
 	TTL  int    `json:"ttl"`
 	Time int64  `json:"time"`
-	Size string `json:"size"`
+	Size int64  `json:"size"`
 	Name string `json:"name"`
 }

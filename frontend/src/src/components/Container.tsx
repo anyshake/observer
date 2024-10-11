@@ -15,7 +15,7 @@ export const Container = forwardRef((props: ContainerProps, ref: ForwardedRef<HT
 		<div
 			className={
 				main
-					? "bg-gray-50 min-h-screen ml-10 p-20 px-4 flex flex-col space-y-3"
+					? "bg-gray-50 min-h-screen ml-10 p-20 px-4 flex flex-col space-y-4"
 					: className ?? ""
 			}
 			ref={ref}
