@@ -10,8 +10,6 @@ import (
 	"syscall"
 	"time"
 
-	"go.uber.org/dig"
-
 	"github.com/anyshake/observer/cleaners"
 	cleaner_database "github.com/anyshake/observer/cleaners/database"
 	cleaner_explorer "github.com/anyshake/observer/cleaners/explorer"
@@ -20,8 +18,8 @@ import (
 	"github.com/anyshake/observer/server"
 	"github.com/anyshake/observer/services"
 	service_archiver "github.com/anyshake/observer/services/archiver"
-
 	service_forwarder "github.com/anyshake/observer/services/forwarder"
+	service_helicorder "github.com/anyshake/observer/services/helicorder"
 	service_miniseed "github.com/anyshake/observer/services/miniseed"
 	service_seedlink "github.com/anyshake/observer/services/seedlink"
 	service_timesync "github.com/anyshake/observer/services/timesync"
@@ -32,6 +30,7 @@ import (
 	"github.com/anyshake/observer/utils/logger"
 	"github.com/anyshake/observer/utils/timesource"
 	"github.com/common-nighthawk/go-figure"
+	"go.uber.org/dig"
 )
 
 func parseCommandLine() (args arguments) {
@@ -193,6 +192,7 @@ func main() {
 		&service_timesync.TimeSyncService{},
 		&service_seedlink.SeedLinkService{},
 		&service_forwarder.ForwarderService{},
+		&service_helicorder.HelicorderService{},
 	}
 	serviceOptions := &services.Options{
 		Config:      &conf,

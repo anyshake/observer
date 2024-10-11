@@ -1,4 +1,4 @@
-package miniseed
+package helicorder
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func (m *MiniSeedService) handleClean() error {
+func (m *HelicorderService) handleClean() error {
 	if m.lifeCycle == 0 {
 		return nil
 	}
@@ -18,7 +18,7 @@ func (m *MiniSeedService) handleClean() error {
 	}
 
 	for _, entry := range entries {
-		if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".mseed") &&
+		if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".svg") &&
 			strings.ContainsAny(entry.Name(), m.stationCode) &&
 			strings.ContainsAny(entry.Name(), m.networkCode) {
 
