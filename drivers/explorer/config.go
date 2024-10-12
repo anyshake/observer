@@ -28,11 +28,12 @@ func (c *ExplorerConfig) GetDeviceInfo() (deviceInfo, deviceId uint32) {
 	defer c.mutex.RUnlock()
 
 	// Leagcy mode is always 0xFFFFFFFF
-	if deviceId == math.MaxUint32 {
-		return deviceId, deviceId
+	if c.deviceInfo == math.MaxUint32 {
+		return c.deviceInfo, c.deviceInfo
 	}
 
-	return c.deviceInfo, c.deviceInfo & 0x7FFFFFFF
+	deviceId = c.deviceInfo & 0x7FFFFFFF
+	return c.deviceInfo, deviceId
 }
 
 func (c *ExplorerConfig) SetLatitude(latitude float64) {
