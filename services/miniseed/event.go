@@ -16,7 +16,7 @@ func (m *MiniSeedService) handleExplorerEvent(data *explorer.ExplorerData) {
 		if err != nil {
 			logger.GetLogger(m.GetServiceName()).Warnln(err)
 		} else {
-			logger.GetLogger(m.GetServiceName()).Infof("%d record(s) has been written to MiniSEED file", m.writeBufferInterval)
+			logger.GetLogger(m.GetServiceName()).Infof("%d record(s) has been written to miniSEED file", m.writeBufferInterval)
 		}
 		m.writeBufferCountDown = m.writeBufferInterval
 	}
