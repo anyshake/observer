@@ -30,21 +30,22 @@ func (u *GEONET) GetProperty() DataSourceProperty {
 }
 
 func (u *GEONET) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if !u.cache.Valid() {
-		res, err := request.GET(
-			"https://api.geonet.org.nz/quake?MMI=1",
-			10*time.Second, time.Second, 3, false, nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		u.cache.Set(res)
+	if u.cache.Valid() {
+		return u.cache.Get().([]Event), nil
+	}
+
+	res, err := request.GET(
+		"https://api.geonet.org.nz/quake?MMI=1",
+		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse GEONET JSON response
 	var dataMap map[string]any
-	err := json.Unmarshal(u.cache.Get().([]byte), &dataMap)
+	err = json.Unmarshal(res, &dataMap)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +95,9 @@ func (u *GEONET) GetEvents(latitude, longitude float64) ([]Event, error) {
 		resultArr = append(resultArr, seisEvent)
 	}
 
-	return sortSeismicEvents(resultArr), nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	u.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }
 
 func (u *GEONET) getTimestamp(data string) int64 {

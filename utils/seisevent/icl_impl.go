@@ -31,21 +31,22 @@ func (c *ICL) GetProperty() DataSourceProperty {
 }
 
 func (c *ICL) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if !c.cache.Valid() {
-		res, err := request.GET(
-			"https://mobile-new.chinaeew.cn/v1/earlywarnings?start_at=&updates=",
-			10*time.Second, time.Second, 3, false, nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		c.cache.Set(res)
+	if c.cache.Valid() {
+		return c.cache.Get().([]Event), nil
+	}
+
+	res, err := request.GET(
+		"https://mobile-new.chinaeew.cn/v1/earlywarnings?start_at=&updates=",
+		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse ICL JSON response
 	var dataMap map[string]any
-	err := json.Unmarshal(c.cache.Get().([]byte), &dataMap)
+	err = json.Unmarshal(res, &dataMap)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +89,9 @@ func (c *ICL) GetEvents(latitude, longitude float64) ([]Event, error) {
 		resultArr = append(resultArr, seisEvent)
 	}
 
-	return sortSeismicEvents(resultArr), nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	c.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }
 
 func (c *ICL) getMagnitude(data float64) []Magnitude {

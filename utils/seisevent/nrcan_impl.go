@@ -32,20 +32,21 @@ func (s *NRCAN) GetProperty() DataSourceProperty {
 }
 
 func (s *NRCAN) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if !s.cache.Valid() {
-		res, err := request.GET(
-			"https://www.earthquakescanada.nrcan.gc.ca/cache/earthquakes/canada-30.xml",
-			30*time.Second, time.Second, 3, false, nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		s.cache.Set(res)
+	if s.cache.Valid() {
+		return s.cache.Get().([]Event), nil
+	}
+
+	res, err := request.GET(
+		"https://www.earthquakescanada.nrcan.gc.ca/cache/earthquakes/canada-30.xml",
+		30*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse NRCAN XML response
-	dataMap, err := xml2map.NewDecoder(strings.NewReader(string(s.cache.Get().([]byte)))).Decode()
+	dataMap, err := xml2map.NewDecoder(strings.NewReader(string(res))).Decode()
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +134,9 @@ func (s *NRCAN) GetEvents(latitude, longitude float64) ([]Event, error) {
 		resultArr = append(resultArr, seisEvent)
 	}
 
-	return sortSeismicEvents(resultArr), nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	s.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }
 
 func (s *NRCAN) getTimestamp(data string) int64 {

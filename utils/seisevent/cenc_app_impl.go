@@ -31,22 +31,23 @@ func (c *CENC_APP) GetProperty() DataSourceProperty {
 }
 
 func (c *CENC_APP) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if !c.cache.Valid() {
-		res, err := request.POST(
-			"http://api.dizhensubao.igexin.com/api.htm",
-			`{"action":"requestMonitorDataAction","startTime":"0","dataSource":"CEIC"}`,
-			"application/json", 10*time.Second, time.Second, 3, false, nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		c.cache.Set(res)
+	if c.cache.Valid() {
+		return c.cache.Get().([]Event), nil
+	}
+
+	res, err := request.POST(
+		"http://api.dizhensubao.igexin.com/api.htm",
+		`{"action":"requestMonitorDataAction","startTime":"0","dataSource":"CEIC"}`,
+		"application/json", 10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse CENC JSON response
 	var dataMap map[string]any
-	err := json.Unmarshal(c.cache.Get().([]byte), &dataMap)
+	err = json.Unmarshal(res, &dataMap)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +98,9 @@ func (c *CENC_APP) GetEvents(latitude, longitude float64) ([]Event, error) {
 		resultArr = append(resultArr, seisEvent)
 	}
 
-	return sortSeismicEvents(resultArr), nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	c.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }
 
 func (c *CENC_APP) getMagnitude(data float64) []Magnitude {

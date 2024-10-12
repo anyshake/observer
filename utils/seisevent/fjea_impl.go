@@ -31,21 +31,22 @@ func (s *FJEA) GetProperty() DataSourceProperty {
 }
 
 func (s *FJEA) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if !s.cache.Valid() {
-		res, err := request.GET(
-			"http://218.5.2.111:9088/earthquakeWarn/bulletin/list.json?pageSize=100",
-			10*time.Second, time.Second, 3, false, nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		s.cache.Set(res)
+	if s.cache.Valid() {
+		return s.cache.Get().([]Event), nil
+	}
+
+	res, err := request.GET(
+		"http://218.5.2.111:9088/earthquakeWarn/bulletin/list.json?pageSize=100",
+		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse FJEA JSON response
 	var dataMap map[string]any
-	err := json.Unmarshal(s.cache.Get().([]byte), &dataMap)
+	err = json.Unmarshal(res, &dataMap)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +89,9 @@ func (s *FJEA) GetEvents(latitude, longitude float64) ([]Event, error) {
 		resultArr = append(resultArr, seisEvent)
 	}
 
-	return sortSeismicEvents(resultArr), nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	s.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }
 
 func (s *FJEA) getTimestamp(data string) int64 {

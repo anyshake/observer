@@ -28,22 +28,25 @@ func (c *INFP) GetProperty() DataSourceProperty {
 }
 
 func (c *INFP) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if !c.cache.Valid() {
-		res, err := request.GET(
-			"https://eida-sc3.infp.ro/fdsnws/event/1/query?minmag=-1&format=text&limit=300&orderby=time",
-			30*time.Second, time.Second, 3, false, nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		c.cache.Set(res)
+	if c.cache.Valid() {
+		return c.cache.Get().([]Event), nil
 	}
 
-	resultArr, err := ParseFdsnwsEvent(string(c.cache.Get().([]byte)), "2006-01-02T15:04:05", latitude, longitude)
+	res, err := request.GET(
+		"https://eida-sc3.infp.ro/fdsnws/event/1/query?minmag=-1&format=text&limit=300&orderby=time",
+		30*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	return sortSeismicEvents(resultArr), nil
+	resultArr, err := ParseFdsnwsEvent(string(res), "2006-01-02T15:04:05", latitude, longitude)
+	if err != nil {
+		return nil, err
+	}
+
+	sortedEvents := sortSeismicEvents(resultArr)
+	c.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }

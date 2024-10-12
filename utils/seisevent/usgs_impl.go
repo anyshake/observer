@@ -30,21 +30,22 @@ func (u *USGS) GetProperty() DataSourceProperty {
 }
 
 func (u *USGS) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if !u.cache.Valid() {
-		res, err := request.GET(
-			"https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson",
-			10*time.Second, time.Second, 3, false, nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		u.cache.Set(res)
+	if u.cache.Valid() {
+		return u.cache.Get().([]Event), nil
+	}
+
+	res, err := request.GET(
+		"https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson",
+		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse USGS JSON response
 	var dataMap map[string]any
-	err := json.Unmarshal(u.cache.Get().([]byte), &dataMap)
+	err = json.Unmarshal(res, &dataMap)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +98,9 @@ func (u *USGS) GetEvents(latitude, longitude float64) ([]Event, error) {
 		resultArr = append(resultArr, seisEvent)
 	}
 
-	return sortSeismicEvents(resultArr), nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	u.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }
 
 func (u *USGS) getMagnitude(magType string, data float64) []Magnitude {

@@ -30,21 +30,22 @@ func (j *JMA_OFFICIAL) GetProperty() DataSourceProperty {
 }
 
 func (j *JMA_OFFICIAL) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if !j.cache.Valid() {
-		res, err := request.GET(
-			"https://www.jma.go.jp/bosai/quake/data/list.json",
-			10*time.Second, time.Second, 3, false, nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		j.cache.Set(res)
+	if j.cache.Valid() {
+		return j.cache.Get().([]Event), nil
+	}
+
+	res, err := request.GET(
+		"https://www.jma.go.jp/bosai/quake/data/list.json",
+		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse JMA_OFFICIAL JSON response
 	var dataMapEvents []map[string]any
-	err := json.Unmarshal(j.cache.Get().([]byte), &dataMapEvents)
+	err = json.Unmarshal(res, &dataMapEvents)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +82,9 @@ func (j *JMA_OFFICIAL) GetEvents(latitude, longitude float64) ([]Event, error) {
 		resultArr = append(resultArr, seisEvent)
 	}
 
-	return sortSeismicEvents(resultArr), nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	j.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }
 
 func (j *JMA_OFFICIAL) getTimestamp(timeStr, secStr string) (int64, error) {

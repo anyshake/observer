@@ -40,38 +40,39 @@ func (c *AFAD) getRequestParam() string {
 }
 
 func (c *AFAD) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if !c.cache.Valid() {
-		// Get current time to construct the request parameter
-		res, err := request.GET(
-			"https://www.cloudflare.com/cdn-cgi/trace",
-			10*time.Second, time.Second, 3, false,
-			nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		ts := regexp.MustCompile(`ts=(\d+)`).FindStringSubmatch(string(res))
-		if len(ts) == 0 {
-			return nil, errors.New("failed to get current time from Cloudflare")
-		}
-		c.currentTime = time.Unix(int64(string2Float(ts[1])), 0)
+	if c.cache.Valid() {
+		return c.cache.Get().([]Event), nil
+	}
 
-		// Make AFAD API request
-		res, err = request.GET(
-			fmt.Sprintf("https://deprem.afad.gov.tr/apiv2/event/filter?%s", c.getRequestParam()),
-			10*time.Second, time.Second, 3, false, nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		c.cache.Set(res)
+	// Get current time to construct the request parameter
+	res, err := request.GET(
+		"https://www.cloudflare.com/cdn-cgi/trace",
+		10*time.Second, time.Second, 3, false,
+		nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
+	}
+	ts := regexp.MustCompile(`ts=(\d+)`).FindStringSubmatch(string(res))
+	if len(ts) == 0 {
+		return nil, errors.New("failed to get current time from Cloudflare")
+	}
+	c.currentTime = time.Unix(int64(string2Float(ts[1])), 0)
+
+	// Make AFAD API request
+	res, err = request.GET(
+		fmt.Sprintf("https://deprem.afad.gov.tr/apiv2/event/filter?%s", c.getRequestParam()),
+		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse AFAD JSON response
 	var dataMapEvents []map[string]any
-	err := json.Unmarshal(c.cache.Get().([]byte), &dataMapEvents)
+	err = json.Unmarshal(res, &dataMapEvents)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +107,9 @@ func (c *AFAD) GetEvents(latitude, longitude float64) ([]Event, error) {
 		resultArr = append(resultArr, seisEvent)
 	}
 
-	return sortSeismicEvents(resultArr), nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	c.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }
 
 func (c *AFAD) getTimestamp(timeStr string) (int64, error) {

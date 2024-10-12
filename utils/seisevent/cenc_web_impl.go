@@ -31,25 +31,26 @@ func (c *CENC_WEB) GetProperty() DataSourceProperty {
 }
 
 func (c *CENC_WEB) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if !c.cache.Valid() {
-		addrs := []string{
-			"https://www.ceic.ac.cn/ajax/google",
-			"https://news.ceic.ac.cn/ajax/google",
-		}
-		res, err := request.GET(
-			addrs[rand.Intn(len(addrs))],
-			10*time.Second, time.Second, 3, false, nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		c.cache.Set(res)
+	if c.cache.Valid() {
+		return c.cache.Get().([]Event), nil
+	}
+
+	addrs := []string{
+		"https://www.ceic.ac.cn/ajax/google",
+		"https://news.ceic.ac.cn/ajax/google",
+	}
+	res, err := request.GET(
+		addrs[rand.Intn(len(addrs))],
+		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse CENC JSON response
 	var dataMapEvents []map[string]any
-	err := json.Unmarshal(c.cache.Get().([]byte), &dataMapEvents)
+	err = json.Unmarshal(res, &dataMapEvents)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +101,9 @@ func (c *CENC_WEB) GetEvents(latitude, longitude float64) ([]Event, error) {
 		resultArr = append(resultArr, seisEvent)
 	}
 
-	return sortSeismicEvents(resultArr), nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	c.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }
 
 func (c *CENC_WEB) getTimestamp(timeStr string) (int64, error) {
