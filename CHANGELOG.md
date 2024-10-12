@@ -2,6 +2,13 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.4.2
+
+### Refactor
+
+- Reduced memory usage when plotting helicorder images.
+- Record sequence numbers to file to reduce initialization time.
+
 ## v3.4.1
 
 ### New Features
