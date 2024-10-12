@@ -13,7 +13,7 @@ import (
 
 type provider struct {
 	database   *gorm.DB
-	queryCache cache.AnyCache
+	queryCache cache.KvCache
 
 	stationCode   string
 	networkCode   string
@@ -48,25 +48,28 @@ func (d *provider) GetLocation() string {
 }
 
 func (d *provider) GetPlotData(startTime, endTime time.Time) ([]heligo.PlotData, error) {
-	if !d.queryCache.Valid() {
-		var (
-			adcCountModel tables.AdcCount
-			adcCountData  []tables.AdcCount
-		)
+	startTimestamp := startTime.Add(-time.Second).UnixMilli() // Also used as key of cache
+	endTimestamp := endTime.Add(time.Second).UnixMilli()
+
+	var adcCountData []tables.AdcCount
+	cacheData, found := d.queryCache.Get(startTimestamp)
+	if found {
+		adcCountData = cacheData.([]tables.AdcCount)
+	} else {
 		err := d.database.
-			Table(adcCountModel.GetName()).
-			Where("timestamp >= ? AND timestamp <= ?", startTime.UnixMilli(), endTime.UnixMilli()).
+			Table(tables.AdcCount{}.GetName()).
+			Select("timestamp, z_axis, e_axis, n_axis, sample_rate").
+			Where("timestamp >= ? AND timestamp <= ?", startTimestamp, endTimestamp).
 			Order("timestamp ASC").
-			Find(&adcCountData).
-			Error
+			Find(&adcCountData).Error
 		if err != nil {
 			return nil, err
 		}
-		d.queryCache.Set(adcCountData)
+		d.queryCache.Set(startTimestamp, adcCountData)
 	}
 
 	var plotData []heligo.PlotData
-	for _, adcCount := range d.queryCache.Get().([]tables.AdcCount) {
+	for _, adcCount := range adcCountData {
 		data := make([]heligo.PlotData, adcCount.SampleRate)
 		for i := 0; i < adcCount.SampleRate; i++ {
 			timeOffset := time.Duration(i*int(time.Second.Seconds())/adcCount.SampleRate) * time.Millisecond

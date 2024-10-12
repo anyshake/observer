@@ -11,7 +11,7 @@ require (
 	github.com/antonfisher/nested-logrus-formatter v1.3.1
 	github.com/appleboy/gin-jwt/v2 v2.10.0
 	github.com/bclswl0827/go-serial v0.0.1
-	github.com/bclswl0827/heligo v0.0.7
+	github.com/bclswl0827/heligo v0.0.10
 	github.com/bclswl0827/mseedio v1.0.9
 	github.com/bclswl0827/sacio v1.0.6
 	github.com/bclswl0827/slgo v0.0.4
