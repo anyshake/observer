@@ -305,6 +305,7 @@
                 },
                 "actions": {
                     "export": "匯出",
+                    "preview": "預覽",
                     "download": "下載"
                 }
             },
@@ -317,6 +318,9 @@
                 "search_filter_reset": "已重設篩選條件",
                 "is_exporting_mseed": "正在匯出 MiniSEED 格式檔案，這可能需要一些時間",
                 "export_mseed_success": "MiniSEED 格式檔案匯出成功",
+                "is_previewing_helicorder": "正在加載預覽圖像，請稍候...",
+                "preview_helicorder_success": "預覽圖像加載成功",
+                "preview_helicorder_error": "預覽圖像加載失敗",
                 "is_downloading_helicorder": "正在下載 Helicorder 捲筒檔案，這可能需要一些時間",
                 "download_helicorder_success": "Helicorder 捲筒檔案下載成功",
                 "download_helicorder_error": "Helicorder 捲筒檔案下載失敗"
