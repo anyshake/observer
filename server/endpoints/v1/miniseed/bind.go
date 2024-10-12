@@ -28,6 +28,7 @@ func (h *MiniSEED) Bind(rg *gin.RouterGroup, jwtHandler *jwt.GinJWTMiddleware, o
 	if !ok {
 		return errors.New("failed to get configuration for miniSEED service")
 	}
+	enable := serviceConfig.(map[string]any)["enable"].(bool)
 	basePath := serviceConfig.(map[string]any)["path"].(string)
 	lifeCycle := int(serviceConfig.(map[string]any)["lifecycle"].(float64))
 
@@ -41,6 +42,11 @@ func (h *MiniSEED) Bind(rg *gin.RouterGroup, jwtHandler *jwt.GinJWTMiddleware, o
 		if err != nil {
 			logger.GetLogger(h.GetApiName()).Errorln(err)
 			response.Message(c, options.TimeSource, "request body is not valid", http.StatusBadRequest, nil)
+			return
+		}
+
+		if !enable {
+			response.Message(c, options.TimeSource, "miniSEED service is disabled by admin", http.StatusOK, nil)
 			return
 		}
 

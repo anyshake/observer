@@ -28,6 +28,7 @@ func (h *HeliCorder) Bind(rg *gin.RouterGroup, jwtHandler *jwt.GinJWTMiddleware,
 	if !ok {
 		return errors.New("failed to get configuration for helicorder service")
 	}
+	enable := serviceConfig.(map[string]any)["enable"].(bool)
 	basePath := serviceConfig.(map[string]any)["path"].(string)
 	lifeCycle := int(serviceConfig.(map[string]any)["lifecycle"].(float64))
 
@@ -41,6 +42,11 @@ func (h *HeliCorder) Bind(rg *gin.RouterGroup, jwtHandler *jwt.GinJWTMiddleware,
 		if err != nil {
 			logger.GetLogger(h.GetApiName()).Errorln(err)
 			response.Message(c, options.TimeSource, "request body is not valid", http.StatusBadRequest, nil)
+			return
+		}
+
+		if !enable {
+			response.Message(c, options.TimeSource, "helicorder service is disabled by admin", http.StatusOK, nil)
 			return
 		}
 
