@@ -53,8 +53,7 @@ func (i *Inventory) handleInventory(config *config.Config, explorerDeps *explore
 					<latitude>%f</latitude>
 					<longitude>%f</longitude>
 					<elevation>%f</elevation>
-					<stream publicID="Stream#EHN" code="EHN" datalogger="Datalogger@AnyShake"
-						sensor="Sensor@AnyShake">
+					<stream publicID="Stream#%sZ" code="%sZ" datalogger="Datalogger@AnyShake" sensor="Sensor@AnyShake">
 						<start>%s</start>
 						<sampleRateNumerator>%d</sampleRateNumerator>
 						<sampleRateDenominator>1</sampleRateDenominator>
@@ -68,8 +67,7 @@ func (i *Inventory) handleInventory(config *config.Config, explorerDeps *explore
 						<flags>GC</flags>
 						<shared>true</shared>
 					</stream>
-					<stream publicID="Stream#EHE" code="EHE" datalogger="Datalogger@AnyShake"
-						sensor="Sensor@AnyShake">
+					<stream publicID="Stream#%sE" code="%sE" datalogger="Datalogger@AnyShake" sensor="Sensor@AnyShake">
 						<start>%s</start>
 						<sampleRateNumerator>%d</sampleRateNumerator>
 						<sampleRateDenominator>1</sampleRateDenominator>
@@ -83,8 +81,7 @@ func (i *Inventory) handleInventory(config *config.Config, explorerDeps *explore
 						<flags>GC</flags>
 						<shared>true</shared>
 					</stream>
-					<stream publicID="Stream#EHZ" code="EHZ" datalogger="Datalogger@AnyShake"
-						sensor="Sensor@AnyShake">
+					<stream publicID="Stream#%sN" code="%sN" datalogger="Datalogger@AnyShake" sensor="Sensor@AnyShake">
 						<start>%s</start>
 						<sampleRateNumerator>%d</sampleRateNumerator>
 						<sampleRateDenominator>1</sampleRateDenominator>
@@ -138,6 +135,7 @@ func (i *Inventory) handleInventory(config *config.Config, explorerDeps *explore
 	streamStart := startTime.UTC().Format("2006-01-02T15:04:05.0000Z")
 	streamSampleRateNumerator := currentSampleRate
 	streamGain := dataloggerGain * config.Sensor.Sensitivity
+	channelPrefix := config.Stream.Channel
 
 	return fmt.Sprintf(
 		xmlTemplate,
@@ -164,15 +162,21 @@ func (i *Inventory) handleInventory(config *config.Config, explorerDeps *explore
 		sensorLocationLatitude,
 		sensorLocationLongitude,
 		sensorLocationElevation,
-		// Stream for EHZ
+		// Stream for Z-axis
+		channelPrefix,
+		channelPrefix,
 		streamStart,
 		streamSampleRateNumerator,
 		streamGain,
-		// Stream for EHE
+		// Stream for E-axis
+		channelPrefix,
+		channelPrefix,
 		streamStart,
 		streamSampleRateNumerator,
 		streamGain,
-		// Stream for EHN
+		// Stream for N-axis
+		channelPrefix,
+		channelPrefix,
 		streamStart,
 		streamSampleRateNumerator,
 		streamGain,
