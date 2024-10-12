@@ -2,6 +2,22 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.4.1
+
+### New Features
+
+- Support previewing helicorder images in frontend.
+- Added earthquake event source API of KNDC.
+
+### Bug Fixes
+
+- Fixed channel names in inventory response.
+
+### Refactor
+
+- Cache parsed results instead of crawler response.
+- Return nil directly for API endpoints if miniSEED or helicorder service is disabled.
+
 ## v3.4.0
 
 ### New Features

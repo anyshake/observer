@@ -19,7 +19,8 @@ interface Options<APIRequest, APICommonResponse, APIErrorResponse> {
 	readonly abortController?: AbortController;
 	readonly endpoint: Endpoint<APIRequest, APICommonResponse, APIErrorResponse>;
 	readonly blobOptions?: {
-		readonly fileName: string;
+		readonly fileName?: string;
+		readonly onComplete?: (response: Blob) => void;
 		readonly onDownload?: (progressEvent: AxiosProgressEvent) => void;
 	};
 }
@@ -87,7 +88,7 @@ export const requestRestApi = async <APIRequest, APICommonResponse, APIErrorResp
 			responseType: blobOptions ? "blob" : "json",
 			data: endpoint.method === "post" ? payload : {}
 		});
-		if (blobOptions) {
+		if (blobOptions?.fileName) {
 			const { "content-disposition": contentDisposition } = headers;
 			let fileName = blobOptions.fileName;
 			if (contentDisposition) {
@@ -97,8 +98,10 @@ export const requestRestApi = async <APIRequest, APICommonResponse, APIErrorResp
 					?.split("=")[1];
 			}
 
-			saveAs(data, !fileName.length ? "stream" : fileName);
+			saveAs(data, fileName);
 			return response.common;
+		} else if (blobOptions?.onComplete) {
+			blobOptions.onComplete(data);
 		}
 
 		return { ...response.common, ...data };

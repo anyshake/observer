@@ -5,6 +5,7 @@
     "dependencies": {
         "@emotion/react": "^11.11.4",
         "@emotion/styled": "^11.11.0",
+        "@fancyapps/ui": "^5.0.36",
         "@mdi/js": "^7.4.47",
         "@mdi/react": "^1.6.1",
         "@mui/material": "^5.14.14",
