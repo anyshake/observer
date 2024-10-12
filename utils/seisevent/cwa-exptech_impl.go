@@ -31,25 +31,26 @@ func (c *CWA_EXPTECH) GetProperty() DataSourceProperty {
 
 func (c *CWA_EXPTECH) GetEvents(latitude, longitude float64) ([]Event, error) {
 	// Get CWA JSON response
-	if !c.cache.Valid() {
-		addrs := []string{
-			"https://api-1.exptech.dev/api/v2/eq/report?limit=100",
-			"https://api-2.exptech.dev/api/v2/eq/report?limit=100",
-		}
-		res, err := request.GET(
-			addrs[rand.Intn(len(addrs))],
-			10*time.Second, time.Second, 3, false, nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		c.cache.Set(res)
+	if c.cache.Valid() {
+		return c.cache.Get().([]Event), nil
+	}
+
+	addrs := []string{
+		"https://api-1.exptech.dev/api/v2/eq/report?limit=100",
+		"https://api-2.exptech.dev/api/v2/eq/report?limit=100",
+	}
+	res, err := request.GET(
+		addrs[rand.Intn(len(addrs))],
+		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse CWA JSON response
 	var dataMapEvents []map[string]any
-	err := json.Unmarshal(c.cache.Get().([]byte), &dataMapEvents)
+	err = json.Unmarshal(res, &dataMapEvents)
 	if err != nil {
 		return nil, err
 	}
@@ -79,5 +80,7 @@ func (c *CWA_EXPTECH) GetEvents(latitude, longitude float64) ([]Event, error) {
 		resultArr = append(resultArr, seisEvent)
 	}
 
-	return sortSeismicEvents(resultArr), nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	c.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }

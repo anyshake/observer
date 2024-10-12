@@ -51,28 +51,29 @@ func (c *CWA_API) GetProperty() DataSourceProperty {
 
 func (c *CWA_API) GetEvents(latitude, longitude float64) ([]Event, error) {
 	// Get CWA HTML response
-	if !c.cache.Valid() {
-		res, err := request.POST(
-			"https://scweb.cwa.gov.tw/zh-tw/earthquake/ajaxhandler",
-			c.getRequestBody(100),
-			"application/x-www-form-urlencoded; charset=UTF-8",
-			10*time.Second, time.Second, 3, false,
-			// HiNet CDN IP addresses
-			c.createGfwBypasser([]string{
-				"168.95.245.1:443", "168.95.245.2:443", "168.95.245.3:443", "168.95.245.4:443",
-				"168.95.246.1:443", "168.95.246.2:443", "168.95.246.3:443", "168.95.246.4:443",
-			}),
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		c.cache.Set(res)
+	if c.cache.Valid() {
+		return c.cache.Get().([]Event), nil
+	}
+
+	res, err := request.POST(
+		"https://scweb.cwa.gov.tw/zh-tw/earthquake/ajaxhandler",
+		c.getRequestBody(100),
+		"application/x-www-form-urlencoded; charset=UTF-8",
+		10*time.Second, time.Second, 3, false,
+		// HiNet CDN IP addresses
+		c.createGfwBypasser([]string{
+			"168.95.245.1:443", "168.95.245.2:443", "168.95.245.3:443", "168.95.245.4:443",
+			"168.95.246.1:443", "168.95.246.2:443", "168.95.246.3:443", "168.95.246.4:443",
+		}),
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse CWA JSON response
 	var dataMap map[string]any
-	err := json.Unmarshal(c.cache.Get().([]byte), &dataMap)
+	err = json.Unmarshal(res, &dataMap)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +106,9 @@ func (c *CWA_API) GetEvents(latitude, longitude float64) ([]Event, error) {
 		resultArr = append(resultArr, seisEvent)
 	}
 
-	return sortSeismicEvents(resultArr), nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	c.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }
 
 func (c *CWA_API) getTimestamp(textValue string) int64 {

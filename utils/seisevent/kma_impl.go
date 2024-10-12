@@ -32,20 +32,21 @@ func (k *KMA) GetProperty() DataSourceProperty {
 }
 
 func (k *KMA) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if !k.cache.Valid() {
-		res, err := request.GET(
-			"https://www.weather.go.kr/w/eqk-vol/search/korea.do",
-			10*time.Second, time.Second, 3, false, nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		k.cache.Set(res)
+	if k.cache.Valid() {
+		return k.cache.Get().([]Event), nil
+	}
+
+	res, err := request.GET(
+		"https://www.weather.go.kr/w/eqk-vol/search/korea.do",
+		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse KMA HTML response
-	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(k.cache.Get().([]byte)))
+	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(res))
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +84,9 @@ func (k *KMA) GetEvents(latitude, longitude float64) ([]Event, error) {
 		})
 	})
 
-	return resultArr, nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	k.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }
 
 func (k *KMA) getTimestamp(data string) int64 {
