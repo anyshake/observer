@@ -1,3 +1,6 @@
+import "@fancyapps/ui/dist/fancybox/fancybox.css";
+
+import { Fancybox } from "@fancyapps/ui";
 import { mdiMagnify } from "@mdi/js";
 import { Icon } from "@mdi/react";
 import { GridValidRowModel } from "@mui/x-data-grid";
@@ -26,6 +29,7 @@ const Export = ({ locale }: RouterComponentProps) => {
 		const { endpoints, backend } = apiConfig;
 		const miniSeedRes = await requestRestApi({
 			backend,
+			throwError: true,
 			endpoint: endpoints.miniseed,
 			payload: { action: "list", name: "" }
 		});
@@ -63,6 +67,7 @@ const Export = ({ locale }: RouterComponentProps) => {
 		const { endpoints, backend } = apiConfig;
 		const heliCorderRes = await requestRestApi({
 			backend,
+			throwError: true,
 			endpoint: endpoints.helicorder,
 			payload: { action: "list", name: "" }
 		});
@@ -186,6 +191,43 @@ const Export = ({ locale }: RouterComponentProps) => {
 		forceUpdateComponent();
 	};
 
+	// Handler for previewing helicorder
+	const handlePreviewHeliCorder = async (fileName: string) => {
+		const { backend, endpoints } = apiConfig;
+		await sendPromiseAlert(
+			requestRestApi<
+				typeof endpoints.helicorder.model.request,
+				typeof endpoints.helicorder.model.response.common,
+				typeof endpoints.helicorder.model.response.error
+			>({
+				throwError: true,
+				payload: { action: "export", name: fileName },
+				endpoint: endpoints.helicorder,
+				timeout: 3600,
+				backend,
+				blobOptions: {
+					onComplete: async (response) => {
+						const imageData = await response.text();
+						const blob = new Blob([imageData], { type: "image/svg+xml" });
+						const blobUrl = URL.createObjectURL(blob);
+						Fancybox.show([{ src: blobUrl, type: "image" }], {
+							on: { close: () => URL.revokeObjectURL(blobUrl) }
+						});
+					}
+				}
+			}),
+			t("views.export.toasts.is_previewing_helicorder"),
+			t("views.export.toasts.preview_helicorder_success"),
+			t("views.export.toasts.preview_helicorder_error")
+		);
+	};
+	useEffect(
+		() => () => {
+			Fancybox.destroy();
+		},
+		[]
+	);
+
 	// Handler for downloading helicorder
 	const handleDownloadHeliCorder = async (fileName: string) => {
 		const { backend, endpoints } = apiConfig;
@@ -195,6 +237,7 @@ const Export = ({ locale }: RouterComponentProps) => {
 				typeof endpoints.helicorder.model.response.common,
 				typeof endpoints.helicorder.model.response.error
 			>({
+				throwError: true,
 				blobOptions: { fileName },
 				payload: { action: "export", name: fileName },
 				endpoint: endpoints.helicorder,
@@ -421,7 +464,16 @@ const Export = ({ locale }: RouterComponentProps) => {
 							headerName: t("views.export.table.columns.ttl"),
 							hideable: true,
 							sortable: false,
-							minWidth: 200
+							minWidth: 200,
+							renderCell: ({ value }) => {
+								if (value === -1) {
+									return "∞";
+								}
+								if (value < 0) {
+									return "0";
+								}
+								return String(value);
+							}
 						},
 						{
 							field: "actions",
@@ -431,6 +483,14 @@ const Export = ({ locale }: RouterComponentProps) => {
 							minWidth: 150,
 							renderCell: ({ row }) => (
 								<div className="flex flex-row space-x-4 w-full">
+									<button
+										className="text-blue-700 dark:text-blue-400 hover:opacity-50"
+										onClick={() => {
+											handlePreviewHeliCorder(row.name);
+										}}
+									>
+										{t("views.export.table.actions.preview")}
+									</button>
 									<button
 										className="text-blue-700 dark:text-blue-400 hover:opacity-50"
 										onClick={() => {
