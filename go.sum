@@ -49,8 +49,8 @@ github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0 h1:jfIu9sQUG6Ig
 github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0/go.mod h1:t2tdKJDJF9BV14lnkjHmOQgcvEKgtqs5a1N3LNdJhGE=
 github.com/bclswl0827/go-serial v0.0.1 h1:pIQZytCy9gg5lxxhfkhbHEz3WF0+tkZRQsE9qz6OJfM=
 github.com/bclswl0827/go-serial v0.0.1/go.mod h1:qt+s3rGDzar90EshNSPN0myWyCMaSj32BFQNmrh3Pnw=
-github.com/bclswl0827/heligo v0.0.7 h1:yfBztzvg5GBmPQTy7oIPQ7OfbwwphMthunDOQYTpb0M=
-github.com/bclswl0827/heligo v0.0.7/go.mod h1:34BorRyFJilChv2+drQk6SyAqACmhUqeZjGwIuypn74=
+github.com/bclswl0827/heligo v0.0.10 h1:ROArqZNr1X13KYeG5JYos3+SEXNlLRll/gFRF1OaNao=
+github.com/bclswl0827/heligo v0.0.10/go.mod h1:34BorRyFJilChv2+drQk6SyAqACmhUqeZjGwIuypn74=
 github.com/bclswl0827/mseedio v1.0.9 h1:t5w6K+yjWxl1PxlKy1YpOFf5wKE/r5/bqesWLIrFTZE=
 github.com/bclswl0827/mseedio v1.0.9/go.mod h1:G9nOPR8epxb7ihX5pUpvs3HqYZMnMlXc1Ha1WSMWn7s=
 github.com/bclswl0827/sacio v1.0.6 h1:kR6ll6xjoQGO+YVEZvvvbAxKGUD3qUXsyIuQape1+vc=

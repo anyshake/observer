@@ -43,7 +43,7 @@ func (m *HelicorderService) Start(options *services.Options, waitGroup *sync.Wai
 	m.locationCode = options.Config.Stream.Location
 	dataProvider := &provider{
 		database:      options.Database,
-		queryCache:    cache.New(HELICORDER_TIME_SPAN),
+		queryCache:    cache.NewKv(HELICORDER_TIME_SPAN),
 		stationCode:   m.stationCode,
 		networkCode:   m.networkCode,
 		locationCode:  m.locationCode,
@@ -92,8 +92,8 @@ func (m *HelicorderService) Start(options *services.Options, waitGroup *sync.Wai
 			currentTime = currentTime.Add(-time.Minute)
 			for _, channelCode := range []string{
 				explorer.EXPLORER_CHANNEL_CODE_Z,
-				explorer.EXPLORER_CHANNEL_CODE_N,
 				explorer.EXPLORER_CHANNEL_CODE_E,
+				explorer.EXPLORER_CHANNEL_CODE_N,
 			} {
 				// Create helicorder context
 				helicorderCtx, err := heligo.New(dataProvider, 24*time.Hour, HELICORDER_TIME_SPAN)

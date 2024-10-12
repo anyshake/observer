@@ -7,3 +7,9 @@ func (c *AnyCache) Valid() bool {
 	defer c.mutex.RUnlock()
 	return time.Since(c.createdAt) < c.ttl
 }
+
+func (c *KvCache) Valid() bool {
+	c.mutex.RLock()
+	defer c.mutex.RUnlock()
+	return time.Since(c.createdAt) < c.ttl
+}
