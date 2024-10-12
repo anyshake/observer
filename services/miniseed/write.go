@@ -72,14 +72,17 @@ func (m *MiniSeedService) handleWrite() error {
 		if err != nil {
 			return err
 		}
-		filePath := m.getFilePath(channelName, startTime)
+		filePath := m.getMiniSEEDFilePath(channelName, startTime)
 		err = miniseed.Write(filePath, mseedio.APPEND, dataBytes)
 		if err != nil {
 			return err
 		}
 
+		// Reset to 0 if sequence number goes beyond 999999
 		m.miniseedSequence[channelCode]++
+		m.miniseedSequence[channelCode] %= 999999 + 1
 	}
 
-	return nil
+	// Save current sequence number to file
+	return m.saveSequence()
 }
