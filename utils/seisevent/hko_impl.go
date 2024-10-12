@@ -32,20 +32,21 @@ func (h *HKO) GetProperty() DataSourceProperty {
 }
 
 func (h *HKO) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if !h.cache.Valid() {
-		res, err := request.GET(
-			"https://www.hko.gov.hk/gts/QEM/eq_app-30d_uc.xml",
-			10*time.Second, time.Second, 3, false, nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		h.cache.Set(res)
+	if h.cache.Valid() {
+		return h.cache.Get().([]Event), nil
+	}
+
+	res, err := request.GET(
+		"https://www.hko.gov.hk/gts/QEM/eq_app-30d_uc.xml",
+		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse HKO XML response
-	dataMap, err := xml2map.NewDecoder(strings.NewReader(string(h.cache.Get().([]byte)))).Decode()
+	dataMap, err := xml2map.NewDecoder(strings.NewReader(string(res))).Decode()
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +85,9 @@ func (h *HKO) GetEvents(latitude, longitude float64) ([]Event, error) {
 		resultArr = append(resultArr, seisEvent)
 	}
 
-	return sortSeismicEvents(resultArr), nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	h.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }
 
 func (h *HKO) getTimestamp(timeStr string) (int64, error) {

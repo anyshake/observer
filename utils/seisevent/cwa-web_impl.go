@@ -50,42 +50,43 @@ func (c *CWA_WP) GetProperty() DataSourceProperty {
 }
 
 func (c *CWA_WP) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if !c.cache.Valid() {
-		// This is a workaround for the CWA webpage that does not provide the year of the events
-		res, err := request.GET(
-			"https://www.cloudflare.com/cdn-cgi/trace",
-			10*time.Second, time.Second, 3, false,
-			nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		ts := regexp.MustCompile(`ts=(\d+)`).FindStringSubmatch(string(res))
-		if len(ts) == 0 {
-			return nil, errors.New("failed to get current time from Cloudflare")
-		}
-		c.cacheYear = time.Unix(int64(string2Float(ts[1])), 0).Year()
+	if c.cache.Valid() {
+		return c.cache.Get().([]Event), nil
+	}
 
-		// Get CWA HTML response
-		res, err = request.GET(
-			"https://www.cwa.gov.tw/V8/C/E/MOD/MAP_LIST.html",
-			10*time.Second, time.Second, 3, false,
-			// HiNet CDN IP addresses
-			c.createGfwBypasser([]string{
-				"168.95.245.1:443", "168.95.245.2:443", "168.95.245.3:443", "168.95.245.4:443",
-				"168.95.246.1:443", "168.95.246.2:443", "168.95.246.3:443", "168.95.246.4:443",
-			}),
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		c.cache.Set(res)
+	// This is a workaround for the CWA webpage that does not provide the year of the events
+	res, err := request.GET(
+		"https://www.cloudflare.com/cdn-cgi/trace",
+		10*time.Second, time.Second, 3, false,
+		nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
+	}
+	ts := regexp.MustCompile(`ts=(\d+)`).FindStringSubmatch(string(res))
+	if len(ts) == 0 {
+		return nil, errors.New("failed to get current time from Cloudflare")
+	}
+	c.cacheYear = time.Unix(int64(string2Float(ts[1])), 0).Year()
+
+	// Get CWA HTML response
+	res, err = request.GET(
+		"https://www.cwa.gov.tw/V8/C/E/MOD/MAP_LIST.html",
+		10*time.Second, time.Second, 3, false,
+		// HiNet CDN IP addresses
+		c.createGfwBypasser([]string{
+			"168.95.245.1:443", "168.95.245.2:443", "168.95.245.3:443", "168.95.245.4:443",
+			"168.95.246.1:443", "168.95.246.2:443", "168.95.246.3:443", "168.95.246.4:443",
+		}),
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse CWA HTML response
-	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(c.cache.Get().([]byte)))
+	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(res))
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +123,9 @@ func (c *CWA_WP) GetEvents(latitude, longitude float64) ([]Event, error) {
 		resultArr = append(resultArr, seisEvent)
 	})
 
-	return sortSeismicEvents(resultArr), nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	c.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }
 
 func (c *CWA_WP) getDepth(data string) float64 {

@@ -31,21 +31,22 @@ func (s *SCEA_E) GetProperty() DataSourceProperty {
 }
 
 func (s *SCEA_E) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if !s.cache.Valid() {
-		res, err := request.GET(
-			"http://118.113.105.29:8002/api/earlywarning/jsonPageList?pageSize=100",
-			10*time.Second, time.Second, 3, false, nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		s.cache.Set(res)
+	if s.cache.Valid() {
+		return s.cache.Get().([]Event), nil
+	}
+
+	res, err := request.GET(
+		"http://118.113.105.29:8002/api/earlywarning/jsonPageList?pageSize=100",
+		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse SCEA_B JSON response
 	var dataMap map[string]any
-	err := json.Unmarshal(s.cache.Get().([]byte), &dataMap)
+	err = json.Unmarshal(res, &dataMap)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +86,9 @@ func (s *SCEA_E) GetEvents(latitude, longitude float64) ([]Event, error) {
 		resultArr = append(resultArr, seisEvent)
 	}
 
-	return sortSeismicEvents(resultArr), nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	s.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }
 
 func (s *SCEA_E) getMagnitude(data float64) []Magnitude {

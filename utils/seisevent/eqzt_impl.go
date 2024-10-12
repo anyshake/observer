@@ -37,20 +37,21 @@ func (j *EQZT) GetProperty() DataSourceProperty {
 }
 
 func (j *EQZT) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if !j.cache.Valid() {
-		res, err := request.GET(
-			"http://www.eqzt.com/eqzt/seis/view_sbml.php?dzml=sbml",
-			10*time.Second, time.Second, 3, false, nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		j.cache.Set(res)
+	if j.cache.Valid() {
+		return j.cache.Get().([]Event), nil
+	}
+
+	res, err := request.GET(
+		"http://www.eqzt.com/eqzt/seis/view_sbml.php?dzml=sbml",
+		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Convert GB18030 to UTF-8
-	dataBytes, err := io.ReadAll(transform.NewReader(bytes.NewReader(j.cache.Get().([]byte)), simplifiedchinese.GB18030.NewDecoder()))
+	dataBytes, err := io.ReadAll(transform.NewReader(bytes.NewReader(res), simplifiedchinese.GB18030.NewDecoder()))
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +105,9 @@ func (j *EQZT) GetEvents(latitude, longitude float64) ([]Event, error) {
 		})
 	})
 
-	return sortSeismicEvents(resultArr), nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	j.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }
 
 func (j *EQZT) getTimestamp(text string) int64 {

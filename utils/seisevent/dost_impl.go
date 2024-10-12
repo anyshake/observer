@@ -33,20 +33,21 @@ func (c *DOST) GetProperty() DataSourceProperty {
 
 func (c *DOST) GetEvents(latitude, longitude float64) ([]Event, error) {
 	// Get DOST HTML response
-	if !c.cache.Valid() {
-		res, err := request.GET(
-			"https://earthquake.phivolcs.dost.gov.ph/",
-			10*time.Second, time.Second, 3, false, nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		c.cache.Set(res)
+	if c.cache.Valid() {
+		return c.cache.Get().([]Event), nil
+	}
+
+	res, err := request.GET(
+		"https://earthquake.phivolcs.dost.gov.ph/",
+		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse DOST HTML response
-	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(c.cache.Get().([]byte)))
+	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(res))
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +85,9 @@ func (c *DOST) GetEvents(latitude, longitude float64) ([]Event, error) {
 		}
 	})
 
-	return sortSeismicEvents(resultArr), nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	c.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }
 
 func (c *DOST) getTimestamp(data string) int64 {

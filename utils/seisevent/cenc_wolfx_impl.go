@@ -29,21 +29,22 @@ func (c *CENC_WOLFX) GetProperty() DataSourceProperty {
 }
 
 func (c *CENC_WOLFX) GetEvents(latitude, longitude float64) ([]Event, error) {
-	if !c.cache.Valid() {
-		res, err := request.GET(
-			"https://api.wolfx.jp/cenc_eqlist.json",
-			10*time.Second, time.Second, 3, false, nil,
-			map[string]string{"User-Agent": uarand.GetRandom()},
-		)
-		if err != nil {
-			return nil, err
-		}
-		c.cache.Set(res)
+	if c.cache.Valid() {
+		return c.cache.Get().([]Event), nil
+	}
+
+	res, err := request.GET(
+		"https://api.wolfx.jp/cenc_eqlist.json",
+		10*time.Second, time.Second, 3, false, nil,
+		map[string]string{"User-Agent": uarand.GetRandom()},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse CENC JSON response
 	var dataMapEvents map[string]any
-	err := json.Unmarshal(c.cache.Get().([]byte), &dataMapEvents)
+	err = json.Unmarshal(res, &dataMapEvents)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +85,9 @@ func (c *CENC_WOLFX) GetEvents(latitude, longitude float64) ([]Event, error) {
 		resultArr = append(resultArr, seisEvent)
 	}
 
-	return sortSeismicEvents(resultArr), nil
+	sortedEvents := sortSeismicEvents(resultArr)
+	c.cache.Set(sortedEvents)
+	return sortedEvents, nil
 }
 
 func (c *CENC_WOLFX) getTimestamp(timeStr string) (int64, error) {
