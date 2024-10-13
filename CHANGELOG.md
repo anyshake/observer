@@ -2,6 +2,17 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.4.3
+
+### New Features
+
+- Display progress for helicorder tasks in frontend.
+
+### Refactor
+
+- Plot helicorder hourly for some weak devices.
+- Split helicorder line into multiple segments when gap occurs.
+
 ## v3.4.2
 
 ### Refactor

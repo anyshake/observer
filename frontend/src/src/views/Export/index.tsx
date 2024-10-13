@@ -113,20 +113,38 @@ const Export = ({ locale }: RouterComponentProps) => {
 			t("views.export.toasts.fetch_files_error")
 		);
 	}, [getFileList, t]);
-	useInterval(getFileList, 10000, false);
+	useInterval(
+		() => {
+			try {
+				getFileList();
+			} catch (e) {
+				/* empty */
+			}
+		},
+		10000,
+		false
+	);
 
-	// Ref for storing export miniSEED tasks, with progress and abort controller
-	const exportMiniSeedTasksRef = useRef<
+	// Ref for storing any HTTP request tasks, with progress and abort controller
+	const requestTasksRef = useRef<
 		Record<string, { fileName: string; progress: number; abortController?: AbortController }>
 	>({});
 	useEffect(
 		() => () => {
-			Object.values(exportMiniSeedTasksRef.current).forEach(({ abortController }) => {
+			Object.values(requestTasksRef.current).forEach(({ abortController }) => {
 				abortController?.abort();
 			});
 		},
 		[]
 	);
+
+	// Handler for cancelling request task
+	const handleRequestTask = (fileName: string) => {
+		const { abortController } = requestTasksRef.current[fileName];
+		abortController?.abort();
+		delete requestTasksRef.current[fileName];
+		forceUpdateComponent();
+	};
 
 	// Little hack to force update the component
 	const [, forceUpdateKey] = useState(false);
@@ -134,27 +152,27 @@ const Export = ({ locale }: RouterComponentProps) => {
 		forceUpdateKey((prev) => !prev);
 	};
 
-	// Handler for displaying export miniSEED progress
-	const handleExportMiniSeedProgress = (name: string, progress: number) => {
-		exportMiniSeedTasksRef.current[name] = {
-			...exportMiniSeedTasksRef.current[name],
+	// Handler for setting request task progress
+	const handleRequestProgress = (name: string, progress: number, onComplete?: () => void) => {
+		requestTasksRef.current[name] = {
+			...requestTasksRef.current[name],
 			progress
 		};
 		if (progress === 100) {
-			delete exportMiniSeedTasksRef.current[name];
-			sendUserAlert(t("views.export.toasts.export_mseed_success"));
+			delete requestTasksRef.current[name];
+			onComplete?.();
 		}
 		forceUpdateComponent();
 	};
 
 	// Handler for making export miniSEED request
 	const handleExportMiniSeed = async (fileName: string) => {
-		if (fileName in exportMiniSeedTasksRef.current) {
+		if (fileName in requestTasksRef.current) {
 			return;
 		}
 
 		const abortController = new AbortController();
-		exportMiniSeedTasksRef.current[fileName] = {
+		requestTasksRef.current[fileName] = {
 			fileName,
 			abortController,
 			progress: 0
@@ -172,7 +190,9 @@ const Export = ({ locale }: RouterComponentProps) => {
 			blobOptions: {
 				fileName,
 				onDownload: ({ progress }) => {
-					handleExportMiniSeedProgress(fileName, (progress ?? 0) * 100);
+					handleRequestProgress(fileName, (progress ?? 0) * 100, () => {
+						sendUserAlert(t("views.export.toasts.export_mseed_success"));
+					});
 				}
 			},
 			payload: { action: "export", name: fileName },
@@ -183,43 +203,48 @@ const Export = ({ locale }: RouterComponentProps) => {
 		});
 	};
 
-	// Handler for cancelling export miniSEED request
-	const handleCancelExportMiniSeed = (fileName: string) => {
-		const { abortController } = exportMiniSeedTasksRef.current[fileName];
-		abortController?.abort();
-		delete exportMiniSeedTasksRef.current[fileName];
-		forceUpdateComponent();
-	};
-
 	// Handler for previewing helicorder
 	const handlePreviewHeliCorder = async (fileName: string) => {
+		if (fileName in requestTasksRef.current) {
+			return;
+		}
+
+		const abortController = new AbortController();
+		requestTasksRef.current[fileName] = {
+			fileName,
+			abortController,
+			progress: 0
+		};
+
+		forceUpdateComponent();
+		sendUserAlert(t("views.export.toasts.is_previewing_helicorder"));
+
 		const { backend, endpoints } = apiConfig;
-		await sendPromiseAlert(
-			requestRestApi<
-				typeof endpoints.helicorder.model.request,
-				typeof endpoints.helicorder.model.response.common,
-				typeof endpoints.helicorder.model.response.error
-			>({
-				throwError: true,
-				payload: { action: "export", name: fileName },
-				endpoint: endpoints.helicorder,
-				timeout: 3600,
-				backend,
-				blobOptions: {
-					onComplete: async (response) => {
-						const imageData = await response.text();
-						const blob = new Blob([imageData], { type: "image/svg+xml" });
-						const blobUrl = URL.createObjectURL(blob);
-						Fancybox.show([{ src: blobUrl, type: "image" }], {
-							on: { close: () => URL.revokeObjectURL(blobUrl) }
-						});
-					}
+		await requestRestApi<
+			typeof endpoints.helicorder.model.request,
+			typeof endpoints.helicorder.model.response.common,
+			typeof endpoints.helicorder.model.response.error
+		>({
+			payload: { action: "export", name: fileName },
+			endpoint: endpoints.helicorder,
+			timeout: 3600,
+			backend,
+			blobOptions: {
+				onDownload: ({ progress }) => {
+					handleRequestProgress(fileName, (progress ?? 0) * 100);
+				},
+				onComplete: async (response) => {
+					sendUserAlert(t("views.export.toasts.preview_helicorder_success"));
+					const imageData = await response.text();
+					const blob = new Blob([imageData], { type: "image/svg+xml" });
+					const blobUrl = URL.createObjectURL(blob);
+					Fancybox.show([{ src: blobUrl, type: "image" }], {
+						on: { close: () => URL.revokeObjectURL(blobUrl) }
+					});
 				}
-			}),
-			t("views.export.toasts.is_previewing_helicorder"),
-			t("views.export.toasts.preview_helicorder_success"),
-			t("views.export.toasts.preview_helicorder_error")
-		);
+			},
+			abortController
+		});
 	};
 	useEffect(
 		() => () => {
@@ -230,39 +255,58 @@ const Export = ({ locale }: RouterComponentProps) => {
 
 	// Handler for downloading helicorder
 	const handleDownloadHeliCorder = async (fileName: string) => {
+		if (fileName in requestTasksRef.current) {
+			return;
+		}
+
+		const abortController = new AbortController();
+		requestTasksRef.current[fileName] = {
+			fileName,
+			abortController,
+			progress: 0
+		};
+
+		forceUpdateComponent();
+		sendUserAlert(t("views.export.toasts.is_downloading_helicorder"));
+
 		const { backend, endpoints } = apiConfig;
-		await sendPromiseAlert(
-			requestRestApi<
-				typeof endpoints.helicorder.model.request,
-				typeof endpoints.helicorder.model.response.common,
-				typeof endpoints.helicorder.model.response.error
-			>({
-				throwError: true,
-				blobOptions: { fileName },
-				payload: { action: "export", name: fileName },
-				endpoint: endpoints.helicorder,
-				timeout: 3600,
-				backend
-			}),
-			t("views.export.toasts.is_downloading_helicorder"),
-			t("views.export.toasts.download_helicorder_success"),
-			t("views.export.toasts.download_helicorder_error")
-		);
+		await requestRestApi<
+			typeof endpoints.helicorder.model.request,
+			typeof endpoints.helicorder.model.response.common,
+			typeof endpoints.helicorder.model.response.error
+		>({
+			blobOptions: {
+				fileName,
+				onDownload: ({ progress }) => {
+					handleRequestProgress(fileName, (progress ?? 0) * 100);
+				},
+				onComplete: () => {
+					sendUserAlert(t("views.export.toasts.download_helicorder_success"));
+				}
+			},
+			payload: { action: "export", name: fileName },
+			endpoint: endpoints.helicorder,
+			timeout: 3600,
+			backend,
+			abortController
+		});
 	};
 
 	return (
 		<Container>
 			<Panel label={t("views.export.panels.miniseed_list")}>
-				{Object.values(exportMiniSeedTasksRef.current).map(({ fileName, progress }) => (
-					<Progress
-						key={fileName}
-						value={progress}
-						label={fileName}
-						onCancel={() => {
-							handleCancelExportMiniSeed(fileName);
-						}}
-					/>
-				))}
+				{Object.values(requestTasksRef.current)
+					.filter(({ fileName }) => fileName.endsWith(".mseed"))
+					.map(({ fileName, progress }) => (
+						<Progress
+							key={fileName}
+							value={progress}
+							label={fileName}
+							onCancel={() => {
+								handleRequestTask(fileName);
+							}}
+						/>
+					))}
 				<Container className="flex flex-col sm:flex-row justify-between gap-6">
 					<Container className="flex flex-row space-x-4 sm:whitespace-nowrap">
 						<Button
@@ -295,14 +339,14 @@ const Export = ({ locale }: RouterComponentProps) => {
 								<Field
 									type="search"
 									name="keyword"
-									className="ps-3 w-full min-w-32 md:w-64 py-2 text-sm text-gray-900 border focus:outline-none border-gray-300 rounded-lg bg-gray-50 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
+									className="ps-3 w-full min-w-32 md:w-64 py-2 text-sm text-gray-900 border focus:outline-none border-gray-300 rounded-lg bg-gray-50 focus:border-blue-500"
 									placeholder={t(
 										"views.export.forms.search_miniseed.placeholder"
 									)}
 									required
 								/>
 								<button
-									className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none font-medium rounded-lg text-sm p-2 dark:bg-blue-600 dark:hover:bg-blue-700 disabled:cursor-not-allowed"
+									className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none font-medium rounded-lg text-sm p-2 disabled:cursor-not-allowed"
 									disabled={isSubmitting}
 									type="submit"
 								>
@@ -377,6 +421,18 @@ const Export = ({ locale }: RouterComponentProps) => {
 			</Panel>
 
 			<Panel label={t("views.export.panels.helicorder_list")}>
+				{Object.values(requestTasksRef.current)
+					.filter(({ fileName }) => fileName.endsWith(".svg"))
+					.map(({ fileName, progress }) => (
+						<Progress
+							key={fileName}
+							value={progress}
+							label={fileName}
+							onCancel={() => {
+								handleRequestTask(fileName);
+							}}
+						/>
+					))}
 				<Container className="flex flex-col sm:flex-row justify-between gap-6">
 					<Container className="flex flex-row space-x-4 sm:whitespace-nowrap">
 						<Button
@@ -409,14 +465,14 @@ const Export = ({ locale }: RouterComponentProps) => {
 								<Field
 									type="search"
 									name="keyword"
-									className="ps-3 w-full min-w-32 md:w-64 py-2 text-sm text-gray-900 border focus:outline-none border-gray-300 rounded-lg bg-gray-50 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
+									className="ps-3 w-full min-w-32 md:w-64 py-2 text-sm text-gray-900 border focus:outline-none border-gray-300 rounded-lg bg-gray-50 focus:border-blue-500"
 									placeholder={t(
 										"views.export.forms.search_helicorder.placeholder"
 									)}
 									required
 								/>
 								<button
-									className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none font-medium rounded-lg text-sm p-2 dark:bg-blue-600 dark:hover:bg-blue-700 disabled:cursor-not-allowed"
+									className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none font-medium rounded-lg text-sm p-2 disabled:cursor-not-allowed"
 									disabled={isSubmitting}
 									type="submit"
 								>
