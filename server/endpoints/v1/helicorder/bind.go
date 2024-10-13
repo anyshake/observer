@@ -26,7 +26,12 @@ func (h *HeliCorder) Bind(rg *gin.RouterGroup, jwtHandler *jwt.GinJWTMiddleware,
 	var helicorderService helicorder.HelicorderService
 	serviceConfig, ok := options.Config.Services[helicorderService.GetServiceName()]
 	if !ok {
-		return errors.New("failed to get configuration for helicorder service")
+		// Set default configuration
+		serviceConfig = map[string]any{
+			"enable":    false,
+			"path":      "",
+			"lifecycle": 0.0,
+		}
 	}
 	enable := serviceConfig.(map[string]any)["enable"].(bool)
 	basePath := serviceConfig.(map[string]any)["path"].(string)
