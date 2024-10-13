@@ -579,7 +579,7 @@ const Settings = ({ locale }: RouterComponentProps) => {
 								renderCell: ({ row }) => (
 									<div className="flex flex-row space-x-4 w-full">
 										<button
-											className="text-blue-700 dark:text-blue-400 hover:opacity-50"
+											className="text-blue-700 hover:opacity-50"
 											onClick={() => {
 												handleEditUser(String(row.user_id), row.username);
 											}}
@@ -587,7 +587,7 @@ const Settings = ({ locale }: RouterComponentProps) => {
 											{t("views.setting.table.actions.edit")}
 										</button>
 										<button
-											className="text-red-700 dark:text-red-400 hover:opacity-50"
+											className="text-red-700 hover:opacity-50"
 											onClick={() => {
 												handleRemoveUser(row.username);
 											}}
