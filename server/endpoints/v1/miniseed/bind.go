@@ -26,7 +26,12 @@ func (h *MiniSEED) Bind(rg *gin.RouterGroup, jwtHandler *jwt.GinJWTMiddleware, o
 	var miniseedService miniseed.MiniSeedService
 	serviceConfig, ok := options.Config.Services[miniseedService.GetServiceName()]
 	if !ok {
-		return errors.New("failed to get configuration for miniSEED service")
+		// Set default configuration
+		serviceConfig = map[string]any{
+			"enable":    false,
+			"path":      "",
+			"lifecycle": 0.0,
+		}
 	}
 	enable := serviceConfig.(map[string]any)["enable"].(bool)
 	basePath := serviceConfig.(map[string]any)["path"].(string)
