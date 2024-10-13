@@ -13,7 +13,8 @@
             },
             "captcha": {
                 "title": "驗證碼",
-                "placeholder": "驗證碼",
+                "loading": "图像載入中...",
+                "placeholder": "圖中驗證碼",
                 "error": "請輸入驗證碼"
             },
             "submit": {
