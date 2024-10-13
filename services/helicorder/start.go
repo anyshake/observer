@@ -55,7 +55,7 @@ func (m *HelicorderService) Start(options *services.Options, waitGroup *sync.Wai
 
 	// To calculate next plot time
 	calcDuration := func(currentTime time.Time) time.Duration {
-		timsSpanMinute := int(HELICORDER_TIME_SPAN.Minutes())
+		timsSpanMinute := int(time.Hour.Minutes())
 		currentMinute := currentTime.Minute()
 		// Minutes to next time span
 		nextQuarter := (currentMinute/timsSpanMinute + 1) * timsSpanMinute % 60
