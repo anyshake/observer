@@ -320,10 +320,8 @@
                 "export_mseed_success": "MiniSEED file exported successfully",
                 "is_previewing_helicorder": "Loading helicorder preview, please wait...",
                 "preview_helicorder_success": "Helicorder preview loaded successfully",
-                "preview_helicorder_error": "Failed to load helicorder preview",
                 "is_downloading_helicorder": "Downloading Helicorder scroll file, this may take a while",
-                "download_helicorder_success": "Helicorder scroll file downloaded successfully",
-                "download_helicorder_error": "Failed to download Helicorder scroll file"
+                "download_helicorder_success": "Helicorder scroll file downloaded successfully"
             }
         },
         "setting": {

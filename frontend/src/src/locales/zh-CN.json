@@ -320,10 +320,8 @@
                 "export_mseed_success": "MiniSEED 格式文件导出成功",
                 "is_previewing_helicorder": "正在加载预览图片，请稍等...",
                 "preview_helicorder_success": "预览图片加载成功",
-                "preview_helicorder_error": "预览图片加载失败",
                 "is_downloading_helicorder": "正在下载 Helicorder 滚筒文件，这可能需要一些时间",
-                "download_helicorder_success": "Helicorder 滚筒文件下载成功",
-                "download_helicorder_error": "Helicorder 滚筒文件下载失败"
+                "download_helicorder_success": "Helicorder 滚筒文件下载成功"
             }
         },
         "setting": {
