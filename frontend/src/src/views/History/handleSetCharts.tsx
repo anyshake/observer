@@ -61,7 +61,14 @@ export const handleSetCharts = (
 			// Put response data to circular buffer
 			respData.forEach(({ timestamp, ...data }) => {
 				const axisData = data[key as keyof typeof data] as number[];
-				prev[key].chart.buffer.write(new Float64Array([timestamp, ...axisData]));
+				if (axisData.length !== respSampleRate) {
+					// Fill with zeros if sample rate differs from the expected one
+					prev[key].chart.buffer.write(
+						new Float64Array([timestamp, ...new Array(respSampleRate).fill(0)])
+					);
+				} else {
+					prev[key].chart.buffer.write(new Float64Array([timestamp, ...axisData]));
+				}
 			});
 
 			// Get filter settings and apply to chart

@@ -64,7 +64,11 @@ export const Login = ({
 			) as typeof authCommonResponseModel0;
 			if (res.data) {
 				const { ttl, encrypt_key, captcha_id, captcha_img } = res.data;
-				setPreAuthData({ encrypt_key, captcha_id, captcha_img });
+				setPreAuthData({
+					encrypt_key,
+					captcha_id,
+					captcha_img: `data:image/png;base64,${captcha_img}`
+				});
 				setPreAuthTTL(ttl);
 			}
 		},
@@ -227,19 +231,25 @@ export const Login = ({
 										className="py-2 px-3 border border-gray-300 focus:outline-none focus:ring focus:ring-opacity-50 rounded-md shadow-sm disabled:bg-gray-100 mt-1 block w-full"
 										type="text"
 										name="captcha"
-                                        disabled={!preAuthData.captcha_img.length}
-										placeholder={t("login.forms.captcha.placeholder")}
+										disabled={!preAuthData.captcha_img.length}
+										placeholder={t(
+											preAuthData.captcha_img.length
+												? "login.forms.captcha.placeholder"
+												: "login.forms.captcha.loading"
+										)}
 									/>
-									{preAuthData.captcha_img && (
+									<div
+										className="self-center cursor-pointer w-24 md:w-32"
+										onClick={() => {
+											getPreAuthData(true);
+										}}
+									>
 										<img
-											className="self-center w-24 md:w-32 cursor-pointer"
-											src={`data:image/png;base64,${preAuthData.captcha_img}`}
-											onClick={() => {
-												getPreAuthData(true);
-											}}
+											className="text-gray-600"
+											src={preAuthData.captcha_img}
 											alt=""
 										/>
-									)}
+									</div>
 								</div>
 							</div>
 

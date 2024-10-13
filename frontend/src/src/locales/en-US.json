@@ -13,7 +13,8 @@
             },
             "captcha": {
                 "title": "Captcha",
-                "placeholder": "Captcha",
+                "loading": "Loading captcha...",
+                "placeholder": "Captcha code",
                 "error": "Please enter the captcha"
             },
             "submit": {

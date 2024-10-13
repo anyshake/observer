@@ -114,10 +114,10 @@ const Export = ({ locale }: RouterComponentProps) => {
 		);
 	}, [getFileList, t]);
 	useInterval(
-		() => {
+		async () => {
 			try {
-				getFileList();
-			} catch (e) {
+				await getFileList();
+			} catch {
 				/* empty */
 			}
 		},
@@ -405,7 +405,7 @@ const Export = ({ locale }: RouterComponentProps) => {
 							renderCell: ({ row }) => (
 								<div className="flex flex-row space-x-4 w-full">
 									<button
-										className="text-blue-700 dark:text-blue-400 hover:opacity-50"
+										className="text-blue-700 hover:opacity-50"
 										onClick={() => {
 											handleExportMiniSeed(row.name);
 										}}
@@ -540,7 +540,7 @@ const Export = ({ locale }: RouterComponentProps) => {
 							renderCell: ({ row }) => (
 								<div className="flex flex-row space-x-4 w-full">
 									<button
-										className="text-blue-700 dark:text-blue-400 hover:opacity-50"
+										className="text-blue-700 hover:opacity-50"
 										onClick={() => {
 											handlePreviewHeliCorder(row.name);
 										}}
@@ -548,7 +548,7 @@ const Export = ({ locale }: RouterComponentProps) => {
 										{t("views.export.table.actions.preview")}
 									</button>
 									<button
-										className="text-blue-700 dark:text-blue-400 hover:opacity-50"
+										className="text-blue-700 hover:opacity-50"
 										onClick={() => {
 											handleDownloadHeliCorder(row.name);
 										}}
