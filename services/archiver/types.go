@@ -6,12 +6,12 @@ import (
 )
 
 const (
-	INSERT_COUNTDOWN  = 10
-	CLEANUP_COUNTDOWN = 60
+	RECORDS_INSERT_INTERVAL  = 10
+	RECORDS_CLEANUP_INTERVAL = 3600
 )
 
 type ArchiverService struct {
-	recordBuffer     [INSERT_COUNTDOWN]explorer.ExplorerData
+	recordBuffer     [RECORDS_INSERT_INTERVAL]explorer.ExplorerData
 	insertCountDown  int
 	cleanupCountDown int
 	lifeCycle        int

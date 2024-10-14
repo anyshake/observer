@@ -51,8 +51,8 @@ github.com/bclswl0827/go-serial v0.0.1 h1:pIQZytCy9gg5lxxhfkhbHEz3WF0+tkZRQsE9qz
 github.com/bclswl0827/go-serial v0.0.1/go.mod h1:qt+s3rGDzar90EshNSPN0myWyCMaSj32BFQNmrh3Pnw=
 github.com/bclswl0827/heligo v0.0.12 h1:/UtwJmUBomowCjMSHRzAvFQUtOPBOTIWh6us2+CXNAg=
 github.com/bclswl0827/heligo v0.0.12/go.mod h1:34BorRyFJilChv2+drQk6SyAqACmhUqeZjGwIuypn74=
-github.com/bclswl0827/mseedio v1.0.9 h1:t5w6K+yjWxl1PxlKy1YpOFf5wKE/r5/bqesWLIrFTZE=
-github.com/bclswl0827/mseedio v1.0.9/go.mod h1:G9nOPR8epxb7ihX5pUpvs3HqYZMnMlXc1Ha1WSMWn7s=
+github.com/bclswl0827/mseedio v1.0.10 h1:415K2mJCVqAUeuCfTxOuf5tnUVKfptGokroAlM7hxxI=
+github.com/bclswl0827/mseedio v1.0.10/go.mod h1:G9nOPR8epxb7ihX5pUpvs3HqYZMnMlXc1Ha1WSMWn7s=
 github.com/bclswl0827/sacio v1.0.6 h1:kR6ll6xjoQGO+YVEZvvvbAxKGUD3qUXsyIuQape1+vc=
 github.com/bclswl0827/sacio v1.0.6/go.mod h1:SuiIK7hBHCJvxUOC/rgbJRUO5IoFrEnuCY0xVJ7RyQk=
 github.com/bclswl0827/slgo v0.0.4 h1:WJn0kkQTsGaVJYPnIdDwRgHyEN6FdkIbvBDPxCGk6nU=

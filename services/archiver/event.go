@@ -35,7 +35,7 @@ func (a *ArchiverService) handleExplorerEvent(data *explorer.ExplorerData) {
 		} else {
 			logger.GetLogger(a.GetServiceName()).Infof("%d record(s) has been inserted to database", len(a.recordBuffer))
 		}
-		a.insertCountDown = INSERT_COUNTDOWN
+		a.insertCountDown = RECORDS_INSERT_INTERVAL
 	}
 
 	if a.cleanupCountDown == 0 {
@@ -47,6 +47,6 @@ func (a *ArchiverService) handleExplorerEvent(data *explorer.ExplorerData) {
 		if err != nil {
 			logger.GetLogger(a.GetServiceName()).Warnln(err)
 		}
-		a.cleanupCountDown = CLEANUP_COUNTDOWN
+		a.cleanupCountDown = RECORDS_CLEANUP_INTERVAL
 	}
 }
