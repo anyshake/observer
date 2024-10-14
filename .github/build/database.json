@@ -39,6 +39,14 @@
         "gomips": "",
         "name": "freebsd-amd64"
     },
+    "freebsd_arm32_v5": {
+        "toolchain": "stable",
+        "goos": "freebsd",
+        "goarch": "arm",
+        "goarm": "5",
+        "gomips": "",
+        "name": "freebsd-arm32-v5"
+    },
     "freebsd_arm32_v6": {
         "toolchain": "stable",
         "goos": "freebsd",
@@ -86,6 +94,14 @@
         "goarm": "",
         "gomips": "",
         "name": "linux-amd64"
+    },
+    "linux_arm32_v5": {
+        "toolchain": "stable",
+        "goos": "linux",
+        "goarch": "arm",
+        "goarm": "5",
+        "gomips": "",
+        "name": "linux-arm32-v5"
     },
     "linux_arm32_v6": {
         "toolchain": "stable",
@@ -231,6 +247,14 @@
         "gomips": "",
         "name": "openbsd-amd64"
     },
+    "openbsd_arm32_v5": {
+        "toolchain": "stable",
+        "goos": "openbsd",
+        "goarch": "arm",
+        "goarm": "5",
+        "gomips": "",
+        "name": "openbsd-arm32-v5"
+    },
     "openbsd_arm32_v6": {
         "toolchain": "stable",
         "goos": "openbsd",
@@ -270,6 +294,22 @@
         "goarm": "",
         "gomips": "",
         "name": "windows-amd64"
+    },
+    "windows_arm32_v5": {
+        "toolchain": "stable",
+        "goos": "windows",
+        "goarch": "arm",
+        "goarm": "5",
+        "gomips": "",
+        "name": "windows-arm32-v5"
+    },
+    "windows_arm32_v6": {
+        "toolchain": "stable",
+        "goos": "windows",
+        "goarch": "arm",
+        "goarm": "6",
+        "gomips": "",
+        "name": "windows-arm32-v6"
     },
     "windows_arm32_v7a": {
         "toolchain": "stable",
