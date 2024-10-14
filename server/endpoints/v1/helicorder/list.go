@@ -25,13 +25,15 @@ func (m *HeliCorder) handleList(basePath, stationCode, networkCode string, lifeC
 				return nil, err
 			}
 
-			modTime := info.ModTime().UTC()
+			fileSize := info.Size()
+			if fileSize == 0 {
+				continue
+			}
 
-			var fileTTL int
+			modTime := info.ModTime().UTC()
+			fileTTL := -1
 			if lifeCycle > 0 {
 				fileTTL = lifeCycle - int(time.Since(modTime).Hours()/24)
-			} else {
-				fileTTL = -1
 			}
 
 			files = append(files, heliCorderFileInfo{
