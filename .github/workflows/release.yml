@@ -61,11 +61,13 @@ jobs:
                     - darwin_arm64_v8a
                     - freebsd_386
                     - freebsd_amd64
+                    - freebsd_arm32_v5
                     - freebsd_arm32_v6
                     - freebsd_arm32_v7a
                     - freebsd_arm64_v8a
                     - linux_386
                     - linux_amd64
+                    - linux_arm32_v5
                     - linux_arm32_v6
                     - linux_arm32_v7a
                     - linux_arm64_v8a
@@ -83,11 +85,14 @@ jobs:
                     - linux_s390x
                     - openbsd_386
                     - openbsd_amd64
+                    - openbsd_arm32_v5
                     - openbsd_arm32_v6
                     - openbsd_arm32_v7a
                     - openbsd_arm64_v8a
                     - windows_386
                     - windows_amd64
+                    - windows_arm32_v5
+                    - windows_arm32_v6
                     - windows_arm32_v7a
                     - windows_arm64_v8a
                     - windows7_386
