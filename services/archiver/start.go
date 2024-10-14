@@ -27,8 +27,8 @@ func (a *ArchiverService) Start(options *services.Options, waitGroup *sync.WaitG
 	}
 
 	a.lifeCycle = lifecycle.(int)
-	a.cleanupCountDown = CLEANUP_COUNTDOWN
-	a.insertCountDown = INSERT_COUNTDOWN
+	a.cleanupCountDown = RECORDS_CLEANUP_INTERVAL
+	a.insertCountDown = RECORDS_INSERT_INTERVAL
 	a.databaseConn = options.Database
 
 	// Subscribe to Explorer events
