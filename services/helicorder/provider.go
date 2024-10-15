@@ -12,7 +12,9 @@ import (
 )
 
 type provider struct {
-	database   *gorm.DB
+	database *gorm.DB
+
+	useCache   bool
 	queryCache cache.KvCache
 
 	stationCode   string
@@ -65,7 +67,9 @@ func (d *provider) GetPlotData(startTime, endTime time.Time) ([]heligo.PlotData,
 		if err != nil {
 			return nil, err
 		}
-		d.queryCache.Set(startTimestamp, adcCountData)
+		if d.useCache {
+			d.queryCache.Set(startTimestamp, adcCountData)
+		}
 	}
 
 	var plotData []heligo.PlotData

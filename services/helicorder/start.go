@@ -9,6 +9,7 @@ import (
 	"github.com/anyshake/observer/utils/cache"
 	"github.com/anyshake/observer/utils/logger"
 	"github.com/bclswl0827/heligo"
+	"github.com/shirou/gopsutil/v4/mem"
 )
 
 func (m *HelicorderService) Start(options *services.Options, waitGroup *sync.WaitGroup) {
@@ -87,6 +88,15 @@ func (m *HelicorderService) Start(options *services.Options, waitGroup *sync.Wai
 			// Reset timer to next plot time
 			currentTime = options.TimeSource.Get()
 			timer.Reset(calcDuration(currentTime))
+
+			// Determine if eligible to enable cache
+			// Need 1GB of available memory for storing query result
+			vmStat, err := mem.VirtualMemory()
+			if err != nil {
+				logger.GetLogger(m.GetServiceName()).Errorln(err)
+				return
+			}
+			dataProvider.useCache = vmStat.Available > 1*1024*1024*1024
 
 			// Subtract one minute to avoid date rollover
 			currentTime = currentTime.Add(-time.Minute)
