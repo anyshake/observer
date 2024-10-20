@@ -2,6 +2,24 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.4.4
+
+### CI/CD Changes
+
+- Added precompiled packages for ARMv5 devices.
+
+### Bug Fixes
+
+- Determine if eligible to enable cache to aviod OOM.
+- Discard record that sample rate jitters in history.
+- Load dummy settings if service configration field not found.
+
+### Chore
+
+- Added the code of conduct.
+- Skip empty files when getting file list.
+- Set archiver clean interval to 1 hour.
+
 ## v3.4.3
 
 ### New Features
