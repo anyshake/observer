@@ -32,7 +32,12 @@ func (c *ExplorerConfig) GetDeviceInfo() (deviceInfo, deviceId uint32) {
 		return c.deviceInfo, c.deviceInfo
 	}
 
+	// 0x7FFFFFFF represents a device with no assigned serial number
 	deviceId = c.deviceInfo & 0x7FFFFFFF
+	if deviceId == 0x7FFFFFFF {
+		deviceId = math.MaxUint32
+	}
+
 	return c.deviceInfo, deviceId
 }
 
