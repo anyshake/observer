@@ -425,6 +425,8 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency, 
 				if nextTick == 0 || currentTime.Unix()%(int64(time.Hour.Seconds())*24) == 0 {
 					timeDiff = currentTime.UTC().UnixMilli() - e.mainlinePacket.Timestamp
 				}
+			} else {
+				timeDiff = 0
 			}
 
 			// Append the packet to the buffer
