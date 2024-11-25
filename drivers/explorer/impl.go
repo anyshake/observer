@@ -470,10 +470,15 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency, 
 				deps.Health.SetUpdatedAt(time.UnixMilli(e.mainlinePacket.Timestamp).UTC())
 
 				packetBuffer = []mainlinePacket{}
-			} else if e.mainlinePacket.Timestamp-nextTick > EXPLORER_ALLOWED_JITTER_MS {
+			} else if nextTick-e.mainlinePacket.Timestamp > time.Second.Milliseconds()+EXPLORER_ALLOWED_JITTER_MS {
 				// Update the next tick, clear the buffer if the jitter exceeds the threshold
 				nextTick = e.mainlinePacket.Timestamp + time.Second.Milliseconds()
 				packetBuffer = []mainlinePacket{}
+				// Update the time difference again if the device is running without GNSS module
+				if noGnssMode {
+					currentTime := deps.FallbackTime.Get()
+					timeDiff = currentTime.UTC().UnixMilli() - e.mainlinePacket.Timestamp
+				}
 			}
 		}
 	}
