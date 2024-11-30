@@ -16,11 +16,11 @@ export const api = {
 	) => {
 		const timestamp = bufferData[0];
 		const channelData = Array.from(bufferData).slice(1);
-		const normalizedData = getNormalizedData(channelData, 0);
+		// const normalizedData = getNormalizedData(channelData, 0);
 
 		if (filterEnabled) {
 			return Array.from(
-				getFilteredCounts(Float32Array.from(normalizedData), {
+				getFilteredCounts(Float32Array.from(channelData), {
 					poles,
 					lowFreqCorner,
 					highFreqCorner,
@@ -30,10 +30,7 @@ export const api = {
 			).map((value, index) => [timestamp + (1000 / sampleRate) * index, value]);
 		}
 
-		return normalizedData.map((value, index) => [
-			timestamp + (1000 / sampleRate) * index,
-			value
-		]);
+		return channelData.map((value, index) => [timestamp + (1000 / sampleRate) * index, value]);
 	},
 	getLabelAxisValues: (bufferData: Float64Array[]) => {
 		const channelData = [];
