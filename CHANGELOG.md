@@ -2,6 +2,19 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.4.5
+
+### Bug Fixes
+
+- Fixed device ID calculation when it is not set on AnyShake Explorer.
+- Fixed the issue of not being able to reconnect to AnyShake Explorer after hard reset.
+- Support GNSS mode enabling or disabling by hot switch.
+
+### Chore
+
+- Update logotypes for AnyShake.
+- Disable waveform normalization.
+
 ## v3.4.4
 
 ### CI/CD Changes
