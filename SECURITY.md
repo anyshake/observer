@@ -12,7 +12,7 @@ currently being supported with security updates.
 
 ## Reporting a Vulnerability
 
-Vulnerabilities should be reported to bclswl0827[ατ]gmail.com - the main maintainer of this project. We will attempt to respond to/confirm reports within 2-3 days, but if you believe your report to be "critical" to user safety and security, please note as such in the subject. We take security vulnerabilities seriously.
+Vulnerabilities should be reported to joshua4096[ατ]gmail.com - the main maintainer of this project. We will attempt to respond to/confirm reports within 2-3 days, but if you believe your report to be "critical" to user safety and security, please note as such in the subject. We take security vulnerabilities seriously.
 
 When reporting an issue, where possible, please provide at least:
 
