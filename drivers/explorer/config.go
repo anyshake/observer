@@ -45,40 +45,64 @@ func (c *ExplorerConfig) SetLatitude(latitude float64) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	c.latitude = latitude
+	if c.deviceInfo&0x80000000 == 0 {
+		c.fallbackLatitude = latitude
+	} else {
+		c.gnssLatitude = latitude
+	}
 }
 
 func (c *ExplorerConfig) GetLatitude() float64 {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 
-	return c.latitude
+	if c.deviceInfo&0x80000000 == 0 {
+		return c.fallbackLatitude
+	}
+
+	return c.gnssLatitude
 }
 
 func (c *ExplorerConfig) SetLongitude(longitude float64) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	c.longitude = longitude
+	if c.deviceInfo&0x80000000 == 0 {
+		c.fallbackLongitude = longitude
+	} else {
+		c.gnssLongitude = longitude
+	}
 }
 
 func (c *ExplorerConfig) GetLongitude() float64 {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 
-	return c.longitude
+	if c.deviceInfo&0x80000000 == 0 {
+		return c.fallbackLongitude
+	}
+
+	return c.gnssLongitude
 }
 
 func (c *ExplorerConfig) SetElevation(elevation float64) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	c.elevation = elevation
+	if c.deviceInfo&0x80000000 == 0 {
+		c.fallbackElevation = elevation
+	} else {
+		c.gnssElevation = elevation
+	}
 }
 
 func (c *ExplorerConfig) GetElevation() float64 {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 
-	return c.elevation
+	if c.deviceInfo&0x80000000 == 0 {
+		return c.fallbackElevation
+	}
+
+	return c.gnssElevation
 }

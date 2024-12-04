@@ -30,12 +30,15 @@ type ExplorerHealth struct {
 }
 
 type ExplorerConfig struct {
-	mutex      sync.RWMutex
-	legacyMode bool
-	deviceInfo uint32
-	latitude   float64
-	longitude  float64
-	elevation  float64
+	mutex             sync.RWMutex
+	legacyMode        bool
+	deviceInfo        uint32
+	gnssLatitude      float64
+	fallbackLatitude  float64
+	gnssLongitude     float64
+	fallbackLongitude float64
+	gnssElevation     float64
+	fallbackElevation float64
 }
 
 type ExplorerDependency struct {
