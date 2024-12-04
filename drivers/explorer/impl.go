@@ -384,19 +384,28 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency, 
 			}
 
 			// If device ID is not initialized, get the device ID from the packet
-			_, deviceId := deps.Config.GetDeviceInfo()
-			if deviceId == 0 && e.mainlinePacket.VariableName == "device_info" {
-				deviceInfo := binary.LittleEndian.Uint32(e.mainlinePacket.VariableData[:])
-				// When the most significant bit is 0, it means the device is running without GNSS module.
-				// In this case, the latitude, longitude, elevation will not be updated.
-				// The timestamp will be replaced with the NTP time.
-				if deviceInfo&0x80000000 == 0 {
-					noGnssMode = true
+			currentDeviceInfo, _ := deps.Config.GetDeviceInfo()
+			if e.mainlinePacket.VariableName == "device_info" {
+				newDeviceInfo := binary.LittleEndian.Uint32(e.mainlinePacket.VariableData[:])
+				if newDeviceInfo != currentDeviceInfo {
+					deps.Config.SetDeviceInfo(newDeviceInfo)
+					_, currentDeviceId := deps.Config.GetDeviceInfo()
+
+					// When the most significant bit is 0, it means the device is running without GNSS module.
+					// In this case, the latitude, longitude, elevation will not be updated.
+					// The timestamp will be replaced with the NTP time.
+					noGnssMode = newDeviceInfo&0x80000000 == 0
+					if noGnssMode {
+						e.logger.Infof("got current device ID: %08X, GNSS not enabled", currentDeviceId)
+					} else {
+						e.logger.Infof("got current device ID: %08X, GNSS enabled", currentDeviceId)
+					}
+
+					nextTick = 0
+					packetBuffer = []mainlinePacket{}
 				}
-				deps.Config.SetDeviceInfo(deviceInfo)
-				_, deviceId = deps.Config.GetDeviceInfo()
-				e.logger.Infof("got current device ID: %08X", deviceId)
-			} else if deviceId == 0 {
+			}
+			if currentDeviceInfo == 0 {
 				continue
 			}
 
@@ -472,7 +481,8 @@ func (e *ExplorerDriverImpl) handleReadMainlinePacket(deps *ExplorerDependency, 
 				deps.Health.SetUpdatedAt(time.UnixMilli(e.mainlinePacket.Timestamp).UTC())
 
 				packetBuffer = []mainlinePacket{}
-			} else if nextTick-e.mainlinePacket.Timestamp > time.Second.Milliseconds()+EXPLORER_ALLOWED_JITTER_MS {
+			} else if nextTick-e.mainlinePacket.Timestamp > time.Second.Milliseconds()+EXPLORER_ALLOWED_JITTER_MS ||
+				nextTick-e.mainlinePacket.Timestamp < 0 {
 				// Update the next tick, clear the buffer if the jitter exceeds the threshold
 				nextTick = e.mainlinePacket.Timestamp + time.Second.Milliseconds()
 				packetBuffer = []mainlinePacket{}

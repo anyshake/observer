@@ -2,6 +2,16 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.4.6
+
+### Bug Fixes
+
+- Handle coordinates correctly when by hot switching.
+
+### Chore
+
+- Update copyright and email address.
+
 ## v3.4.5
 
 ### Bug Fixes
