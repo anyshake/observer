@@ -20,8 +20,8 @@
         "frequency": 4.5,
         "sensitivity": 28.8,
         "velocity": true,
-        "vref": 5.0,
-        "fullscale": 10.0,
+        "vref": 2.5,
+        "fullscale": 5.0,
         "resolution": 32
     },
     "stream_settings": {
@@ -63,6 +63,7 @@
         "miniseed": {
             "enable": true,
             "lifecycle": 10,
+            "nocompress": false,
             "path": "/home/user/miniseed"
         },
         "archiver": {
@@ -77,7 +78,8 @@
         "seedlink": {
             "enable": true,
             "host": "0.0.0.0",
-            "port": 18000
+            "port": 18000,
+            "nocompress": false
         },
         "helicorder": {
             "enable": true,

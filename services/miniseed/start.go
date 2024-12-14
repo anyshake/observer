@@ -35,6 +35,12 @@ func (m *MiniSeedService) Start(options *services.Options, waitGroup *sync.WaitG
 	}
 	m.basePath = basePath.(string)
 
+	noCompress, err := options.Config.Services.GetValue(m.GetServiceName(), "nocompress", "bool")
+	if err != nil {
+		noCompress = false
+	}
+	m.noCompress = noCompress.(bool)
+
 	m.stationCode = options.Config.Stream.Station
 	m.networkCode = options.Config.Stream.Network
 	m.locationCode = options.Config.Stream.Location

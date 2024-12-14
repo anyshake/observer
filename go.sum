@@ -55,8 +55,8 @@ github.com/bclswl0827/mseedio v1.0.10 h1:415K2mJCVqAUeuCfTxOuf5tnUVKfptGokroAlM7
 github.com/bclswl0827/mseedio v1.0.10/go.mod h1:G9nOPR8epxb7ihX5pUpvs3HqYZMnMlXc1Ha1WSMWn7s=
 github.com/bclswl0827/sacio v1.0.6 h1:kR6ll6xjoQGO+YVEZvvvbAxKGUD3qUXsyIuQape1+vc=
 github.com/bclswl0827/sacio v1.0.6/go.mod h1:SuiIK7hBHCJvxUOC/rgbJRUO5IoFrEnuCY0xVJ7RyQk=
-github.com/bclswl0827/slgo v0.0.4 h1:WJn0kkQTsGaVJYPnIdDwRgHyEN6FdkIbvBDPxCGk6nU=
-github.com/bclswl0827/slgo v0.0.4/go.mod h1:HlY9zJp3ZxqeS66SoRcnwE/c92Mh4d9Jpeat/68yZhs=
+github.com/bclswl0827/slgo v0.1.0 h1:ndEOFi/3sx56i5AKvex6hSmhvwG8wP2KnwhVFlbpzQ4=
+github.com/bclswl0827/slgo v0.1.0/go.mod h1:HlY9zJp3ZxqeS66SoRcnwE/c92Mh4d9Jpeat/68yZhs=
 github.com/bclswl0827/sqlite v1.11.1-0.20240613172512-9e6ac9861470 h1:VYRieWhizTvSnQ3iJ9cVvB+4go+f/2mTp6CC2MSXnn4=
 github.com/bclswl0827/sqlite v1.11.1-0.20240613172512-9e6ac9861470/go.mod h1:/xElCFPGgTMHBhfSjGBlITMQ/qe6CLTinWdxSbc4oDE=
 github.com/beevik/ntp v1.4.3 h1:PlbTvE5NNy4QHmA4Mg57n7mcFTmr1W1j3gcK7L1lqho=

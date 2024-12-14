@@ -2,6 +2,12 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.5.0
+
+### New Features
+
+- Provide an option to disable MiniSEED compression.
+
 ## v3.4.6
 
 ### Bug Fixes
