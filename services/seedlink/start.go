@@ -34,6 +34,10 @@ func (s *SeedLinkService) Start(options *services.Options, waitGroup *sync.WaitG
 		logger.GetLogger(s.GetServiceName()).Errorln(err)
 		return
 	}
+	noCompress, err := options.Config.Services.GetValue(s.GetServiceName(), "nocompress", "bool")
+	if err != nil {
+		noCompress = false
+	}
 
 	currentTime := options.TimeSource.Get()
 	messageBus := messagebus.New(65535)
@@ -86,7 +90,7 @@ func (s *SeedLinkService) Start(options *services.Options, waitGroup *sync.WaitG
 			serviceName: s.GetServiceName(),
 		},
 	)
-	go server.Start(serverHost.(string), serverPort.(int))
+	go server.Start(serverHost.(string), serverPort.(int), !noCompress.(bool))
 	logger.GetLogger(s.GetServiceName()).Infof("seedlink is listening on %s:%d", serverHost, serverPort)
 
 	logger.GetLogger(s.GetServiceName()).Infoln("service has been started")

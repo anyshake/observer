@@ -33,6 +33,10 @@ func (m *MiniSeedService) handleWrite() error {
 	}
 
 	// Write data to file by channels
+	encodeType := mseedio.STEIM2
+	if m.noCompress {
+		encodeType = mseedio.INT32
+	}
 	for _, channelCode := range []string{
 		explorer.EXPLORER_CHANNEL_CODE_Z,
 		explorer.EXPLORER_CHANNEL_CODE_E,
@@ -50,7 +54,7 @@ func (m *MiniSeedService) handleWrite() error {
 			}
 		}
 		var miniseed mseedio.MiniSeedData
-		err := miniseed.Init(MINISEED_ENCODE_TYPE, MINISEED_BIT_ORDER)
+		err := miniseed.Init(encodeType, MINISEED_BIT_ORDER)
 		if err != nil {
 			return err
 		}
