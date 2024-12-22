@@ -144,8 +144,8 @@ type ExplorerDriverImpl struct {
 }
 
 func (e *ExplorerDriverImpl) handleReadLegacyPacket(deps *ExplorerDependency, fifoBuffer *fifo.Buffer) {
-	// Set to 0xFFFFFFFF to indicate legacy mode
-	deps.Config.SetDeviceInfo(math.MaxUint32)
+	// Set to 0x7FFFFFFF to indicate legacy mode (bit 31 set to 0 to force fallback coordinates)
+	deps.Config.SetDeviceInfo(math.MaxUint32 & 0x7FFFFFFF)
 
 	findIndices := func(arr []byte, sep []byte) []int {
 		var indices []int
