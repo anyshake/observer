@@ -42,6 +42,18 @@ func (m *HelicorderService) Start(options *services.Options, waitGroup *sync.Wai
 	m.stationCode = options.Config.Stream.Station
 	m.networkCode = options.Config.Stream.Network
 	m.locationCode = options.Config.Stream.Location
+	m.loadDefault()
+
+	if imageSize, err := options.Config.Services.GetValue(m.GetServiceName(), "size", "int"); err == nil {
+		m.imageSize = imageSize.(int)
+	}
+	if spanSamples, err := options.Config.Services.GetValue(m.GetServiceName(), "samples", "int"); err == nil {
+		m.spanSamples = spanSamples.(int)
+	}
+	if scaleFactor, err := options.Config.Services.GetValue(m.GetServiceName(), "scale", "float"); err == nil {
+		m.scaleFactor = scaleFactor.(float64)
+	}
+
 	dataProvider := &provider{
 		database:      options.Database,
 		queryCache:    cache.NewKv(HELICORDER_TIME_SPAN),
@@ -117,14 +129,14 @@ func (m *HelicorderService) Start(options *services.Options, waitGroup *sync.Wai
 				channelName := dataProvider.GetChannel()
 				logger.GetLogger(m.GetServiceName()).Infof("start plotting helicorder for %s", channelName)
 
-				err = helicorderCtx.Plot(currentTime, HELICORDER_DOWNSAMPLE_FACTOR, HELICORDER_SCALE_FACTOR, HELICORDER_LINE_WIDTH)
+				err = helicorderCtx.Plot(currentTime, m.spanSamples, m.scaleFactor, HELICORDER_LINE_WIDTH)
 				if err != nil {
 					logger.GetLogger(m.GetServiceName()).Errorln(err)
 					continue
 				}
 
 				filePath := m.getFilePath(channelName, currentTime)
-				err = helicorderCtx.Save(HELICORDER_IMAGE_SIZE, filePath)
+				err = helicorderCtx.Save(m.imageSize, filePath)
 				if err != nil {
 					logger.GetLogger(m.GetServiceName()).Errorln(err)
 					continue
