@@ -2,6 +2,16 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.6.0
+
+### Bug Fixes
+
+- Fixed incorrect coordinates when legacy mode enabled.
+
+### New Features
+
+- Support customizing helicorder image size, waveform scale and samples per span.
+
 ## v3.5.0
 
 ### New Features

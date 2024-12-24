@@ -84,6 +84,9 @@
         "helicorder": {
             "enable": true,
             "lifecycle": 10,
+            "scale": 2.0,
+            "size": 1000,
+            "samples": 10000,
             "path": "/home/user/helicorder"
         }
     }

@@ -7,7 +7,7 @@ const (
 	HELICORDER_IMAGE_SIZE        = 1000
 	HELICORDER_DOWNSAMPLE_FACTOR = 5000
 	HELICORDER_SCALE_FACTOR      = 2.2
-	HELICORDER_LINE_WIDTH        = 0.8
+	HELICORDER_LINE_WIDTH        = 1
 )
 
 type HelicorderService struct {
@@ -16,4 +16,8 @@ type HelicorderService struct {
 	stationCode  string
 	networkCode  string
 	locationCode string
+
+	imageSize   int
+	spanSamples int
+	scaleFactor float64
 }
