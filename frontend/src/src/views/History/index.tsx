@@ -23,7 +23,6 @@ import { sendPromiseAlert } from "../../helpers/interact/sendPromiseAlert";
 import { sendUserAlert } from "../../helpers/interact/sendUserAlert";
 import { requestRestApi } from "../../helpers/request/requestRestApi";
 import { FilterPassband, getFilteredCounts } from "../../helpers/seismic/getFilteredCounts";
-import { getNormalizedData } from "../../helpers/seismic/getNormalizedData";
 import { asyncSleep } from "../../helpers/utils/asyncSleep";
 import { CircularQueue2D } from "../../helpers/utils/CircularQueue2D";
 import { getTimeString } from "../../helpers/utils/getTimeString";
@@ -190,15 +189,12 @@ const History = ({ locale }: RouterComponentProps) => {
 					.map((item) => {
 						const timestamp = item[0];
 						const channelData = item.slice(1);
-						const normalizedData = Float32Array.from(
-							getNormalizedData(Array.from(channelData), 0)
-						);
 						if (filterEnabled) {
-							const filteredData = getFilteredCounts(normalizedData, {
+							const filteredData = getFilteredCounts(Float32Array.from(channelData), {
 								poles: 4,
 								lowFreqCorner,
 								highFreqCorner,
-								sampleRate: normalizedData.length,
+								sampleRate: channelData.length,
 								passbandType: FilterPassband.BAND_PASS
 							});
 							return Array.from(filteredData).map((value, index) => [
@@ -206,8 +202,8 @@ const History = ({ locale }: RouterComponentProps) => {
 								value
 							]);
 						}
-						return Array.from(normalizedData).map((value, index) => [
-							timestamp + (1000 / normalizedData.length) * index,
+						return Array.from(channelData).map((value, index) => [
+							timestamp + (1000 / channelData.length) * index,
 							value
 						]);
 					})

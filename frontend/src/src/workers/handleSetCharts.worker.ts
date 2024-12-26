@@ -1,7 +1,6 @@
 import { expose } from "comlink";
 
 import { FilterPassband, getFilteredCounts } from "../helpers/seismic/getFilteredCounts";
-import { getNormalizedData } from "../helpers/seismic/getNormalizedData";
 
 export default {} as typeof Worker & { new (): Worker };
 
@@ -16,7 +15,6 @@ export const api = {
 	) => {
 		const timestamp = bufferData[0];
 		const channelData = Array.from(bufferData).slice(1);
-		// const normalizedData = getNormalizedData(channelData, 0);
 
 		if (filterEnabled) {
 			return Array.from(
@@ -37,9 +35,8 @@ export const api = {
 		for (const data of bufferData) {
 			channelData.push(...Array.from(data).slice(1));
 		}
-		const normalizedData = getNormalizedData(channelData, 0);
-		const max = Math.max(...normalizedData);
-		const min = Math.min(...normalizedData);
+		const max = Math.max(...channelData);
+		const min = Math.min(...channelData);
 		return { max: max.toFixed(0), min: min.toFixed(0) };
 	}
 };
