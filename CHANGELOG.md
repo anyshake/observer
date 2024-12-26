@@ -2,6 +2,13 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v3.6.1
+
+## Bug Fixes
+
+- Disable waveform normalization completely.
+- Disable compression for exporting MiniSEED in history service.
+
 ## v3.6.0
 
 ### Bug Fixes

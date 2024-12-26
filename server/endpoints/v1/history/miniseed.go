@@ -10,7 +10,7 @@ import (
 
 func (h *History) handleMiniSEED(data []explorer.ExplorerData, stationCode, networkCode, locationCode, channelPrefix, channelCode string) (fileName string, dataBytes []byte, err error) {
 	var miniseed mseedio.MiniSeedData
-	err = miniseed.Init(mseedio.STEIM2, mseedio.MSBFIRST)
+	err = miniseed.Init(mseedio.INT32, mseedio.MSBFIRST)
 	if err != nil {
 		return "", nil, err
 	}
