@@ -244,7 +244,7 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                             </div>
 
                             <button
-                                className="btn mt-4 w-full rounded-lg bg-purple-500 py-2 font-medium text-white shadow-lg transition-all hover:bg-purple-700"
+                                className="btn mt-4 mb-8 w-full rounded-lg bg-purple-500 py-2 font-medium text-white shadow-lg transition-all hover:bg-purple-700"
                                 type="submit"
                                 disabled={isSubmitting || !preAuthData.captcha_img.length}
                             >
