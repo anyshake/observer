@@ -1,0 +1,25 @@
+query getServiceData {
+    getServiceConfigConstraint {
+        serviceName
+        serviceId
+        constraints {
+            key
+            name
+            description
+            configType
+            isRequired
+            currentValue
+            options
+        }
+    }
+    getServiceStatus {
+        description
+        serviceId
+        name
+        restarts
+        startedAt
+        stoppedAt
+        updatedAt
+        isRunning
+    }
+}

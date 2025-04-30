@@ -1,0 +1,456 @@
+{
+    "components": {
+        "ErrorPage": {
+            "something_went_wrong": "哎呀！ 出錯了。",
+            "try_again_later": "請嘗試重新整理頁面或稍後再回來。"
+        },
+        "TypedInput": {
+            "yes": "是",
+            "no": "否",
+            "add_new_item": "輸入新項目。",
+            "editing_list": "編輯 {{fieldName}} 列表"
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "檔案名稱",
+                "time": "修改時間",
+                "size": "檔案大小",
+                "actions": "操作"
+            },
+            "miniseed_list": {
+                "title": "每日 MiniSEED",
+                "download": "下載",
+                "search": "搜尋"
+            },
+            "helicorder_list": {
+                "title": "Helicorder 列表",
+                "download": "下載",
+                "search": "搜尋"
+            },
+            "request_file": {
+                "requesting": "正在請求下載檔案 {{fileName}} 的連結。",
+                "success": "已取得下載檔案 {{fileName}} 的連結。",
+                "error": "請求檔案 {{fileName}} 的連結失敗：{{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "事件查詢",
+                "data_agency": "資料機構",
+                "search_button": "搜尋事件",
+                "searching": "正在從選定來源搜尋事件。",
+                "success": "從選定來源找到 {{count}} 個事件。",
+                "no_data": "在選定來源中找不到任何事件。",
+                "error": "搜尋事件失敗：{{error}}"
+            },
+            "event_list_modal": {
+                "title": "選擇一個地震事件",
+                "earthquake_at": "地震發生於 {{time}}",
+                "p_wave_arrival": "P 波到達 {{time}} 秒",
+                "s_wave_arrival": "S 波到達 {{time}} 秒",
+                "epicenter_distance": "震央距離 {{distance}} km",
+                "earthquake_depth": "深度 {{depth}} km",
+                "selected_an_event": "已選擇位於 {{region}} 於 {{time}} 發生的地震事件。"
+            },
+            "data_export": {
+                "title": "資料匯出",
+                "file_format": "檔案格式",
+                "channel_code": "頻道代碼",
+                "export_button": "取得資料",
+                "exporting": "正在將頻道 {{channel}} 匯出為 {{format}} 格式。",
+                "success": "已成功將頻道 {{channel}} 匯出為 {{format}} 格式。",
+                "error": "將頻道 {{channel}} 匯出為 {{format}} 格式失敗：{{error}}"
+            },
+            "search_records": {
+                "title": "時間查詢",
+                "start_time": "開始時間",
+                "end_time": "結束時間",
+                "invalid_time": "開始時間必須早於結束時間。",
+                "search_button": "搜尋紀錄",
+                "searching": "正在從資料庫搜尋地震紀錄。",
+                "success": "從資料庫找到 {{count}} 筆地震紀錄。",
+                "no_data": "在資料庫中找不到任何地震紀錄。",
+                "error": "搜尋紀錄失敗：{{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "鎖定佈局",
+                "unlock_button": "解鎖佈局"
+            },
+            "reset_layout": {
+                "reset_button": "全部重設",
+                "confirm_message": "您確定要重設佈局嗎？",
+                "confirm_title": "確認重設",
+                "confirm_button": "重設",
+                "cancel_button": "取消"
+            },
+            "share_link": {
+                "share_button": "分享連結",
+                "link_copied": "分享連結已複製到剪貼簿。"
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "測站資訊",
+                "name": "名稱",
+                "country": "國家",
+                "place": "地點",
+                "affiliation": "隸屬機構",
+                "channels": "頻道"
+            },
+            "device_info": {
+                "title": "裝置資訊",
+                "product_model": "產品型號",
+                "device_id": "裝置 ID",
+                "link_protocol": "連結協定",
+                "packet_interval": "封包間隔",
+                "gnss_active": "GNSS 啟用"
+            },
+            "device_status": {
+                "title": "裝置狀態",
+                "sample_rate": "取樣率",
+                "latitude": "緯度",
+                "longitude": "經度",
+                "elevation": "海拔高度",
+                "temperature": "溫度"
+            },
+            "link_status": {
+                "title": "連結狀態",
+                "started_at": "啟動於",
+                "last_frame": "最後訊框",
+                "frames": "訊框",
+                "errors": "錯誤",
+                "messages": "訊息"
+            },
+            "connectivity": {
+                "loading": "正在連接到測站...",
+                "success": "已連接到測站，伺服器已運行 {{uptime}} 秒，更新於 {{updatedAt}}。",
+                "error": "連接測站時發生錯誤，請檢查您的連線。"
+            },
+            "station_location": {
+                "title": "測站位置"
+            },
+            "service_status": {
+                "title": "服務狀態"
+            },
+            "cpu_usage": {
+                "title": "CPU 使用率"
+            },
+            "memory_usage": {
+                "title": "記憶體使用率"
+            },
+            "disk_usage": {
+                "title": "磁碟使用率"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "哎呀！ 找不到頁面。",
+            "check_your_url": "請檢查您的 URL 並再試一次。",
+            "go_back_button": "返回"
+        },
+        "RealTime": {
+            "reset_layout": {
+                "reset_button": "全部重設",
+                "confirm_message": "您確定要重設佈局嗎？",
+                "confirm_title": "確認重設",
+                "confirm_button": "重設",
+                "cancel_button": "取消"
+            },
+            "layout_locker": {
+                "lock_button": "鎖定佈局",
+                "unlock_button": "解鎖佈局"
+            },
+            "connectivity": {
+                "connecting": "沒有連線，正在嘗試連接...",
+                "connected": "已連線，最後更新於 {{updatedAt}}。"
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} SPS",
+                "channels": "{{num}} 個頻道",
+                "retention": "保留 {{retention}} 秒"
+            }
+        },
+        "Settings": {
+            "Dangerous": {
+                "title": "危險區域",
+                "purge_waveform_records": {
+                    "title": "清除波形紀錄",
+                    "description": "這將刪除資料庫中的所有波形紀錄，此操作不可逆。",
+                    "submit_button": "清除紀錄",
+                    "confirm_title": "確認清除",
+                    "confirm_message": "您確定要清除所有波形紀錄嗎？",
+                    "confirm_button": "清除",
+                    "cancel_button": "取消",
+                    "purging": "正在清除波形紀錄...",
+                    "success": "已成功清除波形紀錄。",
+                    "error": "清除波形紀錄失敗：{{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "清除 MiniSEED 檔案",
+                    "description": "這將刪除系統中的所有 MiniSEED 檔案，此操作不可逆。",
+                    "submit_button": "清除 MiniSEED",
+                    "confirm_title": "確認清除",
+                    "confirm_message": "您確定要清除所有 MiniSEED 檔案嗎？",
+                    "confirm_button": "清除",
+                    "cancel_button": "取消",
+                    "purging": "正在清除 MiniSEED 檔案...",
+                    "success": "已成功清除 MiniSEED 檔案。",
+                    "error": "清除 MiniSEED 檔案失敗：{{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "清除 Helicorder 檔案",
+                    "description": "這將刪除系統中的所有 Helicorder 檔案，此操作不可逆。",
+                    "submit_button": "清除 Helicorder",
+                    "confirm_title": "確認清除",
+                    "confirm_message": "您確定要清除所有 Helicorder 檔案嗎？",
+                    "confirm_button": "清除",
+                    "cancel_button": "取消",
+                    "purging": "正在清除 Helicorder 檔案...",
+                    "success": "已成功清除 Helicorder 檔案。",
+                    "error": "清除 Helicorder 檔案失敗：{{error}}"
+                },
+                "reset_station_config": {
+                    "title": "重設測站設定",
+                    "description": "這將重設所有測站設定，此操作不可逆，需要重新啟動才能生效。",
+                    "submit_button": "重設測站",
+                    "confirm_title": "確認重設",
+                    "confirm_message": "您確定要重設所有測站設定嗎？",
+                    "confirm_button": "重設",
+                    "cancel_button": "取消",
+                    "resetting": "正在重設測站設定...",
+                    "success": "已成功重設測站設定。",
+                    "error": "重設測站設定失敗：{{error}}"
+                },
+                "reset_service_config": {
+                    "title": "重設服務設定",
+                    "description": "這將重設所有服務設定，此操作不可逆，需要重新啟動才能生效。",
+                    "submit_button": "重設服務",
+                    "confirm_title": "確認重設",
+                    "confirm_message": "您確定要重設所有服務設定嗎？",
+                    "confirm_button": "重設",
+                    "cancel_button": "取消",
+                    "resetting": "正在重設服務設定...",
+                    "success": "已成功重設服務設定。",
+                    "error": "重設服務設定失敗：{{error}}"
+                }
+            },
+            "Metadata": {
+                "title": "測站元數據"
+            },
+            "Preference": {
+                "title": "網頁偏好設定",
+                "reset_layout_preference": {
+                    "title": "重設佈局偏好",
+                    "description": "這將重設所有佈局偏好，此操作不可逆。",
+                    "submit_button": "重設偏好",
+                    "confirm_title": "確認重設",
+                    "confirm_message": "您確定要重設所有佈局偏好嗎？",
+                    "confirm_button": "重設",
+                    "cancel_button": "取消",
+                    "success": "已成功重設佈局偏好。"
+                }
+            },
+            "Service": {
+                "title": "服務控制",
+                "restart_service": {
+                    "submit_button": "重新啟動",
+                    "confirm_title": "確認重新啟動",
+                    "confirm_message": "您確定要重新啟動服務嗎？",
+                    "confirm_button": "重新啟動",
+                    "cancel_button": "取消",
+                    "restarting": "正在重新啟動服務...",
+                    "success": "已成功重新啟動服務。",
+                    "error": "重新啟動服務失敗：{{error}}"
+                },
+                "start_service": {
+                    "submit_button": "啟動",
+                    "confirm_title": "確認啟動",
+                    "confirm_message": "您確定要啟動服務嗎？",
+                    "confirm_button": "啟動",
+                    "cancel_button": "取消",
+                    "starting": "正在啟動服務...",
+                    "success": "已成功啟動服務。",
+                    "error": "啟動服務失敗：{{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "停止",
+                    "confirm_title": "確認停止",
+                    "confirm_message": "您確定要停止服務嗎？",
+                    "confirm_button": "停止",
+                    "cancel_button": "取消",
+                    "stopping": "正在停止服務...",
+                    "success": "已成功停止服務。",
+                    "error": "停止服務失敗：{{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "重設",
+                    "confirm_title": "確認重設",
+                    "confirm_message": "您確定要重設服務嗎？",
+                    "confirm_button": "重設",
+                    "cancel_button": "取消",
+                    "resetting": "正在重設服務...",
+                    "success": "已成功重設服務。",
+                    "error": "重設服務失敗：{{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "編輯",
+                    "updating": "正在應用新變更...",
+                    "success": "變更已成功應用。",
+                    "error": "更新服務設定失敗：{{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "編輯服務：{{name}}"
+                },
+                "service_status": {
+                    "yes": "是",
+                    "no": "否",
+                    "is_running": "運行中",
+                    "restarts": "重新啟動次數",
+                    "stopped_at": "停止於",
+                    "started_at": "啟動於",
+                    "updated_at": "更新於"
+                }
+            },
+            "Station": {
+                "title": "測站設定",
+                "update_station": {
+                    "field_required": "此欄位為必填。",
+                    "updating": "正在更新測站設定...",
+                    "success": "已成功更新測站設定。",
+                    "error": "更新測站設定失敗：{{error}}"
+                }
+            },
+            "Users": {
+                "title": "使用者管理",
+                "search_users": {
+                    "placeholder": "搜尋使用者"
+                },
+                "refresh_list": {
+                    "submit_button": "重新整理",
+                    "refreshing": "正在重新整理使用者列表...",
+                    "success": "已成功重新整理使用者列表。",
+                    "error": "重新整理使用者列表失敗：{{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "移除使用者",
+                    "confirm_title": "確認移除",
+                    "confirm_message": "您確定要移除選定的使用者嗎？",
+                    "confirm_button": "移除",
+                    "cancel_button": "取消",
+                    "removing": "正在移除選定的使用者...",
+                    "success": "已移除 {{num}} 位使用者。",
+                    "error": "移除選定的使用者失敗：{{error}}"
+                },
+                "create_user": {
+                    "submit_button": "建立使用者",
+                    "creating": "正在建立新使用者...",
+                    "success": "使用者 {{username}} 已建立。",
+                    "error": "建立新使用者失敗：{{error}}"
+                },
+                "create_user_modal": {
+                    "title": "建立新使用者",
+                    "username": {
+                        "label": "使用者名稱",
+                        "placeholder": "新使用者的名稱"
+                    },
+                    "password": {
+                        "label": "密碼",
+                        "placeholder": "新使用者的密碼"
+                    },
+                    "admin": {
+                        "label": "具有管理員權限的使用者"
+                    },
+                    "create_button": "建立"
+                },
+                "edit_user": {
+                    "submit_button": "編輯",
+                    "updating": "正在更新使用者...",
+                    "success": "使用者 {{username}} 已更新。",
+                    "error": "更新使用者失敗：{{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "編輯使用者",
+                    "username": {
+                        "label": "使用者名稱",
+                        "placeholder": "留空表示不變更。"
+                    },
+                    "password": {
+                        "label": "密碼",
+                        "placeholder": "留空表示不變更。"
+                    },
+                    "admin": {
+                        "label": "具有管理員權限的使用者"
+                    },
+                    "update_button": "更新"
+                },
+                "remove_user": {
+                    "submit_button": "移除",
+                    "confirm_title": "確認移除",
+                    "confirm_message": "您確定要移除使用者 {{username}} 嗎？",
+                    "confirm_button": "移除",
+                    "cancel_button": "取消",
+                    "removing": "正在移除使用者...",
+                    "success": "使用者 {{username}} 已被移除。",
+                    "error": "移除使用者失敗：{{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "是",
+                    "no": "否",
+                    "never": "從未",
+                    "id": "ID",
+                    "user_id": "使用者 ID",
+                    "username": "使用者名稱",
+                    "admin": "管理員",
+                    "created_at": "建立於",
+                    "last_login": "上次登入",
+                    "user_ip": "使用者 IP",
+                    "user_agent": "使用者代理",
+                    "updated_at": "更新於",
+                    "actions": "操作"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "有可用的新更新，您想現在更新嗎？",
+            "confirm_title": "有可用更新",
+            "confirm_button": "更新",
+            "cancel_button": "取消"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "您確定要登出嗎？",
+            "confirm_title": "登出",
+            "confirm_button": "確定",
+            "cancel_button": "取消"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "使用者名稱",
+            "placeholder": "您的使用者名稱"
+        },
+        "password": {
+            "label": "密碼",
+            "placeholder": "您的密碼"
+        },
+        "captcha": {
+            "label": "輸入驗證碼",
+            "loading": "正在加載驗證碼...",
+            "placeholder": "驗證碼",
+            "refreshing": "正在重新整理驗證碼。",
+            "refresh_success": "已成功重新整理驗證碼。",
+            "refresh_error": "重新整理驗證碼失敗。"
+        },
+        "signin": {
+            "button": "登入",
+            "loading": "正在登入...",
+            "success": "您已成功登入。",
+            "error": "登入失敗。"
+        }
+    }
+}

@@ -1,0 +1,3 @@
+mutation updateStationConfig($key: String!, $value: Any!) {
+    updateStationConfig(key: $key, value: $value)
+}

@@ -1,0 +1,456 @@
+{
+    "components": {
+        "ErrorPage": {
+            "something_went_wrong": "Oups ! Quelque chose s'est mal passé.",
+            "try_again_later": "Veuillez essayer d'actualiser la page ou de revenir plus tard."
+        },
+        "TypedInput": {
+            "yes": "Oui",
+            "no": "Non",
+            "add_new_item": "Saisir un nouvel élément.",
+            "editing_list": "Modification de la liste de {{fieldName}}"
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "Nom du fichier",
+                "time": "Date de modification",
+                "size": "Taille du fichier",
+                "actions": "Actions"
+            },
+            "miniseed_list": {
+                "title": "MiniSEED quotidien",
+                "download": "Télécharger",
+                "search": "Rechercher"
+            },
+            "helicorder_list": {
+                "title": "Liste Helicorder",
+                "download": "Télécharger",
+                "search": "Rechercher"
+            },
+            "request_file": {
+                "requesting": "Demande du lien de téléchargement pour le fichier {{fileName}}.",
+                "success": "Lien obtenu pour le téléchargement du fichier {{fileName}}.",
+                "error": "Échec de la demande du lien pour le fichier {{fileName}} : {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "Requête d'événement",
+                "data_agency": "Agence de données",
+                "search_button": "Rechercher des événements",
+                "searching": "Recherche d'événements depuis la source sélectionnée.",
+                "success": "{{count}} événements trouvés depuis la source sélectionnée.",
+                "no_data": "Aucun événement trouvé dans la source sélectionnée.",
+                "error": "Échec de la recherche d'événements : {{error}}"
+            },
+            "event_list_modal": {
+                "title": "Sélectionner un événement sismique",
+                "earthquake_at": "Séisme à {{time}}",
+                "p_wave_arrival": "Arrivée Onde P {{time}} secondes",
+                "s_wave_arrival": "Arrivée Onde S {{time}} secondes",
+                "epicenter_distance": "Épicentre {{distance}} km",
+                "earthquake_depth": "Profondeur {{depth}} km",
+                "selected_an_event": "Un événement sismique sélectionné dans {{region}} à {{time}}."
+            },
+            "data_export": {
+                "title": "Exportation de données",
+                "file_format": "Format de fichier",
+                "channel_code": "Code de canal",
+                "export_button": "Obtenir les données",
+                "exporting": "Exportation du canal {{channel}} au format {{format}}.",
+                "success": "Canal {{channel}} exporté avec succès au format {{format}}.",
+                "error": "Échec de l'exportation du canal {{channel}} au format {{format}} : {{error}}"
+            },
+            "search_records": {
+                "title": "Requête temporelle",
+                "start_time": "Heure de début",
+                "end_time": "Heure de fin",
+                "invalid_time": "L'heure de début doit être antérieure à l'heure de fin.",
+                "search_button": "Rechercher des enregistrements",
+                "searching": "Recherche d'enregistrements sismiques dans la base de données.",
+                "success": "{{count}} enregistrements sismiques trouvés dans la base de données.",
+                "no_data": "Aucun enregistrement sismique trouvé dans la base de données.",
+                "error": "Échec de la recherche d'enregistrements : {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "Verrouiller la disposition",
+                "unlock_button": "Déverrouiller la disposition"
+            },
+            "reset_layout": {
+                "reset_button": "Tout réinitialiser",
+                "confirm_message": "Êtes-vous sûr de vouloir réinitialiser la disposition ?",
+                "confirm_title": "Confirmer la réinitialisation",
+                "confirm_button": "Réinitialiser",
+                "cancel_button": "Annuler"
+            },
+            "share_link": {
+                "share_button": "Partager le lien",
+                "link_copied": "Le lien partagé a été copié dans le presse-papiers."
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "Informations sur la station",
+                "name": "Nom",
+                "country": "Pays",
+                "place": "Lieu",
+                "affiliation": "Affiliation",
+                "channels": "Canaux"
+            },
+            "device_info": {
+                "title": "Informations sur l'appareil",
+                "product_model": "Modèle de produit",
+                "device_id": "ID de l'appareil",
+                "link_protocol": "Protocole de liaison",
+                "packet_interval": "Intervalle de paquets",
+                "gnss_active": "GNSS Actif"
+            },
+            "device_status": {
+                "title": "État de l'appareil",
+                "sample_rate": "Taux d'échantillonnage",
+                "latitude": "Latitude",
+                "longitude": "Longitude",
+                "elevation": "Altitude",
+                "temperature": "Température"
+            },
+            "link_status": {
+                "title": "État de la liaison",
+                "started_at": "Démarré à",
+                "last_frame": "Dernière trame",
+                "frames": "Trames",
+                "errors": "Erreurs",
+                "messages": "Messages"
+            },
+            "connectivity": {
+                "loading": "Connexion à la station en cours...",
+                "success": "Connecté à la station, serveur actif depuis {{uptime}} secondes, mis à jour à {{updatedAt}}.",
+                "error": "Erreur lors de la connexion à la station, veuillez vérifier votre connexion."
+            },
+            "station_location": {
+                "title": "Emplacement de la station"
+            },
+            "service_status": {
+                "title": "État du service"
+            },
+            "cpu_usage": {
+                "title": "Utilisation CPU"
+            },
+            "memory_usage": {
+                "title": "Utilisation mémoire"
+            },
+            "disk_usage": {
+                "title": "Utilisation disque"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "Oups ! Page non trouvée.",
+            "check_your_url": "Veuillez vérifier votre URL et réessayer.",
+            "go_back_button": "Retour"
+        },
+        "RealTime": {
+            "reset_layout": {
+                "reset_button": "Tout réinitialiser",
+                "confirm_message": "Êtes-vous sûr de vouloir réinitialiser la disposition ?",
+                "confirm_title": "Confirmer la réinitialisation",
+                "confirm_button": "Réinitialiser",
+                "cancel_button": "Annuler"
+            },
+            "layout_locker": {
+                "lock_button": "Verrouiller la disposition",
+                "unlock_button": "Déverrouiller la disposition"
+            },
+            "connectivity": {
+                "connecting": "Pas de connexion, connexion en cours...",
+                "connected": "Connecté, dernière mise à jour à {{updatedAt}}."
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} SPS",
+                "channels": "{{num}} Canaux",
+                "retention": "{{retention}} secondes"
+            }
+        },
+        "Settings": {
+            "Dangerous": {
+                "title": "Zone dangereuse",
+                "purge_waveform_records": {
+                    "title": "Purger les enregistrements de forme d'onde",
+                    "description": "Ceci supprimera tous les enregistrements de forme d'onde de la base de données, l'opération est irréversible.",
+                    "submit_button": "Purger les enregistrements",
+                    "confirm_title": "Confirmer la purge",
+                    "confirm_message": "Êtes-vous sûr de vouloir purger tous les enregistrements de forme d'onde ?",
+                    "confirm_button": "Purger",
+                    "cancel_button": "Annuler",
+                    "purging": "Purge des enregistrements de forme d'onde en cours...",
+                    "success": "Enregistrements de forme d'onde purgés avec succès.",
+                    "error": "Échec de la purge des enregistrements de forme d'onde : {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "Purger les fichiers MiniSEED",
+                    "description": "Ceci supprimera tous les fichiers MiniSEED du système, l'opération est irréversible.",
+                    "submit_button": "Purger MiniSEED",
+                    "confirm_title": "Confirmer la purge",
+                    "confirm_message": "Êtes-vous sûr de vouloir purger tous les fichiers MiniSEED ?",
+                    "confirm_button": "Purger",
+                    "cancel_button": "Annuler",
+                    "purging": "Purge des fichiers MiniSEED en cours...",
+                    "success": "Fichiers MiniSEED purgés avec succès.",
+                    "error": "Échec de la purge des fichiers MiniSEED : {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "Purger les fichiers Helicorder",
+                    "description": "Ceci supprimera tous les fichiers Helicorder du système, l'opération est irréversible.",
+                    "submit_button": "Purger Helicorder",
+                    "confirm_title": "Confirmer la purge",
+                    "confirm_message": "Êtes-vous sûr de vouloir purger tous les fichiers Helicorder ?",
+                    "confirm_button": "Purger",
+                    "cancel_button": "Annuler",
+                    "purging": "Purge des fichiers Helicorder en cours...",
+                    "success": "Fichiers Helicorder purgés avec succès.",
+                    "error": "Échec de la purge des fichiers Helicorder : {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "Réinitialiser la configuration de la station",
+                    "description": "Ceci réinitialisera toute la configuration de la station, l'opération est irréversible, un redémarrage est requis pour prendre effet.",
+                    "submit_button": "Réinitialiser la station",
+                    "confirm_title": "Confirmer la réinitialisation",
+                    "confirm_message": "Voulez-vous réinitialiser toute la configuration de la station ?",
+                    "confirm_button": "Réinitialiser",
+                    "cancel_button": "Annuler",
+                    "resetting": "Réinitialisation de la configuration de la station en cours...",
+                    "success": "Configuration de la station réinitialisée avec succès.",
+                    "error": "Échec de la réinitialisation de la configuration de la station : {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "Réinitialiser la configuration du service",
+                    "description": "Ceci réinitialisera toute la configuration du service, l'opération est irréversible, un redémarrage est requis pour prendre effet.",
+                    "submit_button": "Réinitialiser le service",
+                    "confirm_title": "Confirmer la réinitialisation",
+                    "confirm_message": "Voulez-vous réinitialiser toute la configuration du service ?",
+                    "confirm_button": "Réinitialiser",
+                    "cancel_button": "Annuler",
+                    "resetting": "Réinitialisation de la configuration du service en cours...",
+                    "success": "Configuration du service réinitialisée avec succès.",
+                    "error": "Échec de la réinitialisation de la configuration du service : {{error}}"
+                }
+            },
+            "Metadata": {
+                "title": "Métadonnées de la station"
+            },
+            "Preference": {
+                "title": "Préférences Web",
+                "reset_layout_preference": {
+                    "title": "Réinitialiser les préférences de disposition",
+                    "description": "Ceci réinitialisera toutes les préférences de disposition, l'opération est irréversible.",
+                    "submit_button": "Réinitialiser les préférences",
+                    "confirm_title": "Confirmer la réinitialisation",
+                    "confirm_message": "Êtes-vous sûr de vouloir réinitialiser toutes les préférences de disposition ?",
+                    "confirm_button": "Réinitialiser",
+                    "cancel_button": "Annuler",
+                    "success": "Préférences de disposition réinitialisées avec succès."
+                }
+            },
+            "Service": {
+                "title": "Contrôle du service",
+                "restart_service": {
+                    "submit_button": "Redémarrer",
+                    "confirm_title": "Confirmer le redémarrage",
+                    "confirm_message": "Êtes-vous sûr de vouloir redémarrer le service ?",
+                    "confirm_button": "Redémarrer",
+                    "cancel_button": "Annuler",
+                    "restarting": "Redémarrage du service en cours...",
+                    "success": "Service redémarré avec succès.",
+                    "error": "Échec du redémarrage du service : {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "Démarrer",
+                    "confirm_title": "Confirmer le démarrage",
+                    "confirm_message": "Êtes-vous sûr de vouloir démarrer le service ?",
+                    "confirm_button": "Démarrer",
+                    "cancel_button": "Annuler",
+                    "starting": "Démarrage du service en cours...",
+                    "success": "Service démarré avec succès.",
+                    "error": "Échec du démarrage du service : {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "Arrêter",
+                    "confirm_title": "Confirmer l'arrêt",
+                    "confirm_message": "Êtes-vous sûr de vouloir arrêter le service ?",
+                    "confirm_button": "Arrêter",
+                    "cancel_button": "Annuler",
+                    "stopping": "Arrêt du service en cours...",
+                    "success": "Service arrêté avec succès.",
+                    "error": "Échec de l'arrêt du service : {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "Réinitialiser",
+                    "confirm_title": "Confirmer la réinitialisation",
+                    "confirm_message": "Êtes-vous sûr de vouloir réinitialiser le service ?",
+                    "confirm_button": "Réinitialiser",
+                    "cancel_button": "Annuler",
+                    "resetting": "Réinitialisation du service en cours...",
+                    "success": "Service réinitialisé avec succès.",
+                    "error": "Échec de la réinitialisation du service : {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "Modifier",
+                    "updating": "Application des nouveaux changements en cours...",
+                    "success": "Les changements ont été appliqués.",
+                    "error": "Échec de la mise à jour de la configuration du service : {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "Modification du service : {{name}}"
+                },
+                "service_status": {
+                    "yes": "Oui",
+                    "no": "Non",
+                    "is_running": "En cours d'exécution",
+                    "restarts": "Redémarrages",
+                    "stopped_at": "Arrêté à",
+                    "started_at": "Démarré à",
+                    "updated_at": "Mis à jour à"
+                }
+            },
+            "Station": {
+                "title": "Paramètres de la station",
+                "update_station": {
+                    "field_required": "Ce champ est obligatoire.",
+                    "updating": "Mise à jour de la configuration de la station en cours...",
+                    "success": "Configuration de la station mise à jour avec succès.",
+                    "error": "Échec de la mise à jour de la configuration de la station : {{error}}"
+                }
+            },
+            "Users": {
+                "title": "Gestion des utilisateurs",
+                "search_users": {
+                    "placeholder": "Rechercher des utilisateurs"
+                },
+                "refresh_list": {
+                    "submit_button": "Actualiser",
+                    "refreshing": "Actualisation de la liste des utilisateurs en cours...",
+                    "success": "Liste des utilisateurs actualisée avec succès.",
+                    "error": "Échec de l'actualisation de la liste des utilisateurs : {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "Supprimer les utilisateurs",
+                    "confirm_title": "Confirmer la suppression",
+                    "confirm_message": "Êtes-vous sûr de vouloir supprimer les utilisateurs sélectionnés ?",
+                    "confirm_button": "Supprimer",
+                    "cancel_button": "Annuler",
+                    "removing": "Suppression des utilisateurs sélectionnés en cours...",
+                    "success": "{{num}} utilisateur(s) a/ont été supprimé(s).",
+                    "error": "Échec de la suppression des utilisateurs sélectionnés : {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "Créer un utilisateur",
+                    "creating": "Création d'un nouvel utilisateur en cours...",
+                    "success": "Utilisateur {{username}} créé avec succès.",
+                    "error": "Échec de la création du nouvel utilisateur : {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "Créer un nouvel utilisateur",
+                    "username": {
+                        "label": "Nom d'utilisateur",
+                        "placeholder": "Nom d'utilisateur du nouvel utilisateur"
+                    },
+                    "password": {
+                        "label": "Mot de passe",
+                        "placeholder": "Mot de passe du nouvel utilisateur"
+                    },
+                    "admin": {
+                        "label": "Utilisateur avec privilèges administrateur"
+                    },
+                    "create_button": "Créer"
+                },
+                "edit_user": {
+                    "submit_button": "Modifier",
+                    "updating": "Mise à jour de l'utilisateur en cours...",
+                    "success": "Utilisateur {{username}} mis à jour avec succès.",
+                    "error": "Échec de la mise à jour de l'utilisateur : {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "Modifier l'utilisateur",
+                    "username": {
+                        "label": "Nom d'utilisateur",
+                        "placeholder": "Vide pour aucun changement."
+                    },
+                    "password": {
+                        "label": "Mot de passe",
+                        "placeholder": "Vide pour aucun changement."
+                    },
+                    "admin": {
+                        "label": "Utilisateur avec privilèges administrateur"
+                    },
+                    "update_button": "Mettre à jour"
+                },
+                "remove_user": {
+                    "submit_button": "Supprimer",
+                    "confirm_title": "Confirmer la suppression",
+                    "confirm_message": "Êtes-vous sûr de vouloir supprimer l'utilisateur {{username}} ?",
+                    "confirm_button": "Supprimer",
+                    "cancel_button": "Annuler",
+                    "removing": "Suppression de l'utilisateur en cours...",
+                    "success": "Utilisateur {{username}} supprimé avec succès.",
+                    "error": "Échec de la suppression de l'utilisateur : {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "Oui",
+                    "no": "Non",
+                    "never": "Jamais",
+                    "id": "ID",
+                    "user_id": "ID Utilisateur",
+                    "username": "Nom d'utilisateur",
+                    "admin": "Admin",
+                    "created_at": "Créé le",
+                    "last_login": "Dernière connexion",
+                    "user_ip": "IP Utilisateur",
+                    "user_agent": "Agent Utilisateur",
+                    "updated_at": "Mis à jour le",
+                    "actions": "Actions"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "Une nouvelle mise à jour est disponible, souhaitez-vous mettre à jour maintenant ?",
+            "confirm_title": "Mise à jour disponible",
+            "confirm_button": "Mettre à jour",
+            "cancel_button": "Annuler"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "Êtes-vous sûr de vouloir vous déconnecter ?",
+            "confirm_title": "Déconnexion",
+            "confirm_button": "OK",
+            "cancel_button": "Annuler"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "Nom d'utilisateur",
+            "placeholder": "Votre nom d'utilisateur"
+        },
+        "password": {
+            "label": "Mot de passe",
+            "placeholder": "Votre mot de passe"
+        },
+        "captcha": {
+            "label": "Saisir le Captcha",
+            "loading": "Chargement du captcha en cours...",
+            "placeholder": "Code Captcha",
+            "refreshing": "Actualisation du captcha en cours.",
+            "refresh_success": "Captcha actualisé avec succès.",
+            "refresh_error": "Échec de l'actualisation du captcha."
+        },
+        "signin": {
+            "button": "Connexion",
+            "loading": "Connexion en cours...",
+            "success": "Vous vous êtes connecté avec succès.",
+            "error": "Échec de la connexion."
+        }
+    }
+}

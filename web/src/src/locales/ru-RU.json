@@ -1,0 +1,456 @@
+{
+    "components": {
+        "ErrorPage": {
+            "something_went_wrong": "Ой! Что-то пошло не так.",
+            "try_again_later": "Пожалуйста, попробуйте обновить страницу или вернитесь позже."
+        },
+        "TypedInput": {
+            "yes": "Да",
+            "no": "Нет",
+            "add_new_item": "Введите новый элемент.",
+            "editing_list": "Редактирование списка {{fieldName}}"
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "Имя файла",
+                "time": "Время изменения",
+                "size": "Размер файла",
+                "actions": "Действия"
+            },
+            "miniseed_list": {
+                "title": "Ежедневный MiniSEED",
+                "download": "Скачать",
+                "search": "Поиск"
+            },
+            "helicorder_list": {
+                "title": "Список Helicorder",
+                "download": "Скачать",
+                "search": "Поиск"
+            },
+            "request_file": {
+                "requesting": "Запрос ссылки для скачивания файла {{fileName}}.",
+                "success": "Получена ссылка для скачивания файла {{fileName}}.",
+                "error": "Не удалось запросить ссылку на файл {{fileName}}: {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "Запрос событий",
+                "data_agency": "Агентство данных",
+                "search_button": "Искать события",
+                "searching": "Поиск событий из выбранного источника.",
+                "success": "Найдено {{count}} событий из выбранного источника.",
+                "no_data": "События в выбранном источнике не найдены.",
+                "error": "Не удалось найти события: {{error}}"
+            },
+            "event_list_modal": {
+                "title": "Выберите сейсмическое событие",
+                "earthquake_at": "Землетрясение в {{time}}",
+                "p_wave_arrival": "Приход P-волны {{time}} секунд",
+                "s_wave_arrival": "Приход S-волны {{time}} секунд",
+                "epicenter_distance": "Эпицентр {{distance}} км",
+                "earthquake_depth": "Глубина {{depth}} км",
+                "selected_an_event": "Выбрано землетрясение в регионе {{region}} в {{time}}."
+            },
+            "data_export": {
+                "title": "Экспорт данных",
+                "file_format": "Формат файла",
+                "channel_code": "Код канала",
+                "export_button": "Получить данные",
+                "exporting": "Экспорт канала {{channel}} в формат {{format}}.",
+                "success": "Канал {{channel}} успешно экспортирован в формат {{format}}.",
+                "error": "Не удалось экспортировать канал {{channel}} в формат {{format}}: {{error}}"
+            },
+            "search_records": {
+                "title": "Запрос по времени",
+                "start_time": "Время начала",
+                "end_time": "Время окончания",
+                "invalid_time": "Время начала должно быть раньше времени окончания.",
+                "search_button": "Искать записи",
+                "searching": "Поиск сейсмических записей в базе данных.",
+                "success": "Найдено {{count}} сейсмических записей в базе данных.",
+                "no_data": "Сейсмические записи в базе данных не найдены.",
+                "error": "Не удалось найти записи: {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "Заблокировать макет",
+                "unlock_button": "Разблокировать макет"
+            },
+            "reset_layout": {
+                "reset_button": "Сбросить все",
+                "confirm_message": "Вы уверены, что хотите сбросить макет?",
+                "confirm_title": "Подтвердить сброс",
+                "confirm_button": "Сбросить",
+                "cancel_button": "Отмена"
+            },
+            "share_link": {
+                "share_button": "Поделиться ссылкой",
+                "link_copied": "Ссылка скопирована в буфер обмена."
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "Информация о станции",
+                "name": "Название",
+                "country": "Страна",
+                "place": "Место",
+                "affiliation": "Принадлежность",
+                "channels": "Каналы"
+            },
+            "device_info": {
+                "title": "Информация об устройстве",
+                "product_model": "Модель продукта",
+                "device_id": "ID устройства",
+                "link_protocol": "Протокол связи",
+                "packet_interval": "Интервал пакетов",
+                "gnss_active": "GNSS активен"
+            },
+            "device_status": {
+                "title": "Статус устройства",
+                "sample_rate": "Частота дискретизации",
+                "latitude": "Широта",
+                "longitude": "Долгота",
+                "elevation": "Высота",
+                "temperature": "Температура"
+            },
+            "link_status": {
+                "title": "Статус соединения",
+                "started_at": "Запущено в",
+                "last_frame": "Последний кадр",
+                "frames": "Кадры",
+                "errors": "Ошибки",
+                "messages": "Сообщения"
+            },
+            "connectivity": {
+                "loading": "Подключение к станции...",
+                "success": "Подключено к станции, сервер работает {{uptime}} секунд, обновлено в {{updatedAt}}.",
+                "error": "Произошла ошибка при подключении к станции, проверьте соединение."
+            },
+            "station_location": {
+                "title": "Местоположение станции"
+            },
+            "service_status": {
+                "title": "Статус службы"
+            },
+            "cpu_usage": {
+                "title": "Загрузка ЦП"
+            },
+            "memory_usage": {
+                "title": "Использование памяти"
+            },
+            "disk_usage": {
+                "title": "Использование диска"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "Ой! Страница не найдена.",
+            "check_your_url": "Пожалуйста, проверьте URL и попробуйте снова.",
+            "go_back_button": "Назад"
+        },
+        "RealTime": {
+            "reset_layout": {
+                "reset_button": "Сбросить все",
+                "confirm_message": "Вы уверены, что хотите сбросить макет?",
+                "confirm_title": "Подтвердить сброс",
+                "confirm_button": "Сбросить",
+                "cancel_button": "Отмена"
+            },
+            "layout_locker": {
+                "lock_button": "Заблокировать макет",
+                "unlock_button": "Разблокировать макет"
+            },
+            "connectivity": {
+                "connecting": "Нет соединения, подключение...",
+                "connected": "Подключено, последнее обновление в {{updatedAt}}."
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} SPS",
+                "channels": "{{num}} каналов",
+                "retention": "{{retention}} секунд"
+            }
+        },
+        "Settings": {
+            "Dangerous": {
+                "title": "Опасная зона",
+                "purge_waveform_records": {
+                    "title": "Удалить записи волновых форм",
+                    "description": "Это удалит все записи волновых форм в базе данных, операция необратима.",
+                    "submit_button": "Удалить записи",
+                    "confirm_title": "Подтвердить удаление",
+                    "confirm_message": "Вы уверены, что хотите удалить все записи волновых форм?",
+                    "confirm_button": "Удалить",
+                    "cancel_button": "Отмена",
+                    "purging": "Удаление записей волновых форм...",
+                    "success": "Записи волновых форм успешно удалены.",
+                    "error": "Не удалось удалить записи волновых форм: {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "Удалить файлы MiniSEED",
+                    "description": "Это удалит все файлы MiniSEED в системе, операция необратима.",
+                    "submit_button": "Удалить MiniSEED",
+                    "confirm_title": "Подтвердить удаление",
+                    "confirm_message": "Вы уверены, что хотите удалить все файлы MiniSEED?",
+                    "confirm_button": "Удалить",
+                    "cancel_button": "Отмена",
+                    "purging": "Удаление файлов MiniSEED...",
+                    "success": "Файлы MiniSEED успешно удалены.",
+                    "error": "Не удалось удалить файлы MiniSEED: {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "Удалить файлы Helicorder",
+                    "description": "Это удалит все файлы Helicorder в системе, операция необратима.",
+                    "submit_button": "Удалить Helicorder",
+                    "confirm_title": "Подтвердить удаление",
+                    "confirm_message": "Вы уверены, что хотите удалить все файлы Helicorder?",
+                    "confirm_button": "Удалить",
+                    "cancel_button": "Отмена",
+                    "purging": "Удаление файлов Helicorder...",
+                    "success": "Файлы Helicorder успешно удалены.",
+                    "error": "Не удалось удалить файлы Helicorder: {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "Сбросить конфигурацию станции",
+                    "description": "Это сбросит всю конфигурацию станции, операция необратима, для применения требуется перезагрузка.",
+                    "submit_button": "Сбросить станцию",
+                    "confirm_title": "Подтвердить сброс",
+                    "confirm_message": "Вы хотите сбросить всю конфигурацию станции?",
+                    "confirm_button": "Сбросить",
+                    "cancel_button": "Отмена",
+                    "resetting": "Сброс конфигурации станции...",
+                    "success": "Конфигурация станции успешно сброшена.",
+                    "error": "Не удалось сбросить конфигурацию станции: {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "Сбросить конфигурацию службы",
+                    "description": "Это сбросит всю конфигурацию службы, операция необратима, для применения требуется перезагрузка.",
+                    "submit_button": "Сбросить службу",
+                    "confirm_title": "Подтвердить сброс",
+                    "confirm_message": "Вы хотите сбросить всю конфигурацию службы?",
+                    "confirm_button": "Сбросить",
+                    "cancel_button": "Отмена",
+                    "resetting": "Сброс конфигурации службы...",
+                    "success": "Конфигурация службы успешно сброшена.",
+                    "error": "Не удалось сбросить конфигурацию службы: {{error}}"
+                }
+            },
+            "Metadata": {
+                "title": "Метаданные станции"
+            },
+            "Preference": {
+                "title": "Веб-настройки",
+                "reset_layout_preference": {
+                    "title": "Сбросить настройки макета",
+                    "description": "Это сбросит все настройки макета, операция необратима.",
+                    "submit_button": "Сбросить настройки",
+                    "confirm_title": "Подтвердить сброс",
+                    "confirm_message": "Вы уверены, что хотите сбросить все настройки макета?",
+                    "confirm_button": "Сбросить",
+                    "cancel_button": "Отмена",
+                    "success": "Настройки макета успешно сброшены."
+                }
+            },
+            "Service": {
+                "title": "Управление службой",
+                "restart_service": {
+                    "submit_button": "Перезапустить",
+                    "confirm_title": "Подтвердить перезапуск",
+                    "confirm_message": "Вы уверены, что хотите перезапустить службу?",
+                    "confirm_button": "Перезапустить",
+                    "cancel_button": "Отмена",
+                    "restarting": "Перезапуск службы...",
+                    "success": "Служба успешно перезапущена.",
+                    "error": "Не удалось перезапустить службу: {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "Запустить",
+                    "confirm_title": "Подтвердить запуск",
+                    "confirm_message": "Вы уверены, что хотите запустить службу?",
+                    "confirm_button": "Запустить",
+                    "cancel_button": "Отмена",
+                    "starting": "Запуск службы...",
+                    "success": "Служба успешно запущена.",
+                    "error": "Не удалось запустить службу: {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "Остановить",
+                    "confirm_title": "Подтвердить остановку",
+                    "confirm_message": "Вы уверены, что хотите остановить службу?",
+                    "confirm_button": "Остановить",
+                    "cancel_button": "Отмена",
+                    "stopping": "Остановка службы...",
+                    "success": "Служба успешно остановлена.",
+                    "error": "Не удалось остановить службу: {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "Сбросить",
+                    "confirm_title": "Подтвердить сброс",
+                    "confirm_message": "Вы уверены, что хотите сбросить службу?",
+                    "confirm_button": "Сбросить",
+                    "cancel_button": "Отмена",
+                    "resetting": "Сброс службы...",
+                    "success": "Служба успешно сброшена.",
+                    "error": "Не удалось сбросить службу: {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "Редактировать",
+                    "updating": "Применение новых изменений...",
+                    "success": "Изменения применены.",
+                    "error": "Не удалось обновить конфигурацию службы: {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "Редактирование службы: {{name}}"
+                },
+                "service_status": {
+                    "yes": "Да",
+                    "no": "Нет",
+                    "is_running": "Работает",
+                    "restarts": "Перезапуски",
+                    "stopped_at": "Остановлено в",
+                    "started_at": "Запущено в",
+                    "updated_at": "Обновлено в"
+                }
+            },
+            "Station": {
+                "title": "Настройки станции",
+                "update_station": {
+                    "field_required": "Это поле обязательно для заполнения.",
+                    "updating": "Обновление конфигурации станции...",
+                    "success": "Конфигурация станции успешно обновлена.",
+                    "error": "Не удалось обновить конфигурацию станции: {{error}}"
+                }
+            },
+            "Users": {
+                "title": "Управление пользователями",
+                "search_users": {
+                    "placeholder": "Поиск пользователей"
+                },
+                "refresh_list": {
+                    "submit_button": "Обновить",
+                    "refreshing": "Обновление списка пользователей...",
+                    "success": "Список пользователей успешно обновлен.",
+                    "error": "Не удалось обновить список пользователей: {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "Удалить пользователей",
+                    "confirm_title": "Подтвердить удаление",
+                    "confirm_message": "Вы уверены, что хотите удалить выбранных пользователей?",
+                    "confirm_button": "Удалить",
+                    "cancel_button": "Отмена",
+                    "removing": "Удаление выбранных пользователей...",
+                    "success": "{{num}} пользователь(ей) удалено.",
+                    "error": "Не удалось удалить выбранных пользователей: {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "Создать пользователя",
+                    "creating": "Создание нового пользователя...",
+                    "success": "Пользователь {{username}} создан.",
+                    "error": "Не удалось создать нового пользователя: {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "Создать нового пользователя",
+                    "username": {
+                        "label": "Имя пользователя",
+                        "placeholder": "Имя нового пользователя"
+                    },
+                    "password": {
+                        "label": "Пароль",
+                        "placeholder": "Пароль нового пользователя"
+                    },
+                    "admin": {
+                        "label": "Пользователь с правами администратора"
+                    },
+                    "create_button": "Создать"
+                },
+                "edit_user": {
+                    "submit_button": "Редактировать",
+                    "updating": "Обновление пользователя...",
+                    "success": "Пользователь {{username}} обновлен.",
+                    "error": "Не удалось обновить пользователя: {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "Редактировать пользователя",
+                    "username": {
+                        "label": "Имя пользователя",
+                        "placeholder": "Пусто, если не менять."
+                    },
+                    "password": {
+                        "label": "Пароль",
+                        "placeholder": "Пусто, если не менять."
+                    },
+                    "admin": {
+                        "label": "Пользователь с правами администратора"
+                    },
+                    "update_button": "Обновить"
+                },
+                "remove_user": {
+                    "submit_button": "Удалить",
+                    "confirm_title": "Подтвердить удаление",
+                    "confirm_message": "Вы уверены, что хотите удалить пользователя {{username}}?",
+                    "confirm_button": "Удалить",
+                    "cancel_button": "Отмена",
+                    "removing": "Удаление пользователя...",
+                    "success": "Пользователь {{username}} удален.",
+                    "error": "Не удалось удалить пользователя: {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "Да",
+                    "no": "Нет",
+                    "never": "Никогда",
+                    "id": "ID",
+                    "user_id": "ID пользователя",
+                    "username": "Имя пользователя",
+                    "admin": "Админ",
+                    "created_at": "Создано",
+                    "last_login": "Последний вход",
+                    "user_ip": "IP пользователя",
+                    "user_agent": "User Agent",
+                    "updated_at": "Обновлено",
+                    "actions": "Действия"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "Доступно новое обновление. Хотите обновить сейчас?",
+            "confirm_title": "Доступно обновление",
+            "confirm_button": "Обновить",
+            "cancel_button": "Отмена"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "Вы уверены, что хотите выйти?",
+            "confirm_title": "Выход",
+            "confirm_button": "OK",
+            "cancel_button": "Отмена"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "Имя пользователя",
+            "placeholder": "Ваше имя пользователя"
+        },
+        "password": {
+            "label": "Пароль",
+            "placeholder": "Ваш пароль"
+        },
+        "captcha": {
+            "label": "Введите капчу",
+            "loading": "Загрузка капчи...",
+            "placeholder": "Код капчи",
+            "refreshing": "Обновление капчи.",
+            "refresh_success": "Капча успешно обновлена.",
+            "refresh_error": "Не удалось обновить капчу."
+        },
+        "signin": {
+            "button": "Войти",
+            "loading": "Вход в систему...",
+            "success": "Вы успешно вошли в систему.",
+            "error": "Ошибка входа."
+        }
+    }
+}

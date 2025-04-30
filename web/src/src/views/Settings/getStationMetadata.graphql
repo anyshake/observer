@@ -1,0 +1,3 @@
+query getStationMetadata($format: String!) {
+    getStationMetadata(format: $format)
+}

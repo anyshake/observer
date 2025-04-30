@@ -1,4 +1,4 @@
 Dockerfile
 
-build
-frontend/src/node_modules
+build/dist
+web/src/node_modules

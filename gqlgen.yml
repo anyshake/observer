@@ -1,21 +1,24 @@
 schema:
-  - server/endpoints/v2/*.graphqls
+  - internal/server/router/graph/*.graphqls
 
 exec:
-  filename: server/endpoints/v2/generated.go
-  package: v2
+  filename: internal/server/router/graph/generated.go
+  package: graph_resolver
 
 model:
-  filename: server/endpoints/v2/model/models_gen.go
-  package: model
+  filename: internal/server/router/graph/model/models_gen.go
+  package: graph_model
 
 resolver:
   layout: follow-schema
-  dir: server/endpoints/v2
-  package: v2
+  dir: internal/server/router/graph
+  package: graph_resolver
   filename_template: "{name}.resolvers.go"
 
 models:
+  Int32:
+    model:
+      - github.com/99designs/gqlgen/graphql.Int32
   Int64:
     model:
       - github.com/99designs/gqlgen/graphql.Int64

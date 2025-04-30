@@ -1,0 +1,169 @@
+scalar Int32
+scalar Int64
+scalar Map
+scalar Any
+
+type systemStatus {
+  cpu: Float!
+  memory: Float!
+  disk: Float!
+  uptime: Int64!
+}
+
+type deviceConfig {
+  packetInterval: Int64!
+  sampleRate: Int!
+  channelCodes: [String!]!
+  gnssEnabled: Boolean!
+  model: String!
+  protocol: String!
+}
+
+type deviceStatus {
+  startedAt: Int64!
+  updatedAt: Int64!
+  frames: Int64!
+  errors: Int64!
+  messages: Int64!
+}
+
+type deviceInfo {
+  latitude: Float
+  longitude: Float
+  elevation: Float
+  temperature: Float
+}
+
+type _channelData {
+  channelCode: String!
+  channelId: Int!
+  data: [Int32!]!
+}
+
+type seisRecord {
+  timestamp: Int64!
+  sampleRate: Int!
+  channelData: [_channelData!]!
+}
+
+type seisEventSource {
+  id: String!
+  country: String!
+  locales: Map!
+  defaultLocale: String!
+}
+
+type seisEvent {
+  verfied: Boolean!
+  timestamp: Int64!
+  eventId: String!
+  region: String!
+  depth: Float!
+  latitude: Float!
+  longitude: Float!
+  magnitude: Map!
+  distance: Float!
+  estimation: [Float!]! # [P-wave travel time, S-wave travel time]
+}
+
+type serviceStatus {
+  serviceId: String!
+  name: String!
+  description: String!
+  restarts: Int!
+  startedAt: Int64!
+  stoppedAt: Int64!
+  updatedAt: Int64!
+  isRunning: Boolean!
+}
+
+type serviceAsset {
+  namespace: String!
+  size: Int64!
+  filePath: String!
+  fileName: String!
+  modifiedAt: Int64!
+}
+
+type configConstraint {
+  namespace: String!
+  key: String!
+  name: String!
+  description: String!
+  configType: String!
+  isRequired: Boolean!
+  currentValue: Any!
+  options: Any
+}
+
+type serviceConfigConstraint {
+  serviceName: String!
+  serviceId: String!
+  constraints: [configConstraint]!
+}
+
+type sysUser {
+  createdAt: Int64!
+  userId: String!
+  username: String!
+  lastLogin: Int64!
+  userIp: String!
+  userAgent: String!
+  admin: Boolean!
+  updatedAt: Int64!
+}
+
+type Mutation {
+  # user management - admin only
+  createSysUser(username: String!, password: String!, admin: Boolean!): String!
+  removeSysUser(userId: String!): Boolean!
+  updateSysUser(
+    userId: String!
+    username: String!
+    password: String
+    admin: Boolean!
+  ): Boolean!
+
+  # data management - admin only
+  purgeSeisRecords: Boolean!
+  purgeMiniSeedFiles: Boolean!
+  purgeHelicorderFiles: Boolean!
+
+  # station management - admin only
+  updateStationConfig(key: String!, value: Any!): Boolean!
+  restoreStationConfig: Boolean!
+
+  # service management - admin only
+  stopService(serviceId: String!): Boolean!
+  startService(serviceId: String!): Boolean!
+  restartService(serviceId: String!): Boolean!
+  restoreServiceConfig(serviceId: String): Boolean!
+  updateServiceConfig(serviceId: String!, key: String!, val: Any!): Boolean!
+}
+
+type Query {
+  getCurrentTime: Int64!
+  getStationConfig: Map!
+  getSystemStatus: systemStatus!
+
+  getDeviceId: String! # return ******** to non-admin users
+  getDeviceConfig: deviceConfig!
+  getDeviceStatus: deviceStatus!
+  getDeviceInfo: deviceInfo!
+  getStationMetadata(format: String!): String!
+
+  getServiceConfigConstraint: [serviceConfigConstraint!]! # admin only
+  getStationConfigConstraint: [configConstraint!]! # admin only
+  getServiceStatus: [serviceStatus!]
+
+  getEventSource: [seisEventSource]!
+  getEventsBySource(code: String!): [seisEvent!]!
+  getSeisRecordsByTime(startTime: Int64!, endTime: Int64!): [seisRecord]!
+
+  getMiniSeedFiles: [serviceAsset]!
+  getHelicorderFiles: [serviceAsset]!
+
+  getCurrentUser: sysUser!
+  getSysUsers: [sysUser!]! # admin only
+  isOfficialProduct: Boolean! # admin only
+}

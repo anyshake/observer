@@ -1,0 +1,16 @@
+query getFileListData {
+    getMiniSeedFiles {
+        namespace
+        size
+        filePath
+        fileName
+        modifiedAt
+    }
+    getHelicorderFiles {
+        namespace
+        size
+        filePath
+        fileName
+        modifiedAt
+    }
+}

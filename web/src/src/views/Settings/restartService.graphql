@@ -1,0 +1,3 @@
+mutation restartService($serviceId: String!) {
+    restartService(serviceId: $serviceId)
+}

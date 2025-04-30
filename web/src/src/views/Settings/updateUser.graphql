@@ -1,0 +1,3 @@
+mutation updateUser($userId: String!, $username: String!, $password: String, $admin: Boolean!) {
+    updateSysUser(userId: $userId, username: $username, password: $password, admin: $admin)
+}

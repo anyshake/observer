@@ -1,0 +1,3 @@
+mutation createUser($username: String!, $password: String!, $admin: Boolean!) {
+    createSysUser(username: $username, password: $password, admin: $admin)
+}

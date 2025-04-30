@@ -1,0 +1,19 @@
+mutation purgeSeisRecords {
+    purgeSeisRecords
+}
+
+mutation purgeMiniSeedFiles {
+    purgeMiniSeedFiles
+}
+
+mutation purgeHelicorderFiles {
+    purgeHelicorderFiles
+}
+
+mutation restoreStationConfig {
+    restoreStationConfig
+}
+
+mutation restoreServiceConfig($serviceId: String) {
+    restoreServiceConfig(serviceId: $serviceId)
+}

@@ -1,0 +1,456 @@
+{
+    "components": {
+        "ErrorPage": {
+            "something_went_wrong": "Hoppa! Bir şeyler ters gitti.",
+            "try_again_later": "Lütfen sayfayı yenilemeyi deneyin veya daha sonra tekrar gelin."
+        },
+        "TypedInput": {
+            "yes": "Evet",
+            "no": "Hayır",
+            "add_new_item": "Yeni öğe girin.",
+            "editing_list": "{{fieldName}} Listesi Düzenleniyor"
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "Dosya Adı",
+                "time": "Değiştirme Zamanı",
+                "size": "Dosya Boyutu",
+                "actions": "Eylemler"
+            },
+            "miniseed_list": {
+                "title": "Günlük MiniSEED",
+                "download": "İndir",
+                "search": "Ara"
+            },
+            "helicorder_list": {
+                "title": "Helicorder Listesi",
+                "download": "İndir",
+                "search": "Ara"
+            },
+            "request_file": {
+                "requesting": "{{fileName}} dosyasını indirmek için bağlantı isteniyor.",
+                "success": "{{fileName}} dosyasını indirmek için bağlantı alındı.",
+                "error": "{{fileName}} için dosya bağlantısı istenemedi: {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "Olay Sorgusu",
+                "data_agency": "Veri Ajansı",
+                "search_button": "Olayları Ara",
+                "searching": "Seçili kaynaktan olaylar aranıyor.",
+                "success": "Seçili kaynaktan {{count}} olay bulundu.",
+                "no_data": "Seçili kaynakta olay bulunamadı.",
+                "error": "Olaylar aranamadı: {{error}}"
+            },
+            "event_list_modal": {
+                "title": "Bir Sismik Olay Seçin",
+                "earthquake_at": "{{time}} zamanında deprem",
+                "p_wave_arrival": "P-Dalgası Varışı {{time}} saniye",
+                "s_wave_arrival": "S-Dalgası Varışı {{time}} saniye",
+                "epicenter_distance": "Episantr {{distance}} km",
+                "earthquake_depth": "Derinlik {{depth}} km",
+                "selected_an_event": "{{region}} bölgesinde {{time}} zamanında bir deprem olayı seçildi."
+            },
+            "data_export": {
+                "title": "Veri Dışa Aktarma",
+                "file_format": "Dosya Formatı",
+                "channel_code": "Kanal Kodu",
+                "export_button": "Veri Al",
+                "exporting": "{{channel}} kanalı {{format}} formatına aktarılıyor.",
+                "success": "{{channel}} kanalı {{format}} formatına başarıyla aktarıldı.",
+                "error": "{{channel}} kanalı {{format}} formatına aktarılamadı: {{error}}"
+            },
+            "search_records": {
+                "title": "Zaman Sorgusu",
+                "start_time": "Başlangıç Zamanı",
+                "end_time": "Bitiş Zamanı",
+                "invalid_time": "Başlangıç zamanı bitiş zamanından önce olmalıdır.",
+                "search_button": "Kayıtları Ara",
+                "searching": "Veritabanından sismik kayıtlar aranıyor.",
+                "success": "Veritabanında {{count}} sismik kayıt bulundu.",
+                "no_data": "Veritabanında sismik kayıt bulunamadı.",
+                "error": "Kayıtlar aranamadı: {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "Düzeni Kilitle",
+                "unlock_button": "Düzen Kilidini Aç"
+            },
+            "reset_layout": {
+                "reset_button": "Tümünü Sıfırla",
+                "confirm_message": "Düzeni sıfırlamak istediğinizden emin misiniz?",
+                "confirm_title": "Sıfırlamayı Onayla",
+                "confirm_button": "Sıfırla",
+                "cancel_button": "İptal"
+            },
+            "share_link": {
+                "share_button": "Bağlantıyı Paylaş",
+                "link_copied": "Paylaşılan bağlantı panoya kopyalandı."
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "İstasyon Bilgileri",
+                "name": "Ad",
+                "country": "Ülke",
+                "place": "Yer",
+                "affiliation": "Bağlılık",
+                "channels": "Kanallar"
+            },
+            "device_info": {
+                "title": "Cihaz Bilgileri",
+                "product_model": "Ürün Modeli",
+                "device_id": "Cihaz ID",
+                "link_protocol": "Bağlantı Protokolü",
+                "packet_interval": "Paket Aralığı",
+                "gnss_active": "GNSS Aktif"
+            },
+            "device_status": {
+                "title": "Cihaz Durumu",
+                "sample_rate": "Örnekleme Hızı",
+                "latitude": "Enlem",
+                "longitude": "Boylam",
+                "elevation": "Yükseklik",
+                "temperature": "Sıcaklık"
+            },
+            "link_status": {
+                "title": "Bağlantı Durumu",
+                "started_at": "Başlama Zamanı",
+                "last_frame": "Son Çerçeve",
+                "frames": "Çerçeveler",
+                "errors": "Hatalar",
+                "messages": "Mesajlar"
+            },
+            "connectivity": {
+                "loading": "İstasyona bağlanılıyor...",
+                "success": "İstasyona bağlandı, sunucu {{uptime}} saniyedir aktif, {{updatedAt}} tarihinde güncellendi.",
+                "error": "İstasyona bağlanırken hata oluştu, lütfen bağlantınızı kontrol edin."
+            },
+            "station_location": {
+                "title": "İstasyon Konumu"
+            },
+            "service_status": {
+                "title": "Hizmet Durumu"
+            },
+            "cpu_usage": {
+                "title": "CPU Kullanımı"
+            },
+            "memory_usage": {
+                "title": "Bellek Kullanımı"
+            },
+            "disk_usage": {
+                "title": "Disk Kullanımı"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "Hoppa! Sayfa bulunamadı.",
+            "check_your_url": "Lütfen URL'nizi kontrol edin ve tekrar deneyin.",
+            "go_back_button": "Geri Git"
+        },
+        "RealTime": {
+            "reset_layout": {
+                "reset_button": "Tümünü Sıfırla",
+                "confirm_message": "Düzeni sıfırlamak istediğinizden emin misiniz?",
+                "confirm_title": "Sıfırlamayı Onayla",
+                "confirm_button": "Sıfırla",
+                "cancel_button": "İptal"
+            },
+            "layout_locker": {
+                "lock_button": "Düzeni Kilitle",
+                "unlock_button": "Düzen Kilidini Aç"
+            },
+            "connectivity": {
+                "connecting": "Bağlantı yok, şimdi bağlanılıyor...",
+                "connected": "Bağlandı, son güncelleme {{updatedAt}}."
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} SPS",
+                "channels": "{{num}} Kanal",
+                "retention": "{{retention}} saniye"
+            }
+        },
+        "Settings": {
+            "Dangerous": {
+                "title": "Tehlikeli Bölge",
+                "purge_waveform_records": {
+                    "title": "Dalga Formu Kayıtlarını Temizle",
+                    "description": "Bu, veritabanındaki tüm dalga formu kayıtlarını silecektir, işlem geri alınamaz.",
+                    "submit_button": "Kayıtları Temizle",
+                    "confirm_title": "Temizlemeyi Onayla",
+                    "confirm_message": "Tüm dalga formu kayıtlarını temizlemek istediğinizden emin misiniz?",
+                    "confirm_button": "Temizle",
+                    "cancel_button": "İptal",
+                    "purging": "Dalga formu kayıtları temizleniyor...",
+                    "success": "Dalga formu kayıtları başarıyla temizlendi.",
+                    "error": "Dalga formu kayıtları temizlenemedi: {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "MiniSEED Dosyalarını Temizle",
+                    "description": "Bu, sistemdeki tüm MiniSEED dosyalarını silecektir, işlem geri alınamaz.",
+                    "submit_button": "MiniSEED'i Temizle",
+                    "confirm_title": "Temizlemeyi Onayla",
+                    "confirm_message": "Tüm MiniSEED dosyalarını temizlemek istediğinizden emin misiniz?",
+                    "confirm_button": "Temizle",
+                    "cancel_button": "İptal",
+                    "purging": "MiniSEED dosyaları temizleniyor...",
+                    "success": "MiniSEED dosyaları başarıyla temizlendi.",
+                    "error": "MiniSEED dosyaları temizlenemedi: {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "Helicorder Dosyalarını Temizle",
+                    "description": "Bu, sistemdeki tüm helicorder dosyalarını silecektir, işlem geri alınamaz.",
+                    "submit_button": "Helicorder'ı Temizle",
+                    "confirm_title": "Temizlemeyi Onayla",
+                    "confirm_message": "Tüm helicorder dosyalarını temizlemek istediğinizden emin misiniz?",
+                    "confirm_button": "Temizle",
+                    "cancel_button": "İptal",
+                    "purging": "Helicorder dosyaları temizleniyor...",
+                    "success": "Helicorder dosyaları başarıyla temizlendi.",
+                    "error": "Helicorder dosyaları temizlenemedi: {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "İstasyon Yapılandırmasını Sıfırla",
+                    "description": "Bu, tüm istasyon yapılandırmasını sıfırlayacaktır, işlem geri alınamaz, etkili olması için yeniden başlatma gerekir.",
+                    "submit_button": "İstasyonu Sıfırla",
+                    "confirm_title": "Sıfırlamayı Onayla",
+                    "confirm_message": "Tüm istasyon yapılandırmasını sıfırlamak istiyor musunuz?",
+                    "confirm_button": "Sıfırla",
+                    "cancel_button": "İptal",
+                    "resetting": "İstasyon yapılandırması sıfırlanıyor...",
+                    "success": "İstasyon yapılandırması başarıyla sıfırlandı.",
+                    "error": "İstasyon yapılandırması sıfırlanamadı: {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "Hizmet Yapılandırmasını Sıfırla",
+                    "description": "Bu, tüm hizmet yapılandırmasını sıfırlayacaktır, işlem geri alınamaz, etkili olması için yeniden başlatma gerekir.",
+                    "submit_button": "Hizmeti Sıfırla",
+                    "confirm_title": "Sıfırlamayı Onayla",
+                    "confirm_message": "Tüm hizmet yapılandırmasını sıfırlamak istiyor musunuz?",
+                    "confirm_button": "Sıfırla",
+                    "cancel_button": "İptal",
+                    "resetting": "Hizmet yapılandırması sıfırlanıyor...",
+                    "success": "Hizmet yapılandırması başarıyla sıfırlandı.",
+                    "error": "Hizmet yapılandırması sıfırlanamadı: {{error}}"
+                }
+            },
+            "Metadata": {
+                "title": "İstasyon Meta Verileri"
+            },
+            "Preference": {
+                "title": "Web Tercihleri",
+                "reset_layout_preference": {
+                    "title": "Düzen Tercihlerini Sıfırla",
+                    "description": "Bu, tüm düzen tercihlerini sıfırlayacaktır, işlem geri alınamaz.",
+                    "submit_button": "Tercihleri Sıfırla",
+                    "confirm_title": "Sıfırlamayı Onayla",
+                    "confirm_message": "Tüm düzen tercihlerini sıfırlamak istediğinizden emin misiniz?",
+                    "confirm_button": "Sıfırla",
+                    "cancel_button": "İptal",
+                    "success": "Düzen tercihleri başarıyla sıfırlandı."
+                }
+            },
+            "Service": {
+                "title": "Hizmet Kontrolü",
+                "restart_service": {
+                    "submit_button": "Yeniden Başlat",
+                    "confirm_title": "Yeniden Başlatmayı Onayla",
+                    "confirm_message": "Hizmeti yeniden başlatmak istediğinizden emin misiniz?",
+                    "confirm_button": "Yeniden Başlat",
+                    "cancel_button": "İptal",
+                    "restarting": "Hizmet yeniden başlatılıyor...",
+                    "success": "Hizmet başarıyla yeniden başlatıldı.",
+                    "error": "Hizmet yeniden başlatılamadı: {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "Başlat",
+                    "confirm_title": "Başlatmayı Onayla",
+                    "confirm_message": "Hizmeti başlatmak istediğinizden emin misiniz?",
+                    "confirm_button": "Başlat",
+                    "cancel_button": "İptal",
+                    "starting": "Hizmet başlatılıyor...",
+                    "success": "Hizmet başarıyla başlatıldı.",
+                    "error": "Hizmet başlatılamadı: {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "Durdur",
+                    "confirm_title": "Durdurmayı Onayla",
+                    "confirm_message": "Hizmeti durdurmak istediğinizden emin misiniz?",
+                    "confirm_button": "Durdur",
+                    "cancel_button": "İptal",
+                    "stopping": "Hizmet durduruluyor...",
+                    "success": "Hizmet başarıyla durduruldu.",
+                    "error": "Hizmet durdurulamadı: {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "Sıfırla",
+                    "confirm_title": "Sıfırlamayı Onayla",
+                    "confirm_message": "Hizmeti sıfırlamak istediğinizden emin misiniz?",
+                    "confirm_button": "Sıfırla",
+                    "cancel_button": "İptal",
+                    "resetting": "Hizmet sıfırlanıyor...",
+                    "success": "Hizmet başarıyla sıfırlandı.",
+                    "error": "Hizmet sıfırlanamadı: {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "Düzenle",
+                    "updating": "Yeni değişiklikler uygulanıyor...",
+                    "success": "Değişiklikler uygulandı.",
+                    "error": "Hizmet yapılandırması güncellenemedi: {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "Hizmet Düzenleniyor: {{name}}"
+                },
+                "service_status": {
+                    "yes": "Evet",
+                    "no": "Hayır",
+                    "is_running": "Çalışıyor",
+                    "restarts": "Yeniden Başlatmalar",
+                    "stopped_at": "Durdurulma Zamanı",
+                    "started_at": "Başlama Zamanı",
+                    "updated_at": "Güncellenme Zamanı"
+                }
+            },
+            "Station": {
+                "title": "İstasyon Ayarları",
+                "update_station": {
+                    "field_required": "Bu alan zorunludur.",
+                    "updating": "İstasyon yapılandırması güncelleniyor...",
+                    "success": "İstasyon yapılandırması başarıyla güncellendi.",
+                    "error": "İstasyon yapılandırması güncellenemedi: {{error}}"
+                }
+            },
+            "Users": {
+                "title": "Kullanıcı Yönetimi",
+                "search_users": {
+                    "placeholder": "Kullanıcı ara"
+                },
+                "refresh_list": {
+                    "submit_button": "Yenile",
+                    "refreshing": "Kullanıcı listesi yenileniyor...",
+                    "success": "Kullanıcı listesi başarıyla yenilendi.",
+                    "error": "Kullanıcı listesi yenilenemedi: {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "Kullanıcıları Kaldır",
+                    "confirm_title": "Kaldırmayı Onayla",
+                    "confirm_message": "Seçili kullanıcıları kaldırmak istediğinizden emin misiniz?",
+                    "confirm_button": "Kaldır",
+                    "cancel_button": "İptal",
+                    "removing": "Seçili kullanıcılar kaldırılıyor...",
+                    "success": "{{num}} kullanıcı kaldırıldı.",
+                    "error": "Seçili kullanıcılar kaldırılamadı: {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "Kullanıcı Oluştur",
+                    "creating": "Yeni kullanıcı oluşturuluyor...",
+                    "success": "{{username}} kullanıcısı oluşturuldu.",
+                    "error": "Yeni kullanıcı oluşturulamadı: {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "Yeni Kullanıcı Oluştur",
+                    "username": {
+                        "label": "Kullanıcı Adı",
+                        "placeholder": "Yeni kullanıcının adı"
+                    },
+                    "password": {
+                        "label": "Şifre",
+                        "placeholder": "Yeni kullanıcının şifresi"
+                    },
+                    "admin": {
+                        "label": "Yönetici ayrıcalıklarına sahip kullanıcı"
+                    },
+                    "create_button": "Oluştur"
+                },
+                "edit_user": {
+                    "submit_button": "Düzenle",
+                    "updating": "Kullanıcı güncelleniyor...",
+                    "success": "{{username}} kullanıcısı güncellendi.",
+                    "error": "Kullanıcı güncellenemedi: {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "Kullanıcıyı Düzenle",
+                    "username": {
+                        "label": "Kullanıcı Adı",
+                        "placeholder": "Değişiklik yoksa boş bırakın."
+                    },
+                    "password": {
+                        "label": "Şifre",
+                        "placeholder": "Değişiklik yoksa boş bırakın."
+                    },
+                    "admin": {
+                        "label": "Yönetici ayrıcalıklarına sahip kullanıcı"
+                    },
+                    "update_button": "Güncelle"
+                },
+                "remove_user": {
+                    "submit_button": "Kaldır",
+                    "confirm_title": "Kaldırmayı Onayla",
+                    "confirm_message": "{{username}} kullanıcısını kaldırmak istediğinizden emin misiniz?",
+                    "confirm_button": "Kaldır",
+                    "cancel_button": "İptal",
+                    "removing": "Kullanıcı kaldırılıyor...",
+                    "success": "{{username}} kullanıcısı kaldırıldı.",
+                    "error": "Kullanıcı kaldırılamadı: {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "Evet",
+                    "no": "Hayır",
+                    "never": "Asla",
+                    "id": "ID",
+                    "user_id": "Kullanıcı ID",
+                    "username": "Kullanıcı Adı",
+                    "admin": "Yönetici",
+                    "created_at": "Oluşturulma Zamanı",
+                    "last_login": "Son Giriş",
+                    "user_ip": "Kullanıcı IP",
+                    "user_agent": "User Agent",
+                    "updated_at": "Güncellenme Zamanı",
+                    "actions": "Eylemler"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "Yeni bir güncelleme mevcut, şimdi güncellemek ister misiniz?",
+            "confirm_title": "Güncelleme Mevcut",
+            "confirm_button": "Güncelle",
+            "cancel_button": "İptal"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "Oturumu kapatmak istediğinizden emin misiniz?",
+            "confirm_title": "Oturumu Kapat",
+            "confirm_button": "Tamam",
+            "cancel_button": "İptal"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "Kullanıcı Adı",
+            "placeholder": "Kullanıcı Adınız"
+        },
+        "password": {
+            "label": "Şifre",
+            "placeholder": "Şifreniz"
+        },
+        "captcha": {
+            "label": "Captcha'yı Girin",
+            "loading": "Captcha yükleniyor...",
+            "placeholder": "Captcha kodu",
+            "refreshing": "Captcha yenileniyor.",
+            "refresh_success": "Captcha başarıyla yenilendi.",
+            "refresh_error": "Captcha yenilenemedi."
+        },
+        "signin": {
+            "button": "Giriş Yap",
+            "loading": "Giriş yapılıyor...",
+            "success": "Başarıyla giriş yaptınız.",
+            "error": "Giriş başarısız."
+        }
+    }
+}

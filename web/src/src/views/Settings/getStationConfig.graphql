@@ -1,0 +1,12 @@
+query getStationConfig {
+    getStationConfigConstraint {
+        namespace
+        name
+        key
+        description
+        configType
+        isRequired
+        currentValue
+        options
+    }
+}

@@ -1,0 +1,460 @@
+{
+    "components": {
+        "ErrorPage": {
+            "something_went_wrong": "Oops! Something went wrong.",
+            "try_again_later": "Please try to refresh the page or come back later."
+        },
+        "TypedInput": {
+            "yes": "Yes",
+            "no": "No",
+            "add_new_item": "Input new item.",
+            "editing_list": "Editing List of {{fieldName}}"
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "File Name",
+                "time": "Time Modified",
+                "size": "File Size",
+                "actions": "Actions"
+            },
+            "miniseed_list": {
+                "title": "Daily MiniSEED",
+                "download": "Download",
+                "search": "Search"
+            },
+            "helicorder_list": {
+                "title": "Helicorder List",
+                "download": "Download",
+                "search": "Search"
+            },
+            "request_file": {
+                "requesting": "Requesting link to downloading file {{fileName}}.",
+                "success": "Got link for downloading file {{fileName}}.",
+                "error": "Failed to request file link for {{fileName}}: {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "Event Query",
+                "data_agency": "Data Agency",
+                "search_button": "Search Events",
+                "searching": "Searching events from selected source.",
+                "success": "Found {{count}} events from selected source.",
+                "no_data": "No events found in selected source.",
+                "error": "Failed to search for events: {{error}}"
+            },
+            "event_list_modal": {
+                "title": "Select a Seismic Event",
+                "earthquake_at": "Earthquake at {{time}}",
+                "p_wave_arrival": "P-Wave Arrival {{time}} seconds",
+                "s_wave_arrival": "S-Wave Arrival {{time}} seconds",
+                "epicenter_distance": "Epicenter {{distance}} km",
+                "earthquake_depth": "Depth {{depth}} km",
+                "selected_an_event": "Selected an earthquake event in {{region}} at {{time}}."
+            },
+            "data_export": {
+                "title": "Data Export",
+                "file_format": "File Format",
+                "channel_code": "Channel Code",
+                "export_button": "Get Data",
+                "exporting": "Exporting channel {{channel}} to {{format}} format.",
+                "success": "Successfully exported channel {{channel}} to {{format}} format.",
+                "error": "Failed to export channel {{channel}} to {{format}} format: {{error}}"
+            },
+            "search_records": {
+                "title": "Time Query",
+                "start_time": "Start Time",
+                "end_time": "End Time",
+                "invalid_time": "Start time must be before the end time.",
+                "search_button": "Search Records",
+                "searching": "Searching seismic records from database.",
+                "success": "Found {{count}} seismic records from database.",
+                "no_data": "No seismic records found in database.",
+                "error": "Failed to search for records: {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "Lock Layout",
+                "unlock_button": "Unlock Layout"
+            },
+            "reset_layout": {
+                "reset_button": "Reset All",
+                "confirm_message": "Are you sure you want to reset the layout?",
+                "confirm_title": "Confirm Reset",
+                "confirm_button": "Reset",
+                "cancel_button": "Cancel"
+            },
+            "share_link": {
+                "share_button": "Share Link",
+                "link_copied": "Shared link has been copied to clipboard."
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "Station Information",
+                "name": "Name",
+                "country": "Country",
+                "place": "Place",
+                "affiliation": "Affiliation",
+                "channels": "Channels"
+            },
+            "device_info": {
+                "title": "Device Information",
+                "product_model": "Product Model",
+                "device_id": "Device ID",
+                "link_protocol": "Link Protocol",
+                "packet_interval": "Packet Interval",
+                "gnss_active": "GNSS Active"
+            },
+            "device_status": {
+                "title": "Device Status",
+                "sample_rate": "Sample Rate",
+                "latitude": "Latitude",
+                "longitude": "Longitude",
+                "elevation": "Elevation",
+                "temperature": "Temperature"
+            },
+            "link_status": {
+                "title": "Link Status",
+                "started_at": "Started At",
+                "last_frame": "Last Frame",
+                "frames": "Frames",
+                "errors": "Errors",
+                "messages": "Messages"
+            },
+            "connectivity": {
+                "loading": "Connecting to the station...",
+                "success": "Connected to station, server up for {{uptime}} seconds, updated at {{updatedAt}}.",
+                "error": "Error occurred while connecting to station, please check your connection."
+            },
+            "station_location": {
+                "title": "Station Location"
+            },
+            "service_status": {
+                "title": "Service Status"
+            },
+            "cpu_usage": {
+                "title": "CPU Usage"
+            },
+            "memory_usage": {
+                "title": "Memory Usage"
+            },
+            "disk_usage": {
+                "title": "Disk Usage"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "Oops! Page not found.",
+            "check_your_url": "Please check your URL and try again.",
+            "go_back_button": "Go Back"
+        },
+        "RealTime": {
+            "reset_layout": {
+                "reset_button": "Reset All",
+                "confirm_message": "Are you sure you want to reset the layout?",
+                "confirm_title": "Confirm Reset",
+                "confirm_button": "Reset",
+                "cancel_button": "Cancel"
+            },
+            "layout_locker": {
+                "lock_button": "Lock Layout",
+                "unlock_button": "Unlock Layout"
+            },
+            "connectivity": {
+                "connecting": "No connection, connecting now...",
+                "connected": "Connected, last updated at {{updatedAt}}."
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} SPS",
+                "channels": "{{num}} Channels",
+                "retention": "{{retention}} seconds"
+            }
+        },
+        "Settings": {
+            "Dangerous": {
+                "title": "Dangerous Zone",
+                "purge_waveform_records": {
+                    "title": "Purge Waveform Records",
+                    "description": "This will delete all waveform records in the database, operation is irreversible.",
+                    "submit_button": "Purge Records",
+                    "confirm_title": "Confirm Purge",
+                    "confirm_message": "Are you sure you want to purge all waveform records?",
+                    "confirm_button": "Purge",
+                    "cancel_button": "Cancel",
+                    "purging": "Purging waveform records...",
+                    "success": "Successfully purged waveform records.",
+                    "error": "Failed to purge waveform records: {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "Purge MiniSEED Files",
+                    "description": "This will delete all MiniSEED files in the system, operation is irreversible.",
+                    "submit_button": "Purge MiniSEED",
+                    "confirm_title": "Confirm Purge",
+                    "confirm_message": "Are you sure you want to purge all MiniSEED files?",
+                    "confirm_button": "Purge",
+                    "cancel_button": "Cancel",
+                    "purging": "Purging MiniSEED files...",
+                    "success": "Successfully purged MiniSEED files.",
+                    "error": "Failed to purge MiniSEED files: {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "Purge Helicorder Files",
+                    "description": "This will delete all helicorder files in the system, operation is irreversible.",
+                    "submit_button": "Purge Helicorder",
+                    "confirm_title": "Confirm Purge",
+                    "confirm_message": "Are you sure you want to purge all helicorder files?",
+                    "confirm_button": "Purge",
+                    "cancel_button": "Cancel",
+                    "purging": "Purging helicorder files...",
+                    "success": "Successfully purged helicorder files.",
+                    "error": "Failed to purge helicorder files: {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "Reset Station Configuration",
+                    "description": "This will reset all station configuration, operation is irreversible, restart required to take effect.",
+                    "submit_button": "Reset Station",
+                    "confirm_title": "Confirm Reset",
+                    "confirm_message": "Are you want to reset all station configuration?",
+                    "confirm_button": "Reset",
+                    "cancel_button": "Cancel",
+                    "resetting": "Resetting station configuration...",
+                    "success": "Successfully reset station configuration.",
+                    "error": "Failed to reset station configuration: {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "Reset Service Configuration",
+                    "description": "This will reset all service configuration, operation is irreversible, restart required to take effect.",
+                    "submit_button": "Reset Service",
+                    "confirm_title": "Confirm Reset",
+                    "confirm_message": "Are you want to reset all service configuration?",
+                    "confirm_button": "Reset",
+                    "cancel_button": "Cancel",
+                    "resetting": "Resetting service configuration...",
+                    "success": "Successfully reset service configuration.",
+                    "error": "Failed to reset service configuration: {{error}}"
+                }
+            },
+            "Metadata": {
+                "title": "Station Metadata"
+            },
+            "Preference": {
+                "title": "Web Preference",
+                "reset_layout_preference": {
+                    "title": "Reset Layout Preference",
+                    "description": "This will reset all layout preference, operation is irreversible.",
+                    "submit_button": "Reset Preference",
+                    "confirm_title": "Confirm Reset",
+                    "confirm_message": "Are you sure you want to reset all layout preference?",
+                    "confirm_button": "Reset",
+                    "cancel_button": "Cancel",
+                    "success": "Successfully reset layout preference."
+                }
+            },
+            "Service": {
+                "title": "Service Control",
+                "restart_service": {
+                    "submit_button": "Restart",
+                    "confirm_title": "Confirm Restart",
+                    "confirm_message": "Are you sure you want to restart the service?",
+                    "confirm_button": "Restart",
+                    "cancel_button": "Cancel",
+                    "restarting": "Restarting the service...",
+                    "success": "Successfully restarted the service.",
+                    "error": "Failed to restart the service: {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "Start",
+                    "confirm_title": "Confirm Start",
+                    "confirm_message": "Are you sure you want to start the service?",
+                    "confirm_button": "Start",
+                    "cancel_button": "Cancel",
+                    "starting": "Starting the service...",
+                    "success": "Successfully started the service.",
+                    "error": "Failed to start the service: {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "Stop",
+                    "confirm_title": "Confirm Stop",
+                    "confirm_message": "Are you sure you want to stop the service?",
+                    "confirm_button": "Stop",
+                    "cancel_button": "Cancel",
+                    "stopping": "Stopping the service...",
+                    "success": "Successfully stopped the service.",
+                    "error": "Failed to stop the service: {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "Reset",
+                    "confirm_title": "Confirm Reset",
+                    "confirm_message": "Are you sure you want to reset the service?",
+                    "confirm_button": "Reset",
+                    "cancel_button": "Cancel",
+                    "resetting": "Resetting the service...",
+                    "success": "Successfully reset the service.",
+                    "error": "Failed to reset the service: {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "Edit",
+                    "updating": "Applying new changes...",
+                    "success": "Changes have been applied.",
+                    "error": "Failed to update service configuration: {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "Editing Service: {{name}}"
+                },
+                "service_status": {
+                    "yes": "Yes",
+                    "no": "No",
+                    "is_running": "Running",
+                    "restarts": "Restarts",
+                    "stopped_at": "Stopped At",
+                    "started_at": "Started At",
+                    "updated_at": "Updated At"
+                }
+            },
+            "Station": {
+                "title": "Station Settings",
+                "update_station": {
+                    "field_required": "This field is required.",
+                    "updating": "Updating station configuration...",
+                    "success": "Successfully updated station configuration.",
+                    "error": "Failed to update station configuration: {{error}}"
+                }
+            },
+            "Users": {
+                "title": "User Management",
+                "search_users": {
+                    "placeholder": "Search users"
+                },
+                "refresh_list": {
+                    "submit_button": "Refresh",
+                    "refreshing": "Refreshing user list...",
+                    "success": "Successfully refreshed user list.",
+                    "error": "Failed to refresh user list: {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "Remove Users",
+                    "confirm_title": "Confirm Remove",
+                    "confirm_message": "Are you sure you want to remove selected users?",
+                    "confirm_button": "Remove",
+                    "cancel_button": "Cancel",
+                    "removing": "Removing selected users...",
+                    "success": "{{num}} user has been removed.",
+                    "error": "Failed to remove selected users: {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "Create User",
+                    "creating": "Creating new user...",
+                    "success": "User {{username}} has been created.",
+                    "error": "Failed to create new user: {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "Create New User",
+                    "username": {
+                        "label": "Username",
+                        "placeholder": "Username of new user"
+                    },
+                    "password": {
+                        "label": "Password",
+                        "placeholder": "Password of new user"
+                    },
+                    "admin": {
+                        "label": "User with admin privilege"
+                    },
+                    "create_button": "Create"
+                },
+                "edit_user": {
+                    "submit_button": "Edit",
+                    "updating": "Updating user...",
+                    "success": "User {{username}} has been updated.",
+                    "error": "Failed to update user: {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "Edit User",
+                    "username": {
+                        "label": "Username",
+                        "placeholder": "Empty for no change."
+                    },
+                    "password": {
+                        "label": "Password",
+                        "placeholder": "Empty for no change."
+                    },
+                    "admin": {
+                        "label": "User with admin privilege"
+                    },
+                    "update_button": "Update"
+                },
+                "remove_user": {
+                    "submit_button": "Remove",
+                    "confirm_title": "Confirm Remove",
+                    "confirm_message": "Are you sure you want to remove user {{username}}?",
+                    "confirm_button": "Remove",
+                    "cancel_button": "Cancel",
+                    "removing": "Removing user...",
+                    "success": "User {{username}} has been removed.",
+                    "error": "Failed to remove user: {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "Yes",
+                    "no": "No",
+                    "never": "Never",
+                    "id": "ID",
+                    "user_id": "User ID",
+                    "username": "Username",
+                    "admin": "Admin",
+                    "created_at": "Created At",
+                    "last_login": "Last Login",
+                    "user_ip": "User IP",
+                    "user_agent": "User Agent",
+                    "updated_at": "Updated At",
+                    "actions": "Actions"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "A new update is available, would you like to update now?",
+            "confirm_title": "Update Available",
+            "confirm_button": "Update",
+            "cancel_button": "Cancel"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "Are you sure you want to logout?",
+            "confirm_title": "Logout",
+            "confirm_button": "OK",
+            "cancel_button": "Cancel"
+        },
+        "newsletter": {
+            "title": "Newsletter",
+            "submit_button": "Subscribe"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "Username",
+            "placeholder": "Your Username"
+        },
+        "password": {
+            "label": "Password",
+            "placeholder": "Your Password"
+        },
+        "captcha": {
+            "label": "Enter Captcha",
+            "loading": "Loading captcha...",
+            "placeholder": "Captcha code",
+            "refreshing": "Refreshing captcha.",
+            "refresh_success": "Refreshed captcha successfully.",
+            "refresh_error": "Failed to refresh captcha."
+        },
+        "signin": {
+            "button": "Login",
+            "loading": "Logging you in...",
+            "success": "You have successfully logged in.",
+            "error": "Login failed."
+        }
+    }
+}

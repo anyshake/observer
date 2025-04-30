@@ -1,0 +1,7 @@
+mutation startService($serviceId: String!) {
+    startService(serviceId: $serviceId)
+}
+
+mutation stopService($serviceId: String!) {
+    stopService(serviceId: $serviceId)
+}

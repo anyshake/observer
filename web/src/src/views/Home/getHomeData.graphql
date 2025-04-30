@@ -1,0 +1,38 @@
+query getHomeData {
+    getCurrentTime
+    getStationConfig
+    getDeviceId
+    getDeviceConfig {
+        packetInterval
+        sampleRate
+        channelCodes
+        gnssEnabled
+        model
+        protocol
+    }
+    getDeviceInfo {
+        latitude
+        longitude
+        elevation
+        temperature
+    }
+    getDeviceStatus {
+        startedAt
+        updatedAt
+        frames
+        errors
+        messages
+    }
+    getServiceStatus {
+        serviceId
+        isRunning
+        name
+        description
+    }
+    getSystemStatus {
+        cpu
+        memory
+        disk
+        uptime
+    }
+}

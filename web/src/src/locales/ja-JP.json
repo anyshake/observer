@@ -1,0 +1,456 @@
+{
+    "components": {
+        "ErrorPage": {
+            "something_went_wrong": "おっと！ 何か問題が発生しました。",
+            "try_again_later": "ページを再読み込みするか、後でもう一度お試しください。"
+        },
+        "TypedInput": {
+            "yes": "はい",
+            "no": "いいえ",
+            "add_new_item": "新しい項目を入力してください。",
+            "editing_list": "{{fieldName}} のリストを編集中"
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "ファイル名",
+                "time": "更新日時",
+                "size": "ファイルサイズ",
+                "actions": "操作"
+            },
+            "miniseed_list": {
+                "title": "日次 MiniSEED",
+                "download": "ダウンロード",
+                "search": "検索"
+            },
+            "helicorder_list": {
+                "title": "Helicorder リスト",
+                "download": "ダウンロード",
+                "search": "検索"
+            },
+            "request_file": {
+                "requesting": "ファイル {{fileName}} のダウンロードリンクをリクエスト中。",
+                "success": "ファイル {{fileName}} のダウンロードリンクを取得しました。",
+                "error": "ファイル {{fileName}} のリンクリクエストに失敗しました： {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "イベントクエリ",
+                "data_agency": "データ機関",
+                "search_button": "イベント検索",
+                "searching": "選択したソースからイベントを検索中。",
+                "success": "選択したソースから {{count}} 件のイベントが見つかりました。",
+                "no_data": "選択したソースにイベントが見つかりませんでした。",
+                "error": "イベントの検索に失敗しました： {{error}}"
+            },
+            "event_list_modal": {
+                "title": "地震イベントを選択",
+                "earthquake_at": "{{time}} に地震発生",
+                "p_wave_arrival": "P 波到達 {{time}} 秒",
+                "s_wave_arrival": "S 波到達 {{time}} 秒",
+                "epicenter_distance": "震源距離 {{distance}} km",
+                "earthquake_depth": "深さ {{depth}} km",
+                "selected_an_event": "{{region}} で {{time}} に発生した地震イベントを選択しました。"
+            },
+            "data_export": {
+                "title": "データエクスポート",
+                "file_format": "ファイル形式",
+                "channel_code": "チャンネルコード",
+                "export_button": "データ取得",
+                "exporting": "チャンネル {{channel}} を {{format}} 形式にエクスポート中。",
+                "success": "チャンネル {{channel}} を {{format}} 形式に正常にエクスポートしました。",
+                "error": "チャンネル {{channel}} の {{format}} 形式へのエクスポートに失敗しました： {{error}}"
+            },
+            "search_records": {
+                "title": "時間クエリ",
+                "start_time": "開始時間",
+                "end_time": "終了時間",
+                "invalid_time": "開始時間は終了時間より前にする必要があります。",
+                "search_button": "記録検索",
+                "searching": "データベースから地震記録を検索中。",
+                "success": "データベースから {{count}} 件の地震記録が見つかりました。",
+                "no_data": "データベースに地震記録が見つかりませんでした。",
+                "error": "記録の検索に失敗しました： {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "レイアウトをロック",
+                "unlock_button": "レイアウトをアンロック"
+            },
+            "reset_layout": {
+                "reset_button": "すべてリセット",
+                "confirm_message": "レイアウトをリセットしてもよろしいですか？",
+                "confirm_title": "リセット確認",
+                "confirm_button": "リセット",
+                "cancel_button": "キャンセル"
+            },
+            "share_link": {
+                "share_button": "リンクを共有",
+                "link_copied": "共有リンクがクリップボードにコピーされました。"
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "観測点情報",
+                "name": "名称",
+                "country": "国",
+                "place": "場所",
+                "affiliation": "所属機関",
+                "channels": "チャンネル"
+            },
+            "device_info": {
+                "title": "デバイス情報",
+                "product_model": "製品モデル",
+                "device_id": "デバイス ID",
+                "link_protocol": "リンクプロトコル",
+                "packet_interval": "パケット間隔",
+                "gnss_active": "GNSS アクティブ"
+            },
+            "device_status": {
+                "title": "デバイスステータス",
+                "sample_rate": "サンプルレート",
+                "latitude": "緯度",
+                "longitude": "経度",
+                "elevation": "標高",
+                "temperature": "温度"
+            },
+            "link_status": {
+                "title": "リンクステータス",
+                "started_at": "開始日時",
+                "last_frame": "最終フレーム",
+                "frames": "フレーム",
+                "errors": "エラー",
+                "messages": "メッセージ"
+            },
+            "connectivity": {
+                "loading": "観測点に接続中...",
+                "success": "観測点に接続しました。サーバー稼働時間 {{uptime}} 秒、更新日時 {{updatedAt}}。",
+                "error": "観測点への接続中にエラーが発生しました。接続を確認してください。"
+            },
+            "station_location": {
+                "title": "観測点の場所"
+            },
+            "service_status": {
+                "title": "サービスステータス"
+            },
+            "cpu_usage": {
+                "title": "CPU 使用率"
+            },
+            "memory_usage": {
+                "title": "メモリ使用率"
+            },
+            "disk_usage": {
+                "title": "ディスク使用率"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "おっと！ ページが見つかりません。",
+            "check_your_url": "URL を確認してもう一度お試しください。",
+            "go_back_button": "戻る"
+        },
+        "RealTime": {
+            "reset_layout": {
+                "reset_button": "すべてリセット",
+                "confirm_message": "レイアウトをリセットしてもよろしいですか？",
+                "confirm_title": "リセット確認",
+                "confirm_button": "リセット",
+                "cancel_button": "キャンセル"
+            },
+            "layout_locker": {
+                "lock_button": "レイアウトをロック",
+                "unlock_button": "レイアウトをアンロック"
+            },
+            "connectivity": {
+                "connecting": "接続なし、接続中...",
+                "connected": "接続済み、最終更新日時 {{updatedAt}}。"
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} SPS",
+                "channels": "{{num}} チャンネル",
+                "retention": "{{retention}} 秒保持"
+            }
+        },
+        "Settings": {
+            "Dangerous": {
+                "title": "危険ゾーン",
+                "purge_waveform_records": {
+                    "title": "波形記録を消去",
+                    "description": "データベース内のすべての波形記録が削除されます。この操作は元に戻せません。",
+                    "submit_button": "記録を消去",
+                    "confirm_title": "消去確認",
+                    "confirm_message": "すべての波形記録を消去してもよろしいですか？",
+                    "confirm_button": "消去",
+                    "cancel_button": "キャンセル",
+                    "purging": "波形記録を消去中...",
+                    "success": "波形記録を正常に消去しました。",
+                    "error": "波形記録の消去に失敗しました： {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "MiniSEED ファイルを消去",
+                    "description": "システム内のすべての MiniSEED ファイルが削除されます。この操作は元に戻せません。",
+                    "submit_button": "MiniSEED を消去",
+                    "confirm_title": "消去確認",
+                    "confirm_message": "すべての MiniSEED ファイルを消去してもよろしいですか？",
+                    "confirm_button": "消去",
+                    "cancel_button": "キャンセル",
+                    "purging": "MiniSEED ファイルを消去中...",
+                    "success": "MiniSEED ファイルを正常に消去しました。",
+                    "error": "MiniSEED ファイルの消去に失敗しました： {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "Helicorder ファイルを消去",
+                    "description": "システム内のすべての Helicorder ファイルが削除されます。この操作は元に戻せません。",
+                    "submit_button": "Helicorder を消去",
+                    "confirm_title": "消去確認",
+                    "confirm_message": "すべての Helicorder ファイルを消去してもよろしいですか？",
+                    "confirm_button": "消去",
+                    "cancel_button": "キャンセル",
+                    "purging": "Helicorder ファイルを消去中...",
+                    "success": "Helicorder ファイルを正常に消去しました。",
+                    "error": "Helicorder ファイルの消去に失敗しました： {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "観測点設定をリセット",
+                    "description": "すべての観測点設定がリセットされます。この操作は元に戻せません。反映するには再起動が必要です。",
+                    "submit_button": "観測点をリセット",
+                    "confirm_title": "リセット確認",
+                    "confirm_message": "すべての観測点設定をリセットしてもよろしいですか？",
+                    "confirm_button": "リセット",
+                    "cancel_button": "キャンセル",
+                    "resetting": "観測点設定をリセット中...",
+                    "success": "観測点設定を正常にリセットしました。",
+                    "error": "観測点設定のリセットに失敗しました： {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "サービス設定をリセット",
+                    "description": "すべてのサービス設定がリセットされます。この操作は元に戻せません。反映するには再起動が必要です。",
+                    "submit_button": "サービスをリセット",
+                    "confirm_title": "リセット確認",
+                    "confirm_message": "すべてのサービス設定をリセットしてもよろしいですか？",
+                    "confirm_button": "リセット",
+                    "cancel_button": "キャンセル",
+                    "resetting": "サービス設定をリセット中...",
+                    "success": "サービス設定を正常にリセットしました。",
+                    "error": "サービス設定のリセットに失敗しました： {{error}}"
+                }
+            },
+            "Metadata": {
+                "title": "観測点メタデータ"
+            },
+            "Preference": {
+                "title": "Web 設定",
+                "reset_layout_preference": {
+                    "title": "レイアウト設定をリセット",
+                    "description": "すべてのレイアウト設定がリセットされます。この操作は元に戻せません。",
+                    "submit_button": "設定をリセット",
+                    "confirm_title": "リセット確認",
+                    "confirm_message": "すべてのレイアウト設定をリセットしてもよろしいですか？",
+                    "confirm_button": "リセット",
+                    "cancel_button": "キャンセル",
+                    "success": "レイアウト設定を正常にリセットしました。"
+                }
+            },
+            "Service": {
+                "title": "サービス管理",
+                "restart_service": {
+                    "submit_button": "再起動",
+                    "confirm_title": "再起動確認",
+                    "confirm_message": "サービスを再起動してもよろしいですか？",
+                    "confirm_button": "再起動",
+                    "cancel_button": "キャンセル",
+                    "restarting": "サービスを再起動中...",
+                    "success": "サービスを正常に再起動しました。",
+                    "error": "サービスの再起動に失敗しました： {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "開始",
+                    "confirm_title": "開始確認",
+                    "confirm_message": "サービスを開始してもよろしいですか？",
+                    "confirm_button": "開始",
+                    "cancel_button": "キャンセル",
+                    "starting": "サービスを開始中...",
+                    "success": "サービスを正常に開始しました。",
+                    "error": "サービスの開始に失敗しました： {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "停止",
+                    "confirm_title": "停止確認",
+                    "confirm_message": "サービスを停止してもよろしいですか？",
+                    "confirm_button": "停止",
+                    "cancel_button": "キャンセル",
+                    "stopping": "サービスを停止中...",
+                    "success": "サービスを正常に停止しました。",
+                    "error": "サービスの停止に失敗しました： {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "リセット",
+                    "confirm_title": "リセット確認",
+                    "confirm_message": "サービスをリセットしてもよろしいですか？",
+                    "confirm_button": "リセット",
+                    "cancel_button": "キャンセル",
+                    "resetting": "サービスをリセット中...",
+                    "success": "サービスを正常にリセットしました。",
+                    "error": "サービスのリセットに失敗しました： {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "編集",
+                    "updating": "新しい変更を適用中...",
+                    "success": "変更が適用されました。",
+                    "error": "サービス設定の更新に失敗しました： {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "サービス編集中： {{name}}"
+                },
+                "service_status": {
+                    "yes": "はい",
+                    "no": "いいえ",
+                    "is_running": "実行中",
+                    "restarts": "再起動回数",
+                    "stopped_at": "停止日時",
+                    "started_at": "開始日時",
+                    "updated_at": "更新日時"
+                }
+            },
+            "Station": {
+                "title": "観測点設定",
+                "update_station": {
+                    "field_required": "このフィールドは必須です。",
+                    "updating": "観測点設定を更新中...",
+                    "success": "観測点設定を正常に更新しました。",
+                    "error": "観測点設定の更新に失敗しました： {{error}}"
+                }
+            },
+            "Users": {
+                "title": "ユーザー管理",
+                "search_users": {
+                    "placeholder": "ユーザー検索"
+                },
+                "refresh_list": {
+                    "submit_button": "更新",
+                    "refreshing": "ユーザーリストを更新中...",
+                    "success": "ユーザーリストを正常に更新しました。",
+                    "error": "ユーザーリストの更新に失敗しました： {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "ユーザーを削除",
+                    "confirm_title": "削除確認",
+                    "confirm_message": "選択したユーザーを削除してもよろしいですか？",
+                    "confirm_button": "削除",
+                    "cancel_button": "キャンセル",
+                    "removing": "選択したユーザーを削除中...",
+                    "success": "{{num}} 人のユーザーが削除されました。",
+                    "error": "選択したユーザーの削除に失敗しました： {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "ユーザー作成",
+                    "creating": "新しいユーザーを作成中...",
+                    "success": "ユーザー {{username}} が作成されました。",
+                    "error": "新しいユーザーの作成に失敗しました： {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "新しいユーザーを作成",
+                    "username": {
+                        "label": "ユーザー名",
+                        "placeholder": "新しいユーザーのユーザー名"
+                    },
+                    "password": {
+                        "label": "パスワード",
+                        "placeholder": "新しいユーザーのパスワード"
+                    },
+                    "admin": {
+                        "label": "管理者権限を持つユーザー"
+                    },
+                    "create_button": "作成"
+                },
+                "edit_user": {
+                    "submit_button": "編集",
+                    "updating": "ユーザーを更新中...",
+                    "success": "ユーザー {{username}} が更新されました。",
+                    "error": "ユーザーの更新に失敗しました： {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "ユーザー編集",
+                    "username": {
+                        "label": "ユーザー名",
+                        "placeholder": "変更しない場合は空欄。"
+                    },
+                    "password": {
+                        "label": "パスワード",
+                        "placeholder": "変更しない場合は空欄。"
+                    },
+                    "admin": {
+                        "label": "管理者権限を持つユーザー"
+                    },
+                    "update_button": "更新"
+                },
+                "remove_user": {
+                    "submit_button": "削除",
+                    "confirm_title": "削除確認",
+                    "confirm_message": "ユーザー {{username}} を削除してもよろしいですか？",
+                    "confirm_button": "削除",
+                    "cancel_button": "キャンセル",
+                    "removing": "ユーザーを削除中...",
+                    "success": "ユーザー {{username}} が削除されました。",
+                    "error": "ユーザーの削除に失敗しました： {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "はい",
+                    "no": "いいえ",
+                    "never": "なし",
+                    "id": "ID",
+                    "user_id": "ユーザー ID",
+                    "username": "ユーザー名",
+                    "admin": "管理者",
+                    "created_at": "作成日時",
+                    "last_login": "最終ログイン",
+                    "user_ip": "ユーザー IP",
+                    "user_agent": "ユーザーエージェント",
+                    "updated_at": "更新日時",
+                    "actions": "操作"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "新しいアップデートがあります。今すぐアップデートしますか？",
+            "confirm_title": "アップデートあり",
+            "confirm_button": "アップデート",
+            "cancel_button": "キャンセル"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "ログアウトしてもよろしいですか？",
+            "confirm_title": "ログアウト",
+            "confirm_button": "OK",
+            "cancel_button": "キャンセル"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "ユーザー名",
+            "placeholder": "あなたのユーザー名"
+        },
+        "password": {
+            "label": "パスワード",
+            "placeholder": "あなたのパスワード"
+        },
+        "captcha": {
+            "label": "キャプチャを入力",
+            "loading": "キャプチャを更新中。",
+            "placeholder": "キャプチャコード",
+            "refreshing": "キャプチャを更新中。",
+            "refresh_success": "キャプチャを正常に更新しました。",
+            "refresh_error": "キャプチャの更新に失敗しました。"
+        },
+        "signin": {
+            "button": "ログイン",
+            "loading": "ログイン中...",
+            "success": "正常にログインしました。",
+            "error": "ログインに失敗しました。"
+        }
+    }
+}

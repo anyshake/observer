@@ -2,9 +2,50 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.0.0
+
+### Release Notes
+
+We are proud to announce **AnyShake Observer v4.0.0**, a major release that marks a transformative step forward in our seismic monitoring software. This update is **incompatible with all previous versions** due to significant architectural changes and feature enhancements.
+
+🚀 **Now crowdfunding on CrowdSupply**  
+Alongside this release, we are launching the **AnyShake Explorer**, a fully open-source, low-cost, and reliable seismic data acquisition device. Designed for researchers, hobbyists, and professionals alike, the Explorer integrates seamlessly with AnyShake Observer and sets a new standard for affordable and powerful seismology tools.
+
+🧠 **What’s New**  
+This version represents a leap forward in terms of **usability, security, reliability, and functionality** — setting a new benchmark in open-source seismic software.
+
+### New Features
+
+- Resolved high CPU usage issue caused by "empty-run" behavior after Explorer device disconnection.
+- Fixed significant time offset when AnyShake Observer starts before Explorer under NTP mode.
+- Resolved decoder thread crash when receiving delayed data via serial-to-TCP device.
+- Fixed numerous potential data race issues for improved multithreaded stability.
+
+### Bug Fixes
+
+- Simplified deployment with just **40 lines of configuration** to get started.
+- Full support for **legacy v1**, **mainline v2**, and **latest v3 protocols** used by AnyShake Explorer.
+- Enhanced coroutine lifecycle management to ensure clean, stable module operations.
+- **Multi-channel sampling** support to accommodate new Explorer variants with both 3-axis geophones and 3-axis accelerometers.
+- Efficient waveform data archiving and fast querying for reduced CPU overhead.
+- Export station metadata in **SeisComp XML** and **FDSNWS StationXML** formats for Explorer devices.
+- Upgraded API architecture combining **GraphQL + RESTful** interfaces.
+- WebSocket endpoints now support **120 seconds of historical waveform data**, reducing chart fill time.
+- Data export now includes both **TXT (for MATLAB)** and **WAV (for audio sharing)** formats.
+- Fully redesigned and optimized UI — **minimalist design with smoother performance** even under large data volumes.
+- Web interface now supports editing station metadata and managing coroutine services dynamically.
+- Customizable waveform panel layout via drag/zoom actions — with memory and locking features.
+- Introduced **QuakeSense service**: earthquake detection using **Classic STA/LTA** and **Z-Detect**, with rapid alerts via **MQTT**.
+- Helicorder images can now be saved in **PNG** format (previously only SVG).
+- Removed deprecated seismic event data APIs.
+- Improved **SeedLink protocol** stability.
+- Added **multi-language support** with translations in 9 languages.
+
+---
+
 ## v3.6.1
 
-## Bug Fixes
+### Bug Fixes
 
 - Disable waveform normalization completely.
 - Disable compression for exporting MiniSEED in history service.
@@ -266,7 +307,7 @@ Starting from v2.2.5, all notable changes to this project will be documented in 
 
 - Fixed potential data race issues.
 - Replace concurrent-map with haxmap to avoid OOM.
-- Fixed build failure on windows/386, linux/mips* architectures.
+- Fixed build failure on windows/386, linux/mips\* architectures.
 
 ## v3.1.1
 
@@ -342,7 +383,7 @@ Starting from v2.2.5, all notable changes to this project will be documented in 
 ### New Features
 
 - Added support for accessing AnyShake Explorer via a serial-to-Ethernet converter.
-- Introduced custom channel prefixes (e.g., HH*, SH*, EH*).
+- Introduced custom channel prefixes (e.g., HH*, SH*, EH\*).
 - Added log dumping functionality with multiple output levels.
 - Enhanced data processing and storage efficiency.
 - Improved the accuracy of reading time from the Internet NTP server.
@@ -354,6 +395,8 @@ Starting from v2.2.5, all notable changes to this project will be documented in 
 ### Bug Fixes
 
 - Completely resolved the gap issue in MiniSEED records.
+
+---
 
 ## v2.12.5
 
@@ -563,3 +606,5 @@ Starting from v2.2.5, all notable changes to this project will be documented in 
 - Supplement of README, CHANGELOG, build instructions, etc.
 - Use templates to standardize ISSUEs and Pull Requests
 - Update repository frontend logos
+
+---

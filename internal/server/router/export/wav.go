@@ -1,0 +1,220 @@
+package export
+
+import (
+	"errors"
+	"fmt"
+	"math"
+	"time"
+
+	"github.com/anyshake/observer/config"
+	"github.com/anyshake/observer/internal/dao/action"
+	"github.com/anyshake/observer/internal/dao/model"
+	"github.com/anyshake/observer/internal/hardware/explorer"
+	"github.com/anyshake/observer/pkg/seekbuf"
+	"github.com/go-audio/audio"
+	"github.com/go-audio/wav"
+	"github.com/samber/lo"
+)
+
+type seismicDataEncoderWavImpl struct {
+	outputSampleRate   int
+	actionHandler      *action.Handler
+	stationCodeConfig  config.StationStationCodeConfigConstraintImpl
+	locationCodeConfig config.StationLocationCodeConfigConstraintImpl
+	networkCodeConfig  config.StationNetworkCodeConfigConstraintImpl
+}
+
+func (e *seismicDataEncoderWavImpl) GetName() string {
+	return "WAV (Audio)"
+}
+
+func (e *seismicDataEncoderWavImpl) Encode(records []model.SeisRecord, channelCode string) ([]byte, error) {
+	var (
+		startSampleRate = records[0].SampleRate
+		startTimestamp  = records[0].Timestamp
+	)
+
+	var channelBuffer []int32
+	for index, record := range records {
+		_, _, channelDataArr, err := record.Decode()
+		if err != nil {
+			return nil, err
+		}
+		channelData, ok := lo.Find(channelDataArr, func(item explorer.ChannelData) bool { return item.ChannelCode == channelCode })
+		if !ok {
+			continue
+		}
+
+		if math.Abs(float64(record.Timestamp-startTimestamp-int64(index*1000))) >= explorer.ALLOWED_JITTER_MS {
+			return nil, fmt.Errorf(
+				"timestamp is not within allowed jitter %d ms, expected %d, got %d",
+				explorer.ALLOWED_JITTER_MS,
+				startTimestamp+int64(index*1000),
+				record.Timestamp,
+			)
+		}
+
+		if record.SampleRate != startSampleRate {
+			return nil, fmt.Errorf("sample rate is not the same, expected %d, got %d", startSampleRate, record.SampleRate)
+		}
+
+		channelBuffer = append(channelBuffer, channelData.Data...)
+	}
+
+	audioData := e.normalizeToInt16(channelBuffer)
+
+	timeDiff := e.computeTimeDuration(records)
+	if timeDiff == 0 {
+		return nil, errors.New("invalid time difference")
+	}
+
+	originalSampleRate := int(float64(len(audioData)) / (timeDiff / 30.0))
+	filterKernel := e.getLowPassFilter(originalSampleRate, 25, 51)
+	audioData = e.applyFilter(audioData, filterKernel)
+
+	interpolatedData := e.linearInterpolate(audioData, originalSampleRate, e.outputSampleRate)
+
+	dataBytes, err := e.saveToWavBytes(interpolatedData, e.outputSampleRate)
+	if err != nil {
+		return nil, err
+	}
+
+	return dataBytes, nil
+}
+
+func (e *seismicDataEncoderWavImpl) GetFileName(startTime time.Time, channelCode string) (string, error) {
+	stationCode, err := e.stationCodeConfig.Get(e.actionHandler)
+	if err != nil {
+		return "", err
+	}
+	locationCode, err := e.locationCodeConfig.Get(e.actionHandler)
+	if err != nil {
+		return "", err
+	}
+	networkCode, err := e.networkCodeConfig.Get(e.actionHandler)
+	if err != nil {
+		return "", err
+	}
+
+	stationCodeStr := stationCode.(string)
+	locationCodeStr := locationCode.(string)
+	networkCodeStr := networkCode.(string)
+
+	filename := fmt.Sprintf("%s.%s.%s.%s.%s.%04d.%s.%s.%s.%s.D.wav",
+		startTime.UTC().Format("2006"),
+		startTime.UTC().Format("002"),
+		startTime.UTC().Format("15"),
+		startTime.UTC().Format("04"),
+		startTime.UTC().Format("05"),
+		startTime.UTC().Nanosecond()/1000000,
+		stationCodeStr, networkCodeStr,
+		locationCodeStr, channelCode,
+	)
+	return filename, nil
+}
+
+func (e *seismicDataEncoderWavImpl) normalizeToInt16(data []int32) []int16 {
+	maxVal := lo.Max(lo.Map(data, func(v int32, _ int) int32 {
+		return int32(math.Abs(float64(v)))
+	}))
+	if maxVal == 0 {
+		return nil
+	}
+	scaleFactor := float64(math.MaxInt16) / float64(maxVal)
+	return lo.Map(data, func(v int32, _ int) int16 {
+		return int16(float64(v) * scaleFactor)
+	})
+}
+
+func (e *seismicDataEncoderWavImpl) computeTimeDuration(records []model.SeisRecord) float64 {
+	startTime := records[0].Timestamp
+	endTime := records[len(records)-1].Timestamp
+	return time.UnixMilli(endTime).Sub(time.UnixMilli(startTime)).Seconds()
+}
+
+func (e *seismicDataEncoderWavImpl) linearInterpolate(data []int16, oldRate, newRate int) []int16 {
+	if oldRate == newRate || oldRate == 0 {
+		return data
+	}
+
+	scale := float64(oldRate) / float64(newRate)
+	newLength := int(float64(len(data)) * float64(newRate) / float64(oldRate))
+	interpolated := make([]int16, newLength)
+
+	for i := 0; i < newLength; i++ {
+		origIndex := float64(i) * scale
+		index := int(origIndex)
+		fraction := origIndex - float64(index)
+
+		if index+1 < len(data) {
+			interpolated[i] = int16(float64(data[index])*(1-fraction) + float64(data[index+1])*fraction)
+		} else {
+			interpolated[i] = data[index]
+		}
+	}
+
+	return interpolated
+}
+
+func (e *seismicDataEncoderWavImpl) getLowPassFilter(sampleRate int, cutoffFreq float64, numTaps int) []float64 {
+	kernel := make([]float64, numTaps)
+	normCutoff := cutoffFreq / float64(sampleRate)
+
+	for i := 0; i < numTaps; i++ {
+		n := float64(i - numTaps/2)
+
+		if n == 0 {
+			kernel[i] = 2.0 * math.Pi * normCutoff
+		} else {
+			kernel[i] = math.Sin(2.0*math.Pi*normCutoff*n) / (math.Pi * n)
+		}
+
+		kernel[i] *= 0.54 - 0.46*math.Cos(2.0*math.Pi*float64(i)/float64(numTaps-1))
+	}
+
+	sum := 0.0
+	for _, v := range kernel {
+		sum += v
+	}
+	for i := range kernel {
+		kernel[i] /= sum
+	}
+
+	return kernel
+}
+
+func (e *seismicDataEncoderWavImpl) applyFilter(data []int16, kernel []float64) []int16 {
+	numTaps := len(kernel)
+	filtered := make([]int16, len(data))
+
+	for i := range data {
+		sum := 0.0
+		for j := 0; j < numTaps; j++ {
+			if i-j >= 0 {
+				sum += float64(data[i-j]) * kernel[j]
+			}
+		}
+		filtered[i] = int16(sum)
+	}
+
+	return filtered
+}
+
+func (e *seismicDataEncoderWavImpl) saveToWavBytes(data []int16, sampleRate int) ([]byte, error) {
+	var buf seekbuf.Buffer
+	encoder := wav.NewEncoder(&buf, sampleRate, 16, 1, 1)
+	buffer := &audio.IntBuffer{
+		Data:   lo.Map(data, func(v int16, _ int) int { return int(v) }),
+		Format: &audio.Format{SampleRate: sampleRate, NumChannels: 1},
+	}
+
+	if err := encoder.Write(buffer); err != nil {
+		return nil, err
+	}
+
+	if err := encoder.Close(); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}

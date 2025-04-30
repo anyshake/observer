@@ -1,0 +1,6 @@
+@import 'tailwindcss';
+@import 'tailwindcss-animated';
+@plugin "@tailwindcss/typography";
+@plugin "daisyui" {
+    themes: light --default;
+}

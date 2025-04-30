@@ -43,8 +43,8 @@ jobs:
               with:
                   fetch-depth: 1
 
-            - name: Build frontend
-              working-directory: frontend/src
+            - name: Build web
+              working-directory: web/src
               run: |
                   npm install
                   npm run build

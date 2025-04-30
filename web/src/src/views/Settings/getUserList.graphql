@@ -1,0 +1,12 @@
+query getUserList {
+    getSysUsers {
+        userId
+        username
+        createdAt
+        updatedAt
+        lastLogin
+        userIp
+        userAgent
+        admin
+    }
+}

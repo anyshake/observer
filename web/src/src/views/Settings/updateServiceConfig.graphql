@@ -1,0 +1,3 @@
+mutation updateServiceConfig($serviceId: String!, $key: String!, $val: Any!) {
+    updateServiceConfig(serviceId: $serviceId, key: $key, val: $val)
+}

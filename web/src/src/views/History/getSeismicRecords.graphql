@@ -1,0 +1,11 @@
+query getSeismicRecords($startTime: Int64!, $endTime: Int64!) {
+    getSeisRecordsByTime(startTime: $startTime, endTime: $endTime) {
+        timestamp
+        sampleRate
+        channelData {
+            channelCode
+            channelId
+            data
+        }
+    }
+}

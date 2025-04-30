@@ -1,0 +1,3 @@
+mutation removeUser($userId: String!) {
+    removeSysUser(userId: $userId)
+}

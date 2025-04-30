@@ -1,0 +1,456 @@
+{
+    "components": {
+        "ErrorPage": {
+            "something_went_wrong": "Oops! Algo correu mal.",
+            "try_again_later": "Por favor, tente atualizar a página ou volte mais tarde."
+        },
+        "TypedInput": {
+            "yes": "Sim",
+            "no": "Não",
+            "add_new_item": "Inserir novo item.",
+            "editing_list": "A editar Lista de {{fieldName}}"
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "Nome do Ficheiro",
+                "time": "Hora de Modificação",
+                "size": "Tamanho do Ficheiro",
+                "actions": "Ações"
+            },
+            "miniseed_list": {
+                "title": "MiniSEED Diário",
+                "download": "Descarregar",
+                "search": "Pesquisar"
+            },
+            "helicorder_list": {
+                "title": "Lista Helicorder",
+                "download": "Descarregar",
+                "search": "Pesquisar"
+            },
+            "request_file": {
+                "requesting": "A solicitar link para descarregar o ficheiro {{fileName}}.",
+                "success": "Link obtido para descarregar o ficheiro {{fileName}}.",
+                "error": "Falha ao solicitar link do ficheiro para {{fileName}}: {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "Consulta de Eventos",
+                "data_agency": "Agência de Dados",
+                "search_button": "Pesquisar Eventos",
+                "searching": "A pesquisar eventos da fonte selecionada.",
+                "success": "{{count}} eventos encontrados na fonte selecionada.",
+                "no_data": "Nenhum evento encontrado na fonte selecionada.",
+                "error": "Falha ao pesquisar eventos: {{error}}"
+            },
+            "event_list_modal": {
+                "title": "Selecionar um Evento Sísmico",
+                "earthquake_at": "Sismo às {{time}}",
+                "p_wave_arrival": "Chegada da Onda P {{time}} segundos",
+                "s_wave_arrival": "Chegada da Onda S {{time}} segundos",
+                "epicenter_distance": "Epicentro {{distance}} km",
+                "earthquake_depth": "Profundidade {{depth}} km",
+                "selected_an_event": "Selecionado um evento sísmico em {{region}} às {{time}}."
+            },
+            "data_export": {
+                "title": "Exportação de Dados",
+                "file_format": "Formato do Ficheiro",
+                "channel_code": "Código do Canal",
+                "export_button": "Obter Dados",
+                "exporting": "A exportar canal {{channel}} para o formato {{format}}.",
+                "success": "Canal {{channel}} exportado com sucesso para o formato {{format}}.",
+                "error": "Falha ao exportar canal {{channel}} para o formato {{format}}: {{error}}"
+            },
+            "search_records": {
+                "title": "Consulta Temporal",
+                "start_time": "Hora de Início",
+                "end_time": "Hora de Fim",
+                "invalid_time": "A hora de início deve ser anterior à hora de fim.",
+                "search_button": "Pesquisar Registos",
+                "searching": "A pesquisar registos sísmicos na base de dados.",
+                "success": "{{count}} registos sísmicos encontrados na base de dados.",
+                "no_data": "Nenhum registo sísmico encontrado na base de dados.",
+                "error": "Falha ao pesquisar registos: {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "Bloquear Layout",
+                "unlock_button": "Desbloquear Layout"
+            },
+            "reset_layout": {
+                "reset_button": "Repor Tudo",
+                "confirm_message": "Tem a certeza de que deseja repor o layout?",
+                "confirm_title": "Confirmar Reposição",
+                "confirm_button": "Repor",
+                "cancel_button": "Cancelar"
+            },
+            "share_link": {
+                "share_button": "Partilhar Link",
+                "link_copied": "Link partilhado copiado para a área de transferência."
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "Informação da Estação",
+                "name": "Nome",
+                "country": "País",
+                "place": "Local",
+                "affiliation": "Afiliação",
+                "channels": "Canais"
+            },
+            "device_info": {
+                "title": "Informação do Dispositivo",
+                "product_model": "Modelo do Produto",
+                "device_id": "ID do Dispositivo",
+                "link_protocol": "Protocolo de Ligação",
+                "packet_interval": "Intervalo de Pacotes",
+                "gnss_active": "GNSS Ativo"
+            },
+            "device_status": {
+                "title": "Estado do Dispositivo",
+                "sample_rate": "Taxa de Amostragem",
+                "latitude": "Latitude",
+                "longitude": "Longitude",
+                "elevation": "Elevação",
+                "temperature": "Temperatura"
+            },
+            "link_status": {
+                "title": "Estado da Ligação",
+                "started_at": "Iniciada em",
+                "last_frame": "Última Frame",
+                "frames": "Frames",
+                "errors": "Erros",
+                "messages": "Mensagens"
+            },
+            "connectivity": {
+                "loading": "A ligar à estação...",
+                "success": "Ligado à estação, servidor ativo há {{uptime}} segundos, atualizado às {{updatedAt}}.",
+                "error": "Ocorreu um erro ao ligar à estação, por favor verifique a sua ligação."
+            },
+            "station_location": {
+                "title": "Localização da Estação"
+            },
+            "service_status": {
+                "title": "Estado do Serviço"
+            },
+            "cpu_usage": {
+                "title": "Utilização do CPU"
+            },
+            "memory_usage": {
+                "title": "Utilização da Memória"
+            },
+            "disk_usage": {
+                "title": "Utilização do Disco"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "Oops! Página não encontrada.",
+            "check_your_url": "Por favor, verifique o seu URL e tente novamente.",
+            "go_back_button": "Voltar"
+        },
+        "RealTime": {
+            "reset_layout": {
+                "reset_button": "Repor Tudo",
+                "confirm_message": "Tem a certeza de que deseja repor o layout?",
+                "confirm_title": "Confirmar Reposição",
+                "confirm_button": "Repor",
+                "cancel_button": "Cancelar"
+            },
+            "layout_locker": {
+                "lock_button": "Bloquear Layout",
+                "unlock_button": "Desbloquear Layout"
+            },
+            "connectivity": {
+                "connecting": "Sem ligação, a ligar agora...",
+                "connected": "Ligado, última atualização às {{updatedAt}}."
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} SPS",
+                "channels": "{{num}} Canais",
+                "retention": "{{retention}} segundos"
+            }
+        },
+        "Settings": {
+            "Dangerous": {
+                "title": "Zona Perigosa",
+                "purge_waveform_records": {
+                    "title": "Purgar Registos de Forma de Onda",
+                    "description": "Isto irá apagar todos os registos de forma de onda na base de dados. A operação é irreversível.",
+                    "submit_button": "Purgar Registos",
+                    "confirm_title": "Confirmar Purga",
+                    "confirm_message": "Tem a certeza de que deseja purgar todos os registos de forma de onda?",
+                    "confirm_button": "Purgar",
+                    "cancel_button": "Cancelar",
+                    "purging": "A purgar registos de forma de onda...",
+                    "success": "Registos de forma de onda purgados com sucesso.",
+                    "error": "Falha ao purgar registos de forma de onda: {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "Purgar Ficheiros MiniSEED",
+                    "description": "Isto irá apagar todos os ficheiros MiniSEED no sistema. A operação é irreversível.",
+                    "submit_button": "Purgar MiniSEED",
+                    "confirm_title": "Confirmar Purga",
+                    "confirm_message": "Tem a certeza de que deseja purgar todos os ficheiros MiniSEED?",
+                    "confirm_button": "Purgar",
+                    "cancel_button": "Cancelar",
+                    "purging": "A purgar ficheiros MiniSEED...",
+                    "success": "Ficheiros MiniSEED purgados com sucesso.",
+                    "error": "Falha ao purgar ficheiros MiniSEED: {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "Purgar Ficheiros Helicorder",
+                    "description": "Isto irá apagar todos os ficheiros Helicorder no sistema. A operação é irreversível.",
+                    "submit_button": "Purgar Helicorder",
+                    "confirm_title": "Confirmar Purga",
+                    "confirm_message": "Tem a certeza de que deseja purgar todos os ficheiros Helicorder?",
+                    "confirm_button": "Purgar",
+                    "cancel_button": "Cancelar",
+                    "purging": "A purgar ficheiros Helicorder...",
+                    "success": "Ficheiros Helicorder purgados com sucesso.",
+                    "error": "Falha ao purgar ficheiros Helicorder: {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "Repor Configuração da Estação",
+                    "description": "Isto irá repor toda a configuração da estação. A operação é irreversível, é necessário reiniciar para que tenha efeito.",
+                    "submit_button": "Repor Estação",
+                    "confirm_title": "Confirmar Reposição",
+                    "confirm_message": "Deseja repor toda a configuração da estação?",
+                    "confirm_button": "Repor",
+                    "cancel_button": "Cancelar",
+                    "resetting": "A repor configuração da estação...",
+                    "success": "Configuração da estação reposta com sucesso.",
+                    "error": "Falha ao repor a configuração da estação: {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "Repor Configuração do Serviço",
+                    "description": "Isto irá repor toda a configuração do serviço. A operação é irreversível, é necessário reiniciar para que tenha efeito.",
+                    "submit_button": "Repor Serviço",
+                    "confirm_title": "Confirmar Reposição",
+                    "confirm_message": "Deseja repor toda a configuração do serviço?",
+                    "confirm_button": "Repor",
+                    "cancel_button": "Cancelar",
+                    "resetting": "A repor configuração do serviço...",
+                    "success": "Configuração do serviço reposta com sucesso.",
+                    "error": "Falha ao repor a configuração do serviço: {{error}}"
+                }
+            },
+            "Metadata": {
+                "title": "Metadados da Estação"
+            },
+            "Preference": {
+                "title": "Preferências Web",
+                "reset_layout_preference": {
+                    "title": "Repor Preferências de Layout",
+                    "description": "Isto irá repor todas as preferências de layout. A operação é irreversível.",
+                    "submit_button": "Repor Preferências",
+                    "confirm_title": "Confirmar Reposição",
+                    "confirm_message": "Tem a certeza de que deseja repor todas as preferências de layout?",
+                    "confirm_button": "Repor",
+                    "cancel_button": "Cancelar",
+                    "success": "Preferências de layout repostas com sucesso."
+                }
+            },
+            "Service": {
+                "title": "Controlo de Serviço",
+                "restart_service": {
+                    "submit_button": "Reiniciar",
+                    "confirm_title": "Confirmar Reinício",
+                    "confirm_message": "Tem a certeza de que deseja reiniciar o serviço?",
+                    "confirm_button": "Reiniciar",
+                    "cancel_button": "Cancelar",
+                    "restarting": "A reiniciar o serviço...",
+                    "success": "Serviço reiniciado com sucesso.",
+                    "error": "Falha ao reiniciar o serviço: {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "Iniciar",
+                    "confirm_title": "Confirmar Início",
+                    "confirm_message": "Tem a certeza de que deseja iniciar o serviço?",
+                    "confirm_button": "Iniciar",
+                    "cancel_button": "Cancelar",
+                    "starting": "A iniciar o serviço...",
+                    "success": "Serviço iniciado com sucesso.",
+                    "error": "Falha ao iniciar o serviço: {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "Parar",
+                    "confirm_title": "Confirmar Paragem",
+                    "confirm_message": "Tem a certeza de que deseja parar o serviço?",
+                    "confirm_button": "Parar",
+                    "cancel_button": "Cancelar",
+                    "stopping": "A parar o serviço...",
+                    "success": "Serviço parado com sucesso.",
+                    "error": "Falha ao parar o serviço: {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "Repor",
+                    "confirm_title": "Confirmar Reposição",
+                    "confirm_message": "Tem a certeza de que deseja repor o serviço?",
+                    "confirm_button": "Repor",
+                    "cancel_button": "Cancelar",
+                    "resetting": "A repor o serviço...",
+                    "success": "Serviço reposto com sucesso.",
+                    "error": "Falha ao repor o serviço: {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "Editar",
+                    "updating": "A aplicar novas alterações...",
+                    "success": "Alterações aplicadas com sucesso.",
+                    "error": "Falha ao atualizar a configuração do serviço: {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "A editar Serviço: {{name}}"
+                },
+                "service_status": {
+                    "yes": "Sim",
+                    "no": "Não",
+                    "is_running": "Em execução",
+                    "restarts": "Reinícios",
+                    "stopped_at": "Parado em",
+                    "started_at": "Iniciado em",
+                    "updated_at": "Atualizado em"
+                }
+            },
+            "Station": {
+                "title": "Configurações da Estação",
+                "update_station": {
+                    "field_required": "Este campo é obrigatório.",
+                    "updating": "A atualizar configuração da estação...",
+                    "success": "Configuração da estação atualizada com sucesso.",
+                    "error": "Falha ao atualizar a configuração da estação: {{error}}"
+                }
+            },
+            "Users": {
+                "title": "Gestão de Utilizadores",
+                "search_users": {
+                    "placeholder": "Pesquisar utilizadores"
+                },
+                "refresh_list": {
+                    "submit_button": "Atualizar",
+                    "refreshing": "A atualizar lista de utilizadores...",
+                    "success": "Lista de utilizadores atualizada com sucesso.",
+                    "error": "Falha ao atualizar a lista de utilizadores: {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "Remover Utilizadores",
+                    "confirm_title": "Confirmar Remoção",
+                    "confirm_message": "Tem a certeza de que deseja remover os utilizadores selecionados?",
+                    "confirm_button": "Remover",
+                    "cancel_button": "Cancelar",
+                    "removing": "A remover utilizadores selecionados...",
+                    "success": "{{num}} utilizador(es) removido(s).",
+                    "error": "Falha ao remover os utilizadores selecionados: {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "Criar Utilizador",
+                    "creating": "A criar novo utilizador...",
+                    "success": "Utilizador {{username}} criado com sucesso.",
+                    "error": "Falha ao criar novo utilizador: {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "Criar Novo Utilizador",
+                    "username": {
+                        "label": "Nome de Utilizador",
+                        "placeholder": "Nome do novo utilizador"
+                    },
+                    "password": {
+                        "label": "Palavra-passe",
+                        "placeholder": "Palavra-passe do novo utilizador"
+                    },
+                    "admin": {
+                        "label": "Utilizador com privilégios de administrador"
+                    },
+                    "create_button": "Criar"
+                },
+                "edit_user": {
+                    "submit_button": "Editar",
+                    "updating": "A atualizar utilizador...",
+                    "success": "Utilizador {{username}} atualizado com sucesso.",
+                    "error": "Falha ao atualizar utilizador: {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "Editar Utilizador",
+                    "username": {
+                        "label": "Nome de Utilizador",
+                        "placeholder": "Vazio para nenhuma alteração."
+                    },
+                    "password": {
+                        "label": "Palavra-passe",
+                        "placeholder": "Vazio para nenhuma alteração."
+                    },
+                    "admin": {
+                        "label": "Utilizador com privilégios de administrador"
+                    },
+                    "update_button": "Atualizar"
+                },
+                "remove_user": {
+                    "submit_button": "Remover",
+                    "confirm_title": "Confirmar Remoção",
+                    "confirm_message": "Tem a certeza de que deseja remover o utilizador {{username}}?",
+                    "confirm_button": "Remover",
+                    "cancel_button": "Cancelar",
+                    "removing": "A remover utilizador...",
+                    "success": "Utilizador {{username}} removido com sucesso.",
+                    "error": "Falha ao remover utilizador: {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "Sim",
+                    "no": "Não",
+                    "never": "Nunca",
+                    "id": "ID",
+                    "user_id": "ID do Utilizador",
+                    "username": "Nome de Utilizador",
+                    "admin": "Admin",
+                    "created_at": "Criado em",
+                    "last_login": "Último Login",
+                    "user_ip": "IP do Utilizador",
+                    "user_agent": "User Agent",
+                    "updated_at": "Atualizado em",
+                    "actions": "Ações"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "Uma nova atualização está disponível. Gostaria de atualizar agora?",
+            "confirm_title": "Atualização Disponível",
+            "confirm_button": "Atualizar",
+            "cancel_button": "Cancelar"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "Tem a certeza de que deseja terminar sessão?",
+            "confirm_title": "Terminar Sessão",
+            "confirm_button": "OK",
+            "cancel_button": "Cancelar"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "Nome de Utilizador",
+            "placeholder": "O seu Nome de Utilizador"
+        },
+        "password": {
+            "label": "Palavra-passe",
+            "placeholder": "A sua Palavra-passe"
+        },
+        "captcha": {
+            "label": "Introduzir Captcha",
+            "loading": "A carregar captcha...",
+            "placeholder": "Código Captcha",
+            "refreshing": "A atualizar captcha.",
+            "refresh_success": "Captcha atualizado com sucesso.",
+            "refresh_error": "Falha ao atualizar captcha."
+        },
+        "signin": {
+            "button": "Iniciar Sessão",
+            "loading": "A iniciar sessão...",
+            "success": "Iniciou sessão com sucesso.",
+            "error": "Falha no início de sessão."
+        }
+    }
+}

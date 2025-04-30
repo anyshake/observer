@@ -1,0 +1,456 @@
+{
+    "components": {
+        "ErrorPage": {
+            "something_went_wrong": "Hoppla! Etwas ist schiefgelaufen.",
+            "try_again_later": "Bitte versuchen Sie, die Seite neu zu laden oder kommen Sie später wieder."
+        },
+        "TypedInput": {
+            "yes": "Ja",
+            "no": "Nein",
+            "add_new_item": "Neuen Eintrag eingeben.",
+            "editing_list": "Liste von {{fieldName}} bearbeiten"
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "Dateiname",
+                "time": "Änderungszeit",
+                "size": "Dateigröße",
+                "actions": "Aktionen"
+            },
+            "miniseed_list": {
+                "title": "Tägliche MiniSEED",
+                "download": "Herunterladen",
+                "search": "Suchen"
+            },
+            "helicorder_list": {
+                "title": "Helicorder-Liste",
+                "download": "Herunterladen",
+                "search": "Suchen"
+            },
+            "request_file": {
+                "requesting": "Link zum Herunterladen der Datei {{fileName}} wird angefordert.",
+                "success": "Link zum Herunterladen der Datei {{fileName}} erhalten.",
+                "error": "Fehler beim Anfordern des Dateilinks für {{fileName}}: {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "Ereignisabfrage",
+                "data_agency": "Datenagentur",
+                "search_button": "Ereignisse suchen",
+                "searching": "Suche nach Ereignissen aus der ausgewählten Quelle.",
+                "success": "{{count}} Ereignisse in der ausgewählten Quelle gefunden.",
+                "no_data": "Keine Ereignisse in der ausgewählten Quelle gefunden.",
+                "error": "Fehler bei der Suche nach Ereignissen: {{error}}"
+            },
+            "event_list_modal": {
+                "title": "Ein seismisches Ereignis auswählen",
+                "earthquake_at": "Erdbeben um {{time}}",
+                "p_wave_arrival": "P-Wellen-Ankunft {{time}} Sekunden",
+                "s_wave_arrival": "S-Wellen-Ankunft {{time}} Sekunden",
+                "epicenter_distance": "Epizentrum {{distance}} km",
+                "earthquake_depth": "Tiefe {{depth}} km",
+                "selected_an_event": "Ein Erdbebenereignis in {{region}} um {{time}} ausgewählt."
+            },
+            "data_export": {
+                "title": "Datenexport",
+                "file_format": "Dateiformat",
+                "channel_code": "Kanalcode",
+                "export_button": "Daten abrufen",
+                "exporting": "Kanal {{channel}} wird ins {{format}}-Format exportiert.",
+                "success": "Kanal {{channel}} erfolgreich ins {{format}}-Format exportiert.",
+                "error": "Fehler beim Exportieren von Kanal {{channel}} ins {{format}}-Format: {{error}}"
+            },
+            "search_records": {
+                "title": "Zeitabfrage",
+                "start_time": "Startzeit",
+                "end_time": "Endzeit",
+                "invalid_time": "Die Startzeit muss vor der Endzeit liegen.",
+                "search_button": "Aufzeichnungen suchen",
+                "searching": "Suche nach seismischen Aufzeichnungen in der Datenbank.",
+                "success": "{{count}} seismische Aufzeichnungen in der Datenbank gefunden.",
+                "no_data": "Keine seismischen Aufzeichnungen in der Datenbank gefunden.",
+                "error": "Fehler bei der Suche nach Aufzeichnungen: {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "Layout sperren",
+                "unlock_button": "Layout entsperren"
+            },
+            "reset_layout": {
+                "reset_button": "Alles zurücksetzen",
+                "confirm_message": "Sind Sie sicher, dass Sie das Layout zurücksetzen möchten?",
+                "confirm_title": "Zurücksetzen bestätigen",
+                "confirm_button": "Zurücksetzen",
+                "cancel_button": "Abbrechen"
+            },
+            "share_link": {
+                "share_button": "Link teilen",
+                "link_copied": "Geteilter Link wurde in die Zwischenablage kopiert."
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "Stationsinformationen",
+                "name": "Name",
+                "country": "Land",
+                "place": "Ort",
+                "affiliation": "Zugehörigkeit",
+                "channels": "Kanäle"
+            },
+            "device_info": {
+                "title": "Geräteinformationen",
+                "product_model": "Produktmodell",
+                "device_id": "Geräte-ID",
+                "link_protocol": "Verbindungsprotokoll",
+                "packet_interval": "Paketintervall",
+                "gnss_active": "GNSS aktiv"
+            },
+            "device_status": {
+                "title": "Gerätestatus",
+                "sample_rate": "Abtastrate",
+                "latitude": "Breitengrad",
+                "longitude": "Längengrad",
+                "elevation": "Höhe",
+                "temperature": "Temperatur"
+            },
+            "link_status": {
+                "title": "Verbindungsstatus",
+                "started_at": "Gestartet am",
+                "last_frame": "Letzter Frame",
+                "frames": "Frames",
+                "errors": "Fehler",
+                "messages": "Nachrichten"
+            },
+            "connectivity": {
+                "loading": "Verbindung zur Station wird hergestellt...",
+                "success": "Mit Station verbunden, Server läuft seit {{uptime}} Sekunden, aktualisiert um {{updatedAt}}.",
+                "error": "Fehler beim Verbinden mit der Station, bitte überprüfen Sie Ihre Verbindung."
+            },
+            "station_location": {
+                "title": "Stationsstandort"
+            },
+            "service_status": {
+                "title": "Dienststatus"
+            },
+            "cpu_usage": {
+                "title": "CPU-Auslastung"
+            },
+            "memory_usage": {
+                "title": "Speichernutzung"
+            },
+            "disk_usage": {
+                "title": "Festplattennutzung"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "Hoppla! Seite nicht gefunden.",
+            "check_your_url": "Bitte überprüfen Sie Ihre URL und versuchen Sie es erneut.",
+            "go_back_button": "Zurück"
+        },
+        "RealTime": {
+            "reset_layout": {
+                "reset_button": "Alles zurücksetzen",
+                "confirm_message": "Sind Sie sicher, dass Sie das Layout zurücksetzen möchten?",
+                "confirm_title": "Zurücksetzen bestätigen",
+                "confirm_button": "Zurücksetzen",
+                "cancel_button": "Abbrechen"
+            },
+            "layout_locker": {
+                "lock_button": "Layout sperren",
+                "unlock_button": "Layout entsperren"
+            },
+            "connectivity": {
+                "connecting": "Keine Verbindung, wird jetzt verbunden...",
+                "connected": "Verbunden, zuletzt aktualisiert um {{updatedAt}}."
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} SPS",
+                "channels": "{{num}} Kanäle",
+                "retention": "{{retention}} Sekunden"
+            }
+        },
+        "Settings": {
+            "Dangerous": {
+                "title": "Gefahrenbereich",
+                "purge_waveform_records": {
+                    "title": "Wellenform-Aufzeichnungen löschen",
+                    "description": "Dies löscht alle Wellenform-Aufzeichnungen in der Datenbank. Dieser Vorgang kann nicht rückgängig gemacht werden.",
+                    "submit_button": "Aufzeichnungen löschen",
+                    "confirm_title": "Löschen bestätigen",
+                    "confirm_message": "Sind Sie sicher, dass Sie alle Wellenform-Aufzeichnungen löschen möchten?",
+                    "confirm_button": "Löschen",
+                    "cancel_button": "Abbrechen",
+                    "purging": "Wellenform-Aufzeichnungen werden gelöscht...",
+                    "success": "Wellenform-Aufzeichnungen erfolgreich gelöscht.",
+                    "error": "Fehler beim Löschen der Wellenform-Aufzeichnungen: {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "MiniSEED-Dateien löschen",
+                    "description": "Dies löscht alle MiniSEED-Dateien im System. Dieser Vorgang kann nicht rückgängig gemacht werden.",
+                    "submit_button": "MiniSEED löschen",
+                    "confirm_title": "Löschen bestätigen",
+                    "confirm_message": "Sind Sie sicher, dass Sie alle MiniSEED-Dateien löschen möchten?",
+                    "confirm_button": "Löschen",
+                    "cancel_button": "Abbrechen",
+                    "purging": "MiniSEED-Dateien werden gelöscht...",
+                    "success": "MiniSEED-Dateien erfolgreich gelöscht.",
+                    "error": "Fehler beim Löschen der MiniSEED-Dateien: {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "Helicorder-Dateien löschen",
+                    "description": "Dies löscht alle Helicorder-Dateien im System. Dieser Vorgang kann nicht rückgängig gemacht werden.",
+                    "submit_button": "Helicorder löschen",
+                    "confirm_title": "Löschen bestätigen",
+                    "confirm_message": "Sind Sie sicher, dass Sie alle Helicorder-Dateien löschen möchten?",
+                    "confirm_button": "Löschen",
+                    "cancel_button": "Abbrechen",
+                    "purging": "Helicorder-Dateien werden gelöscht...",
+                    "success": "Helicorder-Dateien erfolgreich gelöscht.",
+                    "error": "Fehler beim Löschen der Helicorder-Dateien: {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "Stationskonfiguration zurücksetzen",
+                    "description": "Dies setzt die gesamte Stationskonfiguration zurück. Dieser Vorgang kann nicht rückgängig gemacht werden. Ein Neustart ist erforderlich, damit die Änderungen wirksam werden.",
+                    "submit_button": "Station zurücksetzen",
+                    "confirm_title": "Zurücksetzen bestätigen",
+                    "confirm_message": "Möchten Sie die gesamte Stationskonfiguration zurücksetzen?",
+                    "confirm_button": "Zurücksetzen",
+                    "cancel_button": "Abbrechen",
+                    "resetting": "Stationskonfiguration wird zurückgesetzt...",
+                    "success": "Stationskonfiguration erfolgreich zurückgesetzt.",
+                    "error": "Fehler beim Zurücksetzen der Stationskonfiguration: {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "Dienstkonfiguration zurücksetzen",
+                    "description": "Dies setzt die gesamte Dienstkonfiguration zurück. Dieser Vorgang kann nicht rückgängig gemacht werden. Ein Neustart ist erforderlich, damit die Änderungen wirksam werden.",
+                    "submit_button": "Dienst zurücksetzen",
+                    "confirm_title": "Zurücksetzen bestätigen",
+                    "confirm_message": "Möchten Sie die gesamte Dienstkonfiguration zurücksetzen?",
+                    "confirm_button": "Zurücksetzen",
+                    "cancel_button": "Abbrechen",
+                    "resetting": "Dienstkonfiguration wird zurückgesetzt...",
+                    "success": "Dienstkonfiguration erfolgreich zurückgesetzt.",
+                    "error": "Fehler beim Zurücksetzen der Dienstkonfiguration: {{error}}"
+                }
+            },
+            "Metadata": {
+                "title": "Stations-Metadaten"
+            },
+            "Preference": {
+                "title": "Web-Einstellungen",
+                "reset_layout_preference": {
+                    "title": "Layout-Einstellungen zurücksetzen",
+                    "description": "Dies setzt alle Layout-Einstellungen zurück. Dieser Vorgang kann nicht rückgängig gemacht werden.",
+                    "submit_button": "Einstellungen zurücksetzen",
+                    "confirm_title": "Zurücksetzen bestätigen",
+                    "confirm_message": "Sind Sie sicher, dass Sie alle Layout-Einstellungen zurücksetzen möchten?",
+                    "confirm_button": "Zurücksetzen",
+                    "cancel_button": "Abbrechen",
+                    "success": "Layout-Einstellungen erfolgreich zurückgesetzt."
+                }
+            },
+            "Service": {
+                "title": "Dienststeuerung",
+                "restart_service": {
+                    "submit_button": "Neu starten",
+                    "confirm_title": "Neustart bestätigen",
+                    "confirm_message": "Sind Sie sicher, dass Sie den Dienst neu starten möchten?",
+                    "confirm_button": "Neu starten",
+                    "cancel_button": "Abbrechen",
+                    "restarting": "Dienst wird neu gestartet...",
+                    "success": "Dienst erfolgreich neu gestartet.",
+                    "error": "Fehler beim Neustart des Dienstes: {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "Starten",
+                    "confirm_title": "Start bestätigen",
+                    "confirm_message": "Sind Sie sicher, dass Sie den Dienst starten möchten?",
+                    "confirm_button": "Starten",
+                    "cancel_button": "Abbrechen",
+                    "starting": "Dienst wird gestartet...",
+                    "success": "Dienst erfolgreich gestartet.",
+                    "error": "Fehler beim Starten des Dienstes: {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "Stoppen",
+                    "confirm_title": "Stopp bestätigen",
+                    "confirm_message": "Sind Sie sicher, dass Sie den Dienst stoppen möchten?",
+                    "confirm_button": "Stoppen",
+                    "cancel_button": "Abbrechen",
+                    "stopping": "Dienst wird gestoppt...",
+                    "success": "Dienst erfolgreich gestoppt.",
+                    "error": "Fehler beim Stoppen des Dienstes: {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "Zurücksetzen",
+                    "confirm_title": "Zurücksetzen bestätigen",
+                    "confirm_message": "Sind Sie sicher, dass Sie den Dienst zurücksetzen möchten?",
+                    "confirm_button": "Zurücksetzen",
+                    "cancel_button": "Abbrechen",
+                    "resetting": "Dienst wird zurückgesetzt...",
+                    "success": "Dienst erfolgreich zurückgesetzt.",
+                    "error": "Fehler beim Zurücksetzen des Dienstes: {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "Bearbeiten",
+                    "updating": "Neue Änderungen werden angewendet...",
+                    "success": "Änderungen wurden angewendet.",
+                    "error": "Fehler beim Aktualisieren der Dienstkonfiguration: {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "Dienst bearbeiten: {{name}}"
+                },
+                "service_status": {
+                    "yes": "Ja",
+                    "no": "Nein",
+                    "is_running": "Läuft",
+                    "restarts": "Neustarts",
+                    "stopped_at": "Gestoppt am",
+                    "started_at": "Gestartet am",
+                    "updated_at": "Aktualisiert am"
+                }
+            },
+            "Station": {
+                "title": "Stations-Einstellungen",
+                "update_station": {
+                    "field_required": "Dieses Feld ist erforderlich.",
+                    "updating": "Stationskonfiguration wird aktualisiert...",
+                    "success": "Stationskonfiguration erfolgreich aktualisiert.",
+                    "error": "Fehler beim Aktualisieren der Stationskonfiguration: {{error}}"
+                }
+            },
+            "Users": {
+                "title": "Benutzerverwaltung",
+                "search_users": {
+                    "placeholder": "Benutzer suchen"
+                },
+                "refresh_list": {
+                    "submit_button": "Aktualisieren",
+                    "refreshing": "Benutzerliste wird aktualisiert...",
+                    "success": "Benutzerliste erfolgreich aktualisiert.",
+                    "error": "Fehler beim Aktualisieren der Benutzerliste: {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "Benutzer entfernen",
+                    "confirm_title": "Entfernen bestätigen",
+                    "confirm_message": "Sind Sie sicher, dass Sie die ausgewählten Benutzer entfernen möchten?",
+                    "confirm_button": "Entfernen",
+                    "cancel_button": "Abbrechen",
+                    "removing": "Ausgewählte Benutzer werden entfernt...",
+                    "success": "{{num}} Benutzer entfernt.",
+                    "error": "Fehler beim Entfernen der ausgewählten Benutzer: {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "Benutzer erstellen",
+                    "creating": "Neuer Benutzer wird erstellt...",
+                    "success": "Benutzer {{username}} wurde erstellt.",
+                    "error": "Fehler beim Erstellen des neuen Benutzers: {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "Neuen Benutzer erstellen",
+                    "username": {
+                        "label": "Benutzername",
+                        "placeholder": "Benutzername des neuen Benutzers"
+                    },
+                    "password": {
+                        "label": "Passwort",
+                        "placeholder": "Passwort des neuen Benutzers"
+                    },
+                    "admin": {
+                        "label": "Benutzer mit Administratorrechten"
+                    },
+                    "create_button": "Erstellen"
+                },
+                "edit_user": {
+                    "submit_button": "Bearbeiten",
+                    "updating": "Benutzer wird aktualisiert...",
+                    "success": "Benutzer {{username}} wurde aktualisiert.",
+                    "error": "Fehler beim Aktualisieren des Benutzers: {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "Benutzer bearbeiten",
+                    "username": {
+                        "label": "Benutzername",
+                        "placeholder": "Leer lassen für keine Änderung."
+                    },
+                    "password": {
+                        "label": "Passwort",
+                        "placeholder": "Leer lassen für keine Änderung."
+                    },
+                    "admin": {
+                        "label": "Benutzer mit Administratorrechten"
+                    },
+                    "update_button": "Aktualisieren"
+                },
+                "remove_user": {
+                    "submit_button": "Entfernen",
+                    "confirm_title": "Entfernen bestätigen",
+                    "confirm_message": "Sind Sie sicher, dass Sie den Benutzer {{username}} entfernen möchten?",
+                    "confirm_button": "Entfernen",
+                    "cancel_button": "Abbrechen",
+                    "removing": "Benutzer wird entfernt...",
+                    "success": "Benutzer {{username}} wurde entfernt.",
+                    "error": "Fehler beim Entfernen des Benutzers: {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "Ja",
+                    "no": "Nein",
+                    "never": "Nie",
+                    "id": "ID",
+                    "user_id": "Benutzer-ID",
+                    "username": "Benutzername",
+                    "admin": "Admin",
+                    "created_at": "Erstellt am",
+                    "last_login": "Letzte Anmeldung",
+                    "user_ip": "Benutzer-IP",
+                    "user_agent": "User-Agent",
+                    "updated_at": "Aktualisiert am",
+                    "actions": "Aktionen"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "Ein neues Update ist verfügbar. Möchten Sie es jetzt installieren?",
+            "confirm_title": "Update verfügbar",
+            "confirm_button": "Aktualisieren",
+            "cancel_button": "Abbrechen"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "Sind Sie sicher, dass Sie sich abmelden möchten?",
+            "confirm_title": "Abmelden",
+            "confirm_button": "OK",
+            "cancel_button": "Abbrechen"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "Benutzername",
+            "placeholder": "Ihr Benutzername"
+        },
+        "password": {
+            "label": "Passwort",
+            "placeholder": "Ihr Passwort"
+        },
+        "captcha": {
+            "label": "Captcha eingeben",
+            "loading": "Captcha wird geladen...",
+            "placeholder": "Captcha-Code",
+            "refreshing": "Captcha wird aktualisiert.",
+            "refresh_success": "Captcha erfolgreich aktualisiert.",
+            "refresh_error": "Fehler beim Aktualisieren des Captchas."
+        },
+        "signin": {
+            "button": "Anmelden",
+            "loading": "Anmeldung läuft...",
+            "success": "Sie haben sich erfolgreich angemeldet.",
+            "error": "Anmeldung fehlgeschlagen."
+        }
+    }
+}

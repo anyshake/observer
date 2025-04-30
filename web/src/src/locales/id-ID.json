@@ -1,0 +1,456 @@
+{
+    "components": {
+        "ErrorPage": {
+            "something_went_wrong": "Ups! Terjadi kesalahan.",
+            "try_again_later": "Silakan coba muat ulang halaman atau kembali lagi nanti."
+        },
+        "TypedInput": {
+            "yes": "Ya",
+            "no": "Tidak",
+            "add_new_item": "Masukkan item baru.",
+            "editing_list": "Mengedit Daftar {{fieldName}}"
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "Nama File",
+                "time": "Waktu Dimodifikasi",
+                "size": "Ukuran File",
+                "actions": "Aksi"
+            },
+            "miniseed_list": {
+                "title": "MiniSEED Harian",
+                "download": "Unduh",
+                "search": "Cari"
+            },
+            "helicorder_list": {
+                "title": "Daftar Helicorder",
+                "download": "Unduh",
+                "search": "Cari"
+            },
+            "request_file": {
+                "requesting": "Meminta tautan untuk mengunduh file {{fileName}}.",
+                "success": "Berhasil mendapatkan tautan untuk mengunduh file {{fileName}}.",
+                "error": "Gagal meminta tautan file untuk {{fileName}}: {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "Kueri Kejadian",
+                "data_agency": "Agensi Data",
+                "search_button": "Cari Kejadian",
+                "searching": "Mencari kejadian dari sumber yang dipilih.",
+                "success": "Ditemukan {{count}} kejadian dari sumber yang dipilih.",
+                "no_data": "Tidak ada kejadian yang ditemukan di sumber yang dipilih.",
+                "error": "Gagal mencari kejadian: {{error}}"
+            },
+            "event_list_modal": {
+                "title": "Pilih Kejadian Seismik",
+                "earthquake_at": "Gempa bumi pada {{time}}",
+                "p_wave_arrival": "Kedatangan Gelombang P {{time}} detik",
+                "s_wave_arrival": "Kedatangan Gelombang S {{time}} detik",
+                "epicenter_distance": "Episentrum {{distance}} km",
+                "earthquake_depth": "Kedalaman {{depth}} km",
+                "selected_an_event": "Memilih kejadian gempa bumi di {{region}} pada {{time}}."
+            },
+            "data_export": {
+                "title": "Ekspor Data",
+                "file_format": "Format File",
+                "channel_code": "Kode Saluran",
+                "export_button": "Dapatkan Data",
+                "exporting": "Mengekspor saluran {{channel}} ke format {{format}}.",
+                "success": "Berhasil mengekspor saluran {{channel}} ke format {{format}}.",
+                "error": "Gagal mengekspor saluran {{channel}} ke format {{format}}: {{error}}"
+            },
+            "search_records": {
+                "title": "Kueri Waktu",
+                "start_time": "Waktu Mulai",
+                "end_time": "Waktu Selesai",
+                "invalid_time": "Waktu mulai harus sebelum waktu selesai.",
+                "search_button": "Cari Rekaman",
+                "searching": "Mencari rekaman seismik dari database.",
+                "success": "Ditemukan {{count}} rekaman seismik dari database.",
+                "no_data": "Tidak ada rekaman seismik yang ditemukan di database.",
+                "error": "Gagal mencari rekaman: {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "Kunci Tata Letak",
+                "unlock_button": "Buka Kunci Tata Letak"
+            },
+            "reset_layout": {
+                "reset_button": "Reset Semua",
+                "confirm_message": "Apakah Anda yakin ingin mereset tata letak?",
+                "confirm_title": "Konfirmasi Reset",
+                "confirm_button": "Reset",
+                "cancel_button": "Batal"
+            },
+            "share_link": {
+                "share_button": "Bagikan Tautan",
+                "link_copied": "Tautan yang dibagikan telah disalin ke clipboard."
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "Informasi Stasiun",
+                "name": "Nama",
+                "country": "Negara",
+                "place": "Tempat",
+                "affiliation": "Afiliasi",
+                "channels": "Saluran"
+            },
+            "device_info": {
+                "title": "Informasi Perangkat",
+                "product_model": "Model Produk",
+                "device_id": "ID Perangkat",
+                "link_protocol": "Protokol Tautan",
+                "packet_interval": "Interval Paket",
+                "gnss_active": "GNSS Aktif"
+            },
+            "device_status": {
+                "title": "Status Perangkat",
+                "sample_rate": "Sample Rate",
+                "latitude": "Lintang",
+                "longitude": "Bujur",
+                "elevation": "Ketinggian",
+                "temperature": "Suhu"
+            },
+            "link_status": {
+                "title": "Status Tautan",
+                "started_at": "Dimulai Pada",
+                "last_frame": "Frame Terakhir",
+                "frames": "Frame",
+                "errors": "Error",
+                "messages": "Pesan"
+            },
+            "connectivity": {
+                "loading": "Menghubungkan ke stasiun...",
+                "success": "Terhubung ke stasiun, server aktif selama {{uptime}} detik, diperbarui pada {{updatedAt}}.",
+                "error": "Terjadi error saat menghubungkan ke stasiun, silakan periksa koneksi Anda."
+            },
+            "station_location": {
+                "title": "Lokasi Stasiun"
+            },
+            "service_status": {
+                "title": "Status Layanan"
+            },
+            "cpu_usage": {
+                "title": "Penggunaan CPU"
+            },
+            "memory_usage": {
+                "title": "Penggunaan Memori"
+            },
+            "disk_usage": {
+                "title": "Penggunaan Disk"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "Ups! Halaman tidak ditemukan.",
+            "check_your_url": "Silakan periksa URL Anda dan coba lagi.",
+            "go_back_button": "Kembali"
+        },
+        "RealTime": {
+            "reset_layout": {
+                "reset_button": "Reset Semua",
+                "confirm_message": "Apakah Anda yakin ingin mereset tata letak?",
+                "confirm_title": "Konfirmasi Reset",
+                "confirm_button": "Reset",
+                "cancel_button": "Batal"
+            },
+            "layout_locker": {
+                "lock_button": "Kunci Tata Letak",
+                "unlock_button": "Buka Kunci Tata Letak"
+            },
+            "connectivity": {
+                "connecting": "Tidak ada koneksi, sedang menghubungkan...",
+                "connected": "Terhubung, terakhir diperbarui pada {{updatedAt}}."
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} SPS",
+                "channels": "{{num}} Saluran",
+                "retention": "{{retention}} detik"
+            }
+        },
+        "Settings": {
+            "Dangerous": {
+                "title": "Zona Berbahaya",
+                "purge_waveform_records": {
+                    "title": "Hapus Rekaman Waveform",
+                    "description": "Ini akan menghapus semua rekaman waveform di database, operasi ini tidak dapat dibatalkan.",
+                    "submit_button": "Hapus Rekaman",
+                    "confirm_title": "Konfirmasi Penghapusan",
+                    "confirm_message": "Apakah Anda yakin ingin menghapus semua rekaman waveform?",
+                    "confirm_button": "Hapus",
+                    "cancel_button": "Batal",
+                    "purging": "Menghapus rekaman waveform...",
+                    "success": "Berhasil menghapus rekaman waveform.",
+                    "error": "Gagal menghapus rekaman waveform: {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "Hapus File MiniSEED",
+                    "description": "Ini akan menghapus semua file MiniSEED di sistem, operasi ini tidak dapat dibatalkan.",
+                    "submit_button": "Hapus MiniSEED",
+                    "confirm_title": "Konfirmasi Penghapusan",
+                    "confirm_message": "Apakah Anda yakin ingin menghapus semua file MiniSEED?",
+                    "confirm_button": "Hapus",
+                    "cancel_button": "Batal",
+                    "purging": "Menghapus file MiniSEED...",
+                    "success": "Berhasil menghapus file MiniSEED.",
+                    "error": "Gagal menghapus file MiniSEED: {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "Hapus File Helicorder",
+                    "description": "Ini akan menghapus semua file helicorder di sistem, operasi ini tidak dapat dibatalkan.",
+                    "submit_button": "Hapus Helicorder",
+                    "confirm_title": "Konfirmasi Penghapusan",
+                    "confirm_message": "Apakah Anda yakin ingin menghapus semua file helicorder?",
+                    "confirm_button": "Hapus",
+                    "cancel_button": "Batal",
+                    "purging": "Menghapus file helicorder...",
+                    "success": "Berhasil menghapus file helicorder.",
+                    "error": "Gagal menghapus file helicorder: {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "Reset Konfigurasi Stasiun",
+                    "description": "Ini akan mereset semua konfigurasi stasiun, operasi ini tidak dapat dibatalkan, restart diperlukan agar berlaku.",
+                    "submit_button": "Reset Stasiun",
+                    "confirm_title": "Konfirmasi Reset",
+                    "confirm_message": "Apakah Anda ingin mereset semua konfigurasi stasiun?",
+                    "confirm_button": "Reset",
+                    "cancel_button": "Batal",
+                    "resetting": "Mereset konfigurasi stasiun...",
+                    "success": "Berhasil mereset konfigurasi stasiun.",
+                    "error": "Gagal mereset konfigurasi stasiun: {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "Reset Konfigurasi Layanan",
+                    "description": "Ini akan mereset semua konfigurasi layanan, operasi ini tidak dapat dibatalkan, restart diperlukan agar berlaku.",
+                    "submit_button": "Reset Layanan",
+                    "confirm_title": "Konfirmasi Reset",
+                    "confirm_message": "Apakah Anda ingin mereset semua konfigurasi layanan?",
+                    "confirm_button": "Reset",
+                    "cancel_button": "Batal",
+                    "resetting": "Mereset konfigurasi layanan...",
+                    "success": "Berhasil mereset konfigurasi layanan.",
+                    "error": "Gagal mereset konfigurasi layanan: {{error}}"
+                }
+            },
+            "Metadata": {
+                "title": "Metadata Stasiun"
+            },
+            "Preference": {
+                "title": "Preferensi Web",
+                "reset_layout_preference": {
+                    "title": "Reset Preferensi Tata Letak",
+                    "description": "Ini akan mereset semua preferensi tata letak, operasi ini tidak dapat dibatalkan.",
+                    "submit_button": "Reset Preferensi",
+                    "confirm_title": "Konfirmasi Reset",
+                    "confirm_message": "Apakah Anda yakin ingin mereset semua preferensi tata letak?",
+                    "confirm_button": "Reset",
+                    "cancel_button": "Batal",
+                    "success": "Berhasil mereset preferensi tata letak."
+                }
+            },
+            "Service": {
+                "title": "Kontrol Layanan",
+                "restart_service": {
+                    "submit_button": "Restart",
+                    "confirm_title": "Konfirmasi Restart",
+                    "confirm_message": "Apakah Anda yakin ingin merestart layanan?",
+                    "confirm_button": "Restart",
+                    "cancel_button": "Batal",
+                    "restarting": "Merestart layanan...",
+                    "success": "Berhasil merestart layanan.",
+                    "error": "Gagal merestart layanan: {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "Mulai",
+                    "confirm_title": "Konfirmasi Mulai",
+                    "confirm_message": "Apakah Anda yakin ingin memulai layanan?",
+                    "confirm_button": "Mulai",
+                    "cancel_button": "Batal",
+                    "starting": "Memulai layanan...",
+                    "success": "Berhasil memulai layanan.",
+                    "error": "Gagal memulai layanan: {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "Hentikan",
+                    "confirm_title": "Konfirmasi Hentikan",
+                    "confirm_message": "Apakah Anda yakin ingin menghentikan layanan?",
+                    "confirm_button": "Hentikan",
+                    "cancel_button": "Batal",
+                    "stopping": "Menghentikan layanan...",
+                    "success": "Berhasil menghentikan layanan.",
+                    "error": "Gagal menghentikan layanan: {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "Reset",
+                    "confirm_title": "Konfirmasi Reset",
+                    "confirm_message": "Apakah Anda yakin ingin mereset layanan?",
+                    "confirm_button": "Reset",
+                    "cancel_button": "Batal",
+                    "resetting": "Mereset layanan...",
+                    "success": "Berhasil mereset layanan.",
+                    "error": "Gagal mereset layanan: {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "Edit",
+                    "updating": "Menerapkan perubahan baru...",
+                    "success": "Perubahan telah diterapkan.",
+                    "error": "Gagal memperbarui konfigurasi layanan: {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "Mengedit Layanan: {{name}}"
+                },
+                "service_status": {
+                    "yes": "Ya",
+                    "no": "Tidak",
+                    "is_running": "Berjalan",
+                    "restarts": "Restart",
+                    "stopped_at": "Dihentikan Pada",
+                    "started_at": "Dimulai Pada",
+                    "updated_at": "Diperbarui Pada"
+                }
+            },
+            "Station": {
+                "title": "Pengaturan Stasiun",
+                "update_station": {
+                    "field_required": "Bidang ini wajib diisi.",
+                    "updating": "Memperbarui konfigurasi stasiun...",
+                    "success": "Berhasil memperbarui konfigurasi stasiun.",
+                    "error": "Gagal memperbarui konfigurasi stasiun: {{error}}"
+                }
+            },
+            "Users": {
+                "title": "Manajemen Pengguna",
+                "search_users": {
+                    "placeholder": "Cari pengguna"
+                },
+                "refresh_list": {
+                    "submit_button": "Segarkan",
+                    "refreshing": "Menyegarkan daftar pengguna...",
+                    "success": "Berhasil menyegarkan daftar pengguna.",
+                    "error": "Gagal menyegarkan daftar pengguna: {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "Hapus Pengguna",
+                    "confirm_title": "Konfirmasi Penghapusan",
+                    "confirm_message": "Apakah Anda yakin ingin menghapus pengguna yang dipilih?",
+                    "confirm_button": "Hapus",
+                    "cancel_button": "Batal",
+                    "removing": "Menghapus pengguna yang dipilih...",
+                    "success": "{{num}} pengguna telah dihapus.",
+                    "error": "Gagal menghapus pengguna yang dipilih: {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "Buat Pengguna",
+                    "creating": "Membuat pengguna baru...",
+                    "success": "Pengguna {{username}} telah dibuat.",
+                    "error": "Gagal membuat pengguna baru: {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "Buat Pengguna Baru",
+                    "username": {
+                        "label": "Nama Pengguna",
+                        "placeholder": "Nama pengguna baru"
+                    },
+                    "password": {
+                        "label": "Kata Sandi",
+                        "placeholder": "Kata sandi pengguna baru"
+                    },
+                    "admin": {
+                        "label": "Pengguna dengan hak admin"
+                    },
+                    "create_button": "Buat"
+                },
+                "edit_user": {
+                    "submit_button": "Edit",
+                    "updating": "Memperbarui pengguna...",
+                    "success": "Pengguna {{username}} telah diperbarui.",
+                    "error": "Gagal memperbarui pengguna: {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "Edit Pengguna",
+                    "username": {
+                        "label": "Nama Pengguna",
+                        "placeholder": "Kosongkan jika tidak ada perubahan."
+                    },
+                    "password": {
+                        "label": "Kata Sandi",
+                        "placeholder": "Kosongkan jika tidak ada perubahan."
+                    },
+                    "admin": {
+                        "label": "Pengguna dengan hak admin"
+                    },
+                    "update_button": "Perbarui"
+                },
+                "remove_user": {
+                    "submit_button": "Hapus",
+                    "confirm_title": "Konfirmasi Penghapusan",
+                    "confirm_message": "Apakah Anda yakin ingin menghapus pengguna {{username}}?",
+                    "confirm_button": "Hapus",
+                    "cancel_button": "Batal",
+                    "removing": "Menghapus pengguna...",
+                    "success": "Pengguna {{username}} telah dihapus.",
+                    "error": "Gagal menghapus pengguna: {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "Ya",
+                    "no": "Tidak",
+                    "never": "Tidak Pernah",
+                    "id": "ID",
+                    "user_id": "ID Pengguna",
+                    "username": "Nama Pengguna",
+                    "admin": "Admin",
+                    "created_at": "Dibuat Pada",
+                    "last_login": "Login Terakhir",
+                    "user_ip": "IP Pengguna",
+                    "user_agent": "User Agent",
+                    "updated_at": "Diperbarui Pada",
+                    "actions": "Aksi"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "Pembaruan baru tersedia, apakah Anda ingin memperbarui sekarang?",
+            "confirm_title": "Pembaruan Tersedia",
+            "confirm_button": "Perbarui",
+            "cancel_button": "Batal"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "Apakah Anda yakin ingin keluar?",
+            "confirm_title": "Keluar",
+            "confirm_button": "OK",
+            "cancel_button": "Batal"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "Nama Pengguna",
+            "placeholder": "Nama Pengguna Anda"
+        },
+        "password": {
+            "label": "Kata Sandi",
+            "placeholder": "Kata Sandi Anda"
+        },
+        "captcha": {
+            "label": "Masukkan Captcha",
+            "loading": "Memuat captcha...",
+            "placeholder": "Kode Captcha",
+            "refreshing": "Menyegarkan captcha.",
+            "refresh_success": "Berhasil menyegarkan captcha.",
+            "refresh_error": "Gagal menyegarkan captcha."
+        },
+        "signin": {
+            "button": "Masuk",
+            "loading": "Sedang masuk...",
+            "success": "Anda telah berhasil masuk.",
+            "error": "Gagal masuk."
+        }
+    }
+}
