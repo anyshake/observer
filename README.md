@@ -55,82 +55,55 @@ Here are some screenshots showcasing the key features of **AnyShake Observer**.
 
 ### Home Dashboard
 
-**The Home Dashboard provides a concise overview of the station and device status, including current location, service module health, link connectivity, and real-time system statistics.**
+The Home Dashboard provides a concise overview of the station and device status, including current location, service module health, link connectivity, and real-time system statistics.
 
-<details>
-<summary>Click to view</summary>
 <img src="https://raw.githubusercontent.com/anyshake/observer/master/images/key-features/home.webp" width="600" alt="Home Dashboard" />
-</details>
 
 ### Realtime Waveform
 
-**The real-time waveform view displays seismic data and the current sample rate from your AnyShake Explorer device in a web-based interface. It supports zooming, panning, and customizable channel layouts. Layout configurations are persistent and can be locked to prevent accidental changes.**
+The real-time waveform view displays seismic data and the current sample rate from your AnyShake Explorer device in a web-based interface. It supports zooming, panning, and customizable channel layouts. Layout configurations are persistent and can be locked to prevent accidental changes.
 
-<details>
-<summary>Click to view</summary>
 <img src="https://raw.githubusercontent.com/anyshake/observer/master/images/key-features/realtime.webp" width="600" alt="Realtime View" />
-</details>
 
 ### SeedLink Streaming
 
-**The AnyShake team independently developed a SeedLink protocol implementation in pure Go ([github.com/bclswl0827/slgo](https://github.com/bclswl0827/slgo)), enabling native SeedLink services without relying on RingServer or SeisComP. This allows seamless integration with tools like Swarm and ObsPy.**
+The AnyShake team independently developed a SeedLink protocol implementation in pure Go ([github.com/bclswl0827/slgo](https://github.com/bclswl0827/slgo)), enabling native SeedLink services without relying on RingServer or SeisComP. This allows seamless integration with tools like Swarm and ObsPy.
 
-<details>
-<summary>Click to view</summary>
 <img src="https://raw.githubusercontent.com/anyshake/observer/master/images/key-features/seedlink.webp" width="600" alt="SeedLink View" />
-</details>
 
 ### Historical Data Query
 
-**The historical query feature lets users retrieve waveforms from the database by specifying a time range (up to 1 hour). It also integrates global seismic agency data for reverse earthquake lookup. Retrieved waveform parts can be exported in multiple formats, including MiniSEED, SAC, TXT, and WAV audio.**
+The historical query feature lets users retrieve waveforms from the database by specifying a time range (up to 1 hour). It also integrates global seismic agency data for reverse earthquake lookup. Retrieved waveform parts can be exported in multiple formats, including MiniSEED, SAC, TXT, and WAV audio.
 
-<details>
-<summary>Click to view</summary>
 <img src="https://raw.githubusercontent.com/anyshake/observer/master/images/key-features/history.webp" width="600" alt="History Query" />
-</details>
 
-**Exported data formats, such as MiniSEED, are fully compatible with third-party analysis tools like Swarm. The image below shows a seismic event in Myanmar on Mar 28th, 2025, detected from over 2,400 kilometers away using AnyShake Explorer — demonstrating its remarkable sensitivity and real-world performance, on par with many proprietary, closed-source systems.**
+Exported data formats, such as MiniSEED, are fully compatible with third-party analysis tools like Swarm. The image below shows a seismic event in Myanmar on Mar 28th, 2025, detected from over 2,400 kilometers away using AnyShake Explorer — demonstrating its remarkable sensitivity and real-world performance, on par with many proprietary, closed-source systems.
 
-<details>
-<summary>Click to view</summary>
 <img src="https://raw.githubusercontent.com/anyshake/observer/master/images/key-features/miniseed.webp" width="600" alt="MiniSEED View" />
-</details>
 
 ### Data Download
 
-**The Data Download page allows users to access and download daily archived MiniSEED files and helicorder images directly from disk for extended archiving or offline analysis.**
+The Data Download page allows users to access and download daily archived MiniSEED files and helicorder images directly from disk for extended archiving or offline analysis.
 
-<details>
-<summary>Click to view</summary>
 <img src="https://raw.githubusercontent.com/anyshake/observer/master/images/key-features/download.webp" width="600" alt="Data Download" />
-</details>
 
 ### Station Metadata
 
-**Station metadata files for AnyShake Explorer devices — including instrument response (poles and zeros) are available in both SeisComP XML and FDSNWS StationXML formats. Users can easily copy the content to the clipboard or download it as a file.**
+Station metadata files for AnyShake Explorer devices — including instrument response (poles and zeros) are available in both SeisComP XML and FDSNWS StationXML formats. Users can easily copy the content to the clipboard or download it as a file.
 
-<details>
-<summary>Click to view</summary>
 <img src="https://raw.githubusercontent.com/anyshake/observer/master/images/key-features/metadata.webp" width="600" alt="Station Metadata" />
-</details>
 
 ### Service Control
 
-**A rich set of modular service modules are integrated, each running independently to ensure stability and flexibility. Users can enable, disable, or configure these modules directly through the web interface. The system also includes earthquake detection services using STA/LTA and Z-Detect algorithms (QuakeSense Service). Upon detecting seismic activity, it can push alerts in real time via MQTT protocol.**
+A rich set of modular service modules are integrated, each running independently to ensure stability and flexibility. Users can enable, disable, or configure these modules directly through the web interface. The system also includes earthquake detection services using STA/LTA and Z-Detect algorithms (QuakeSense Service). Upon detecting seismic activity, it can push alerts in real time via MQTT protocol.
 
-<details>
-<summary>Click to view</summary>
 <img src="https://raw.githubusercontent.com/anyshake/observer/master/images/key-features/service.webp" width="600" alt="Service Control" />
-</details>
 
 ### User Management
 
-**The system supports both administrator and general user roles, making it adaptable for scenarios where multiple individuals manage and operate the site.**
+The system supports both administrator and general user roles, making it adaptable for scenarios where multiple individuals manage and operate the site.
 
-<details>
-<summary>Click to view</summary>
-<img src="https://raw.githubusercontent.com/anyshake/observer/master/images/key-features/user.webp" width="600" alt="User Management" />
-</details>
+<img src="https://raw.githubusercontent.com/anyshake/observer/master/images/key-features/users.webp" width="600" alt="User Management" />
 
 ## Credits
 
