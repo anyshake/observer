@@ -10,6 +10,24 @@ import (
 	"github.com/anyshake/observer/internal/dao/model"
 )
 
+func (h *Handler) SysUserHasAdmin() (bool, error) {
+	if h.daoObj == nil {
+		return false, errors.New("database is not opened")
+	}
+
+	var adminUsers int64
+	err := h.daoObj.Database.
+		Table((&model.SysUser{}).GetName(h.daoObj.GetPrefix())).
+		Where("admin = ?", model.ADMIN).
+		Count(&adminUsers).
+		Error
+	if err != nil {
+		return false, fmt.Errorf("failed to check for admin users: %w", err)
+	}
+
+	return adminUsers > 0, nil
+}
+
 func (h *Handler) SysUserList() ([]model.SysUser, error) {
 	if h.daoObj == nil {
 		return nil, errors.New("database is not opened")

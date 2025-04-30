@@ -9,23 +9,29 @@ import (
 )
 
 func (t *SetupAdminStartupImpl) Execute() error {
-	user, _ := t.ActionHandler.SysUserGetByUsername(model.DEFAULT_USERNAME)
+	log := logger.GetLogger(t.GetName())
 
-	// Create default admin user if not exists
-	if user.UserId == "" {
-		if _, err := t.ActionHandler.SysUserCreate(model.DEFAULT_USERNAME, model.DEFAULT_PASSWORD, true); err != nil {
-			return err
-		}
-		infoText := fmt.Sprintf("CREATED DEFAULT ADMIN USER, USERNAME: %s, PASSWORD: %s", model.DEFAULT_USERNAME, model.DEFAULT_PASSWORD)
-		border := strings.Repeat("=", len(infoText)+6)
-		logger.GetLogger(t.GetName()).Infof("\n%s\n|| %s ||\n%s", border, infoText, border)
-	} else if user.Username == model.DEFAULT_USERNAME {
-		if _, err := t.ActionHandler.SysUserLogin(model.DEFAULT_USERNAME, model.DEFAULT_PASSWORD, "", ""); err == nil {
-			warnText := fmt.Sprintf("PLEASE CHANGE THE DEFAULT PASSWORD FOR DEFAULT USER IMMEDIATELY: %s", model.DEFAULT_USERNAME)
-			border := strings.Repeat("=", len(warnText)+6)
-			logger.GetLogger(t.GetName()).Warnf("\n%s\n|| %s ||\n%s", border, warnText, border)
-		}
+	printBanner := func(logFunc func(string, ...any), msg string) {
+		border := strings.Repeat("=", len(msg)+6)
+		logFunc("\n%s\n|| %s ||\n%s", border, msg, border)
 	}
+
+	hasAdmin, err := t.ActionHandler.SysUserHasAdmin()
+	if err != nil {
+		return err
+	}
+
+	if hasAdmin {
+		if _, err := t.ActionHandler.SysUserLogin(model.DEFAULT_USERNAME, model.DEFAULT_PASSWORD, "", ""); err == nil {
+			printBanner(log.Warnf, fmt.Sprintf("PLEASE CHANGE THE DEFAULT PASSWORD FOR DEFAULT USER IMMEDIATELY: %s", model.DEFAULT_USERNAME))
+		}
+		return nil
+	}
+
+	if _, err := t.ActionHandler.SysUserCreate(model.DEFAULT_USERNAME, model.DEFAULT_PASSWORD, true); err != nil {
+		return err
+	}
+	printBanner(log.Infof, fmt.Sprintf("CREATED DEFAULT ADMIN USER, USERNAME: %s, PASSWORD: %s", model.DEFAULT_USERNAME, model.DEFAULT_PASSWORD))
 
 	return nil
 }
