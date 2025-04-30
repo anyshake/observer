@@ -10,13 +10,11 @@
 
 ## 🚀 **Join the Open Science Movement!** 🚀
 
-> 🌟 **AnyShake Explorer is currently in pre-launch!** 🌟
-
-> We're working hard to bring the **AnyShake Project** to life, but we need your support to reach our goal of 200 subscribers.
+> 🌟 **AnyShake Explorer is currently in pre-launch! We're working hard to bring the **AnyShake Project** to life, but we need your support to reach our goal of 200 subscribers.** 🌟
 
 > 👉 **[Go and subscribe us on Crowd Supply](https://www.crowdsupply.com/senseplex/anyshake-explorer)** and be a part of the first wave of users to get hands-on with this revolutionary open-source seismic monitoring system!
 
-> Help us spread the word by sharing this page: 👉 **[www.crowdsupply.com/senseplex/anyshake-explorer](https://www.crowdsupply.com/senseplex/anyshake-explorer)**
+> Also help us spread the word by sharing this page: 👉 **[www.crowdsupply.com/senseplex/anyshake-explorer](https://www.crowdsupply.com/senseplex/anyshake-explorer)**
 
 ---
 
@@ -107,7 +105,7 @@ The system supports both administrator and general user roles, making it adaptab
 
 ## Credits
 
-The AnyShake Project is maintained by **SensePlex Limited**, a UK-based company dedicated to developing open-source hardware and software.
+The project is maintained by **SensePlex Limited**, a UK-based company dedicated to developing open-source hardware and software.
 
 All rights, including the right of interpretation, reproduction, distribution, and commercial use, are reserved by **SensePlex Limited**.
 

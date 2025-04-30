@@ -7,6 +7,7 @@ currently being supported with security updates.
 
 | Version | Supported          |
 | ------- | ------------------ |
+| 4.x.x   | :white_check_mark: |
 | 3.x.x   | :white_check_mark: |
 | < 3.0.0 | :x:                |
 
@@ -16,10 +17,10 @@ Vulnerabilities should be reported to `anyshake@senseplex.net` - the official em
 
 When reporting an issue, where possible, please provide at least:
 
-* The commit version the issue was identified at
-* A proof of concept (plaintext; no binaries)
-* Steps to reproduce
-* Your recommended remediation(s), if any.
+- The commit version the issue was identified at
+- A proof of concept (plaintext; no binaries)
+- Steps to reproduce
+- Your recommended remediation(s), if any
 
 The AnyShake team is a volunteer-only effort, and may reach back out for clarification.
 
