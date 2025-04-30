@@ -16,7 +16,7 @@ require (
 	github.com/bclswl0827/heligo v0.0.12
 	github.com/bclswl0827/mseedio v1.0.12
 	github.com/bclswl0827/sacio v1.0.6
-	github.com/bclswl0827/slgo v0.2.1
+	github.com/bclswl0827/slgo v0.2.2
 	github.com/bclswl0827/sqlite v1.11.1-0.20240613172512-9e6ac9861470
 	github.com/beevik/ntp v1.4.3
 	github.com/blang/semver/v4 v4.0.0
