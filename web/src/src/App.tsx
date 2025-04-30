@@ -18,7 +18,10 @@ import { useCredentialStore } from './stores/credential';
 const App = () => {
     const { t } = useTranslation();
 
-    const { needRefresh: needRefreshState, updateServiceWorker } = useRegisterSW({
+    const {
+        needRefresh: [needRefreshApp, setNeedRefreshApp],
+        updateServiceWorker
+    } = useRegisterSW({
         onRegistered(r) {
             if (r) {
                 setInterval(() => {
@@ -27,7 +30,6 @@ const App = () => {
             }
         }
     });
-    const [needRefreshApp, setNeedRefreshApp] = needRefreshState;
     useEffect(() => {
         if (needRefreshApp) {
             sendUserConfirm(t('App.app_update.confirm_message'), {

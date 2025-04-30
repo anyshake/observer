@@ -1,4 +1,4 @@
-import logo from '/anyshake.svg?url';
+import logo from '/anyshake.svg';
 
 import { getVersionTag } from '../helpers/app/getVersionTag';
 import { Translation } from './locale';
