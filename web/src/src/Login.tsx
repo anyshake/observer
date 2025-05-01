@@ -130,13 +130,14 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                                 handleLoginSubmit(username, password, captcha),
                                 t('Login.signin.loading'),
                                 t('Login.signin.success'),
-                                t('Login.signin.error'),
+                                () => {
+                                    setSubmitting(false);
+                                    return t('Login.signin.error');
+                                },
                                 false
                             );
                         } catch {
                             getPreAuthData(false);
-                        } finally {
-                            setSubmitting(false);
                         }
                     }}
                 >

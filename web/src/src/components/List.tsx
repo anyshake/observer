@@ -12,7 +12,9 @@ interface IList {
 
 export const List = ({ data, onClick, className }: IList) => {
     return (
-        <ul className={`list bg-base-100 rounded-box overflow-y-scroll shadow-md ${className}`}>
+        <ul
+            className={`list bg-base-100 rounded-box overflow-y-scroll border border-dashed border-gray-300 ${className}`}
+        >
             {data.map(({ primary, secondary, id }, index) => (
                 <li
                     key={`${index}-${id}`}
