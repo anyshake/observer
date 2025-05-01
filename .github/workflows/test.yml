@@ -98,7 +98,7 @@ jobs:
           - windows_arm64_v8a
           - windows7_386
           - windows7_amd64
-        fail-fast: false
+      fail-fast: false
 
     needs:
       - build_web
