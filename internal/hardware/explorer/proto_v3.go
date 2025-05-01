@@ -175,13 +175,13 @@ func (g *ExplorerProtoImplV3) getVariableData(mcuTimestamp uint64, deviceConfig 
 	}
 
 	if (variableBits>>1)&0x1 != 0 {
-		if _, err := g.deviceVariable.GetLatitude(); err != nil {
+		if _, err := g.deviceVariable.GetLatitude(false); err != nil {
 			variableAllSet = false
 		}
 	}
 
 	if (variableBits>>2)&0x1 != 0 {
-		if _, err := g.deviceVariable.GetLongitude(); err != nil {
+		if _, err := g.deviceVariable.GetLongitude(false); err != nil {
 			variableAllSet = false
 		}
 	}
@@ -422,13 +422,13 @@ func (g *ExplorerProtoImplV3) GetStatus() DeviceStatus {
 	}
 }
 
-func (g *ExplorerProtoImplV3) GetCoordinates() (float64, float64, float64, error) {
-	lat, err := g.deviceVariable.GetLatitude()
+func (g *ExplorerProtoImplV3) GetCoordinates(fuzzy bool) (float64, float64, float64, error) {
+	lat, err := g.deviceVariable.GetLatitude(fuzzy)
 	if err != nil {
 		return 0, 0, 0, fmt.Errorf("failed to get latitude: %w", err)
 	}
 
-	lon, err := g.deviceVariable.GetLongitude()
+	lon, err := g.deviceVariable.GetLongitude(fuzzy)
 	if err != nil {
 		return 0, 0, 0, fmt.Errorf("failed to get longitude: %w", err)
 	}
@@ -461,12 +461,12 @@ func (g *ExplorerProtoImplV3) Flush() error {
 	return g.Transport.Flush()
 }
 
-func (g *ExplorerProtoImplV3) GetMetadata(stationAffiliation, stationDescription, stationCountry, stationPlace, networkCode, stationCode, locationCode string) (metadata.IMetadata, error) {
-	latitude, err := g.deviceVariable.GetLatitude()
+func (g *ExplorerProtoImplV3) GetMetadata(stationAffiliation, stationDescription, stationCountry, stationPlace, networkCode, stationCode, locationCode string, fuzzyLocation bool) (metadata.IMetadata, error) {
+	latitude, err := g.deviceVariable.GetLatitude(fuzzyLocation)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get latitude: %w", err)
 	}
-	longitude, err := g.deviceVariable.GetLongitude()
+	longitude, err := g.deviceVariable.GetLongitude(fuzzyLocation)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get longitude: %w", err)
 	}

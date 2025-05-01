@@ -18,7 +18,7 @@ type IHardware interface {
 	GetConfig() explorer.DeviceConfig
 	GetStatus() explorer.DeviceStatus
 
-	GetCoordinates() (float64, float64, float64, error)
+	GetCoordinates(fuzzy bool) (float64, float64, float64, error)
 	GetTemperature() (float64, error)
 	GetDeviceId() string
 
@@ -30,5 +30,6 @@ type IHardware interface {
 		networkCode,
 		stationCode,
 		locationCode string,
+		fuzzyCoordinates bool,
 	) (metadata.IMetadata, error)
 }

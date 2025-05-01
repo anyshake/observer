@@ -3,6 +3,8 @@ package explorer
 import (
 	"errors"
 	"math"
+
+	"github.com/samber/lo"
 )
 
 func (v *DeviceVariable) Reset() {
@@ -70,7 +72,7 @@ func (v *DeviceVariable) SetLatitude(latitude *float64) {
 	}
 }
 
-func (v *DeviceVariable) GetLatitude() (float64, error) {
+func (v *DeviceVariable) GetLatitude(fuzzy bool) (float64, error) {
 	v.mu.Lock()
 	defer v.mu.Unlock()
 
@@ -78,7 +80,8 @@ func (v *DeviceVariable) GetLatitude() (float64, error) {
 		return 0, errors.New("latitude is not set")
 	}
 
-	return *v.latitude, nil
+	lat := *v.latitude
+	return lo.Ternary(fuzzy, math.Round(lat*100)/100, lat), nil
 }
 
 func (v *DeviceVariable) SetLongitude(longitude *float64) {
@@ -100,7 +103,7 @@ func (v *DeviceVariable) SetLongitude(longitude *float64) {
 	}
 }
 
-func (v *DeviceVariable) GetLongitude() (float64, error) {
+func (v *DeviceVariable) GetLongitude(fuzzy bool) (float64, error) {
 	v.mu.Lock()
 	defer v.mu.Unlock()
 
@@ -108,7 +111,8 @@ func (v *DeviceVariable) GetLongitude() (float64, error) {
 		return 0, errors.New("longitude is not set")
 	}
 
-	return *v.longitude, nil
+	lon := *v.longitude
+	return lo.Ternary(fuzzy, math.Round(lon*100)/100, lon), nil
 }
 
 func (v *DeviceVariable) SetElevation(elevation *float64) {

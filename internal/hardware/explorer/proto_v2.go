@@ -121,10 +121,10 @@ func (g *ExplorerProtoImplV2) getVariableData(mcuTimestamp uint64, variableBytes
 		}
 	}
 
-	if _, err := g.deviceVariable.GetLatitude(); err != nil {
+	if _, err := g.deviceVariable.GetLatitude(false); err != nil {
 		return
 	}
-	if _, err := g.deviceVariable.GetLongitude(); err != nil {
+	if _, err := g.deviceVariable.GetLongitude(false); err != nil {
 		return
 	}
 	if _, err := g.deviceVariable.GetElevation(); err != nil {
@@ -369,13 +369,13 @@ func (g *ExplorerProtoImplV2) GetStatus() DeviceStatus {
 	}
 }
 
-func (g *ExplorerProtoImplV2) GetCoordinates() (float64, float64, float64, error) {
-	lat, err := g.deviceVariable.GetLatitude()
+func (g *ExplorerProtoImplV2) GetCoordinates(fuzzy bool) (float64, float64, float64, error) {
+	lat, err := g.deviceVariable.GetLatitude(fuzzy)
 	if err != nil {
 		return 0, 0, 0, fmt.Errorf("failed to get latitude: %w", err)
 	}
 
-	lon, err := g.deviceVariable.GetLongitude()
+	lon, err := g.deviceVariable.GetLongitude(fuzzy)
 	if err != nil {
 		return 0, 0, 0, fmt.Errorf("failed to get longitude: %w", err)
 	}
@@ -408,18 +408,10 @@ func (g *ExplorerProtoImplV2) Flush() error {
 	return g.Transport.Flush()
 }
 
-func (g *ExplorerProtoImplV2) GetMetadata(stationAffiliation, stationDescription, stationCountry, stationPlace, networkCode, stationCode, locationCode string) (metadata.IMetadata, error) {
-	latitude, err := g.deviceVariable.GetLatitude()
+func (g *ExplorerProtoImplV2) GetMetadata(stationAffiliation, stationDescription, stationCountry, stationPlace, networkCode, stationCode, locationCode string, fuzzyLocation bool) (metadata.IMetadata, error) {
+	latitude, longitude, elevation, err := g.GetCoordinates(fuzzyLocation)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get latitude: %w", err)
-	}
-	longitude, err := g.deviceVariable.GetLongitude()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get longitude: %w", err)
-	}
-	elevation, err := g.deviceVariable.GetElevation()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get altitude: %w", err)
+		return nil, err
 	}
 	return metadata.New(g.deviceConfig.GetModel(), metadata.Options{
 		ChannelCodes:       g.deviceConfig.GetChannelCodes(),

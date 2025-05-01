@@ -390,13 +390,10 @@ func (r *queryResolver) GetDeviceStatus(ctx context.Context) (*graph_model.Devic
 func (r *queryResolver) GetDeviceInfo(ctx context.Context) (*graph_model.DeviceInfo, error) {
 	var deviceInfo graph_model.DeviceInfo
 
-	temp, err := r.HardwareDev.GetTemperature()
-	if err == nil {
+	if temp, err := r.HardwareDev.GetTemperature(); err == nil {
 		deviceInfo.Temperature = &temp
 	}
-
-	lat, lon, elv, err := r.HardwareDev.GetCoordinates()
-	if err == nil {
+	if lat, lon, elv, err := r.HardwareDev.GetCoordinates(!r.checkIsAdmin(ctx)); err == nil {
 		deviceInfo.Latitude = &lat
 		deviceInfo.Longitude = &lon
 		deviceInfo.Elevation = &elv
@@ -452,7 +449,7 @@ func (r *queryResolver) GetStationMetadata(ctx context.Context, format string) (
 	// Ignore errors for non-AnyShake devices
 	metadata, err := r.HardwareDev.GetMetadata(
 		stationAffiliation.(string), stationDescription.(string), stationCountry.(string), stationPlace.(string),
-		networkCode.(string), stationCode.(string), locationCode.(string),
+		networkCode.(string), stationCode.(string), locationCode.(string), !r.checkIsAdmin(ctx),
 	)
 	if err != nil {
 		return fmt.Sprintf("failed to get metadata: %s", err.Error()), nil
@@ -574,7 +571,7 @@ func (r *queryResolver) GetEventsBySource(ctx context.Context, code string) ([]*
 		return nil, fmt.Errorf("seismic event data source not found: %s", code)
 	}
 
-	lat, lon, _, err := r.HardwareDev.GetCoordinates()
+	lat, lon, _, err := r.HardwareDev.GetCoordinates(r.checkIsAdmin(ctx))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get current coordinates of device: %w", err)
 	}
