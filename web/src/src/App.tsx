@@ -56,13 +56,10 @@ const App = () => {
         hideLoaderAnimation();
     }, []);
     useEffect(() => {
-        getUserLoginStatus(); // Get user login status in initial render
-    }, [getUserLoginStatus]);
-    useEffect(() => {
         const { token, lifeTime } = credential;
         if (token.length > 0 && lifeTime > 0) {
             getUserLoginStatus();
-        } else if (!token.length || !lifeTime) {
+        } else {
             setHasLoggedIn(false);
         }
     }, [credential, getUserLoginStatus]);
