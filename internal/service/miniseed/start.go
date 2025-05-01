@@ -8,6 +8,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"time"
 
 	"github.com/anyshake/observer/internal/hardware/explorer"
@@ -40,6 +41,13 @@ func (s *MiniSeedServiceImpl) Start() error {
 	s.recordBuffer = make([][]buffer, s.appendCountDown)
 
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
+				_ = s.Stop()
+			}
+		}()
+
 		err := s.hardwareDev.Subscribe(ID, func(t time.Time, di *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
 			s.mu.Lock()
 			defer s.mu.Unlock()

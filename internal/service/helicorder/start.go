@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"time"
 
 	"github.com/anyshake/observer/internal/dao/action"
@@ -95,6 +96,13 @@ func (s *HelicorderServiceImpl) Start() error {
 	logger.GetLogger(ID).Infof("generated helicorder images will be saved to %s", s.filePath)
 
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
+				_ = s.Stop()
+			}
+		}()
+
 		s.status.SetStartedAt(s.timeSource.Get())
 		s.status.SetIsRunning(true)
 

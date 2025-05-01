@@ -2,6 +2,7 @@ package seedlink
 
 import (
 	"context"
+	"runtime/debug"
 	"time"
 
 	"github.com/anyshake/observer/internal/dao/action"
@@ -40,6 +41,13 @@ func (s *SeedLinkServiceImpl) Start() error {
 	)
 
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
+				_ = s.Stop()
+			}
+		}()
+
 		err := s.hardwareDev.Subscribe(ID, func(t time.Time, di *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
 			seedlinkMessageBus.Publish(t, di, dv, cd)
 		})

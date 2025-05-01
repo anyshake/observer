@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"runtime/debug"
 	"strings"
 	"time"
 	"unsafe"
@@ -32,6 +33,13 @@ func (s *ForwarderServiceImpl) Start() error {
 	logger.GetLogger(ID).Infof("service forwarder is listening on %s:%d", s.listenHost, s.listenPort)
 
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
+				_ = s.Stop()
+			}
+		}()
+
 		err = s.hardwareDev.Subscribe(ID, func(t time.Time, di *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
 			s.messageBus.Publish(t, di, dv, cd)
 		})

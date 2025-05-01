@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"runtime"
+	"runtime/debug"
 	"strconv"
 	"time"
 
+	"github.com/anyshake/observer/pkg/logger"
 	"github.com/anyshake/observer/pkg/system"
 	"github.com/go-logr/logr"
 	"go.opentelemetry.io/otel"
@@ -62,6 +64,13 @@ func (s *MetricsServiceImpl) Start() error {
 	tracer := otel.Tracer(OTLP_TRACER_NAME)
 
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
+				_ = s.Stop()
+			}
+		}()
+
 		s.status.SetStartedAt(s.timeSource.Get())
 		s.status.SetIsRunning(true)
 

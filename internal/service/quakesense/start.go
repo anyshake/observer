@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"runtime/debug"
 	"time"
 
 	"github.com/anyshake/observer/internal/hardware/explorer"
@@ -49,6 +50,13 @@ func (s *QuakeSenseServiceImpl) Start() error {
 	}
 
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
+				_ = s.Stop()
+			}
+		}()
+
 		s.status.SetStartedAt(s.timeSource.Get())
 		s.status.SetIsRunning(true)
 

@@ -2,6 +2,7 @@ package archiver
 
 import (
 	"context"
+	"runtime/debug"
 	"time"
 
 	"github.com/anyshake/observer/internal/dao/model"
@@ -22,6 +23,13 @@ func (s *ArchiverServiceImpl) Start() error {
 	s.recordBuffer = make([]model.SeisRecord, RECORDS_INSERT_INTERVAL)
 
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
+				_ = s.Stop()
+			}
+		}()
+
 		err := s.hardwareDev.Subscribe(ID, func(t time.Time, di *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
 			s.mu.Lock()
 			defer s.mu.Unlock()

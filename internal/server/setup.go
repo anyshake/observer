@@ -11,6 +11,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/anyshake/observer/internal/server/middleware/auth_jwt"
 	"github.com/anyshake/observer/internal/server/middleware/httplog"
+	"github.com/anyshake/observer/internal/server/middleware/recovery"
 	"github.com/anyshake/observer/internal/server/response"
 	"github.com/anyshake/observer/internal/server/router/auth"
 	"github.com/anyshake/observer/internal/server/router/export"
@@ -29,7 +30,7 @@ import (
 func (s *httpServer) Setup(listen string) error {
 	s.engine = gin.New()
 
-	s.engine.Use(gin.Recovery())
+	s.engine.Use(recovery.New(s.log.Logger))
 	s.engine.Use(httplog.New(s.log))
 	s.engine.Use(gzipHandler.Gzip(gzip.BestCompression))
 	s.engine.Use(secure.Secure(secure.Options{
