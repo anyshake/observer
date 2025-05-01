@@ -3,11 +3,16 @@ package main
 import (
 	"fmt"
 	"os"
+	"path"
 
 	"github.com/anyshake/observer/pkg/logger"
 )
 
 func setupLogger(level, logPath string, maxSize, rotation, lifeCycle int) (string, error) {
+	if logPath != "" {
+		logPath = path.Clean(logPath)
+	}
+
 	var err error
 	switch level {
 	case "info":
