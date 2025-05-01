@@ -11,6 +11,15 @@ import (
 func setupLogger(level, logPath string, maxSize, rotation, lifeCycle int) (string, error) {
 	if logPath != "" {
 		logPath = path.Clean(logPath)
+
+		if _, err := os.Stat(logPath); os.IsNotExist(err) {
+			err = os.MkdirAll(logPath, os.ModePerm)
+			if err != nil {
+				return "", fmt.Errorf("failed to create log directory: %w", err)
+			}
+		}
+
+		logger.SetFile(logPath, maxSize, rotation, lifeCycle)
 	}
 
 	var err error
@@ -26,17 +35,6 @@ func setupLogger(level, logPath string, maxSize, rotation, lifeCycle int) (strin
 	}
 	if err != nil {
 		return "", fmt.Errorf("failed to set log level: %w", err)
-	}
-
-	if len(logPath) != 0 {
-		if _, err := os.Stat(logPath); os.IsNotExist(err) {
-			err = os.MkdirAll(logPath, os.ModePerm)
-			if err != nil {
-				return "", fmt.Errorf("failed to create log directory: %w", err)
-			}
-		}
-
-		logger.SetFile(logPath, maxSize, rotation, lifeCycle)
 	}
 
 	return logPath, nil
