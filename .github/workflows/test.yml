@@ -25,7 +25,7 @@ jobs:
       - name: Build web
         working-directory: web/src
         run: |
-          npm install
+          npm ci
           npm run build
           tar -zcf ../web_dist.tar.gz ../dist
 
