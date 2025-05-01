@@ -142,4 +142,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target_id }}
-          path: build/*
+          path: build/dist/*
