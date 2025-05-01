@@ -66,10 +66,10 @@ func (d *provider) GetPlotData(startTime, endTime time.Time) ([]heligo.PlotData,
 	var plotData []heligo.PlotData
 	for _, record := range seisRecords {
 		data := make([]heligo.PlotData, record.sampleRate)
-		for i := 0; i < record.sampleRate; i++ {
+		for i := range record.sampleRate {
 			timeOffset := int64(i * 1000 / record.sampleRate)
 			data[i].Time = time.UnixMilli(record.timestamp + timeOffset)
-			if d.channelCodeIndex > len(record.channelData) {
+			if d.channelCodeIndex >= len(record.channelData) {
 				continue
 			}
 			data[i].Value = float64(record.channelData[d.channelCodeIndex].Data[i])
