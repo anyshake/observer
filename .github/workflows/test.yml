@@ -131,5 +131,20 @@ jobs:
           GOARCH=${{ env.GOARCH }} \
           GOARM=${{ env.GOARM }} \
           GOMIPS=${{ env.GOMIPS }} \
-          BUILD_PLATFORM=github-actions-ci \
+          BUILD_PLATFORM=gh-ci-test \
           make build
+
+      - name: Create release digest
+        run: |
+          make digest | tee build/${{ matrix.target_id }}.dgst
+
+      - name: Package release to zip
+        working-directory: build/dist
+        run: |
+          zip -r ../${{ matrix.target_id }}.zip *
+
+      - name: Upload package to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target_id }}
+          path: build/${{ matrix.target_id }}.zip

@@ -132,7 +132,7 @@ jobs:
           GOARCH=${{ env.GOARCH }} \
           GOARM=${{ env.GOARM }} \
           GOMIPS=${{ env.GOMIPS }} \
-          BUILD_PLATFORM=github-actions-ci \
+          BUILD_PLATFORM=gh-ci-release \
           make build
 
       - name: Create release digest
