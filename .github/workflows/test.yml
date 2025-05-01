@@ -93,7 +93,20 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Set up Golang
+      - name: Set up workflow env
+        run: |
+          TOOLCHAIN=$(jq ".[\"${{ matrix.target_id }}\"].toolchain" -r < pkg/uniarch/arch_map.json)
+          echo "TOOLCHAIN=$TOOLCHAIN" >> $GITHUB_ENV
+          GOOS=$(jq ".[\"${{ matrix.target_id }}\"].goos" -r < pkg/uniarch/arch_map.json)
+          echo "GOOS=$GOOS" >> $GITHUB_ENV
+          GOARCH=$(jq ".[\"${{ matrix.target_id }}\"].goarch" -r < pkg/uniarch/arch_map.json)
+          echo "GOARCH=$GOARCH" >> $GITHUB_ENV
+          GOARM=$(jq ".[\"${{ matrix.target_id }}\"].goarm" -r < pkg/uniarch/arch_map.json)
+          echo "GOARM=$GOARM" >> $GITHUB_ENV
+          GOMIPS=$(jq ".[\"${{ matrix.target_id }}\"].gomips" -r < pkg/uniarch/arch_map.json)
+          echo "GOMIPS=$GOMIPS" >> $GITHUB_ENV
+
+      - name: Set up Go toolchain
         uses: actions/setup-go@v5
         with:
           cache: false
@@ -111,19 +124,6 @@ jobs:
         run: |
           tar -zxf web_dist.tar.gz
           rm -f web_dist.tar.gz
-
-      - name: Set up workflow env
-        run: |
-          TOOLCHAIN=$(jq ".[\"${{ matrix.target_id }}\"].toolchain" -r < pkg/uniarch/arch_map.json)
-          echo "TOOLCHAIN=$TOOLCHAIN" >> $GITHUB_ENV
-          GOOS=$(jq ".[\"${{ matrix.target_id }}\"].goos" -r < pkg/uniarch/arch_map.json)
-          echo "GOOS=$GOOS" >> $GITHUB_ENV
-          GOARCH=$(jq ".[\"${{ matrix.target_id }}\"].goarch" -r < pkg/uniarch/arch_map.json)
-          echo "GOARCH=$GOARCH" >> $GITHUB_ENV
-          GOARM=$(jq ".[\"${{ matrix.target_id }}\"].goarm" -r < pkg/uniarch/arch_map.json)
-          echo "GOARM=$GOARM" >> $GITHUB_ENV
-          GOMIPS=$(jq ".[\"${{ matrix.target_id }}\"].gomips" -r < pkg/uniarch/arch_map.json)
-          echo "GOMIPS=$GOMIPS" >> $GITHUB_ENV
 
       - name: Build core application
         run: |
