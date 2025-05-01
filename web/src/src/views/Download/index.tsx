@@ -83,24 +83,23 @@ const Download = ({ currentLocale }: IRouterComponent) => {
     const handleDownloadAsset = useCallback(
         async (namespace: string, fileName: string, filePath: string) => {
             const apiUrl = getRestfulApiUrl('/files');
-            const res = await sendPromiseAlert(
+            await sendPromiseAlert(
                 ApiClient.request<string>({
                     url: apiUrl,
                     method: 'post',
                     data: { file_path: filePath }
                 }),
                 t('views.Download.request_file.requesting', { fileName }),
-                t('views.Download.request_file.success', { fileName }),
+                (res) => {
+                    const urlObj = new URL(apiUrl);
+                    urlObj.searchParams.set('token', res!.data!);
+                    urlObj.searchParams.set('namespace', namespace);
+                    urlObj.searchParams.set('file_path', filePath);
+                    window.open(urlObj.toString(), '_blank');
+                    return t('views.Download.request_file.success', { fileName });
+                },
                 (error) => t('views.Download.request_file.error', { fileName, error })
             );
-            const urlObj = new URL(apiUrl);
-            urlObj.searchParams.set('token', res!.data!);
-            urlObj.searchParams.set('namespace', namespace);
-            urlObj.searchParams.set('file_path', filePath);
-            const link = document.createElement('a');
-            link.href = urlObj.toString();
-            link.click();
-            link.remove();
         },
         [t]
     );
