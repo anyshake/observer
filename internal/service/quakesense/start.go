@@ -114,7 +114,7 @@ func (s *QuakeSenseServiceImpl) Start() error {
 				return
 			}
 
-			onsets := eewgo.TriggerOnset(staLtaArr, s.trigOn, s.trigOff, math.MaxInt64, false)
+			onsets := eewgo.TriggerOnset(staLtaArr, s.trigOn, s.trigOff, math.MaxInt32, false)
 			if len(onsets) > 0 {
 				if s.throttleSeconds > 0 && !lastTriggeredTime.IsZero() {
 					elapsed := t.Sub(lastTriggeredTime)

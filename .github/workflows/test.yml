@@ -15,7 +15,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18.14.0"
+          node-version: "latest"
 
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -34,22 +34,6 @@ jobs:
         with:
           name: web-dist
           path: web/web_dist.tar.gz
-
-  build_api_docs:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Set up Golang
-        uses: actions/setup-go@v5
-        with:
-          cache: false
-          go-version: stable
-          check-latest: true
-
-      - name: Checkout source code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
   test_build:
     runs-on: ubuntu-latest
@@ -102,7 +86,6 @@ jobs:
 
     needs:
       - build_web
-      - build_api_docs
 
     steps:
       - name: Checkout source code
