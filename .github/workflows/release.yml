@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "latest"
@@ -79,8 +79,8 @@ jobs:
           - windows_arm32_v6
           - windows_arm32_v7a
           - windows_arm64_v8a
-          - windows7_386
-          - windows7_amd64
+          # - windows7_386
+          # - windows7_amd64
       fail-fast: false
 
     needs:
@@ -92,7 +92,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Set up workflow env
+      - name: Setup workflow env
         run: |
           TOOLCHAIN=$(jq ".[\"${{ matrix.target_id }}\"].toolchain" -r < pkg/uniarch/arch_map.json)
           echo "TOOLCHAIN=$TOOLCHAIN" >> $GITHUB_ENV
@@ -107,7 +107,7 @@ jobs:
           RELEASE_NAME=$(jq ".[\"${{ matrix.target_id }}\"].name" -r < pkg/uniarch/arch_map.json)
           echo "RELEASE_NAME=$RELEASE_NAME" >> $GITHUB_ENV
 
-      - name: Set up Go toolchain
+      - name: Setup Go toolchain
         uses: actions/setup-go@v5
         with:
           cache: false

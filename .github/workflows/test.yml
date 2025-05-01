@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "latest"
@@ -80,8 +80,8 @@ jobs:
           - windows_arm32_v6
           - windows_arm32_v7a
           - windows_arm64_v8a
-          - windows7_386
-          - windows7_amd64
+          # - windows7_386
+          # - windows7_amd64
       fail-fast: false
 
     needs:
@@ -93,7 +93,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Set up workflow env
+      - name: Setup workflow env
         run: |
           TOOLCHAIN=$(jq ".[\"${{ matrix.target_id }}\"].toolchain" -r < pkg/uniarch/arch_map.json)
           echo "TOOLCHAIN=$TOOLCHAIN" >> $GITHUB_ENV
@@ -106,7 +106,7 @@ jobs:
           GOMIPS=$(jq ".[\"${{ matrix.target_id }}\"].gomips" -r < pkg/uniarch/arch_map.json)
           echo "GOMIPS=$GOMIPS" >> $GITHUB_ENV
 
-      - name: Set up Go toolchain
+      - name: Setup Go toolchain
         uses: actions/setup-go@v5
         with:
           cache: false
@@ -138,13 +138,8 @@ jobs:
         run: |
           make digest | tee build/${{ matrix.target_id }}.dgst
 
-      - name: Package release to zip
-        working-directory: build/dist
-        run: |
-          zip -r ../${{ matrix.target_id }}.zip *
-
       - name: Upload package to artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target_id }}
-          path: build/${{ matrix.target_id }}.zip
+          path: build/*
