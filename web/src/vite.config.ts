@@ -57,6 +57,7 @@ export default defineConfig({
         port: 3000
     },
     define: {
+        'globalThis.__DEV__': JSON.stringify(false), // Disable DevTools message
         'import.meta.env.BUILD_TAG': JSON.stringify(getBuildTag())
     }
 });
