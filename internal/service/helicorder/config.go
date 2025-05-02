@@ -432,53 +432,56 @@ func (s *helicorderConfigLineWidthImpl) Restore(handler *action.Handler) error {
 	return nil
 }
 
-type helicorderConfigScaleFactorImpl struct{}
+type helicorderConfigScaleFactorsImpl struct{}
 
-func (s *helicorderConfigScaleFactorImpl) GetName() string             { return "Sacle Factor" }
-func (s *helicorderConfigScaleFactorImpl) GetNamespace() string        { return ID }
-func (s *helicorderConfigScaleFactorImpl) GetKey() string              { return "sacle_factor" }
-func (s *helicorderConfigScaleFactorImpl) GetType() action.SettingType { return action.Float }
-func (s *helicorderConfigScaleFactorImpl) IsRequired() bool            { return true }
-func (s *helicorderConfigScaleFactorImpl) GetVersion() int             { return 0 }
-func (s *helicorderConfigScaleFactorImpl) GetOptions() map[string]any  { return nil }
-func (s *helicorderConfigScaleFactorImpl) GetDefaultValue() any        { return 500.0 }
-func (s *helicorderConfigScaleFactorImpl) GetDescription() string {
-	return "Waveform scale factor in helicorder."
+func (s *helicorderConfigScaleFactorsImpl) GetName() string             { return "Sacle Factors" }
+func (s *helicorderConfigScaleFactorsImpl) GetNamespace() string        { return ID }
+func (s *helicorderConfigScaleFactorsImpl) GetKey() string              { return "sacle_factors" }
+func (s *helicorderConfigScaleFactorsImpl) GetType() action.SettingType { return action.FloatArray }
+func (s *helicorderConfigScaleFactorsImpl) IsRequired() bool            { return true }
+func (s *helicorderConfigScaleFactorsImpl) GetVersion() int             { return 0 }
+func (s *helicorderConfigScaleFactorsImpl) GetOptions() map[string]any  { return nil }
+func (s *helicorderConfigScaleFactorsImpl) GetDefaultValue() any {
+	return []float64{
+		500, 500, 500, // EHZ, EHE, EHN
+		30000000, 30000000, 30000000, // EHZ, EHE, EHN
+	}
 }
-func (s *helicorderConfigScaleFactorImpl) Init(handler *action.Handler) error {
+func (s *helicorderConfigScaleFactorsImpl) GetDescription() string {
+	return "Each channel has an associated scale factor. If the value is 0 or undefined, no helicorder image will be generated. A higher value results in a larger waveform scale."
+}
+func (s *helicorderConfigScaleFactorsImpl) Init(handler *action.Handler) error {
 	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default waveform scale factor for helicorder service: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigScaleFactorImpl) Set(handler *action.Handler, newVal any) error {
-	scaleFactor, err := config.GetConfigValFloat64(newVal)
+func (s *helicorderConfigScaleFactorsImpl) Set(handler *action.Handler, newVal any) error {
+	scaleFactors, err := config.GetConfigValFloat64Array(newVal)
 	if err != nil {
 		return err
 	}
-	if scaleFactor <= 0 {
-		return errors.New("scale factor cannot be zero or negative")
+	_, hasNegative := lo.Find(scaleFactors, func(v float64) bool { return v < 0 })
+	if hasNegative {
+		return errors.New("scale factors cannot be negative")
 	}
-	if scaleFactor > 5000 {
-		return errors.New("scale factor cannot be greater than 5000")
-	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), scaleFactor); err != nil {
+	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), scaleFactors); err != nil {
 		return fmt.Errorf("failed to set helicorder waveform scale factor: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigScaleFactorImpl) Get(handler *action.Handler) (any, error) {
+func (s *helicorderConfigScaleFactorsImpl) Get(handler *action.Handler) (any, error) {
 	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get helicorder waveform scale factor: %w", err)
 	}
-	scaleFactor, ok := val.(float64)
+	scaleFactor, ok := val.([]float64)
 	if !ok {
-		return nil, errors.New("float expected")
+		return nil, errors.New("float array expected")
 	}
 	return scaleFactor, nil
 }
-func (s *helicorderConfigScaleFactorImpl) Restore(handler *action.Handler) error {
+func (s *helicorderConfigScaleFactorsImpl) Restore(handler *action.Handler) error {
 	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset helicorder waveform scale factor: %w", err)
 	}
@@ -495,6 +498,6 @@ func (s *HelicorderServiceImpl) GetConfigConstraint() []config.IConstraint {
 		&helicorderConfigImageSizeImpl{},
 		&helicorderConfigSpanSamplesImpl{},
 		&helicorderConfigLineWidthImpl{},
-		&helicorderConfigScaleFactorImpl{},
+		&helicorderConfigScaleFactorsImpl{},
 	}
 }

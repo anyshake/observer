@@ -70,11 +70,11 @@ func (s *HelicorderServiceImpl) Init() error {
 	}
 	s.lineWidth = lineWidth.(float64)
 
-	scaleFactor, err := (&helicorderConfigScaleFactorImpl{}).Get(s.dataProvider.actionHandler)
+	scaleFactors, err := (&helicorderConfigScaleFactorsImpl{}).Get(s.dataProvider.actionHandler)
 	if err != nil {
 		return fmt.Errorf("failed to get helicorder waveform scale factor: %w", err)
 	}
-	s.scaleFactor = scaleFactor.(float64)
+	s.scaleFactors = scaleFactors.([]float64)
 
 	return nil
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"runtime/debug"
 	"time"
 
@@ -109,19 +110,28 @@ func (s *HelicorderServiceImpl) Start() error {
 		timer := time.NewTimer(time.Minute)
 
 		for {
-			currentTime := s.timeSource.Get().Add(-time.Minute) // Subtract one minute to avoid date rollover
-			timer.Reset(s.getDurationToNextTime(s.timeSource.Get()))
-
 			select {
 			case <-s.ctx.Done():
-				timer.Stop()
+				if !timer.Stop() {
+					<-timer.C
+				}
 				s.wg.Done()
 				return
 			case <-timer.C:
+				// Subtract one minute to avoid date rollover
+				currentTime := s.timeSource.Get().Add(-time.Minute)
+
 				hardwareConfig := s.hardwareDev.GetConfig()
 				s.channelCodes = hardwareConfig.GetChannelCodes()
 
 				for channelIdx, channelCode := range s.channelCodes {
+					// Discard channels which scale factor is zero or undefined
+					if channelIdx >= len(s.scaleFactors) || s.scaleFactors[channelIdx] == 0 {
+						logger.GetLogger(ID).Warnf("skipping channel %s: scale factor is zero or undefined", channelCode)
+						continue
+					}
+					scaleFactor := s.scaleFactors[channelIdx]
+
 					helicorderCtx, err := heligo.New(&s.dataProvider, 24*time.Hour, time.Duration(s.timeSpan)*time.Minute)
 					if err != nil {
 						logger.GetLogger(ID).Errorf("failed to create helicorder context: %v", err)
@@ -132,7 +142,7 @@ func (s *HelicorderServiceImpl) Start() error {
 					s.dataProvider.setChannelCode(channelCode, channelIdx)
 					logger.GetLogger(ID).Infof("start plotting helicorder for channel %s", channelCode)
 
-					err = helicorderCtx.Plot(currentTime, s.spanSamples, s.scaleFactor, s.lineWidth, nil)
+					err = helicorderCtx.Plot(currentTime, s.spanSamples, scaleFactor, s.lineWidth, nil)
 					if err != nil {
 						logger.GetLogger(ID).Errorf("failed to plot helicorder for %s: %v", channelCode, err)
 						continue
@@ -156,6 +166,7 @@ func (s *HelicorderServiceImpl) Start() error {
 				}
 
 				s.dataProvider.queryCache.Clear()
+				runtime.GC()
 
 				if s.lifeCycle > 0 {
 					endTime := currentTime.Add(time.Duration(-s.lifeCycle) * time.Hour * 24)
@@ -163,6 +174,8 @@ func (s *HelicorderServiceImpl) Start() error {
 						logger.GetLogger(ID).Errorf("failed to purge expired helicorder files: %v", err)
 					}
 				}
+
+				timer.Reset(s.getDurationToNextTime(s.timeSource.Get()))
 			}
 		}
 	}()

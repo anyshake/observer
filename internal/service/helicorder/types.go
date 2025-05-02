@@ -38,10 +38,10 @@ type HelicorderServiceImpl struct {
 	filePath    string
 	imageFormat string
 
-	timeSpan    int
-	lifeCycle   int
-	imageSize   int
-	spanSamples int
-	lineWidth   float64
-	scaleFactor float64
+	timeSpan     int
+	lifeCycle    int
+	imageSize    int
+	spanSamples  int
+	lineWidth    float64
+	scaleFactors []float64
 }
