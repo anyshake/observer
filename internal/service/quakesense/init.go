@@ -46,6 +46,30 @@ func (s *QuakeSenseServiceImpl) Init() error {
 	}
 	s.stationName = stationName.(string)
 
+	stationDescription, err := (&config.StationDescriptionConfigConstraintImpl{}).Get(s.actionHandler)
+	if err != nil {
+		return fmt.Errorf("failed to get quakeSense station description: %w", err)
+	}
+	s.stationDescription = stationDescription.(string)
+
+	stationPlace, err := (&config.StationPlaceConfigConstraintImpl{}).Get(s.actionHandler)
+	if err != nil {
+		return fmt.Errorf("failed to get quakeSense station place: %w", err)
+	}
+	s.stationPlace = stationPlace.(string)
+
+	stationCountry, err := (&config.StationCountryConfigConstraintImpl{}).Get(s.actionHandler)
+	if err != nil {
+		return fmt.Errorf("failed to get quakeSense station country: %w", err)
+	}
+	s.stationCountry = stationCountry.(string)
+
+	stationAffiliation, err := (&config.StationAffiliationConfigConstraintImpl{}).Get(s.actionHandler)
+	if err != nil {
+		return fmt.Errorf("failed to get quakeSense station affiliation: %w", err)
+	}
+	s.stationAffiliation = stationAffiliation.(string)
+
 	stationCode, err := (&config.StationStationCodeConfigConstraintImpl{}).Get(s.actionHandler)
 	if err != nil {
 		return fmt.Errorf("failed to get quakeSense station code: %w", err)

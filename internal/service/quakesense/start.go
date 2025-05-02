@@ -126,26 +126,39 @@ func (s *QuakeSenseServiceImpl) Start() error {
 				logger.GetLogger(ID).Infof("detected %d seismic event at UTC time: %s", len(onsets), t.UTC().Format(time.RFC3339))
 				lastTriggeredTime = t
 
+				latitude, longitude, elevation, err := s.hardwareDev.GetCoordinates(true)
+				if err != nil {
+					logger.GetLogger(ID).Warnf("failed to get coordinates: %v", err)
+					return
+				}
+
 				startTime := t.Add(-time.Duration(bufferSize/currentSamplerate) * time.Second)
 				for _, onset := range onsets {
 					triggerTime := startTime.Add(time.Duration(onset[0]) * time.Second / time.Duration(s.prevSamplerate))
 					payload, err := json.Marshal(map[string]any{
-						"trigger_method": s.triggerMethod,
-						"trigger_time":   triggerTime.UnixMilli(),
-						"station_name":   s.stationName,
-						"station_code":   s.stationCode,
-						"network_code":   s.networkCode,
-						"location_code":  s.locationCode,
-						"sta_window":     s.staWindow,
-						"lta_window":     s.ltaWindow,
-						"trig_on":        s.trigOn,
-						"trig_off":       s.trigOff,
-						"filter_type":    s.filterType,
-						"min_freq":       s.minFreq,
-						"max_freq":       s.maxFreq,
-						"num_taps":       FILTER_NUM_TAPS,
-						"sample_rate":    s.prevSamplerate,
-						"channel_code":   s.monitorChannel,
+						"trigger_method":      s.triggerMethod,
+						"trigger_time":        triggerTime.UnixMilli(),
+						"station_name":        s.stationName,
+						"station_description": s.stationDescription,
+						"station_country":     s.stationCountry,
+						"station_place":       s.stationPlace,
+						"station_affiliation": s.stationAffiliation,
+						"latitude":            latitude,
+						"longitude":           longitude,
+						"elevation":           elevation,
+						"station_code":        s.stationCode,
+						"network_code":        s.networkCode,
+						"location_code":       s.locationCode,
+						"sta_window":          s.staWindow,
+						"lta_window":          s.ltaWindow,
+						"trig_on":             s.trigOn,
+						"trig_off":            s.trigOff,
+						"filter_type":         s.filterType,
+						"min_freq":            s.minFreq,
+						"max_freq":            s.maxFreq,
+						"num_taps":            FILTER_NUM_TAPS,
+						"sample_rate":         s.prevSamplerate,
+						"channel_code":        s.monitorChannel,
 					})
 					if err != nil {
 						logger.GetLogger(ID).Errorf("failed to marshal payload: %v", err)
