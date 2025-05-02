@@ -27,22 +27,20 @@ func (s *TimeSyncServiceImpl) Start() error {
 		s.status.SetStartedAt(s.timeSource.Get())
 		s.status.SetIsRunning(true)
 
-		timer := time.NewTimer(TIMESOURCE_REFRESH_INTERVAL)
+		ticker := time.NewTicker(TIMESOURCE_REFRESH_INTERVAL)
 
 		for {
-			timer.Reset(TIMESOURCE_REFRESH_INTERVAL)
-
 			select {
 			case <-s.ctx.Done():
-				timer.Stop()
+				ticker.Stop()
 				s.wg.Done()
 				return
-			case <-timer.C:
+			case <-ticker.C:
 				if err := s.timeSource.Update(); err != nil {
 					logger.GetLogger(ID).Warnf("failed to refresh time source: %v", err)
-					continue
+				} else {
+					logger.GetLogger(ID).Debugf("time source refreshed: %v", s.timeSource.Get().Format(time.RFC3339))
 				}
-				logger.GetLogger(ID).Debugf("time source refreshed: %v", s.timeSource.Get().Format(time.RFC3339))
 			}
 		}
 	}()

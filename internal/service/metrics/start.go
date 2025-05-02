@@ -74,17 +74,15 @@ func (s *MetricsServiceImpl) Start() error {
 		s.status.SetStartedAt(s.timeSource.Get())
 		s.status.SetIsRunning(true)
 
-		timer := time.NewTimer(30 * time.Second)
+		ticker := time.NewTicker(30 * time.Second)
 
 		for {
-			timer.Reset(METRICS_REPORT_INTERVAL)
-
 			select {
 			case <-s.ctx.Done():
-				timer.Stop()
+				ticker.Stop()
 				s.wg.Done()
 				return
-			case <-timer.C:
+			case <-ticker.C:
 				s.reportCurrentStatus(tracer)
 			}
 		}

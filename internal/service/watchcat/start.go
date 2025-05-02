@@ -27,18 +27,16 @@ func (s *WatchCatServiceImpl) Start() error {
 		s.status.SetStartedAt(s.timeSource.Get())
 		s.status.SetIsRunning(true)
 
-		timer := time.NewTimer(WATCHCAT_CHECK_INTERVAL)
-
 		var lastUpdatedAt time.Time
-		for {
-			timer.Reset(WATCHCAT_CHECK_INTERVAL)
+		ticker := time.NewTicker(WATCHCAT_CHECK_INTERVAL)
 
+		for {
 			select {
 			case <-s.ctx.Done():
-				timer.Stop()
+				ticker.Stop()
 				s.wg.Done()
 				return
-			case <-timer.C:
+			case <-ticker.C:
 				status := s.hardwareDev.GetStatus()
 				updatedAt := status.GetUpdatedAt()
 				if !lastUpdatedAt.IsZero() && updatedAt.Sub(lastUpdatedAt) == 0 {
