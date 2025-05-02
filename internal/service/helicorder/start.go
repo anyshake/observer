@@ -132,7 +132,7 @@ func (s *HelicorderServiceImpl) Start() error {
 					s.dataProvider.setChannelCode(channelCode, channelIdx)
 					logger.GetLogger(ID).Infof("start plotting helicorder for channel %s", channelCode)
 
-					err = helicorderCtx.Plot(currentTime, s.spanSamples, s.scaleFactor, s.lineWidth)
+					err = helicorderCtx.Plot(currentTime, s.spanSamples, s.scaleFactor, s.lineWidth, nil)
 					if err != nil {
 						logger.GetLogger(ID).Errorf("failed to plot helicorder for %s: %v", channelCode, err)
 						continue

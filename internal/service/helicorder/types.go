@@ -20,7 +20,6 @@ const (
 	TIMESPAN_10_MINUTES int64 = 10
 	TIMESPAN_15_MINUTES int64 = 15
 	TIMESPAN_30_MINUTES int64 = 30
-	TIMESPAN_60_MINUTES int64 = 60
 )
 
 type HelicorderServiceImpl struct {
