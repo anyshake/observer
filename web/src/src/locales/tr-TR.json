@@ -20,19 +20,26 @@
                 "size": "Dosya Boyutu",
                 "actions": "Eylemler"
             },
+            "file_list_actions": {
+                "download": "İndir",
+                "preview": "Oynat"
+            },
             "miniseed_list": {
                 "title": "Günlük MiniSEED",
-                "download": "İndir",
                 "search": "Ara"
             },
             "helicorder_list": {
                 "title": "Helicorder Listesi",
-                "download": "İndir",
                 "search": "Ara"
             },
             "request_file": {
                 "requesting": "{{fileName}} dosyasını indirmek için bağlantı isteniyor.",
                 "success": "{{fileName}} dosyasını indirmek için bağlantı alındı.",
+                "error": "{{fileName}} için dosya bağlantısı istenemedi: {{error}}"
+            },
+            "preview_file": {
+                "requesting": "{{fileName}} dosyasını oynatmak için bağlantı isteniyor.",
+                "success": "{{fileName}} dosyasını oynatmak için bağlantı alındı.",
                 "error": "{{fileName}} için dosya bağlantısı istenemedi: {{error}}"
             }
         },

@@ -49,6 +49,6 @@ func Setup(routerGroup *gin.RouterGroup, serviceMap map[string]service.IService,
 			response.Error(ctx, http.StatusBadRequest, err.Error())
 			return
 		}
-		response.Blob(ctx, asset.FileName, asset.Data)
+		response.Blob(ctx, asset.FileName, asset.ContentType, asset.Data)
 	})
 }

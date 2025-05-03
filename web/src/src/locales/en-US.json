@@ -20,19 +20,26 @@
                 "size": "File Size",
                 "actions": "Actions"
             },
+            "file_list_actions": {
+                "download": "Download",
+                "preview": "Preview"
+            },
             "miniseed_list": {
                 "title": "Daily MiniSEED",
-                "download": "Download",
                 "search": "Search"
             },
             "helicorder_list": {
                 "title": "Helicorder List",
-                "download": "Download",
                 "search": "Search"
             },
             "request_file": {
                 "requesting": "Requesting link to downloading file {{fileName}}.",
                 "success": "Got link for downloading file {{fileName}}.",
+                "error": "Failed to request file link for {{fileName}}: {{error}}"
+            },
+            "preview_file": {
+                "requesting": "Requesting link to preview file {{fileName}}.",
+                "success": "Got link for previewing file {{fileName}}.",
                 "error": "Failed to request file link for {{fileName}}: {{error}}"
             }
         },

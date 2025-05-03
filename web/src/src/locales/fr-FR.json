@@ -20,19 +20,26 @@
                 "size": "Taille du fichier",
                 "actions": "Actions"
             },
+            "file_list_actions": {
+                "download": "Télécharger",
+                "preview": "Apercus"
+            },
             "miniseed_list": {
                 "title": "MiniSEED quotidien",
-                "download": "Télécharger",
                 "search": "Rechercher"
             },
             "helicorder_list": {
                 "title": "Liste Helicorder",
-                "download": "Télécharger",
                 "search": "Rechercher"
             },
             "request_file": {
                 "requesting": "Demande du lien de téléchargement pour le fichier {{fileName}}.",
                 "success": "Lien obtenu pour le téléchargement du fichier {{fileName}}.",
+                "error": "Échec de la demande du lien pour le fichier {{fileName}} : {{error}}"
+            },
+            "preview_file": {
+                "requesting": "Demande du lien de prévisualisation pour le fichier {{fileName}}.",
+                "success": "Lien obtenu pour la prévisualisation du fichier {{fileName}}.",
                 "error": "Échec de la demande du lien pour le fichier {{fileName}} : {{error}}"
             }
         },

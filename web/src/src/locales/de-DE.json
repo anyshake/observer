@@ -20,19 +20,26 @@
                 "size": "Dateigröße",
                 "actions": "Aktionen"
             },
+            "file_list_actions": {
+                "download": "Herunterladen",
+                "preview": "Vorschau"
+            },
             "miniseed_list": {
                 "title": "Tägliche MiniSEED",
-                "download": "Herunterladen",
                 "search": "Suchen"
             },
             "helicorder_list": {
                 "title": "Helicorder-Liste",
-                "download": "Herunterladen",
                 "search": "Suchen"
             },
             "request_file": {
                 "requesting": "Link zum Herunterladen der Datei {{fileName}} wird angefordert.",
                 "success": "Link zum Herunterladen der Datei {{fileName}} erhalten.",
+                "error": "Fehler beim Anfordern des Dateilinks für {{fileName}}: {{error}}"
+            },
+            "preview_file": {
+                "requesting": "Link zur Vorschau der Datei {{fileName}} wird angefordert.",
+                "success": "Link zur Vorschau der Datei {{fileName}} erhalten.",
                 "error": "Fehler beim Anfordern des Dateilinks für {{fileName}}: {{error}}"
             }
         },

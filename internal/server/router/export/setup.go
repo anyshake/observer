@@ -109,7 +109,7 @@ func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, hardware
 				response.Error(ctx, http.StatusInternalServerError, err.Error())
 				return
 			}
-			response.Blob(ctx, fileName, dataBytes)
+			response.Blob(ctx, fileName, "application/octet-stream", dataBytes)
 			return
 		}
 

@@ -2,6 +2,7 @@ package helicorder
 
 import (
 	"fmt"
+	"mime"
 	"os"
 	"path/filepath"
 	"strings"
@@ -77,8 +78,9 @@ func (s *HelicorderServiceImpl) GetAssetData(assetId string) (*service.AssetData
 	}
 
 	assetData := &service.AssetData{
-		FileName: filepath.Base(assetId),
-		Data:     data,
+		ContentType: mime.TypeByExtension(filepath.Ext(assetId)),
+		FileName:    filepath.Base(assetId),
+		Data:        data,
 	}
 
 	return assetData, nil

@@ -20,19 +20,26 @@
                 "size": "Размер файла",
                 "actions": "Действия"
             },
+            "file_list_actions": {
+                "download": "Скачать",
+                "preview": "Предпросмотр"
+            },
             "miniseed_list": {
                 "title": "Ежедневный MiniSEED",
-                "download": "Скачать",
                 "search": "Поиск"
             },
             "helicorder_list": {
                 "title": "Список Helicorder",
-                "download": "Скачать",
                 "search": "Поиск"
             },
             "request_file": {
                 "requesting": "Запрос ссылки для скачивания файла {{fileName}}.",
                 "success": "Получена ссылка для скачивания файла {{fileName}}.",
+                "error": "Не удалось запросить ссылку на файл {{fileName}}: {{error}}"
+            },
+            "preview_file": {
+                "requesting": "Запрос ссылки для просмотра файла {{fileName}}.",
+                "success": "Получена ссылка для просмотра файла {{fileName}}.",
                 "error": "Не удалось запросить ссылку на файл {{fileName}}: {{error}}"
             }
         },

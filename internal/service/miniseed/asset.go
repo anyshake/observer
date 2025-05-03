@@ -77,7 +77,8 @@ func (s *MiniSeedServiceImpl) GetAssetData(assetId string) (*service.AssetData, 
 	}
 
 	return &service.AssetData{
-		FileName: filepath.Base(assetId),
-		Data:     data,
+		ContentType: "application/octet-stream",
+		FileName:    filepath.Base(assetId),
+		Data:        data,
 	}, nil
 }

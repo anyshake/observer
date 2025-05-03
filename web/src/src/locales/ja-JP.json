@@ -20,19 +20,26 @@
                 "size": "ファイルサイズ",
                 "actions": "操作"
             },
+            "file_list_actions": {
+                "download": "ダウンロード",
+                "preview": "プレビュー"
+            },
             "miniseed_list": {
                 "title": "日次 MiniSEED",
-                "download": "ダウンロード",
                 "search": "検索"
             },
             "helicorder_list": {
                 "title": "Helicorder リスト",
-                "download": "ダウンロード",
                 "search": "検索"
             },
             "request_file": {
                 "requesting": "ファイル {{fileName}} のダウンロードリンクをリクエスト中。",
                 "success": "ファイル {{fileName}} のダウンロードリンクを取得しました。",
+                "error": "ファイル {{fileName}} のリンクリクエストに失敗しました： {{error}}"
+            },
+            "preview_file": {
+                "requesting": "ファイル {{fileName}} のプレビューリンクをリクエスト中。",
+                "success": "ファイル {{fileName}} のプレビューリンクを取得しました。",
                 "error": "ファイル {{fileName}} のリンクリクエストに失敗しました： {{error}}"
             }
         },

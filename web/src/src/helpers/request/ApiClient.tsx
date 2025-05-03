@@ -81,6 +81,31 @@ class AxiosWrapper {
         }
     }
 
+    async getBlob(config: AxiosRequestConfig & { ignoreErrors?: boolean }): Promise<Blob | null> {
+        const { ignoreErrors = false, ...axiosConfig } = config;
+
+        try {
+            const response = await this.instance.request<Blob>({
+                ...axiosConfig,
+                responseType: 'blob'
+            });
+
+            return response.data;
+        } catch (error) {
+            if (!ignoreErrors) {
+                throw axios.isAxiosError(error) && error.response
+                    ? JSON.parse(await error.response.data.text()).message
+                    : error;
+            }
+
+            if (axios.isAxiosError(error) && error.response) {
+                return null;
+            }
+
+            return null;
+        }
+    }
+
     async saveAs(
         config: AxiosRequestConfig & { ignoreErrors?: boolean }
     ): Promise<IResponse<void> | void> {

@@ -20,19 +20,26 @@
                 "size": "檔案大小",
                 "actions": "操作"
             },
+            "file_list_actions": {
+                "download": "下載",
+                "preview": "預覽"
+            },
             "miniseed_list": {
                 "title": "每日 MiniSEED",
-                "download": "下載",
                 "search": "搜尋"
             },
             "helicorder_list": {
                 "title": "Helicorder 列表",
-                "download": "下載",
                 "search": "搜尋"
             },
             "request_file": {
                 "requesting": "正在請求下載檔案 {{fileName}} 的連結。",
                 "success": "已取得下載檔案 {{fileName}} 的連結。",
+                "error": "請求檔案 {{fileName}} 的連結失敗：{{error}}"
+            },
+            "preview_file": {
+                "requesting": "正在請求預覽檔案 {{fileName}} 的連結。",
+                "success": "已取得預覽檔案 {{fileName}} 的連結。",
                 "error": "請求檔案 {{fileName}} 的連結失敗：{{error}}"
             }
         },

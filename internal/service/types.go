@@ -25,8 +25,9 @@ type Asset struct {
 }
 
 type AssetData struct {
-	FileName string
-	Data     []byte
+	ContentType string
+	FileName    string
+	Data        []byte
 }
 
 type IService interface {

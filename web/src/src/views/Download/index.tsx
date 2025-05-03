@@ -1,7 +1,10 @@
+import '@fancyapps/ui/dist/fancybox/fancybox.css';
+
+import { Fancybox } from '@fancyapps/ui';
 import { mdiArchive, mdiClose, mdiImageAlbum, mdiMagnify } from '@mdi/js';
 import Icon from '@mdi/react';
 import { GridColDef, GridValidRowModel } from '@mui/x-data-grid';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Card } from '../../components/Card';
@@ -80,6 +83,17 @@ const Download = ({ currentLocale }: IRouterComponent) => {
         item.fileName.toLowerCase().includes(searchHelicorder.toLowerCase())
     );
 
+    const getAssetFetchLink = useCallback(
+        (apiUrl: string, token: string, namespace: string, filePath: string) => {
+            const urlObj = new URL(apiUrl);
+            urlObj.searchParams.set('token', token);
+            urlObj.searchParams.set('namespace', namespace);
+            urlObj.searchParams.set('file_path', filePath);
+            return urlObj.toString();
+        },
+        []
+    );
+
     const handleDownloadAsset = useCallback(
         async (namespace: string, fileName: string, filePath: string) => {
             const apiUrl = getRestfulApiUrl('/files');
@@ -91,21 +105,50 @@ const Download = ({ currentLocale }: IRouterComponent) => {
                 }),
                 t('views.Download.request_file.requesting', { fileName }),
                 (res) => {
-                    const urlObj = new URL(apiUrl);
-                    urlObj.searchParams.set('token', res!.data!);
-                    urlObj.searchParams.set('namespace', namespace);
-                    urlObj.searchParams.set('file_path', filePath);
-                    window.open(urlObj.toString(), '_blank');
+                    const fetchUrl = getAssetFetchLink(apiUrl, res!.data!, namespace, filePath);
+                    window.open(fetchUrl, '_blank');
                     return t('views.Download.request_file.success', { fileName });
                 },
                 (error) => t('views.Download.request_file.error', { fileName, error })
             );
         },
-        [t]
+        [t, getAssetFetchLink]
     );
 
-    const columns = useMemo(
-        () => [
+    const handlePreviewAsset = useCallback(
+        async (namespace: string, fileName: string, filePath: string) => {
+            const requestFn = async () => {
+                const apiUrl = getRestfulApiUrl('/files');
+                const res = await ApiClient.request<string>({
+                    url: apiUrl,
+                    method: 'post',
+                    data: { file_path: filePath }
+                });
+                const fetchUrl = getAssetFetchLink(apiUrl, res!.data!, namespace, filePath);
+                const blobObj = await ApiClient.getBlob({ url: fetchUrl });
+                const blobUrl = URL.createObjectURL(blobObj!);
+                Fancybox.show([{ src: blobUrl, type: 'image' }], {
+                    on: { close: () => URL.revokeObjectURL(blobUrl) }
+                });
+            };
+            await sendPromiseAlert(
+                requestFn(),
+                t('views.Download.preview_file.requesting', { fileName }),
+                t('views.Download.preview_file.success', { fileName }),
+                (error) => t('views.Download.preview_file.error', { fileName, error })
+            );
+        },
+        [t, getAssetFetchLink]
+    );
+    useEffect(
+        () => () => {
+            Fancybox.destroy();
+        },
+        []
+    );
+
+    const getColumns = useCallback(
+        (hasPreview: boolean): GridColDef<GridValidRowModel>[] => [
             {
                 field: 'id',
                 headerName: t('views.Download.file_list_columns.id'),
@@ -141,24 +184,34 @@ const Download = ({ currentLocale }: IRouterComponent) => {
                 field: 'actions',
                 headerName: t('views.Download.file_list_columns.actions'),
                 sortable: false,
-                minWidth: 170,
+                minWidth: 220,
                 headerAlign: 'center',
                 align: 'center',
                 renderCell: ({ row: { fileName, namespace, filePath } }: GridValidRowModel) => (
                     <div className="space-x-4">
+                        {hasPreview && (
+                            <button
+                                className="cursor-pointer text-blue-700 hover:opacity-50"
+                                onClick={() => {
+                                    handlePreviewAsset(namespace, fileName, filePath);
+                                }}
+                            >
+                                {t('views.Download.file_list_actions.preview')}
+                            </button>
+                        )}
                         <button
                             className="cursor-pointer text-blue-700 hover:opacity-50"
                             onClick={() => {
                                 handleDownloadAsset(namespace, fileName, filePath);
                             }}
                         >
-                            {t('views.Download.miniseed_list.download')}
+                            {t('views.Download.file_list_actions.download')}
                         </button>
                     </div>
                 )
             }
         ],
-        [t, handleDownloadAsset]
+        [t, handlePreviewAsset, handleDownloadAsset]
     );
 
     return (
@@ -200,7 +253,7 @@ const Download = ({ currentLocale }: IRouterComponent) => {
                                 sortDirection="desc"
                                 currentLocale={currentLocale}
                                 data={filteredMiniSeedList}
-                                columns={columns as GridColDef<GridValidRowModel>[]}
+                                columns={getColumns(false)}
                             />
                         </div>
                     )}
@@ -241,7 +294,7 @@ const Download = ({ currentLocale }: IRouterComponent) => {
                                 sortDirection="desc"
                                 currentLocale={currentLocale}
                                 data={filteredHelicorderList}
-                                columns={columns as GridColDef<GridValidRowModel>[]}
+                                columns={getColumns(true)}
                             />
                         </div>
                     )}

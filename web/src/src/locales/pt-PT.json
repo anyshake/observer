@@ -20,19 +20,26 @@
                 "size": "Tamanho do Ficheiro",
                 "actions": "Ações"
             },
+            "file_list_actions": {
+                "download": "Descarregar",
+                "preview": "Visualizar"
+            },
             "miniseed_list": {
                 "title": "MiniSEED Diário",
-                "download": "Descarregar",
                 "search": "Pesquisar"
             },
             "helicorder_list": {
                 "title": "Lista Helicorder",
-                "download": "Descarregar",
                 "search": "Pesquisar"
             },
             "request_file": {
                 "requesting": "A solicitar link para descarregar o ficheiro {{fileName}}.",
                 "success": "Link obtido para descarregar o ficheiro {{fileName}}.",
+                "error": "Falha ao solicitar link do ficheiro para {{fileName}}: {{error}}"
+            },
+            "preview_file": {
+                "requesting": "A solicitar link para visualizar o ficheiro {{fileName}}.",
+                "success": "Link obtido para visualizar o ficheiro {{fileName}}.",
                 "error": "Falha ao solicitar link do ficheiro para {{fileName}}: {{error}}"
             }
         },

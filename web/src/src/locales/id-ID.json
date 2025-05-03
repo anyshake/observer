@@ -20,19 +20,26 @@
                 "size": "Ukuran File",
                 "actions": "Aksi"
             },
+            "file_list_actions": {
+                "download": "Unduh",
+                "preview": "Pratinjau"
+            },
             "miniseed_list": {
                 "title": "MiniSEED Harian",
-                "download": "Unduh",
                 "search": "Cari"
             },
             "helicorder_list": {
                 "title": "Daftar Helicorder",
-                "download": "Unduh",
                 "search": "Cari"
             },
             "request_file": {
                 "requesting": "Meminta tautan untuk mengunduh file {{fileName}}.",
                 "success": "Berhasil mendapatkan tautan untuk mengunduh file {{fileName}}.",
+                "error": "Gagal meminta tautan file untuk {{fileName}}: {{error}}"
+            },
+            "preview_file": {
+                "requesting": "Meminta tautan untuk melihat file {{fileName}}.",
+                "success": "Berhasil mendapatkan tautan untuk melihat file {{fileName}}.",
                 "error": "Gagal meminta tautan file untuk {{fileName}}: {{error}}"
             }
         },
