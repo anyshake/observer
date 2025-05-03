@@ -37,7 +37,7 @@ func (s *httpServer) Setup(listen string) error {
 		FrameDeny:             true,
 		BrowserXssFilter:      true,
 		ContentTypeNosniff:    true,
-		ContentSecurityPolicy: "default-src 'self'; connect-src 'self' anyshake.org; style-src 'self' cdn.jsdelivr.net 'unsafe-inline'; script-src 'self' cdn.jsdelivr.net 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:;",
+		ContentSecurityPolicy: "default-src 'self'; connect-src 'self' anyshake.org; style-src 'self' cdn.jsdelivr.net 'unsafe-inline'; script-src 'self' cdn.jsdelivr.net 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob:;",
 	}))
 	if s.cors {
 		s.engine.Use(cors.New(cors.Config{
