@@ -29,8 +29,8 @@ const RealTime = () => {
     const { getCredential } = useCredentialStore();
     const { config, locks, toggleLock, setLayoutConfig, resetLayoutConfig } = useLayoutStore();
 
-    const sampleRate = useRef(0);
-    const updatedAt = useRef(0);
+    const [sampleRate, setSampleRate] = useState(0);
+    const [updatedAt, setUpdatedAt] = useState(0);
     const [activeChannels, setActiveChannels] = useState<Record<string, { id: string }>>({});
 
     const chartRefs = useRef<{ [key: string]: RefObject<DequeChartHandle> }>({});
@@ -75,8 +75,8 @@ const RealTime = () => {
                     }
                 });
 
-                sampleRate.current = sample_rate;
-                updatedAt.current = timestamp;
+                setSampleRate(sample_rate);
+                setUpdatedAt(timestamp);
 
                 updateChannels(channel_data);
             }
@@ -153,7 +153,7 @@ const RealTime = () => {
                 message={
                     readyState === 1
                         ? t('views.RealTime.connectivity.connected', {
-                              updatedAt: getTimeString(updatedAt.current)
+                              updatedAt: getTimeString(updatedAt)
                           })
                         : t('views.RealTime.connectivity.connecting')
                 }
@@ -181,9 +181,7 @@ const RealTime = () => {
                 </button>
                 <div className="flex flex-wrap gap-2">
                     <div className="badge badge-soft badge-primary font-medium">
-                        {t('views.RealTime.stream_status.sample_rate', {
-                            value: sampleRate.current
-                        })}
+                        {t('views.RealTime.stream_status.sample_rate', { value: sampleRate })}
                     </div>
                     <div className="badge badge-soft badge-primary font-medium">
                         {t('views.RealTime.stream_status.channels', {

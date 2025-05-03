@@ -448,7 +448,7 @@ func (s *helicorderConfigScaleFactorsImpl) GetDefaultValue() any {
 	}
 }
 func (s *helicorderConfigScaleFactorsImpl) GetDescription() string {
-	return "Each channel has an associated scale factor. If the value is 0 or undefined, no helicorder image will be generated. A higher value results in a larger waveform scale."
+	return "Each channel has an associated scale factor. If the value is 0 or undefined, a helicorder will not be generated for that channel. The display order follows the channel number, and a higher scale factor results in a larger waveform amplitude."
 }
 func (s *helicorderConfigScaleFactorsImpl) Init(handler *action.Handler) error {
 	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
