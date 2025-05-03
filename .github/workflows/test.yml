@@ -117,12 +117,15 @@ jobs:
       - name: Setup Go toolchain (Windows 7)
         if: ${{ matrix.target_id == 'windows7_386' || matrix.target_id == 'windows7_amd64' }}
         run: |
+          sudo rm -rf `which go`
           sudo rm -rf /usr/local/go
           curl -L -o /tmp/go-legacy-win7.tar.gz https://github.com/thongtech/go-legacy-win7/releases/download/v1.24.2-1/go-legacy-win7-1.24.2-1.linux_amd64.tar.gz
           tar -xvf /tmp/go-legacy-win7.tar.gz -C $HOME
           rm -f go-legacy-win7.tar.gz
-          echo "GOROOT=$HOME/go-legacy-win7" >> $GITHUB_ENV
-          echo "$GOROOT/bin" >> $GITHUB_PATH
+          export GOROOT=$HOME/go-legacy-win7
+          export PATH=$PATH:$GOROOT/bin
+          echo "GOROOT=$GOROOT" >> $GITHUB_ENV
+          echo "PATH=$PATH" >> $GITHUB_ENV
           go version
 
       - name: Download web artifacts
