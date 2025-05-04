@@ -18,7 +18,6 @@ import (
 	"github.com/anyshake/observer/internal/server/router/files"
 	graph_resolver "github.com/anyshake/observer/internal/server/router/graph"
 	"github.com/anyshake/observer/internal/server/router/socket"
-	"github.com/anyshake/observer/pkg/logger"
 	"github.com/anyshake/observer/web"
 	"github.com/gin-contrib/cors"
 	gzipHandler "github.com/gin-contrib/gzip"
@@ -55,7 +54,7 @@ func (s *httpServer) Setup(listen string) error {
 		response.Error(ctx, http.StatusNotFound, msg)
 	})
 
-	jwtHandler, err := auth_jwt.New(s.resolver.TimeSource, s.resolver.ActionHandler, AUTH_TIMEOUT, logger.GetLogger("auth_jwt"))
+	jwtHandler, err := auth_jwt.New(s.resolver.TimeSource, s.resolver.ActionHandler, AUTH_TIMEOUT)
 	if err != nil {
 		return fmt.Errorf("failed to create jwt handler: %w", err)
 	}

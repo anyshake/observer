@@ -15,6 +15,10 @@ import (
 	"github.com/bclswl0827/slgo/handlers"
 )
 
+func (s *SeedLinkServiceImpl) handleInterrupt() {
+	s.wg.Done()
+}
+
 func (s *SeedLinkServiceImpl) Start() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -41,9 +45,12 @@ func (s *SeedLinkServiceImpl) Start() error {
 	)
 
 	go func() {
+		s.status.SetStartedAt(s.timeSource.Get())
+		s.status.SetIsRunning(true)
 		defer func() {
 			if r := recover(); r != nil {
-				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
+				logger.GetLogger(ID).Errorf("service unexpectly crashed, recovered from panic: %v\n%s", r, debug.Stack())
+				s.handleInterrupt()
 				_ = s.Stop()
 			}
 		}()
@@ -56,9 +63,6 @@ func (s *SeedLinkServiceImpl) Start() error {
 			return
 		}
 
-		s.status.SetStartedAt(s.timeSource.Get())
-		s.status.SetIsRunning(true)
-
 		logger.GetLogger(ID).Infof("service seedlink is listening on %s:%d", s.listenHost, s.listenPort)
 		if err := server.Start(s.ctx, s.listenHost, s.listenPort, s.useCompress); err != nil {
 			logger.GetLogger(ID).Errorf("failed to start seedlink server: %v", err)
@@ -67,7 +71,7 @@ func (s *SeedLinkServiceImpl) Start() error {
 			_ = s.hardwareDev.Unsubscribe(ID)
 		}
 
-		s.wg.Done()
+		s.handleInterrupt()
 	}()
 
 	s.wg.Add(1)

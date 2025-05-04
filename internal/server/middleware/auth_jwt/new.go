@@ -11,10 +11,9 @@ import (
 	"github.com/anyshake/observer/pkg/timesource"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
-func New(timeSource *timesource.Source, actionHandler *action.Handler, expiration time.Duration, logger logrus.FieldLogger) (*jwt.GinJWTMiddleware, error) {
+func New(timeSource *timesource.Source, actionHandler *action.Handler, expiration time.Duration) (*jwt.GinJWTMiddleware, error) {
 	secret, err := createJwtSecret()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create JWT secret: %w", err)
@@ -35,8 +34,7 @@ func New(timeSource *timesource.Source, actionHandler *action.Handler, expiratio
 		},
 		Unauthorized: func(c *gin.Context, code int, message string) {
 			baseMessage := "access denied due to invalid authorization token"
-			logger.Warnf("%s: %s", baseMessage, message)
-			response.Error(c, http.StatusUnauthorized, baseMessage)
+			response.Error(c, http.StatusUnauthorized, fmt.Sprintf("%s: %s", baseMessage, message))
 		},
 		Authenticator: func(c *gin.Context) (any, error) {
 			userId, ok := c.MustGet("user_id").(string)

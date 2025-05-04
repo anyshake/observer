@@ -10,6 +10,10 @@ import (
 	"github.com/anyshake/observer/pkg/logger"
 )
 
+func (s *ArchiverServiceImpl) handleInterrupt() {
+	s.wg.Done()
+}
+
 func (s *ArchiverServiceImpl) Start() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -23,9 +27,12 @@ func (s *ArchiverServiceImpl) Start() error {
 	s.recordBuffer = make([]model.SeisRecord, RECORDS_INSERT_INTERVAL)
 
 	go func() {
+		s.status.SetStartedAt(s.timeSource.Get())
+		s.status.SetIsRunning(true)
 		defer func() {
 			if r := recover(); r != nil {
-				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
+				logger.GetLogger(ID).Errorf("service unexpectly crashed, recovered from panic: %v\n%s", r, debug.Stack())
+				s.handleInterrupt()
 				_ = s.Stop()
 			}
 		}()
@@ -69,11 +76,8 @@ func (s *ArchiverServiceImpl) Start() error {
 			return
 		}
 
-		s.status.SetStartedAt(s.timeSource.Get())
-		s.status.SetIsRunning(true)
-
 		<-s.ctx.Done()
-		s.wg.Done()
+		s.handleInterrupt()
 	}()
 
 	s.wg.Add(1)

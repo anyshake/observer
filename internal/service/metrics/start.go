@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/pkg/logger"
+	"github.com/anyshake/observer/pkg/request"
 	"github.com/anyshake/observer/pkg/system"
 	"github.com/go-logr/logr"
 	"go.opentelemetry.io/otel"
@@ -22,6 +23,11 @@ import (
 	_trace "go.opentelemetry.io/otel/trace"
 )
 
+func (s *MetricsServiceImpl) handleInterrupt(ticker *time.Ticker) {
+	ticker.Stop()
+	s.wg.Done()
+}
+
 func (s *MetricsServiceImpl) Start() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -30,17 +36,20 @@ func (s *MetricsServiceImpl) Start() error {
 		s.ctx, s.cancelFn = context.WithCancel(context.Background())
 	}
 
-	s.oltpCtx = context.Background()
+	otel.SetLogger(logr.Discard())
+
+	s.oltpCtx, s.oltpCtxCancelFn = context.WithCancel(context.Background())
 	exporter, err := otlptracehttp.New(
 		s.oltpCtx,
 		otlptracehttp.WithEndpoint(OTLP_EXPORTER_ENDPOINT),
 		otlptracehttp.WithTimeout(METRICS_REPORT_TIMEOUT),
+		otlptracehttp.WithRetry(otlptracehttp.RetryConfig{Enabled: false, MaxElapsedTime: 0}),
 	)
 	if err != nil {
 		return fmt.Errorf("failed to create OTLP exporter: %w", err)
 	}
 
-	tp := trace.NewTracerProvider(
+	s.oltpTracerProvider = trace.NewTracerProvider(
 		trace.WithBatcher(exporter),
 		trace.WithResource(resource.NewSchemaless(
 			semconv.TelemetrySDKLanguageGo,
@@ -57,33 +66,31 @@ func (s *MetricsServiceImpl) Start() error {
 			semconv.HostArchKey.String(runtime.GOARCH),
 		)),
 	)
-	s.oltpTracerProvider = tp
-
-	otel.SetLogger(logr.Discard())
-	otel.SetTracerProvider(tp)
-	tracer := otel.Tracer(OTLP_TRACER_NAME)
+	otel.SetTracerProvider(s.oltpTracerProvider)
 
 	go func() {
+		ticker := time.NewTicker(METRICS_REPORT_INTERVAL)
+		tracer := otel.Tracer(OTLP_TRACER_NAME)
+
+		s.status.SetStartedAt(s.timeSource.Get())
+		s.status.SetIsRunning(true)
 		defer func() {
 			if r := recover(); r != nil {
-				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
+				logger.GetLogger(ID).Errorf("service unexpectly crashed, recovered from panic: %v\n%s", r, debug.Stack())
+				s.handleInterrupt(ticker)
 				_ = s.Stop()
 			}
 		}()
 
-		s.status.SetStartedAt(s.timeSource.Get())
-		s.status.SetIsRunning(true)
-
-		ticker := time.NewTicker(30 * time.Second)
-
 		for {
 			select {
 			case <-s.ctx.Done():
-				ticker.Stop()
-				s.wg.Done()
+				s.handleInterrupt(ticker)
 				return
 			case <-ticker.C:
-				s.reportCurrentStatus(tracer)
+				if _, err := request.GET(HTTP_GENERATE_204_URL, METRICS_REPORT_TIMEOUT, 0, 0, false, nil, nil); err == nil {
+					s.reportCurrentStatus(tracer)
+				}
 			}
 		}
 	}()
@@ -96,7 +103,9 @@ func (s *MetricsServiceImpl) reportCurrentStatus(tracer _trace.Tracer) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), METRICS_REPORT_TIMEOUT)
+	defer cancel()
+
 	currentTime := s.timeSource.Get()
 	appElapsed := currentTime.Sub(s.startTime)
 
@@ -106,38 +115,38 @@ func (s *MetricsServiceImpl) reportCurrentStatus(tracer _trace.Tracer) {
 	appSpan.SetAttributes(attribute.String("app.elapsed", appElapsed.String()))
 	defer appSpan.End()
 
-	var errData error
+	var errObj error
 
 	cpuModel, err := system.GetCpuModel()
 	if err != nil {
-		errData = errors.Join(errData, err)
+		errObj = errors.Join(errObj, err)
 	}
 	cpuPercent, err := system.GetCpuPercent()
 	if err != nil {
-		errData = errors.Join(errData, err)
+		errObj = errors.Join(errObj, err)
 	}
 	memPercent, err := system.GetMemoryPercent()
 	if err != nil {
-		errData = errors.Join(errData, err)
+		errObj = errors.Join(errObj, err)
 	}
 	diskPercent, err := system.GetDiskPercent()
 	if err != nil {
-		errData = errors.Join(errData, err)
+		errObj = errors.Join(errObj, err)
 	}
 	osUptime, err := system.GetOsUptime()
 	if err != nil {
-		errData = errors.Join(errData, err)
+		errObj = errors.Join(errObj, err)
 	}
 
-	if errData != nil {
+	if errObj != nil {
 		appSpan.SetStatus(codes.Error, "error occurred in system metrics")
 	} else {
 		appSpan.SetStatus(codes.Ok, "successfully got status for entire application")
 	}
 
 	_, systemSpan := tracer.Start(ctx, "system", _trace.WithSpanKind(_trace.SpanKindInternal))
-	if errData != nil {
-		systemSpan.SetStatus(codes.Error, fmt.Sprintf("error occurred while retrieving system metrics: %s", err.Error()))
+	if errObj != nil {
+		systemSpan.SetStatus(codes.Error, fmt.Sprintf("error occurred while retrieving system metrics: %v", errObj))
 	} else {
 		systemSpan.SetStatus(codes.Ok, "successfully got current system status")
 		systemSpan.SetAttributes(attribute.String("system.os_uptime", strconv.FormatInt(osUptime, 10)))

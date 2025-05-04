@@ -24,8 +24,7 @@ func POST(url, payload, contentType string, timeout, retryInterval time.Duration
 		}
 	}
 
-	err = fmt.Errorf("POST request failed")
-	for retries := 0; retries < maxRetries; retries++ {
+	for retries := 0; retries <= maxRetries; retries++ {
 		resp, err := client.Do(req)
 		if err != nil {
 			time.Sleep(time.Second)
@@ -48,5 +47,5 @@ func POST(url, payload, contentType string, timeout, retryInterval time.Duration
 		return b, nil
 	}
 
-	return nil, err
+	return nil, fmt.Errorf("POST request failed after %d retries", maxRetries)
 }

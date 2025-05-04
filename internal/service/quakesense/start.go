@@ -16,6 +16,10 @@ import (
 	"github.com/samber/lo"
 )
 
+func (s *QuakeSenseServiceImpl) handleInterrupt() {
+	s.wg.Done()
+}
+
 func (s *QuakeSenseServiceImpl) Start() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -50,15 +54,15 @@ func (s *QuakeSenseServiceImpl) Start() error {
 	}
 
 	go func() {
+		s.status.SetStartedAt(s.timeSource.Get())
+		s.status.SetIsRunning(true)
 		defer func() {
 			if r := recover(); r != nil {
-				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
+				logger.GetLogger(ID).Errorf("service unexpectly crashed, recovered from panic: %v\n%s", r, debug.Stack())
+				s.handleInterrupt()
 				_ = s.Stop()
 			}
 		}()
-
-		s.status.SetStartedAt(s.timeSource.Get())
-		s.status.SetIsRunning(true)
 
 		var lastTriggeredTime time.Time
 
@@ -173,7 +177,7 @@ func (s *QuakeSenseServiceImpl) Start() error {
 		})
 
 		<-s.ctx.Done()
-		s.wg.Done()
+		s.handleInterrupt()
 	}()
 
 	s.wg.Add(1)

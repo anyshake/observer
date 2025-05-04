@@ -15,6 +15,10 @@ import (
 	"github.com/anyshake/observer/pkg/message"
 )
 
+func (s *ForwarderServiceImpl) handleInterrupt() {
+	s.wg.Done()
+}
+
 func (s *ForwarderServiceImpl) Start() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -33,9 +37,12 @@ func (s *ForwarderServiceImpl) Start() error {
 	logger.GetLogger(ID).Infof("service forwarder is listening on %s:%d", s.listenHost, s.listenPort)
 
 	go func() {
+		s.status.SetStartedAt(s.timeSource.Get())
+		s.status.SetIsRunning(true)
 		defer func() {
 			if r := recover(); r != nil {
-				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
+				logger.GetLogger(ID).Errorf("service unexpectly crashed, recovered from panic: %v\n%s", r, debug.Stack())
+				s.handleInterrupt()
 				_ = s.Stop()
 			}
 		}()
@@ -61,11 +68,8 @@ func (s *ForwarderServiceImpl) Start() error {
 			}
 		}()
 
-		s.status.SetStartedAt(s.timeSource.Get())
-		s.status.SetIsRunning(true)
-
 		<-s.ctx.Done()
-		s.wg.Done()
+		s.handleInterrupt()
 	}()
 
 	s.wg.Add(1)

@@ -86,6 +86,13 @@ func (d *provider) setChannelCode(channelCode string, channelCodeIndex int) {
 	d.channelCodeIndex = channelCodeIndex
 }
 
+func (s *HelicorderServiceImpl) handleInterrupt(timer *time.Timer) {
+	if !timer.Stop() {
+		<-timer.C
+	}
+	s.wg.Done()
+}
+
 func (s *HelicorderServiceImpl) Start() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -97,25 +104,22 @@ func (s *HelicorderServiceImpl) Start() error {
 	logger.GetLogger(ID).Infof("generated helicorder images will be saved to %s", s.filePath)
 
 	go func() {
+		timer := time.NewTimer(time.Minute)
+
+		s.status.SetStartedAt(s.timeSource.Get())
+		s.status.SetIsRunning(true)
 		defer func() {
 			if r := recover(); r != nil {
-				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
+				logger.GetLogger(ID).Errorf("service unexpectly crashed, recovered from panic: %v\n%s", r, debug.Stack())
+				s.handleInterrupt(timer)
 				_ = s.Stop()
 			}
 		}()
 
-		s.status.SetStartedAt(s.timeSource.Get())
-		s.status.SetIsRunning(true)
-
-		timer := time.NewTimer(time.Minute)
-
 		for {
 			select {
 			case <-s.ctx.Done():
-				if !timer.Stop() {
-					<-timer.C
-				}
-				s.wg.Done()
+				s.handleInterrupt(timer)
 				return
 			case <-timer.C:
 				// Subtract one minute to avoid date rollover

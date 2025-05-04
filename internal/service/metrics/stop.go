@@ -8,6 +8,8 @@ func (s *MetricsServiceImpl) Stop() error {
 	s.status.SetIsRunning(false)
 
 	_ = s.oltpTracerProvider.Shutdown(s.oltpCtx)
+	s.oltpCtxCancelFn()
+
 	s.cancelFn()
 	s.wg.Wait()
 

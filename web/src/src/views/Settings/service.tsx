@@ -36,7 +36,7 @@ export const Service = () => {
         refetch: getServiceDataRefetch,
         error: getServiceDataError,
         loading: getServiceDataLoading
-    } = useGetServiceDataQuery();
+    } = useGetServiceDataQuery({ pollInterval: 5000 });
 
     const [serviceConfig, setServiceConfig] = useState<
         Record<

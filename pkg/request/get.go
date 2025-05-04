@@ -22,8 +22,7 @@ func GET(url string, timeout, retryInterval time.Duration, maxRetries int, trimS
 		}
 	}
 
-	err = fmt.Errorf("GET request failed")
-	for retries := 0; retries < maxRetries; retries++ {
+	for retries := 0; retries <= maxRetries; retries++ {
 		resp, err := client.Do(req)
 		if err != nil {
 			time.Sleep(retryInterval)
@@ -46,5 +45,5 @@ func GET(url string, timeout, retryInterval time.Duration, maxRetries int, trimS
 		return b, nil
 	}
 
-	return nil, err
+	return nil, fmt.Errorf("GET request failed after %d retries", maxRetries)
 }

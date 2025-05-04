@@ -23,15 +23,15 @@ func (s *MetricsServiceImpl) Init() error {
 	s.hostInfo = hostInfo
 
 	if s.hostInfo.PlatformVersion == "" {
-		s.hostInfo.PlatformVersion = "<unknown>"
+		s.hostInfo.PlatformVersion = ATTRIBUTE_DUMMY_VALUE
 	}
 
 	if s.hostInfo.Platform == "" {
-		s.hostInfo.Platform = "<unknown>"
+		s.hostInfo.Platform = ATTRIBUTE_DUMMY_VALUE
 	}
 
 	if s.hostInfo.Hostname == "" {
-		s.hostInfo.Hostname = "<unknown>"
+		s.hostInfo.Hostname = ATTRIBUTE_DUMMY_VALUE
 	}
 
 	s.startTime = s.timeSource.Get()

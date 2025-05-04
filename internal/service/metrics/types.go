@@ -16,10 +16,12 @@ import (
 const ID = "service_metrics"
 
 const (
+	HTTP_GENERATE_204_URL   = "https://www.gstatic.com/generate_204"
 	OTLP_EXPORTER_ENDPOINT  = "metrics.anyshake.org:443"
 	OTLP_SERVICE_NAME       = "anyshake-observer"
 	OTLP_TRACER_NAME        = "anyshake-observer-tracer"
-	METRICS_REPORT_INTERVAL = 5 * time.Minute
+	ATTRIBUTE_DUMMY_VALUE   = "<dummy>"
+	METRICS_REPORT_INTERVAL = time.Minute
 	METRICS_REPORT_TIMEOUT  = 5 * time.Second
 )
 
@@ -36,6 +38,7 @@ type MetricsServiceImpl struct {
 	actionHandler *action.Handler
 
 	oltpCtx            context.Context
+	oltpCtxCancelFn    context.CancelFunc
 	oltpTracerProvider *trace.TracerProvider
 
 	startTime time.Time

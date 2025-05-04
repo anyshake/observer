@@ -237,7 +237,11 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 
 	subCtx, cancelFn := context.WithCancel(ctx)
 
-	g.fifoBuffer = fifo.New[byte](4096)
+	// Assume that the longest packet interval is 1000 ms
+	// With 8 channels and 1000 samples per second per channel in int32
+	// That would be 8 channels * 4 bytes * (1000 ms / (1000 / 1000 SPS))
+	// Set to 655350 would be safe enough to avoid buffer overflows
+	g.fifoBuffer = fifo.New[byte](655350)
 	g.messageBus = message.NewBus[EventHandler](EXPLORER_STREAM_TOPIC, 1024)
 	g.deviceStatus.SetStartedAt(g.TimeSource.Get())
 	g.deviceStatus.SetUpdatedAt(time.Unix(0, 0))
@@ -301,8 +305,8 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 				// Calculate channel data size and read data remaining (channel data + checksum + tailer)
 				channelChunkLength, channelSize, channelData := g.getChannelSize(deviceConfig)
 				readSize := channelSize + 1 + len(DATA_PACKET_TAILER)
-				for !g.fifoBuffer.Available(readSize) {
-					time.Sleep(time.Millisecond)
+				for g.fifoBuffer.Len() < readSize {
+					time.Sleep(10 * time.Millisecond)
 				}
 				channelDataSection, err := g.fifoBuffer.Read(readSize)
 				if err != nil {

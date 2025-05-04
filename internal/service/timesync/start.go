@@ -8,6 +8,11 @@ import (
 	"github.com/anyshake/observer/pkg/logger"
 )
 
+func (s *TimeSyncServiceImpl) handleInterrupt(ticker *time.Ticker) {
+	ticker.Stop()
+	s.wg.Done()
+}
+
 func (s *TimeSyncServiceImpl) Start() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -17,23 +22,22 @@ func (s *TimeSyncServiceImpl) Start() error {
 	}
 
 	go func() {
+		ticker := time.NewTicker(TIMESOURCE_REFRESH_INTERVAL)
+
+		s.status.SetStartedAt(s.timeSource.Get())
+		s.status.SetIsRunning(true)
 		defer func() {
 			if r := recover(); r != nil {
-				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
+				logger.GetLogger(ID).Errorf("service unexpectly crashed, recovered from panic: %v\n%s", r, debug.Stack())
+				s.handleInterrupt(ticker)
 				_ = s.Stop()
 			}
 		}()
 
-		s.status.SetStartedAt(s.timeSource.Get())
-		s.status.SetIsRunning(true)
-
-		ticker := time.NewTicker(TIMESOURCE_REFRESH_INTERVAL)
-
 		for {
 			select {
 			case <-s.ctx.Done():
-				ticker.Stop()
-				s.wg.Done()
+				s.handleInterrupt(ticker)
 				return
 			case <-ticker.C:
 				if err := s.timeSource.Update(); err != nil {
