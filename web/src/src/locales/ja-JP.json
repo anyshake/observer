@@ -121,7 +121,7 @@
                 "latitude": "緯度",
                 "longitude": "経度",
                 "elevation": "標高",
-                "temperature": "温度"
+                "temperature": "デバイスの温度"
             },
             "link_status": {
                 "title": "リンクステータス",

@@ -121,7 +121,7 @@
                 "latitude": "Latitude",
                 "longitude": "Longitude",
                 "elevation": "Elevation",
-                "temperature": "Temperature"
+                "temperature": "Device Temperature"
             },
             "link_status": {
                 "title": "Link Status",

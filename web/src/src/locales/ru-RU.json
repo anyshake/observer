@@ -121,7 +121,7 @@
                 "latitude": "Широта",
                 "longitude": "Долгота",
                 "elevation": "Высота",
-                "temperature": "Температура"
+                "temperature": "Температура устройства"
             },
             "link_status": {
                 "title": "Статус соединения",

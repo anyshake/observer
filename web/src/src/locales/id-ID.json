@@ -121,7 +121,7 @@
                 "latitude": "Lintang",
                 "longitude": "Bujur",
                 "elevation": "Ketinggian",
-                "temperature": "Suhu"
+                "temperature": "Suhu Perangkat"
             },
             "link_status": {
                 "title": "Status Tautan",

@@ -121,7 +121,7 @@
                 "latitude": "Enlem",
                 "longitude": "Boylam",
                 "elevation": "Yükseklik",
-                "temperature": "Sıcaklık"
+                "temperature": "Cihaz Sıcaklığı"
             },
             "link_status": {
                 "title": "Bağlantı Durumu",

@@ -121,7 +121,7 @@
                 "latitude": "緯度",
                 "longitude": "經度",
                 "elevation": "海拔高度",
-                "temperature": "溫度"
+                "temperature": "裝置溫度"
             },
             "link_status": {
                 "title": "連結狀態",
