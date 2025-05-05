@@ -16,7 +16,7 @@ const SEIS_RECORD_SHARDS = 366 // By days of the year
 
 type SeisRecord struct {
 	dao.BaseTable
-	Timestamp   int64  `gorm:"column:timestamp;index;not null;unique"`
+	RecordTime  int64  `gorm:"column:record_time;index;not null;unique"`
 	SampleRate  int    `gorm:"column:sample_rate;not null"`
 	ChannelData []byte `gorm:"column:channel_data;not null"`
 }
@@ -42,15 +42,10 @@ func (t *SeisRecord) AddPlugins(dbObj *gorm.DB, tablePrefix string) ([]gorm.Plug
 	}
 
 	shard := sharding.Register(sharding.Config{
-		ShardingKey:    "timestamp",
+		ShardingKey:    "record_time",
 		NumberOfShards: SEIS_RECORD_SHARDS,
 		ShardingAlgorithm: func(columnValue any) (string, error) {
-			timestamp, ok := columnValue.(int64)
-			if !ok {
-				return "", fmt.Errorf("invalid sharding key type: %T", columnValue)
-			}
-			t := time.UnixMilli(timestamp).UTC()
-			return fmt.Sprintf("_%d", t.YearDay()%SEIS_RECORD_SHARDS), nil
+			return "", nil // We will handle sharding ourselves in SeisRecordsCreate
 		},
 		PrimaryKeyGenerator: sharding.PKSnowflake,
 	}, tableName)
@@ -58,8 +53,8 @@ func (t *SeisRecord) AddPlugins(dbObj *gorm.DB, tablePrefix string) ([]gorm.Plug
 	return []gorm.Plugin{shard}, nil
 }
 
-func (t *SeisRecord) Encode(tm time.Time, sampleRate int, channelData []explorer.ChannelData) error {
-	t.Timestamp = tm.UnixMilli()
+func (t *SeisRecord) Encode(recordTime time.Time, sampleRate int, channelData []explorer.ChannelData) error {
+	t.RecordTime = recordTime.UnixMilli()
 	t.SampleRate = sampleRate
 
 	buf := bytes.Buffer{}
@@ -73,7 +68,7 @@ func (t *SeisRecord) Encode(tm time.Time, sampleRate int, channelData []explorer
 	return nil
 }
 
-func (t *SeisRecord) Decode() (tm time.Time, sampleRate int, channelData []explorer.ChannelData, err error) {
+func (t *SeisRecord) Decode() (recordTime time.Time, sampleRate int, channelData []explorer.ChannelData, err error) {
 	buf := bytes.Buffer{}
 	decoder := gob.NewDecoder(&buf)
 
@@ -84,5 +79,5 @@ func (t *SeisRecord) Decode() (tm time.Time, sampleRate int, channelData []explo
 		return time.Time{}, 0, nil, fmt.Errorf("failed to decode channel data: %w", err)
 	}
 
-	return time.UnixMilli(t.Timestamp), t.SampleRate, channelData, nil
+	return time.UnixMilli(t.RecordTime), t.SampleRate, channelData, nil
 }

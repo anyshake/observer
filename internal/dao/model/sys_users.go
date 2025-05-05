@@ -21,14 +21,14 @@ const (
 
 type SysUser struct {
 	dao.BaseTable
-	UserId    string `gorm:"column:user_id;index;not null;unique"` // Unique user ID generated using Snowflake
-	Username  string `gorm:"column:username;index;not null;unique"`
-	Password  string `gorm:"column:password;not null"` // Must be hashed using GetHashedPassword
-	LastLogin int64  `gorm:"column:last_login"`
-	UserIp    string `gorm:"column:user_ip"`
-	UserAgent string `gorm:"column:user_agent"`
-	Admin     string `gorm:"column:admin;index;not null;default:false"` // false or true in string
-	UpdatedAt int64  `gorm:"column:update_at;autoUpdateTime:milli;<-:update"`
+	UserId         string `gorm:"column:user_id;index;not null;unique"` // Unique user ID generated using Snowflake
+	Username       string `gorm:"column:username;index;not null;unique"`
+	HashedPassword string `gorm:"column:hashed_password;not null"` // Must be hashed using GetHashedPassword
+	LastLogin      int64  `gorm:"column:last_login"`
+	UserIp         string `gorm:"column:user_ip"`
+	UserAgent      string `gorm:"column:user_agent"`
+	IsAdmin        string `gorm:"column:is_admin;index;not null;default:false"` // false or true in string
+	UpdatedAt      int64  `gorm:"column:update_at;autoUpdateTime:milli;<-:update"`
 }
 
 func (t *SysUser) GetModel() any {
@@ -58,6 +58,6 @@ func (t *SysUser) GetHashedPassword(password string) string {
 }
 
 func (t *SysUser) IsPasswordCorrect(password string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(t.Password), []byte(password))
+	err := bcrypt.CompareHashAndPassword([]byte(t.HashedPassword), []byte(password))
 	return err == nil
 }

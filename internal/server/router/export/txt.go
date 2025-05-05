@@ -30,7 +30,7 @@ func (e *seismicDataEncoderTxtImpl) Encode(records []model.SeisRecord, channelCo
 
 	var (
 		startSampleRate = records[0].SampleRate
-		startTimestamp  = records[0].Timestamp
+		startTimestamp  = records[0].RecordTime
 	)
 
 	for index, record := range records {
@@ -51,12 +51,12 @@ func (e *seismicDataEncoderTxtImpl) Encode(records []model.SeisRecord, channelCo
 		}
 
 		// Make sure timestamp is continuous
-		if math.Abs(float64(record.Timestamp-startTimestamp-int64(index*1000))) >= explorer.ALLOWED_JITTER_MS {
+		if math.Abs(float64(record.RecordTime-startTimestamp-int64(index*1000))) >= explorer.ALLOWED_JITTER_MS {
 			return nil, fmt.Errorf(
 				"timestamp is not within allowed jitter %d ms, expected %d, got %d",
 				explorer.ALLOWED_JITTER_MS,
 				startTimestamp+int64(index*1000),
-				record.Timestamp,
+				record.RecordTime,
 			)
 		}
 
@@ -67,7 +67,7 @@ func (e *seismicDataEncoderTxtImpl) Encode(records []model.SeisRecord, channelCo
 
 		sampleSpanMs := 1000.0 / float64(record.SampleRate)
 		for i, v := range channelData.Data {
-			timestampMs := float64(record.Timestamp) + sampleSpanMs*float64(i)
+			timestampMs := float64(record.RecordTime) + sampleSpanMs*float64(i)
 			builder.WriteString(strconv.FormatFloat(timestampMs, 'f', 0, 64))
 			builder.WriteByte(' ')
 			builder.WriteString(strconv.Itoa(int(v)))

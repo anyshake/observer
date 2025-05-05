@@ -5,7 +5,11 @@ import (
 )
 
 func (p *CloseExplorerCleanerImpl) Execute() error {
-	logger.GetLogger(p.GetName()).Info("closing connection to hardware")
-	defer logger.GetLogger(p.GetName()).Info("hardware connection has been closed")
-	return p.HardwareDev.Close()
+	if p.HardwareDev != nil {
+		logger.GetLogger(p.GetName()).Info("closing connection to hardware")
+		defer logger.GetLogger(p.GetName()).Info("hardware connection has been closed")
+		return p.HardwareDev.Close()
+	}
+
+	return nil
 }

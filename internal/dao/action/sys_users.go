@@ -18,7 +18,7 @@ func (h *Handler) SysUserHasAdmin() (bool, error) {
 	var adminUsers int64
 	err := h.daoObj.Database.
 		Table((&model.SysUser{}).GetName(h.daoObj.GetPrefix())).
-		Where("admin = ?", model.ADMIN).
+		Where("is_admin = ?", model.ADMIN).
 		Count(&adminUsers).
 		Error
 	if err != nil {
@@ -94,10 +94,10 @@ func (h *Handler) SysUserCreate(username, password string, isAdmin bool) (string
 	}
 
 	user := model.SysUser{
-		Admin:    strconv.FormatBool(isAdmin),
+		IsAdmin:  strconv.FormatBool(isAdmin),
 		Username: username,
 	}
-	user.Password = user.GetHashedPassword(password)
+	user.HashedPassword = user.GetHashedPassword(password)
 	user.UserId = user.NewUserId()
 
 	err := h.daoObj.Database.
@@ -154,9 +154,9 @@ func (h *Handler) SysUserUpdte(userId string, user model.SysUser) error {
 		}
 	}
 
-	currentUser.Admin = user.Admin
+	currentUser.IsAdmin = user.IsAdmin
 	currentUser.LastLogin = user.LastLogin
-	currentUser.Password = user.Password
+	currentUser.HashedPassword = user.HashedPassword
 	currentUser.UserAgent = user.UserAgent
 	currentUser.UserIp = user.UserIp
 	currentUser.Username = user.Username

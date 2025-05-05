@@ -5,7 +5,11 @@ import (
 )
 
 func (d *CloseDatabaseCleanerImpl) Execute() error {
-	logger.GetLogger(d.GetName()).Info("closing connection to database")
-	defer logger.GetLogger(d.GetName()).Info("database connection has been closed")
-	return d.DAO.Close()
+	if d.DAO != nil {
+		logger.GetLogger(d.GetName()).Info("closing connection to database")
+		defer logger.GetLogger(d.GetName()).Info("database connection has been closed")
+		return d.DAO.Close()
+	}
+
+	return nil
 }

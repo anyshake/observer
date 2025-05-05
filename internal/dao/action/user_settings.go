@@ -29,45 +29,45 @@ func (h *Handler) SettingsGet(namespace, key string) (any, SettingType, int, err
 	var settings model.UserSettings
 	err := h.daoObj.Database.
 		Model(settings).
-		Where("namespace = ? AND key = ?", namespace, key).
+		Where("namespace = ? AND config_key = ?", namespace, key).
 		First(&settings).
 		Error
 	if err != nil {
 		return nil, "", 0, fmt.Errorf("failed to get settings for namespace %s, key %s: %w", namespace, key, err)
 	}
 
-	switch SettingType(settings.Type) {
+	switch SettingType(settings.ConfigType) {
 	case String:
-		return string(settings.Value), String, settings.Version, nil
+		return string(settings.ConfigValue), String, settings.Version, nil
 	case Bool:
-		return settings.Value[0] == 1, Bool, settings.Version, nil
+		return settings.ConfigValue[0] == 1, Bool, settings.Version, nil
 	case Int:
 		var result int64
-		if err := gob.NewDecoder(bytes.NewReader(settings.Value)).Decode(&result); err != nil {
+		if err := gob.NewDecoder(bytes.NewReader(settings.ConfigValue)).Decode(&result); err != nil {
 			return nil, "", 0, fmt.Errorf("failed to decode int: %w", err)
 		}
 		return result, Int, settings.Version, nil
 	case Float:
 		var result float64
-		if err := gob.NewDecoder(bytes.NewReader(settings.Value)).Decode(&result); err != nil {
+		if err := gob.NewDecoder(bytes.NewReader(settings.ConfigValue)).Decode(&result); err != nil {
 			return nil, "", 0, fmt.Errorf("failed to decode float: %w", err)
 		}
 		return result, Float, settings.Version, nil
 	case StringArray:
 		var result []string
-		if err := gob.NewDecoder(bytes.NewReader(settings.Value)).Decode(&result); err != nil {
+		if err := gob.NewDecoder(bytes.NewReader(settings.ConfigValue)).Decode(&result); err != nil {
 			return nil, "", 0, fmt.Errorf("failed to decode string array: %w", err)
 		}
 		return result, StringArray, settings.Version, nil
 	case IntArray:
 		var result []int64
-		if err := gob.NewDecoder(bytes.NewReader(settings.Value)).Decode(&result); err != nil {
+		if err := gob.NewDecoder(bytes.NewReader(settings.ConfigValue)).Decode(&result); err != nil {
 			return nil, "", 0, fmt.Errorf("failed to decode int array: %w", err)
 		}
 		return result, IntArray, settings.Version, nil
 	case FloatArray:
 		var result []float64
-		if err := gob.NewDecoder(bytes.NewReader(settings.Value)).Decode(&result); err != nil {
+		if err := gob.NewDecoder(bytes.NewReader(settings.ConfigValue)).Decode(&result); err != nil {
 			return nil, "", 0, fmt.Errorf("failed to decode float array: %w", err)
 		}
 		return result, FloatArray, settings.Version, nil
@@ -112,15 +112,15 @@ func (h *Handler) SettingsSet(namespace, key string, valueType SettingType, vers
 	}
 
 	settings := model.UserSettings{
-		Namespace: namespace,
-		Key:       key,
-		Value:     dataValBytes,
-		Version:   version,
-		Type:      string(valueType),
+		Namespace:   namespace,
+		ConfigKey:   key,
+		ConfigValue: dataValBytes,
+		Version:     version,
+		ConfigType:  string(valueType),
 	}
 	err := h.daoObj.Database.
 		Model(settings).
-		Where("namespace = ? AND key = ?", namespace, key).
+		Where("namespace = ? AND config_key = ?", namespace, key).
 		Assign(settings).
 		FirstOrCreate(&settings).
 		Error

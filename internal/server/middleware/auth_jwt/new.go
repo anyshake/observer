@@ -27,7 +27,7 @@ func New(timeSource *timesource.Source, actionHandler *action.Handler, expiratio
 			}
 			userModel, err := actionHandler.SysUserGetByUserId(userId)
 			if userModel.UserId != "" && err == nil {
-				c.Set("is_admin", userModel.Admin == model.ADMIN)
+				c.Set("is_admin", userModel.IsAdmin == model.ADMIN)
 				return true
 			}
 			return false

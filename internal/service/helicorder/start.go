@@ -56,11 +56,11 @@ func (d *provider) GetPlotData(startTime, endTime time.Time) ([]heligo.PlotData,
 		for idx, record := range records {
 			_, sampleRate, channelData, err := record.Decode()
 			if err != nil {
-				return nil, fmt.Errorf("failed to decode seismic waveform record on timestamp %d: %w", record.Timestamp, err)
+				return nil, fmt.Errorf("failed to decode seismic waveform record on timestamp %d: %w", record.RecordTime, err)
 			}
 			seisRecords[idx].sampleRate = sampleRate
 			seisRecords[idx].channelData = channelData
-			seisRecords[idx].timestamp = record.Timestamp
+			seisRecords[idx].timestamp = record.RecordTime
 		}
 		d.queryCache.Set(startTimestamp, seisRecords)
 	}

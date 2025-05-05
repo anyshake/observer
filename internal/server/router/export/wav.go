@@ -31,7 +31,7 @@ func (e *seismicDataEncoderWavImpl) GetName() string {
 func (e *seismicDataEncoderWavImpl) Encode(records []model.SeisRecord, channelCode string) ([]byte, error) {
 	var (
 		startSampleRate = records[0].SampleRate
-		startTimestamp  = records[0].Timestamp
+		startTimestamp  = records[0].RecordTime
 	)
 
 	var channelBuffer []int32
@@ -45,12 +45,12 @@ func (e *seismicDataEncoderWavImpl) Encode(records []model.SeisRecord, channelCo
 			continue
 		}
 
-		if math.Abs(float64(record.Timestamp-startTimestamp-int64(index*1000))) >= explorer.ALLOWED_JITTER_MS {
+		if math.Abs(float64(record.RecordTime-startTimestamp-int64(index*1000))) >= explorer.ALLOWED_JITTER_MS {
 			return nil, fmt.Errorf(
 				"timestamp is not within allowed jitter %d ms, expected %d, got %d",
 				explorer.ALLOWED_JITTER_MS,
 				startTimestamp+int64(index*1000),
-				record.Timestamp,
+				record.RecordTime,
 			)
 		}
 
@@ -127,8 +127,8 @@ func (e *seismicDataEncoderWavImpl) normalizeToInt16(data []int32) []int16 {
 }
 
 func (e *seismicDataEncoderWavImpl) computeTimeDuration(records []model.SeisRecord) float64 {
-	startTime := records[0].Timestamp
-	endTime := records[len(records)-1].Timestamp
+	startTime := records[0].RecordTime
+	endTime := records[len(records)-1].RecordTime
 	return time.UnixMilli(endTime).Sub(time.UnixMilli(startTime)).Seconds()
 }
 

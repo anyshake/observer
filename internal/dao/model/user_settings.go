@@ -9,12 +9,12 @@ import (
 
 type UserSettings struct {
 	dao.BaseTable
-	Namespace string `gorm:"column:namespace;index;not null"`
-	Key       string `gorm:"column:key;index;not null"`
-	Value     []byte `gorm:"column:value;not null"`
-	Type      string `gorm:"column:type;not null"`
-	Version   int    `gorm:"column:version;not null"`
-	UpdatedAt int64  `gorm:"column:update_at;autoUpdateTime:milli;<-:update"`
+	Namespace   string `gorm:"column:namespace;index;not null"`
+	ConfigKey   string `gorm:"column:config_key;index;not null"`
+	ConfigValue []byte `gorm:"column:config_val;not null"`
+	ConfigType  string `gorm:"column:config_type;not null"`
+	Version     int    `gorm:"column:version;not null"`
+	UpdatedAt   int64  `gorm:"column:update_at;autoUpdateTime:milli;<-:update"`
 }
 
 func (t *UserSettings) GetModel() any {
@@ -22,7 +22,6 @@ func (t *UserSettings) GetModel() any {
 }
 
 func (t *UserSettings) GetName(tablePrefix string) string {
-	// return "user_settings"
 	return fmt.Sprintf("%s%s", tablePrefix, "user_settings")
 }
 

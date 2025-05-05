@@ -16,16 +16,14 @@ func (h *Handler) SeisRecordsCreate(records ...model.SeisRecord) error {
 	groupedRecords := make(map[int][]model.SeisRecord)
 
 	for _, record := range records {
-		t := time.UnixMilli(record.Timestamp).UTC().YearDay()
+		t := time.UnixMilli(record.RecordTime).UTC().YearDay()
 		groupedRecords[t] = append(groupedRecords[t], record)
 	}
 
 	for day, group := range groupedRecords {
-		err := h.daoObj.Database.
-			Table((&model.SeisRecord{}).GetName(h.daoObj.GetPrefix())).
-			Create(&group).
-			Error
-		if err != nil {
+		tableName := fmt.Sprintf("%sseis_records_%d", h.daoObj.GetPrefix(), day%model.SEIS_RECORD_SHARDS)
+
+		if err := h.daoObj.Database.Table(tableName).Create(&group).Error; err != nil {
 			return fmt.Errorf("failed to insert records for day %d: %w", day, err)
 		}
 	}
@@ -53,8 +51,8 @@ func (h *Handler) SeisRecordsQuery(startTime, endTime time.Time) ([]model.SeisRe
 		var tempRecords []model.SeisRecord
 		err := h.daoObj.Database.
 			Table(tableName).
-			Where("timestamp >= ? AND timestamp <= ?", startTime.UnixMilli(), endTime.UnixMilli()).
-			Order("timestamp ASC").
+			Where("record_time >= ? AND record_time <= ?", startTime.UnixMilli(), endTime.UnixMilli()).
+			Order("record_time ASC").
 			Find(&tempRecords).
 			Error
 		if err != nil {
@@ -77,7 +75,7 @@ func (h *Handler) SeisRecordsPurge(startTime, endTime time.Time) error {
 
 		err := h.daoObj.Database.
 			Table(tableName).
-			Where("timestamp >= ? AND timestamp <= ?", startTime.UnixMilli(), endTime.UnixMilli()).
+			Where("record_time >= ? AND record_time <= ?", startTime.UnixMilli(), endTime.UnixMilli()).
 			Delete(model.SeisRecord{}).
 			Error
 		if err != nil {

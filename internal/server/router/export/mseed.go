@@ -83,7 +83,7 @@ func (e *seismicDataEncoderMseedImpl) GetFileName(startTime time.Time, channelCo
 	if err != nil {
 		return "", err
 	}
-	locationCode, err := e.stationCodeConfig.Get(e.actionHandler)
+	locationCode, err := e.locationCodeConfig.Get(e.actionHandler)
 	if err != nil {
 		return "", err
 	}

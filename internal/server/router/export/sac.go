@@ -44,7 +44,7 @@ func (e *seismicDataEncoderSacImpl) Encode(records []model.SeisRecord, channelCo
 
 	var (
 		startSampleRate = records[0].SampleRate
-		startTimestamp  = records[0].Timestamp
+		startTimestamp  = records[0].RecordTime
 	)
 
 	var channelBuffer []int32
@@ -59,12 +59,12 @@ func (e *seismicDataEncoderSacImpl) Encode(records []model.SeisRecord, channelCo
 		}
 
 		// Make sure timestamp is continuous
-		if math.Abs(float64(record.Timestamp-startTimestamp-int64(index*1000))) >= explorer.ALLOWED_JITTER_MS {
+		if math.Abs(float64(record.RecordTime-startTimestamp-int64(index*1000))) >= explorer.ALLOWED_JITTER_MS {
 			return nil, fmt.Errorf(
 				"timestamp is not within allowed jitter %d ms, expected %d, got %d",
 				explorer.ALLOWED_JITTER_MS,
 				startTimestamp+int64(index*1000),
-				record.Timestamp,
+				record.RecordTime,
 			)
 		}
 

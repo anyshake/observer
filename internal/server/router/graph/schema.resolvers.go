@@ -76,14 +76,14 @@ func (r *mutationResolver) UpdateSysUser(ctx context.Context, userID string, use
 		if err := r.ActionHandler.SysUserCheckPassword(*password); err != nil {
 			return false, err
 		}
-		user.Password = user.GetHashedPassword(*password)
+		user.HashedPassword = user.GetHashedPassword(*password)
 	}
 
 	// Note that the admin itself cannot downgrade to a regular user
 	if r.checkIsAdmin(ctx) && userID == r.getCurrentUserId(ctx) && !admin {
 		return false, errors.New("current admin itself cannot be downgraded")
 	}
-	user.Admin = lo.Ternary(admin, model.ADMIN, model.NON_ADMIN)
+	user.IsAdmin = lo.Ternary(admin, model.ADMIN, model.NON_ADMIN)
 
 	if err := r.ActionHandler.SysUserUpdte(userID, user); err != nil {
 		return false, fmt.Errorf("failed to update user: %w", err)
@@ -704,7 +704,7 @@ func (r *queryResolver) GetCurrentUser(ctx context.Context) (*graph_model.SysUse
 		LastLogin: sysUser.LastLogin,
 		UserIP:    sysUser.UserIp,
 		UserAgent: sysUser.UserAgent,
-		Admin:     sysUser.Admin == model.ADMIN,
+		Admin:     sysUser.IsAdmin == model.ADMIN,
 		UpdatedAt: sysUser.UpdatedAt,
 	}, nil
 }
@@ -729,7 +729,7 @@ func (r *queryResolver) GetSysUsers(ctx context.Context) ([]*graph_model.SysUser
 			LastLogin: user.LastLogin,
 			UserIP:    user.UserIp,
 			UserAgent: user.UserAgent,
-			Admin:     user.Admin == model.ADMIN,
+			Admin:     user.IsAdmin == model.ADMIN,
 			UpdatedAt: user.UpdatedAt,
 		})
 	}
