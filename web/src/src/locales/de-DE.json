@@ -108,6 +108,8 @@
                 "channels": "Kanäle"
             },
             "device_info": {
+                "yes": "Ja",
+                "no": "Nein",
                 "title": "Geräteinformationen",
                 "product_model": "Produktmodell",
                 "device_id": "Geräte-ID",

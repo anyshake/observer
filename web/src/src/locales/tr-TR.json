@@ -116,6 +116,8 @@
                 "gnss_active": "GNSS Aktif"
             },
             "device_status": {
+                "yes": "Evet",
+                "no": "Hayır",
                 "title": "Cihaz Durumu",
                 "sample_rate": "Örnekleme Hızı",
                 "latitude": "Enlem",

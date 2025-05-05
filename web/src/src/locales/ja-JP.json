@@ -116,6 +116,8 @@
                 "gnss_active": "GNSS アクティブ"
             },
             "device_status": {
+                "yes": "はい",
+                "no": "いいえ",
                 "title": "デバイスステータス",
                 "sample_rate": "サンプルレート",
                 "latitude": "緯度",

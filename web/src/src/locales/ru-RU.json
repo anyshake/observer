@@ -116,6 +116,8 @@
                 "gnss_active": "GNSS активен"
             },
             "device_status": {
+                "yes": "Да",
+                "no": "Нет",
                 "title": "Статус устройства",
                 "sample_rate": "Частота дискретизации",
                 "latitude": "Широта",

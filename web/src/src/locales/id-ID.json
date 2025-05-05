@@ -116,6 +116,8 @@
                 "gnss_active": "GNSS Aktif"
             },
             "device_status": {
+                "yes": "Ya",
+                "no": "Tidak",
                 "title": "Status Perangkat",
                 "sample_rate": "Sample Rate",
                 "latitude": "Lintang",

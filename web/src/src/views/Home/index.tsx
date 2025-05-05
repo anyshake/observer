@@ -106,7 +106,9 @@ const Home = () => {
             },
             {
                 label: t('views.Home.device_info.gnss_active'),
-                value: getHomeDataData?.getDeviceConfig.gnssEnabled ? 'Yes' : 'No'
+                value: getHomeDataData?.getDeviceConfig.gnssEnabled
+                    ? t('views.Home.device_info.yes')
+                    : t('views.Home.device_info.no')
             }
         ],
         [t, getHomeDataData]
@@ -285,7 +287,17 @@ const Home = () => {
                         <Icon className="flex-shrink-0" path={mdiMapMarkerRadius} size={1} />
                         <span>{t('views.Home.station_location.title')}</span>
                     </h2>
-                    <MapContainer height={300} coordinates={getStationCoordinates} />
+                    <MapContainer
+                        scrollWheelZoom
+                        zoomControl
+                        dragging
+                        zoom={6}
+                        maxZoom={7}
+                        minZoom={3}
+                        height={300}
+                        tile="/tiles/{z}/{x}/{y}.webp"
+                        coordinates={getStationCoordinates}
+                    />
                 </div>
 
                 <div className="card bg-base-100 flex flex-col space-y-4 p-5 text-gray-700 shadow-md md:col-span-9">

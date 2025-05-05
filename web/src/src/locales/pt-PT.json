@@ -116,6 +116,8 @@
                 "gnss_active": "GNSS Ativo"
             },
             "device_status": {
+                "yes": "Sim",
+                "no": " Não",
                 "title": "Estado do Dispositivo",
                 "sample_rate": "Taxa de Amostragem",
                 "latitude": "Latitude",

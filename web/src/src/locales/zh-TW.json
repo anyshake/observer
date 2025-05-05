@@ -108,6 +108,8 @@
                 "channels": "頻道"
             },
             "device_info": {
+                "yes": "是",
+                "no": "否",
                 "title": "裝置資訊",
                 "product_model": "產品型號",
                 "device_id": "裝置 ID",
