@@ -92,7 +92,8 @@ func (a *ForwarderServiceImpl) getDataBytes(tm time.Time, sampleRate int, channe
 	for _, channel := range channelData {
 		dataStr := strings.Trim(strings.Replace(fmt.Sprint(channel.Data), " ", ",", -1), "[]")
 		msg := fmt.Sprintf(
-			"$%s,%s,%s,%s,%d,%d,%s,*%02X\r\n",
+			"$%d,%s,%s,%s,%s,%d,%d,%s,*%02X\r\n",
+			channel.ChannelId,
 			a.networkCode,
 			a.stationCode,
 			a.locationCode,
