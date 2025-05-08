@@ -108,6 +108,8 @@
                 "channels": "Channels"
             },
             "device_info": {
+                "yes": "Yes",
+                "no": "No",
                 "title": "Device Information",
                 "product_model": "Product Model",
                 "device_id": "Device ID",
@@ -116,8 +118,6 @@
                 "gnss_active": "GNSS Active"
             },
             "device_status": {
-                "yes": "Yes",
-                "no": "No",
                 "title": "Device Status",
                 "sample_rate": "Sample Rate",
                 "latitude": "Latitude",

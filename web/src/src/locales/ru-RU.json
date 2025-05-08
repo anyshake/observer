@@ -108,6 +108,8 @@
                 "channels": "Каналы"
             },
             "device_info": {
+                "yes": "Да",
+                "no": "Нет",
                 "title": "Информация об устройстве",
                 "product_model": "Модель продукта",
                 "device_id": "ID устройства",
@@ -116,8 +118,6 @@
                 "gnss_active": "GNSS активен"
             },
             "device_status": {
-                "yes": "Да",
-                "no": "Нет",
                 "title": "Статус устройства",
                 "sample_rate": "Частота дискретизации",
                 "latitude": "Широта",

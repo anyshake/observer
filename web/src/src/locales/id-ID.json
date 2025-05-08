@@ -108,6 +108,8 @@
                 "channels": "Saluran"
             },
             "device_info": {
+                "yes": "Ya",
+                "no": "Tidak",
                 "title": "Informasi Perangkat",
                 "product_model": "Model Produk",
                 "device_id": "ID Perangkat",
@@ -116,8 +118,6 @@
                 "gnss_active": "GNSS Aktif"
             },
             "device_status": {
-                "yes": "Ya",
-                "no": "Tidak",
                 "title": "Status Perangkat",
                 "sample_rate": "Sample Rate",
                 "latitude": "Lintang",

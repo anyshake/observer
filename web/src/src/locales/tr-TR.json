@@ -108,6 +108,8 @@
                 "channels": "Kanallar"
             },
             "device_info": {
+                "yes": "Evet",
+                "no": "Hayır",
                 "title": "Cihaz Bilgileri",
                 "product_model": "Ürün Modeli",
                 "device_id": "Cihaz ID",
@@ -116,8 +118,6 @@
                 "gnss_active": "GNSS Aktif"
             },
             "device_status": {
-                "yes": "Evet",
-                "no": "Hayır",
                 "title": "Cihaz Durumu",
                 "sample_rate": "Örnekleme Hızı",
                 "latitude": "Enlem",

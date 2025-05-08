@@ -108,6 +108,8 @@
                 "channels": "チャンネル"
             },
             "device_info": {
+                "yes": "はい",
+                "no": "いいえ",
                 "title": "デバイス情報",
                 "product_model": "製品モデル",
                 "device_id": "デバイス ID",
@@ -116,8 +118,6 @@
                 "gnss_active": "GNSS アクティブ"
             },
             "device_status": {
-                "yes": "はい",
-                "no": "いいえ",
                 "title": "デバイスステータス",
                 "sample_rate": "サンプルレート",
                 "latitude": "緯度",
