@@ -164,7 +164,7 @@ export const TypedInput = ({
             <div className="join">
                 {renderInput()}
                 <button
-                    className="btn join-item"
+                    className="btn join-item text-base-200 bg-purple-500 hover:bg-purple-600 disabled:bg-gray-300 disabled:text-gray-500"
                     onClick={() => onSubmit?.(value)}
                     disabled={!hasChanged}
                 >
@@ -191,7 +191,7 @@ export const TypedInput = ({
                             type={inputTypeMap[dataType as keyof typeof inputTypeMap]}
                             onChange={({ currentTarget }) => setTempArrayValue(currentTarget.value)}
                         />
-                        <button className="join-item btn" onClick={handleAddArrayItem}>
+                        <button className="btn join-item" onClick={handleAddArrayItem}>
                             <Icon className="flex-shrink-0" path={mdiPlus} size={0.9} />
                         </button>
                     </div>
