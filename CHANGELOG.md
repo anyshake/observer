@@ -14,14 +14,14 @@ Alongside this release, we are launching the **AnyShake Explorer**, a fully open
 🧠 **What’s New**  
 This version represents a leap forward in terms of **usability, security, reliability, and functionality** — setting a new benchmark in open-source seismic software.
 
-### New Features
+### Bug Fixes
 
 - Resolved high CPU usage issue caused by "empty-run" behavior after Explorer device disconnection.
 - Fixed significant time offset when AnyShake Observer starts before Explorer under NTP mode.
 - Resolved decoder thread crash when receiving delayed data via serial-to-TCP device.
 - Fixed numerous potential data race issues for improved multithreaded stability.
 
-### Bug Fixes
+### New Features
 
 - Simplified deployment with just **40 lines of configuration** to get started.
 - Full support for **legacy v1**, **mainline v2**, and **latest v3 protocols** used by AnyShake Explorer.
