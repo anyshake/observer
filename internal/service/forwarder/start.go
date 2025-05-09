@@ -12,7 +12,6 @@ import (
 
 	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/pkg/logger"
-	"github.com/anyshake/observer/pkg/message"
 )
 
 func (s *ForwarderServiceImpl) handleInterrupt() {
@@ -27,7 +26,6 @@ func (s *ForwarderServiceImpl) Start() error {
 		s.ctx, s.cancelFn = context.WithCancel(context.Background())
 	}
 
-	s.messageBus = message.NewBus[explorer.EventHandler](ID, 65535)
 	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", s.listenHost, s.listenPort))
 	if err != nil {
 		return fmt.Errorf("failed to listen on %s:%d: %w", s.listenHost, s.listenPort, err)
