@@ -3,7 +3,7 @@ package miniseed
 import (
 	"errors"
 	"fmt"
-	"path"
+	"path/filepath"
 
 	"github.com/anyshake/observer/config"
 	"github.com/anyshake/observer/internal/dao/action"
@@ -127,7 +127,10 @@ func (s *miniSeedConfigFilePathImpl) Set(handler *action.Handler, newVal any) er
 	if err != nil {
 		return err
 	}
-	filePath = path.Clean(filePath)
+	if filePath == "" {
+		return errors.New("file path cannot be empty")
+	}
+	filePath = filepath.Clean(filePath)
 	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), filePath); err != nil {
 		return fmt.Errorf("failed to set MiniSEED storage path: %w", err)
 	}

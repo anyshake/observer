@@ -3,8 +3,10 @@ package server
 import (
 	"compress/gzip"
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
+	"runtime/debug"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -67,6 +69,11 @@ func (s *httpServer) Setup(listen string) error {
 	files.Setup(api, s.resolver.ServiceMap, jwtMiddlewareFn)
 
 	graphql := handler.NewDefaultServer(graph_resolver.NewExecutableSchema(graph_resolver.Config{Resolvers: s.resolver}))
+	graphql.SetRecoverFunc(func(ctx context.Context, err any) (userMessage error) {
+		s.log.Errorf("recovered from panic in GraphQL: %v\n%s", err, debug.Stack())
+		return errors.New("fatal error occured")
+	})
+
 	api.POST("/graphql", jwtMiddlewareFn, func(ctx *gin.Context) {
 		ctxWithUserStatus := context.WithValue(ctx.Request.Context(), graph_resolver.ContextKey("user_status"), map[string]any{
 			"is_admin": ctx.GetBool("is_admin"),
