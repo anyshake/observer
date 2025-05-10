@@ -21,6 +21,15 @@ func (s *MiniSeedServiceImpl) handleInterrupt() {
 	s.wg.Done()
 }
 
+func (s *MiniSeedServiceImpl) getAppendInterval() int {
+	// Set write interval to 1 if protocol is v1
+	// This is a simple solution to sample rate jittering
+	// However, it will increase the disk I/O and file size
+	hardwareCfg := s.hardwareDev.GetConfig()
+	dataProtocol := hardwareCfg.GetProtocol()
+	return lo.Ternary(dataProtocol == "v1", 1, MINISEED_APPEND_INTERVAL)
+}
+
 func (s *MiniSeedServiceImpl) Start() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -34,14 +43,7 @@ func (s *MiniSeedServiceImpl) Start() error {
 	s.dataSequence.sequenceData = make(map[string]uint32)
 	s.cleanupCountDown = MINISEED_CLEANUP_INTERVAL
 
-	// Set write interval to 1 if protocol is v1
-	// This is a simple solution to sample rate jittering
-	// However, it will increase the disk I/O and file size
-	hardwareCfg := s.hardwareDev.GetConfig()
-	s.appendCountDown = MINISEED_APPEND_INTERVAL
-	if hardwareCfg.GetProtocol() == "v1" {
-		s.appendCountDown = 1
-	}
+	s.appendCountDown = s.getAppendInterval()
 	s.recordBuffer = make([][]buffer, s.appendCountDown)
 
 	go func() {
@@ -77,7 +79,7 @@ func (s *MiniSeedServiceImpl) Start() error {
 			}
 
 			if s.appendCountDown == 0 {
-				s.appendCountDown = MINISEED_APPEND_INTERVAL
+				s.appendCountDown = s.getAppendInterval()
 				channels, err := s.saveMiniSeedRecords()
 				if err != nil {
 					logger.GetLogger(ID).Errorf("failed to append records to MiniSEED file: %v", err)
