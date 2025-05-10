@@ -69,7 +69,6 @@
     "cross-env": "^7.0.3",
     "daisyui": "^5.0.0-beta.9",
     "eslint": "^9.21.0",
-    "eslint-plugin-import-sort": "^0.0.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "eslint-plugin-simple-import-sort": "^12.1.1",
