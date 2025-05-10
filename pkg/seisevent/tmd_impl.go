@@ -72,13 +72,21 @@ func (c *TMD) GetEvents(latitude, longitude float64) ([]Event, error) {
 				mag := string2Float(s.Text())
 				seisEvent.Magnitude = []Magnitude{{Type: ParseMagnitude("M"), Value: mag}}
 			case 2:
-				seisEvent.Latitude = string2Float(s.Text())
+				lat, err := c.getLatitude(s.Text())
+				if err != nil {
+					return
+				}
+				seisEvent.Latitude = lat
 			case 3:
-				seisEvent.Longitude = string2Float(s.Text())
+				lon, err := c.getLongitude(s.Text())
+				if err != nil {
+					return
+				}
+				seisEvent.Longitude = lon
 			case 4:
 				seisEvent.Depth = string2Float(s.Text())
 			case 6:
-				thai, eng, err := getRegion(s)
+				thai, eng, err := c.getRegion(s)
 				if err != nil {
 					return
 				}
@@ -110,13 +118,21 @@ func (c *TMD) GetEvents(latitude, longitude float64) ([]Event, error) {
 				mag := string2Float(s.Text())
 				seisEvent.Magnitude = []Magnitude{{Type: ParseMagnitude("M"), Value: mag}}
 			case 2:
-				seisEvent.Latitude = string2Float(s.Text())
+				lat, err := c.getLatitude(s.Text())
+				if err != nil {
+					return
+				}
+				seisEvent.Latitude = lat
 			case 3:
-				seisEvent.Longitude = string2Float(s.Text())
+				lon, err := c.getLongitude(s.Text())
+				if err != nil {
+					return
+				}
+				seisEvent.Longitude = lon
 			case 4:
 				seisEvent.Depth = string2Float(s.Text())
 			case 6:
-				thai, eng, err := getRegion(s)
+				thai, eng, err := c.getRegion(s)
 				if err != nil {
 					return
 				}
@@ -136,7 +152,67 @@ func (c *TMD) GetEvents(latitude, longitude float64) ([]Event, error) {
 	return sortedEvents, nil
 }
 
-func getRegion(s *goquery.Selection) (string, string, error) {
+func (t *TMD) getLatitude(latStr string) (float64, error) {
+	parts := strings.SplitN(latStr, "°", 2)
+	if len(parts) != 2 {
+		return 0, fmt.Errorf("invalid latitude format: expected 'value°Direction', got '%s'", latStr)
+	}
+
+	valueStr := strings.TrimSpace(parts[0])
+	direction := strings.TrimSpace(parts[1])
+
+	latitude, err := strconv.ParseFloat(valueStr, 64)
+	if err != nil {
+		return 0, fmt.Errorf("invalid latitude value '%s': %w", valueStr, err)
+	}
+
+	switch strings.ToUpper(direction) {
+	case "N":
+		// North is positive, do nothing
+	case "S":
+		latitude = -latitude
+	default:
+		return 0, fmt.Errorf("invalid latitude direction: '%s', expected 'N' or 'S'", direction)
+	}
+
+	if latitude < -90.0 || latitude > 90.0 {
+		return 0, fmt.Errorf("latitude out of range [-90, 90]: %.2f", latitude)
+	}
+
+	return latitude, nil
+}
+
+func (t *TMD) getLongitude(lonStr string) (float64, error) {
+	parts := strings.SplitN(lonStr, "°", 2)
+	if len(parts) != 2 {
+		return 0, fmt.Errorf("invalid longitude format: expected 'value°Direction', got '%s'", lonStr)
+	}
+
+	valueStr := strings.TrimSpace(parts[0])
+	direction := strings.TrimSpace(parts[1])
+
+	longitude, err := strconv.ParseFloat(valueStr, 64)
+	if err != nil {
+		return 0, fmt.Errorf("invalid longitude value '%s': %w", valueStr, err)
+	}
+
+	switch strings.ToUpper(direction) {
+	case "E":
+		// East is positive, do nothing
+	case "W":
+		longitude = -longitude
+	default:
+		return 0, fmt.Errorf("invalid longitude direction: '%s', expected 'E' or 'W'", direction)
+	}
+
+	if longitude < -180.0 || longitude > 180.0 {
+		return 0, fmt.Errorf("longitude out of range [-180, 180]: %.2f", longitude)
+	}
+
+	return longitude, nil
+}
+
+func (t *TMD) getRegion(s *goquery.Selection) (string, string, error) {
 	var thai, eng string
 	s.Contents().Each(func(i int, s *goquery.Selection) {
 		html, _ := s.Html()
