@@ -19,7 +19,7 @@ func validateToken(filePath, token string, secretKey []byte) bool {
 	var expireAt int64
 	var sig string
 	_, err := fmt.Sscanf(token, "%d:%s", &expireAt, &sig)
-	if err != nil || time.Now().Unix() > expireAt {
+	if err != nil || time.Now().UnixMilli() > expireAt {
 		return false
 	}
 	expected := generateToken(filePath, secretKey, expireAt)
