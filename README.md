@@ -41,6 +41,7 @@ It works seamlessly with **AnyShake Explorer** over a serial connection and supp
 - 📁 **Data export** – save data as **MiniSEED**, **SAC**, **TXT**, or **WAV**
 - 🔁 **Streaming & forwarding** – supports **SeedLink** and **TCP** protocols
 - 🧩 **Flexible storage** – compatible with PostgreSQL, MariaDB/MySQL, SQL Server, and SQLite
+- 🔗 **Seamless SeisComP integration** – easily connect to professional seismic networks
 - 🚀 **... and more!** – with active development and community-driven features
 
 ## Documentation

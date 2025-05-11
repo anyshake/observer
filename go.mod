@@ -13,7 +13,7 @@ require (
 	github.com/appleboy/gin-jwt/v2 v2.10.1
 	github.com/bclswl0827/eewgo v0.0.3
 	github.com/bclswl0827/go-serial v0.0.1
-	github.com/bclswl0827/heligo v0.1.0
+	github.com/bclswl0827/heligo v0.1.1
 	github.com/bclswl0827/mseedio v1.0.12
 	github.com/bclswl0827/sacio v1.0.6
 	github.com/bclswl0827/slgo v0.2.2
@@ -99,7 +99,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/clbanning/anyxml v1.2.2 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
-	github.com/ebitengine/purego v0.8.3-0.20250507171810-1638563e3615 // indirect
+	github.com/ebitengine/purego v0.8.3 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gin-contrib/sse v1.0.0 // indirect
 	github.com/go-audio/riff v1.0.0 // indirect

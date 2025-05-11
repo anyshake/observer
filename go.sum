@@ -63,8 +63,8 @@ github.com/bclswl0827/eewgo v0.0.3 h1:NMudtgqeKAkO3366jjVeYDFiJb1SxO0Y575+5Wk4qi
 github.com/bclswl0827/eewgo v0.0.3/go.mod h1:4sMo4eop3NwYOHWxe9G441+T7X7vnxmSKmqWfryZnhw=
 github.com/bclswl0827/go-serial v0.0.1 h1:pIQZytCy9gg5lxxhfkhbHEz3WF0+tkZRQsE9qz6OJfM=
 github.com/bclswl0827/go-serial v0.0.1/go.mod h1:qt+s3rGDzar90EshNSPN0myWyCMaSj32BFQNmrh3Pnw=
-github.com/bclswl0827/heligo v0.1.0 h1:PqJ/jBi0rGp2NjPNx+yDpDgHkDul25QaYSJa1PrO1YE=
-github.com/bclswl0827/heligo v0.1.0/go.mod h1:34BorRyFJilChv2+drQk6SyAqACmhUqeZjGwIuypn74=
+github.com/bclswl0827/heligo v0.1.1 h1:FWtPkHDzl8Z4WyHDbqdS5wJi49KkiE8aQEDxa2/0jqA=
+github.com/bclswl0827/heligo v0.1.1/go.mod h1:34BorRyFJilChv2+drQk6SyAqACmhUqeZjGwIuypn74=
 github.com/bclswl0827/mseedio v1.0.12 h1:TO/3fwHzwKpAbe3l1yRGHGVaINAvN2/WcQJaV28uYJE=
 github.com/bclswl0827/mseedio v1.0.12/go.mod h1:G9nOPR8epxb7ihX5pUpvs3HqYZMnMlXc1Ha1WSMWn7s=
 github.com/bclswl0827/sacio v1.0.6 h1:kR6ll6xjoQGO+YVEZvvvbAxKGUD3qUXsyIuQape1+vc=
@@ -111,8 +111,8 @@ github.com/dnaeon/go-vcr v1.1.0/go.mod h1:M7tiix8f0r6mKKJ3Yq/kqU1OYf3MnfmBWVbPx/
 github.com/dnaeon/go-vcr v1.2.0/go.mod h1:R4UdLID7HZT3taECzJs4YgbbH6PIGXB6W/sc5OLb6RQ=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
-github.com/ebitengine/purego v0.8.3-0.20250507171810-1638563e3615 h1:W7mpP4uiOAbBOdDnRXT9EUdauFv7bz+ERT5rPIord00=
-github.com/ebitengine/purego v0.8.3-0.20250507171810-1638563e3615/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
+github.com/ebitengine/purego v0.8.3 h1:K+0AjQp63JEZTEMZiwsI9g0+hAMNohwUOtY0RPGexmc=
+github.com/ebitengine/purego v0.8.3/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
 github.com/eclipse/paho.mqtt.golang v1.5.0 h1:EH+bUVJNgttidWFkLLVKaQPGmkTUfQQqjOsyvMGvD6o=
 github.com/eclipse/paho.mqtt.golang v1.5.0/go.mod h1:du/2qNQVqJf/Sqs4MEL77kR8QTqANF7XU7Fk0aOTAgk=
 github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHkI4W8=
