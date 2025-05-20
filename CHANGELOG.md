@@ -2,6 +2,25 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.0.2
+
+### Release Notes
+
+This patch release focuses on reliability improvements and critical bug fixes. It introduces STEIM2 compression support for MiniSEED export and resolves issues affecting helicorder rendering and token expiration.
+
+🧠 **What’s New**
+
+Enhancements in this version contribute to better performance, interoperability, and system integrity, especially when exporting seismic clips and managing real-time data views.
+
+### New Features
+
+- Added support for exporting **MiniSEED clips with STEIM2 compression**, fixing Waves' compatibility issue on INT32 encoding.
+
+### Bug Fixes
+
+- Fixed a **division by zero** error in the helicorder generator under certain data conditions.
+- Corrected an issue where **temporary tokens never expired**, improving session security and compliance.
+
 ## v4.0.1
 
 ### Release Notes
@@ -12,17 +31,17 @@ A minor but essential update focusing on stability, performance, and new regiona
 
 This version includes critical bug fixes, UI improvements, and a new data integration, further enhancing the reliability and usability of the AnyShake Observer platform.
 
-### Bug Fixes
-
-* Fixed a link error with **Go 1.24.3** that could cause build failures on Darwin.
-* Prevented unnecessary **message bus re-creation**, improving runtime stability.
-* Corrected **translation keys** for more accurate localization.
-
 ### New Features
 
-* Added **Thai Meteorological Department** as a new data agency, expanding regional data support.
-* Enhanced UI to **highlight unsaved changes**, reducing the risk of accidental data loss.
-* Optimized **error handling** for more robust system behavior.
+- Added **Thai Meteorological Department** as a new data agency, expanding regional data support.
+- Enhanced UI to **highlight unsaved changes**, reducing the risk of accidental data loss.
+- Optimized **error handling** for more robust system behavior.
+
+### Bug Fixes
+
+- Fixed a link error with **Go 1.24.3** that could cause build failures on Darwin.
+- Prevented unnecessary **message bus re-creation**, improving runtime stability.
+- Corrected **translation keys** for more accurate localization.
 
 ## v4.0.0
 
@@ -30,20 +49,13 @@ This version includes critical bug fixes, UI improvements, and a new data integr
 
 We are proud to announce **AnyShake Observer v4.0.0**, a major release that marks a transformative step forward in our seismic monitoring software. This update is **incompatible with all previous versions** due to significant architectural changes and feature enhancements.
 
-🚀 **Now crowdfunding on CrowdSupply**  
+🚀 **Now crowdfunding on CrowdSupply**
 
 Alongside this release, we are launching the **AnyShake Explorer**, a fully open-source, low-cost, and reliable seismic data acquisition device. Designed for researchers, hobbyists, and professionals alike, the Explorer integrates seamlessly with AnyShake Observer and sets a new standard for affordable and powerful seismology tools.
 
-🧠 **What’s New**  
+🧠 **What’s New**
 
 This version represents a leap forward in terms of **usability, security, reliability, and functionality** — setting a new benchmark in open-source seismic software.
-
-### Bug Fixes
-
-- Resolved high CPU usage issue caused by "empty-run" behavior after Explorer device disconnection.
-- Fixed significant time offset when AnyShake Observer starts before Explorer under NTP mode.
-- Resolved decoder thread crash when receiving delayed data via serial-to-TCP device.
-- Fixed numerous potential data race issues for improved multithreaded stability.
 
 ### New Features
 
@@ -64,6 +76,13 @@ This version represents a leap forward in terms of **usability, security, reliab
 - Removed deprecated seismic event data APIs.
 - Improved **SeedLink protocol** stability.
 - Added **multi-language support** with translations in 9 languages.
+
+### Bug Fixes
+
+- Resolved high CPU usage issue caused by "empty-run" behavior after Explorer device disconnection.
+- Fixed significant time offset when AnyShake Observer starts before Explorer under NTP mode.
+- Resolved decoder thread crash when receiving delayed data via serial-to-TCP device.
+- Fixed numerous potential data race issues for improved multithreaded stability.
 
 ---
 

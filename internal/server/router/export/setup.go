@@ -9,6 +9,7 @@ import (
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/hardware"
 	"github.com/anyshake/observer/internal/server/response"
+	"github.com/bclswl0827/mseedio"
 	"github.com/gin-gonic/gin"
 	"github.com/samber/lo"
 )
@@ -26,7 +27,17 @@ func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, hardware
 			locationCodeConfig: locationCodeConfig,
 			networkCodeConfig:  networkCodeConfig,
 		},
-		"mseed": &seismicDataEncoderMseedImpl{
+		"mseed_int32": &seismicDataEncoderMseedImpl{
+			encodeType:         mseedio.INT32,
+			name:               "MiniSEED (INT32)",
+			actionHandler:      actionHandler,
+			stationCodeConfig:  stationCodeConfig,
+			locationCodeConfig: locationCodeConfig,
+			networkCodeConfig:  networkCodeConfig,
+		},
+		"mseed_steim2": &seismicDataEncoderMseedImpl{
+			encodeType:         mseedio.STEIM2,
+			name:               "MiniSEED (STEIM2)",
 			actionHandler:      actionHandler,
 			stationCodeConfig:  stationCodeConfig,
 			locationCodeConfig: locationCodeConfig,

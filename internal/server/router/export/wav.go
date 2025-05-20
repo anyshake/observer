@@ -69,7 +69,7 @@ func (e *seismicDataEncoderWavImpl) Encode(records []model.SeisRecord, channelCo
 	}
 
 	originalSampleRate := int(float64(len(audioData)) / (timeDiff / 30.0))
-	filterKernel := e.getLowPassFilter(originalSampleRate, 25, 51)
+	filterKernel := e.getLowPassFilter(originalSampleRate, 25, 311)
 	audioData = e.applyFilter(audioData, filterKernel)
 
 	interpolatedData := e.linearInterpolate(audioData, originalSampleRate, e.outputSampleRate)

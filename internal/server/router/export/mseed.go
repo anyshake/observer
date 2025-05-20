@@ -13,6 +13,9 @@ import (
 )
 
 type seismicDataEncoderMseedImpl struct {
+	name       string
+	encodeType int
+
 	actionHandler      *action.Handler
 	stationCodeConfig  config.StationStationCodeConfigConstraintImpl
 	locationCodeConfig config.StationLocationCodeConfigConstraintImpl
@@ -20,7 +23,7 @@ type seismicDataEncoderMseedImpl struct {
 }
 
 func (e *seismicDataEncoderMseedImpl) GetName() string {
-	return "MiniSEED"
+	return e.name
 }
 
 func (e *seismicDataEncoderMseedImpl) Encode(records []model.SeisRecord, channelCode string) ([]byte, error) {
@@ -42,7 +45,7 @@ func (e *seismicDataEncoderMseedImpl) Encode(records []model.SeisRecord, channel
 	networkCodeStr := networkCode.(string)
 
 	var miniseed mseedio.MiniSeedData
-	err = miniseed.Init(mseedio.INT32, mseedio.MSBFIRST)
+	err = miniseed.Init(e.encodeType, mseedio.MSBFIRST)
 	if err != nil {
 		return nil, err
 	}
