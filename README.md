@@ -46,7 +46,7 @@ It works seamlessly with **AnyShake Explorer** over a serial connection and supp
 
 ## Documentation
 
-Start here 👉 [https://anyshake.org/docs/introduction](https://anyshake.org/docs/introduction)
+Start here 👉 [https://anyshake.org/docs/get-started](https://anyshake.org/docs/get-started/)
 
 ## Preview
 
