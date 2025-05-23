@@ -163,7 +163,7 @@ export const Entry = ({ currentLocale, locales, onSwitchLocale }: IEntry) => {
                 <DialogModal
                     enlarge
                     heading={
-                        <div className="text-gray-800">
+                        <div className="space-y-4 text-gray-800">
                             <h2 className="flex items-center space-x-2 text-lg font-extrabold">
                                 <Icon
                                     className="flex-shrink-0"
