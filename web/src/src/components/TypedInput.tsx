@@ -47,13 +47,23 @@ export const TypedInput = ({
     const [tempArrayValue, setTempArrayValue] = useState('');
     const [hasChanged, setHasChanged] = useState(false);
 
+    const normalizeValue = useCallback(
+        (val: unknown) => {
+            if (dataType === 'string') {
+                return (val as string).toLowerCase?.() ?? val;
+            }
+            if (dataType === 'string[]' && Array.isArray(val)) {
+                return val.map((item: string) => item.toLowerCase?.() ?? item);
+            }
+            return val;
+        },
+        [dataType]
+    );
     useEffect(() => {
-        if (isArrayType) {
-            setHasChanged(JSON.stringify(value) !== JSON.stringify(defaultValue));
-        } else {
-            setHasChanged(value !== defaultValue);
-        }
-    }, [value, defaultValue, isArrayType]);
+        setHasChanged(
+            JSON.stringify(normalizeValue(value)) !== JSON.stringify(normalizeValue(defaultValue))
+        );
+    }, [defaultValue, normalizeValue, value]);
 
     const parseValue = useCallback((input: string, type: InputType) => {
         switch (type) {
