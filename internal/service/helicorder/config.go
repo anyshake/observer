@@ -353,8 +353,8 @@ func (s *helicorderConfigSpanSamplesImpl) Set(handler *action.Handler, newVal an
 	if err != nil {
 		return err
 	}
-	if spanSamples <= 0 {
-		return errors.New("span samples cannot be zero or negative")
+	if spanSamples < 100 {
+		return errors.New("span samples cannot be less than 100")
 	}
 	if spanSamples > 100000 {
 		return errors.New("span samples cannot be greater than 100000")

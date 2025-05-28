@@ -227,21 +227,37 @@ func appStart(args arguments) {
 		logger.GetLogger(main).Warnln("fatal error detected (probably hardware connection lost), shutting down...")
 	}
 
-	if err = httpServer.Stop(); err != nil {
-		logger.GetLogger(main).Errorf("failed to stop http server: %v", err)
-	}
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-	for serviceName, serviceObj := range serviceMap {
-		if !serviceObj.GetStatus().GetIsRunning() {
-			continue
-		}
-		if err = serviceObj.Stop(); err != nil {
-			logger.GetLogger(serviceName).Errorf("failed to stop service %s: %v", serviceName, err)
-		} else {
-			logger.GetLogger(serviceName).Infof("service %s has been stopped", serviceName)
-		}
-	}
+	done := make(chan struct{})
 
-	sendHardwareAbortSignal()
-	runCleanerTasks()
+	go func() {
+		defer close(done)
+
+		if err = httpServer.Stop(); err != nil {
+			logger.GetLogger(main).Errorf("failed to stop http server: %v", err)
+		}
+
+		for serviceName, serviceObj := range serviceMap {
+			if !serviceObj.GetStatus().GetIsRunning() {
+				continue
+			}
+			if err = serviceObj.Stop(); err != nil {
+				logger.GetLogger(serviceName).Errorf("failed to stop service %s: %v", serviceName, err)
+			} else {
+				logger.GetLogger(serviceName).Infof("service %s has been stopped", serviceName)
+			}
+		}
+
+		sendHardwareAbortSignal()
+		runCleanerTasks()
+	}()
+
+	select {
+	case <-done:
+		logger.GetLogger(main).Info("program exited, goodbye")
+	case <-shutdownCtx.Done():
+		logger.GetLogger(main).Errorln("shutdown timed out, forcing exit")
+	}
 }
