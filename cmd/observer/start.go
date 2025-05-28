@@ -217,21 +217,21 @@ func appStart(args arguments) {
 		}
 	}()
 
-	osSignal := make(chan os.Signal, 1)
-	signal.Notify(osSignal, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	defer signal.Stop(signalChan)
 
 	select {
-	case <-osSignal:
+	case <-signalChan:
 		logger.GetLogger(main).Warnln("interrupt signal received (e.g. Ctrl+C), shutting down...")
 	case <-hardwareCtx.Done():
 		logger.GetLogger(main).Warnln("fatal error detected (probably hardware connection lost), shutting down...")
 	}
 
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	done := make(chan struct{})
-
 	go func() {
 		defer close(done)
 
@@ -249,15 +249,22 @@ func appStart(args arguments) {
 				logger.GetLogger(serviceName).Infof("service %s has been stopped", serviceName)
 			}
 		}
+	}()
 
+	handleExit := func(reason string, warn bool) {
 		sendHardwareAbortSignal()
 		runCleanerTasks()
-	}()
+		if warn {
+			logger.GetLogger(main).Warn(reason)
+		} else {
+			logger.GetLogger(main).Info(reason)
+		}
+	}
 
 	select {
 	case <-done:
-		logger.GetLogger(main).Info("program exited, goodbye")
+		handleExit("program exited successfully, goodbye", false)
 	case <-shutdownCtx.Done():
-		logger.GetLogger(main).Errorln("shutdown timed out, forcing exit")
+		handleExit("shutdown timed out, forcing exit", true)
 	}
 }

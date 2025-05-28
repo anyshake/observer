@@ -1,5 +1,10 @@
 package seedlink
 
+import (
+	"errors"
+	"time"
+)
+
 func (s *SeedLinkServiceImpl) Stop() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -9,7 +14,20 @@ func (s *SeedLinkServiceImpl) Stop() error {
 
 	_ = s.hardwareDev.Unsubscribe(ID)
 	s.cancelFn()
-	s.wg.Wait()
 
-	return nil
+	done := make(chan struct{})
+	go func() {
+		s.wg.Wait()
+		close(done)
+	}()
+
+	timer := time.NewTimer(5 * time.Second)
+	defer timer.Stop()
+
+	select {
+	case <-done:
+		return nil
+	case <-timer.C:
+		return errors.New("timeout waiting for goroutines to finish")
+	}
 }

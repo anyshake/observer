@@ -1,5 +1,10 @@
 package helicorder
 
+import (
+	"errors"
+	"time"
+)
+
 func (s *HelicorderServiceImpl) Stop() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -9,7 +14,20 @@ func (s *HelicorderServiceImpl) Stop() error {
 	s.status.SetIsRunning(false)
 
 	s.cancelFn()
-	s.wg.Wait()
 
-	return nil
+	done := make(chan struct{})
+	go func() {
+		s.wg.Wait()
+		close(done)
+	}()
+
+	timer := time.NewTimer(10 * time.Second)
+	defer timer.Stop()
+
+	select {
+	case <-done:
+		return nil
+	case <-timer.C:
+		return errors.New("timeout waiting for goroutines to finish")
+	}
 }
