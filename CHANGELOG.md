@@ -2,6 +2,32 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.0.3
+
+### Release Notes
+
+This patch release focuses on improving stability, performance, and overall robustness. It resolves several critical issues, including a potential crash in the helicorder module, and introduces subtle improvements to the application's lifecycle management and UI.
+
+🧠 **What’s New**
+
+This update enhances reliability during seismic clip exports and real-time data handling, ensuring smoother operation in both background services and user interactions.
+
+### New Features
+
+- Added **timeout control** for service modules to prevent indefinite blocking and ensure smoother background operations.
+- Introduced a **timeout threshold** for program exit, improving stability during abnormal shutdown scenarios.
+
+### Bug Fixes
+
+- Fixed **FIR filter issues** in the QuakeSense module and WAV audio export to restore accurate signal processing.
+- Corrected a UI issue where **buttons did not reset** properly after submitting field settings.
+- Fixed a critical **integer divide by zero** error in the helicorder module that could cause application crashes during rendering.
+- Validated **helicorder settings** before applying them to prevent runtime configuration errors.
+- Improved system resilience by adding **connectivity checks** before reporting status.
+- Normalized **string comparisons** to avoid subtle logic errors.
+- Updated **broken documentation links** for easier access to support materials.
+- Applied **minor style adjustments** for improved visual consistency.
+
 ## v4.0.2
 
 ### Release Notes
