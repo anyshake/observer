@@ -11,7 +11,7 @@ require (
 	github.com/ameshkov/dnscrypt/v2 v2.3.0
 	github.com/antonfisher/nested-logrus-formatter v1.3.1
 	github.com/appleboy/gin-jwt/v2 v2.10.1
-	github.com/bclswl0827/eewgo v0.0.3
+	github.com/bclswl0827/eewgo v0.1.0
 	github.com/bclswl0827/go-serial v0.0.1
 	github.com/bclswl0827/heligo v0.1.3
 	github.com/bclswl0827/mseedio v1.0.12

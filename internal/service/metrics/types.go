@@ -16,7 +16,7 @@ import (
 const ID = "service_metrics"
 
 const (
-	HTTP_GENERATE_204_URL   = "https://www.gstatic.com/generate_204"
+	CONNECTIVITY_CHECK_URL  = "https://metrics.anyshake.org"
 	OTLP_EXPORTER_ENDPOINT  = "metrics.anyshake.org:443"
 	OTLP_SERVICE_NAME       = "anyshake-observer"
 	OTLP_TRACER_NAME        = "anyshake-observer-tracer"

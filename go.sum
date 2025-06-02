@@ -59,8 +59,8 @@ github.com/appleboy/gofight/v2 v2.1.2 h1:VOy3jow4vIK8BRQJoC/I9muxyYlJ2yb9ht2hZoS
 github.com/appleboy/gofight/v2 v2.1.2/go.mod h1:frW+U1QZEdDgixycTj4CygQ48yLTUhplt43+Wczp3rw=
 github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0 h1:jfIu9sQUG6Ig+0+Ap1h4unLjW6YQJpKZVmUzxsD4E/Q=
 github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0/go.mod h1:t2tdKJDJF9BV14lnkjHmOQgcvEKgtqs5a1N3LNdJhGE=
-github.com/bclswl0827/eewgo v0.0.3 h1:NMudtgqeKAkO3366jjVeYDFiJb1SxO0Y575+5Wk4qi0=
-github.com/bclswl0827/eewgo v0.0.3/go.mod h1:4sMo4eop3NwYOHWxe9G441+T7X7vnxmSKmqWfryZnhw=
+github.com/bclswl0827/eewgo v0.1.0 h1:YzrTtE9SRQN+iKNX3fwB8z+5LNMQTuILhmcuA/y6uow=
+github.com/bclswl0827/eewgo v0.1.0/go.mod h1:4sMo4eop3NwYOHWxe9G441+T7X7vnxmSKmqWfryZnhw=
 github.com/bclswl0827/go-serial v0.0.1 h1:pIQZytCy9gg5lxxhfkhbHEz3WF0+tkZRQsE9qz6OJfM=
 github.com/bclswl0827/go-serial v0.0.1/go.mod h1:qt+s3rGDzar90EshNSPN0myWyCMaSj32BFQNmrh3Pnw=
 github.com/bclswl0827/heligo v0.1.3 h1:l5vo9zXTd3yYTDM8WfoAP5ultSqhxjOUGnF/fuCCEWg=

@@ -16,6 +16,8 @@ import (
 	"github.com/samber/lo"
 )
 
+const FILTER_NUM_TAPS = 101
+
 type seismicDataEncoderWavImpl struct {
 	outputSampleRate   int
 	actionHandler      *action.Handler
@@ -69,7 +71,7 @@ func (e *seismicDataEncoderWavImpl) Encode(records []model.SeisRecord, channelCo
 	}
 
 	originalSampleRate := int(float64(len(audioData)) / (timeDiff / 30.0))
-	filterKernel := e.getLowPassFilter(originalSampleRate, 25, 311)
+	filterKernel := e.getLowPassFilter(originalSampleRate, 40, FILTER_NUM_TAPS)
 	audioData = e.applyFilter(audioData, filterKernel)
 
 	interpolatedData := e.linearInterpolate(audioData, originalSampleRate, e.outputSampleRate)
@@ -114,13 +116,11 @@ func (e *seismicDataEncoderWavImpl) GetFileName(startTime time.Time, channelCode
 }
 
 func (e *seismicDataEncoderWavImpl) normalizeToInt16(data []int32) []int16 {
-	maxVal := lo.Max(lo.Map(data, func(v int32, _ int) int32 {
-		return int32(math.Abs(float64(v)))
-	}))
-	if maxVal == 0 {
+	absMaxVal := lo.Max(lo.Map(data, func(v int32, _ int) int32 { return int32(math.Abs(float64(v))) }))
+	if absMaxVal == 0 {
 		return nil
 	}
-	scaleFactor := float64(math.MaxInt16) / float64(maxVal)
+	scaleFactor := float64(math.MaxInt16) / float64(absMaxVal)
 	return lo.Map(data, func(v int32, _ int) int16 {
 		return int16(float64(v) * scaleFactor)
 	})
@@ -157,30 +157,32 @@ func (e *seismicDataEncoderWavImpl) linearInterpolate(data []int16, oldRate, new
 }
 
 func (e *seismicDataEncoderWavImpl) getLowPassFilter(sampleRate int, cutoffFreq float64, numTaps int) []float64 {
-	kernel := make([]float64, numTaps)
-	normCutoff := cutoffFreq / float64(sampleRate)
+	normalizedCutoff := cutoffFreq / float64(sampleRate)
+	coeffs := make([]float64, numTaps)
 
+	center := numTaps / 2
 	for i := 0; i < numTaps; i++ {
-		n := float64(i - numTaps/2)
-
-		if n == 0 {
-			kernel[i] = 2.0 * math.Pi * normCutoff
+		n := float64(i - center)
+		if i == center {
+			coeffs[i] = 2 * normalizedCutoff
 		} else {
-			kernel[i] = math.Sin(2.0*math.Pi*normCutoff*n) / (math.Pi * n)
+			coeffs[i] = math.Sin(2*math.Pi*normalizedCutoff*n) / (math.Pi * n)
 		}
 
-		kernel[i] *= 0.54 - 0.46*math.Cos(2.0*math.Pi*float64(i)/float64(numTaps-1))
+		// Hamming window
+		coeffs[i] *= 0.54 - 0.46*math.Cos(2*math.Pi*float64(i)/float64(numTaps-1))
 	}
 
-	sum := 0.0
-	for _, v := range kernel {
-		sum += v
+	// Normalize gain
+	var sum float64
+	for _, c := range coeffs {
+		sum += c
 	}
-	for i := range kernel {
-		kernel[i] /= sum
+	for i := range coeffs {
+		coeffs[i] /= sum
 	}
 
-	return kernel
+	return coeffs
 }
 
 func (e *seismicDataEncoderWavImpl) applyFilter(data []int16, kernel []float64) []int16 {
