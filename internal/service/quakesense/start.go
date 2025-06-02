@@ -83,14 +83,14 @@ func (s *QuakeSenseServiceImpl) Start() error {
 				s.channelBuffer = ringbuf.New[float64](bufferSize)
 
 				switch s.filterType {
-				case "bandpass":
-					s.filterKernel = eewgo.NewFilter(eewgo.UseBandPassFilter(s.minFreq, s.maxFreq, float64(s.prevSamplerate), FILTER_NUM_TAPS))
-				case "lowpass":
-					s.filterKernel = eewgo.NewFilter(eewgo.UseLowPassFilter(s.maxFreq, float64(s.prevSamplerate), FILTER_NUM_TAPS))
-				case "highpass":
-					s.filterKernel = eewgo.NewFilter(eewgo.UseHighPassFilter(s.minFreq, float64(s.prevSamplerate), FILTER_NUM_TAPS))
-				default:
-					s.filterKernel = eewgo.NewFilter(eewgo.UseBandPassFilter(0.5, 10, float64(s.prevSamplerate), FILTER_NUM_TAPS))
+				case BAND_PASS_FILTER:
+					s.filterKernel, _ = eewgo.NewBandPassFIRFilter(s.minFreq, s.maxFreq, float64(s.prevSamplerate), FILTER_NUM_TAPS)
+				case LOW_PASS_FILTER:
+					s.filterKernel, _ = eewgo.NewLowPassFIRFilter(s.maxFreq, float64(s.prevSamplerate), FILTER_NUM_TAPS)
+				case HIGH_PASS_FILTER:
+					s.filterKernel, _ = eewgo.NewHighPassFIRFilter(s.minFreq, float64(s.prevSamplerate), FILTER_NUM_TAPS)
+				case NO_FILTER:
+					s.filterKernel, _ = eewgo.NewHighPassFIRFilter(0, float64(s.prevSamplerate), FILTER_NUM_TAPS)
 				}
 			}
 

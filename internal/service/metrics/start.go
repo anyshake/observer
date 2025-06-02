@@ -2,15 +2,16 @@ package metrics
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
+	"net/http"
 	"runtime"
 	"runtime/debug"
 	"strconv"
 	"time"
 
 	"github.com/anyshake/observer/pkg/logger"
-	"github.com/anyshake/observer/pkg/request"
 	"github.com/anyshake/observer/pkg/system"
 	"github.com/go-logr/logr"
 	"go.opentelemetry.io/otel"
@@ -88,7 +89,7 @@ func (s *MetricsServiceImpl) Start() error {
 				s.handleInterrupt(ticker)
 				return
 			case <-ticker.C:
-				if _, err := request.GET(HTTP_GENERATE_204_URL, METRICS_REPORT_TIMEOUT, 0, 0, false, nil, nil); err == nil {
+				if err := s.checkConnectivity(); err == nil {
 					s.reportCurrentStatus(tracer)
 				}
 			}
@@ -96,6 +97,21 @@ func (s *MetricsServiceImpl) Start() error {
 	}()
 
 	s.wg.Add(1)
+	return nil
+}
+
+func (s *MetricsServiceImpl) checkConnectivity() error {
+	client := &http.Client{Timeout: 5 * time.Second, Transport: &http.Transport{TLSClientConfig: &tls.Config{MinVersion: tls.VersionTLS12}}}
+	resp, err := client.Get(CONNECTIVITY_CHECK_URL)
+	if err != nil {
+		return fmt.Errorf("connection failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
 	return nil
 }
 
