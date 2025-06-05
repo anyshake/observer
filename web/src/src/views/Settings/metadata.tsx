@@ -9,7 +9,7 @@ export const Metadata = () => {
         () => [
             {
                 value: 'seiscomp_xml',
-                label: 'SeisComp XML',
+                label: 'SeisComP XML',
                 fileName: 'seiscomp_xml.xml',
                 language: 'xml'
             },
