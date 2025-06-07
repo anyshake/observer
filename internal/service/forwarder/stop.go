@@ -11,15 +11,14 @@ func (s *ForwarderServiceImpl) Stop() error {
 
 	s.status.SetStoppedAt(s.timeSource.Get())
 	s.status.SetIsRunning(false)
-
-	_ = s.hardwareDev.Unsubscribe(ID)
-	if s.listener != nil {
-		_ = s.listener.Close()
-	}
 	s.cancelFn()
 
 	done := make(chan struct{})
 	go func() {
+		_ = s.hardwareDev.Unsubscribe(ID)
+		if s.listener != nil {
+			_ = s.listener.Close()
+		}
 		s.wg.Wait()
 		close(done)
 	}()

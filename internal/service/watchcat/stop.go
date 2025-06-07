@@ -11,7 +11,6 @@ func (s *WatchCatServiceImpl) Stop() error {
 
 	s.status.SetStoppedAt(s.timeSource.Get())
 	s.status.SetIsRunning(false)
-
 	s.cancelFn()
 
 	done := make(chan struct{})

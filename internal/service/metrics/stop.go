@@ -11,14 +11,12 @@ func (s *MetricsServiceImpl) Stop() error {
 
 	s.status.SetStoppedAt(s.timeSource.Get())
 	s.status.SetIsRunning(false)
-
-	_ = s.oltpTracerProvider.Shutdown(s.oltpCtx)
-	s.oltpCtxCancelFn()
-
 	s.cancelFn()
 
 	done := make(chan struct{})
 	go func() {
+		_ = s.oltpTracerProvider.Shutdown(s.oltpCtx)
+		s.oltpCtxCancelFn()
 		s.wg.Wait()
 		close(done)
 	}()

@@ -11,12 +11,11 @@ func (s *MiniSeedServiceImpl) Stop() error {
 
 	s.status.SetStoppedAt(s.timeSource.Get())
 	s.status.SetIsRunning(false)
-
-	_ = s.hardwareDev.Unsubscribe(ID)
 	s.cancelFn()
 
 	done := make(chan struct{})
 	go func() {
+		_ = s.hardwareDev.Unsubscribe(ID)
 		s.wg.Wait()
 		close(done)
 	}()
@@ -30,6 +29,4 @@ func (s *MiniSeedServiceImpl) Stop() error {
 	case <-timer.C:
 		return errors.New("timeout waiting for goroutines to finish")
 	}
-
-	return nil
 }

@@ -11,18 +11,17 @@ func (s *QuakeSenseServiceImpl) Stop() error {
 
 	s.status.SetStoppedAt(s.timeSource.Get())
 	s.status.SetIsRunning(false)
-
-	_ = s.hardwareDev.Unsubscribe(ID)
-	if s.mqttClient != nil {
-		s.mqttClient.Disconnect(100)
-	}
-	s.channelBuffer.Reset()
-	s.prevSamplerate = 0
-	s.filterKernel = nil
 	s.cancelFn()
 
 	done := make(chan struct{})
 	go func() {
+		s.prevSamplerate = 0
+		s.filterKernel = nil
+		_ = s.hardwareDev.Unsubscribe(ID)
+		if s.mqttClient != nil {
+			s.mqttClient.Disconnect(100)
+		}
+		s.channelBuffer.Reset()
 		s.wg.Wait()
 		close(done)
 	}()
