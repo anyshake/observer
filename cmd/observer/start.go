@@ -23,6 +23,7 @@ import (
 	service_archiver "github.com/anyshake/observer/internal/service/archiver"
 
 	service_forwarder "github.com/anyshake/observer/internal/service/forwarder"
+	service_frp_client "github.com/anyshake/observer/internal/service/frp_client"
 	service_helicorder "github.com/anyshake/observer/internal/service/helicorder"
 
 	service_metrics "github.com/anyshake/observer/internal/service/metrics"
@@ -165,6 +166,7 @@ func appStart(args arguments) {
 	serviceMap := map[string]service.IService{
 		service_archiver.ID:   service_archiver.New(hardwareDevice, actionHandler, ntpTimeSource),
 		service_forwarder.ID:  service_forwarder.New(hardwareDevice, actionHandler, ntpTimeSource),
+		service_frp_client.ID: service_frp_client.New(conf.Server.Listen, actionHandler, ntpTimeSource),
 		service_helicorder.ID: service_helicorder.New(hardwareDevice, actionHandler, ntpTimeSource),
 		service_metrics.ID:    service_metrics.New(hardwareDevice, actionHandler, ntpTimeSource, binaryVersion, commitHash, buildPlatform),
 		service_miniseed.ID:   service_miniseed.New(hardwareDevice, actionHandler, ntpTimeSource),
