@@ -49,6 +49,9 @@ export const TypedInput = ({
 
     const normalizeValue = useCallback(
         (val: unknown) => {
+            if (val === null && dataType.endsWith('[]')) {
+                return [];
+            }
             if (dataType === 'string') {
                 return (val as string).toLowerCase?.() ?? val;
             }
