@@ -655,7 +655,7 @@ func (s *frpClientConfigRemoteOutboundPortImpl) GetDefaultValue() any {
 	return rand.Intn(30000) + 30000
 }
 func (s *frpClientConfigRemoteOutboundPortImpl) GetDescription() string {
-	return "Remote outbound port for the proxy traffic."
+	return "Remote outbound port for the proxy traffic, this field is available only when domain mode is disabled."
 }
 func (s *frpClientConfigRemoteOutboundPortImpl) Init(handler *action.Handler) error {
 	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
@@ -740,7 +740,7 @@ func (s *frpClientConfigCustomDomainsImpl) GetVersion() int             { return
 func (s *frpClientConfigCustomDomainsImpl) GetOptions() map[string]any  { return nil }
 func (s *frpClientConfigCustomDomainsImpl) GetDefaultValue() any        { return []string{} }
 func (s *frpClientConfigCustomDomainsImpl) GetDescription() string {
-	return "List of custom domains to bind for this proxy, , this field is available only when domain mode is enabled"
+	return "List of custom domains to bind for this proxy, this field is available only when domain mode is enabled."
 }
 func (s *frpClientConfigCustomDomainsImpl) Init(handler *action.Handler) error {
 	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
