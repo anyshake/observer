@@ -29,6 +29,7 @@ func (s *FrpClientServiceImpl) Start() error {
 	falseVal := false
 	commonConfig := &v1.ClientCommonConfig{
 		LoginFailExit: &falseVal,
+		User:          s.user,
 		ServerAddr:    s.serverAddr,
 		ServerPort:    int(s.serverPort),
 		Transport: v1.ClientTransportConfig{
@@ -47,7 +48,7 @@ func (s *FrpClientServiceImpl) Start() error {
 		&v1.HTTPProxyConfig{
 			ProxyBaseConfig: v1.ProxyBaseConfig{
 				Type:         "http",
-				Name:         s.proxyName,
+				Name:         lo.Ternary(s.user != "", fmt.Sprintf("%s.%s", s.user, s.proxyName), s.proxyName),
 				ProxyBackend: v1.ProxyBackend{LocalIP: localServerHostname, LocalPort: localServerPort},
 				Transport:    v1.ProxyTransport{UseEncryption: s.useEncryption, UseCompression: s.useCompression},
 			},
@@ -56,7 +57,7 @@ func (s *FrpClientServiceImpl) Start() error {
 		&v1.TCPProxyConfig{
 			ProxyBaseConfig: v1.ProxyBaseConfig{
 				Type:         "tcp",
-				Name:         s.proxyName,
+				Name:         lo.Ternary(s.user != "", fmt.Sprintf("%s.%s", s.user, s.proxyName), s.proxyName),
 				ProxyBackend: v1.ProxyBackend{LocalIP: localServerHostname, LocalPort: localServerPort},
 				Transport:    v1.ProxyTransport{UseEncryption: s.useEncryption, UseCompression: s.useCompression},
 			},

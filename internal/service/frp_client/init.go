@@ -30,6 +30,12 @@ func (s *FrpClientServiceImpl) Init() error {
 	}
 	s.disableCustomTLSFirstByte = disableCustomTLSFirstByte.(bool)
 
+	user, err := (&frpClientConfigUserImpl{}).Get(s.actionHandler)
+	if err != nil {
+		return err
+	}
+	s.user = user.(string)
+
 	authToken, err := (&frpClientConfigTokenImpl{}).Get(s.actionHandler)
 	if err != nil {
 		return err

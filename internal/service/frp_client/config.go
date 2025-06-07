@@ -208,6 +208,48 @@ func (s *frpClientConfigDisableCustomTLSFirstByteImpl) Restore(handler *action.H
 	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
+type frpClientConfigUserImpl struct{}
+
+func (s *frpClientConfigUserImpl) GetName() string             { return "User" }
+func (s *frpClientConfigUserImpl) GetNamespace() string        { return ID }
+func (s *frpClientConfigUserImpl) GetKey() string              { return "user" }
+func (s *frpClientConfigUserImpl) GetType() action.SettingType { return action.String }
+func (s *frpClientConfigUserImpl) IsRequired() bool            { return false }
+func (s *frpClientConfigUserImpl) GetVersion() int             { return 0 }
+func (s *frpClientConfigUserImpl) GetOptions() map[string]any  { return nil }
+func (s *frpClientConfigUserImpl) GetDefaultValue() any        { return "" }
+func (s *frpClientConfigUserImpl) GetDescription() string {
+	return "User field as prefix in proxy name for distinguishing proxies."
+}
+func (s *frpClientConfigUserImpl) Init(handler *action.Handler) error {
+	_, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+	if err != nil {
+		return fmt.Errorf("failed to init user: %w", err)
+	}
+	return nil
+}
+func (s *frpClientConfigUserImpl) Set(handler *action.Handler, newVal any) error {
+	user, err := config.GetConfigValString(newVal)
+	if err != nil {
+		return err
+	}
+	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), user)
+}
+func (s *frpClientConfigUserImpl) Get(handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
+	user, ok := val.(string)
+	if !ok {
+		return nil, errors.New("string expected")
+	}
+	return user, nil
+}
+func (s *frpClientConfigUserImpl) Restore(handler *action.Handler) error {
+	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+}
+
 type frpClientConfigTokenImpl struct{}
 
 func (s *frpClientConfigTokenImpl) GetName() string             { return "Authentication Token" }
@@ -734,6 +776,7 @@ func (s *FrpClientServiceImpl) GetConfigConstraint() []config.IConstraint {
 		&frpClientConfigServerAddrImpl{},
 		&frpClientConfigServerPortImpl{},
 		&frpClientConfigDisableCustomTLSFirstByteImpl{},
+		&frpClientConfigUserImpl{},
 		&frpClientConfigTokenImpl{},
 		&frpClientConfigPoolCountImpl{},
 		&frpClientConfigTcpMuxImpl{},

@@ -32,6 +32,8 @@ type FrpClientServiceImpl struct {
 	disableCustomTLSFirstByte bool
 	// The token for authentication when connecting to the server
 	authToken string
+	// A prefix in proxy name to distinguish different users
+	user string
 	// Count of connection pool
 	connPoolCount int64
 	// TCP multiplexing availablity, should be same as FRP server config
