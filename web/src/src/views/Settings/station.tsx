@@ -95,7 +95,7 @@ export const Station = () => {
                         fieldName={item.name}
                         options={item.options}
                     />
-                    <p className="text-xs text-gray-500">{item.description}</p>
+                    <p className="w-[80%] text-xs text-gray-500">{item.description}</p>
                 </fieldset>
             ))}
         </div>
