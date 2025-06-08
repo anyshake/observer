@@ -429,7 +429,6 @@ func (s *frpClientConfigProtocolImpl) GetOptions() map[string]any {
 	return map[string]any{
 		"TCP":       "tcp",
 		"KCP":       "kcp",
-		"QUIC":      "quic",
 		"WebSocket": "websocket",
 	}
 }
@@ -448,8 +447,8 @@ func (s *frpClientConfigProtocolImpl) Set(h *action.Handler, v any) error {
 	if err != nil {
 		return err
 	}
-	if str != "tcp" && str != "kcp" && str != "quic" && str != "websocket" {
-		return errors.New("protocol must be one of TCP, KCP, QUIC or WebSocket")
+	if str != "tcp" && str != "kcp" && str != "websocket" {
+		return errors.New("protocol must be one of TCP, KCP or WebSocket")
 	}
 	return h.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), str)
 }
