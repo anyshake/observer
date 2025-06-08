@@ -502,11 +502,11 @@ func (s *quakeSenseConfigTriggerMethodImpl) Get(handler *action.Handler) (any, e
 	if err != nil {
 		return nil, fmt.Errorf("failed to get trigger method: %w", err)
 	}
-	staWindow, ok := val.(string)
+	method, ok := val.(string)
 	if !ok {
 		return nil, errors.New("string expected")
 	}
-	return staWindow, nil
+	return method, nil
 }
 func (s *quakeSenseConfigTriggerMethodImpl) Restore(handler *action.Handler) error {
 	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
