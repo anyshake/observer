@@ -354,7 +354,10 @@ const History = ({ currentLocale }: IRouterComponent) => {
                             const dataArray = newChartData[channelCode];
                             if (dataArray) {
                                 for (let i = 0; i < channel.data.length; i++) {
-                                    dataArray.push([timestamp + i * interval, channel.data[i]]);
+                                    dataArray.push([
+                                        timestamp - (channel.data.length - 1 - i) * interval,
+                                        channel.data[i]
+                                    ]);
                                 }
                             }
                         });

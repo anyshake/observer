@@ -4,6 +4,7 @@
 package transport
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"sync"
@@ -110,4 +111,38 @@ func (t *SerialTransportImpl) Flush() error {
 		return err
 	}
 	return nil
+}
+
+func (t *SerialTransportImpl) ReadUntil(delim []byte, maxBytes int) ([]byte, error) {
+	if t.conn == nil {
+		return nil, errors.New("connection is not opened")
+	}
+
+	buffer := make([]byte, 0, maxBytes)
+	temp := make([]byte, 1)
+
+	for {
+		t.mutex.Lock()
+		n, err := t.conn.Read(temp)
+		t.mutex.Unlock()
+
+		if err != nil {
+			break
+		}
+		if n == 0 {
+			continue // retry
+		}
+
+		buffer = append(buffer, temp[0])
+
+		if len(buffer) > maxBytes {
+			return nil, fmt.Errorf("delimiter not found within %d bytes", maxBytes)
+		}
+
+		if len(buffer) >= len(delim) && bytes.HasSuffix(buffer, delim) {
+			return buffer, nil
+		}
+	}
+
+	return nil, nil
 }

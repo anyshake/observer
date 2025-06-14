@@ -88,7 +88,7 @@ func (e *seismicDataEncoderSacImpl) Encode(records []model.SeisRecord, channelCo
 	if err != nil {
 		return nil, err
 	}
-	sac.SetTime(startTime, endTime.Sub(startTime))
+	sac.SetTime(startTime.UTC(), endTime.Sub(startTime))
 	sac.SetInfo(networkCodeStr, stationCodeStr, locationCodeStr, channelCode)
 	sac.SetBody(e.int32ToFloat32(channelBuffer), startSampleRate)
 

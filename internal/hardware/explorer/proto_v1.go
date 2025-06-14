@@ -296,7 +296,8 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 
 					g.deviceConfig.SetSampleRate(targetSampleRate)
 					g.deviceConfig.SetPacketInterval(time.Duration((1000/targetSampleRate)*DATA_PACKET_CHANNEL_SIZE) * time.Millisecond)
-					g.messageBus.Publish(time.UnixMilli(collectedTimestampArr[0]), &g.deviceConfig, &g.deviceVariable, g.channelDataBuf)
+					packetTimestamp := collectedTimestampArr[len(collectedTimestampArr)-1]
+					g.messageBus.Publish(time.UnixMilli(packetTimestamp), &g.deviceConfig, &g.deviceVariable, g.channelDataBuf)
 					g.deviceStatus.IncrementMessages()
 
 					collectedTimestampArr = []int64{}

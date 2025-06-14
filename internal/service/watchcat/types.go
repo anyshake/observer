@@ -13,7 +13,7 @@ import (
 const ID = "service_watchcat"
 
 const (
-	WATCHCAT_CHECK_INTERVAL = 3 * time.Second
+	WATCHCAT_CHECK_INTERVAL = 30 * time.Second
 )
 
 type WatchCatServiceImpl struct {

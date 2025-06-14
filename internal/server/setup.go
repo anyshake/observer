@@ -65,7 +65,7 @@ func (s *httpServer) Setup(listen string) error {
 	api := s.engine.Group("/api")
 	auth.Setup(api, s.resolver.ActionHandler, jwtMiddlewareFn, jwtHandler.LoginHandler, jwtHandler.RefreshHandler)
 	export.Setup(api, s.resolver.ActionHandler, s.resolver.HardwareDev, jwtMiddlewareFn)
-	socket.Setup(api, s.resolver.HardwareDev, jwtMiddlewareFn)
+	socket.Setup(api, s.resolver.TimeSource, s.resolver.HardwareDev, jwtMiddlewareFn)
 	files.Setup(api, s.resolver.ServiceMap, jwtMiddlewareFn)
 
 	graphql := handler.NewDefaultServer(graph_resolver.NewExecutableSchema(graph_resolver.Config{Resolvers: s.resolver}))

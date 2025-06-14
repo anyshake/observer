@@ -1,12 +1,9 @@
 package timesource
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 	"time"
-
-	"github.com/beevik/ntp"
 )
 
 func NewNtpClient(endpoint string, retries int, timeout time.Duration) (*Source, error) {
@@ -16,19 +13,18 @@ func NewNtpClient(endpoint string, retries int, timeout time.Duration) (*Source,
 	}
 
 	ntpAddress := urlObj.Host
-	for i := 0; i <= retries; i++ {
-		res, err := ntp.QueryWithOptions(ntpAddress, ntp.QueryOptions{Timeout: timeout})
-		if err != nil {
-			continue
-		}
-		return &Source{
-			ntpAddress:    ntpAddress,
-			queryRetries:  retries,
-			queryTimeout:  timeout,
-			LocalBaseTime: time.Now().UTC(),
-			ReferenceTime: res.Time,
-		}, nil
+
+	avgOffset, err := measureStableOffset(ntpAddress, retries, timeout, 10)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, errors.New("failed to read time from NTP server")
+	now := time.Now()
+	return &Source{
+		ntpAddress:    ntpAddress,
+		queryRetries:  retries,
+		queryTimeout:  timeout,
+		LocalBaseTime: now,
+		ReferenceTime: now.Add(avgOffset),
+	}, nil
 }

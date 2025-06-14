@@ -1,25 +1,20 @@
 package timesource
 
 import (
-	"errors"
+	"fmt"
 	"time"
-
-	"github.com/beevik/ntp"
 )
 
 func (s *Source) Update() error {
 	s.rwMutex.Lock()
 	defer s.rwMutex.Unlock()
 
-	for i := 0; i <= s.queryRetries; i++ {
-		res, err := ntp.QueryWithOptions(s.ntpAddress, ntp.QueryOptions{Timeout: s.queryTimeout})
-		if err != nil {
-			continue
-		}
-		s.LocalBaseTime = time.Now().UTC()
-		s.ReferenceTime = res.Time
-		return nil
+	avgOffset, err := measureStableOffset(s.ntpAddress, s.queryRetries, s.queryTimeout, 10)
+	if err != nil {
+		return fmt.Errorf("failed to update time from NTP server: %w", err)
 	}
 
-	return errors.New("failed to update time from NTP server")
+	s.LocalBaseTime = time.Now().UTC()
+	s.ReferenceTime = s.LocalBaseTime.Add(avgOffset)
+	return nil
 }

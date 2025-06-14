@@ -9,12 +9,13 @@ import (
 	"github.com/anyshake/observer/internal/server/response"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/anyshake/observer/pkg/message"
+	"github.com/anyshake/observer/pkg/timesource"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/samber/lo"
 )
 
-func Setup(routerGroup *gin.RouterGroup, hardware hardware.IHardware, jwtMiddleware gin.HandlerFunc) {
+func Setup(routerGroup *gin.RouterGroup, timeSource *timesource.Source, hardware hardware.IHardware, jwtMiddleware gin.HandlerFunc) {
 	s := socket{
 		messageBus:    message.NewBus[explorer.EventHandler](LOG_PREFIX, 65535),
 		historyBuffer: make([]buffer, 0, HISTORY_BUFFER_SIZE),
@@ -43,7 +44,7 @@ func Setup(routerGroup *gin.RouterGroup, hardware hardware.IHardware, jwtMiddlew
 		}
 		defer conn.Close()
 
-		s.handleWebSocket(ctx, conn)
+		s.handleWebSocket(ctx, conn, timeSource)
 	})
 }
 
@@ -60,12 +61,13 @@ func (s *socket) storeHistory(t time.Time, di *explorer.DeviceConfig, cd []explo
 	})
 }
 
-func (s *socket) sendHistory(conn *websocket.Conn) error {
+func (s *socket) sendHistory(conn *websocket.Conn, timeSource *timesource.Source) error {
 	s.mu.Lock()
 	historyMessages := lo.Map(s.historyBuffer, func(history buffer, _ int) map[string]any {
 		return map[string]any{
-			"timestamp":   history.Timestamp,
-			"sample_rate": history.SampleRate,
+			"current_time": timeSource.Get().UnixMilli(),
+			"record_time":  history.Timestamp,
+			"sample_rate":  history.SampleRate,
 			"channel_data": lo.SliceToMap(history.ChannelData, func(v explorer.ChannelData) (string, any) {
 				return v.ChannelCode, map[string]any{
 					"channel_id":   v.ChannelId,
@@ -86,15 +88,16 @@ func (s *socket) sendHistory(conn *websocket.Conn) error {
 	return nil
 }
 
-func (s *socket) handleWebSocket(_ *gin.Context, conn *websocket.Conn) {
+func (s *socket) handleWebSocket(_ *gin.Context, conn *websocket.Conn, timeSource *timesource.Source) {
 	clientID := conn.RemoteAddr().String()
 	subscribedAt := time.Now()
 	logger.GetLogger(LOG_PREFIX).Infof("%s - client subscribed to message bus", clientID)
 
 	callbackFn := func(t time.Time, di *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
 		data := map[string]any{
-			"timestamp":   t.UnixMilli(),
-			"sample_rate": di.GetSampleRate(),
+			"current_time": timeSource.Get().UnixMilli(),
+			"record_time":  t.UnixMilli(),
+			"sample_rate":  di.GetSampleRate(),
 			"channel_data": lo.SliceToMap(cd, func(v explorer.ChannelData) (string, any) {
 				return v.ChannelCode, map[string]any{
 					"channel_id":   v.ChannelId,
@@ -121,7 +124,7 @@ func (s *socket) handleWebSocket(_ *gin.Context, conn *websocket.Conn) {
 			break
 		}
 		if string(dataBytes) == "client hello" {
-			if err := s.sendHistory(conn); err != nil {
+			if err := s.sendHistory(conn, timeSource); err != nil {
 				break
 			}
 		}

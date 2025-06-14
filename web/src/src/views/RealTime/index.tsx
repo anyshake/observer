@@ -66,17 +66,22 @@ const RealTime = () => {
         {
             url: getSocketApiUrl(getCredential().token),
             onData: ({ data }) => {
-                const { channel_data, sample_rate, timestamp } = data;
+                const { channel_data, sample_rate, record_time, current_time } = data;
 
                 Object.keys(channel_data).forEach((channel) => {
                     const chartRef = chartRefs.current[channel]?.current;
                     if (chartRef) {
-                        chartRef.addData(channel_data[channel].data_array, timestamp, sample_rate);
+                        chartRef.addData(
+                            channel_data[channel].data_array,
+                            record_time,
+                            current_time,
+                            sample_rate
+                        );
                     }
                 });
 
                 setSampleRate(sample_rate);
-                setUpdatedAt(timestamp);
+                setUpdatedAt(record_time);
 
                 updateChannels(channel_data);
             }

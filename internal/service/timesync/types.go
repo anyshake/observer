@@ -11,7 +11,7 @@ import (
 
 const ID = "service_timesync"
 
-const TIMESOURCE_REFRESH_INTERVAL = 24 * time.Hour
+const TIMESOURCE_REFRESH_INTERVAL = 12 * time.Hour
 
 type TimeSyncServiceImpl struct {
 	mu     sync.Mutex

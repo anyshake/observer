@@ -8,7 +8,12 @@ export default class TimeSeriesBuffer {
         this.buffer = [];
     }
 
-    addData(values: (number | null)[], timestamp: number, sampleRate: number) {
+    addData(
+        values: (number | null)[],
+        recordTime: number,
+        currentTime: number,
+        sampleRate: number
+    ) {
         if (this.lastSampleRate !== null && this.lastSampleRate !== sampleRate) {
             this.clear();
         }
@@ -17,9 +22,9 @@ export default class TimeSeriesBuffer {
 
         const interval = 1000 / sampleRate;
         for (let i = 0; i < values.length; i++) {
-            this.buffer.push([timestamp + i * interval, values[i]]);
+            this.buffer.push([recordTime - (values.length - 1 - i) * interval, values[i]]);
         }
-        this.cleanup();
+        this.cleanup(currentTime);
     }
 
     getData(): Array<[number, number | null]> {
@@ -57,8 +62,8 @@ export default class TimeSeriesBuffer {
         this.lastSampleRate = null;
     }
 
-    private cleanup() {
-        const cutoff = Date.now() - this.maxDuration;
+    private cleanup(currentTime: number) {
+        const cutoff = currentTime - this.maxDuration;
         const index = this.buffer.findIndex(([timestamp]) => timestamp >= cutoff);
         if (index > 0) {
             this.buffer = this.buffer.slice(index);

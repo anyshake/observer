@@ -12,7 +12,12 @@ import {
 import TimeSeriesBuffer from '../helpers/storage/TimeSeriesBuffer';
 
 export interface DequeChartHandle {
-    addData: (values: number[], timestamp: number, sampleRate: number) => void;
+    addData: (
+        values: number[],
+        recordTime: number,
+        currentTime: number,
+        sampleRate: number
+    ) => void;
 }
 
 interface IDequeChart {
@@ -55,8 +60,8 @@ export const DequeChart = memo(
             const needsUpdateRef = useRef(false);
 
             const addData = useCallback(
-                (values: number[], timestamp: number, sampleRate: number) => {
-                    bufferRef.current.addData(values, timestamp, sampleRate);
+                (values: number[], recordTime: number, currentTime: number, sampleRate: number) => {
+                    bufferRef.current.addData(values, recordTime, currentTime, sampleRate);
                     needsUpdateRef.current = true;
                 },
                 []

@@ -7,13 +7,16 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"sync"
 	"time"
+	"unsafe"
 
 	"github.com/anyshake/observer/internal/hardware/explorer/metadata"
 	"github.com/anyshake/observer/pkg/fifo"
 	"github.com/anyshake/observer/pkg/message"
 	"github.com/anyshake/observer/pkg/timesource"
 	"github.com/anyshake/observer/pkg/transport"
+	"github.com/samber/lo"
 	"github.com/sirupsen/logrus"
 )
 
@@ -31,10 +34,12 @@ type ExplorerProtoImplV3 struct {
 	fifoBuffer fifo.Buffer[byte]
 	messageBus message.Bus[EventHandler]
 
-	prevTimestamp4NonGnssMode uint64
-	timeDiff4NonGnssMode      uint64
+	timeDiffMutex                sync.Mutex
+	prevMcuTimestamp             int64
+	prevTimestamp4NonGnssMode    int64
+	timeDiff4NonGnssMode         int64
+	isTimeDiff4NonGnssModeStable bool
 
-	packetTimeObj    time.Time
 	variableAllSet   bool
 	collectedSamples int
 
@@ -46,9 +51,7 @@ type ExplorerProtoImplV3 struct {
 
 func (g *ExplorerProtoImplV3) resetFlags() {
 	g.channelDataBuf = []ChannelData{}
-	g.packetTimeObj = time.Time{}
 	g.collectedSamples = 0
-
 }
 
 func (g *ExplorerProtoImplV3) resetVariables() {
@@ -56,33 +59,15 @@ func (g *ExplorerProtoImplV3) resetVariables() {
 	g.deviceVariable.Reset()
 }
 
-func (g *ExplorerProtoImplV3) getTimestamp(mcuTimestamp uint64) uint64 {
+func (g *ExplorerProtoImplV3) getTimestamp(mcuTimestamp int64) int64 {
 	if g.deviceConfig.GetGnssAvailability() {
 		return mcuTimestamp
 	}
 
-	currentTime := g.TimeSource.Get()
-	currentUnixMilli := currentTime.UnixMilli()
-
-	// Force calibrate time difference every day UTC at 00:00:00
-	currentUtcDate := time.Unix(currentUnixMilli/1000, 0).UTC().Format("2006-01-02")
-	prevUtcDate := time.Unix(int64(g.prevTimestamp4NonGnssMode)/1000, 0).UTC().Format("2006-01-02")
-	if g.timeDiff4NonGnssMode == 0 || currentUtcDate != prevUtcDate {
-		g.timeDiff4NonGnssMode = uint64(currentUnixMilli) - mcuTimestamp
-	}
-
+	g.timeDiffMutex.Lock()
 	timestamp := mcuTimestamp + g.timeDiff4NonGnssMode
+	g.timeDiffMutex.Unlock()
 
-	// In this case the hardware may have been reset, we need to update the time difference
-	// Reset the variableAllSet flag to false, clear all the pointers in deviceInfo
-	if timestamp < g.prevTimestamp4NonGnssMode {
-		g.timeDiff4NonGnssMode = uint64(currentUnixMilli) - mcuTimestamp
-		timestamp = mcuTimestamp + g.timeDiff4NonGnssMode
-		g.resetVariables()
-		g.resetFlags()
-	}
-
-	g.prevTimestamp4NonGnssMode = timestamp
 	return timestamp
 }
 
@@ -126,7 +111,7 @@ func (g *ExplorerProtoImplV3) getChannelSize(deviceConfig uint32) (channelChunkL
 	return channelChunkLength, totalChannelSize, channelData
 }
 
-func (g *ExplorerProtoImplV3) getVariableData(mcuTimestamp uint64, deviceConfig uint32, variableBytes [4]byte) {
+func (g *ExplorerProtoImplV3) getVariableData(mcuTimestamp int64, deviceConfig uint32, variableBytes [4]byte) {
 	variableData := binary.LittleEndian.Uint32(variableBytes[:])
 	variableBits := deviceConfig & 0x3FF
 
@@ -222,6 +207,21 @@ func (g *ExplorerProtoImplV3) getChannelData(channelData []*ChannelData, channel
 	}
 }
 
+func (g *ExplorerProtoImplV3) verifyChecksum(packetData, header, tailer []byte) error {
+	if len(packetData) <= len(header)+len(tailer) {
+		return errors.New("invalid packet length")
+	}
+	recvChecksum := packetData[len(packetData)-len(tailer)-1]
+	calcChecksum := uint8(0)
+	for _, b := range packetData[len(header) : len(packetData)-len(tailer)-1] {
+		calcChecksum ^= b
+	}
+	if recvChecksum != calcChecksum {
+		return fmt.Errorf("invalid checksum: expected %v, got %v", recvChecksum, calcChecksum)
+	}
+	return nil
+}
+
 func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, context.CancelFunc, error) {
 	if g.Transport == nil {
 		return nil, nil, errors.New("transport is not opened")
@@ -248,22 +248,87 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 	g.deviceConfig.SetProtocol("v3")
 	g.deviceConfig.SetModel(g.Model)
 
-	// FIXME: Timestamp drift if software starts before hardware
+	DATA_PACKET_HEADER := []byte{0x01, 0xFE}
+	DATA_PACKET_TAILER := []byte{0xEF, 0x10}
+
 	go func(readInterval time.Duration) {
+		const stableCheckSamples = 10
+
+		g.isTimeDiff4NonGnssModeStable = false
+		timeDiffSamples := make([]int64, 0, stableCheckSamples)
+
 		timer := time.NewTimer(readInterval)
-		buf := make([]byte, 512)
 
 		for {
 			timer.Reset(readInterval)
 
 			select {
 			case <-timer.C:
-				n, err := g.Transport.Read(buf)
+				currentMillis := g.TimeSource.Get().UnixMilli()
+				recvBuf, err := g.Transport.ReadUntil(DATA_PACKET_TAILER, 32000)
 				if err != nil {
 					g.Logger.Errorf("failed to read data from transport: %v", err)
 					cancelFn()
 				}
-				_, _ = g.fifoBuffer.Write(buf[:n]...)
+
+				headerIdx := bytes.Index(recvBuf, DATA_PACKET_HEADER)
+				if headerIdx != -1 {
+					if err = g.verifyChecksum(recvBuf[headerIdx:], DATA_PACKET_HEADER, DATA_PACKET_TAILER); err == nil && len(recvBuf) > headerIdx+len(DATA_PACKET_HEADER)+int(unsafe.Sizeof(int64(0))) {
+						mcuTimestamp := int64(binary.LittleEndian.Uint64(recvBuf[headerIdx+len(DATA_PACKET_HEADER) : headerIdx+len(DATA_PACKET_HEADER)+int(unsafe.Sizeof(int64(0)))]))
+						timeDiff := currentMillis - mcuTimestamp
+
+						if !g.isTimeDiff4NonGnssModeStable {
+							timeDiffSamples = append(timeDiffSamples, timeDiff)
+							if len(timeDiffSamples) > stableCheckSamples {
+								timeDiffSamples = timeDiffSamples[1:]
+							}
+
+							if len(timeDiffSamples) == stableCheckSamples {
+								minVal, maxVal := lo.Min(timeDiffSamples), lo.Max(timeDiffSamples)
+								if minVal == maxVal {
+									g.isTimeDiff4NonGnssModeStable = true
+									g.Logger.Infof("data time series stabilized: time difference = %d ms", timeDiff)
+								} else {
+									g.Logger.Warnln("waiting for data time series to settle down, this may take a while")
+								}
+							} else {
+								if err = g.Flush(); err != nil {
+									g.Logger.Errorf("failed to flush transport: %v", err)
+									cancelFn()
+								} else {
+									g.Logger.Warnln("collecting data time series, this may take a while")
+								}
+							}
+						}
+
+						g.timeDiffMutex.Lock()
+
+						// Force calibrate time difference every day UTC at 00:00:00
+						currentUtcDate := time.Unix(currentMillis/1000, 0).UTC().Format("2006-01-02")
+						prevUtcDate := time.Unix(g.prevTimestamp4NonGnssMode/1000, 0).UTC().Format("2006-01-02")
+						if g.timeDiff4NonGnssMode == 0 || currentUtcDate != prevUtcDate {
+							g.timeDiff4NonGnssMode = timeDiff
+						}
+
+						if mcuTimestamp < g.prevMcuTimestamp && g.prevMcuTimestamp != 0 {
+							g.fifoBuffer.Reset()
+							g.resetVariables()
+							g.resetFlags()
+							g.timeDiff4NonGnssMode = 0
+							g.isTimeDiff4NonGnssModeStable = false
+							timeDiffSamples = make([]int64, 0, stableCheckSamples)
+						}
+
+						g.prevMcuTimestamp = mcuTimestamp
+						g.prevTimestamp4NonGnssMode = g.prevMcuTimestamp + g.timeDiff4NonGnssMode
+
+						g.timeDiffMutex.Unlock()
+					}
+				}
+
+				if g.isTimeDiff4NonGnssModeStable {
+					_, _ = g.fifoBuffer.Write(recvBuf...)
+				}
 			case <-subCtx.Done():
 				g.Logger.Info("exiting from data packet reader")
 				timer.Stop()
@@ -273,9 +338,6 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 	}(10 * time.Millisecond)
 
 	go func(decodeInterval time.Duration) {
-		DATA_PACKET_HEADER := []byte{0x01, 0xFE}
-		DATA_PACKET_TAILER := []byte{0xEF, 0x10}
-
 		timer := time.NewTimer(decodeInterval)
 
 		for {
@@ -289,7 +351,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 					continue
 				}
 
-				mcuTimestamp := binary.LittleEndian.Uint64(packetFixedSection[2:10])
+				mcuTimestamp := int64(binary.LittleEndian.Uint64(packetFixedSection[2:10]))
 				deviceConfig := binary.LittleEndian.Uint32(packetFixedSection[10:14])
 				g.getPacketInterval(deviceConfig)
 				g.getSampleRate(deviceConfig)
@@ -322,16 +384,11 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 					continue
 				}
 
-				calcChecksum := uint8(0)
-				for _, b := range packetFixedSection[len(DATA_PACKET_HEADER):] {
-					calcChecksum ^= b
-				}
-				for _, b := range channelDataSection[:len(channelDataSection)-1-len(recvTailer)] {
-					calcChecksum ^= b
-				}
-				recvChecksum := channelDataSection[len(channelDataSection)-len(DATA_PACKET_TAILER)-1]
-				if recvChecksum != calcChecksum {
-					g.Logger.Errorf("checksum mismatch, expected %v, got %v", recvChecksum, calcChecksum)
+				if err = g.verifyChecksum(
+					bytes.Join([][]byte{packetFixedSection, channelDataSection}, nil),
+					DATA_PACKET_HEADER, DATA_PACKET_TAILER,
+				); err != nil {
+					g.Logger.Errorln(err)
 					g.deviceStatus.IncrementErrors()
 					continue
 				}
@@ -340,16 +397,12 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 				g.deviceStatus.SetUpdatedAt(timeObj)
 
 				if !g.variableAllSet {
-					g.Logger.Infoln("waiting for device config to be fully collected, this may take a while")
+					g.Logger.Warnln("waiting for device config to be fully collected, this may take a while")
 					continue
 				}
 
 				g.getChannelData(channelData, channelDataSection[:len(channelDataSection)-1-len(recvTailer)], channelChunkLength)
 				g.collectedSamples += channelChunkLength
-
-				if g.packetTimeObj.IsZero() {
-					g.packetTimeObj = timeObj
-				}
 
 				channelCodes := make([]string, len(channelData))
 				if len(g.channelDataBuf) != len(channelData) {
