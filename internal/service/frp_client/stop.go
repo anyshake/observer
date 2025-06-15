@@ -15,7 +15,7 @@ func (s *FrpClientServiceImpl) Stop() error {
 
 	done := make(chan struct{})
 	go func() {
-		s.clientObj.GracefulClose(500 * time.Millisecond)
+		s.clientObj.Close()
 		s.wg.Wait()
 		close(done)
 	}()
