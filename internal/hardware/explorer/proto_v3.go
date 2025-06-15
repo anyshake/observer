@@ -310,7 +310,9 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 							g.timeDiff4NonGnssMode = timeDiff
 						}
 
-						if mcuTimestamp < g.prevMcuTimestamp && g.prevMcuTimestamp != 0 {
+						// Handle MCU time jumps (usually caused by Explorer power loss or PC hibernation)
+						// 1500 ms is a threshold determined by max packet interval with a safety margin (see getPacketInterval function)
+						if (mcuTimestamp < g.prevMcuTimestamp || math.Abs(float64(mcuTimestamp)-float64(g.prevMcuTimestamp)) >= 1500) && g.prevMcuTimestamp != 0 {
 							g.fifoBuffer.Reset()
 							g.resetVariables()
 							g.resetFlags()

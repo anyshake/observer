@@ -30,7 +30,7 @@ func measureStableOffset(ntpAddress string, retries int, timeout time.Duration, 
 			return 0, fmt.Errorf("failed to query NTP server after %d retries (iteration %d): %w", retries, i+1, err)
 		}
 
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 	}
 
 	if len(rawOffsets) == 0 {
