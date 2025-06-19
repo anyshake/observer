@@ -68,7 +68,7 @@ func (s *frpClientConfigServerAddrImpl) GetType() action.SettingType { return ac
 func (s *frpClientConfigServerAddrImpl) IsRequired() bool            { return true }
 func (s *frpClientConfigServerAddrImpl) GetVersion() int             { return 0 }
 func (s *frpClientConfigServerAddrImpl) GetOptions() map[string]any  { return nil }
-func (s *frpClientConfigServerAddrImpl) GetDefaultValue() any        { return "example.com" }
+func (s *frpClientConfigServerAddrImpl) GetDefaultValue() any        { return "anyshake.ip-ddns.com" }
 func (s *frpClientConfigServerAddrImpl) GetDescription() string {
 	return "The address of the FRP server to connect to."
 }
@@ -118,7 +118,7 @@ func (s *frpClientConfigServerPortImpl) GetType() action.SettingType { return ac
 func (s *frpClientConfigServerPortImpl) IsRequired() bool            { return true }
 func (s *frpClientConfigServerPortImpl) GetVersion() int             { return 0 }
 func (s *frpClientConfigServerPortImpl) GetOptions() map[string]any  { return nil }
-func (s *frpClientConfigServerPortImpl) GetDefaultValue() any        { return 7000 }
+func (s *frpClientConfigServerPortImpl) GetDefaultValue() any        { return 443 }
 func (s *frpClientConfigServerPortImpl) GetDescription() string {
 	return "The port on which the FRP server is listening."
 }
@@ -259,7 +259,7 @@ func (s *frpClientConfigTokenImpl) GetType() action.SettingType { return action.
 func (s *frpClientConfigTokenImpl) IsRequired() bool            { return false }
 func (s *frpClientConfigTokenImpl) GetVersion() int             { return 0 }
 func (s *frpClientConfigTokenImpl) GetOptions() map[string]any  { return nil }
-func (s *frpClientConfigTokenImpl) GetDefaultValue() any        { return "<auth_token_here>" }
+func (s *frpClientConfigTokenImpl) GetDefaultValue() any        { return "anyshake.org" }
 func (s *frpClientConfigTokenImpl) GetDescription() string {
 	return "Authentication token used to validate client connection with the server."
 }
@@ -427,12 +427,14 @@ func (s *frpClientConfigProtocolImpl) IsRequired() bool            { return true
 func (s *frpClientConfigProtocolImpl) GetVersion() int             { return 0 }
 func (s *frpClientConfigProtocolImpl) GetOptions() map[string]any {
 	return map[string]any{
-		"TCP":       "tcp",
-		"KCP":       "kcp",
-		"WebSocket": "websocket",
+		"TCP":              "tcp",
+		"KCP":              "kcp",
+		"QUIC":             "quic",
+		"WebSocket":        "websocket",
+		"WebSocket Secure": "wss",
 	}
 }
-func (s *frpClientConfigProtocolImpl) GetDefaultValue() any { return "tcp" }
+func (s *frpClientConfigProtocolImpl) GetDefaultValue() any { return "wss" }
 func (s *frpClientConfigProtocolImpl) GetDescription() string {
 	return "Protocol used to communicate with the server."
 }
@@ -447,8 +449,8 @@ func (s *frpClientConfigProtocolImpl) Set(h *action.Handler, v any) error {
 	if err != nil {
 		return err
 	}
-	if str != "tcp" && str != "kcp" && str != "websocket" {
-		return errors.New("protocol must be one of TCP, KCP or WebSocket")
+	if str != "tcp" && str != "kcp" && str != "websocket" && str != "wss" && str != "quic" {
+		return errors.New("protocol must be one of TCP, KCP, WebSocket, WebSocket Secure or QUIC")
 	}
 	return h.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), str)
 }
@@ -479,7 +481,7 @@ func (s *frpClientConfigProxyNameImpl) GetOptions() map[string]any  { return nil
 func (s *frpClientConfigProxyNameImpl) GetDefaultValue() any {
 	b := make([]byte, 4)
 	if _, err := crypto_rand.Read(b); err != nil {
-		return "anyshake-observer-web"
+		return fmt.Sprintf("anyshake-observer-%x", uint32(time.Now().UnixNano()))
 	}
 	return fmt.Sprintf("anyshake-observer-%x", b)
 }
@@ -608,7 +610,7 @@ func (s *frpClientConfigUseDomainAccessImpl) GetType() action.SettingType { retu
 func (s *frpClientConfigUseDomainAccessImpl) IsRequired() bool            { return true }
 func (s *frpClientConfigUseDomainAccessImpl) GetVersion() int             { return 0 }
 func (s *frpClientConfigUseDomainAccessImpl) GetOptions() map[string]any  { return nil }
-func (s *frpClientConfigUseDomainAccessImpl) GetDefaultValue() any        { return false }
+func (s *frpClientConfigUseDomainAccessImpl) GetDefaultValue() any        { return true }
 func (s *frpClientConfigUseDomainAccessImpl) GetDescription() string {
 	return "Enable domain access for the proxy traffic. If enabled, the proxy will be accessible via subdomain or custom domains."
 }
@@ -696,7 +698,13 @@ func (s *frpClientConfigSubdomainImpl) GetType() action.SettingType { return act
 func (s *frpClientConfigSubdomainImpl) IsRequired() bool            { return false }
 func (s *frpClientConfigSubdomainImpl) GetVersion() int             { return 0 }
 func (s *frpClientConfigSubdomainImpl) GetOptions() map[string]any  { return nil }
-func (s *frpClientConfigSubdomainImpl) GetDefaultValue() any        { return "" }
+func (s *frpClientConfigSubdomainImpl) GetDefaultValue() any {
+	b := make([]byte, 4)
+	if _, err := crypto_rand.Read(b); err != nil {
+		return fmt.Sprintf("station-%x", uint32(time.Now().UnixNano()))
+	}
+	return fmt.Sprintf("station-%x", b)
+}
 func (s *frpClientConfigSubdomainImpl) GetDescription() string {
 	return "Subdomain to bind for this proxy, this field is available only when domain mode is enabled."
 }
