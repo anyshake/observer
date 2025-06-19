@@ -3,6 +3,9 @@ package quakesense
 import (
 	"errors"
 	"fmt"
+	"time"
+
+	crypto_rand "crypto/rand"
 
 	"github.com/anyshake/observer/config"
 	"github.com/anyshake/observer/internal/dao/action"
@@ -112,9 +115,15 @@ func (s *quakeSenseConfigMqttTopicImpl) GetType() action.SettingType { return ac
 func (s *quakeSenseConfigMqttTopicImpl) IsRequired() bool            { return true }
 func (s *quakeSenseConfigMqttTopicImpl) GetVersion() int             { return 0 }
 func (s *quakeSenseConfigMqttTopicImpl) GetOptions() map[string]any  { return nil }
-func (s *quakeSenseConfigMqttTopicImpl) GetDefaultValue() any        { return "anyshake/quakesense" }
+func (s *quakeSenseConfigMqttTopicImpl) GetDefaultValue() any {
+	b := make([]byte, 4)
+	if _, err := crypto_rand.Read(b); err != nil {
+		return fmt.Sprintf("anyshake/quakesense/%x", uint32(time.Now().UnixNano()))
+	}
+	return fmt.Sprintf("anyshake/quakesense/%x", b)
+}
 func (s *quakeSenseConfigMqttTopicImpl) GetDescription() string {
-	return "Topic used for publishing MQTT messages, by default, the topic is anyshake/quakeSense"
+	return "Topic used for publishing MQTT messages, by default, the topic is anyshake/quakesense/<random string>"
 }
 func (s *quakeSenseConfigMqttTopicImpl) Init(handler *action.Handler) error {
 	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
