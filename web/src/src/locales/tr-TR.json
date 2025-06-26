@@ -450,6 +450,7 @@
         "captcha": {
             "label": "Captcha'yı Girin",
             "loading": "Captcha yükleniyor...",
+            "error": "Captcha yüklenemedi",
             "placeholder": "Captcha kodu",
             "refreshing": "Captcha yenileniyor.",
             "refresh_success": "Captcha başarıyla yenilendi.",

@@ -1,4 +1,11 @@
-import { mdiAccount, mdiChevronUp, mdiEarth, mdiKey, mdiShieldCheck } from '@mdi/js';
+import {
+    mdiAccount,
+    mdiChevronUp,
+    mdiEarth,
+    mdiKey,
+    mdiRefreshCircle,
+    mdiShieldCheck
+} from '@mdi/js';
 import Icon from '@mdi/react';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import { md, pki, util } from 'node-forge';
@@ -28,14 +35,15 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
     const [preAuthData, setPreAuthData] = useState({
         encrypt_key: '',
         captcha_id: '',
-        captcha_img: ''
+        captcha_img: '',
+        error: false
     });
     const { t } = useTranslation();
     const getPreAuthData = useCallback(
         async (notify: boolean) => {
-            setPreAuthData({ encrypt_key: '', captcha_id: '', captcha_img: '' });
-            const requestFn = (throwError: boolean) => {
-                return ApiClient.request<{
+            setPreAuthData({ encrypt_key: '', captcha_id: '', captcha_img: '', error: false });
+            const requestFn = async (throwError: boolean) => {
+                const result = await ApiClient.request<{
                     ttl: number;
                     encrypt_key: string;
                     captcha_id: string;
@@ -43,9 +51,16 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                 }>({
                     url: getRestfulApiUrl('/auth'),
                     method: 'post',
-                    ignoreErrors: !throwError,
+                    ignoreErrors: true,
                     data: { action: 'preauth', nonce: '', credential: '' }
                 });
+                if (result.error) {
+                    setPreAuthData((preAuthData) => ({ ...preAuthData, error: true }));
+                    if (throwError) {
+                        throw new Error(result.message);
+                    }
+                }
+                return result;
             };
             const res = (
                 notify
@@ -60,6 +75,7 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
             if (res?.data) {
                 const { ttl, encrypt_key, captcha_id, captcha_img } = res.data;
                 setPreAuthData({
+                    error: false,
                     encrypt_key,
                     captcha_id,
                     captcha_img: `data:image/png;base64,${captcha_img}`
@@ -80,7 +96,7 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
         getPreAuthData(false);
     }, [preAuthTTL, getPreAuthData]);
 
-    const { setCredential } = useCredentialStore();
+    const { setCredential, credential } = useCredentialStore();
     const handleLoginSubmit = async (username: string, password: string, captcha: string) => {
         // Load public key and encrypt credential
         const publicKey = util.decode64(preAuthData.encrypt_key);
@@ -210,35 +226,42 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                                     name="captcha"
                                     component="div"
                                 />
-                                <div className="flex justify-between space-x-2">
+                                <div className="mt-1 flex items-center justify-between space-x-2">
                                     <Field
                                         required
                                         autoComplete="off"
                                         id="captcha"
-                                        className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none disabled:bg-gray-100"
+                                        className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none disabled:bg-gray-100"
                                         type="text"
                                         name="captcha"
                                         disabled={!preAuthData.captcha_img.length}
                                         placeholder={t(
                                             preAuthData.captcha_img.length
                                                 ? 'Login.captcha.placeholder'
-                                                : 'Login.captcha.loading'
+                                                : preAuthData.error
+                                                  ? 'Login.captcha.error'
+                                                  : 'Login.captcha.loading'
                                         )}
                                     />
                                     <div
-                                        className="flex w-24 cursor-pointer items-center justify-center md:w-32"
+                                        className="flex w-24 cursor-pointer items-center justify-center rounded-md border border-gray-300 py-2 transition-all hover:border-gray-400 md:w-32"
                                         onClick={() => {
                                             getPreAuthData(true);
                                         }}
                                     >
                                         {preAuthData.captcha_img.length ? (
                                             <img
-                                                className="text-gray-700"
+                                                className="h-6"
                                                 src={preAuthData.captcha_img}
                                                 alt=""
                                             />
+                                        ) : preAuthData.error ? (
+                                            <Icon
+                                                className="size-6 flex-shrink-0 text-red-400"
+                                                path={mdiRefreshCircle}
+                                            />
                                         ) : (
-                                            <span className="loading loading-dots loading-sm bg-gray-500" />
+                                            <span className="loading loading-dots loading-sm size-6 bg-gray-500" />
                                         )}
                                     </div>
                                 </div>
@@ -247,7 +270,11 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                             <button
                                 className="btn mt-4 mb-8 w-full rounded-lg bg-purple-500 py-2 font-medium text-white shadow-lg transition-all hover:bg-purple-700"
                                 type="submit"
-                                disabled={isSubmitting || !preAuthData.captcha_img.length}
+                                disabled={
+                                    isSubmitting ||
+                                    !preAuthData.captcha_img.length ||
+                                    credential.token.length > 0
+                                }
                             >
                                 {t('Login.signin.button')}
                             </button>

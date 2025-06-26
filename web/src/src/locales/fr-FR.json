@@ -450,6 +450,7 @@
         "captcha": {
             "label": "Saisir le Captcha",
             "loading": "Chargement du captcha en cours...",
+            "error": "Échec du chargement du captcha",
             "placeholder": "Code Captcha",
             "refreshing": "Actualisation du captcha en cours.",
             "refresh_success": "Captcha actualisé avec succès.",

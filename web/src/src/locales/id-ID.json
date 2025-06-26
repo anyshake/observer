@@ -450,6 +450,7 @@
         "captcha": {
             "label": "Masukkan Captcha",
             "loading": "Memuat captcha...",
+            "error": "Gagal memuat captcha",
             "placeholder": "Kode Captcha",
             "refreshing": "Menyegarkan captcha.",
             "refresh_success": "Berhasil menyegarkan captcha.",

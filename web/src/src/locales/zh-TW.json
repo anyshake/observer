@@ -450,6 +450,7 @@
         "captcha": {
             "label": "輸入驗證碼",
             "loading": "正在加載驗證碼...",
+            "error": "加載驗證碼失敗",
             "placeholder": "驗證碼",
             "refreshing": "正在重新整理驗證碼。",
             "refresh_success": "已成功重新整理驗證碼。",

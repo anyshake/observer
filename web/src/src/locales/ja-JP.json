@@ -450,6 +450,7 @@
         "captcha": {
             "label": "キャプチャを入力",
             "loading": "キャプチャを更新中。",
+            "error": "キャプチャの読み込みに失敗しました",
             "placeholder": "キャプチャコード",
             "refreshing": "キャプチャを更新中。",
             "refresh_success": "キャプチャを正常に更新しました。",

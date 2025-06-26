@@ -454,6 +454,7 @@
         "captcha": {
             "label": "Enter Captcha",
             "loading": "Loading captcha...",
+            "error": "Failed to load captcha",
             "placeholder": "Captcha code",
             "refreshing": "Refreshing captcha.",
             "refresh_success": "Refreshed captcha successfully.",

@@ -450,6 +450,7 @@
         "captcha": {
             "label": "Captcha eingeben",
             "loading": "Captcha wird geladen...",
+            "error": "Fehler beim Laden des Captchas",
             "placeholder": "Captcha-Code",
             "refreshing": "Captcha wird aktualisiert.",
             "refresh_success": "Captcha erfolgreich aktualisiert.",
