@@ -1,5 +1,5 @@
 FROM alpine:latest AS web
-# Uncomment the following line to use a mirror of APT repository
+# Uncomment the following line to use a mirror of APK repository
 # ENV APK_SOURCE_HOST="mirror.bjtu.edu.cn"
 # Uncomment the following line to use a mirror of npm registry
 # ENV NPM_REGISTRY_HOST="registry.npmmirror.com"
@@ -19,7 +19,7 @@ RUN if [ ! -d "../dist" ]; then \
     fi
 
 FROM golang:alpine AS builder
-# Uncomment the following line to use a mirror of APT repository
+# Uncomment the following line to use a mirror of APK repository
 # ENV APK_SOURCE_HOST="mirror.bjtu.edu.cn"
 # Uncomment the following line to use a mirror of go module proxy
 # ENV GOPROXY="https://goproxy.cn,direct"
