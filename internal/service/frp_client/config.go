@@ -208,6 +208,174 @@ func (s *frpClientConfigDisableCustomTLSFirstByteImpl) Restore(handler *action.H
 	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
+type frpClientConfigKeyFileImpl struct{}
+
+func (s *frpClientConfigKeyFileImpl) GetName() string             { return "Key File" }
+func (s *frpClientConfigKeyFileImpl) GetNamespace() string        { return ID }
+func (s *frpClientConfigKeyFileImpl) GetKey() string              { return "key_file" }
+func (s *frpClientConfigKeyFileImpl) GetType() action.SettingType { return action.String }
+func (s *frpClientConfigKeyFileImpl) IsRequired() bool            { return false }
+func (s *frpClientConfigKeyFileImpl) GetVersion() int             { return 0 }
+func (s *frpClientConfigKeyFileImpl) GetOptions() map[string]any  { return nil }
+func (s *frpClientConfigKeyFileImpl) GetDefaultValue() any        { return "" }
+func (s *frpClientConfigKeyFileImpl) GetDescription() string {
+	return "Path of the secret key file that FRP client will load."
+}
+func (s *frpClientConfigKeyFileImpl) Init(handler *action.Handler) error {
+	_, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+	if err != nil {
+		return fmt.Errorf("failed to init key_file: %w", err)
+	}
+	return nil
+}
+func (s *frpClientConfigKeyFileImpl) Set(handler *action.Handler, newVal any) error {
+	k, err := config.GetConfigValString(newVal)
+	if err != nil {
+		return err
+	}
+	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), k)
+}
+func (s *frpClientConfigKeyFileImpl) Get(handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+	if err != nil {
+		return nil, fmt.Errorf("failed to get key_file: %w", err)
+	}
+	b, ok := val.(string)
+	if !ok {
+		return nil, errors.New("string expected")
+	}
+	return b, nil
+}
+func (s *frpClientConfigKeyFileImpl) Restore(handler *action.Handler) error {
+	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+}
+
+type frpClientConfigCertFileImpl struct{}
+
+func (s *frpClientConfigCertFileImpl) GetName() string             { return "Cert File" }
+func (s *frpClientConfigCertFileImpl) GetNamespace() string        { return ID }
+func (s *frpClientConfigCertFileImpl) GetKey() string              { return "cert_file" }
+func (s *frpClientConfigCertFileImpl) GetType() action.SettingType { return action.String }
+func (s *frpClientConfigCertFileImpl) IsRequired() bool            { return false }
+func (s *frpClientConfigCertFileImpl) GetVersion() int             { return 0 }
+func (s *frpClientConfigCertFileImpl) GetOptions() map[string]any  { return nil }
+func (s *frpClientConfigCertFileImpl) GetDefaultValue() any        { return "" }
+func (s *frpClientConfigCertFileImpl) GetDescription() string {
+	return "Path of the cert file that FRP client will load."
+}
+func (s *frpClientConfigCertFileImpl) Init(handler *action.Handler) error {
+	_, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+	if err != nil {
+		return fmt.Errorf("failed to init cert_file: %w", err)
+	}
+	return nil
+}
+func (s *frpClientConfigCertFileImpl) Set(handler *action.Handler, newVal any) error {
+	k, err := config.GetConfigValString(newVal)
+	if err != nil {
+		return err
+	}
+	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), k)
+}
+func (s *frpClientConfigCertFileImpl) Get(handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+	if err != nil {
+		return nil, fmt.Errorf("failed to get cert_file: %w", err)
+	}
+	b, ok := val.(string)
+	if !ok {
+		return nil, errors.New("string expected")
+	}
+	return b, nil
+}
+func (s *frpClientConfigCertFileImpl) Restore(handler *action.Handler) error {
+	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+}
+
+type frpClientConfigTrustedCaFileImpl struct{}
+
+func (s *frpClientConfigTrustedCaFileImpl) GetName() string             { return "Trusted CA File" }
+func (s *frpClientConfigTrustedCaFileImpl) GetNamespace() string        { return ID }
+func (s *frpClientConfigTrustedCaFileImpl) GetKey() string              { return "trusted_ca_file" }
+func (s *frpClientConfigTrustedCaFileImpl) GetType() action.SettingType { return action.String }
+func (s *frpClientConfigTrustedCaFileImpl) IsRequired() bool            { return false }
+func (s *frpClientConfigTrustedCaFileImpl) GetVersion() int             { return 0 }
+func (s *frpClientConfigTrustedCaFileImpl) GetOptions() map[string]any  { return nil }
+func (s *frpClientConfigTrustedCaFileImpl) GetDefaultValue() any        { return "" }
+func (s *frpClientConfigTrustedCaFileImpl) GetDescription() string {
+	return "Path of the trusted CA file that FRP client will load."
+}
+func (s *frpClientConfigTrustedCaFileImpl) Init(handler *action.Handler) error {
+	_, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+	if err != nil {
+		return fmt.Errorf("failed to init trusted_ca_file: %w", err)
+	}
+	return nil
+}
+func (s *frpClientConfigTrustedCaFileImpl) Set(handler *action.Handler, newVal any) error {
+	k, err := config.GetConfigValString(newVal)
+	if err != nil {
+		return err
+	}
+	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), k)
+}
+func (s *frpClientConfigTrustedCaFileImpl) Get(handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+	if err != nil {
+		return nil, fmt.Errorf("failed to get trusted_ca_file: %w", err)
+	}
+	b, ok := val.(string)
+	if !ok {
+		return nil, errors.New("string expected")
+	}
+	return b, nil
+}
+func (s *frpClientConfigTrustedCaFileImpl) Restore(handler *action.Handler) error {
+	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+}
+
+type frpClientConfigTlsServerNameImpl struct{}
+
+func (s *frpClientConfigTlsServerNameImpl) GetName() string             { return "TLS Server Name" }
+func (s *frpClientConfigTlsServerNameImpl) GetNamespace() string        { return ID }
+func (s *frpClientConfigTlsServerNameImpl) GetKey() string              { return "tls_server_name" }
+func (s *frpClientConfigTlsServerNameImpl) GetType() action.SettingType { return action.String }
+func (s *frpClientConfigTlsServerNameImpl) IsRequired() bool            { return false }
+func (s *frpClientConfigTlsServerNameImpl) GetVersion() int             { return 0 }
+func (s *frpClientConfigTlsServerNameImpl) GetOptions() map[string]any  { return nil }
+func (s *frpClientConfigTlsServerNameImpl) GetDefaultValue() any        { return "" }
+func (s *frpClientConfigTlsServerNameImpl) GetDescription() string {
+	return "TLS Server Name specifies the custom server name of tls certificate. By default, server name if same to Server Addr."
+}
+func (s *frpClientConfigTlsServerNameImpl) Init(handler *action.Handler) error {
+	_, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+	if err != nil {
+		return fmt.Errorf("failed to init tls_server_name: %w", err)
+	}
+	return nil
+}
+func (s *frpClientConfigTlsServerNameImpl) Set(handler *action.Handler, newVal any) error {
+	k, err := config.GetConfigValString(newVal)
+	if err != nil {
+		return err
+	}
+	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), k)
+}
+func (s *frpClientConfigTlsServerNameImpl) Get(handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+	if err != nil {
+		return nil, fmt.Errorf("failed to get tls_server_name: %w", err)
+	}
+	b, ok := val.(string)
+	if !ok {
+		return nil, errors.New("string expected")
+	}
+	return b, nil
+}
+func (s *frpClientConfigTlsServerNameImpl) Restore(handler *action.Handler) error {
+	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+}
+
 type frpClientConfigUserImpl struct{}
 
 func (s *frpClientConfigUserImpl) GetName() string             { return "User" }
@@ -783,6 +951,10 @@ func (s *FrpClientServiceImpl) GetConfigConstraint() []config.IConstraint {
 		&frpClientConfigServerAddrImpl{},
 		&frpClientConfigServerPortImpl{},
 		&frpClientConfigDisableCustomTLSFirstByteImpl{},
+		&frpClientConfigKeyFileImpl{},
+		&frpClientConfigCertFileImpl{},
+		&frpClientConfigTrustedCaFileImpl{},
+		&frpClientConfigTlsServerNameImpl{},
 		&frpClientConfigUserImpl{},
 		&frpClientConfigTokenImpl{},
 		&frpClientConfigPoolCountImpl{},

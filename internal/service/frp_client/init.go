@@ -30,6 +30,30 @@ func (s *FrpClientServiceImpl) Init() error {
 	}
 	s.disableCustomTLSFirstByte = disableCustomTLSFirstByte.(bool)
 
+	keyFile, err := (&frpClientConfigKeyFileImpl{}).Get(s.actionHandler)
+	if err != nil {
+		return err
+	}
+	s.keyFile = keyFile.(string)
+
+	certFile, err := (&frpClientConfigCertFileImpl{}).Get(s.actionHandler)
+	if err != nil {
+		return err
+	}
+	s.certFile = certFile.(string)
+
+	trustedCaFile, err := (&frpClientConfigTrustedCaFileImpl{}).Get(s.actionHandler)
+	if err != nil {
+		return err
+	}
+	s.trustedCaFile = trustedCaFile.(string)
+
+	tlsServerName, err := (&frpClientConfigTlsServerNameImpl{}).Get(s.actionHandler)
+	if err != nil {
+		return err
+	}
+	s.tlsServerName = tlsServerName.(string)
+
 	user, err := (&frpClientConfigUserImpl{}).Get(s.actionHandler)
 	if err != nil {
 		return err

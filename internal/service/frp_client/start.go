@@ -39,6 +39,12 @@ func (s *FrpClientServiceImpl) Start() error {
 			TLS: v1.TLSClientConfig{
 				Enable:                    &s.tlsEnable,
 				DisableCustomTLSFirstByte: &s.disableCustomTLSFirstByte,
+				TLSConfig: v1.TLSConfig{
+					KeyFile:       s.keyFile,
+					CertFile:      s.certFile,
+					TrustedCaFile: s.trustedCaFile,
+					ServerName:    s.tlsServerName,
+				},
 			},
 		},
 		Auth: v1.AuthClientConfig{Token: s.authToken},

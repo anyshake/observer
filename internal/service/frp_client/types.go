@@ -30,6 +30,15 @@ type FrpClientServiceImpl struct {
 	// Disable custom TLS first byte to avoid traffic being sniffed.
 	// See https://github.com/fatedier/frp/issues/3193#issuecomment-1332547301
 	disableCustomTLSFirstByte bool
+	// Specifies the path of the secret key file that client will load.
+	keyFile string
+	// Specifies the path of the cert file that client will load.
+	certFile string
+	// Specifies the path of the trusted ca file that will load.
+	trustedCaFile string
+	// specifies the custom server name of tls certificate.
+	// By default, server name if same to ServerAddr.
+	tlsServerName string
 	// The token for authentication when connecting to the server
 	authToken string
 	// A prefix in proxy name to distinguish different users
