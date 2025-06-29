@@ -2,6 +2,40 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.1.0
+
+### Release Notes
+
+This update continues our mission to make seismic monitoring more powerful, accessible, and secure. It adds key network and time-handling improvements, introduces better fault tolerance, and enhances QuakeSense detection flexibility. With this release, AnyShake Observer becomes even more robust in various deployment environments.
+
+📢 **Crowdfunding Now Live!**
+Don’t miss out on the launch of **AnyShake Explorer** — our open-source, high-performance seismic acquisition hardware. Available now on Crowd Supply: [www.crowdsupply.com/senseplex/anyshake-explorer](https://www.crowdsupply.com/senseplex/anyshake-explorer)
+
+🧠 **What’s New**
+
+This version delivers major reliability enhancements to time synchronization, networking flexibility, and QuakeSense analytics. It also features UI polish, bug fixes, and better compatibility across diverse user environments.
+
+### New Features
+
+- Integrated **FRP (Fast Reverse Proxy)** client service for connecting devices behind NAT/firewall.
+- Built-in **public FRP server** support for quick remote access without external configuration.
+- Added **support for custom TLS settings** to improve secure deployment scenarios.
+- **Random topic assignment** in QuakeSense for enhanced event stream handling in distributed setups.
+
+### Bug Fixes
+
+- Fixed **time offset issues after system hibernation (e.g., on battery powered laptops)**, ensuring consistent timestamps.
+- Improved **NTP mode accuracy** under varying system load conditions.
+- Resolved a bug causing **FRP connections not to close cleanly**, preventing potential resource leaks.
+- Fixed **login error prompts** to show more informative messages on failure.
+- Normalized comparison logic between **null values and empty arrays**, reducing edge case errors.
+- Moved potentially blocking code into goroutines to **ensure timeout mechanisms work properly**.
+- Removed an **invalid protocol entry** to prevent runtime parsing issues.
+- Corrected several **minor typos and documentation mismatches**.
+- Refined **login error UI** for better user experience.
+- Removed **background colors** on images for a cleaner visual presentation.
+- Applied minor **style and layout adjustments** for consistent appearance.
+
 ## v4.0.3
 
 ### Release Notes
