@@ -1,5 +1,7 @@
 .PHONY: build digest clean run gen
 
+GO ?= go
+
 BINARY=observer
 ifeq (${GOOS}, windows)
     BINARY := $(BINARY).exe
@@ -22,7 +24,7 @@ build:
 	@echo "[Info] Building project, output file path: $(DIST_DIR)/$(BINARY)"
 	@mkdir -p $(DIST_DIR)
 	CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} GOARM=${GOARM} GOMIPS=${GOMIPS} \
-		go build -ldflags="$(BUILD_FLAGS)" $(BUILD_ARGS) -o $(DIST_DIR)/$(BINARY) $(SRC_DIR)/*.go
+		$(GO) build -ldflags="$(BUILD_FLAGS)" $(BUILD_ARGS) -o $(DIST_DIR)/$(BINARY) $(SRC_DIR)/*.go
 	@cp -r $(ASSETS_DIR) $(DIST_DIR)
 	@echo "[Info] Build completed."
 
@@ -43,7 +45,7 @@ ifeq ($(wildcard $(DIST_DIR)/config.json.local),)
 	@cp $(ASSETS_DIR)/config.json $(DIST_DIR)/config.json.local
 endif
 	@echo "[Info] Running project..."
-	go run -gcflags="all=-N -l" -race $(SRC_DIR)/*.go --config $(DIST_DIR)/config.json.local
+	$(GO) run -gcflags="all=-N -l" -race $(SRC_DIR)/*.go --config $(DIST_DIR)/config.json.local
 
 clean:
 	@echo "[Warn] Cleaning up project..."
@@ -52,8 +54,8 @@ clean:
 gen:
 ifeq ($(shell command -v gqlgen 2> /dev/null),)
 	@echo "[Info] Installing gqlgen..."
-	@go get github.com/99designs/gqlgen
-	@go install github.com/99designs/gqlgen
+	@$(GO) get github.com/99designs/gqlgen
+	@$(GO) install github.com/99designs/gqlgen
 endif
 	@echo "[Info] Generating GraphQL code..."
 	@gqlgen generate

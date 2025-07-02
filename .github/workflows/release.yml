@@ -118,16 +118,12 @@ jobs:
       - name: Setup Go toolchain (Windows 7)
         if: ${{ matrix.target_id == 'windows7_386' || matrix.target_id == 'windows7_amd64' }}
         run: |
-          sudo rm -rf `which go`
-          sudo rm -rf /usr/local/go
           curl -L -o /tmp/go-legacy-win7.tar.gz https://github.com/thongtech/go-legacy-win7/releases/download/v1.24.2-1/go-legacy-win7-1.24.2-1.linux_amd64.tar.gz
           tar -xvf /tmp/go-legacy-win7.tar.gz -C $HOME
           rm -f go-legacy-win7.tar.gz
           export GOROOT=$HOME/go-legacy-win7
-          export PATH=$PATH:$GOROOT/bin
           echo "GOROOT=$GOROOT" >> $GITHUB_ENV
-          echo "PATH=$PATH" >> $GITHUB_ENV
-          go version
+          $GOROOT/bin/go version
 
       - name: Download web artifacts
         uses: actions/download-artifact@v4
@@ -142,7 +138,19 @@ jobs:
           rm -f web_dist.tar.gz
 
       - name: Build core application
+        if: ${{ matrix.target_id != 'windows7_386' && matrix.target_id != 'windows7_amd64' }}
         run: |
+          GOOS=${{ env.GOOS }} \
+          GOARCH=${{ env.GOARCH }} \
+          GOARM=${{ env.GOARM }} \
+          GOMIPS=${{ env.GOMIPS }} \
+          BUILD_PLATFORM=gh-ci-release \
+          make build
+
+      - name: Build core application (Windows 7)
+        if: ${{ matrix.target_id == 'windows7_386' || matrix.target_id == 'windows7_amd64' }}
+        run: |
+          GO=${{ env.GOROOT }}/bin/go \
           GOOS=${{ env.GOOS }} \
           GOARCH=${{ env.GOARCH }} \
           GOARM=${{ env.GOARM }} \
