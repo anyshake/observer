@@ -50,23 +50,23 @@ type DeviceStatus struct {
 }
 
 type SeisEvent struct {
-	Verfied    bool                   `json:"verfied"`
-	Timestamp  int64                  `json:"timestamp"`
-	EventID    string                 `json:"eventId"`
-	Region     string                 `json:"region"`
-	Depth      float64                `json:"depth"`
-	Latitude   float64                `json:"latitude"`
-	Longitude  float64                `json:"longitude"`
-	Magnitude  map[string]interface{} `json:"magnitude"`
-	Distance   float64                `json:"distance"`
-	Estimation []float64              `json:"estimation"`
+	Verfied    bool           `json:"verfied"`
+	Timestamp  int64          `json:"timestamp"`
+	EventID    string         `json:"eventId"`
+	Region     string         `json:"region"`
+	Depth      float64        `json:"depth"`
+	Latitude   float64        `json:"latitude"`
+	Longitude  float64        `json:"longitude"`
+	Magnitude  map[string]any `json:"magnitude"`
+	Distance   float64        `json:"distance"`
+	Estimation []float64      `json:"estimation"`
 }
 
 type SeisEventSource struct {
-	ID            string                 `json:"id"`
-	Country       string                 `json:"country"`
-	Locales       map[string]interface{} `json:"locales"`
-	DefaultLocale string                 `json:"defaultLocale"`
+	ID            string         `json:"id"`
+	Country       string         `json:"country"`
+	Locales       map[string]any `json:"locales"`
+	DefaultLocale string         `json:"defaultLocale"`
 }
 
 type SeisRecord struct {
