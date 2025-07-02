@@ -2,8 +2,6 @@ module github.com/anyshake/observer
 
 go 1.23.0
 
-toolchain go1.24.3
-
 require (
 	github.com/99designs/gqlgen v0.17.76
 	github.com/PuerkitoBio/goquery v1.10.3
