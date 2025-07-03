@@ -265,10 +265,14 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 			select {
 			case <-timer.C:
 				currentMillis := g.TimeSource.Get().UnixMilli()
-				recvBuf, err := g.Transport.ReadUntil(DATA_PACKET_TAILER, 32000)
+				recvBuf, timeout, err := g.Transport.ReadUntil(DATA_PACKET_TAILER, 32000, 5*time.Second)
 				if err != nil {
 					g.Logger.Errorf("failed to read data from transport: %v", err)
 					cancelFn()
+				}
+				if timeout {
+					g.Logger.Error("timeout when reading data from transport")
+					continue
 				}
 
 				headerIdx := bytes.Index(recvBuf, DATA_PACKET_HEADER)

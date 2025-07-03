@@ -9,5 +9,5 @@ type ITransport interface {
 	Read(buf []byte) (int, error)
 	Write(buf []byte) (int, error)
 	SetTimeout(timeout time.Duration) error
-	ReadUntil(delim []byte, maxBytes int) ([]byte, error)
+	ReadUntil(delim []byte, maxBytes int, timeout time.Duration) (dataBytes []byte, isTimeout bool, err error)
 }

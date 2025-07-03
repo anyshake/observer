@@ -110,36 +110,38 @@ func (t *SerialTransportImpl) Flush() error {
 	return nil
 }
 
-func (t *SerialTransportImpl) ReadUntil(delim []byte, maxBytes int) ([]byte, error) {
+func (t *SerialTransportImpl) ReadUntil(delim []byte, maxBytes int, timeout time.Duration) ([]byte, bool, error) {
 	if t.conn == nil {
-		return nil, errors.New("connection is not opened")
+		return nil, false, errors.New("connection is not opened")
 	}
 
+	deadline := time.Now().Add(timeout)
 	buffer := make([]byte, 0, maxBytes)
 	temp := make([]byte, 1)
 
 	for {
+		if time.Now().After(deadline) {
+			return nil, true, nil
+		}
+
 		t.mutex.Lock()
 		n, err := t.conn.Read(temp)
 		t.mutex.Unlock()
 
 		if err != nil {
-			break
+			return nil, false, fmt.Errorf("read error: %w", err)
 		}
 		if n == 0 {
-			continue // retry
+			continue
 		}
 
 		buffer = append(buffer, temp[0])
-
 		if len(buffer) > maxBytes {
-			return nil, fmt.Errorf("delimiter not found within %d bytes", maxBytes)
+			return nil, false, fmt.Errorf("read exceeded maxBytes (%d) before delimiter", maxBytes)
 		}
 
 		if len(buffer) >= len(delim) && bytes.HasSuffix(buffer, delim) {
-			return buffer, nil
+			return buffer, false, nil
 		}
 	}
-
-	return nil, nil
 }
