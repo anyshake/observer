@@ -258,8 +258,10 @@ func appStart(args arguments) {
 		runCleanerTasks()
 		if warn {
 			logger.GetLogger(main).Warn(reason)
+			os.Exit(1)
 		} else {
 			logger.GetLogger(main).Info(reason)
+			os.Exit(0)
 		}
 	}
 
