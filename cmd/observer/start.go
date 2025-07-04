@@ -223,10 +223,12 @@ func appStart(args arguments) {
 	signal.Notify(signalChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	defer signal.Stop(signalChan)
 
+	exitWithError := false
 	select {
 	case <-signalChan:
 		logger.GetLogger(main).Warnln("interrupt signal received (e.g. Ctrl+C), shutting down...")
 	case <-hardwareCtx.Done():
+		exitWithError = true
 		logger.GetLogger(main).Warnln("fatal error detected (probably hardware connection lost), shutting down...")
 	}
 
@@ -258,9 +260,12 @@ func appStart(args arguments) {
 		runCleanerTasks()
 		if warn {
 			logger.GetLogger(main).Warn(reason)
-			os.Exit(1)
 		} else {
 			logger.GetLogger(main).Info(reason)
+		}
+		if warn || exitWithError {
+			os.Exit(1)
+		} else {
 			os.Exit(0)
 		}
 	}
