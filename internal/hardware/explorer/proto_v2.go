@@ -38,6 +38,7 @@ type ExplorerProtoImplV2 struct {
 	prevMcuTimestamp             int64
 	prevTimestamp4NonGnssMode    int64
 	timeDiff4NonGnssMode         int64
+	prevTimeOffset4NonGnssMode   *int64
 	isTimeDiff4NonGnssModeStable bool
 
 	variableAllSet bool
@@ -231,11 +232,10 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 		g.isTimeDiff4NonGnssModeStable = false
 		timeDiffSamples := make([]int64, 0, stableCheckSamples)
 
-		timer := time.NewTimer(readInterval)
 		buf := make([]byte, packetSize*2)
 		_ = g.Flush()
 
-		for {
+		for timer := time.NewTimer(readInterval); ; {
 			timer.Reset(readInterval)
 
 			select {
@@ -248,11 +248,10 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 				}
 				recvBuf := buf[:n]
 
-				headerIdx := bytes.Index(recvBuf, DATA_PACKET_HEADER)
-				if headerIdx != -1 && len(recvBuf) > headerIdx+packetSize {
+				if headerIdx := bytes.Index(recvBuf, DATA_PACKET_HEADER); headerIdx != -1 && len(recvBuf) > headerIdx+packetSize {
 					if err = g.verifyChecksum(recvBuf[headerIdx:headerIdx+packetSize], DATA_PACKET_HEADER); err == nil {
 						mcuTimestamp := int64(binary.LittleEndian.Uint64(recvBuf[headerIdx+len(DATA_PACKET_HEADER) : headerIdx+len(DATA_PACKET_HEADER)+int(unsafe.Sizeof(int64(0)))]))
-						timeDiff := currentMillis - mcuTimestamp
+						timeDiff := currentMillis - mcuTimestamp - g.Transport.GetLatency(len(recvBuf)).Milliseconds()
 
 						if !g.isTimeDiff4NonGnssModeStable {
 							timeDiffSamples = append(timeDiffSamples, timeDiff)
@@ -274,6 +273,18 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 									cancelFn()
 								}
 								g.Logger.Warnln("collecting data time series, this may take a while")
+							}
+						}
+
+						// Compensate for oscillator drift on the AnyShake Explorer board (NTP mode only)
+						if g.deviceConfig.GetSampleRate() > 0 && !g.deviceConfig.GetGnssAvailability() {
+							timeOffset := g.getTimestamp(mcuTimestamp) - g.TimeSource.Get().UnixMilli()
+							if g.prevTimeOffset4NonGnssMode == nil {
+								g.prevTimeOffset4NonGnssMode = &timeOffset
+							}
+							if math.Abs(float64(timeOffset)-float64(*g.prevTimeOffset4NonGnssMode)) > 1 {
+								g.timeDiff4NonGnssMode = timeDiff
+								g.prevTimeOffset4NonGnssMode = &timeOffset
 							}
 						}
 
@@ -315,13 +326,11 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 	}(time.Millisecond)
 
 	go func(decodeInterval time.Duration) {
-		timer := time.NewTimer(decodeInterval)
-
 		var (
 			expectedNextTimestamp int64
 			collectedTimestampArr []int64
 		)
-		for {
+		for timer := time.NewTimer(decodeInterval); ; {
 			timer.Reset(decodeInterval)
 
 			select {
@@ -369,7 +378,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 					sampleRate := len(collectedTimestampArr) * DATA_PACKET_CHANNEL_SIZE
 					g.deviceConfig.SetSampleRate(sampleRate)
 					g.deviceConfig.SetPacketInterval(time.Duration((1000/sampleRate)*DATA_PACKET_CHANNEL_SIZE) * time.Millisecond)
-					packetTimestamp := collectedTimestampArr[len(collectedTimestampArr)-1]
+					packetTimestamp := collectedTimestampArr[0]
 					g.messageBus.Publish(time.UnixMilli(packetTimestamp), &g.deviceConfig, &g.deviceVariable, g.channelDataBuf)
 					g.deviceStatus.IncrementMessages()
 

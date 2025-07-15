@@ -22,7 +22,7 @@ export default class TimeSeriesBuffer {
 
         const interval = 1000 / sampleRate;
         for (let i = 0; i < values.length; i++) {
-            this.buffer.push([recordTime - (values.length - 1 - i) * interval, values[i]]);
+            this.buffer.push([recordTime + i * interval, values[i]]);
         }
         this.cleanup(currentTime);
     }

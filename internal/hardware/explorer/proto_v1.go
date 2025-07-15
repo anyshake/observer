@@ -196,15 +196,13 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 	g.deviceConfig.SetModel(g.Model)
 
 	go func(readInterval time.Duration) {
-		timer := time.NewTimer(readInterval)
-
 		recvBuf := make([]byte, packetSize)
 		prevHeaderIndex := -1
 
 		timeBytes := make([]byte, 8)
 		packetBuf := make([]byte, packetSize+len(timeBytes))
 
-		for {
+		for timer := time.NewTimer(readInterval); ; {
 			timer.Reset(readInterval)
 
 			select {
@@ -216,8 +214,8 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 				}
 
 				// Record the current time of the packet
-				currentTime := g.TimeSource.Get()
-				binary.BigEndian.PutUint64(timeBytes, uint64(currentTime.UnixMilli()))
+				currentTime := g.TimeSource.Get().UnixMilli() - g.Transport.GetLatency(packetSize).Milliseconds()
+				binary.BigEndian.PutUint64(timeBytes, uint64(currentTime))
 
 				// Find possible header in the buffer to insert current time next to the header
 				headerIndices := g.getIndices(recvBuf[:n], DATA_PACKET_HEADER)
@@ -254,13 +252,11 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 	}(time.Millisecond)
 
 	go func(decodeInterval time.Duration) {
-		timer := time.NewTimer(decodeInterval)
-
 		var (
 			expectedNextTimestamp int64
 			collectedTimestampArr []int64
 		)
-		for {
+		for timer := time.NewTimer(decodeInterval); ; {
 			timer.Reset(decodeInterval)
 
 			select {
@@ -296,7 +292,7 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 
 					g.deviceConfig.SetSampleRate(targetSampleRate)
 					g.deviceConfig.SetPacketInterval(time.Duration((1000/targetSampleRate)*DATA_PACKET_CHANNEL_SIZE) * time.Millisecond)
-					packetTimestamp := collectedTimestampArr[len(collectedTimestampArr)-1]
+					packetTimestamp := collectedTimestampArr[0]
 					g.messageBus.Publish(time.UnixMilli(packetTimestamp), &g.deviceConfig, &g.deviceVariable, g.channelDataBuf)
 					g.deviceStatus.IncrementMessages()
 

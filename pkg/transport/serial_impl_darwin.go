@@ -58,6 +58,11 @@ func (t *SerialTransportImpl) Close() error {
 	return t.conn.Close()
 }
 
+func (t *SerialTransportImpl) GetLatency(packetSize int) time.Duration {
+	totalBits := packetSize * (8 + 1) // 8 bits data + 1 bit stop bit
+	return time.Duration(float64(totalBits) * float64(time.Second) / float64(t.baudrate))
+}
+
 func (t *SerialTransportImpl) SetTimeout(timeout time.Duration) error {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()

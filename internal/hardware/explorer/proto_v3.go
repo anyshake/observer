@@ -38,10 +38,12 @@ type ExplorerProtoImplV3 struct {
 	prevMcuTimestamp             int64
 	prevTimestamp4NonGnssMode    int64
 	timeDiff4NonGnssMode         int64
+	prevTimeOffset4NonGnssMode   *int64
 	isTimeDiff4NonGnssModeStable bool
 
 	variableAllSet   bool
 	collectedSamples int
+	packetTimeObj    time.Time
 
 	deviceStatus   DeviceStatus
 	deviceConfig   DeviceConfig
@@ -51,6 +53,7 @@ type ExplorerProtoImplV3 struct {
 
 func (g *ExplorerProtoImplV3) resetFlags() {
 	g.channelDataBuf = []ChannelData{}
+	g.packetTimeObj = time.Time{}
 	g.collectedSamples = 0
 }
 
@@ -257,9 +260,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 		g.isTimeDiff4NonGnssModeStable = false
 		timeDiffSamples := make([]int64, 0, stableCheckSamples)
 
-		timer := time.NewTimer(readInterval)
-
-		for {
+		for timer := time.NewTimer(readInterval); ; {
 			timer.Reset(readInterval)
 
 			select {
@@ -275,11 +276,10 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 					continue
 				}
 
-				headerIdx := bytes.Index(recvBuf, DATA_PACKET_HEADER)
-				if headerIdx != -1 {
+				if headerIdx := bytes.Index(recvBuf, DATA_PACKET_HEADER); headerIdx != -1 {
 					if err = g.verifyChecksum(recvBuf[headerIdx:], DATA_PACKET_HEADER, DATA_PACKET_TAILER); err == nil && len(recvBuf) > headerIdx+len(DATA_PACKET_HEADER)+int(unsafe.Sizeof(int64(0))) {
 						mcuTimestamp := int64(binary.LittleEndian.Uint64(recvBuf[headerIdx+len(DATA_PACKET_HEADER) : headerIdx+len(DATA_PACKET_HEADER)+int(unsafe.Sizeof(int64(0)))]))
-						timeDiff := currentMillis - mcuTimestamp
+						timeDiff := currentMillis - mcuTimestamp - g.Transport.GetLatency(len(recvBuf)).Milliseconds()
 
 						if !g.isTimeDiff4NonGnssModeStable {
 							timeDiffSamples = append(timeDiffSamples, timeDiff)
@@ -302,6 +302,18 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 								} else {
 									g.Logger.Warnln("collecting data time series, this may take a while")
 								}
+							}
+						}
+
+						// Compensate for oscillator drift on the AnyShake Explorer board (NTP mode only)
+						if g.deviceConfig.GetSampleRate() > 0 && !g.deviceConfig.GetGnssAvailability() {
+							timeOffset := g.getTimestamp(mcuTimestamp) - g.TimeSource.Get().UnixMilli()
+							if g.prevTimeOffset4NonGnssMode == nil {
+								g.prevTimeOffset4NonGnssMode = &timeOffset
+							}
+							if math.Abs(float64(timeOffset)-float64(*g.prevTimeOffset4NonGnssMode)) > 1 {
+								g.timeDiff4NonGnssMode = timeDiff
+								g.prevTimeOffset4NonGnssMode = &timeOffset
 							}
 						}
 
@@ -344,9 +356,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 	}(10 * time.Millisecond)
 
 	go func(decodeInterval time.Duration) {
-		timer := time.NewTimer(decodeInterval)
-
-		for {
+		for timer := time.NewTimer(decodeInterval); ; {
 			timer.Reset(decodeInterval)
 
 			select {
@@ -410,6 +420,10 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 				g.getChannelData(channelData, channelDataSection[:len(channelDataSection)-1-len(recvTailer)], channelChunkLength)
 				g.collectedSamples += channelChunkLength
 
+				if g.packetTimeObj.IsZero() {
+					g.packetTimeObj = timeObj
+				}
+
 				channelCodes := make([]string, len(channelData))
 				if len(g.channelDataBuf) != len(channelData) {
 					g.channelDataBuf = make([]ChannelData, len(channelData))
@@ -429,7 +443,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 				if g.collectedSamples < sampleRate {
 					continue
 				} else if g.collectedSamples == sampleRate {
-					g.messageBus.Publish(timeObj, &g.deviceConfig, &g.deviceVariable, g.channelDataBuf)
+					g.messageBus.Publish(g.packetTimeObj, &g.deviceConfig, &g.deviceVariable, g.channelDataBuf)
 					g.deviceStatus.IncrementMessages()
 				} else {
 					g.Logger.Warn("collected samples exceeded the sample rate, resetting counters")
