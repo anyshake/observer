@@ -248,7 +248,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 				}
 				recvBuf := buf[:n]
 
-				if headerIdx := bytes.Index(recvBuf, DATA_PACKET_HEADER); headerIdx != -1 && len(recvBuf) > headerIdx+packetSize {
+				if headerIdx := bytes.Index(recvBuf, DATA_PACKET_HEADER); headerIdx != -1 && len(recvBuf) >= headerIdx+packetSize {
 					if err = g.verifyChecksum(recvBuf[headerIdx:headerIdx+packetSize], DATA_PACKET_HEADER); err == nil {
 						mcuTimestamp := int64(binary.LittleEndian.Uint64(recvBuf[headerIdx+len(DATA_PACKET_HEADER) : headerIdx+len(DATA_PACKET_HEADER)+int(unsafe.Sizeof(int64(0)))]))
 						timeDiff := currentMillis - mcuTimestamp - g.Transport.GetLatency(len(recvBuf)).Milliseconds()
