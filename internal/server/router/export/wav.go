@@ -47,10 +47,10 @@ func (e *seismicDataEncoderWavImpl) Encode(records []model.SeisRecord, channelCo
 			continue
 		}
 
-		if math.Abs(float64(record.RecordTime-startTimestamp-int64(index*1000))) >= explorer.ALLOWED_JITTER_MS {
+		if math.Abs(float64(record.RecordTime-startTimestamp-int64(index*1000))) >= explorer.ALLOWED_JITTER_MS_NTP {
 			return nil, fmt.Errorf(
 				"timestamp is not within allowed jitter %d ms, expected %d, got %d",
-				explorer.ALLOWED_JITTER_MS,
+				explorer.ALLOWED_JITTER_MS_NTP,
 				startTimestamp+int64(index*1000),
 				record.RecordTime,
 			)

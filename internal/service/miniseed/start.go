@@ -21,13 +21,18 @@ func (s *MiniSeedServiceImpl) handleInterrupt() {
 	s.wg.Done()
 }
 
-func (s *MiniSeedServiceImpl) getAppendInterval() int {
-	// Set write interval to 1 if protocol is v1
-	// This is a simple solution to sample rate jittering
+func (s *MiniSeedServiceImpl) getAppendInterval(cfg *explorer.DeviceConfig) int {
+	if cfg == nil {
+		cfgVal := s.hardwareDev.GetConfig()
+		cfg = &cfgVal
+	}
+	// Set write interval to 1 if GNSS time is not available
+	// This is a simple solution to sample rate and timestamp jittering
 	// However, it will increase the disk I/O and file size
-	hardwareCfg := s.hardwareDev.GetConfig()
-	dataProtocol := hardwareCfg.GetProtocol()
-	return lo.Ternary(dataProtocol == "v1", 1, MINISEED_APPEND_INTERVAL)
+	if !cfg.GetGnssAvailability() {
+		return 1
+	}
+	return MINISEED_APPEND_INTERVAL
 }
 
 func (s *MiniSeedServiceImpl) Start() error {
@@ -43,7 +48,7 @@ func (s *MiniSeedServiceImpl) Start() error {
 	s.dataSequence.sequenceData = make(map[string]uint32)
 	s.cleanupCountDown = MINISEED_CLEANUP_INTERVAL
 
-	s.appendCountDown = s.getAppendInterval()
+	s.appendCountDown = s.getAppendInterval(nil)
 	s.recordBuffer = make([][]buffer, s.appendCountDown)
 
 	go func() {
@@ -60,6 +65,12 @@ func (s *MiniSeedServiceImpl) Start() error {
 		err := s.hardwareDev.Subscribe(ID, func(t time.Time, di *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
 			s.mu.Lock()
 			defer s.mu.Unlock()
+
+			currentInterval := s.getAppendInterval(di)
+			if len(s.recordBuffer) != currentInterval {
+				s.recordBuffer = make([][]buffer, s.appendCountDown)
+				s.appendCountDown = currentInterval
+			}
 
 			bufferIndex := len(s.recordBuffer) - s.appendCountDown
 			if bufferIndex >= 0 && bufferIndex < len(s.recordBuffer) {
@@ -79,8 +90,8 @@ func (s *MiniSeedServiceImpl) Start() error {
 			}
 
 			if s.appendCountDown == 0 {
-				s.appendCountDown = s.getAppendInterval()
-				channels, err := s.saveMiniSeedRecords()
+				s.appendCountDown = currentInterval
+				channels, err := s.saveMiniSeedRecords(di)
 				if err != nil {
 					logger.GetLogger(ID).Errorf("failed to append records to MiniSEED file: %v", err)
 					return
@@ -173,7 +184,7 @@ func (m *MiniSeedServiceImpl) getMiniSeedFileName(tm time.Time, channelCode stri
 	)
 }
 
-func (s *MiniSeedServiceImpl) saveMiniSeedRecords() (int, error) {
+func (s *MiniSeedServiceImpl) saveMiniSeedRecords(cfg *explorer.DeviceConfig) (int, error) {
 	if len(s.recordBuffer) == 0 || len(s.recordBuffer[0]) == 0 {
 		return 0, errors.New("no data to save")
 	}
@@ -183,15 +194,21 @@ func (s *MiniSeedServiceImpl) saveMiniSeedRecords() (int, error) {
 		logger.GetLogger(ID).Warnf("failed to read data sequence, starting from 0: %v", err)
 	}
 
+	if cfg == nil {
+		cfgVal := s.hardwareDev.GetConfig()
+		cfg = &cfgVal
+	}
+	allowedJitterMs := lo.Ternary[float64](cfg.GetGnssAvailability(), explorer.ALLOWED_JITTER_MS_GNSS, explorer.ALLOWED_JITTER_MS_NTP)
+
 	startTimestamp := s.recordBuffer[0][0].Timestamp
 	startSampleRate := s.recordBuffer[0][0].SampleRate
 	startChannels := len(s.recordBuffer[0])
 	for i := 1; i < len(s.recordBuffer); i++ {
 		expectedTimestamp := startTimestamp + int64(i)*1000
-		if math.Abs(float64(s.recordBuffer[i][0].Timestamp-expectedTimestamp)) >= explorer.ALLOWED_JITTER_MS {
+		if math.Abs(float64(s.recordBuffer[i][0].Timestamp-expectedTimestamp)) >= allowedJitterMs {
 			return 0, fmt.Errorf(
 				"timestamp out of jitter range %d ms, expected %d, got %d",
-				explorer.ALLOWED_JITTER_MS,
+				int(allowedJitterMs),
 				expectedTimestamp,
 				s.recordBuffer[i][0].Timestamp,
 			)

@@ -283,7 +283,7 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 				currentSampleRate := len(collectedTimestampArr) * DATA_PACKET_CHANNEL_SIZE
 				targetSampleRate := g.fixSampleRate(currentSampleRate)
 
-				if math.Abs(float64(timestamp-expectedNextTimestamp)) <= ALLOWED_JITTER_MS && currentSampleRate == targetSampleRate {
+				if math.Abs(float64(timestamp-expectedNextTimestamp)) <= ALLOWED_JITTER_MS_NTP && currentSampleRate == targetSampleRate {
 					// Update the next tick even if the buffer is empty
 					expectedNextTimestamp = timestamp + time.Second.Milliseconds()
 					if len(collectedTimestampArr) == 0 {
@@ -298,7 +298,7 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 
 					collectedTimestampArr = []int64{}
 					g.channelDataBuf = []ChannelData{}
-				} else if timestamp-expectedNextTimestamp > ALLOWED_JITTER_MS {
+				} else if timestamp-expectedNextTimestamp > ALLOWED_JITTER_MS_NTP {
 					g.Logger.Warnf("jitter detected, discarding this packet, expected %v, got %v", expectedNextTimestamp, timestamp)
 					g.deviceStatus.IncrementErrors()
 					// Update the next tick, clear the buffer if the jitter exceeds the threshold

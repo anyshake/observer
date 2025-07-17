@@ -227,10 +227,8 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 	g.deviceConfig.SetModel(g.Model)
 
 	go func(readInterval time.Duration) {
-		const stableCheckSamples = 10
-
 		g.isTimeDiff4NonGnssModeStable = false
-		timeDiffSamples := make([]int64, 0, stableCheckSamples)
+		timeDiffSamples := make([]int64, 0, STABLE_CHECK_SAMPLES)
 
 		buf := make([]byte, packetSize*2)
 		_ = g.Flush()
@@ -255,11 +253,11 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 
 						if !g.isTimeDiff4NonGnssModeStable {
 							timeDiffSamples = append(timeDiffSamples, timeDiff)
-							if len(timeDiffSamples) > stableCheckSamples {
+							if len(timeDiffSamples) > STABLE_CHECK_SAMPLES {
 								timeDiffSamples = timeDiffSamples[1:]
 							}
 
-							if len(timeDiffSamples) == stableCheckSamples {
+							if len(timeDiffSamples) == STABLE_CHECK_SAMPLES {
 								minVal, maxVal := lo.Min(timeDiffSamples), lo.Max(timeDiffSamples)
 								if minVal == maxVal {
 									g.isTimeDiff4NonGnssModeStable = true
@@ -304,7 +302,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 							g.resetVariables()
 							g.timeDiff4NonGnssMode = 0
 							g.isTimeDiff4NonGnssModeStable = false
-							timeDiffSamples = make([]int64, 0, stableCheckSamples)
+							timeDiffSamples = make([]int64, 0, STABLE_CHECK_SAMPLES)
 						}
 
 						g.prevMcuTimestamp = mcuTimestamp
@@ -327,8 +325,8 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 
 	go func(decodeInterval time.Duration) {
 		var (
-			expectedNextTimestamp int64
-			collectedTimestampArr []int64
+			expectedNextMcuTimestamp int64
+			collectedTimestampArr    []int64
 		)
 		for timer := time.NewTimer(decodeInterval); ; {
 			timer.Reset(decodeInterval)
@@ -356,8 +354,8 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 				}
 
 				timestamp := g.getTimestamp(mcuTimestamp)
-				if expectedNextTimestamp == 0 {
-					expectedNextTimestamp = timestamp + 1000
+				if expectedNextMcuTimestamp == 0 {
+					expectedNextMcuTimestamp = mcuTimestamp + 1000
 				} else {
 					collectedTimestampArr = append(collectedTimestampArr, timestamp)
 					err = g.getChannelData(dataPacket, len(DATA_PACKET_HEADER), DATA_PACKET_CHANNEL_SIZE)
@@ -368,9 +366,9 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 					}
 				}
 
-				if math.Abs(float64(timestamp-expectedNextTimestamp)) <= ALLOWED_JITTER_MS {
+				if math.Abs(float64(mcuTimestamp-expectedNextMcuTimestamp)) <= ALLOWED_JITTER_MS {
 					// Update the next tick even if the buffer is empty
-					expectedNextTimestamp = timestamp + time.Second.Milliseconds()
+					expectedNextMcuTimestamp = mcuTimestamp + time.Second.Milliseconds()
 					if len(collectedTimestampArr) == 0 {
 						continue
 					}
@@ -384,11 +382,12 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 
 					collectedTimestampArr = []int64{}
 					g.channelDataBuf = []ChannelData{}
-				} else if int64(expectedNextTimestamp)-int64(timestamp) > time.Second.Milliseconds()+ALLOWED_JITTER_MS || expectedNextTimestamp-timestamp < 0 {
-					g.Logger.Warnf("jitter detected, discarding this packet, expected %v, got %v", expectedNextTimestamp, timestamp)
+				} else if expectedNextMcuTimestamp-mcuTimestamp > time.Second.Milliseconds()+ALLOWED_JITTER_MS || expectedNextMcuTimestamp-mcuTimestamp < 0 {
+					fmt.Println(expectedNextMcuTimestamp - mcuTimestamp)
+					g.Logger.Warnf("jitter detected, discarding this packet, expected %v, got %v", g.getTimestamp(expectedNextMcuTimestamp), timestamp)
 					g.deviceStatus.IncrementErrors()
 					// Update the next tick, clear the buffer if the jitter exceeds the threshold
-					expectedNextTimestamp = int64(int64(timestamp) + time.Second.Milliseconds())
+					expectedNextMcuTimestamp = mcuTimestamp + time.Second.Milliseconds()
 					collectedTimestampArr = []int64{}
 					g.channelDataBuf = []ChannelData{}
 				}

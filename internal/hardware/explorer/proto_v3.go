@@ -255,10 +255,8 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 	DATA_PACKET_TAILER := []byte{0xEF, 0x10}
 
 	go func(readInterval time.Duration) {
-		const stableCheckSamples = 10
-
 		g.isTimeDiff4NonGnssModeStable = false
-		timeDiffSamples := make([]int64, 0, stableCheckSamples)
+		timeDiffSamples := make([]int64, 0, STABLE_CHECK_SAMPLES)
 
 		for timer := time.NewTimer(readInterval); ; {
 			timer.Reset(readInterval)
@@ -283,11 +281,11 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 
 						if !g.isTimeDiff4NonGnssModeStable {
 							timeDiffSamples = append(timeDiffSamples, timeDiff)
-							if len(timeDiffSamples) > stableCheckSamples {
+							if len(timeDiffSamples) > STABLE_CHECK_SAMPLES {
 								timeDiffSamples = timeDiffSamples[1:]
 							}
 
-							if len(timeDiffSamples) == stableCheckSamples {
+							if len(timeDiffSamples) == STABLE_CHECK_SAMPLES {
 								minVal, maxVal := lo.Min(timeDiffSamples), lo.Max(timeDiffSamples)
 								if minVal == maxVal {
 									g.isTimeDiff4NonGnssModeStable = true
@@ -334,7 +332,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 							g.resetFlags()
 							g.timeDiff4NonGnssMode = 0
 							g.isTimeDiff4NonGnssModeStable = false
-							timeDiffSamples = make([]int64, 0, stableCheckSamples)
+							timeDiffSamples = make([]int64, 0, STABLE_CHECK_SAMPLES)
 						}
 
 						g.prevMcuTimestamp = mcuTimestamp

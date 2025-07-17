@@ -6,8 +6,10 @@ import (
 )
 
 const (
-	EXPLORER_STREAM_TOPIC = "/explorer/stream"
-	ALLOWED_JITTER_MS     = 10
+	EXPLORER_STREAM_TOPIC  = "/explorer/stream"
+	STABLE_CHECK_SAMPLES   = 10
+	ALLOWED_JITTER_MS_GNSS = 10
+	ALLOWED_JITTER_MS_NTP  = 50
 )
 
 type DeviceStatus struct {
