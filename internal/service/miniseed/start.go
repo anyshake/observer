@@ -68,7 +68,7 @@ func (s *MiniSeedServiceImpl) Start() error {
 
 			currentInterval := s.getAppendInterval(di)
 			if len(s.recordBuffer) != currentInterval {
-				s.recordBuffer = make([][]buffer, s.appendCountDown)
+				s.recordBuffer = make([][]buffer, currentInterval)
 				s.appendCountDown = currentInterval
 			}
 
