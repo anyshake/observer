@@ -22,30 +22,30 @@
             },
             "file_list_actions": {
                 "download": "Pobierz",
-                "preview": "Zapowiedź"
+                "preview": "Podgląd"
             },
             "miniseed_list": {
-                "title": "Daily MiniSEED",
-                "search": "Search"
+                "title": "Codzienny MiniSEED",
+                "search": "Wyszukaj"
             },
             "helicorder_list": {
                 "title": "Lista helikorderów",
                 "search": "Wyszukaj"
             },
             "request_file": {
-                "requesting": "Requesting link to downloading file {{fileName}}.",
-                "success": "Got link for downloading file {{fileName}}.",
-                "error": "Failed to request file link for {{fileName}}: {{error}}"
+                "requesting": "Prośba o link do pobrania pliku {{fileName}}.",
+                "success": "Otrzymano link do pobrania pliku {{fileName}}.",
+                "error": "Nie udało się poprosić o link do pliku {{fileName}}: {{error}}"
             },
             "preview_file": {
-                "requesting": "Requesting link to preview file {{fileName}}.",
-                "success": "Got link for previewing file {{fileName}}.",
-                "error": "Failed to request file link for {{fileName}}: {{error}}"
+                "requesting": "Prośba o link do podglądu pliku {{fileName}}.",
+                "success": "Otrzymano link umożliwiający podgląd pliku {{fileName}}.",
+                "error": "Nie udało się poprosić o link do pliku {{fileName}}: {{error}}"
             }
         },
         "History": {
             "search_events": {
-                "title": "Event Query",
+                "title": "Zapytanie o zdarzenie",
                 "data_agency": "Data Agency",
                 "search_button": "Search Events",
                 "searching": "Searching events from selected source.",
