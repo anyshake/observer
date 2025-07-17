@@ -46,9 +46,9 @@
         "History": {
             "search_events": {
                 "title": "Zapytanie o zdarzenie",
-                "data_agency": "Data Agency",
-                "search_button": "Search Events",
-                "searching": "Searching events from selected source.",
+                "data_agency": "Agencja Danych",
+                "search_button": "Wyszukaj wydarzenia",
+                "searching": "Wyszukiwanie zdarzeń z wybranego źródła.",
                 "success": "Found {{count}} events from selected source.",
                 "no_data": "No events found in selected source.",
                 "error": "Failed to search for events: {{error}}"
