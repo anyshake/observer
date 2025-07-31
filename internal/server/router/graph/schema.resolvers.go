@@ -98,7 +98,7 @@ func (r *mutationResolver) PurgeSeisRecords(ctx context.Context) (bool, error) {
 		return false, errors.New("permission denied")
 	}
 
-	if err := r.ActionHandler.SeisRecordsPurge(time.Unix(0, 0), r.TimeSource.Get()); err != nil {
+	if err := r.ActionHandler.SeisRecordsPurge(time.Unix(0, 0), r.TimeSource.Now()); err != nil {
 		return false, fmt.Errorf("failed to purge seis records: %w", err)
 	}
 
@@ -305,7 +305,7 @@ func (r *mutationResolver) UpdateServiceConfig(ctx context.Context, serviceID st
 
 // GetCurrentTime is the resolver for the getCurrentTime field.
 func (r *queryResolver) GetCurrentTime(ctx context.Context) (int64, error) {
-	return r.TimeSource.Get().UnixMilli(), nil
+	return r.TimeSource.Now().UnixMilli(), nil
 }
 
 // GetStationConfig is the resolver for the getStationConfig field.

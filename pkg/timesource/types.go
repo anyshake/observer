@@ -6,10 +6,7 @@ import (
 )
 
 type Source struct {
-	rwMutex       sync.RWMutex
-	ntpAddress    string
-	queryRetries  int
-	queryTimeout  time.Duration
-	LocalBaseTime time.Time
-	ReferenceTime time.Time
+	mu        sync.Mutex
+	refTime   time.Time
+	localTime time.Time
 }

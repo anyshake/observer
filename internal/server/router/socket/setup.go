@@ -65,7 +65,7 @@ func (s *socket) sendHistory(conn *websocket.Conn, timeSource *timesource.Source
 	s.mu.Lock()
 	historyMessages := lo.Map(s.historyBuffer, func(history buffer, _ int) map[string]any {
 		return map[string]any{
-			"current_time": timeSource.Get().UnixMilli(),
+			"current_time": timeSource.Now().UnixMilli(),
 			"record_time":  history.Timestamp,
 			"sample_rate":  history.SampleRate,
 			"channel_data": lo.SliceToMap(history.ChannelData, func(v explorer.ChannelData) (string, any) {
@@ -95,7 +95,7 @@ func (s *socket) handleWebSocket(_ *gin.Context, conn *websocket.Conn, timeSourc
 
 	callbackFn := func(t time.Time, di *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
 		data := map[string]any{
-			"current_time": timeSource.Get().UnixMilli(),
+			"current_time": timeSource.Now().UnixMilli(),
 			"record_time":  t.UnixMilli(),
 			"sample_rate":  di.GetSampleRate(),
 			"channel_data": lo.SliceToMap(cd, func(v explorer.ChannelData) (string, any) {
