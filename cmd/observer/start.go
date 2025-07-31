@@ -157,7 +157,7 @@ func appStart(args arguments) {
 	if err != nil {
 		logger.GetLogger(main).Fatalf("failed to open explorer instance: %v", err)
 	}
-	logger.GetLogger(main).Info("harware device has been connected")
+	logger.GetLogger(main).Infof("hardware device has been connected, current time in UTC: %s", timeSrc.Now().Format(time.RFC3339))
 
 	serviceMap := map[string]service.IService{
 		service_archiver.ID:   service_archiver.New(hardwareDevice, actionHandler, timeSrc),
