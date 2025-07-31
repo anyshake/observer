@@ -8,12 +8,14 @@ import (
 	"fmt"
 	"math"
 	"sync"
+	"sync/atomic"
 	"time"
 	"unsafe"
 
 	"github.com/anyshake/observer/internal/hardware/explorer/metadata"
 	"github.com/anyshake/observer/pkg/fifo"
 	"github.com/anyshake/observer/pkg/message"
+	"github.com/anyshake/observer/pkg/ntpclient"
 	"github.com/anyshake/observer/pkg/timesource"
 	"github.com/anyshake/observer/pkg/transport"
 	"github.com/samber/lo"
@@ -21,14 +23,11 @@ import (
 )
 
 type ExplorerProtoImplV3 struct {
-	ChannelCodes []string
-	Model        string
-	Logger       *logrus.Entry
-	TimeSource   *timesource.Source
-
-	FallbackLatitude  float64
-	FallbackLongitude float64
-	FallbackElevation float64
+	ChannelCodes    []string
+	ExplorerOptions ExplorerOptions
+	NtpOptions      NtpOptions
+	Logger          *logrus.Entry
+	TimeSource      *timesource.Source
 
 	Transport  transport.ITransport
 	fifoBuffer fifo.Buffer[byte]
@@ -41,9 +40,11 @@ type ExplorerProtoImplV3 struct {
 	prevTimeOffset4NonGnssMode   *int64
 	isTimeDiff4NonGnssModeStable bool
 
-	variableAllSet   bool
-	collectedSamples int
-	packetTimeObj    time.Time
+	flagMutex            sync.Mutex
+	needUpdateTimeSource bool
+	variableAllSet       bool
+	collectedSamples     int
+	packetTimeObj        time.Time
 
 	deviceStatus   DeviceStatus
 	deviceConfig   DeviceConfig
@@ -52,13 +53,20 @@ type ExplorerProtoImplV3 struct {
 }
 
 func (g *ExplorerProtoImplV3) resetFlags() {
+	g.flagMutex.Lock()
+	defer g.flagMutex.Unlock()
+
 	g.channelDataBuf = []ChannelData{}
 	g.packetTimeObj = time.Time{}
 	g.collectedSamples = 0
 }
 
 func (g *ExplorerProtoImplV3) resetVariables() {
+	g.flagMutex.Lock()
+	g.needUpdateTimeSource = true
 	g.variableAllSet = false
+	g.flagMutex.Unlock()
+
 	g.deviceVariable.Reset()
 }
 
@@ -130,21 +138,21 @@ func (g *ExplorerProtoImplV3) getVariableData(mcuTimestamp int64, deviceConfig u
 			n := float64(math.Float32frombits(variableData))
 			g.deviceVariable.SetLatitude(&n)
 		} else {
-			g.deviceVariable.SetLatitude(&g.FallbackLatitude)
+			g.deviceVariable.SetLatitude(&g.ExplorerOptions.Latitude)
 		}
 	case 2:
 		if (variableBits>>2)&0x1 != 0 {
 			n := float64(math.Float32frombits(variableData))
 			g.deviceVariable.SetLongitude(&n)
 		} else {
-			g.deviceVariable.SetLongitude(&g.FallbackLongitude)
+			g.deviceVariable.SetLongitude(&g.ExplorerOptions.Longitude)
 		}
 	case 3:
 		if (variableBits>>3)&0x1 != 0 {
 			n := float64(math.Float32frombits(variableData))
 			g.deviceVariable.SetElevation(&n)
 		} else {
-			g.deviceVariable.SetElevation(&g.FallbackElevation)
+			g.deviceVariable.SetElevation(&g.ExplorerOptions.Elevation)
 		}
 	case 4:
 		if (variableBits>>4)&0x1 != 0 {
@@ -229,13 +237,16 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 	if g.Transport == nil {
 		return nil, nil, errors.New("transport is not opened")
 	}
-
 	if err := g.Transport.Open(); err != nil {
 		return nil, nil, fmt.Errorf("failed to open transport: %w", err)
 	}
 
 	if g.Logger == nil {
 		return nil, nil, errors.New("logger is not set")
+	}
+	ntpClient, err := ntpclient.New(g.NtpOptions.Endpoint, g.NtpOptions.Retry, g.NtpOptions.ReadTimeout)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create ntp client: %w", err)
 	}
 
 	subCtx, cancelFn := context.WithCancel(ctx)
@@ -246,24 +257,31 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 	// Set to 655350 would be safe enough to avoid buffer overflows
 	g.fifoBuffer = fifo.New[byte](655350)
 	g.messageBus = message.NewBus[EventHandler](EXPLORER_STREAM_TOPIC, 1024)
-	g.deviceStatus.SetStartedAt(g.TimeSource.Get())
 	g.deviceStatus.SetUpdatedAt(time.Unix(0, 0))
 	g.deviceConfig.SetProtocol("v3")
-	g.deviceConfig.SetModel(g.Model)
+	g.deviceConfig.SetModel(g.ExplorerOptions.Model)
+
+	var initFlag int32
+	atomic.StoreInt32(&initFlag, 0)
+	readyChan := make(chan struct{})
 
 	DATA_PACKET_HEADER := []byte{0x01, 0xFE}
 	DATA_PACKET_TAILER := []byte{0xEF, 0x10}
 
 	go func(readInterval time.Duration) {
-		g.isTimeDiff4NonGnssModeStable = false
 		timeDiffSamples := make([]int64, 0, STABLE_CHECK_SAMPLES)
+		g.isTimeDiff4NonGnssModeStable = false
+
+		g.flagMutex.Lock()
+		g.needUpdateTimeSource = true
+		g.flagMutex.Unlock()
 
 		for timer := time.NewTimer(readInterval); ; {
 			timer.Reset(readInterval)
 
 			select {
 			case <-timer.C:
-				currentMillis := g.TimeSource.Get().UnixMilli()
+				currentMillis := g.TimeSource.Now().UnixMilli()
 				recvBuf, timeout, err := g.Transport.ReadUntil(DATA_PACKET_TAILER, 32000, 5*time.Second)
 				if err != nil {
 					g.Logger.Errorf("failed to read data from transport: %v", err)
@@ -303,9 +321,57 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 							}
 						}
 
+						if g.deviceConfig.GetSampleRate() > 0 && g.variableAllSet {
+							g.flagMutex.Lock()
+							needUpdateTimeSource := g.needUpdateTimeSource
+							g.flagMutex.Unlock()
+
+							latency := g.Transport.GetLatency(len(recvBuf))
+							if g.deviceConfig.GetGnssAvailability() && needUpdateTimeSource {
+								g.TimeSource.Update(time.Now(), time.UnixMilli(mcuTimestamp).Add(latency))
+
+								g.isTimeDiff4NonGnssModeStable = false
+								g.resetFlags()
+
+								g.flagMutex.Lock()
+								g.needUpdateTimeSource = false
+								g.flagMutex.Unlock()
+
+								g.Logger.Infof("time synchronized with Explorer built-in GNSS module")
+							} else if needUpdateTimeSource {
+								g.Logger.Infof("synchronizing time with NTP server: %s", g.NtpOptions.Endpoint)
+								res, err := ntpClient.Query()
+								if err != nil {
+									g.Logger.Errorf("failed to synchronize time with NTP server: %v", err)
+									if atomic.LoadInt32(&initFlag) == 0 {
+										cancelFn()
+									} else {
+										continue
+									}
+								} else {
+									g.Logger.Infof("time synchronized with NTP server, local time offset: %d ms", res.ClockOffset.Milliseconds())
+								}
+
+								currentTime := time.Now()
+								g.TimeSource.Update(currentTime, currentTime.Add(res.ClockOffset).Add(latency))
+								g.isTimeDiff4NonGnssModeStable = false
+								g.resetFlags()
+
+								g.flagMutex.Lock()
+								g.needUpdateTimeSource = false
+								g.flagMutex.Unlock()
+							}
+
+							if atomic.LoadInt32(&initFlag) == 0 {
+								atomic.StoreInt32(&initFlag, 1)
+								close(readyChan)
+								g.deviceStatus.SetStartedAt(g.TimeSource.Now())
+							}
+						}
+
 						// Compensate for oscillator drift on the AnyShake Explorer board (NTP mode only)
 						if g.deviceConfig.GetSampleRate() > 0 && !g.deviceConfig.GetGnssAvailability() {
-							timeOffset := g.getTimestamp(mcuTimestamp) - g.TimeSource.Get().UnixMilli()
+							timeOffset := g.getTimestamp(mcuTimestamp) - g.TimeSource.Now().UnixMilli()
 							if g.prevTimeOffset4NonGnssMode == nil {
 								g.prevTimeOffset4NonGnssMode = &timeOffset
 							}
@@ -317,10 +383,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 
 						g.timeDiffMutex.Lock()
 
-						// Force calibrate time difference every day UTC at 00:00:00
-						currentUtcDate := time.Unix(currentMillis/1000, 0).UTC().Format("2006-01-02")
-						prevUtcDate := time.Unix(g.prevTimestamp4NonGnssMode/1000, 0).UTC().Format("2006-01-02")
-						if g.timeDiff4NonGnssMode == 0 || currentUtcDate != prevUtcDate {
+						if g.timeDiff4NonGnssMode == 0 && timeDiff != 0 {
 							g.timeDiff4NonGnssMode = timeDiff
 						}
 
@@ -415,8 +478,15 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 					continue
 				}
 
+				if atomic.LoadInt32(&initFlag) == 0 {
+					g.Logger.Warnln("waiting for time to be synchronized, this may take a while")
+					continue
+				}
+
 				g.getChannelData(channelData, channelDataSection[:len(channelDataSection)-1-len(recvTailer)], channelChunkLength)
+				g.flagMutex.Lock()
 				g.collectedSamples += channelChunkLength
+				g.flagMutex.Unlock()
 
 				if g.packetTimeObj.IsZero() {
 					g.packetTimeObj = timeObj
@@ -438,9 +508,14 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 				g.deviceConfig.SetChannelCodes(channelCodes)
 
 				sampleRate := g.deviceConfig.GetSampleRate()
-				if g.collectedSamples < sampleRate {
+
+				g.flagMutex.Lock()
+				collectedSamples := g.collectedSamples
+				g.flagMutex.Unlock()
+
+				if collectedSamples < sampleRate {
 					continue
-				} else if g.collectedSamples == sampleRate {
+				} else if collectedSamples == sampleRate {
 					g.messageBus.Publish(g.packetTimeObj, &g.deviceConfig, &g.deviceVariable, g.channelDataBuf)
 					g.deviceStatus.IncrementMessages()
 				} else {
@@ -457,6 +532,37 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 		}
 	}(50 * time.Millisecond)
 
+	go func() {
+		<-readyChan
+
+		getNextUtcMidnight := func() time.Duration {
+			now := g.TimeSource.Now()
+			nextMidnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, time.UTC)
+			return time.Until(nextMidnight)
+		}
+		for timer := time.NewTimer(getNextUtcMidnight()); ; {
+			timer.Reset(getNextUtcMidnight())
+
+			select {
+			case <-timer.C:
+				if g.deviceConfig.GetGnssAvailability() {
+					continue
+				}
+				res, err := ntpClient.Query()
+				if err != nil {
+					g.Logger.Warnf("error occurred while re-synchronizing time: %v", err)
+					continue
+				}
+				currentTime := time.Now()
+				g.TimeSource.Update(currentTime, currentTime.Add(res.ClockOffset))
+			case <-subCtx.Done():
+				timer.Stop()
+				return
+			}
+		}
+	}()
+
+	<-readyChan
 	return subCtx, cancelFn, nil
 }
 

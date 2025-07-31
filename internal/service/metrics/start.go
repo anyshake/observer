@@ -73,7 +73,7 @@ func (s *MetricsServiceImpl) Start() error {
 		ticker := time.NewTicker(METRICS_REPORT_INTERVAL)
 		tracer := otel.Tracer(OTLP_TRACER_NAME)
 
-		s.status.SetStartedAt(s.timeSource.Get())
+		s.status.SetStartedAt(s.timeSource.Now())
 		s.status.SetIsRunning(true)
 		defer func() {
 			if r := recover(); r != nil {
@@ -122,7 +122,7 @@ func (s *MetricsServiceImpl) reportCurrentStatus(tracer _trace.Tracer) {
 	ctx, cancel := context.WithTimeout(context.Background(), METRICS_REPORT_TIMEOUT)
 	defer cancel()
 
-	currentTime := s.timeSource.Get()
+	currentTime := s.timeSource.Now()
 	appElapsed := currentTime.Sub(s.startTime)
 
 	ctx, appSpan := tracer.Start(ctx, "app-status")

@@ -11,8 +11,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func New(endpoint, protocol, model string, timeout int, latitude, longitude, elevation float64, actionHandler *action.Handler, timeSource *timesource.Source, logger *logrus.Entry) (IHardware, error) {
-	tr, err := transport.New(endpoint, timeout)
+func New(logger *logrus.Entry, timeSrc *timesource.Source, actionHandler *action.Handler, explorerOptions explorer.ExplorerOptions, ntpOptions explorer.NtpOptions) (IHardware, error) {
+	tr, err := transport.New(explorerOptions.Endpoint, explorerOptions.ReadTimeout)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create hardware transport: %w", err)
 	}
@@ -23,43 +23,38 @@ func New(endpoint, protocol, model string, timeout int, latitude, longitude, ele
 	}
 	channelCodesStrArr := channelCodes.([]string)
 
-	switch protocol {
+	switch explorerOptions.Protocol {
 	case "legacy":
+		explorerOptions.Protocol = "v1"
 		fallthrough
 	case "v1":
 		return &explorer.ExplorerProtoImplV1{
-			ChannelCodes:      channelCodesStrArr,
-			Model:             model,
-			Transport:         tr,
-			Logger:            logger,
-			TimeSource:        timeSource,
-			FallbackLatitude:  latitude,
-			FallbackLongitude: longitude,
-			FallbackElevation: elevation,
+			ChannelCodes:    channelCodesStrArr,
+			ExplorerOptions: explorerOptions,
+			Transport:       tr,
+			Logger:          logger,
+			TimeSource:      timeSrc,
+			NtpOptions:      ntpOptions,
 		}, nil
 	case "v2":
 		return &explorer.ExplorerProtoImplV2{
-			ChannelCodes:      channelCodesStrArr,
-			Model:             model,
-			Transport:         tr,
-			Logger:            logger,
-			TimeSource:        timeSource,
-			FallbackLatitude:  latitude,
-			FallbackLongitude: longitude,
-			FallbackElevation: elevation,
+			ChannelCodes:    channelCodesStrArr,
+			ExplorerOptions: explorerOptions,
+			Transport:       tr,
+			Logger:          logger,
+			TimeSource:      timeSrc,
+			NtpOptions:      ntpOptions,
 		}, nil
 	case "v3":
 		return &explorer.ExplorerProtoImplV3{
-			ChannelCodes:      channelCodesStrArr,
-			Model:             model,
-			Transport:         tr,
-			Logger:            logger,
-			TimeSource:        timeSource,
-			FallbackLatitude:  latitude,
-			FallbackLongitude: longitude,
-			FallbackElevation: elevation,
+			ChannelCodes:    channelCodesStrArr,
+			ExplorerOptions: explorerOptions,
+			Transport:       tr,
+			Logger:          logger,
+			TimeSource:      timeSrc,
+			NtpOptions:      ntpOptions,
 		}, nil
 	}
 
-	return nil, fmt.Errorf("hardware protocol %s is not supported", protocol)
+	return nil, fmt.Errorf("hardware protocol %s is not supported", explorerOptions.Protocol)
 }
