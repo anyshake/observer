@@ -274,7 +274,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 						}
 
 						if len(timeDiffSamples) == STABLE_CHECK_SAMPLES {
-							if minVal, maxVal := lo.Min(timeDiffSamples), lo.Max(timeDiffSamples); math.Abs(float64(maxVal-minVal)) <= 1 {
+							if minVal, maxVal := lo.Min(timeDiffSamples), lo.Max(timeDiffSamples); math.Abs(float64(maxVal-minVal)) <= 10 {
 								g.isTimeDiff4NonGnssModeStable = true
 								g.Logger.Infof("data time series stabilized: time difference = %d ms", timeDiff)
 							} else {
