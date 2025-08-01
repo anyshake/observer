@@ -8,6 +8,8 @@ import (
 	"syscall"
 	"time"
 
+	_ "net/http/pprof"
+
 	"github.com/anyshake/observer/config"
 	"github.com/anyshake/observer/internal/dao"
 	"github.com/anyshake/observer/internal/dao/action"
@@ -15,32 +17,29 @@ import (
 	"github.com/anyshake/observer/internal/hardware"
 	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/internal/hook"
-	cleaner_close_database "github.com/anyshake/observer/internal/hook/cleaner/close_database"
-	cleaner_close_explorer "github.com/anyshake/observer/internal/hook/cleaner/close_explorer"
-	startup_setup_admin "github.com/anyshake/observer/internal/hook/startup/setup_admin"
-	startup_setup_station "github.com/anyshake/observer/internal/hook/startup/setup_station"
 	"github.com/anyshake/observer/internal/server"
-	graph_resolver "github.com/anyshake/observer/internal/server/router/graph"
-	service_archiver "github.com/anyshake/observer/internal/service/archiver"
-
-	service_forwarder "github.com/anyshake/observer/internal/service/forwarder"
-	service_frp_client "github.com/anyshake/observer/internal/service/frp_client"
-	service_helicorder "github.com/anyshake/observer/internal/service/helicorder"
-
-	service_metrics "github.com/anyshake/observer/internal/service/metrics"
-	service_miniseed "github.com/anyshake/observer/internal/service/miniseed"
-
-	service_quakesense "github.com/anyshake/observer/internal/service/quakesense"
-	service_seedlink "github.com/anyshake/observer/internal/service/seedlink"
-
-	_ "net/http/pprof"
-
-	service_watchcat "github.com/anyshake/observer/internal/service/watchcat"
-
 	"github.com/anyshake/observer/internal/service"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/anyshake/observer/pkg/seisevent"
 	"github.com/anyshake/observer/pkg/timesource"
+
+	cleaner_close_database "github.com/anyshake/observer/internal/hook/cleaner/close_database"
+	cleaner_close_explorer "github.com/anyshake/observer/internal/hook/cleaner/close_explorer"
+	startup_setup_admin "github.com/anyshake/observer/internal/hook/startup/setup_admin"
+	startup_setup_station "github.com/anyshake/observer/internal/hook/startup/setup_station"
+
+	graph_resolver "github.com/anyshake/observer/internal/server/router/graph"
+
+	service_archiver "github.com/anyshake/observer/internal/service/archiver"
+	service_forwarder "github.com/anyshake/observer/internal/service/forwarder"
+	service_frp_client "github.com/anyshake/observer/internal/service/frp_client"
+	service_helicorder "github.com/anyshake/observer/internal/service/helicorder"
+	service_metrics "github.com/anyshake/observer/internal/service/metrics"
+	service_miniseed "github.com/anyshake/observer/internal/service/miniseed"
+	service_ntp_server "github.com/anyshake/observer/internal/service/ntp_server"
+	service_quakesense "github.com/anyshake/observer/internal/service/quakesense"
+	service_seedlink "github.com/anyshake/observer/internal/service/seedlink"
+	service_watchcat "github.com/anyshake/observer/internal/service/watchcat"
 )
 
 func appStart(args arguments) {
@@ -166,6 +165,7 @@ func appStart(args arguments) {
 		service_helicorder.ID: service_helicorder.New(hardwareDevice, actionHandler, timeSrc),
 		service_metrics.ID:    service_metrics.New(hardwareDevice, actionHandler, timeSrc, binaryVersion, commitHash, buildPlatform),
 		service_miniseed.ID:   service_miniseed.New(hardwareDevice, actionHandler, timeSrc),
+		service_ntp_server.ID: service_ntp_server.New(actionHandler, timeSrc),
 		service_quakesense.ID: service_quakesense.New(hardwareDevice, actionHandler, timeSrc),
 		service_seedlink.ID:   service_seedlink.New(hardwareDevice, actionHandler, timeSrc),
 		service_watchcat.ID:   service_watchcat.New(hardwareDevice, timeSrc),

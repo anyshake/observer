@@ -160,7 +160,7 @@ func (s *seedlinkConfigListenPortImpl) GetVersion() int             { return 0 }
 func (s *seedlinkConfigListenPortImpl) GetOptions() map[string]any  { return nil }
 func (s *seedlinkConfigListenPortImpl) GetDefaultValue() any        { return 18000 }
 func (s *seedlinkConfigListenPortImpl) GetDescription() string {
-	return "IP address or hostname for SeedLink server to listen, by default, the server will listen on localhost."
+	return "Port for SeedLink server to listen, by default, the server will listen on localhost."
 }
 func (s *seedlinkConfigListenPortImpl) Init(handler *action.Handler) error {
 	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {

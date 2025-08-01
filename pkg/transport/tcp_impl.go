@@ -1,10 +1,8 @@
-//go:build !linux
-// +build !linux
-
 package transport
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"net"
@@ -62,10 +60,6 @@ func (t *TcpTransportImpl) Flush() error {
 	return nil
 }
 
-func (t *TcpTransportImpl) GetLatency(packetSize int) time.Duration {
-	return 0
-}
-
 func (t *TcpTransportImpl) SetTimeout(timeout time.Duration) error {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
@@ -74,7 +68,7 @@ func (t *TcpTransportImpl) SetTimeout(timeout time.Duration) error {
 	return nil
 }
 
-func (t *TcpTransportImpl) ReadUntil(delim []byte, maxBytes int, timeout time.Duration) ([]byte, bool, error) {
+func (t *TcpTransportImpl) ReadUntil(ctx context.Context, delim []byte, maxBytes int, timeout time.Duration) ([]byte, bool, error) {
 	if t.conn == nil {
 		return nil, false, errors.New("connection is not opened")
 	}
@@ -84,6 +78,12 @@ func (t *TcpTransportImpl) ReadUntil(delim []byte, maxBytes int, timeout time.Du
 	temp := make([]byte, 1)
 
 	for {
+		select {
+		case <-ctx.Done():
+			return nil, false, nil
+		default:
+		}
+
 		if time.Now().After(deadline) {
 			return nil, true, nil
 		}

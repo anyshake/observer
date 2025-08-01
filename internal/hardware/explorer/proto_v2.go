@@ -233,7 +233,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 	atomic.StoreInt32(&initFlag, 0)
 	readyChan := make(chan struct{})
 
-	go func(readInterval time.Duration) {
+	go func() {
 		timeDiffSamples := make([]int64, 0, STABLE_CHECK_SAMPLES)
 		g.isTimeDiff4NonGnssModeStable = false
 		g.needUpdateTimeSource = true
@@ -241,126 +241,129 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 		buf := make([]byte, packetSize*2)
 		_ = g.Flush()
 
-		for timer := time.NewTimer(readInterval); ; {
-			timer.Reset(readInterval)
-
+		for {
 			select {
-			case <-timer.C:
-				currentMillis := g.TimeSource.Now().UnixMilli()
-				n, err := g.Transport.Read(buf)
-				if err != nil {
-					g.Logger.Errorf("failed to read data from transport: %v", err)
-					cancelFn()
-				}
-				recvBuf := buf[:n]
-
-				if headerIdx := bytes.Index(recvBuf, DATA_PACKET_HEADER); headerIdx != -1 && len(recvBuf) >= headerIdx+packetSize {
-					if err = g.verifyChecksum(recvBuf[headerIdx:headerIdx+packetSize], DATA_PACKET_HEADER); err == nil {
-						mcuTimestamp := int64(binary.LittleEndian.Uint64(recvBuf[headerIdx+len(DATA_PACKET_HEADER) : headerIdx+len(DATA_PACKET_HEADER)+int(unsafe.Sizeof(int64(0)))]))
-						timeDiff := currentMillis - mcuTimestamp - g.Transport.GetLatency(len(recvBuf)).Milliseconds()
-
-						if !g.isTimeDiff4NonGnssModeStable {
-							timeDiffSamples = append(timeDiffSamples, timeDiff)
-							if len(timeDiffSamples) > STABLE_CHECK_SAMPLES {
-								timeDiffSamples = timeDiffSamples[1:]
-							}
-
-							if len(timeDiffSamples) == STABLE_CHECK_SAMPLES {
-								minVal, maxVal := lo.Min(timeDiffSamples), lo.Max(timeDiffSamples)
-								if minVal == maxVal {
-									g.isTimeDiff4NonGnssModeStable = true
-									g.Logger.Infof("data time series stabilized: time difference = %d ms", timeDiff)
-								} else {
-									g.Logger.Warnln("waiting for data time series to settle down, this may take a while")
-								}
-							} else {
-								if err = g.Flush(); err != nil {
-									g.Logger.Errorf("failed to flush transport: %v", err)
-									cancelFn()
-								}
-								g.Logger.Warnln("collecting data time series, this may take a while")
-							}
-						}
-
-						if g.deviceConfig.GetSampleRate() > 0 && g.variableAllSet {
-							if g.deviceConfig.GetGnssAvailability() && g.needUpdateTimeSource {
-								g.TimeSource.Update(time.Now(), time.UnixMilli(mcuTimestamp).Add(g.Transport.GetLatency(len(recvBuf))))
-								g.needUpdateTimeSource = false
-								g.isTimeDiff4NonGnssModeStable = false
-
-								g.Logger.Infof("time synchronized with Explorer built-in GNSS module")
-							} else if g.needUpdateTimeSource {
-								g.Logger.Infof("synchronizing time with NTP server: %s", g.NtpOptions.Endpoint)
-								res, err := ntpClient.Query()
-								if err != nil {
-									g.Logger.Errorf("failed to synchronize time with NTP server: %v", err)
-									if atomic.LoadInt32(&initFlag) == 0 {
-										cancelFn()
-									} else {
-										continue
-									}
-								} else {
-									g.Logger.Infof("time synchronized with NTP server, local time offset: %d ms", res.ClockOffset.Milliseconds())
-								}
-
-								currentTime := time.Now()
-								g.TimeSource.Update(currentTime, currentTime.Add(res.ClockOffset))
-								g.needUpdateTimeSource = false
-								g.isTimeDiff4NonGnssModeStable = false
-							}
-						}
-
-						if atomic.LoadInt32(&initFlag) == 0 {
-							atomic.StoreInt32(&initFlag, 1)
-							close(readyChan)
-							g.deviceStatus.SetStartedAt(g.TimeSource.Now())
-						}
-
-						// Compensate for oscillator drift on the AnyShake Explorer board (NTP mode only)
-						if g.deviceConfig.GetSampleRate() > 0 && !g.deviceConfig.GetGnssAvailability() {
-							timeOffset := g.getTimestamp(mcuTimestamp) - g.TimeSource.Now().UnixMilli()
-							if g.prevTimeOffset4NonGnssMode == nil {
-								g.prevTimeOffset4NonGnssMode = &timeOffset
-							}
-							if math.Abs(float64(timeOffset)-float64(*g.prevTimeOffset4NonGnssMode)) > 1 {
-								g.timeDiff4NonGnssMode = timeDiff
-								g.prevTimeOffset4NonGnssMode = &timeOffset
-							}
-						}
-
-						g.timeDiffMutex.Lock()
-
-						if g.timeDiff4NonGnssMode == 0 && timeDiff != 0 {
-							g.timeDiff4NonGnssMode = timeDiff
-						}
-
-						// Handle MCU time jumps (usually caused by Explorer power loss or PC hibernation)
-						// 5000 ms is a threshold determined by max packet interval with a minimum sample rate of 1 Hz
-						if (mcuTimestamp < g.prevMcuTimestamp || math.Abs(float64(mcuTimestamp)-float64(g.prevMcuTimestamp)) >= 5000) && g.prevMcuTimestamp != 0 {
-							g.fifoBuffer.Reset()
-							g.resetVariables()
-							g.timeDiff4NonGnssMode = 0
-							g.isTimeDiff4NonGnssModeStable = false
-							timeDiffSamples = make([]int64, 0, STABLE_CHECK_SAMPLES)
-						}
-
-						g.prevMcuTimestamp = mcuTimestamp
-						g.prevTimestamp4NonGnssMode = g.prevMcuTimestamp + g.timeDiff4NonGnssMode
-
-						g.timeDiffMutex.Unlock()
-					}
-				}
-
-				if g.isTimeDiff4NonGnssModeStable {
-					_, _ = g.fifoBuffer.Write(recvBuf...)
-				}
 			case <-subCtx.Done():
 				g.Logger.Info("exiting from data packet reader")
-				timer.Stop()
+				if atomic.LoadInt32(&initFlag) == 0 {
+					close(readyChan)
+				}
 				return
+			default:
+			}
+
+			recvStartTime := g.TimeSource.Now()
+			n, err := g.Transport.Read(buf)
+			recvEndTime := g.TimeSource.Now()
+			if err != nil {
+				g.Logger.Errorf("failed to read data from transport: %v", err)
+				cancelFn()
+			}
+			recvBuf := buf[:n]
+
+			totalLatency := recvEndTime.Sub(recvStartTime)
+			if headerIdx := bytes.Index(recvBuf, DATA_PACKET_HEADER); headerIdx != -1 && len(recvBuf) >= headerIdx+packetSize {
+				if err = g.verifyChecksum(recvBuf[headerIdx:headerIdx+packetSize], DATA_PACKET_HEADER); err == nil {
+					mcuTimestamp := int64(binary.LittleEndian.Uint64(recvBuf[headerIdx+len(DATA_PACKET_HEADER) : headerIdx+len(DATA_PACKET_HEADER)+int(unsafe.Sizeof(int64(0)))]))
+					timeDiff := recvEndTime.UnixMilli() - mcuTimestamp - totalLatency.Milliseconds()
+
+					if !g.isTimeDiff4NonGnssModeStable {
+						timeDiffSamples = append(timeDiffSamples, timeDiff)
+						if len(timeDiffSamples) > STABLE_CHECK_SAMPLES {
+							timeDiffSamples = timeDiffSamples[1:]
+						}
+
+						if len(timeDiffSamples) == STABLE_CHECK_SAMPLES {
+							if minVal, maxVal := lo.Min(timeDiffSamples), lo.Max(timeDiffSamples); math.Abs(float64(maxVal-minVal)) <= 1 {
+								g.isTimeDiff4NonGnssModeStable = true
+								g.Logger.Infof("data time series stabilized: time difference = %d ms", timeDiff)
+							} else {
+								g.Logger.Warnln("waiting for data time series to settle down, this may take a while")
+							}
+						} else {
+							if err = g.Flush(); err != nil {
+								g.Logger.Errorf("failed to flush transport: %v", err)
+								cancelFn()
+							}
+							g.Logger.Warnln("collecting data time series, this may take a while")
+						}
+					}
+
+					if g.deviceConfig.GetSampleRate() > 0 && g.variableAllSet {
+						if g.deviceConfig.GetGnssAvailability() && g.needUpdateTimeSource {
+							g.TimeSource.Update(recvEndTime, time.UnixMilli(mcuTimestamp).Add(totalLatency))
+
+							g.needUpdateTimeSource = false
+							g.isTimeDiff4NonGnssModeStable = false
+
+							g.Logger.Infof("time synchronized with Explorer built-in GNSS module")
+						} else if g.needUpdateTimeSource {
+							g.Logger.Infof("synchronizing time with NTP server: %s", g.NtpOptions.Endpoint)
+							res, err := ntpClient.Query()
+							if err != nil {
+								g.Logger.Errorf("failed to synchronize time with NTP server: %v", err)
+								if atomic.LoadInt32(&initFlag) == 0 {
+									cancelFn()
+								} else {
+									continue
+								}
+							} else {
+								g.Logger.Infof("time synchronized with NTP server, local time offset: %d ms", res.ClockOffset.Milliseconds())
+							}
+
+							currentTime := time.Now()
+							g.TimeSource.Update(currentTime, currentTime.Add(res.ClockOffset))
+							g.needUpdateTimeSource = false
+							g.isTimeDiff4NonGnssModeStable = false
+						}
+					}
+
+					if atomic.LoadInt32(&initFlag) == 0 {
+						atomic.StoreInt32(&initFlag, 1)
+						close(readyChan)
+						g.deviceStatus.SetStartedAt(g.TimeSource.Now())
+					}
+
+					// Compensate for oscillator drift on the AnyShake Explorer board (NTP mode only)
+					if g.deviceConfig.GetSampleRate() > 0 && !g.deviceConfig.GetGnssAvailability() {
+						timeOffset := g.getTimestamp(mcuTimestamp) - g.TimeSource.Now().UnixMilli()
+						if g.prevTimeOffset4NonGnssMode == nil {
+							g.prevTimeOffset4NonGnssMode = &timeOffset
+						}
+						if math.Abs(float64(timeOffset)-float64(*g.prevTimeOffset4NonGnssMode)) > 1 {
+							g.timeDiff4NonGnssMode = timeDiff
+							g.prevTimeOffset4NonGnssMode = &timeOffset
+						}
+					}
+
+					g.timeDiffMutex.Lock()
+
+					if g.timeDiff4NonGnssMode == 0 && timeDiff != 0 {
+						g.timeDiff4NonGnssMode = timeDiff
+					}
+
+					// Handle MCU time jumps (usually caused by Explorer power loss or PC hibernation)
+					// 5000 ms is a threshold determined by max packet interval with a minimum sample rate of 1 Hz
+					if (mcuTimestamp < g.prevMcuTimestamp || math.Abs(float64(mcuTimestamp)-float64(g.prevMcuTimestamp)) >= 5000) && g.prevMcuTimestamp != 0 {
+						g.fifoBuffer.Reset()
+						g.resetVariables()
+						g.timeDiff4NonGnssMode = 0
+						g.isTimeDiff4NonGnssModeStable = false
+						timeDiffSamples = make([]int64, 0, STABLE_CHECK_SAMPLES)
+					}
+
+					g.prevMcuTimestamp = mcuTimestamp
+					g.prevTimestamp4NonGnssMode = g.prevMcuTimestamp + g.timeDiff4NonGnssMode
+
+					g.timeDiffMutex.Unlock()
+				}
+			}
+
+			if g.isTimeDiff4NonGnssModeStable {
+				_, _ = g.fifoBuffer.Write(recvBuf...)
 			}
 		}
-	}(time.Millisecond)
+	}()
 
 	go func(decodeInterval time.Duration) {
 		var (
@@ -443,7 +446,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 				return
 			}
 		}
-	}(time.Millisecond)
+	}(5 * time.Millisecond)
 
 	go func() {
 		<-readyChan
