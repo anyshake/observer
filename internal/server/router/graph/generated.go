@@ -64,6 +64,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		GetApplicationLogs         func(childComplexity int) int
 		GetCurrentTime             func(childComplexity int) int
 		GetCurrentUser             func(childComplexity int) int
 		GetDeviceConfig            func(childComplexity int) int
@@ -82,7 +83,7 @@ type ComplexityRoot struct {
 		GetStationMetadata         func(childComplexity int, format string) int
 		GetSysUsers                func(childComplexity int) int
 		GetSystemStatus            func(childComplexity int) int
-		IsOfficialProduct          func(childComplexity int) int
+		IsGenuineProduct           func(childComplexity int) int
 	}
 
 	_channelData struct {
@@ -230,7 +231,8 @@ type QueryResolver interface {
 	GetHelicorderFiles(ctx context.Context) ([]*graph_model.ServiceAsset, error)
 	GetCurrentUser(ctx context.Context) (*graph_model.SysUser, error)
 	GetSysUsers(ctx context.Context) ([]*graph_model.SysUser, error)
-	IsOfficialProduct(ctx context.Context) (bool, error)
+	IsGenuineProduct(ctx context.Context) (bool, error)
+	GetApplicationLogs(ctx context.Context) ([]string, error)
 }
 
 type executableSchema struct {
@@ -388,6 +390,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.UpdateSysUser(childComplexity, args["userId"].(string), args["username"].(string), args["password"].(*string), args["admin"].(bool)), true
 
+	case "Query.getApplicationLogs":
+		if e.complexity.Query.GetApplicationLogs == nil {
+			break
+		}
+
+		return e.complexity.Query.GetApplicationLogs(childComplexity), true
+
 	case "Query.getCurrentTime":
 		if e.complexity.Query.GetCurrentTime == nil {
 			break
@@ -529,12 +538,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Query.GetSystemStatus(childComplexity), true
 
-	case "Query.isOfficialProduct":
-		if e.complexity.Query.IsOfficialProduct == nil {
+	case "Query.isGenuineProduct":
+		if e.complexity.Query.IsGenuineProduct == nil {
 			break
 		}
 
-		return e.complexity.Query.IsOfficialProduct(childComplexity), true
+		return e.complexity.Query.IsGenuineProduct(childComplexity), true
 
 	case "_channelData.channelCode":
 		if e.complexity._channelData.ChannelCode == nil {
@@ -3542,8 +3551,8 @@ func (ec *executionContext) fieldContext_Query_getSysUsers(_ context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_isOfficialProduct(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_isOfficialProduct(ctx, field)
+func (ec *executionContext) _Query_isGenuineProduct(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_isGenuineProduct(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3556,7 +3565,7 @@ func (ec *executionContext) _Query_isOfficialProduct(ctx context.Context, field 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().IsOfficialProduct(rctx)
+		return ec.resolvers.Query().IsGenuineProduct(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3573,7 +3582,7 @@ func (ec *executionContext) _Query_isOfficialProduct(ctx context.Context, field 
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_isOfficialProduct(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_isGenuineProduct(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -3581,6 +3590,47 @@ func (ec *executionContext) fieldContext_Query_isOfficialProduct(_ context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getApplicationLogs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getApplicationLogs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetApplicationLogs(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getApplicationLogs(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -9356,7 +9406,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "isOfficialProduct":
+		case "isGenuineProduct":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -9365,10 +9415,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_isOfficialProduct(ctx, field)
+				res = ec._Query_isGenuineProduct(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getApplicationLogs":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getApplicationLogs(ctx, field)
 				return res
 			}
 
@@ -11564,6 +11633,42 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	_ = sel
 	res := graphql.MarshalFloatContext(*v)
 	return graphql.WrapContextMarshaler(ctx, res)
+}
+
+func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v any) ([]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v any) (*string, error) {

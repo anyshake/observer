@@ -4,7 +4,8 @@ import {
     mdiCube,
     mdiHeart,
     mdiHomeEdit,
-    mdiPowerPlug
+    mdiPowerPlug,
+    mdiTimelineText
 } from '@mdi/js';
 import Icon from '@mdi/react';
 import { useEffect, useMemo, useState } from 'react';
@@ -14,6 +15,7 @@ import { Skeleton } from '../../components/Skeleton';
 import { IRouterComponent } from '../../config/router';
 import { useIsCurrentUserAdminQuery } from '../../graphql';
 import { Dangerous } from './dangerous';
+import { Logs } from './logs';
 import { Metadata } from './metadata';
 import { Preference } from './preference';
 import { Service } from './service';
@@ -53,6 +55,12 @@ const Settings = ({ currentLocale }: IRouterComponent) => {
                 icon: mdiAccount,
                 label: t('views.Settings.Users.title'),
                 element: <Users currentLocale={currentLocale} />
+            },
+            logs: {
+                adminOnly: true,
+                icon: mdiTimelineText,
+                label: t('views.Settings.Logs.title'),
+                element: <Logs />
             },
             dangerous: {
                 adminOnly: true,

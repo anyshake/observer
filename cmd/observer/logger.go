@@ -6,20 +6,21 @@ import (
 	"path"
 
 	"github.com/anyshake/observer/pkg/logger"
+	"github.com/anyshake/observer/pkg/ringbuf"
 )
 
-func setupLogger(level, logPath string, maxSize, rotation, lifeCycle int) (string, error) {
+func setupLogger(level, logPath string, maxSize, rotation, lifeCycle int) (*ringbuf.Buffer[string], string, error) {
 	if logPath != "" {
 		logPath = path.Clean(logPath)
 
 		if _, err := os.Stat(logPath); os.IsNotExist(err) {
 			err = os.MkdirAll(logPath, os.ModePerm)
 			if err != nil {
-				return "", fmt.Errorf("failed to create log directory: %w", err)
+				return nil, "", fmt.Errorf("failed to create log directory: %w", err)
 			}
 		}
 
-		logger.SetFile(logPath, maxSize, rotation, lifeCycle)
+		logger.RegisterFileLogger(logPath, maxSize, rotation, lifeCycle)
 	}
 
 	var err error
@@ -31,11 +32,12 @@ func setupLogger(level, logPath string, maxSize, rotation, lifeCycle int) (strin
 	case "error":
 		err = logger.SetLevel(logger.ERROR)
 	default:
-		return "", fmt.Errorf("unknown log level: %s", level)
+		return nil, "", fmt.Errorf("unknown log level: %s", level)
 	}
 	if err != nil {
-		return "", fmt.Errorf("failed to set log level: %w", err)
+		return nil, "", fmt.Errorf("failed to set log level: %w", err)
 	}
 
-	return logPath, nil
+	logBuffer := logger.RegisterBufferLogger(256)
+	return logBuffer, logPath, nil
 }

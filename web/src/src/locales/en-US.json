@@ -182,6 +182,9 @@
             }
         },
         "Settings": {
+            "Logs": {
+                "title": "Application Logs"
+            },
             "Dangerous": {
                 "title": "Dangerous Zone",
                 "purge_waveform_records": {

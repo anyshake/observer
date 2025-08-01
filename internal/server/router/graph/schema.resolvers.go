@@ -737,8 +737,8 @@ func (r *queryResolver) GetSysUsers(ctx context.Context) ([]*graph_model.SysUser
 	return sysUsers, nil
 }
 
-// IsOfficialProduct is the resolver for the isOfficialProduct field.
-func (r *queryResolver) IsOfficialProduct(ctx context.Context) (bool, error) {
+// IsGenuineProduct is the resolver for the isGenuineProduct field.
+func (r *queryResolver) IsGenuineProduct(ctx context.Context) (bool, error) {
 	if !r.checkIsAdmin(ctx) {
 		return false, errors.New("permission denied")
 	}
@@ -751,6 +751,15 @@ func (r *queryResolver) IsOfficialProduct(ctx context.Context) (bool, error) {
 
 	currentDeviceId := r.HardwareDev.GetDeviceId()
 	return !lo.Contains([]string{"FFFFFFFF", "00000000"}, currentDeviceId), nil
+}
+
+// GetApplicationLogs is the resolver for the getApplicationLogs field.
+func (r *queryResolver) GetApplicationLogs(ctx context.Context) ([]string, error) {
+	if !r.checkIsAdmin(ctx) {
+		return nil, errors.New("permission denied")
+	}
+
+	return r.LogBuffer.Values(), nil
 }
 
 // Mutation returns MutationResolver implementation.
