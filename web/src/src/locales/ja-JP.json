@@ -182,6 +182,9 @@
             }
         },
         "Settings": {
+            "Logs": {
+                "title": "アプリケーションログ"
+            },
             "Dangerous": {
                 "title": "危険ゾーン",
                 "purge_waveform_records": {

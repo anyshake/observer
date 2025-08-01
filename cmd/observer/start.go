@@ -56,7 +56,7 @@ func appStart(args arguments) {
 		}()
 	}
 
-	logPath, err := setupLogger(
+	logBuffer, logPath, err := setupLogger(
 		conf.Logger.Level,
 		conf.Logger.Path,
 		conf.Logger.Size,
@@ -195,6 +195,7 @@ func appStart(args arguments) {
 			HardwareDev:              hardwareDevice,
 			TimeSource:               timeSrc,
 			ActionHandler:            actionHandler,
+			LogBuffer:                logBuffer,
 			SeisEventSource:          seisevent.New(30 * time.Second),
 			StationConfigConstraints: stationConfigConstraints,
 		},

@@ -182,6 +182,9 @@
             }
         },
         "Settings": {
+            "Logs": {
+                "title": "Журналы приложения"
+            },
             "Dangerous": {
                 "title": "Опасная зона",
                 "purge_waveform_records": {

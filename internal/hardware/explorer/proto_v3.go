@@ -39,6 +39,7 @@ type ExplorerProtoImplV3 struct {
 	timeDiff4NonGnssMode         int64
 	prevTimeOffset4NonGnssMode   *int64
 	isTimeDiff4NonGnssModeStable bool
+	timeCalibrationChan4GnssMode chan [2]time.Time
 
 	flagMutex            sync.Mutex
 	needUpdateTimeSource bool
@@ -258,8 +259,9 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 	g.fifoBuffer = fifo.New[byte](655350)
 	g.messageBus = message.NewBus[EventHandler](EXPLORER_STREAM_TOPIC, 1024)
 	g.deviceStatus.SetUpdatedAt(time.Unix(0, 0))
-	g.deviceConfig.SetProtocol("v3")
+	g.deviceConfig.SetProtocol(g.ExplorerOptions.Protocol)
 	g.deviceConfig.SetModel(g.ExplorerOptions.Model)
+	g.timeCalibrationChan4GnssMode = make(chan [2]time.Time, 1)
 
 	var initFlag int32
 	atomic.StoreInt32(&initFlag, 0)
@@ -372,6 +374,13 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 							atomic.StoreInt32(&initFlag, 1)
 							close(readyChan)
 							g.deviceStatus.SetStartedAt(g.TimeSource.Now())
+						}
+
+						if g.deviceConfig.GetGnssAvailability() {
+							select {
+							case g.timeCalibrationChan4GnssMode <- [2]time.Time{recvEndTime, time.UnixMilli(mcuTimestamp).Add(totalLatency)}:
+							default:
+							}
 						}
 					}
 
@@ -547,15 +556,21 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 			select {
 			case <-timer.C:
 				if g.deviceConfig.GetGnssAvailability() {
-					continue
+					select {
+					case calibTimeData := <-g.timeCalibrationChan4GnssMode:
+						g.TimeSource.Update(calibTimeData[0], calibTimeData[1])
+					case <-time.After(time.Second):
+						g.Logger.Warn("no GNSS calibration timestamp received within 1 second, skipping")
+					}
+				} else {
+					res, err := ntpClient.Query()
+					if err != nil {
+						g.Logger.Warnf("error occurred while re-synchronizing time: %v", err)
+						continue
+					}
+					currentTime := time.Now()
+					g.TimeSource.Update(currentTime, currentTime.Add(res.ClockOffset))
 				}
-				res, err := ntpClient.Query()
-				if err != nil {
-					g.Logger.Warnf("error occurred while re-synchronizing time: %v", err)
-					continue
-				}
-				currentTime := time.Now()
-				g.TimeSource.Update(currentTime, currentTime.Add(res.ClockOffset))
 			case <-subCtx.Done():
 				timer.Stop()
 				return

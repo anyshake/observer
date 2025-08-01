@@ -18,7 +18,7 @@ import { globalConfig } from './config/global';
 import { localeConfig } from './config/locale';
 import { menuConfig } from './config/menu';
 import { routerConfig } from './config/router';
-import { useIsOfficialProductLazyQuery } from './graphql';
+import { useIsGenuineProductLazyQuery } from './graphql';
 import { sendUserConfirm } from './helpers/alert/sendUserConfirm';
 import { getCtaMessageDataUrl } from './helpers/app/getCtaMessageDataUrl';
 import { useCredentialStore } from './stores/credential';
@@ -102,23 +102,23 @@ export const Entry = ({ currentLocale, locales, onSwitchLocale }: IEntry) => {
         }
     }, [ctaModalShouldOpen, getCtaMessage]);
     const [
-        isOfficialProduct,
+        isGenuineProduct,
         {
-            data: isOfficialProductData,
-            loading: isOfficialProductLoading,
-            error: isOfficialProductError
+            data: isGenuineProductData,
+            loading: isGenuineProductLoading,
+            error: isGenuineProductError
         }
-    ] = useIsOfficialProductLazyQuery();
+    ] = useIsGenuineProductLazyQuery();
     useEffect(() => {
         if (!ctaMessageStatus.read) {
-            isOfficialProduct();
+            isGenuineProduct();
         }
-    }, [ctaMessageStatus.read, isOfficialProduct]);
+    }, [ctaMessageStatus.read, isGenuineProduct]);
     useEffect(() => {
-        if (isOfficialProductData && !isOfficialProductLoading && !isOfficialProductError) {
-            setCtaModalShouldOpen(!isOfficialProductData.isOfficialProduct);
+        if (isGenuineProductData && !isGenuineProductLoading && !isGenuineProductError) {
+            setCtaModalShouldOpen(!isGenuineProductData.isGenuineProduct);
         }
-    }, [isOfficialProductData, isOfficialProductError, isOfficialProductLoading]);
+    }, [isGenuineProductData, isGenuineProductError, isGenuineProductLoading]);
 
     return (
         <div className="animate-fade animate-duration-500 animate-delay-300">
