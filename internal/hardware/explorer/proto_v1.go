@@ -206,61 +206,61 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 	g.deviceConfig.SetProtocol(g.ExplorerOptions.Protocol)
 	g.deviceConfig.SetModel(g.ExplorerOptions.Model)
 
-	go func(readInterval time.Duration) {
+	go func() {
 		recvBuf := make([]byte, packetSize)
 		prevHeaderIndex := -1
 
 		timeBytes := make([]byte, 8)
 		packetBuf := make([]byte, packetSize+len(timeBytes))
 
-		for timer := time.NewTimer(readInterval); ; {
-			timer.Reset(readInterval)
-
+		for {
 			select {
-			case <-timer.C:
-				n, err := g.Transport.Read(recvBuf)
-				if err != nil {
-					g.Logger.Errorf("failed to read data from transport: %v", err)
-					cancelFn()
-				}
-
-				// Record the current time of the packet
-				currentTime := g.TimeSource.Now().UnixMilli() - g.Transport.GetLatency(packetSize).Milliseconds()
-				binary.BigEndian.PutUint64(timeBytes, uint64(currentTime))
-
-				// Find possible header in the buffer to insert current time next to the header
-				headerIndices := g.getIndices(recvBuf[:n], DATA_PACKET_HEADER)
-				if len(headerIndices) == 0 {
-					continue
-				}
-				headerIndex := headerIndices[0]
-				if prevHeaderIndex == -1 {
-					prevHeaderIndex = headerIndex
-				}
-
-				// To avoid packet loss, we need to find the "real" header
-				// Which is the header that is always equal to the previous header
-				for _, index := range headerIndices {
-					if index == prevHeaderIndex {
-						headerIndex = index
-						break
-					}
-				}
-				prevHeaderIndex = headerIndex
-
-				// Copy packet buffer with timestamp
-				copy(packetBuf, recvBuf[:headerIndex+len(DATA_PACKET_HEADER)])                                                      // Copy header
-				copy(packetBuf[headerIndex+len(DATA_PACKET_HEADER):headerIndex+len(DATA_PACKET_HEADER)+len(timeBytes)], timeBytes)  // Copy timestamp
-				copy(packetBuf[headerIndex+len(DATA_PACKET_HEADER)+len(timeBytes):], recvBuf[headerIndex+len(DATA_PACKET_HEADER):]) // Copy packet
-
-				_, _ = g.fifoBuffer.Write(packetBuf...)
 			case <-subCtx.Done():
 				g.Logger.Info("exiting from data packet reader")
-				timer.Stop()
 				return
+			default:
 			}
+
+			recvStartTime := g.TimeSource.Now()
+			n, err := g.Transport.Read(recvBuf)
+			recvEndTime := g.TimeSource.Now()
+			if err != nil {
+				g.Logger.Errorf("failed to read data from transport: %v", err)
+				cancelFn()
+			}
+
+			// Record the current time of the packet
+			currentTime := g.TimeSource.Now().UnixMilli() - recvEndTime.Sub(recvStartTime).Milliseconds()
+			binary.BigEndian.PutUint64(timeBytes, uint64(currentTime))
+
+			// Find possible header in the buffer to insert current time next to the header
+			headerIndices := g.getIndices(recvBuf[:n], DATA_PACKET_HEADER)
+			if len(headerIndices) == 0 {
+				continue
+			}
+			headerIndex := headerIndices[0]
+			if prevHeaderIndex == -1 {
+				prevHeaderIndex = headerIndex
+			}
+
+			// To avoid packet loss, we need to find the "real" header
+			// Which is the header that is always equal to the previous header
+			for _, index := range headerIndices {
+				if index == prevHeaderIndex {
+					headerIndex = index
+					break
+				}
+			}
+			prevHeaderIndex = headerIndex
+
+			// Copy packet buffer with timestamp
+			copy(packetBuf, recvBuf[:headerIndex+len(DATA_PACKET_HEADER)])                                                      // Copy header
+			copy(packetBuf[headerIndex+len(DATA_PACKET_HEADER):headerIndex+len(DATA_PACKET_HEADER)+len(timeBytes)], timeBytes)  // Copy timestamp
+			copy(packetBuf[headerIndex+len(DATA_PACKET_HEADER)+len(timeBytes):], recvBuf[headerIndex+len(DATA_PACKET_HEADER):]) // Copy packet
+
+			_, _ = g.fifoBuffer.Write(packetBuf...)
 		}
-	}(time.Millisecond)
+	}()
 
 	go func(decodeInterval time.Duration) {
 		var (
@@ -326,7 +326,7 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 				return
 			}
 		}
-	}(time.Millisecond)
+	}(5 * time.Millisecond)
 
 	go func() {
 		getNextUtcMidnight := func() time.Duration {
