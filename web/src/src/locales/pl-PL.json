@@ -257,7 +257,7 @@
                     "title": "Resetuj preferencje układu",
                     "description": "Spowoduje to zresetowanie wszystkich preferencji układu, Operacja jest nieodwracalna.",
                     "submit_button": "Zresetuj preferencje",
-                    "confirm_title": "Potwierdź zrestowanie",
+                    "confirm_title": "Potwierdź zresetowanie",
                     "confirm_message": "Czy na pewno chcesz zresetować wszystkie preferencje układu?",
                     "confirm_button": "Zresetuj",
                     "cancel_button": "Anuluj",
@@ -309,7 +309,7 @@
                 "edit_service": {
                     "submit_button": "Edytuj",
                     "updating": "Wprowadzanie nowych zmian...",
-                    "success": "Zmiano zostały wprowadzone.",
+                    "success": "Zmiany zostały wprowadzone.",
                     "error": "Nie udało się zaktualizować konfiguracji usługi: {{error}}"
                 },
                 "edit_service_modal": {
@@ -331,7 +331,7 @@
                     "field_required": "To pole jest wymagane.",
                     "updating": "Aktualizowanie konfiguracji stacji...",
                     "success": "Pomyślnie zaktualizowano konfiguracji stacji.",
-                    "error": "Aktualizowanie konfiguracji stacji nie powiodło się: {{error}}"
+                    "error": "Nie udało się zaktualizować konfiguracji stacji: {{error}}"
                 }
             },
             "Users": {
@@ -357,7 +357,7 @@
                 },
                 "create_user": {
                     "submit_button": "Utwórz nowego użytkownika",
-                    "creating": "Tworzenie nowego użytwkonika...",
+                    "creating": "Tworzenie nowego użytkownika...",
                     "success": "Użytkownik {{username}} został utworzony.",
                     "error": "Nie udało się utworzyć nowego użytkownika: {{error}}"
                 },
@@ -378,7 +378,7 @@
                 },
                 "edit_user": {
                     "submit_button": "edytuj",
-                    "updating": "Aktuliazowanie użytkownika...",
+                    "updating": "Aktualizowanie użytkownika...",
                     "success": "Użytkownik {{username}} został zaktualizowany.",
                     "error": "Nie udało się zaktualizować użytkownika: {{error}}"
                 },
@@ -412,12 +412,12 @@
                     "no": "Nie",
                     "never": "Nigdy",
                     "id": "ID",
-                    "user_id": "Indentyfikator użytkownika",
+                    "user_id": "Identyfikator użytkownika",
                     "username": "Nazwa użytkownika",
                     "admin": "Administrator",
                     "created_at": "Utworzono w",
                     "last_login": "Ostatnie logowanie",
-                    "user_ip": "User IP",
+                    "user_ip": "Adres IP użytkownika",
                     "user_agent": "Agent użytkownika",
                     "updated_at": "Zaktualizowano w",
                     "actions": "Akcje"
