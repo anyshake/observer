@@ -142,7 +142,7 @@
                 "title": "Lokalizacja stacji"
             },
             "service_status": {
-                "title": "Status serwisu"
+                "title": "Status usługi"
             },
             "cpu_usage": {
                 "title": "Użycie CPU"
@@ -236,114 +236,114 @@
                     "error": "Nie udało się zresetować konfiguracji stacji: {{error}}"
                 },
                 "reset_service_config": {
-                    "title": "Zresetuj konfigurację serwisu",
-                    "description": "Spowoduje to usunięcie wszystkich konfiguracji serwisu, Operacja jest nieodwracalna, wymagane ponowne uruchomienie, aby zmiany zostały zastosowane.",
-                    "submit_button": "Zresetuj serwis",
+                    "title": "Zresetuj konfigurację usługi",
+                    "description": "Spowoduje to usunięcie wszystkich konfiguracji usługi, Operacja jest nieodwracalna, wymagane ponowne uruchomienie, aby zmiany zostały zastosowane.",
+                    "submit_button": "Zresetuj usługę",
                     "confirm_title": "Potwierdź reset",
-                    "confirm_message": "Czy na pewno chcesz zresetować całą konfigurację serwisu?",
+                    "confirm_message": "Czy na pewno chcesz zresetować całą konfigurację usługi?",
                     "confirm_button": "Zresetuj",
                     "cancel_button": "Anuluj",
-                    "resetting": "Resetowanie konfiguracji serwisu...",
-                    "success": "Pomyślnie zresetowano konfigurację serwisu.",
-                    "error": "Nie udało się zresetować konfiguracji serwisu: {{error}}"
+                    "resetting": "Resetowanie konfiguracji usługi...",
+                    "success": "Pomyślnie zresetowano konfigurację usługi.",
+                    "error": "Nie udało się zresetować konfiguracji usługi: {{error}}"
                 }
             },
             "Metadata": {
                 "title": "Metadane stacji"
             },
             "Preference": {
-                "title": "Web Preference",
+                "title": "Preferencje internetowe",
                 "reset_layout_preference": {
-                    "title": "Reset Layout Preference",
-                    "description": "This will reset all layout preference, operation is irreversible.",
-                    "submit_button": "Reset Preference",
-                    "confirm_title": "Confirm Reset",
-                    "confirm_message": "Are you sure you want to reset all layout preference?",
-                    "confirm_button": "Reset",
-                    "cancel_button": "Cancel",
-                    "success": "Successfully reset layout preference."
+                    "title": "Resetuj preferencje układu",
+                    "description": "Spowoduje to zresetowanie wszystkich preferencji układu, Operacja jest nieodwracalna.",
+                    "submit_button": "Zresetuj preferencje",
+                    "confirm_title": "Potwierdź zrestowanie",
+                    "confirm_message": "Czy na pewno chcesz zresetować wszystkie preferencje układu?",
+                    "confirm_button": "Zresetuj",
+                    "cancel_button": "Anuluj",
+                    "success": "Pomyślnie zresetowano preferencje układu."
                 }
             },
             "Service": {
                 "title": "Service Control",
                 "restart_service": {
-                    "submit_button": "Restart",
-                    "confirm_title": "Confirm Restart",
-                    "confirm_message": "Are you sure you want to restart the service?",
-                    "confirm_button": "Restart",
-                    "cancel_button": "Cancel",
-                    "restarting": "Restarting the service...",
-                    "success": "Successfully restarted the service.",
-                    "error": "Failed to restart the service: {{error}}"
+                    "submit_button": "Zrestartuj",
+                    "confirm_title": "Potwierdź zrestartowanie",
+                    "confirm_message": "Czy na pewno chcesz zrestartować usługę?",
+                    "confirm_button": "Zrestartuj",
+                    "cancel_button": "Anuluj",
+                    "restarting": "Restartowanie usługi...",
+                    "success": "Pomyślnie zrestartowano usługę.",
+                    "error": "Nie udało się zrestartować usługi: {{error}}"
                 },
                 "start_service": {
-                    "submit_button": "Start",
-                    "confirm_title": "Confirm Start",
-                    "confirm_message": "Are you sure you want to start the service?",
-                    "confirm_button": "Start",
-                    "cancel_button": "Cancel",
-                    "starting": "Starting the service...",
-                    "success": "Successfully started the service.",
-                    "error": "Failed to start the service: {{error}}"
+                    "submit_button": "Uruchom",
+                    "confirm_title": "Potwierdź uruchomienie",
+                    "confirm_message": "Czy na pewno chcesz uruchomić usługę?",
+                    "confirm_button": "Uruchom",
+                    "cancel_button": "Anuluj",
+                    "starting": "Uruchamianie usługi...",
+                    "success": "Pomyślnie uruchomiono usługę.",
+                    "error": "Nie udało się uruchomić usługi: {{error}}"
                 },
                 "stop_service": {
-                    "submit_button": "Stop",
-                    "confirm_title": "Confirm Stop",
-                    "confirm_message": "Are you sure you want to stop the service?",
-                    "confirm_button": "Stop",
-                    "cancel_button": "Cancel",
-                    "stopping": "Stopping the service...",
-                    "success": "Successfully stopped the service.",
-                    "error": "Failed to stop the service: {{error}}"
+                    "submit_button": "Zatrzymaj",
+                    "confirm_title": "Potwierdź zatrzymanie",
+                    "confirm_message": "Czy na pewno chcesz zatrzymać usługę?",
+                    "confirm_button": "Zatrzymaj",
+                    "cancel_button": "Anuluj",
+                    "stopping": "Zatrzymywanie usługi...",
+                    "success": "Pomyślnie zatrzymano usługę.",
+                    "error": "Nie udało się zatrzymać usługi: {{error}}"
                 },
                 "reset_service": {
-                    "submit_button": "Reset",
-                    "confirm_title": "Confirm Reset",
-                    "confirm_message": "Are you sure you want to reset the service?",
-                    "confirm_button": "Reset",
-                    "cancel_button": "Cancel",
-                    "resetting": "Resetting the service...",
-                    "success": "Successfully reset the service.",
-                    "error": "Failed to reset the service: {{error}}"
+                    "submit_button": "Zresetuj",
+                    "confirm_title": "Potwierdź zresetowanie",
+                    "confirm_message": "Czy na pewno chcesz zresetować usługę?",
+                    "confirm_button": "Zresetuj",
+                    "cancel_button": "Anuluj",
+                    "resetting": "Resetowanie usługi...",
+                    "success": "Pomyślnie zresetowano usługę.",
+                    "error": "Nie udało się zresetować usługi: {{error}}"
                 },
                 "edit_service": {
-                    "submit_button": "Edit",
-                    "updating": "Applying new changes...",
-                    "success": "Changes have been applied.",
-                    "error": "Failed to update service configuration: {{error}}"
+                    "submit_button": "Edytuj",
+                    "updating": "Wprowadzanie nowych zmian...",
+                    "success": "Zmiano zostały wprowadzone.",
+                    "error": "Nie udało się zaktualizować konfiguracji usługi: {{error}}"
                 },
                 "edit_service_modal": {
-                    "title": "Editing Service: {{name}}"
+                    "title": "Usługa edycyjna: {{name}}"
                 },
                 "service_status": {
-                    "yes": "Yes",
-                    "no": "No",
-                    "is_running": "Running",
-                    "restarts": "Restarts",
-                    "stopped_at": "Stopped At",
-                    "started_at": "Started At",
-                    "updated_at": "Updated At"
+                    "yes": "Tak",
+                    "no": "Nie",
+                    "is_running": "Działa",
+                    "restarts": "Restartuje",
+                    "stopped_at": "Zakończono o",
+                    "started_at": "Zaczęto o",
+                    "updated_at": "Zaktualizowano o"
                 }
             },
             "Station": {
-                "title": "Station Settings",
+                "title": "Ustawienia stacji",
                 "update_station": {
-                    "field_required": "This field is required.",
-                    "updating": "Updating station configuration...",
-                    "success": "Successfully updated station configuration.",
-                    "error": "Failed to update station configuration: {{error}}"
+                    "field_required": "To pole jest wymagane.",
+                    "updating": "Aktualizowanie konfiguracji stacji...",
+                    "success": "Pomyślnie zaktualizowano konfiguracji stacji.",
+                    "error": "Aktualizowanie konfiguracji stacji nie powiodło się: {{error}}"
                 }
             },
             "Users": {
-                "title": "User Management",
+                "title": "Zarządzanie użytkownikami",
                 "search_users": {
-                    "placeholder": "Search users"
+                    "placeholder": "Wyszukaj użytkowników"
                 },
                 "refresh_list": {
                     "submit_button": "Odśwież",
                     "refreshing": "Odświeżanie listy użytkowników...",
-                    "success": "Successfully refreshed user list.",
-                    "error": "Failed to refresh user list: {{error}}"
+                    "success": "Pomyślnie odświeżono listę użytkowników.",
+                    "error": "Odświeżanie listy użytkowników nie powiodło się: {{error}}"
                 },
                 "remove_users": {
                     "submit_button": "Usuń użytkowników",
