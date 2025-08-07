@@ -63,6 +63,7 @@ export const Metadata = () => {
                 <CodeBlock
                     fileName={availableFormats[formatIndex].fileName}
                     language={availableFormats[formatIndex].language}
+                    showLineNumbers
                 >
                     {getStationMetadataData!.getStationMetadata}
                 </CodeBlock>

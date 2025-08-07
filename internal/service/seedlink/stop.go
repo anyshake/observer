@@ -9,7 +9,7 @@ func (s *SeedLinkServiceImpl) Stop() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	s.status.SetStoppedAt(s.timeSource.Get())
+	s.status.SetStoppedAt(s.timeSource.Now())
 	s.status.SetIsRunning(false)
 	s.cancelFn()
 

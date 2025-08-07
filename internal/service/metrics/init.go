@@ -34,7 +34,7 @@ func (s *MetricsServiceImpl) Init() error {
 		s.hostInfo.Hostname = ATTRIBUTE_DUMMY_VALUE
 	}
 
-	s.startTime = s.timeSource.Get()
+	s.startTime = s.timeSource.Now()
 
 	return nil
 }

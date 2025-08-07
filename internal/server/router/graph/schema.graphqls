@@ -165,5 +165,6 @@ type Query {
 
   getCurrentUser: sysUser!
   getSysUsers: [sysUser!]! # admin only
-  isOfficialProduct: Boolean! # admin only
+  isGenuineProduct: Boolean! # admin only
+  getApplicationLogs: [String!] # admin only
 }

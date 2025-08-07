@@ -1,18 +1,20 @@
-package timesync
+package ntp_server
 
 import (
 	"context"
 	"time"
 
+	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/pkg/timesource"
 )
 
-func New(timeSource *timesource.Source) *TimeSyncServiceImpl {
+func New(actionHandler *action.Handler, timeSource *timesource.Source) *NtpServerServiceImpl {
 	ctx, cancelFn := context.WithCancel(context.Background())
-	obj := &TimeSyncServiceImpl{
-		ctx:        ctx,
-		cancelFn:   cancelFn,
-		timeSource: timeSource,
+	obj := &NtpServerServiceImpl{
+		ctx:           ctx,
+		cancelFn:      cancelFn,
+		timeSource:    timeSource,
+		actionHandler: actionHandler,
 	}
 	obj.status.SetStartedAt(time.Unix(0, 0))
 	obj.status.SetStoppedAt(time.Unix(0, 0))

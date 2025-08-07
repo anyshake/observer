@@ -12,6 +12,22 @@ const (
 	ALLOWED_JITTER_MS_NTP  = 50
 )
 
+type ExplorerOptions struct {
+	Endpoint    string
+	Protocol    string
+	Model       string
+	Latitude    float64
+	Longitude   float64
+	Elevation   float64
+	ReadTimeout int
+}
+
+type NtpOptions struct {
+	Endpoint    string
+	Retry       int
+	ReadTimeout int
+}
+
 type DeviceStatus struct {
 	mu sync.Mutex
 

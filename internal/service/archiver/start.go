@@ -27,7 +27,7 @@ func (s *ArchiverServiceImpl) Start() error {
 	s.recordBuffer = make([]model.SeisRecord, RECORDS_INSERT_INTERVAL)
 
 	go func() {
-		s.status.SetStartedAt(s.timeSource.Get())
+		s.status.SetStartedAt(s.timeSource.Now())
 		s.status.SetIsRunning(true)
 		defer func() {
 			if r := recover(); r != nil {

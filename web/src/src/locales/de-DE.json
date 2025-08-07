@@ -182,6 +182,9 @@
             }
         },
         "Settings": {
+            "Logs": {
+                "title": "Anwendungsprotokolle"
+            },
             "Dangerous": {
                 "title": "Gefahrenbereich",
                 "purge_waveform_records": {

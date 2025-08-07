@@ -106,7 +106,7 @@ func (s *HelicorderServiceImpl) Start() error {
 	go func() {
 		timer := time.NewTimer(time.Minute)
 
-		s.status.SetStartedAt(s.timeSource.Get())
+		s.status.SetStartedAt(s.timeSource.Now())
 		s.status.SetIsRunning(true)
 		defer func() {
 			if r := recover(); r != nil {
@@ -123,7 +123,7 @@ func (s *HelicorderServiceImpl) Start() error {
 				return
 			case <-timer.C:
 				// Subtract one minute to avoid date rollover
-				currentTime := s.timeSource.Get().Add(-time.Minute)
+				currentTime := s.timeSource.Now().Add(-time.Minute)
 
 				hardwareConfig := s.hardwareDev.GetConfig()
 				s.channelCodes = hardwareConfig.GetChannelCodes()
@@ -179,7 +179,7 @@ func (s *HelicorderServiceImpl) Start() error {
 					}
 				}
 
-				timer.Reset(s.getDurationToNextTime(s.timeSource.Get()))
+				timer.Reset(s.getDurationToNextTime(s.timeSource.Now()))
 			}
 		}
 	}()

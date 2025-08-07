@@ -1,19 +1,17 @@
-package timesync
+package ntp_server
 
 import (
 	"context"
 	"sync"
-	"time"
 
+	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/service"
 	"github.com/anyshake/observer/pkg/timesource"
 )
 
-const ID = "service_timesync"
+const ID = "service_ntp_server"
 
-const TIMESOURCE_REFRESH_INTERVAL = 12 * time.Hour
-
-type TimeSyncServiceImpl struct {
+type NtpServerServiceImpl struct {
 	mu     sync.Mutex
 	status service.Status
 
@@ -21,5 +19,9 @@ type TimeSyncServiceImpl struct {
 	ctx      context.Context
 	cancelFn context.CancelFunc
 
-	timeSource *timesource.Source
+	timeSource    *timesource.Source
+	actionHandler *action.Handler
+
+	listenHost string
+	listenPort int
 }

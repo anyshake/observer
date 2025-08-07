@@ -33,7 +33,7 @@ func (s *SeedLinkServiceImpl) Start() error {
 			hardwareDev:   s.hardwareDev,
 			timeSource:    s.timeSource,
 			actionHandler: s.actionHandler,
-			startTime:     s.timeSource.Get(),
+			startTime:     s.timeSource.Now(),
 			stationCode:   s.stationCode,
 			networkCode:   s.networkCode,
 			locationCode:  s.locationCode,
@@ -45,7 +45,7 @@ func (s *SeedLinkServiceImpl) Start() error {
 	)
 
 	go func() {
-		s.status.SetStartedAt(s.timeSource.Get())
+		s.status.SetStartedAt(s.timeSource.Now())
 		s.status.SetIsRunning(true)
 		defer func() {
 			if r := recover(); r != nil {
@@ -66,7 +66,7 @@ func (s *SeedLinkServiceImpl) Start() error {
 		logger.GetLogger(ID).Infof("service seedlink is listening on %s:%d", s.listenHost, s.listenPort)
 		if err := server.Start(s.ctx, s.listenHost, s.listenPort, s.useCompress); err != nil {
 			logger.GetLogger(ID).Errorf("failed to start seedlink server: %v", err)
-			s.status.SetStoppedAt(s.timeSource.Get())
+			s.status.SetStoppedAt(s.timeSource.Now())
 			s.status.SetIsRunning(false)
 			_ = s.hardwareDev.Unsubscribe(ID)
 		}
@@ -90,7 +90,7 @@ type provider struct {
 
 func (p *provider) GetSoftware() string       { return "anyshake_observer" }
 func (p *provider) GetOrganization() string   { return "anyshake.org" }
-func (p *provider) GetCurrentTime() time.Time { return p.timeSource.Get() }
+func (p *provider) GetCurrentTime() time.Time { return p.timeSource.Now() }
 func (p *provider) GetStartTime() time.Time   { return p.startTime }
 func (p *provider) GetCapabilities() []handlers.SeedLinkCapability {
 	return []handlers.SeedLinkCapability{
@@ -131,7 +131,7 @@ func (p *provider) GetStreams() []handlers.SeedLinkStream {
 }
 func (p *provider) QueryHistory(startTime, endTime time.Time, channels []handlers.SeedLinkChannel) ([]handlers.SeedLinkDataPacket, error) {
 	if endTime.IsZero() {
-		endTime = p.timeSource.Get()
+		endTime = p.timeSource.Now()
 	}
 	recordsRawData, err := p.actionHandler.SeisRecordsQuery(startTime, endTime)
 	if err != nil {

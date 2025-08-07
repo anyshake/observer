@@ -94,6 +94,7 @@ export type MutationUpdateSysUserArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  getApplicationLogs?: Maybe<Array<Scalars['String']['output']>>;
   getCurrentTime: Scalars['Int64']['output'];
   getCurrentUser: SysUser;
   getDeviceConfig: DeviceConfig;
@@ -106,13 +107,14 @@ export type Query = {
   getMiniSeedFiles: Array<Maybe<ServiceAsset>>;
   getSeisRecordsByTime: Array<Maybe<SeisRecord>>;
   getServiceConfigConstraint: Array<ServiceConfigConstraint>;
+  getServiceLogs?: Maybe<Array<Scalars['String']['output']>>;
   getServiceStatus?: Maybe<Array<ServiceStatus>>;
   getStationConfig: Scalars['Map']['output'];
   getStationConfigConstraint: Array<ConfigConstraint>;
   getStationMetadata: Scalars['String']['output'];
   getSysUsers: Array<SysUser>;
   getSystemStatus: SystemStatus;
-  isOfficialProduct: Scalars['Boolean']['output'];
+  isGenuineProduct: Scalars['Boolean']['output'];
 };
 
 
@@ -124,6 +126,11 @@ export type QueryGetEventsBySourceArgs = {
 export type QueryGetSeisRecordsByTimeArgs = {
   endTime: Scalars['Int64']['input'];
   startTime: Scalars['Int64']['input'];
+};
+
+
+export type QueryGetServiceLogsArgs = {
+  serviceId: Scalars['String']['input'];
 };
 
 
@@ -254,10 +261,10 @@ export type SystemStatus = {
   uptime: Scalars['Int64']['output'];
 };
 
-export type IsOfficialProductQueryVariables = Exact<{ [key: string]: never; }>;
+export type IsGenuineProductQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type IsOfficialProductQuery = { __typename?: 'Query', isOfficialProduct: boolean };
+export type IsGenuineProductQuery = { __typename?: 'Query', isGenuineProduct: boolean };
 
 export type GetFileListDataQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -297,6 +304,11 @@ export type CreateUserMutationVariables = Exact<{
 
 
 export type CreateUserMutation = { __typename?: 'Mutation', createSysUser: string };
+
+export type GetApplicationLogsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetApplicationLogsQuery = { __typename?: 'Query', getApplicationLogs?: Array<string> | null };
 
 export type GetServiceDataQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -408,43 +420,43 @@ export type UpdateUserMutationVariables = Exact<{
 export type UpdateUserMutation = { __typename?: 'Mutation', updateSysUser: boolean };
 
 
-export const IsOfficialProductDocument = gql`
-    query isOfficialProduct {
-  isOfficialProduct
+export const IsGenuineProductDocument = gql`
+    query isGenuineProduct {
+  isGenuineProduct
 }
     `;
 
 /**
- * __useIsOfficialProductQuery__
+ * __useIsGenuineProductQuery__
  *
- * To run a query within a React component, call `useIsOfficialProductQuery` and pass it any options that fit your needs.
- * When your component renders, `useIsOfficialProductQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useIsGenuineProductQuery` and pass it any options that fit your needs.
+ * When your component renders, `useIsGenuineProductQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useIsOfficialProductQuery({
+ * const { data, loading, error } = useIsGenuineProductQuery({
  *   variables: {
  *   },
  * });
  */
-export function useIsOfficialProductQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<IsOfficialProductQuery, IsOfficialProductQueryVariables>) {
+export function useIsGenuineProductQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<IsGenuineProductQuery, IsGenuineProductQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<IsOfficialProductQuery, IsOfficialProductQueryVariables>(IsOfficialProductDocument, options);
+        return ApolloReactHooks.useQuery<IsGenuineProductQuery, IsGenuineProductQueryVariables>(IsGenuineProductDocument, options);
       }
-export function useIsOfficialProductLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<IsOfficialProductQuery, IsOfficialProductQueryVariables>) {
+export function useIsGenuineProductLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<IsGenuineProductQuery, IsGenuineProductQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<IsOfficialProductQuery, IsOfficialProductQueryVariables>(IsOfficialProductDocument, options);
+          return ApolloReactHooks.useLazyQuery<IsGenuineProductQuery, IsGenuineProductQueryVariables>(IsGenuineProductDocument, options);
         }
-export function useIsOfficialProductSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<IsOfficialProductQuery, IsOfficialProductQueryVariables>) {
+export function useIsGenuineProductSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<IsGenuineProductQuery, IsGenuineProductQueryVariables>) {
           const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useSuspenseQuery<IsOfficialProductQuery, IsOfficialProductQueryVariables>(IsOfficialProductDocument, options);
+          return ApolloReactHooks.useSuspenseQuery<IsGenuineProductQuery, IsGenuineProductQueryVariables>(IsGenuineProductDocument, options);
         }
-export type IsOfficialProductQueryHookResult = ReturnType<typeof useIsOfficialProductQuery>;
-export type IsOfficialProductLazyQueryHookResult = ReturnType<typeof useIsOfficialProductLazyQuery>;
-export type IsOfficialProductSuspenseQueryHookResult = ReturnType<typeof useIsOfficialProductSuspenseQuery>;
-export type IsOfficialProductQueryResult = ApolloReactCommon.QueryResult<IsOfficialProductQuery, IsOfficialProductQueryVariables>;
+export type IsGenuineProductQueryHookResult = ReturnType<typeof useIsGenuineProductQuery>;
+export type IsGenuineProductLazyQueryHookResult = ReturnType<typeof useIsGenuineProductLazyQuery>;
+export type IsGenuineProductSuspenseQueryHookResult = ReturnType<typeof useIsGenuineProductSuspenseQuery>;
+export type IsGenuineProductQueryResult = ApolloReactCommon.QueryResult<IsGenuineProductQuery, IsGenuineProductQueryVariables>;
 export const GetFileListDataDocument = gql`
     query getFileListData {
   getMiniSeedFiles {
@@ -739,6 +751,43 @@ export function useCreateUserMutation(baseOptions?: ApolloReactHooks.MutationHoo
 export type CreateUserMutationHookResult = ReturnType<typeof useCreateUserMutation>;
 export type CreateUserMutationResult = ApolloReactCommon.MutationResult<CreateUserMutation>;
 export type CreateUserMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
+export const GetApplicationLogsDocument = gql`
+    query getApplicationLogs {
+  getApplicationLogs
+}
+    `;
+
+/**
+ * __useGetApplicationLogsQuery__
+ *
+ * To run a query within a React component, call `useGetApplicationLogsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetApplicationLogsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetApplicationLogsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetApplicationLogsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetApplicationLogsQuery, GetApplicationLogsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetApplicationLogsQuery, GetApplicationLogsQueryVariables>(GetApplicationLogsDocument, options);
+      }
+export function useGetApplicationLogsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetApplicationLogsQuery, GetApplicationLogsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetApplicationLogsQuery, GetApplicationLogsQueryVariables>(GetApplicationLogsDocument, options);
+        }
+export function useGetApplicationLogsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetApplicationLogsQuery, GetApplicationLogsQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetApplicationLogsQuery, GetApplicationLogsQueryVariables>(GetApplicationLogsDocument, options);
+        }
+export type GetApplicationLogsQueryHookResult = ReturnType<typeof useGetApplicationLogsQuery>;
+export type GetApplicationLogsLazyQueryHookResult = ReturnType<typeof useGetApplicationLogsLazyQuery>;
+export type GetApplicationLogsSuspenseQueryHookResult = ReturnType<typeof useGetApplicationLogsSuspenseQuery>;
+export type GetApplicationLogsQueryResult = ApolloReactCommon.QueryResult<GetApplicationLogsQuery, GetApplicationLogsQueryVariables>;
 export const GetServiceDataDocument = gql`
     query getServiceData {
   getServiceConfigConstraint {

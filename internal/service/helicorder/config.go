@@ -393,7 +393,7 @@ func (s *helicorderConfigLineWidthImpl) GetVersion() int             { return 0 
 func (s *helicorderConfigLineWidthImpl) GetOptions() map[string]any  { return nil }
 func (s *helicorderConfigLineWidthImpl) GetDefaultValue() any        { return 1.0 }
 func (s *helicorderConfigLineWidthImpl) GetDescription() string {
-	return "Samples per time span in points for helicorder images."
+	return "Line width for helicorder images."
 }
 func (s *helicorderConfigLineWidthImpl) Init(handler *action.Handler) error {
 	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {

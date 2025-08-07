@@ -11,9 +11,10 @@ interface ICodeBlock {
     readonly language?: string;
     readonly fileName?: string;
     readonly children: string;
+    readonly showLineNumbers?: boolean;
 }
 
-export const CodeBlock = ({ fileName, language, children }: ICodeBlock) => {
+export const CodeBlock = ({ fileName, language, children, showLineNumbers }: ICodeBlock) => {
     const [isCopied, setIsCopied] = useState(false);
 
     const handleCopy = useCallback(async (text: string) => {
@@ -66,7 +67,7 @@ export const CodeBlock = ({ fileName, language, children }: ICodeBlock) => {
                     )}
                 </div>
             </div>
-            <SyntaxHighlighter language={language} style={theme}>
+            <SyntaxHighlighter language={language} style={theme} showLineNumbers={showLineNumbers}>
                 {children}
             </SyntaxHighlighter>
         </div>

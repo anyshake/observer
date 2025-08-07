@@ -1,10 +1,10 @@
-package timesync
+package ntp_server
 
 import (
 	"fmt"
 )
 
-func (s *TimeSyncServiceImpl) Restart() error {
+func (s *NtpServerServiceImpl) Restart() error {
 	defer s.status.IncrementRestarts()
 
 	if err := s.Stop(); err != nil {

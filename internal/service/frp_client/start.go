@@ -84,7 +84,7 @@ func (s *FrpClientServiceImpl) Start() error {
 	}
 
 	go func() {
-		s.status.SetStartedAt(s.timeSource.Get())
+		s.status.SetStartedAt(s.timeSource.Now())
 		s.status.SetIsRunning(true)
 		defer func() {
 			if r := recover(); r != nil {

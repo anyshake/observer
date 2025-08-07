@@ -24,7 +24,7 @@ func (s *WatchCatServiceImpl) Start() error {
 	go func() {
 		ticker := time.NewTicker(WATCHCAT_CHECK_INTERVAL)
 
-		s.status.SetStartedAt(s.timeSource.Get())
+		s.status.SetStartedAt(s.timeSource.Now())
 		s.status.SetIsRunning(true)
 		defer func() {
 			if r := recover(); r != nil {

@@ -8,39 +8,38 @@ import (
 	"syscall"
 	"time"
 
+	_ "net/http/pprof"
+
 	"github.com/anyshake/observer/config"
 	"github.com/anyshake/observer/internal/dao"
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/dao/model"
 	"github.com/anyshake/observer/internal/hardware"
+	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/internal/hook"
-	cleaner_close_database "github.com/anyshake/observer/internal/hook/cleaner/close_database"
-	cleaner_close_explorer "github.com/anyshake/observer/internal/hook/cleaner/close_explorer"
-	startup_setup_admin "github.com/anyshake/observer/internal/hook/startup/setup_admin"
-	startup_setup_station "github.com/anyshake/observer/internal/hook/startup/setup_station"
 	"github.com/anyshake/observer/internal/server"
-	graph_resolver "github.com/anyshake/observer/internal/server/router/graph"
-	service_archiver "github.com/anyshake/observer/internal/service/archiver"
-
-	service_forwarder "github.com/anyshake/observer/internal/service/forwarder"
-	service_frp_client "github.com/anyshake/observer/internal/service/frp_client"
-	service_helicorder "github.com/anyshake/observer/internal/service/helicorder"
-
-	service_metrics "github.com/anyshake/observer/internal/service/metrics"
-	service_miniseed "github.com/anyshake/observer/internal/service/miniseed"
-
-	service_quakesense "github.com/anyshake/observer/internal/service/quakesense"
-	service_seedlink "github.com/anyshake/observer/internal/service/seedlink"
-	service_timesync "github.com/anyshake/observer/internal/service/timesync"
-
-	_ "net/http/pprof"
-
-	service_watchcat "github.com/anyshake/observer/internal/service/watchcat"
-
 	"github.com/anyshake/observer/internal/service"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/anyshake/observer/pkg/seisevent"
 	"github.com/anyshake/observer/pkg/timesource"
+
+	cleaner_close_database "github.com/anyshake/observer/internal/hook/cleaner/close_database"
+	cleaner_close_explorer "github.com/anyshake/observer/internal/hook/cleaner/close_explorer"
+	startup_setup_admin "github.com/anyshake/observer/internal/hook/startup/setup_admin"
+	startup_setup_station "github.com/anyshake/observer/internal/hook/startup/setup_station"
+
+	graph_resolver "github.com/anyshake/observer/internal/server/router/graph"
+
+	service_archiver "github.com/anyshake/observer/internal/service/archiver"
+	service_forwarder "github.com/anyshake/observer/internal/service/forwarder"
+	service_frp_client "github.com/anyshake/observer/internal/service/frp_client"
+	service_helicorder "github.com/anyshake/observer/internal/service/helicorder"
+	service_metrics "github.com/anyshake/observer/internal/service/metrics"
+	service_miniseed "github.com/anyshake/observer/internal/service/miniseed"
+	service_ntp_server "github.com/anyshake/observer/internal/service/ntp_server"
+	service_quakesense "github.com/anyshake/observer/internal/service/quakesense"
+	service_seedlink "github.com/anyshake/observer/internal/service/seedlink"
+	service_watchcat "github.com/anyshake/observer/internal/service/watchcat"
 )
 
 func appStart(args arguments) {
@@ -57,7 +56,7 @@ func appStart(args arguments) {
 		}()
 	}
 
-	logPath, err := setupLogger(
+	logBuffer, logPath, err := setupLogger(
 		conf.Logger.Level,
 		conf.Logger.Path,
 		conf.Logger.Size,
@@ -70,18 +69,6 @@ func appStart(args arguments) {
 	if len(logPath) != 0 {
 		logger.GetLogger(main).Infof("logs will be saved to: %s", logPath)
 	}
-
-	logger.GetLogger(main).Infof("querying NTP server at %s", conf.NtpClient.Endpoint)
-	ntpTimeSource, err := timesource.NewNtpClient(
-		conf.NtpClient.Endpoint,
-		conf.NtpClient.Retry,
-		time.Duration(conf.NtpClient.Timeout)*time.Second,
-	)
-	if err != nil {
-		logger.GetLogger(main).Fatalln(err)
-	}
-	logger.GetLogger(main).Infof("application time has been synced with NTP server")
-	logger.GetLogger(main).Infof("current network time in UTC timezone: %s", ntpTimeSource.Get().Format(time.RFC3339))
 
 	daoObj, err := dao.New(
 		conf.Database.Endpoint,
@@ -142,17 +129,25 @@ func appStart(args arguments) {
 		}
 	}
 
+	timeSrc := timesource.New()
 	hardwareDevice, err = hardware.New(
-		conf.Hardware.Endpoint,
-		conf.Hardware.Protocol,
-		conf.Hardware.Model,
-		conf.Hardware.Timeout,
-		conf.Location.Latitude,
-		conf.Location.Longitude,
-		conf.Location.Elevation,
-		actionHandler,
-		ntpTimeSource,
 		logger.GetLogger("explorer_driver"),
+		timeSrc,
+		actionHandler,
+		explorer.ExplorerOptions{
+			Endpoint:    conf.Hardware.Endpoint,
+			Protocol:    conf.Hardware.Protocol,
+			Model:       conf.Hardware.Model,
+			Latitude:    conf.Location.Latitude,
+			Longitude:   conf.Location.Longitude,
+			Elevation:   conf.Location.Elevation,
+			ReadTimeout: conf.Hardware.Timeout,
+		},
+		explorer.NtpOptions{
+			Endpoint:    conf.NtpClient.Endpoint,
+			Retry:       conf.NtpClient.Retry,
+			ReadTimeout: conf.NtpClient.Timeout,
+		},
 	)
 	if err != nil {
 		logger.GetLogger(main).Fatalf("failed to create explorer instance: %v", err)
@@ -161,19 +156,19 @@ func appStart(args arguments) {
 	if err != nil {
 		logger.GetLogger(main).Fatalf("failed to open explorer instance: %v", err)
 	}
-	logger.GetLogger(main).Info("harware device has been connected")
+	logger.GetLogger(main).Infof("hardware device has been connected, current time in UTC: %s", timeSrc.Now().Format(time.RFC3339))
 
 	serviceMap := map[string]service.IService{
-		service_archiver.ID:   service_archiver.New(hardwareDevice, actionHandler, ntpTimeSource),
-		service_forwarder.ID:  service_forwarder.New(hardwareDevice, actionHandler, ntpTimeSource),
-		service_frp_client.ID: service_frp_client.New(conf.Server.Listen, actionHandler, ntpTimeSource),
-		service_helicorder.ID: service_helicorder.New(hardwareDevice, actionHandler, ntpTimeSource),
-		service_metrics.ID:    service_metrics.New(hardwareDevice, actionHandler, ntpTimeSource, binaryVersion, commitHash, buildPlatform),
-		service_miniseed.ID:   service_miniseed.New(hardwareDevice, actionHandler, ntpTimeSource),
-		service_quakesense.ID: service_quakesense.New(hardwareDevice, actionHandler, ntpTimeSource),
-		service_seedlink.ID:   service_seedlink.New(hardwareDevice, actionHandler, ntpTimeSource),
-		service_timesync.ID:   service_timesync.New(ntpTimeSource),
-		service_watchcat.ID:   service_watchcat.New(hardwareDevice, ntpTimeSource),
+		service_archiver.ID:   service_archiver.New(hardwareDevice, actionHandler, timeSrc),
+		service_forwarder.ID:  service_forwarder.New(hardwareDevice, actionHandler, timeSrc),
+		service_frp_client.ID: service_frp_client.New(conf.Server.Listen, actionHandler, timeSrc),
+		service_helicorder.ID: service_helicorder.New(hardwareDevice, actionHandler, timeSrc),
+		service_metrics.ID:    service_metrics.New(hardwareDevice, actionHandler, timeSrc, binaryVersion, commitHash, buildPlatform),
+		service_miniseed.ID:   service_miniseed.New(hardwareDevice, actionHandler, timeSrc),
+		service_ntp_server.ID: service_ntp_server.New(actionHandler, timeSrc),
+		service_quakesense.ID: service_quakesense.New(hardwareDevice, actionHandler, timeSrc),
+		service_seedlink.ID:   service_seedlink.New(hardwareDevice, actionHandler, timeSrc),
+		service_watchcat.ID:   service_watchcat.New(hardwareDevice, timeSrc),
 	}
 
 	for serviceName, serviceObj := range serviceMap {
@@ -198,8 +193,9 @@ func appStart(args arguments) {
 		&graph_resolver.Resolver{
 			ServiceMap:               serviceMap,
 			HardwareDev:              hardwareDevice,
-			TimeSource:               ntpTimeSource,
+			TimeSource:               timeSrc,
 			ActionHandler:            actionHandler,
+			LogBuffer:                logBuffer,
 			SeisEventSource:          seisevent.New(30 * time.Second),
 			StationConfigConstraints: stationConfigConstraints,
 		},

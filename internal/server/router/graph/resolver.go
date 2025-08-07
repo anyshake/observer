@@ -7,6 +7,7 @@ import (
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/hardware"
 	"github.com/anyshake/observer/internal/service"
+	"github.com/anyshake/observer/pkg/ringbuf"
 	"github.com/anyshake/observer/pkg/seisevent"
 	"github.com/anyshake/observer/pkg/timesource"
 )
@@ -21,6 +22,7 @@ type Resolver struct {
 	HardwareDev              hardware.IHardware
 	TimeSource               *timesource.Source
 	ActionHandler            *action.Handler
+	LogBuffer                *ringbuf.Buffer[string]
 	StationConfigConstraints []config.IConstraint
 	ServiceMap               map[string]service.IService
 	SeisEventSource          map[string]seisevent.IDataSource

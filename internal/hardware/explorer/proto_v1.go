@@ -13,20 +13,18 @@ import (
 	"github.com/anyshake/observer/internal/hardware/explorer/metadata"
 	"github.com/anyshake/observer/pkg/fifo"
 	"github.com/anyshake/observer/pkg/message"
+	"github.com/anyshake/observer/pkg/ntpclient"
 	"github.com/anyshake/observer/pkg/timesource"
 	"github.com/anyshake/observer/pkg/transport"
 	"github.com/sirupsen/logrus"
 )
 
 type ExplorerProtoImplV1 struct {
-	ChannelCodes []string
-	Model        string
-	Logger       *logrus.Entry
-	TimeSource   *timesource.Source
-
-	FallbackLatitude  float64
-	FallbackLongitude float64
-	FallbackElevation float64
+	ChannelCodes    []string
+	ExplorerOptions ExplorerOptions
+	NtpOptions      NtpOptions
+	Logger          *logrus.Entry
+	TimeSource      *timesource.Source
 
 	Transport  transport.ITransport
 	fifoBuffer fifo.Buffer[byte]
@@ -163,7 +161,6 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 	if g.Transport == nil {
 		return nil, nil, errors.New("transport is not opened")
 	}
-
 	if g.Logger == nil {
 		return nil, nil, errors.New("logger is not set")
 	}
@@ -171,6 +168,20 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 	if err := g.Transport.Open(); err != nil {
 		return nil, nil, fmt.Errorf("failed to open transport: %w", err)
 	}
+	ntpClient, err := ntpclient.New(g.NtpOptions.Endpoint, g.NtpOptions.Retry, g.NtpOptions.ReadTimeout)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create ntp client: %w", err)
+	}
+
+	g.Logger.Infof("synchronizing time with NTP server: %s", g.NtpOptions.Endpoint)
+	res, err := ntpClient.Query()
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to acquire time from NTP server: %w", err)
+	}
+
+	currentTime := time.Now()
+	g.TimeSource.Update(currentTime, currentTime.Add(res.ClockOffset))
+	g.Logger.Infof("time synchronized with NTP server, local time offset: %d ms", res.ClockOffset.Milliseconds())
 
 	subCtx, cancelFn := context.WithCancel(ctx)
 
@@ -187,69 +198,69 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 
 	dummyDeviceId := uint32(0x12F81AC)
 	g.deviceVariable.SetDeviceId(&dummyDeviceId)
-	g.deviceVariable.SetLatitude(&g.FallbackLatitude)
-	g.deviceVariable.SetLongitude(&g.FallbackLongitude)
-	g.deviceVariable.SetElevation(&g.FallbackElevation)
-	g.deviceStatus.SetStartedAt(g.TimeSource.Get())
+	g.deviceVariable.SetLatitude(&g.ExplorerOptions.Latitude)
+	g.deviceVariable.SetLongitude(&g.ExplorerOptions.Longitude)
+	g.deviceVariable.SetElevation(&g.ExplorerOptions.Elevation)
+	g.deviceStatus.SetStartedAt(g.TimeSource.Now())
 	g.deviceStatus.SetUpdatedAt(time.Unix(0, 0))
-	g.deviceConfig.SetProtocol("v1")
-	g.deviceConfig.SetModel(g.Model)
+	g.deviceConfig.SetProtocol(g.ExplorerOptions.Protocol)
+	g.deviceConfig.SetModel(g.ExplorerOptions.Model)
 
-	go func(readInterval time.Duration) {
+	go func() {
 		recvBuf := make([]byte, packetSize)
 		prevHeaderIndex := -1
 
 		timeBytes := make([]byte, 8)
 		packetBuf := make([]byte, packetSize+len(timeBytes))
 
-		for timer := time.NewTimer(readInterval); ; {
-			timer.Reset(readInterval)
-
+		for {
 			select {
-			case <-timer.C:
-				n, err := g.Transport.Read(recvBuf)
-				if err != nil {
-					g.Logger.Errorf("failed to read data from transport: %v", err)
-					cancelFn()
-				}
-
-				// Record the current time of the packet
-				currentTime := g.TimeSource.Get().UnixMilli() - g.Transport.GetLatency(packetSize).Milliseconds()
-				binary.BigEndian.PutUint64(timeBytes, uint64(currentTime))
-
-				// Find possible header in the buffer to insert current time next to the header
-				headerIndices := g.getIndices(recvBuf[:n], DATA_PACKET_HEADER)
-				if len(headerIndices) == 0 {
-					continue
-				}
-				headerIndex := headerIndices[0]
-				if prevHeaderIndex == -1 {
-					prevHeaderIndex = headerIndex
-				}
-
-				// To avoid packet loss, we need to find the "real" header
-				// Which is the header that is always equal to the previous header
-				for _, index := range headerIndices {
-					if index == prevHeaderIndex {
-						headerIndex = index
-						break
-					}
-				}
-				prevHeaderIndex = headerIndex
-
-				// Copy packet buffer with timestamp
-				copy(packetBuf, recvBuf[:headerIndex+len(DATA_PACKET_HEADER)])                                                      // Copy header
-				copy(packetBuf[headerIndex+len(DATA_PACKET_HEADER):headerIndex+len(DATA_PACKET_HEADER)+len(timeBytes)], timeBytes)  // Copy timestamp
-				copy(packetBuf[headerIndex+len(DATA_PACKET_HEADER)+len(timeBytes):], recvBuf[headerIndex+len(DATA_PACKET_HEADER):]) // Copy packet
-
-				_, _ = g.fifoBuffer.Write(packetBuf...)
 			case <-subCtx.Done():
 				g.Logger.Info("exiting from data packet reader")
-				timer.Stop()
 				return
+			default:
 			}
+
+			recvStartTime := g.TimeSource.Now()
+			n, err := g.Transport.Read(recvBuf)
+			recvEndTime := g.TimeSource.Now()
+			if err != nil {
+				g.Logger.Errorf("failed to read data from transport: %v", err)
+				cancelFn()
+			}
+
+			// Record the current time of the packet
+			currentTime := g.TimeSource.Now().UnixMilli() - recvEndTime.Sub(recvStartTime).Milliseconds()
+			binary.BigEndian.PutUint64(timeBytes, uint64(currentTime))
+
+			// Find possible header in the buffer to insert current time next to the header
+			headerIndices := g.getIndices(recvBuf[:n], DATA_PACKET_HEADER)
+			if len(headerIndices) == 0 {
+				continue
+			}
+			headerIndex := headerIndices[0]
+			if prevHeaderIndex == -1 {
+				prevHeaderIndex = headerIndex
+			}
+
+			// To avoid packet loss, we need to find the "real" header
+			// Which is the header that is always equal to the previous header
+			for _, index := range headerIndices {
+				if index == prevHeaderIndex {
+					headerIndex = index
+					break
+				}
+			}
+			prevHeaderIndex = headerIndex
+
+			// Copy packet buffer with timestamp
+			copy(packetBuf, recvBuf[:headerIndex+len(DATA_PACKET_HEADER)])                                                      // Copy header
+			copy(packetBuf[headerIndex+len(DATA_PACKET_HEADER):headerIndex+len(DATA_PACKET_HEADER)+len(timeBytes)], timeBytes)  // Copy timestamp
+			copy(packetBuf[headerIndex+len(DATA_PACKET_HEADER)+len(timeBytes):], recvBuf[headerIndex+len(DATA_PACKET_HEADER):]) // Copy packet
+
+			_, _ = g.fifoBuffer.Write(packetBuf...)
 		}
-	}(time.Millisecond)
+	}()
 
 	go func(decodeInterval time.Duration) {
 		var (
@@ -315,7 +326,33 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 				return
 			}
 		}
-	}(time.Millisecond)
+	}(5 * time.Millisecond)
+
+	go func() {
+		getNextUtcMidnight := func() time.Duration {
+			now := g.TimeSource.Now()
+			nextMidnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, time.UTC)
+			return time.Until(nextMidnight)
+		}
+
+		for timer := time.NewTimer(getNextUtcMidnight()); ; {
+			timer.Reset(getNextUtcMidnight())
+
+			select {
+			case <-timer.C:
+				res, err := ntpClient.Query()
+				if err != nil {
+					g.Logger.Warnf("error occurred while re-synchronizing time: %v", err)
+					continue
+				}
+				currentTime := time.Now()
+				g.TimeSource.Update(currentTime, currentTime.Add(res.ClockOffset))
+			case <-subCtx.Done():
+				timer.Stop()
+				return
+			}
+		}
+	}()
 
 	return subCtx, cancelFn, nil
 }

@@ -182,6 +182,9 @@
             }
         },
         "Settings": {
+            "Logs": {
+                "title": "Uygulama Günlükleri"
+            },
             "Dangerous": {
                 "title": "Tehlikeli Bölge",
                 "purge_waveform_records": {

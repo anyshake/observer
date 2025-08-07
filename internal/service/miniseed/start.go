@@ -52,7 +52,7 @@ func (s *MiniSeedServiceImpl) Start() error {
 	s.recordBuffer = make([][]buffer, s.appendCountDown)
 
 	go func() {
-		s.status.SetStartedAt(s.timeSource.Get())
+		s.status.SetStartedAt(s.timeSource.Now())
 		s.status.SetIsRunning(true)
 		defer func() {
 			if r := recover(); r != nil {

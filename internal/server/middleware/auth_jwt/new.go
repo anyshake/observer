@@ -67,7 +67,7 @@ func New(timeSource *timesource.Source, actionHandler *action.Handler, expiratio
 		Realm:       "anyshake-observer",
 		Timeout:     expiration,
 		MaxRefresh:  expiration,
-		TimeFunc:    timeSource.Get,
+		TimeFunc:    timeSource.Now,
 		TokenLookup: "header: Authorization, query: token",
 	})
 	if err != nil {

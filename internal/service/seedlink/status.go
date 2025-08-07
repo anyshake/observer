@@ -5,7 +5,7 @@ import "github.com/anyshake/observer/internal/service"
 func (s *SeedLinkServiceImpl) GetStatus() *service.Status {
 	var status service.Status
 
-	status.SetUpdatedAt(s.timeSource.Get())
+	status.SetUpdatedAt(s.timeSource.Now())
 	status.SetStoppedAt(s.status.GetStoppedAt())
 	status.SetIsRunning(s.status.GetIsRunning())
 	status.SetRestarts(s.status.GetRestarts())

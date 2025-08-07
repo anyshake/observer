@@ -1,4 +1,4 @@
-package timesync
+package ntp_server
 
 import (
 	"fmt"
@@ -6,10 +6,10 @@ import (
 	"github.com/anyshake/observer/internal/service"
 )
 
-func (s *TimeSyncServiceImpl) GetAssetList() ([]service.Asset, error) {
+func (s *NtpServerServiceImpl) GetAssetList() ([]service.Asset, error) {
 	return nil, fmt.Errorf("assets are not available on %s", ID)
 }
 
-func (s *TimeSyncServiceImpl) GetAssetData(assetId string) (*service.AssetData, error) {
+func (s *NtpServerServiceImpl) GetAssetData(assetId string) (*service.AssetData, error) {
 	return nil, fmt.Errorf("assets ID %s is not available on %s", assetId, ID)
 }

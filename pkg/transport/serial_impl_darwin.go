@@ -2,6 +2,7 @@ package transport
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"sync"
@@ -58,11 +59,6 @@ func (t *SerialTransportImpl) Close() error {
 	return t.conn.Close()
 }
 
-func (t *SerialTransportImpl) GetLatency(packetSize int) time.Duration {
-	totalBits := packetSize * (8 + 1) // 8 bits data + 1 bit stop bit
-	return time.Duration(float64(totalBits) * float64(time.Second) / float64(t.baudrate))
-}
-
 func (t *SerialTransportImpl) SetTimeout(timeout time.Duration) error {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
@@ -115,7 +111,7 @@ func (t *SerialTransportImpl) Flush() error {
 	return nil
 }
 
-func (t *SerialTransportImpl) ReadUntil(delim []byte, maxBytes int, timeout time.Duration) ([]byte, bool, error) {
+func (t *SerialTransportImpl) ReadUntil(ctx context.Context, delim []byte, maxBytes int, timeout time.Duration) ([]byte, bool, error) {
 	if t.conn == nil {
 		return nil, false, errors.New("connection is not opened")
 	}
@@ -125,6 +121,12 @@ func (t *SerialTransportImpl) ReadUntil(delim []byte, maxBytes int, timeout time
 	temp := make([]byte, 1)
 
 	for {
+		select {
+		case <-ctx.Done():
+			return nil, false, nil
+		default:
+		}
+
 		if time.Now().After(deadline) {
 			return nil, true, nil
 		}
