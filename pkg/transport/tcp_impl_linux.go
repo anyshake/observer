@@ -1,6 +1,3 @@
-//go:build !linux
-// +build !linux
-
 package transport
 
 import (
@@ -10,7 +7,10 @@ import (
 	"fmt"
 	"net"
 	"sync"
+	"syscall"
 	"time"
+
+	"golang.org/x/sys/unix"
 )
 
 type TcpTransportImpl struct {
@@ -64,7 +64,29 @@ func (t *TcpTransportImpl) Flush() error {
 }
 
 func (t *TcpTransportImpl) GetLatency(packetSize int) time.Duration {
-	return 0
+	if t.conn == nil {
+		return 0
+	}
+
+	sc, ok := t.conn.(syscall.Conn)
+	if !ok {
+		return 0
+	}
+
+	var rttMicro uint32
+	rawConn, err := sc.SyscallConn()
+	if err != nil {
+		return 0
+	}
+
+	_ = rawConn.Control(func(fd uintptr) {
+		info, err := unix.GetsockoptTCPInfo(int(fd), unix.IPPROTO_TCP, unix.TCP_INFO)
+		if err == nil {
+			rttMicro = info.Rtt
+		}
+	})
+
+	return time.Duration(rttMicro) * time.Microsecond
 }
 
 func (t *TcpTransportImpl) SetTimeout(timeout time.Duration) error {

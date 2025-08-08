@@ -60,6 +60,11 @@ func (t *SerialTransportImpl) Close() error {
 	return t.conn.Close()
 }
 
+func (t *SerialTransportImpl) GetLatency(packetSize int) time.Duration {
+	totalBits := packetSize * (8 + 1) // 8 bits data + 1 bit stop bit
+	return time.Duration(float64(totalBits) * float64(time.Second) / float64(t.baudrate))
+}
+
 func (t *SerialTransportImpl) SetTimeout(timeout time.Duration) error {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
@@ -114,24 +119,27 @@ func (t *SerialTransportImpl) Flush() error {
 	return nil
 }
 
-func (t *SerialTransportImpl) ReadUntil(ctx context.Context, delim []byte, maxBytes int, timeout time.Duration) ([]byte, bool, error) {
+func (t *SerialTransportImpl) ReadUntil(ctx context.Context, delim []byte, maxBytes int, timeout time.Duration) ([]byte, bool, time.Duration, error) {
 	if t.conn == nil {
-		return nil, false, errors.New("connection is not opened")
+		return nil, false, 0, errors.New("connection is not opened")
 	}
 
 	deadline := time.Now().Add(timeout)
 	buffer := make([]byte, 0, maxBytes)
 	temp := make([]byte, 1)
 
+	var firstByteTime time.Time
+	var lastByteTime time.Time
+
 	for {
 		select {
 		case <-ctx.Done():
-			return nil, false, nil
+			return nil, false, 0, nil
 		default:
 		}
 
 		if time.Now().After(deadline) {
-			return nil, true, nil
+			return nil, true, 0, nil
 		}
 
 		t.mutex.Lock()
@@ -139,19 +147,25 @@ func (t *SerialTransportImpl) ReadUntil(ctx context.Context, delim []byte, maxBy
 		t.mutex.Unlock()
 
 		if err != nil {
-			return nil, false, fmt.Errorf("read error: %w", err)
+			return nil, false, 0, fmt.Errorf("read error: %w", err)
 		}
 		if n == 0 {
 			continue
 		}
 
+		if firstByteTime.IsZero() {
+			firstByteTime = time.Now()
+		}
+		lastByteTime = time.Now()
+
 		buffer = append(buffer, temp[0])
 		if len(buffer) > maxBytes {
-			return nil, false, fmt.Errorf("read exceeded maxBytes (%d) before delimiter", maxBytes)
+			return nil, false, 0, fmt.Errorf("read exceeded maxBytes (%d) before delimiter", maxBytes)
 		}
 
 		if len(buffer) >= len(delim) && bytes.HasSuffix(buffer, delim) {
-			return buffer, false, nil
+			duration := lastByteTime.Sub(firstByteTime)
+			return buffer, false, duration, nil
 		}
 	}
 }

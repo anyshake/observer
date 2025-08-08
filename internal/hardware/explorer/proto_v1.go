@@ -228,9 +228,10 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 				g.Logger.Errorf("failed to read data from transport: %v", err)
 				cancelFn()
 			}
+			totalLatency := recvEndTime.Sub(recvStartTime) + g.Transport.GetLatency(len(recvBuf))
 
 			// Record the current time of the packet
-			currentTime := g.TimeSource.Now().UnixMilli() - recvEndTime.Sub(recvStartTime).Milliseconds()
+			currentTime := g.TimeSource.Now().UnixMilli() - totalLatency.Milliseconds()
 			binary.BigEndian.PutUint64(timeBytes, uint64(currentTime))
 
 			// Find possible header in the buffer to insert current time next to the header
@@ -329,14 +330,13 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 	}(5 * time.Millisecond)
 
 	go func() {
-		getNextUtcMidnight := func() time.Duration {
+		getNextHour := func() time.Duration {
 			now := g.TimeSource.Now()
-			nextMidnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, time.UTC)
-			return time.Until(nextMidnight)
+			nextHour := time.Date(now.Year(), now.Month(), now.Day(), now.Hour()+1, 0, 0, 0, time.UTC)
+			return time.Until(nextHour)
 		}
-
-		for timer := time.NewTimer(getNextUtcMidnight()); ; {
-			timer.Reset(getNextUtcMidnight())
+		for timer := time.NewTimer(getNextHour()); ; {
+			timer.Reset(getNextHour())
 
 			select {
 			case <-timer.C:

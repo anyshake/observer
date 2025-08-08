@@ -261,7 +261,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 	g.deviceStatus.SetUpdatedAt(time.Unix(0, 0))
 	g.deviceConfig.SetProtocol(g.ExplorerOptions.Protocol)
 	g.deviceConfig.SetModel(g.ExplorerOptions.Model)
-	g.timeCalibrationChan4GnssMode = make(chan [2]time.Time, 1)
+	g.timeCalibrationChan4GnssMode = make(chan [2]time.Time)
 
 	var initFlag int32
 	atomic.StoreInt32(&initFlag, 0)
@@ -290,7 +290,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 			}
 
 			recvStartTime := g.TimeSource.Now()
-			recvBuf, timeout, err := g.Transport.ReadUntil(subCtx, DATA_PACKET_TAILER, 32000, 5*time.Second)
+			recvBuf, timeout, recvElapsed, err := g.Transport.ReadUntil(subCtx, DATA_PACKET_TAILER, 32000, 5*time.Second)
 			recvEndTime := g.TimeSource.Now()
 			if err != nil {
 				g.Logger.Errorf("failed to read data from transport: %v", err)
@@ -305,6 +305,9 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 			if headerIdx := bytes.Index(recvBuf, DATA_PACKET_HEADER); headerIdx != -1 {
 				if err = g.verifyChecksum(recvBuf[headerIdx:], DATA_PACKET_HEADER, DATA_PACKET_TAILER); err == nil && len(recvBuf) > headerIdx+len(DATA_PACKET_HEADER)+int(unsafe.Sizeof(int64(0))) {
 					mcuTimestamp := int64(binary.LittleEndian.Uint64(recvBuf[headerIdx+len(DATA_PACKET_HEADER) : headerIdx+len(DATA_PACKET_HEADER)+int(unsafe.Sizeof(int64(0)))]))
+
+					estimatedTransportLatency := g.Transport.GetLatency(len(recvBuf))
+					totalLatency += lo.Ternary(estimatedTransportLatency > recvElapsed, estimatedTransportLatency, recvElapsed)
 					timeDiff := recvEndTime.UnixMilli() - mcuTimestamp - totalLatency.Milliseconds()
 
 					if !g.isTimeDiff4NonGnssModeStable {
@@ -545,13 +548,13 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 	go func() {
 		<-readyChan
 
-		getNextUtcMidnight := func() time.Duration {
+		getNextHour := func() time.Duration {
 			now := g.TimeSource.Now()
-			nextMidnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, time.UTC)
-			return time.Until(nextMidnight)
+			nextHour := time.Date(now.Year(), now.Month(), now.Day(), now.Hour()+1, 0, 0, 0, time.UTC)
+			return time.Until(nextHour)
 		}
-		for timer := time.NewTimer(getNextUtcMidnight()); ; {
-			timer.Reset(getNextUtcMidnight())
+		for timer := time.NewTimer(getNextHour()); ; {
+			timer.Reset(getNextHour())
 
 			select {
 			case <-timer.C:

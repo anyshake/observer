@@ -187,7 +187,7 @@ func (p *ntpServer) encodePacket(req []byte) ([]byte, error) {
 	res := make([]byte, 48)
 	vn := req[0] & 0x38
 	res[0] = vn | 0x04 // version + mode (server)
-	res[1] = 0         // stratum
+	res[1] = 1         // stratum
 	res[2] = req[2]    // poll
 	res[3] = 0xEC      // precision
 
