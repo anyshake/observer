@@ -336,13 +336,15 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 			return time.Until(nextHour)
 		}
 		for timer := time.NewTimer(getNextHour()); ; {
-			timer.Reset(getNextHour())
-
 			select {
 			case <-timer.C:
+				timer.Reset(getNextHour())
+				if deviceConfig := g.GetConfig(); deviceConfig.GetGnssAvailability() {
+					continue
+				}
 				res, err := ntpClient.Query()
 				if err != nil {
-					g.Logger.Warnf("error occurred while re-synchronizing time: %v", err)
+					g.Logger.Warnf("error occurred while re-synchronizing time with NTP: %v", err)
 					continue
 				}
 				currentTime := time.Now()

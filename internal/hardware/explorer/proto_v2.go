@@ -463,45 +463,27 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 	go func() {
 		<-readyChan
 
-		getNextInterval := func() time.Duration {
+		getNextHour := func() time.Duration {
 			now := g.TimeSource.Now()
-			interval := time.Hour
-			if g.deviceConfig.GetGnssAvailability() {
-				interval = time.Minute
-			}
-
-			next := now.Truncate(interval).Add(interval)
-			if g.deviceConfig.GetGnssAvailability() && next.Hour() == 0 && next.Minute() == 0 {
-				next = next.Add(interval)
-			}
-
-			return time.Until(next)
+			nextHour := time.Date(now.Year(), now.Month(), now.Day(), now.Hour()+1, 0, 0, 0, time.UTC)
+			return time.Until(nextHour)
 		}
-		for timer := time.NewTimer(getNextInterval()); ; {
-			timer.Reset(getNextInterval())
-
+		for timer := time.NewTimer(getNextHour()); ; {
 			select {
+			case calibTimeData := <-g.timeCalibrationChan4GnssMode:
+				g.TimeSource.Update(calibTimeData[0], calibTimeData[1])
 			case <-timer.C:
-				if g.deviceConfig.GetGnssAvailability() && g.TimeSource.Now().Hour() == 0 {
+				timer.Reset(getNextHour())
+				if deviceConfig := g.GetConfig(); deviceConfig.GetGnssAvailability() {
 					continue
 				}
-
-				if g.deviceConfig.GetGnssAvailability() {
-					select {
-					case calibTimeData := <-g.timeCalibrationChan4GnssMode:
-						g.TimeSource.Update(calibTimeData[0], calibTimeData[1])
-					case <-time.After(time.Second):
-						g.Logger.Warn("no GNSS calibration timestamp received within 1 second, skipping")
-					}
-				} else {
-					res, err := ntpClient.Query()
-					if err != nil {
-						g.Logger.Warnf("error occurred while re-synchronizing time: %v", err)
-						continue
-					}
-					currentTime := time.Now()
-					g.TimeSource.Update(currentTime, currentTime.Add(res.ClockOffset))
+				res, err := ntpClient.Query()
+				if err != nil {
+					g.Logger.Warnf("error occurred while re-synchronizing time with NTP: %v", err)
+					continue
 				}
+				currentTime := time.Now()
+				g.TimeSource.Update(currentTime, currentTime.Add(res.ClockOffset))
 			case <-subCtx.Done():
 				timer.Stop()
 				return
