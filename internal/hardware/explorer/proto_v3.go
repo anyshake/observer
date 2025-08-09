@@ -548,20 +548,25 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 	go func() {
 		<-readyChan
 
-		getNextHour := func() time.Duration {
+		getNextInterval := func() time.Duration {
 			now := g.TimeSource.Now()
-			nextHour := time.Date(now.Year(), now.Month(), now.Day(), now.Hour()+1, 0, 0, 0, time.UTC)
-			return time.Until(nextHour)
+			interval := time.Hour
+			if g.deviceConfig.GetGnssAvailability() {
+				interval = time.Minute
+			}
+
+			next := now.Truncate(interval).Add(interval)
+			if g.deviceConfig.GetGnssAvailability() && next.Hour() == 0 && next.Minute() == 0 {
+				next = next.Add(interval)
+			}
+
+			return time.Until(next)
 		}
-		for timer := time.NewTimer(getNextHour()); ; {
-			timer.Reset(getNextHour())
+		for timer := time.NewTimer(getNextInterval()); ; {
+			timer.Reset(getNextInterval())
 
 			select {
 			case <-timer.C:
-				if g.deviceConfig.GetGnssAvailability() && g.TimeSource.Now().Hour() == 0 {
-					continue
-				}
-
 				if g.deviceConfig.GetGnssAvailability() {
 					select {
 					case calibTimeData := <-g.timeCalibrationChan4GnssMode:
