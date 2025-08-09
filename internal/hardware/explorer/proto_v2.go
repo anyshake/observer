@@ -263,14 +263,14 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 			}
 			recvBuf := buf[:n]
 
-			totalLatency := recvEndTime.Sub(recvStartTime)
+			packetLatency := recvEndTime.Sub(recvStartTime)
 			if headerIdx := bytes.Index(recvBuf, DATA_PACKET_HEADER); headerIdx != -1 && len(recvBuf) >= headerIdx+packetSize {
 				if err = g.verifyChecksum(recvBuf[headerIdx:headerIdx+packetSize], DATA_PACKET_HEADER); err == nil {
 					mcuTimestamp := int64(binary.LittleEndian.Uint64(recvBuf[headerIdx+len(DATA_PACKET_HEADER) : headerIdx+len(DATA_PACKET_HEADER)+int(unsafe.Sizeof(int64(0)))]))
 
 					estimatedTransportLatency := g.Transport.GetLatency(len(recvBuf))
-					totalLatency += estimatedTransportLatency
-					timeDiff := recvEndTime.UnixMilli() - mcuTimestamp - totalLatency.Milliseconds()
+					packetLatency += estimatedTransportLatency
+					timeDiff := recvEndTime.UnixMilli() - mcuTimestamp - packetLatency.Milliseconds()
 
 					if !g.isTimeDiff4NonGnssModeStable {
 						timeDiffSamples = append(timeDiffSamples, timeDiff)
@@ -296,7 +296,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 
 					if g.deviceConfig.GetSampleRate() > 0 && g.variableAllSet {
 						if g.deviceConfig.GetGnssAvailability() && g.needUpdateTimeSource {
-							g.TimeSource.Update(recvEndTime, time.UnixMilli(mcuTimestamp).Add(totalLatency))
+							g.TimeSource.Update(recvEndTime, time.UnixMilli(mcuTimestamp).Add(packetLatency))
 
 							g.needUpdateTimeSource = false
 							g.isTimeDiff4NonGnssModeStable = false
@@ -331,7 +331,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 
 					if g.deviceConfig.GetSampleRate() > 0 && g.variableAllSet && g.deviceConfig.GetGnssAvailability() {
 						select {
-						case g.timeCalibrationChan4GnssMode <- [2]time.Time{recvEndTime, time.UnixMilli(mcuTimestamp).Add(totalLatency)}:
+						case g.timeCalibrationChan4GnssMode <- [2]time.Time{recvEndTime, time.UnixMilli(mcuTimestamp).Add(packetLatency)}:
 						default:
 						}
 					}
