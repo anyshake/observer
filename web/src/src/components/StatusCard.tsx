@@ -15,7 +15,7 @@ export const StatusCard = ({ title, iconPath, fields, children }: IStatusCard) =
             {fields.map(({ label, value }, index) => (
                 <div className="mt-2 flex justify-between" key={`${index}-${label}`}>
                     <span className="pr-4 font-medium whitespace-nowrap">{label}</span>
-                    <div className="max-w-[180px] overflow-x-scroll">
+                    <div className="scrollbar-hide max-w-[180px] overflow-x-scroll">
                         <span className="bg-base-200 rounded px-2 font-mono text-sm whitespace-nowrap text-[#9221ed]">
                             {value}
                         </span>
