@@ -473,6 +473,10 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 
 			select {
 			case <-timer.C:
+				if g.deviceConfig.GetGnssAvailability() && g.TimeSource.Now().Hour() == 0 {
+					continue
+				}
+
 				if g.deviceConfig.GetGnssAvailability() {
 					select {
 					case calibTimeData := <-g.timeCalibrationChan4GnssMode:
