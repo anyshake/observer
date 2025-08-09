@@ -1,0 +1,473 @@
+{
+    "components": {
+        "ErrorPage": {
+            "something_went_wrong": "Ups! Coś poszło nie tak.",
+            "try_again_later": "Proszę odświeżyć stronę lub wrócić później."
+        },
+        "TypedInput": {
+            "yes": "Tak",
+            "no": "Nie",
+            "add_new_item": "Wprowadź nowy element.",
+            "editing_list": "Edycja listy {{fieldName}}"
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "Nazwa pliku",
+                "time": "Czas modyfikacji",
+                "size": "Rozmiar pliku",
+                "actions": "Akcje"
+            },
+            "file_list_actions": {
+                "download": "Pobierz",
+                "preview": "Podgląd"
+            },
+            "miniseed_list": {
+                "title": "Codzienny miniSEED",
+                "search": "Wyszukaj"
+            },
+            "helicorder_list": {
+                "title": "Lista helikorderów",
+                "search": "Wyszukaj"
+            },
+            "request_file": {
+                "requesting": "Prośba o link do pobrania pliku {{fileName}}.",
+                "success": "Otrzymano link do pobrania pliku {{fileName}}.",
+                "error": "Nie udało się poprosić o link do pliku {{fileName}}: {{error}}"
+            },
+            "preview_file": {
+                "requesting": "Prośba o link do podglądu pliku {{fileName}}.",
+                "success": "Otrzymano link umożliwiający podgląd pliku {{fileName}}.",
+                "error": "Nie udało się poprosić o link do pliku {{fileName}}: {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "Zapytanie o wydarzenie",
+                "data_agency": "Agencja danych",
+                "search_button": "Wyszukaj wydarzenia",
+                "searching": "Wyszukiwanie wydarzenia z wybranego źródła.",
+                "success": "Znaleziono {{count}} wydarzeń z wybranego źródła",
+                "no_data": "Nie znaleziono wydarzeń z wybranego źródła",
+                "error": "Nie udało się wyszukać wydarzeń: {{error}}"
+            },
+            "event_list_modal": {
+                "title": "Wybierz wydarzenie sejsmiczne",
+                "earthquake_at": "Trzęsienie ziemi o {{time}}",
+                "p_wave_arrival": "Przybycie fali P {{time}} sekund",
+                "s_wave_arrival": "Przybycie fali S {{time}} sekund",
+                "epicenter_distance": "Epicentrum {{distance}} km",
+                "earthquake_depth": "Głębokość {{depth}} km",
+                "selected_an_event": "Wybrano zdarzenie trzęsienia ziemi w {{region}} o {{time}}."
+            },
+            "data_export": {
+                "title": "Eksport danych",
+                "file_format": "Format pliku",
+                "channel_code": "Kod kanału",
+                "export_button": "Pobierz dane",
+                "exporting": "Eksportowanie kanału {{channel}} do formatu {{format}}.",
+                "success": "Pomyślnie wyeksportowano kanał {{channel}} do formatu {{format}}.",
+                "error": "Nie udało się wyeksportować kanału {{channel}} do formatu {{format}}: {{error}}"
+            },
+            "search_records": {
+                "title": "Zapytanie czasowe",
+                "start_time": "Początek czasu",
+                "end_time": "Koniec czasu",
+                "invalid_time": "Początek czasu musi się zacząć przed końcem czasu. ",
+                "search_button": "Wyszukaj zapisy",
+                "searching": "Przeszukiwanie zapisów sejsmicznych w bazie danych.",
+                "success": "Znaleziono {{count}} zapisów sejsmicznych w bazie danych.",
+                "no_data": "Nie znaleziono żadnych zapisów sejsmicznych w bazie danych.",
+                "error": "Nie udało się wyszukać rekordów: {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "Zablokuj układ",
+                "unlock_button": "Odblokuj układ"
+            },
+            "reset_layout": {
+                "reset_button": "Zresetuj wszystko",
+                "confirm_message": "Czy na pewno chcesz zresetować układ?",
+                "confirm_title": "Potwierdź reset",
+                "confirm_button": "Zresetuj",
+                "cancel_button": "Anuluj"
+            },
+            "share_link": {
+                "share_button": "Udostępnij link",
+                "link_copied": "Udostępniony link został skopiowany do schowka."
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "Informacje o stacji",
+                "name": "Nazwa",
+                "country": "Kraj",
+                "place": "Miejsce",
+                "affiliation": "Afiliacja",
+                "channels": "Kanały"
+            },
+            "device_info": {
+                "yes": "Tak",
+                "no": "Nie",
+                "title": "Informacje o urządzeniu",
+                "product_model": "Model produktu",
+                "device_id": "ID urządzenia",
+                "link_protocol": "Protokół łącza",
+                "packet_interval": "Interwał pakietów",
+                "gnss_active": "Aktywne GNSS"
+            },
+            "device_status": {
+                "title": "Status urządzenia",
+                "sample_rate": "Częstotliwość próbkowania",
+                "latitude": "szerokość",
+                "longitude": "długość",
+                "elevation": "wzniesienie",
+                "temperature": "temperatura urządzenia"
+            },
+            "link_status": {
+                "title": "Status łącza",
+                "started_at": "Rozpoczęto o",
+                "last_frame": "Ostatnia klatka",
+                "frames": "Klatki",
+                "errors": "Errory",
+                "messages": "Wiadomości"
+            },
+            "connectivity": {
+                "loading": "Łączenie ze stacją...",
+                "success": "Połączono ze stacją, serwer włączony przez {{uptime}} sekund, zaktualizowano o {{updatedAt}}.",
+                "error": "Wystąpił błąd podczas łączenia ze stacją. Sprawdź połączenie."
+            },
+            "station_location": {
+                "title": "Lokalizacja stacji"
+            },
+            "service_status": {
+                "title": "Status usługi"
+            },
+            "cpu_usage": {
+                "title": "Użycie CPU"
+            },
+            "memory_usage": {
+                "title": "Użycie pamięci"
+            },
+            "disk_usage": {
+                "title": "Użycie dysku"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "Ups! Strona nie została znaleziona.",
+            "check_your_url": "Sprawdź adres URL i spróbuj ponownie.",
+            "go_back_button": "Wróć"
+        },
+        "RealTime": {
+             "reset_layout": {
+                "reset_button": "Zresetuj wszystko",
+                "confirm_message": "Czy na pewno chcesz zresetować układ?",
+                "confirm_title": "Potwierdź reset",
+                "confirm_button": "Zresetuj",
+                "cancel_button": "Anuluj"
+            },
+            "layout_locker": {
+                "lock_button": "Zablokuj układ",
+                "unlock_button": "Odblokuj układ"
+            },
+            "connectivity": {
+                "connecting": "Brak połączenia. Trwa łączenie...",
+                "connected": "Połączono, ostatnia aktualizacja o {{updatedAt}}."
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} SPS",
+                "channels": "{{num}} Kanały",
+                "retention": "{{retention}} Sekund"
+            }
+        },
+        "Settings": {
+            "Logs": {
+                "title": "Logi Aplikacji"
+            },
+            "Dangerous": {
+                "title": "Strefa Niebezpieczna",
+                "purge_waveform_records": {
+                    "title": "Usuń rekordy falogramów",
+                    "description": "Spowoduje to usunięcie wszystkich falogramów w bazie danych, Operacja jest nieodwracalna.",
+                    "submit_button": "Usuń rekordy",
+                    "confirm_title": "Potwierdź usunięcie",
+                    "confirm_message": "Czy na pewno chcesz usunąć wszystkie rekordy falogramów?",
+                    "confirm_button": "Usuń",
+                    "cancel_button": "Anuluj",
+                    "purging": "Usuwanie rekordów falogramów...",
+                    "success": "Pomyślnie usunięto rekordy falogramów.",
+                    "error": "Nie udało się usunąć rekordów falogramów: {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "Usuń pliki miniSEED",
+                    "description": "Spowoduje to usunięcie wszystkich plików miniSEED w systemie, Operacja jest nieodwracalna.",
+                    "submit_button": "Usuń miniSEED",
+                    "confirm_title": "Potwierdź usunięcie",
+                    "confirm_message": "Czy na pewno chcesz usunąć wszystkie pliki miniSEED?",
+                    "confirm_button": "Usuń",
+                    "cancel_button": "Anuluj",
+                    "purging": "Usuwanie plików miniSEED...",
+                    "success": "Pomyślnie usunięto pliki miniSEED.",
+                    "error": "Nie udało się usunąć plików miniSEED: {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "Usuń pliki helikorderów",
+                    "description": "Spowoduje to usunięcie wszystkich plików helikorderów w systemie, Operacja jest nieodwracalna.",
+                    "submit_button": "Usuń helikordery",
+                    "confirm_title": "Potwierdź usunięcie",
+                    "confirm_message": "Czy na pewno chcesz usunąć wszystkie pliki helikorderów?",
+                    "confirm_button": "Usuń",
+                    "cancel_button": "Anuluj",
+                    "purging": "Usuwanie plików helikorderów...",
+                    "success": "Pomyślnie usunięto pliki helikorderów.",
+                    "error": "Nie udało się usunąć plików helikorderów: {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "Zresetuj konfigurację stacji",
+                    "description": "Spowoduje to usunięcie wszystkich konfiguracji stacji, Operacja jest nieodwracalna, wymagane ponowne uruchomienie, aby zmiany zostały zastosowane.",
+                    "submit_button": "Zresetuj stację",
+                    "confirm_title": "Potwierdź reset",
+                    "confirm_message": "Czy na pewno chcesz zresetować całą konfigurację stacji?",
+                    "confirm_button": "Zresetuj",
+                    "cancel_button": "Anuluj",
+                    "resetting": "Resetowanie konfiguracji stacji...",
+                    "success": "Pomyślnie zresetowano konfigurację stacji.",
+                    "error": "Nie udało się zresetować konfiguracji stacji: {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "Zresetuj konfigurację usługi",
+                    "description": "Spowoduje to usunięcie wszystkich konfiguracji usługi, Operacja jest nieodwracalna, wymagane ponowne uruchomienie, aby zmiany zostały zastosowane.",
+                    "submit_button": "Zresetuj usługę",
+                    "confirm_title": "Potwierdź reset",
+                    "confirm_message": "Czy na pewno chcesz zresetować całą konfigurację usługi?",
+                    "confirm_button": "Zresetuj",
+                    "cancel_button": "Anuluj",
+                    "resetting": "Resetowanie konfiguracji usługi...",
+                    "success": "Pomyślnie zresetowano konfigurację usługi.",
+                    "error": "Nie udało się zresetować konfiguracji usługi: {{error}}"
+                }
+            },
+            "Metadata": {
+                "title": "Metadane stacji"
+            },
+            "Preference": {
+                "title": "Preferencje internetowe",
+                "reset_layout_preference": {
+                    "title": "Resetuj preferencje układu",
+                    "description": "Spowoduje to zresetowanie wszystkich preferencji układu, Operacja jest nieodwracalna.",
+                    "submit_button": "Zresetuj preferencje",
+                    "confirm_title": "Potwierdź zresetowanie",
+                    "confirm_message": "Czy na pewno chcesz zresetować wszystkie preferencje układu?",
+                    "confirm_button": "Zresetuj",
+                    "cancel_button": "Anuluj",
+                    "success": "Pomyślnie zresetowano preferencje układu."
+                }
+            },
+            "Service": {
+                "title": "Service Control",
+                "restart_service": {
+                    "submit_button": "Zrestartuj",
+                    "confirm_title": "Potwierdź zrestartowanie",
+                    "confirm_message": "Czy na pewno chcesz zrestartować usługę?",
+                    "confirm_button": "Zrestartuj",
+                    "cancel_button": "Anuluj",
+                    "restarting": "Restartowanie usługi...",
+                    "success": "Pomyślnie zrestartowano usługę.",
+                    "error": "Nie udało się zrestartować usługi: {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "Uruchom",
+                    "confirm_title": "Potwierdź uruchomienie",
+                    "confirm_message": "Czy na pewno chcesz uruchomić usługę?",
+                    "confirm_button": "Uruchom",
+                    "cancel_button": "Anuluj",
+                    "starting": "Uruchamianie usługi...",
+                    "success": "Pomyślnie uruchomiono usługę.",
+                    "error": "Nie udało się uruchomić usługi: {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "Zatrzymaj",
+                    "confirm_title": "Potwierdź zatrzymanie",
+                    "confirm_message": "Czy na pewno chcesz zatrzymać usługę?",
+                    "confirm_button": "Zatrzymaj",
+                    "cancel_button": "Anuluj",
+                    "stopping": "Zatrzymywanie usługi...",
+                    "success": "Pomyślnie zatrzymano usługę.",
+                    "error": "Nie udało się zatrzymać usługi: {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "Zresetuj",
+                    "confirm_title": "Potwierdź zresetowanie",
+                    "confirm_message": "Czy na pewno chcesz zresetować usługę?",
+                    "confirm_button": "Zresetuj",
+                    "cancel_button": "Anuluj",
+                    "resetting": "Resetowanie usługi...",
+                    "success": "Pomyślnie zresetowano usługę.",
+                    "error": "Nie udało się zresetować usługi: {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "Edytuj",
+                    "updating": "Wprowadzanie nowych zmian...",
+                    "success": "Zmiany zostały wprowadzone.",
+                    "error": "Nie udało się zaktualizować konfiguracji usługi: {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "Usługa edycyjna: {{name}}"
+                },
+                "service_status": {
+                    "yes": "Tak",
+                    "no": "Nie",
+                    "is_running": "Działa",
+                    "restarts": "Restartuje",
+                    "stopped_at": "Zakończono o",
+                    "started_at": "Zaczęto o",
+                    "updated_at": "Zaktualizowano o"
+                }
+            },
+            "Station": {
+                "title": "Ustawienia stacji",
+                "update_station": {
+                    "field_required": "To pole jest wymagane.",
+                    "updating": "Aktualizowanie konfiguracji stacji...",
+                    "success": "Pomyślnie zaktualizowano konfiguracji stacji.",
+                    "error": "Nie udało się zaktualizować konfiguracji stacji: {{error}}"
+                }
+            },
+            "Users": {
+                "title": "Zarządzanie użytkownikami",
+                "search_users": {
+                    "placeholder": "Wyszukaj użytkowników"
+                },
+                "refresh_list": {
+                    "submit_button": "Odśwież",
+                    "refreshing": "Odświeżanie listy użytkowników...",
+                    "success": "Pomyślnie odświeżono listę użytkowników.",
+                    "error": "Odświeżanie listy użytkowników nie powiodło się: {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "Usuń użytkowników",
+                    "confirm_title": "Potwierdź usunięcie",
+                    "confirm_message": "Czy na pewno chcesz usunąć wybranego użytkownika?",
+                    "confirm_button": "Usuń",
+                    "cancel_button": "Anuluj",
+                    "removing": "Usuwanie wybranego użytkownika...",
+                    "success": "{{num}} użytkownik został usunięty.",
+                    "error": "Nie udało się usunąć wybranego użytkownika: {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "Utwórz nowego użytkownika",
+                    "creating": "Tworzenie nowego użytkownika...",
+                    "success": "Użytkownik {{username}} został utworzony.",
+                    "error": "Nie udało się utworzyć nowego użytkownika: {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "Utwórz nowego użytkownika",
+                    "username": {
+                        "label": "Nazwa użytkownika",
+                        "placeholder": "Nazwa nowego użytkownika."
+                    },
+                    "password": {
+                        "label": "Hasło",
+                        "placeholder": "Hasło nowego użytkownika."
+                    },
+                    "admin": {
+                        "label": "Użytkownik z uprawnieniami administratora"
+                    },
+                    "create_button": "Utwórz"
+                },
+                "edit_user": {
+                    "submit_button": "edytuj",
+                    "updating": "Aktualizowanie użytkownika...",
+                    "success": "Użytkownik {{username}} został zaktualizowany.",
+                    "error": "Nie udało się zaktualizować użytkownika: {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "Edytuj użytkownika",
+                    "username": {
+                        "label": "Nazwa użytkownika",
+                        "placeholder": "Puste, bez zmian."
+                    },
+                    "password": {
+                        "label": "Hasło",
+                        "placeholder": "Puste, bez zmian."
+                    },
+                    "admin": {
+                        "label": "Użytkownik z uprawnieniami administratora"
+                    },
+                    "update_button": "Aktualizuj"
+                },
+                "remove_user": {
+                    "submit_button": "Usuń",
+                    "confirm_title": "Potwierdź usunięcie",
+                    "confirm_message": "Czy na pewno chcesz usunąć użytkownika {{username}}?",
+                    "confirm_button": "Usuń",
+                    "cancel_button": "Anuluj",
+                    "removing": "Usuwanie użytkownika...",
+                    "success": "Użytkownik {{username}} został usunięty.",
+                    "error": "Nie udało się usunąć użytkownika: {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "Tak",
+                    "no": "Nie",
+                    "never": "Nigdy",
+                    "id": "ID",
+                    "user_id": "Identyfikator użytkownika",
+                    "username": "Nazwa użytkownika",
+                    "admin": "Administrator",
+                    "created_at": "Utworzono w",
+                    "last_login": "Ostatnie logowanie",
+                    "user_ip": "Adres IP użytkownika",
+                    "user_agent": "Agent użytkownika",
+                    "updated_at": "Zaktualizowano w",
+                    "actions": "Akcje"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "Nowa aktualizacja jest dostępna, czy chcesz teraz dokonać aktualizacji?",
+            "confirm_title": "Aktualiacja dostępna",
+            "confirm_button": "Aktualizuj",
+            "cancel_button": "Anuluj"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "Czy na pewno chcesz się wylogować?",
+            "confirm_title": "Wyloguj",
+            "confirm_button": "OK",
+            "cancel_button": "Anuluj"
+        },
+        "newsletter": {
+            "title": "Newsletter",
+            "submit_button": "Subskrybuj"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "Nazwa użytkownika",
+            "placeholder": "Twoja nazwa użytkownika"
+        },
+        "password": {
+            "label": "Hasło",
+            "placeholder": "Twoje hasło"
+        },
+        "captcha": {
+            "label": "Wprowadź Captcha",
+            "loading": "Ładowanie Captcha...",
+            "error": "Nie udało się załadować Captcha",
+            "placeholder": "Kod Captcha",
+            "refreshing": "Ładowanie Captcha.",
+            "refresh_success": "Odświeżono Captcha pomyślnie.",
+            "refresh_error": "Nie udało się odświeżyć Captcha."
+        },
+        "signin": {
+            "button": "Login",
+            "loading": "Logowanie...",
+            "success": "Zalogowałeś się pomyślnie.",
+            "error": "Logowanie nieudane."
+        }
+    }
+}

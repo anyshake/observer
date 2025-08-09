@@ -228,7 +228,7 @@
                     "description": "This will reset all station configuration, operation is irreversible, restart required to take effect.",
                     "submit_button": "Reset Station",
                     "confirm_title": "Confirm Reset",
-                    "confirm_message": "Are you want to reset all station configuration?",
+                    "confirm_message": "Are you sure you want to reset all station configuration?",
                     "confirm_button": "Reset",
                     "cancel_button": "Cancel",
                     "resetting": "Resetting station configuration...",
@@ -240,7 +240,7 @@
                     "description": "This will reset all service configuration, operation is irreversible, restart required to take effect.",
                     "submit_button": "Reset Service",
                     "confirm_title": "Confirm Reset",
-                    "confirm_message": "Are you want to reset all service configuration?",
+                    "confirm_message": "Are you sure you want to reset all service configuration?",
                     "confirm_button": "Reset",
                     "cancel_button": "Cancel",
                     "resetting": "Resetting service configuration...",
@@ -470,4 +470,5 @@
             "error": "Login failed."
         }
     }
+
 }
