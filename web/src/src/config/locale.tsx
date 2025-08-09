@@ -6,6 +6,7 @@ import enUS from '../locales/en-US.json';
 import frFR from '../locales/fr-FR.json';
 import idID from '../locales/id-ID.json';
 import jaJP from '../locales/ja-JP.json';
+import plPL from '../locales/pl-PL.json';
 import ptPT from '../locales/pt-PT.json';
 import ruRU from '../locales/ru-RU.json';
 import trTR from '../locales/tr-TR.json';
@@ -26,6 +27,7 @@ export const localeConfig: ILocaleConfig = {
         'fr-FR': { label: 'Français', translation: frFR },
         'id-ID': { label: 'Bahasa Indonesia', translation: idID },
         'ja-JP': { label: '日本語', translation: jaJP },
+        'pl-PL': { label: 'Polski', translation: plPL },
         'pt-PT': { label: 'Português', translation: ptPT },
         'ru-RU': { label: 'Русский', translation: ruRU },
         'tr-TR': { label: 'Türkçe', translation: trTR },
