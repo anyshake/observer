@@ -10,7 +10,6 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
-	"unsafe"
 
 	"github.com/anyshake/observer/internal/hardware/explorer/metadata"
 	"github.com/anyshake/observer/pkg/fifo"
@@ -301,22 +300,23 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 			}
 
 			if headerIdx := bytes.Index(recvBuf, DATA_PACKET_HEADER); headerIdx != -1 {
-				if err = g.verifyChecksum(recvBuf[headerIdx:], DATA_PACKET_HEADER, DATA_PACKET_TAILER); err == nil && len(recvBuf) > headerIdx+len(DATA_PACKET_HEADER)+int(unsafe.Sizeof(int64(0))) {
-					mcuTimestamp := int64(binary.LittleEndian.Uint64(recvBuf[headerIdx+len(DATA_PACKET_HEADER) : headerIdx+len(DATA_PACKET_HEADER)+int(unsafe.Sizeof(int64(0)))]))
+				if err = g.verifyChecksum(recvBuf[headerIdx:], DATA_PACKET_HEADER, DATA_PACKET_TAILER); err == nil && len(recvBuf) > 14 {
+					mcuTimestamp := int64(binary.LittleEndian.Uint64(recvBuf[headerIdx+len(DATA_PACKET_HEADER) : headerIdx+len(DATA_PACKET_HEADER)+8]))
 					deviceConfig := binary.LittleEndian.Uint32(recvBuf[headerIdx+len(DATA_PACKET_HEADER)+8 : 14])
+					gnssEnabled := g.parseGnssAvailibility(deviceConfig)
 
 					extraLatency := recvElapsed - g.Transport.GetLatency(len(recvBuf))
 					packetLatency := g.parsePacketInterval(deviceConfig) + recvElapsed + extraLatency
 					timeDiff := recvEndTime.UnixMilli() - mcuTimestamp - packetLatency.Milliseconds()
 
-					if !g.isTimeDiff4NonGnssModeStable {
+					if !g.isTimeDiff4NonGnssModeStable && !gnssEnabled {
 						timeDiffSamples = append(timeDiffSamples, timeDiff)
 						if len(timeDiffSamples) > STABLE_CHECK_SAMPLES {
 							timeDiffSamples = timeDiffSamples[1:]
 						}
 
 						if len(timeDiffSamples) == STABLE_CHECK_SAMPLES {
-							if minVal, maxVal := lo.Min(timeDiffSamples), lo.Max(timeDiffSamples); math.Abs(float64(maxVal-minVal)) <= 10 {
+							if minVal, maxVal := lo.Min(timeDiffSamples), lo.Max(timeDiffSamples); math.Abs(float64(maxVal-minVal)) <= 5 {
 								g.isTimeDiff4NonGnssModeStable = true
 								g.Logger.Infof("data time series stabilized: time difference = %d ms", timeDiff)
 							} else {
@@ -330,6 +330,8 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 								g.Logger.Warnln("collecting data time series, this may take a while")
 							}
 						}
+					} else if gnssEnabled {
+						g.isTimeDiff4NonGnssModeStable = true
 					}
 
 					if g.deviceConfig.GetSampleRate() > 0 && g.variableAllSet {
