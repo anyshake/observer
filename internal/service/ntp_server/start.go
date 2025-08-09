@@ -119,6 +119,8 @@ func (p *ntpServer) Run(ctx context.Context) {
 			break
 		}
 		if n > 0 {
+			currentTime := p.timeFn()
+
 			data := make([]byte, n)
 			copy(data, readBuf[:n])
 
@@ -130,7 +132,8 @@ func (p *ntpServer) Run(ctx context.Context) {
 						logger.GetLogger(ID).Errorf("recovered from panic in handler: %v\n%s", r, debug.Stack())
 					}
 				}()
-				p.handleData(addr, d)
+
+				p.handleData(currentTime, addr, d)
 			}(data, remoteAddr)
 		}
 	}
@@ -150,7 +153,7 @@ func (p *ntpServer) write(data []byte, addr string) error {
 	return nil
 }
 
-func (p *ntpServer) handleData(addr net.Addr, data []byte) {
+func (p *ntpServer) handleData(tm time.Time, addr net.Addr, data []byte) {
 	addrPort, err := netip.ParseAddrPort(addr.String())
 	if err != nil {
 		logger.GetLogger(ID).Errorf("failed to parse address and port: %v", err)
@@ -163,7 +166,7 @@ func (p *ntpServer) handleData(addr net.Addr, data []byte) {
 	if p.isDataValid(ipAddr, data) {
 		logger.GetLogger(ID).Infof("accepted connection from %s", addrPortStr)
 
-		resp, err := p.encodePacket(data)
+		resp, err := p.encodePacket(tm, data)
 		if err != nil {
 			logger.GetLogger(ID).Errorf("failed to encode NTP response packet: %v", err)
 			return
@@ -177,17 +180,15 @@ func (p *ntpServer) handleData(addr net.Addr, data []byte) {
 	}
 }
 
-func (p *ntpServer) encodePacket(req []byte) ([]byte, error) {
-	currentTime := p.timeFn()
-
-	sec := uint32(currentTime.Unix() + FROM_1900_TO_1970)
+func (p *ntpServer) encodePacket(tm time.Time, req []byte) ([]byte, error) {
+	sec := uint32(tm.Unix() + FROM_1900_TO_1970)
 	// convert nanoseconds to 32-bit fraction of a second
-	frac := uint32((uint64(currentTime.Nanosecond()) * (1 << 32)) / 1_000_000_000)
+	frac := uint32((uint64(tm.Nanosecond()) * (1 << 32)) / 1_000_000_000)
 
 	res := make([]byte, 48)
 	vn := req[0] & 0x38
 	res[0] = vn | 0x04 // version + mode (server)
-	res[1] = 0         // stratum
+	res[1] = 1         // stratum
 	res[2] = req[2]    // poll
 	res[3] = 0xEC      // precision
 

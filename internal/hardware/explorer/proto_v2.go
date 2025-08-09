@@ -229,7 +229,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 	g.deviceStatus.SetUpdatedAt(time.Unix(0, 0))
 	g.deviceConfig.SetProtocol(g.ExplorerOptions.Protocol)
 	g.deviceConfig.SetModel(g.ExplorerOptions.Model)
-	g.timeCalibrationChan4GnssMode = make(chan [2]time.Time, 1)
+	g.timeCalibrationChan4GnssMode = make(chan [2]time.Time)
 
 	var initFlag int32
 	atomic.StoreInt32(&initFlag, 0)
@@ -263,11 +263,14 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 			}
 			recvBuf := buf[:n]
 
-			totalLatency := recvEndTime.Sub(recvStartTime)
+			packetLatency := recvEndTime.Sub(recvStartTime)
 			if headerIdx := bytes.Index(recvBuf, DATA_PACKET_HEADER); headerIdx != -1 && len(recvBuf) >= headerIdx+packetSize {
 				if err = g.verifyChecksum(recvBuf[headerIdx:headerIdx+packetSize], DATA_PACKET_HEADER); err == nil {
 					mcuTimestamp := int64(binary.LittleEndian.Uint64(recvBuf[headerIdx+len(DATA_PACKET_HEADER) : headerIdx+len(DATA_PACKET_HEADER)+int(unsafe.Sizeof(int64(0)))]))
-					timeDiff := recvEndTime.UnixMilli() - mcuTimestamp - totalLatency.Milliseconds()
+
+					estimatedTransportLatency := g.Transport.GetLatency(len(recvBuf))
+					packetLatency += estimatedTransportLatency
+					timeDiff := recvEndTime.UnixMilli() - mcuTimestamp - packetLatency.Milliseconds()
 
 					if !g.isTimeDiff4NonGnssModeStable {
 						timeDiffSamples = append(timeDiffSamples, timeDiff)
@@ -276,7 +279,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 						}
 
 						if len(timeDiffSamples) == STABLE_CHECK_SAMPLES {
-							if minVal, maxVal := lo.Min(timeDiffSamples), lo.Max(timeDiffSamples); math.Abs(float64(maxVal-minVal)) <= 10 {
+							if minVal, maxVal := lo.Min(timeDiffSamples), lo.Max(timeDiffSamples); math.Abs(float64(maxVal-minVal)) <= 5 {
 								g.isTimeDiff4NonGnssModeStable = true
 								g.Logger.Infof("data time series stabilized: time difference = %d ms", timeDiff)
 							} else {
@@ -293,7 +296,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 
 					if g.deviceConfig.GetSampleRate() > 0 && g.variableAllSet {
 						if g.deviceConfig.GetGnssAvailability() && g.needUpdateTimeSource {
-							g.TimeSource.Update(recvEndTime, time.UnixMilli(mcuTimestamp).Add(totalLatency))
+							g.TimeSource.Update(recvEndTime, time.UnixMilli(mcuTimestamp).Add(packetLatency))
 
 							g.needUpdateTimeSource = false
 							g.isTimeDiff4NonGnssModeStable = false
@@ -328,7 +331,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 
 					if g.deviceConfig.GetSampleRate() > 0 && g.variableAllSet && g.deviceConfig.GetGnssAvailability() {
 						select {
-						case g.timeCalibrationChan4GnssMode <- [2]time.Time{recvEndTime, time.UnixMilli(mcuTimestamp).Add(totalLatency)}:
+						case g.timeCalibrationChan4GnssMode <- [2]time.Time{recvEndTime, time.UnixMilli(mcuTimestamp).Add(packetLatency)}:
 						default:
 						}
 					}
@@ -460,32 +463,27 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 	go func() {
 		<-readyChan
 
-		getNextUtcMidnight := func() time.Duration {
+		getNextHour := func() time.Duration {
 			now := g.TimeSource.Now()
-			nextMidnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, time.UTC)
-			return time.Until(nextMidnight)
+			nextHour := time.Date(now.Year(), now.Month(), now.Day(), now.Hour()+1, 0, 0, 0, time.UTC)
+			return time.Until(nextHour)
 		}
-		for timer := time.NewTimer(getNextUtcMidnight()); ; {
-			timer.Reset(getNextUtcMidnight())
-
+		for timer := time.NewTimer(getNextHour()); ; {
 			select {
+			case calibTimeData := <-g.timeCalibrationChan4GnssMode:
+				g.TimeSource.Update(calibTimeData[0], calibTimeData[1])
 			case <-timer.C:
-				if g.deviceConfig.GetGnssAvailability() {
-					select {
-					case calibTimeData := <-g.timeCalibrationChan4GnssMode:
-						g.TimeSource.Update(calibTimeData[0], calibTimeData[1])
-					case <-time.After(time.Second):
-						g.Logger.Warn("no GNSS calibration timestamp received within 1 second, skipping")
-					}
-				} else {
-					res, err := ntpClient.Query()
-					if err != nil {
-						g.Logger.Warnf("error occurred while re-synchronizing time: %v", err)
-						continue
-					}
-					currentTime := time.Now()
-					g.TimeSource.Update(currentTime, currentTime.Add(res.ClockOffset))
+				timer.Reset(getNextHour())
+				if deviceConfig := g.GetConfig(); deviceConfig.GetGnssAvailability() {
+					continue
 				}
+				res, err := ntpClient.Query()
+				if err != nil {
+					g.Logger.Warnf("error occurred while re-synchronizing time with NTP: %v", err)
+					continue
+				}
+				currentTime := time.Now()
+				g.TimeSource.Update(currentTime, currentTime.Add(res.ClockOffset))
 			case <-subCtx.Done():
 				timer.Stop()
 				return
