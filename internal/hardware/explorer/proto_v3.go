@@ -300,9 +300,9 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 			}
 
 			if headerIdx := bytes.Index(recvBuf, DATA_PACKET_HEADER); headerIdx != -1 {
-				if err = g.verifyChecksum(recvBuf[headerIdx:], DATA_PACKET_HEADER, DATA_PACKET_TAILER); err == nil && len(recvBuf) > 14 {
+				if err = g.verifyChecksum(recvBuf[headerIdx:], DATA_PACKET_HEADER, DATA_PACKET_TAILER); err == nil && len(recvBuf[headerIdx:]) > headerIdx+len(DATA_PACKET_HEADER)+8+4 {
 					mcuTimestamp := int64(binary.LittleEndian.Uint64(recvBuf[headerIdx+len(DATA_PACKET_HEADER) : headerIdx+len(DATA_PACKET_HEADER)+8]))
-					deviceConfig := binary.LittleEndian.Uint32(recvBuf[headerIdx+len(DATA_PACKET_HEADER)+8 : 14])
+					deviceConfig := binary.LittleEndian.Uint32(recvBuf[headerIdx+len(DATA_PACKET_HEADER)+8 : headerIdx+len(DATA_PACKET_HEADER)+8+4])
 					gnssEnabled := g.parseGnssAvailibility(deviceConfig)
 
 					extraLatency := recvElapsed - g.Transport.GetLatency(len(recvBuf))
