@@ -1,12 +1,12 @@
 module github.com/anyshake/observer
 
-go 1.23.0
+go 1.24.1
 
 require (
 	github.com/99designs/gqlgen v0.17.76
 	github.com/PuerkitoBio/goquery v1.10.3
 	github.com/alphadose/haxmap v1.4.0
-	github.com/ameshkov/dnscrypt/v2 v2.3.0
+	github.com/ameshkov/dnscrypt/v2 v2.4.0
 	github.com/antonfisher/nested-logrus-formatter v1.3.1
 	github.com/appleboy/gin-jwt/v2 v2.10.1
 	github.com/bclswl0827/eewgo v0.1.0
@@ -35,7 +35,7 @@ require (
 	github.com/go-logr/logr v1.4.2
 	github.com/gorilla/websocket v1.5.3
 	github.com/jedisct1/go-dnsstamps v0.0.0-20240423203910-07a0735c7774
-	github.com/miekg/dns v1.1.63
+	github.com/miekg/dns v1.1.65
 	github.com/ncruces/go-sqlite3 v0.18.2
 	github.com/ncruces/go-sqlite3/gormlite v0.18.0
 	github.com/samber/lo v1.49.1
@@ -50,7 +50,7 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.35.0
 	go.opentelemetry.io/otel/sdk v1.35.0
 	go.opentelemetry.io/otel/trace v1.35.0
-	golang.org/x/exp v0.0.0-20241204233417-43b7b7cde48d
+	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.5.2
 	gorm.io/driver/postgres v1.5.7
@@ -84,12 +84,10 @@ require (
 
 require (
 	git.sr.ht/~sbinet/gg v0.5.0 // indirect
-	github.com/AdguardTeam/golibs v0.20.3 // indirect
+	github.com/AdguardTeam/golibs v0.32.7 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.11.1 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.5.2 // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
-	github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da // indirect
-	github.com/aead/poly1305 v0.0.0-20180717145839-3fee0db0b635 // indirect
 	github.com/agnivade/levenshtein v1.2.1 // indirect
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b // indirect
 	github.com/ameshkov/dnsstamps v1.0.3 // indirect
@@ -120,7 +118,7 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/pprof v0.0.0-20241206021119-61a79c692802 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.1 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hashicorp/yamux v0.1.1 // indirect
@@ -178,12 +176,12 @@ require (
 	golang.org/x/mod v0.25.0 // indirect
 	golang.org/x/oauth2 v0.28.0 // indirect
 	golang.org/x/sync v0.15.0 // indirect
-	golang.org/x/time v0.5.0 // indirect
+	golang.org/x/time v0.11.0 // indirect
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	golang.zx2c4.com/wireguard v0.0.0-20231211153847-12269c276173 // indirect
 	gonum.org/v1/plot v0.14.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20250218202821-56aae31c358a // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250218202821-56aae31c358a // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250311190419-81fb87f6b8bf // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250311190419-81fb87f6b8bf // indirect
 	google.golang.org/grpc v1.71.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
