@@ -19,7 +19,7 @@ func (s *SQLite) Open(address, username, password, database, prefix string, time
 		return nil, fmt.Errorf("directory %s does not exist", baseDir)
 	}
 
-	db, err := gorm.Open(gormlite.Open(fmt.Sprintf("%s?_pragma=synchronous(NORMAL)&_pragma=cache_size(-20000)&_pragma=temp_store(MEMORY)&_pragma=foreign_keys(ON)&_pragma=auto_vacuum(FULL)", database)), &gorm.Config{
+	db, err := gorm.Open(gormlite.Open(fmt.Sprintf("file:%s?_pragma=synchronous(NORMAL)&_pragma=cache_size(-20000)&_pragma=temp_store(MEMORY)&_pragma=foreign_keys(ON)&_pragma=auto_vacuum(FULL)", database)), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 		NamingStrategy: schema.NamingStrategy{
 			TablePrefix: prefix,
