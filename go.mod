@@ -14,7 +14,7 @@ require (
 	github.com/bclswl0827/heligo v0.1.3
 	github.com/bclswl0827/mseedio v1.0.12
 	github.com/bclswl0827/sacio v1.0.6
-	github.com/bclswl0827/slgo v0.2.2
+	github.com/bclswl0827/slgo v0.2.3
 	github.com/bclswl0827/sqlite v1.11.1-0.20240613172512-9e6ac9861470
 	github.com/beevik/ntp v1.4.3
 	github.com/blang/semver/v4 v4.0.0
@@ -205,7 +205,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.39.0
 	golang.org/x/net v0.41.0
-	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/sys v0.33.0
 	golang.org/x/text v0.26.0
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
