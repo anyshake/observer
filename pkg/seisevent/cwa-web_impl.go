@@ -2,11 +2,8 @@ package seisevent
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"fmt"
-	"net"
-	"net/http"
 	"regexp"
 	"strings"
 	"time"
@@ -15,25 +12,12 @@ import (
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/request"
 	"github.com/corpix/uarand"
-	"golang.org/x/exp/rand"
 )
 
 const CWA_WP_ID = "cwa_web"
 
 type CWA_WP struct {
-	cache     cache.AnyCache
-	cacheYear int
-}
-
-// Magic function that bypasses the Great Firewall of China
-func (c *CWA_WP) createGfwBypasser(customAddrs []string) *http.Transport {
-	return &http.Transport{
-		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-			// Choose a random address from the list
-			customAddr := customAddrs[rand.Intn(len(customAddrs))]
-			return (&net.Dialer{}).DialContext(ctx, network, customAddr)
-		},
-	}
+	cache cache.AnyCache
 }
 
 func (c *CWA_WP) GetProperty() DataSourceProperty {
@@ -68,16 +52,32 @@ func (c *CWA_WP) GetEvents(latitude, longitude float64) ([]Event, error) {
 	if len(ts) == 0 {
 		return nil, errors.New("failed to get current time from Cloudflare")
 	}
-	c.cacheYear = time.Unix(int64(string2Float(ts[1])), 0).Year()
+	currentYear := time.Unix(int64(string2Float(ts[1])), 0).Year()
 
 	// Get CWA HTML response
 	res, err = request.GET(
 		"https://www.cwa.gov.tw/V8/C/E/MOD/MAP_LIST.html",
 		10*time.Second, time.Second, 3, false,
-		// HiNet CDN IP addresses
-		c.createGfwBypasser([]string{
-			"168.95.245.1:443", "168.95.245.2:443", "168.95.245.3:443", "168.95.245.4:443",
-			"168.95.246.1:443", "168.95.246.2:443", "168.95.246.3:443", "168.95.246.4:443",
+		// Query CWA IP from custom encrypted DNS servers
+		// Most overseas DoH / DoT providers are blocked in China
+		// Recommended DNSCrypt: https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/public-resolvers.md
+		(&CWA_API{}).createGfwBypasser([]string{
+			// cs-tokyo
+			"sdns://AQcAAAAAAAAADDE0Ni43MC4zMS40MyAxM3KtWVYywkFrhy8Jj4Ub3bllKExsvppPGQlkMNupWh4yLmRuc2NyeXB0LWNlcnQuY3J5cHRvc3Rvcm0uaXM",
+			// dnscry.pt-tokyo-ipv4
+			"sdns://AQcAAAAAAAAADDQ1LjY3Ljg2LjEyMyBDK5aRHZnKfdd6Q9ufEJY83WAQ9X5z7OAQa5CeptBCYBkyLmRuc2NyeXB0LWNlcnQuZG5zY3J5LnB0",
+			// dnscry.pt-tokyo02-ipv4
+			"sdns://AQcAAAAAAAAADDEwMy4xNzkuNDUuNiDfai5sp1im-BPHwbM1GCnTqn20FIbQfuvvybKsGf0pjhkyLmRuc2NyeXB0LWNlcnQuZG5zY3J5LnB0",
+			// jp.tiar.app
+			"sdns://AQcAAAAAAAAAEjE3Mi4xMDQuOTMuODA6MTQ0MyAyuHY-8b9lNqHeahPAzW9IoXnjiLaZpTeNbVs8TN9UUxsyLmRuc2NyeXB0LWNlcnQuanAudGlhci5hcHA",
+			// saldns01-conoha-ipv4
+			"sdns://gRQxNjMuNDQuMTI0LjIwNDo1MDQ0Mw",
+			// saldns02-conoha-ipv4
+			"sdns://gRUxNjAuMjUxLjIxNC4xNzI6NTA0NDM",
+			// saldns03-conoha-ipv4
+			"sdns://gRQxNjAuMjUxLjE2OC4yNTo1MDQ0Mw",
+			// dnscry.pt-seoul-ipv4
+			"sdns://AQcAAAAAAAAADTkyLjM4LjEzNS4xMjggyHfVGamJyxLfoAWjERmO4pY3KzKkqY-vSa2UnVx_gYAZMi5kbnNjcnlwdC1jZXJ0LmRuc2NyeS5wdA",
 		}),
 		map[string]string{"User-Agent": uarand.GetRandom()},
 	)
@@ -115,7 +115,7 @@ func (c *CWA_WP) GetEvents(latitude, longitude float64) ([]Event, error) {
 			Depth:     c.getDepth(textValue),
 			Region:    c.getRegion(textValue),
 			Magnitude: c.getMagnitude(textValue),
-			Timestamp: c.getTimestamp(c.cacheYear, textValue),
+			Timestamp: c.getTimestamp(currentYear, textValue),
 		}
 		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
 		seisEvent.Estimation = getSeismicEstimation(seisEvent.Depth, seisEvent.Distance)
