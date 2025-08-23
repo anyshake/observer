@@ -11,7 +11,13 @@
         "timeout": 5
     },
     "ntpclient": {
-        "endpoint": "ntp://pool.ntp.org:123",
+        "pool": [
+            "ntp://ntp-a2.nict.go.jp:123",
+            "ntp://ntp-a3.nict.go.jp:123",
+            "ntp://ntp-b2.nict.go.jp:123",
+            "ntp://ntp-b3.nict.go.jp:123",
+            "ntp://ntp-k1.nict.jp:123"
+        ],
         "timeout": 5,
         "retry": 5
     },

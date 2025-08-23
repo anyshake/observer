@@ -21,9 +21,11 @@ type hardware struct {
 }
 
 type ntpClient struct {
-	Endpoint string `mapstructure:"endpoint" validate:"required"`
-	Timeout  int    `mapstructure:"timeout" validate:"gte=0"`
-	Retry    int    `mapstructure:"retry" validate:"gte=0"`
+	// Endpoint is a deprecated field since v4.2.0, use Pool instead
+	Endpoint string   `mapstructure:"endpoint"`
+	Timeout  int      `mapstructure:"timeout" validate:"gte=0"`
+	Retry    int      `mapstructure:"retry" validate:"gte=0"`
+	Pool     []string `mapstructure:"pool"`
 }
 
 type database struct {

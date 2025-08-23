@@ -207,7 +207,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 	if err := g.Transport.Open(); err != nil {
 		return nil, nil, fmt.Errorf("failed to open transport: %w", err)
 	}
-	ntpClient, err := ntpclient.New(g.NtpOptions.Endpoint, g.NtpOptions.Retry, g.NtpOptions.ReadTimeout)
+	ntpClient, err := ntpclient.New(g.NtpOptions.Pool, g.NtpOptions.Retry, g.NtpOptions.ReadTimeout)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create ntp client: %w", err)
 	}
@@ -241,7 +241,6 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 		g.needUpdateTimeSource = true
 
 		buf := make([]byte, packetSize*2)
-		_ = g.Flush()
 
 		for {
 			select {
@@ -281,15 +280,16 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 						if len(timeDiffSamples) == STABLE_CHECK_SAMPLES {
 							if minVal, maxVal := lo.Min(timeDiffSamples), lo.Max(timeDiffSamples); math.Abs(float64(maxVal-minVal)) <= 5 {
 								g.isTimeDiff4NonGnssModeStable = true
-								g.Logger.Infof("data time series stabilized: time difference = %d ms", timeDiff)
+								if err = g.Flush(); err != nil {
+									g.Logger.Errorf("failed to flush transport: %v", err)
+									cancelFn()
+								}
+								g.fifoBuffer.Reset()
+								g.Logger.Infof("data time series stabilized, final time difference = %d ms", timeDiff)
 							} else {
-								g.Logger.Warnln("waiting for data time series to settle down, this may take a while")
+								g.Logger.Warnf("waiting for data time series to settle down, this may take a while, current time difference = %d ms", timeDiff)
 							}
 						} else {
-							if err = g.Flush(); err != nil {
-								g.Logger.Errorf("failed to flush transport: %v", err)
-								cancelFn()
-							}
 							g.Logger.Warnln("collecting data time series, this may take a while")
 						}
 					}
@@ -303,8 +303,8 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 
 							g.Logger.Infof("time synchronized with Explorer built-in GNSS module")
 						} else if g.needUpdateTimeSource {
-							g.Logger.Infof("synchronizing time with NTP server: %s", g.NtpOptions.Endpoint)
-							res, err := ntpClient.Query()
+							g.Logger.Infoln("synchronizing time with NTP servers, it may take a while")
+							offset, err := ntpClient.QueryAverage(NTP_MEASUREMENT_ATTEMPTS)
 							if err != nil {
 								g.Logger.Errorf("failed to synchronize time with NTP server: %v", err)
 								if atomic.LoadInt32(&initFlag) == 0 {
@@ -313,11 +313,16 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 									continue
 								}
 							} else {
-								g.Logger.Infof("time synchronized with NTP server, local time offset: %d ms", res.ClockOffset.Milliseconds())
+								g.Logger.Infof("time synchronized with NTP server, local time offset: %d ms", offset.Milliseconds())
+								if err = g.Flush(); err != nil {
+									g.Logger.Errorf("failed to flush transport: %v", err)
+									cancelFn()
+								}
+								g.fifoBuffer.Reset()
 							}
 
 							currentTime := time.Now()
-							g.TimeSource.Update(currentTime, currentTime.Add(res.ClockOffset))
+							g.TimeSource.Update(currentTime, currentTime.Add(offset))
 							g.needUpdateTimeSource = false
 							g.isTimeDiff4NonGnssModeStable = false
 						}
@@ -342,7 +347,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 						if g.prevTimeOffset4NonGnssMode == nil {
 							g.prevTimeOffset4NonGnssMode = &timeOffset
 						}
-						if math.Abs(float64(timeOffset)-float64(*g.prevTimeOffset4NonGnssMode)) > 1 {
+						if math.Abs(float64(timeOffset-*g.prevTimeOffset4NonGnssMode)) > 1 {
 							g.timeDiff4NonGnssMode = timeDiff
 							g.prevTimeOffset4NonGnssMode = &timeOffset
 						}
@@ -356,7 +361,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 
 					// Handle MCU time jumps (usually caused by Explorer power loss or PC hibernation)
 					// 5000 ms is a threshold determined by max packet interval with a minimum sample rate of 1 Hz
-					if (mcuTimestamp < g.prevMcuTimestamp || math.Abs(float64(mcuTimestamp)-float64(g.prevMcuTimestamp)) >= 5000) && g.prevMcuTimestamp != 0 {
+					if (mcuTimestamp < g.prevMcuTimestamp || math.Abs(float64(mcuTimestamp-g.prevMcuTimestamp)) >= 5000) && g.prevMcuTimestamp != 0 {
 						g.fifoBuffer.Reset()
 						g.resetVariables()
 						g.timeDiff4NonGnssMode = 0
@@ -460,36 +465,33 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 		}
 	}(5 * time.Millisecond)
 
-	go func() {
+	go func(resyncInterval time.Duration) {
 		<-readyChan
 
-		getNextHour := func() time.Duration {
-			now := g.TimeSource.Now()
-			nextHour := time.Date(now.Year(), now.Month(), now.Day(), now.Hour()+1, 0, 0, 0, time.UTC)
-			return time.Until(nextHour)
-		}
-		for timer := time.NewTimer(getNextHour()); ; {
+		for timer := time.NewTimer(resyncInterval); ; {
 			select {
 			case calibTimeData := <-g.timeCalibrationChan4GnssMode:
 				g.TimeSource.Update(calibTimeData[0], calibTimeData[1])
 			case <-timer.C:
-				timer.Reset(getNextHour())
-				if deviceConfig := g.GetConfig(); deviceConfig.GetGnssAvailability() {
+				timer.Reset(resyncInterval)
+				if deviceConfig := g.GetConfig(); deviceConfig.GetGnssAvailability() || !g.variableAllSet {
 					continue
 				}
-				res, err := ntpClient.Query()
+				g.Logger.Info("re-synchronizing time with NTP servers")
+				offset, err := ntpClient.QueryAverage(NTP_MEASUREMENT_ATTEMPTS)
 				if err != nil {
 					g.Logger.Warnf("error occurred while re-synchronizing time with NTP: %v", err)
 					continue
 				}
 				currentTime := time.Now()
-				g.TimeSource.Update(currentTime, currentTime.Add(res.ClockOffset))
+				g.TimeSource.Update(currentTime, currentTime.Add(offset))
+				g.Logger.Infof("time synchronized with NTP server, local time offset: %d ms", offset.Milliseconds())
 			case <-subCtx.Done():
 				timer.Stop()
 				return
 			}
 		}
-	}()
+	}(NTP_RESYNC_INTERVAL)
 
 	<-readyChan
 	return subCtx, cancelFn, nil
