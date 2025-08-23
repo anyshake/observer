@@ -9,22 +9,23 @@ import (
 	"net/http"
 	"time"
 
+	"math/rand/v2"
+
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/dnsquery"
 	"github.com/anyshake/observer/pkg/request"
 	"github.com/corpix/uarand"
 	"github.com/miekg/dns"
-	"golang.org/x/exp/rand"
 )
 
-const CWA_API_ID = "cwa_api"
+const CWA_SC_ID = "cwa_sc"
 
-type CWA_API struct {
+type CWA_SC struct {
 	cache cache.AnyCache
 }
 
 // Magic function that bypasses the Great Firewall of China
-func (c *CWA_API) createGfwBypasser(dnsList []string) *http.Transport {
+func (c *CWA_SC) createGfwBypasser(dnsList []string) *http.Transport {
 	return &http.Transport{
 		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
 			hostname, port, err := net.SplitHostPort(addr)
@@ -32,7 +33,7 @@ func (c *CWA_API) createGfwBypasser(dnsList []string) *http.Transport {
 				return nil, fmt.Errorf("failed to parse address: %w", err)
 			}
 
-			dnsResolver, err := dnsquery.New(dnsList[rand.Intn(len(dnsList))])
+			dnsResolver, err := dnsquery.New(dnsList[rand.IntN(len(dnsList))])
 			if err != nil {
 				return nil, fmt.Errorf("failed to create DNS resolver: %w", err)
 			}
@@ -50,7 +51,7 @@ func (c *CWA_API) createGfwBypasser(dnsList []string) *http.Transport {
 				return nil, errors.New("no answer from DNS")
 			}
 
-			dnsAnswer := res.Answer[rand.Intn(len(res.Answer))]
+			dnsAnswer := res.Answer[rand.IntN(len(res.Answer))]
 			txtRecord, ok := dnsAnswer.(*dns.A)
 			if !ok {
 				return nil, fmt.Errorf("unexpected DNS answer type: %T", dnsAnswer)
@@ -64,24 +65,24 @@ func (c *CWA_API) createGfwBypasser(dnsList []string) *http.Transport {
 	}
 }
 
-func (c *CWA_API) getRequestBody(limit int) string {
+func (c *CWA_SC) getRequestBody(limit int) string {
 	return fmt.Sprintf(`draw=1&columns[0][data]=0&columns[0][name]=EventNo&columns[0][searchable]=false&columns[0][orderable]=true&columns[0][search][value]=&columns[0][search][regex]=false&columns[1][data]=1&columns[1][name]=MaxIntensity&columns[1][searchable]=true&columns[1][orderable]=true&columns[1][search][value]=&columns[1][search][regex]=false&columns[2][data]=2&columns[2][name]=OriginTime&columns[2][searchable]=true&columns[2][orderable]=true&columns[2][search][value]=&columns[2][search][regex]=false&columns[3][data]=3&columns[3][name]=MagnitudeValue&columns[3][searchable]=true&columns[3][orderable]=true&columns[3][search][value]=&columns[3][search][regex]=false&columns[4][data]=4&columns[4][name]=Depth&columns[4][searchable]=true&columns[4][orderable]=true&columns[4][search][value]=&columns[4][search][regex]=false&columns[5][data]=5&columns[5][name]=Description&columns[5][searchable]=true&columns[5][orderable]=true&columns[5][search][value]=&columns[5][search][regex]=false&columns[6][data]=6&columns[6][name]=Description&columns[6][searchable]=true&columns[6][orderable]=true&columns[6][search][value]=&columns[6][search][regex]=false&order[0][column]=2&order[0][dir]=desc&start=0&length=%d&search[value]=&search[regex]=false&Search=&txtSDate=&txtEDate=&txtSscale=&txtEscale=&txtSdepth=&txtEdepth=&txtLonS=&txtLonE=&txtLatS=&txtLatE=&ddlCity=&ddlCitySta=&txtIntensityB=&txtIntensityE=&txtLon=&txtLat=&txtKM=&ddlStationName=&cblEventNo=&txtSDatePWS=&txtEDatePWS=&txtSscalePWS=&txtEscalePWS=&ddlMark=`, limit)
 }
 
-func (c *CWA_API) GetProperty() DataSourceProperty {
+func (c *CWA_SC) GetProperty() DataSourceProperty {
 	return DataSourceProperty{
-		ID:      CWA_API_ID,
+		ID:      CWA_SC_ID,
 		Country: "TW",
 		Deafult: "en-US",
 		Locales: map[string]string{
-			"en-US": "Central Weather Administration (API)",
-			"zh-TW": "交通部中央氣象署（API）",
-			"zh-CN": "交通部中央气象署（API）",
+			"en-US": "Central Weather Administration Seismological Center",
+			"zh-TW": "交通部中央氣象署地震測報中心",
+			"zh-CN": "交通部中央气象署地震测报中心",
 		},
 	}
 }
 
-func (c *CWA_API) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (c *CWA_SC) GetEvents(latitude, longitude float64) ([]Event, error) {
 	// Get CWA HTML response
 	if c.cache.Valid() {
 		return c.cache.Get().([]Event), nil
@@ -159,11 +160,11 @@ func (c *CWA_API) GetEvents(latitude, longitude float64) ([]Event, error) {
 	return sortedEvents, nil
 }
 
-func (c *CWA_API) getTimestamp(textValue string) int64 {
+func (c *CWA_SC) getTimestamp(textValue string) int64 {
 	t, _ := time.Parse("2006-01-02 15:04:05", textValue)
 	return t.Add(-8 * time.Hour).UnixMilli()
 }
 
-func (c *CWA_API) getMagnitude(textValue string) []Magnitude {
+func (c *CWA_SC) getMagnitude(textValue string) []Magnitude {
 	return []Magnitude{{Type: ParseMagnitude("ML"), Value: string2Float(textValue)}}
 }
