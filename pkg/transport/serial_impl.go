@@ -144,6 +144,7 @@ func (t *SerialTransportImpl) ReadUntil(ctx context.Context, delim []byte, maxBy
 
 		t.mutex.Lock()
 		n, err := t.conn.Read(temp)
+		currentTime := time.Now()
 		t.mutex.Unlock()
 
 		if err != nil {
@@ -154,9 +155,9 @@ func (t *SerialTransportImpl) ReadUntil(ctx context.Context, delim []byte, maxBy
 		}
 
 		if firstByteTime.IsZero() {
-			firstByteTime = time.Now()
+			firstByteTime = currentTime
 		}
-		lastByteTime = time.Now()
+		lastByteTime = currentTime
 
 		buffer = append(buffer, temp[0])
 		if len(buffer) > maxBytes {
