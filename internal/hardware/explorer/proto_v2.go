@@ -364,13 +364,14 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 					if (mcuTimestamp < g.prevMcuTimestamp || math.Abs(float64(mcuTimestamp-g.prevMcuTimestamp)) >= 5000) && g.prevMcuTimestamp != 0 {
 						g.fifoBuffer.Reset()
 						g.resetVariables()
+						g.prevMcuTimestamp = 0
 						g.timeDiff4NonGnssMode = 0
 						g.isTimeDiff4NonGnssModeStable = false
 						timeDiffSamples = make([]int64, 0, STABLE_CHECK_SAMPLES)
+					} else {
+						g.prevMcuTimestamp = mcuTimestamp
+						g.prevTimestamp4NonGnssMode = g.prevMcuTimestamp + g.timeDiff4NonGnssMode
 					}
-
-					g.prevMcuTimestamp = mcuTimestamp
-					g.prevTimestamp4NonGnssMode = g.prevMcuTimestamp + g.timeDiff4NonGnssMode
 
 					g.timeDiffMutex.Unlock()
 				}
