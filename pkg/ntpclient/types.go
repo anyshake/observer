@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	QUERY_ATTEMPT      = 30
+	QUERY_ATTEMPT      = 10
 	CONCURRENT_QUERIES = 5
 )
 
