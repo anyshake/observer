@@ -168,20 +168,23 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 	if err := g.Transport.Open(); err != nil {
 		return nil, nil, fmt.Errorf("failed to open transport: %w", err)
 	}
-	ntpClient, err := ntpclient.New(g.NtpOptions.Endpoint, g.NtpOptions.Retry, g.NtpOptions.ReadTimeout)
+	ntpClient, err := ntpclient.New(g.NtpOptions.Pool, g.NtpOptions.Retry, g.NtpOptions.ReadTimeout)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create ntp client: %w", err)
 	}
 
-	g.Logger.Infof("synchronizing time with NTP server: %s", g.NtpOptions.Endpoint)
-	res, err := ntpClient.Query()
+	g.Logger.Infoln("synchronizing time with NTP servers, it may take a while")
+	offset, err := ntpClient.QueryAverage(NTP_MEASUREMENT_ATTEMPTS)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to acquire time from NTP server: %w", err)
 	}
 
 	currentTime := time.Now()
-	g.TimeSource.Update(currentTime, currentTime.Add(res.ClockOffset))
-	g.Logger.Infof("time synchronized with NTP server, local time offset: %d ms", res.ClockOffset.Milliseconds())
+	g.TimeSource.Update(currentTime, currentTime.Add(offset))
+	g.Logger.Infof("time synchronized with NTP server, local time offset: %d ms", offset.Milliseconds())
+	if err = g.Flush(); err != nil {
+		return nil, nil, fmt.Errorf("failed to flush transport: %w", err)
+	}
 
 	subCtx, cancelFn := context.WithCancel(ctx)
 
@@ -329,32 +332,29 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 		}
 	}(5 * time.Millisecond)
 
-	go func() {
-		getNextHour := func() time.Duration {
-			now := g.TimeSource.Now()
-			nextHour := time.Date(now.Year(), now.Month(), now.Day(), now.Hour()+1, 0, 0, 0, time.UTC)
-			return time.Until(nextHour)
-		}
-		for timer := time.NewTimer(getNextHour()); ; {
+	go func(resyncInterval time.Duration) {
+		for timer := time.NewTimer(resyncInterval); ; {
 			select {
 			case <-timer.C:
-				timer.Reset(getNextHour())
-				if deviceConfig := g.GetConfig(); deviceConfig.GetGnssAvailability() {
-					continue
-				}
-				res, err := ntpClient.Query()
+				timer.Reset(resyncInterval)
+
+				g.Logger.Info("re-synchronizing time with NTP servers")
+				offset, err := ntpClient.QueryAverage(NTP_MEASUREMENT_ATTEMPTS)
 				if err != nil {
 					g.Logger.Warnf("error occurred while re-synchronizing time with NTP: %v", err)
 					continue
 				}
+
 				currentTime := time.Now()
-				g.TimeSource.Update(currentTime, currentTime.Add(res.ClockOffset))
+				g.TimeSource.Update(currentTime, currentTime.Add(offset))
+
+				g.Logger.Infof("time synchronized with NTP server, local time offset: %d ms", offset.Milliseconds())
 			case <-subCtx.Done():
 				timer.Stop()
 				return
 			}
 		}
-	}()
+	}(NTP_RESYNC_INTERVAL)
 
 	return subCtx, cancelFn, nil
 }

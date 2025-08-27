@@ -6,7 +6,7 @@ import (
 )
 
 type Source struct {
-	mu        sync.Mutex
+	mu        sync.RWMutex
 	refTime   time.Time
 	localTime time.Time
 }

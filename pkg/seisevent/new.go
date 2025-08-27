@@ -8,8 +8,7 @@ import (
 
 func New(cacheTTL time.Duration) map[string]IDataSource {
 	return map[string]IDataSource{
-		CWA_WP_ID:       &CWA_WP{cache: cache.New(cacheTTL)},
-		CWA_API_ID:      &CWA_API{cache: cache.New(cacheTTL)},
+		CWA_SC_ID:       &CWA_SC{cache: cache.New(cacheTTL)},
 		CWA_EXPTECH_ID:  &CWA_EXPTECH{cache: cache.New(cacheTTL)},
 		HKO_ID:          &HKO{cache: cache.New(cacheTTL)},
 		JMA_OFFICIAL_ID: &JMA_OFFICIAL{cache: cache.New(cacheTTL)},
@@ -46,5 +45,6 @@ func New(cacheTTL time.Duration) map[string]IDataSource {
 		KNDC_ID:    &KNDC{cache: cache.New(cacheTTL)},
 		TMD_ID:     &TMD{cache: cache.New(cacheTTL)},
 		SSN_ID:     &SSN{cache: cache.New(cacheTTL)},
+		BGS_ID:     &BGS{cache: cache.New(cacheTTL)},
 	}
 }

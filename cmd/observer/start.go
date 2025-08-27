@@ -47,6 +47,9 @@ func appStart(args arguments) {
 	if err := conf.Parse(args.configPath, "json"); err != nil {
 		logger.GetLogger(main).Fatalln(err)
 	}
+	if err := migrateConfig(conf); err != nil {
+		logger.GetLogger(main).Fatalln(err)
+	}
 	logger.GetLogger(main).Info("global configuration has been loaded")
 
 	if conf.Server.Debug {
@@ -144,7 +147,7 @@ func appStart(args arguments) {
 			ReadTimeout: conf.Hardware.Timeout,
 		},
 		explorer.NtpOptions{
-			Endpoint:    conf.NtpClient.Endpoint,
+			Pool:        conf.NtpClient.Pool,
 			Retry:       conf.NtpClient.Retry,
 			ReadTimeout: conf.NtpClient.Timeout,
 		},

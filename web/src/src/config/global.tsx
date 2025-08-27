@@ -26,7 +26,8 @@ export const globalConfig: IGlobalConfig = {
         'pt-PT': 'AnyShake Observer',
         'ru-RU': 'AnyShake Observer',
         'id-ID': 'AnyShake Observer',
-        'tr-TR': 'AnyShake Observer'
+        'tr-TR': 'AnyShake Observer',
+        'pl-PL': 'AnyShake Observer'
     },
     footer: {
         'de-DE': '"Hoher Geist der Erde."',
@@ -37,7 +38,8 @@ export const globalConfig: IGlobalConfig = {
         'pt-PT': '"Ouça a terra sussurrar."',
         'ru-RU': '"Прислушайтесь к шепоту Земли."',
         'id-ID': '"Dengarkan bisikan bumi."',
-        'tr-TR': '"Dünyanın fısıltısını dinleyin."'
+        'tr-TR': '"Dünyanın fısıltısını dinleyin."',
+        'pl-PL': '"Wsłuchaj się w szept Ziemi."'
     },
     update: 10 * 60 * 1000,
     copyright: 'SensePlex Limited',

@@ -6,10 +6,12 @@ import (
 )
 
 const (
-	EXPLORER_STREAM_TOPIC  = "/explorer/stream"
-	STABLE_CHECK_SAMPLES   = 10
-	ALLOWED_JITTER_MS_GNSS = 10
-	ALLOWED_JITTER_MS_NTP  = 50
+	EXPLORER_STREAM_TOPIC    = "/explorer/stream"
+	NTP_RESYNC_INTERVAL      = 5 * time.Minute
+	NTP_MEASUREMENT_ATTEMPTS = 5
+	STABLE_CHECK_SAMPLES     = 10
+	ALLOWED_JITTER_MS_GNSS   = 10
+	ALLOWED_JITTER_MS_NTP    = 20
 )
 
 type ExplorerOptions struct {
@@ -23,7 +25,7 @@ type ExplorerOptions struct {
 }
 
 type NtpOptions struct {
-	Endpoint    string
+	Pool        []string
 	Retry       int
 	ReadTimeout int
 }

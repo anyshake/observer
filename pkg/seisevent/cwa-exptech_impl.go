@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"time"
 
+	"math/rand/v2"
+
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/request"
 	"github.com/corpix/uarand"
-	"golang.org/x/exp/rand"
 )
 
 const CWA_EXPTECH_ID = "cwa_exptech"
@@ -22,9 +23,9 @@ func (c *CWA_EXPTECH) GetProperty() DataSourceProperty {
 		Country: "TW",
 		Deafult: "en-US",
 		Locales: map[string]string{
-			"en-US": "Central Weather Administration (ExpTech)",
-			"zh-TW": "交通部中央氣象署（ExpTech）",
-			"zh-CN": "交通部中央气象署（ExpTech）",
+			"en-US": "Central Weather Administration (ExpTech Studio)",
+			"zh-TW": "交通部中央氣象署（ExpTech Studio）",
+			"zh-CN": "交通部中央气象署（ExpTech Studio）",
 		},
 	}
 }
@@ -40,7 +41,7 @@ func (c *CWA_EXPTECH) GetEvents(latitude, longitude float64) ([]Event, error) {
 		"https://api-2.exptech.dev/api/v2/eq/report?limit=100",
 	}
 	res, err := request.GET(
-		addrs[rand.Intn(len(addrs))],
+		addrs[rand.IntN(len(addrs))],
 		10*time.Second, time.Second, 3, false, nil,
 		map[string]string{"User-Agent": uarand.GetRandom()},
 	)

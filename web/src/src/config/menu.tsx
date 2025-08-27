@@ -22,7 +22,8 @@ export const menuConfig: IMenuItem[] = [
             'pt-PT': 'Status da Estação',
             'ru-RU': 'Статус станции',
             'id-ID': 'Status Stasiun',
-            'tr-TR': 'İstasyon Durumu'
+            'tr-TR': 'İstasyon Durumu',
+            'pl-PL': 'Status Stacji'
         },
         icon: mdiServerNetwork
     },
@@ -37,7 +38,8 @@ export const menuConfig: IMenuItem[] = [
             'pt-PT': 'Forma de Onda em Tempo Real',
             'ru-RU': 'Волновая форма в реальном времени',
             'id-ID': 'Gelombang Waktu Nyata',
-            'tr-TR': 'Gerçek Zamanlı Dalga Formu'
+            'tr-TR': 'Gerçek Zamanlı Dalga Formu',
+            'pl-PL': 'Fala w Czasie Rzeczywistym'
         },
         icon: mdiWaveform
     },
@@ -52,7 +54,8 @@ export const menuConfig: IMenuItem[] = [
             'pt-PT': 'Forma de Onda Histórica',
             'ru-RU': 'Историческая волновая форма',
             'id-ID': 'Gelombang Sejarah',
-            'tr-TR': 'Geçmiş Dalga Formu'
+            'tr-TR': 'Geçmiş Dalga Formu',
+            'pl-PL': 'Fala Historyczna'
         },
         icon: mdiFileClock
     },
@@ -67,7 +70,8 @@ export const menuConfig: IMenuItem[] = [
             'pt-PT': 'Download de Dados',
             'ru-RU': 'Загрузка данных',
             'id-ID': 'Unduh Data',
-            'tr-TR': 'Veri İndir'
+            'tr-TR': 'Veri İndir',
+            'pl-PL': 'Pobieranie Danych'
         },
         icon: mdiDatabaseExport
     },
@@ -82,7 +86,8 @@ export const menuConfig: IMenuItem[] = [
             'pt-PT': 'Configurações do Sistema',
             'ru-RU': 'Настройки системы',
             'id-ID': 'Pengaturan Sistem',
-            'tr-TR': 'Sistem Ayarları'
+            'tr-TR': 'Sistem Ayarları',
+            'pl-PL': 'Ustawienia Systemu'
         },
         icon: mdiCog
     }

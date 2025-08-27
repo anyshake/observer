@@ -122,6 +122,7 @@ func (t *TcpTransportImpl) ReadUntil(ctx context.Context, delim []byte, maxBytes
 
 		t.mutex.Lock()
 		n, err := t.conn.Read(temp)
+		currentTime := time.Now()
 		t.mutex.Unlock()
 
 		if err != nil {
@@ -132,9 +133,9 @@ func (t *TcpTransportImpl) ReadUntil(ctx context.Context, delim []byte, maxBytes
 		}
 
 		if firstByteTime.IsZero() {
-			firstByteTime = time.Now()
+			firstByteTime = currentTime
 		}
-		lastByteTime = time.Now()
+		lastByteTime = currentTime
 
 		buffer = append(buffer, temp[0])
 		if len(buffer) > maxBytes {
