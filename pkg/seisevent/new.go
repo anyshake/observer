@@ -10,6 +10,7 @@ func New(cacheTTL time.Duration) map[string]IDataSource {
 	return map[string]IDataSource{
 		CWA_SC_ID:       &CWA_SC{cache: cache.New(cacheTTL)},
 		CWA_EXPTECH_ID:  &CWA_EXPTECH{cache: cache.New(cacheTTL)},
+		PALERT_ID:       &PALERT{cache: cache.New(cacheTTL)},
 		HKO_ID:          &HKO{cache: cache.New(cacheTTL)},
 		JMA_OFFICIAL_ID: &JMA_OFFICIAL{cache: cache.New(cacheTTL)},
 		JMA_P2PQUAKE_ID: &JMA_P2PQUAKE{cache: cache.New(cacheTTL)},

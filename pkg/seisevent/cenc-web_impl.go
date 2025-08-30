@@ -5,8 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"math/rand/v2"
-
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/request"
 	"github.com/corpix/uarand"
@@ -36,12 +34,8 @@ func (c *CENC_WEB) GetEvents(latitude, longitude float64) ([]Event, error) {
 		return c.cache.Get().([]Event), nil
 	}
 
-	addrs := []string{
-		"https://www.ceic.ac.cn/ajax/google",
-		"https://news.ceic.ac.cn/ajax/google",
-	}
 	res, err := request.GET(
-		addrs[rand.IntN(len(addrs))],
+		"https://www.ceic.ac.cn/ajax/google",
 		10*time.Second, time.Second, 3, false, nil,
 		map[string]string{"User-Agent": uarand.GetRandom()},
 	)
