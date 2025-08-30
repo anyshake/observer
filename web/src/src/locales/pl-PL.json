@@ -120,10 +120,10 @@
             "device_status": {
                 "title": "Status urządzenia",
                 "sample_rate": "Częstotliwość próbkowania",
-                "latitude": "szerokość",
-                "longitude": "długość",
-                "elevation": "wzniesienie",
-                "temperature": "temperatura urządzenia"
+                "latitude": "Szerokość",
+                "longitude": "Długość",
+                "elevation": "Wzniesienie",
+                "temperature": "Temperatura urządzenia"
             },
             "link_status": {
                 "title": "Status łącza",
