@@ -21,7 +21,7 @@ const (
 	OTLP_SERVICE_NAME       = "anyshake-observer"
 	OTLP_TRACER_NAME        = "anyshake-observer-tracer"
 	ATTRIBUTE_DUMMY_VALUE   = "<dummy>"
-	METRICS_REPORT_INTERVAL = time.Minute
+	METRICS_REPORT_INTERVAL = 10 * time.Minute
 	METRICS_REPORT_TIMEOUT  = 5 * time.Second
 )
 
