@@ -57,7 +57,7 @@
                 <Name>V</Name>
               </OutputUnits>
               <PzTransferFunctionType>LAPLACE (RADIANS/SECOND)</PzTransferFunctionType>
-              <NormalizationFactor>1.0</NormalizationFactor>
+              <NormalizationFactor>171.99852139050935</NormalizationFactor>
               <NormalizationFrequency unit="HERTZ">4.5</NormalizationFrequency>
               <Zero number="3">
                 <Real>0.0</Real>
@@ -81,7 +81,7 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>429496729.6</Value>
+              <Value>858993458.8</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
@@ -149,7 +149,7 @@
                 <Name>V</Name>
               </OutputUnits>
               <PzTransferFunctionType>LAPLACE (RADIANS/SECOND)</PzTransferFunctionType>
-              <NormalizationFactor>1.0</NormalizationFactor>
+              <NormalizationFactor>171.99852139050935</NormalizationFactor>
               <NormalizationFrequency unit="HERTZ">4.5</NormalizationFrequency>
               <Zero number="3">
                 <Real>0.0</Real>
@@ -173,7 +173,7 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>429496729.6</Value>
+              <Value>858993458.8</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
@@ -241,7 +241,7 @@
                 <Name>V</Name>
               </OutputUnits>
               <PzTransferFunctionType>LAPLACE (RADIANS/SECOND)</PzTransferFunctionType>
-              <NormalizationFactor>1.0</NormalizationFactor>
+              <NormalizationFactor>171.99852139050935</NormalizationFactor>
               <NormalizationFrequency unit="HERTZ">4.5</NormalizationFrequency>
               <Zero number="3">
                 <Real>0.0</Real>
@@ -265,7 +265,7 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>429496729.6</Value>
+              <Value>858993458.8</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
@@ -334,11 +334,11 @@
               </OutputUnits>
               <PzTransferFunctionType>DIGITAL (Z-TRANSFORM)</PzTransferFunctionType>
               <NormalizationFactor>1.0</NormalizationFactor>
-              <NormalizationFrequency unit="HERTZ">10.0</NormalizationFrequency>
+              <NormalizationFrequency unit="HERTZ">1.0</NormalizationFrequency>
             </PolesZeros>
             <StageGain>
               <Value>32768.0</Value>
-              <Frequency>10.0</Frequency>
+              <Frequency>1.0</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">
@@ -406,11 +406,11 @@
               </OutputUnits>
               <PzTransferFunctionType>DIGITAL (Z-TRANSFORM)</PzTransferFunctionType>
               <NormalizationFactor>1.0</NormalizationFactor>
-              <NormalizationFrequency unit="HERTZ">10.0</NormalizationFrequency>
+              <NormalizationFrequency unit="HERTZ">1.0</NormalizationFrequency>
             </PolesZeros>
             <StageGain>
               <Value>32768.0</Value>
-              <Frequency>10.0</Frequency>
+              <Frequency>1.0</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">
@@ -478,11 +478,11 @@
               </OutputUnits>
               <PzTransferFunctionType>DIGITAL (Z-TRANSFORM)</PzTransferFunctionType>
               <NormalizationFactor>1.0</NormalizationFactor>
-              <NormalizationFrequency unit="HERTZ">10.0</NormalizationFrequency>
+              <NormalizationFrequency unit="HERTZ">1.0</NormalizationFrequency>
             </PolesZeros>
             <StageGain>
               <Value>32768.0</Value>
-              <Frequency>10.0</Frequency>
+              <Frequency>1.0</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">

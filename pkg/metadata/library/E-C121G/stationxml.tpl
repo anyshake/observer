@@ -31,10 +31,10 @@
           <NumberSeconds>1</NumberSeconds>
         </SampleRateRatio>
         <ClockDrift unit="SECONDS/SAMPLE">0.0</ClockDrift>
-        <Sensor resourceId="Sensor-E-C111G-VEL">
+        <Sensor resourceId="Sensor-E-C121G-VEL">
           <Model>LGT-4.5C</Model>
         </Sensor>
-        <DataLogger resourceId="Datalogger-E-C111G"/>
+        <DataLogger resourceId="Datalogger-E-C121G"/>
         <Response>
           <InstrumentSensitivity>
             <Value>100.0</Value>
@@ -49,7 +49,7 @@
             </OutputUnits>
           </InstrumentSensitivity>
           <Stage number="1">
-            <PolesZeros name="AS-E-C111G-VEL" resourceId="ResponsePAZ-E-C111G-VEL">
+            <PolesZeros name="AS-E-C121G-VEL" resourceId="ResponsePAZ-E-C121G-VEL">
               <InputUnits>
                 <Name>m/s</Name>
               </InputUnits>
@@ -57,7 +57,7 @@
                 <Name>V</Name>
               </OutputUnits>
               <PzTransferFunctionType>LAPLACE (RADIANS/SECOND)</PzTransferFunctionType>
-              <NormalizationFactor>1.0</NormalizationFactor>
+              <NormalizationFactor>171.99852139050935</NormalizationFactor>
               <NormalizationFrequency unit="HERTZ">4.5</NormalizationFrequency>
               <Zero number="2">
                 <Real>0.0</Real>
@@ -77,12 +77,12 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>429496729.6</Value>
+              <Value>858993458.8</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">
-            <Coefficients name="DL-E-C111G" resourceId="Datalogger-E-C111G">
+            <Coefficients name="DL-E-C121G" resourceId="Datalogger-E-C121G">
               <InputUnits>
                 <Name>V</Name>
               </InputUnits>
@@ -119,10 +119,10 @@
           <NumberSeconds>1</NumberSeconds>
         </SampleRateRatio>
         <ClockDrift unit="SECONDS/SAMPLE">0.0</ClockDrift>
-        <Sensor resourceId="Sensor-E-C111G-VEL">
+        <Sensor resourceId="Sensor-E-C121G-VEL">
           <Model>LGT-4.5C</Model>
         </Sensor>
-        <DataLogger resourceId="Datalogger-E-C111G"/>
+        <DataLogger resourceId="Datalogger-E-C121G"/>
         <Response>
           <InstrumentSensitivity>
             <Value>100.0</Value>
@@ -137,7 +137,7 @@
             </OutputUnits>
           </InstrumentSensitivity>
           <Stage number="1">
-            <PolesZeros name="AS-E-C111G-VEL" resourceId="ResponsePAZ-E-C111G-VEL">
+            <PolesZeros name="AS-E-C121G-VEL" resourceId="ResponsePAZ-E-C121G-VEL">
               <InputUnits>
                 <Name>m/s</Name>
               </InputUnits>
@@ -145,7 +145,7 @@
                 <Name>V</Name>
               </OutputUnits>
               <PzTransferFunctionType>LAPLACE (RADIANS/SECOND)</PzTransferFunctionType>
-              <NormalizationFactor>1.0</NormalizationFactor>
+              <NormalizationFactor>171.99852139050935</NormalizationFactor>
               <NormalizationFrequency unit="HERTZ">4.5</NormalizationFrequency>
               <Zero number="2">
                 <Real>0.0</Real>
@@ -165,12 +165,12 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>429496729.6</Value>
+              <Value>858993458.8</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">
-            <Coefficients name="DL-E-C111G" resourceId="Datalogger-E-C111G">
+            <Coefficients name="DL-E-C121G" resourceId="Datalogger-E-C121G">
               <InputUnits>
                 <Name>V</Name>
               </InputUnits>
@@ -207,10 +207,10 @@
           <NumberSeconds>1</NumberSeconds>
         </SampleRateRatio>
         <ClockDrift unit="SECONDS/SAMPLE">0.0</ClockDrift>
-        <Sensor resourceId="Sensor-E-C111G-VEL">
+        <Sensor resourceId="Sensor-E-C121G-VEL">
           <Model>LGT-4.5C</Model>
         </Sensor>
-        <DataLogger resourceId="Datalogger-E-C111G"/>
+        <DataLogger resourceId="Datalogger-E-C121G"/>
         <Response>
           <InstrumentSensitivity>
             <Value>100.0</Value>
@@ -225,7 +225,7 @@
             </OutputUnits>
           </InstrumentSensitivity>
           <Stage number="1">
-            <PolesZeros name="AS-E-C111G-VEL" resourceId="ResponsePAZ-E-C111G-VEL">
+            <PolesZeros name="AS-E-C121G-VEL" resourceId="ResponsePAZ-E-C121G-VEL">
               <InputUnits>
                 <Name>m/s</Name>
               </InputUnits>
@@ -233,7 +233,7 @@
                 <Name>V</Name>
               </OutputUnits>
               <PzTransferFunctionType>LAPLACE (RADIANS/SECOND)</PzTransferFunctionType>
-              <NormalizationFactor>1.0</NormalizationFactor>
+              <NormalizationFactor>171.99852139050935</NormalizationFactor>
               <NormalizationFrequency unit="HERTZ">4.5</NormalizationFrequency>
               <Zero number="2">
                 <Real>0.0</Real>
@@ -253,12 +253,12 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>429496729.6</Value>
+              <Value>858993458.8</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">
-            <Coefficients name="DL-E-C111G" resourceId="Datalogger-E-C111G">
+            <Coefficients name="DL-E-C121G" resourceId="Datalogger-E-C121G">
               <InputUnits>
                 <Name>V</Name>
               </InputUnits>
@@ -295,10 +295,10 @@
           <NumberSeconds>1</NumberSeconds>
         </SampleRateRatio>
         <ClockDrift unit="SECONDS/SAMPLE">0.0</ClockDrift>
-        <Sensor resourceId="Sensor-E-C111G-ACC">
+        <Sensor resourceId="Sensor-E-C121G-ACC">
           <Model>ICM-42688-P</Model>
         </Sensor>
-        <DataLogger resourceId="Datalogger-E-C111G"/>
+        <DataLogger resourceId="Datalogger-E-C121G"/>
         <Response>
           <InstrumentSensitivity>
             <Value>1670.703</Value>
@@ -313,7 +313,7 @@
             </OutputUnits>
           </InstrumentSensitivity>
           <Stage number="1">
-            <PolesZeros name="AS-E-C111G-ACC" resourceId="ResponsePAZ-E-C111G-ACC">
+            <PolesZeros name="AS-E-C121G-ACC" resourceId="ResponsePAZ-E-C121G-ACC">
               <InputUnits>
                 <Name>m/s**2</Name>
               </InputUnits>
@@ -322,15 +322,15 @@
               </OutputUnits>
               <PzTransferFunctionType>DIGITAL (Z-TRANSFORM)</PzTransferFunctionType>
               <NormalizationFactor>1.0</NormalizationFactor>
-              <NormalizationFrequency unit="HERTZ">10.0</NormalizationFrequency>
+              <NormalizationFrequency unit="HERTZ">1.0</NormalizationFrequency>
             </PolesZeros>
             <StageGain>
               <Value>32768.0</Value>
-              <Frequency>10.0</Frequency>
+              <Frequency>1.0</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">
-            <Coefficients name="DL-E-C111G" resourceId="Datalogger-E-C111G">
+            <Coefficients name="DL-E-C121G" resourceId="Datalogger-E-C121G">
               <InputUnits>
                 <Name>V</Name>
               </InputUnits>
@@ -367,10 +367,10 @@
           <NumberSeconds>1</NumberSeconds>
         </SampleRateRatio>
         <ClockDrift unit="SECONDS/SAMPLE">0.0</ClockDrift>
-        <Sensor resourceId="Sensor-E-C111G-ACC">
+        <Sensor resourceId="Sensor-E-C121G-ACC">
           <Model>ICM-42688-P</Model>
         </Sensor>
-        <DataLogger resourceId="Datalogger-E-C111G"/>
+        <DataLogger resourceId="Datalogger-E-C121G"/>
         <Response>
           <InstrumentSensitivity>
             <Value>1670.703</Value>
@@ -385,7 +385,7 @@
             </OutputUnits>
           </InstrumentSensitivity>
           <Stage number="1">
-            <PolesZeros name="AS-E-C111G-ACC" resourceId="ResponsePAZ-E-C111G-ACC">
+            <PolesZeros name="AS-E-C121G-ACC" resourceId="ResponsePAZ-E-C121G-ACC">
               <InputUnits>
                 <Name>m/s**2</Name>
               </InputUnits>
@@ -394,15 +394,15 @@
               </OutputUnits>
               <PzTransferFunctionType>DIGITAL (Z-TRANSFORM)</PzTransferFunctionType>
               <NormalizationFactor>1.0</NormalizationFactor>
-              <NormalizationFrequency unit="HERTZ">10.0</NormalizationFrequency>
+              <NormalizationFrequency unit="HERTZ">1.0</NormalizationFrequency>
             </PolesZeros>
             <StageGain>
               <Value>32768.0</Value>
-              <Frequency>10.0</Frequency>
+              <Frequency>1.0</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">
-            <Coefficients name="DL-E-C111G" resourceId="Datalogger-E-C111G">
+            <Coefficients name="DL-E-C121G" resourceId="Datalogger-E-C121G">
               <InputUnits>
                 <Name>V</Name>
               </InputUnits>
@@ -439,10 +439,10 @@
           <NumberSeconds>1</NumberSeconds>
         </SampleRateRatio>
         <ClockDrift unit="SECONDS/SAMPLE">0.0</ClockDrift>
-        <Sensor resourceId="Sensor-E-C111G-ACC">
+        <Sensor resourceId="Sensor-E-C121G-ACC">
           <Model>ICM-42688-P</Model>
         </Sensor>
-        <DataLogger resourceId="Datalogger-E-C111G"/>
+        <DataLogger resourceId="Datalogger-E-C121G"/>
         <Response>
           <InstrumentSensitivity>
             <Value>1670.703</Value>
@@ -457,7 +457,7 @@
             </OutputUnits>
           </InstrumentSensitivity>
           <Stage number="1">
-            <PolesZeros name="AS-E-C111G-ACC" resourceId="ResponsePAZ-E-C111G-ACC">
+            <PolesZeros name="AS-E-C121G-ACC" resourceId="ResponsePAZ-E-C121G-ACC">
               <InputUnits>
                 <Name>m/s**2</Name>
               </InputUnits>
@@ -466,15 +466,15 @@
               </OutputUnits>
               <PzTransferFunctionType>DIGITAL (Z-TRANSFORM)</PzTransferFunctionType>
               <NormalizationFactor>1.0</NormalizationFactor>
-              <NormalizationFrequency unit="HERTZ">10.0</NormalizationFrequency>
+              <NormalizationFrequency unit="HERTZ">1.0</NormalizationFrequency>
             </PolesZeros>
             <StageGain>
               <Value>32768.0</Value>
-              <Frequency>10.0</Frequency>
+              <Frequency>1.0</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">
-            <Coefficients name="DL-E-C111G" resourceId="Datalogger-E-C111G">
+            <Coefficients name="DL-E-C121G" resourceId="Datalogger-E-C121G">
               <InputUnits>
                 <Name>V</Name>
               </InputUnits>

@@ -22,9 +22,9 @@
         </datalogger>
         <responsePAZ publicID="ResponsePAZ-E-C111G-VEL" name="AS-E-C111G-VEL">
             <type>A</type>
-            <gain>429496729.6</gain>
+            <gain>858993458.8</gain>
             <gainFrequency>4.5</gainFrequency>
-            <normalizationFactor>1</normalizationFactor>
+            <normalizationFactor>171.99852139050935</normalizationFactor>
             <normalizationFrequency>4.5</normalizationFrequency>
             <numberOfZeros>2</numberOfZeros>
             <numberOfPoles>3</numberOfPoles>
@@ -34,9 +34,9 @@
         <responsePAZ publicID="ResponsePAZ-E-C111G-ACC" name="AS-E-C111G-ACC">
             <type>D</type>
             <gain>32768</gain>
-            <gainFrequency>10</gainFrequency>
+            <gainFrequency>1</gainFrequency>
             <normalizationFactor>1</normalizationFactor>
-            <normalizationFrequency>10</normalizationFrequency>
+            <normalizationFrequency>1</normalizationFrequency>
         </responsePAZ>
         <network publicID="{{.NetworkCode}}.Network" code="{{.NetworkCode}}">
             <start>{{.StartTime}}</start>

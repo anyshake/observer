@@ -57,7 +57,7 @@
                 <Name>V</Name>
               </OutputUnits>
               <PzTransferFunctionType>LAPLACE (RADIANS/SECOND)</PzTransferFunctionType>
-              <NormalizationFactor>1.0</NormalizationFactor>
+              <NormalizationFactor>171.99852139050935</NormalizationFactor>
               <NormalizationFrequency unit="HERTZ">4.5</NormalizationFrequency>
               <Zero number="3">
                 <Real>0.0</Real>
@@ -81,7 +81,7 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>429496729.6</Value>
+              <Value>858993458.8</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
@@ -149,7 +149,7 @@
                 <Name>V</Name>
               </OutputUnits>
               <PzTransferFunctionType>LAPLACE (RADIANS/SECOND)</PzTransferFunctionType>
-              <NormalizationFactor>1.0</NormalizationFactor>
+              <NormalizationFactor>171.99852139050935</NormalizationFactor>
               <NormalizationFrequency unit="HERTZ">4.5</NormalizationFrequency>
               <Zero number="3">
                 <Real>0.0</Real>
@@ -173,7 +173,7 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>429496729.6</Value>
+              <Value>858993458.8</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
@@ -241,7 +241,7 @@
                 <Name>V</Name>
               </OutputUnits>
               <PzTransferFunctionType>LAPLACE (RADIANS/SECOND)</PzTransferFunctionType>
-              <NormalizationFactor>1.0</NormalizationFactor>
+              <NormalizationFactor>171.99852139050935</NormalizationFactor>
               <NormalizationFrequency unit="HERTZ">4.5</NormalizationFrequency>
               <Zero number="3">
                 <Real>0.0</Real>
@@ -265,7 +265,7 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>429496729.6</Value>
+              <Value>858993458.8</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>

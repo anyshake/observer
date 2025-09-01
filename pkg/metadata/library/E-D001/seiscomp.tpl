@@ -16,9 +16,9 @@
         </datalogger>
         <responsePAZ publicID="ResponsePAZ-E-D001-VEL" name="AS-E-D001-VEL">
             <type>A</type>
-            <gain>429496729.6</gain>
+            <gain>858993458.8</gain>
             <gainFrequency>4.5</gainFrequency>
-            <normalizationFactor>1</normalizationFactor>
+            <normalizationFactor>171.99852139050935</normalizationFactor>
             <normalizationFrequency>4.5</normalizationFrequency>
             <numberOfZeros>2</numberOfZeros>
             <numberOfPoles>3</numberOfPoles>
