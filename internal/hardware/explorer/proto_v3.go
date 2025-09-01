@@ -40,11 +40,10 @@ type ExplorerProtoImplV3 struct {
 	isTimeDiff4NonGnssModeStable bool
 	timeCalibrationChan4GnssMode chan [2]time.Time
 
-	flagMutex            sync.Mutex
-	needUpdateTimeSource bool
-	variableAllSet       bool
-	collectedSamples     int
-	packetTimeObj        time.Time
+	flagMutex        sync.Mutex
+	variableAllSet   bool
+	collectedSamples int
+	packetTimeObj    time.Time
 
 	deviceStatus   DeviceStatus
 	deviceConfig   DeviceConfig
@@ -63,7 +62,6 @@ func (g *ExplorerProtoImplV3) resetFlags() {
 
 func (g *ExplorerProtoImplV3) resetVariables() {
 	g.flagMutex.Lock()
-	g.needUpdateTimeSource = true
 	g.variableAllSet = false
 	g.flagMutex.Unlock()
 
@@ -273,11 +271,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 		timeDiffSamples := make([]int64, 0, STABLE_CHECK_SAMPLES)
 		g.isTimeDiff4NonGnssModeStable = false
 
-		g.flagMutex.Lock()
-		g.needUpdateTimeSource = true
-		g.flagMutex.Unlock()
-
-		for {
+		for timeSourceInitialized := false; ; {
 			select {
 			case <-subCtx.Done():
 				g.Logger.Info("exiting from data packet reader")
@@ -334,23 +328,16 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 						g.isTimeDiff4NonGnssModeStable = true
 					}
 
-					if g.deviceConfig.GetSampleRate() > 0 && g.variableAllSet {
-						g.flagMutex.Lock()
-						needUpdateTimeSource := g.needUpdateTimeSource
-						g.flagMutex.Unlock()
-
-						if g.deviceConfig.GetGnssAvailability() && needUpdateTimeSource {
+					if g.variableAllSet {
+						if gnssEnabled && !timeSourceInitialized {
 							g.TimeSource.Update(recvEndTime, time.UnixMilli(mcuTimestamp).Add(packetLatency))
 
 							g.isTimeDiff4NonGnssModeStable = false
+							timeSourceInitialized = true
 							g.resetFlags()
 
-							g.flagMutex.Lock()
-							g.needUpdateTimeSource = false
-							g.flagMutex.Unlock()
-
 							g.Logger.Infof("time synchronized with Explorer built-in GNSS module")
-						} else if needUpdateTimeSource {
+						} else if !timeSourceInitialized {
 							g.Logger.Infoln("synchronizing time with NTP servers, it may take a while")
 							offset, err := ntpClient.QueryAverage(NTP_MEASUREMENT_ATTEMPTS)
 							if err != nil {
@@ -367,11 +354,8 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 							currentTime := time.Now()
 							g.TimeSource.Update(currentTime, currentTime.Add(offset))
 							g.isTimeDiff4NonGnssModeStable = false
+							timeSourceInitialized = true
 							g.resetFlags()
-
-							g.flagMutex.Lock()
-							g.needUpdateTimeSource = false
-							g.flagMutex.Unlock()
 						}
 
 						if atomic.LoadInt32(&initFlag) == 0 {
@@ -380,29 +364,29 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 							g.deviceStatus.SetStartedAt(g.TimeSource.Now())
 						}
 
-						if g.deviceConfig.GetGnssAvailability() {
+						if gnssEnabled && g.isTimeDiff4NonGnssModeStable {
 							select {
 							case g.timeCalibrationChan4GnssMode <- [2]time.Time{recvEndTime, time.UnixMilli(mcuTimestamp).Add(packetLatency)}:
 							default:
 							}
 						}
-					}
 
-					// Compensate for oscillator drift on the AnyShake Explorer board (NTP mode only)
-					if g.deviceConfig.GetSampleRate() > 0 && !g.deviceConfig.GetGnssAvailability() {
-						timeOffset := g.getTimestamp(mcuTimestamp) - g.TimeSource.Now().UnixMilli()
-						if g.prevTimeOffset4NonGnssMode == nil {
-							g.prevTimeOffset4NonGnssMode = &timeOffset
-						}
-						if math.Abs(float64(timeOffset-*g.prevTimeOffset4NonGnssMode)) > 1 {
-							g.timeDiff4NonGnssMode = lo.Mean(timeDiffSamples)
-							g.prevTimeOffset4NonGnssMode = &timeOffset
+						// Compensate for oscillator drift on the AnyShake Explorer board (NTP mode only)
+						if !gnssEnabled {
+							timeOffset := g.getTimestamp(mcuTimestamp) - g.TimeSource.Now().UnixMilli()
+							if g.prevTimeOffset4NonGnssMode == nil {
+								g.prevTimeOffset4NonGnssMode = &timeOffset
+							}
+							if math.Abs(float64(timeOffset-*g.prevTimeOffset4NonGnssMode)) > 1 {
+								g.timeDiff4NonGnssMode = lo.Mean(timeDiffSamples)
+								g.prevTimeOffset4NonGnssMode = &timeOffset
+							}
 						}
 					}
 
 					g.timeDiffMutex.Lock()
 
-					if g.timeDiff4NonGnssMode == 0 && timeDiff != 0 {
+					if g.timeDiff4NonGnssMode == 0 && timeDiff != 0 && g.isTimeDiff4NonGnssModeStable {
 						g.timeDiff4NonGnssMode = timeDiff
 					}
 
@@ -555,16 +539,18 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 			case calibTimeData := <-g.timeCalibrationChan4GnssMode:
 				g.TimeSource.Update(calibTimeData[0], calibTimeData[1])
 			case <-timer.C:
-				timer.Reset(resyncInterval)
 				if deviceConfig := g.GetConfig(); deviceConfig.GetGnssAvailability() || !g.variableAllSet {
+					timer.Reset(resyncInterval)
 					continue
 				}
 				g.Logger.Info("re-synchronizing time with NTP servers")
 				offset, err := ntpClient.QueryAverage(NTP_MEASUREMENT_ATTEMPTS)
 				if err != nil {
 					g.Logger.Warnf("error occurred while re-synchronizing time with NTP: %v", err)
+					timer.Reset(resyncInterval)
 					continue
 				}
+				timer.Reset(resyncInterval)
 				currentTime := time.Now()
 				g.TimeSource.Update(currentTime, currentTime.Add(offset))
 				g.Logger.Infof("time synchronized with NTP server, local time offset: %d ms", offset.Milliseconds())

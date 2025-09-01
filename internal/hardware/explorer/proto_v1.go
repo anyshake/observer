@@ -336,18 +336,16 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 		for timer := time.NewTimer(resyncInterval); ; {
 			select {
 			case <-timer.C:
-				timer.Reset(resyncInterval)
-
 				g.Logger.Info("re-synchronizing time with NTP servers")
 				offset, err := ntpClient.QueryAverage(NTP_MEASUREMENT_ATTEMPTS)
 				if err != nil {
 					g.Logger.Warnf("error occurred while re-synchronizing time with NTP: %v", err)
+					timer.Reset(resyncInterval)
 					continue
 				}
-
+				timer.Reset(resyncInterval)
 				currentTime := time.Now()
 				g.TimeSource.Update(currentTime, currentTime.Add(offset))
-
 				g.Logger.Infof("time synchronized with NTP server, local time offset: %d ms", offset.Milliseconds())
 			case <-subCtx.Done():
 				timer.Stop()
