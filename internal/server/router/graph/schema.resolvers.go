@@ -457,7 +457,7 @@ func (r *queryResolver) GetStationMetadata(ctx context.Context, format string) (
 
 	switch format {
 	case "seiscomp_xml":
-		return metadata.SeisCompXML(), nil
+		return metadata.SeisComP(), nil
 	case "station_xml":
 		return metadata.StationXML(), nil
 	}

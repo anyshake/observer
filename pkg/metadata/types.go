@@ -1,8 +1,13 @@
-package ed001
+package metadata
 
 import "time"
 
-type ED001_MetadataImpl struct {
+const (
+	SEISCOMP_TEMPLATE   = "seiscomp.tpl"
+	STATIONXML_TEMPLATE = "stationxml.tpl"
+)
+
+type Options struct {
 	StartTime  time.Time
 	SampleRate int
 

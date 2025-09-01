@@ -7,12 +7,13 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"path/filepath"
 	"time"
 	"unsafe"
 
-	"github.com/anyshake/observer/internal/hardware/explorer/metadata"
 	"github.com/anyshake/observer/pkg/fifo"
 	"github.com/anyshake/observer/pkg/message"
+	"github.com/anyshake/observer/pkg/metadata"
 	"github.com/anyshake/observer/pkg/ntpclient"
 	"github.com/anyshake/observer/pkg/timesource"
 	"github.com/anyshake/observer/pkg/transport"
@@ -207,7 +208,7 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 	g.deviceStatus.SetStartedAt(g.TimeSource.Now())
 	g.deviceStatus.SetUpdatedAt(time.Unix(0, 0))
 	g.deviceConfig.SetProtocol(g.ExplorerOptions.Protocol)
-	g.deviceConfig.SetModel(g.ExplorerOptions.Model)
+	g.deviceConfig.SetModel(filepath.Base(g.ExplorerOptions.Model))
 
 	go func() {
 		recvBuf := make([]byte, packetSize)
@@ -433,12 +434,12 @@ func (g *ExplorerProtoImplV1) Flush() error {
 	return g.Transport.Flush()
 }
 
-func (g *ExplorerProtoImplV1) GetMetadata(stationAffiliation, stationDescription, stationCountry, stationPlace, networkCode, stationCode, locationCode string, fuzzyCoordinates bool) (metadata.IMetadata, error) {
+func (g *ExplorerProtoImplV1) GetMetadata(stationAffiliation, stationDescription, stationCountry, stationPlace, networkCode, stationCode, locationCode string, fuzzyCoordinates bool) (*metadata.Render, error) {
 	latitude, longitude, elevation, err := g.GetCoordinates(fuzzyCoordinates)
 	if err != nil {
 		return nil, err
 	}
-	return metadata.New(g.deviceConfig.GetModel(), metadata.Options{
+	return metadata.New(g.ExplorerOptions.Model, metadata.Options{
 		ChannelCodes:       g.deviceConfig.GetChannelCodes(),
 		StartTime:          g.deviceStatus.GetStartedAt(),
 		SampleRate:         g.deviceConfig.GetSampleRate(),
