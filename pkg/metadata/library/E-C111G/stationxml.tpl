@@ -37,7 +37,7 @@
         <DataLogger resourceId="Datalogger-E-C111G"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>429496729.6</Value>
+            <Value>100.0</Value>
             <Frequency>4.5</Frequency>
             <InputUnits>
               <Name>m/s</Name>
@@ -129,7 +129,7 @@
         <DataLogger resourceId="Datalogger-E-C111G"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>429496729.6</Value>
+            <Value>100.0</Value>
             <Frequency>4.5</Frequency>
             <InputUnits>
               <Name>m/s</Name>
@@ -221,7 +221,7 @@
         <DataLogger resourceId="Datalogger-E-C111G"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>429496729.6</Value>
+            <Value>100.0</Value>
             <Frequency>4.5</Frequency>
             <InputUnits>
               <Name>m/s</Name>
@@ -313,7 +313,7 @@
         <DataLogger resourceId="Datalogger-E-C111G"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>32768.0</Value>
+            <Value>1670.703</Value>
             <Frequency>None</Frequency>
             <InputUnits>
               <Name>m/s**2</Name>
@@ -385,7 +385,7 @@
         <DataLogger resourceId="Datalogger-E-C111G"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>32768.0</Value>
+            <Value>1670.703</Value>
             <Frequency>None</Frequency>
             <InputUnits>
               <Name>m/s**2</Name>
@@ -457,7 +457,7 @@
         <DataLogger resourceId="Datalogger-E-C111G"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>32768.0</Value>
+            <Value>1670.703</Value>
             <Frequency>None</Frequency>
             <InputUnits>
               <Name>m/s**2</Name>

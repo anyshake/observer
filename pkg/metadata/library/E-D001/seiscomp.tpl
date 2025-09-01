@@ -57,7 +57,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>-90</dip>
-                        <gain>429496729.6</gain>
+                        <gain>100</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>
@@ -72,7 +72,7 @@
                         <depth>0</depth>
                         <azimuth>90</azimuth>
                         <dip>0</dip>
-                        <gain>429496729.6</gain>
+                        <gain>100</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>
@@ -87,7 +87,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>0</dip>
-                        <gain>429496729.6</gain>
+                        <gain>100</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>

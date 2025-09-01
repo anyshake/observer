@@ -70,7 +70,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>-90</dip>
-                        <gain>429496729.6</gain>
+                        <gain>100</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>
@@ -85,7 +85,7 @@
                         <depth>0</depth>
                         <azimuth>90</azimuth>
                         <dip>0</dip>
-                        <gain>429496729.6</gain>
+                        <gain>100</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>
@@ -100,7 +100,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>0</dip>
-                        <gain>429496729.6</gain>
+                        <gain>100</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>
@@ -115,7 +115,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>-90</dip>
-                        <gain>32768</gain>
+                        <gain>1670.703</gain>
                         <gainUnit>m/s**2</gainUnit>
                     </stream>
                     <stream publicID="Stream/E-C111G-CH5" code="{{.ChannelCode5}}"
@@ -129,7 +129,7 @@
                         <depth>0</depth>
                         <azimuth>90</azimuth>
                         <dip>0</dip>
-                        <gain>32768</gain>
+                        <gain>1670.703</gain>
                         <gainUnit>m/s**2</gainUnit>
                     </stream>
                     <stream publicID="Stream/E-C111G-CH6" code="{{.ChannelCode6}}"
@@ -143,7 +143,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>0</dip>
-                        <gain>32768</gain>
+                        <gain>1670.703</gain>
                         <gainUnit>m/s**2</gainUnit>
                     </stream>
                 </sensorLocation>

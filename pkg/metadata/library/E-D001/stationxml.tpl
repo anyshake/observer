@@ -37,7 +37,7 @@
         <DataLogger resourceId="Datalogger-E-D001"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>429496729.6</Value>
+            <Value>100.0</Value>
             <Frequency>4.5</Frequency>
             <InputUnits>
               <Name>m/s</Name>
@@ -129,7 +129,7 @@
         <DataLogger resourceId="Datalogger-E-D001"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>429496729.6</Value>
+            <Value>100.0</Value>
             <Frequency>4.5</Frequency>
             <InputUnits>
               <Name>m/s</Name>
@@ -221,7 +221,7 @@
         <DataLogger resourceId="Datalogger-E-D001"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>429496729.6</Value>
+            <Value>100.0</Value>
             <Frequency>4.5</Frequency>
             <InputUnits>
               <Name>m/s</Name>
