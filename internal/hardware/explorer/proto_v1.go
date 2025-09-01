@@ -46,9 +46,16 @@ func (g *ExplorerProtoImplV1) getPacketSize(headerSize, channelSize int) int {
 		1 // padding
 }
 
-func (g *ExplorerProtoImplV1) fixSampleRate(currentSampleRate int) int {
+func (g *ExplorerProtoImplV1) fixSampleRate(channelSize int64, duration time.Duration) int {
+	if duration <= 0 {
+		return 0
+	}
+
+	currentSampleRate := int(1000 / duration.Milliseconds() * channelSize)
+	currentSampleRate = int(math.Round(float64(currentSampleRate)/5.0) * 5.0)
+
 	targetSampleRates := []int{
-		5, 10, 25, 50, 75, 100,
+		10, 30, 50, 75, 100,
 		125, 150, 175, 200, 225,
 		250, 275, 300, 325, 350,
 		375, 400, 425, 450, 475,
@@ -232,7 +239,13 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 				g.Logger.Errorf("failed to read data from transport: %v", err)
 				cancelFn()
 			}
-			totalLatency := recvEndTime.Sub(recvStartTime) + g.Transport.GetLatency(len(recvBuf))
+			elapsed := recvEndTime.Sub(recvStartTime)
+			totalLatency := elapsed + g.Transport.GetLatency(len(recvBuf))
+
+			// Calculate proper sample rate to avoid jitter
+			currentSampleRate := g.fixSampleRate(DATA_PACKET_CHANNEL_SIZE, elapsed)
+			g.deviceConfig.SetSampleRate(currentSampleRate)
+			g.deviceConfig.SetPacketInterval(time.Duration(1000/currentSampleRate*DATA_PACKET_CHANNEL_SIZE) * time.Millisecond)
 
 			// Record the current time of the packet
 			currentTime := g.TimeSource.Now().UnixMilli() - totalLatency.Milliseconds()
@@ -269,7 +282,6 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 
 	go func(decodeInterval time.Duration) {
 		var (
-			expectedNextTimestamp int64
 			collectedTimestampArr []int64
 		)
 		for timer := time.NewTimer(decodeInterval); ; {
@@ -277,54 +289,38 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 
 			select {
 			case <-timer.C:
-				dataPacket, err := g.fifoBuffer.Peek(DATA_PACKET_HEADER, packetSize+8)
+				dataPacket, err := g.fifoBuffer.Peek(DATA_PACKET_HEADER, packetSize+8) // extra 8 bytes for inserting timestamp
 				if err != nil {
 					continue
 				}
 
-				timestamp := int64(binary.BigEndian.Uint64(dataPacket[2:10]))
-				if expectedNextTimestamp == 0 {
-					expectedNextTimestamp = timestamp
-				} else {
-					err = g.getChannelData(dataPacket, len(DATA_PACKET_HEADER), DATA_PACKET_CHANNEL_SIZE)
-					if err != nil {
+				currentSampleRate := g.deviceConfig.GetSampleRate()
+				if currentSampleRate > 0 {
+					timestamp := int64(binary.BigEndian.Uint64(dataPacket[2:10]))
+					if err = g.getChannelData(dataPacket, len(DATA_PACKET_HEADER), DATA_PACKET_CHANNEL_SIZE); err != nil {
 						g.Logger.Errorf("failed to get channel data: %v", err)
 						g.deviceStatus.IncrementErrors()
 						continue
 					}
+
 					collectedTimestampArr = append(collectedTimestampArr, timestamp)
-				}
+					g.deviceStatus.IncrementFrames()
 
-				// Calculate proper sample rate to avoid jitter
-				currentSampleRate := len(collectedTimestampArr) * DATA_PACKET_CHANNEL_SIZE
-				targetSampleRate := g.fixSampleRate(currentSampleRate)
-
-				if math.Abs(float64(timestamp-expectedNextTimestamp)) <= ALLOWED_JITTER_MS_NTP && currentSampleRate == targetSampleRate {
-					// Update the next tick even if the buffer is empty
-					expectedNextTimestamp = timestamp + time.Second.Milliseconds()
-					if len(collectedTimestampArr) == 0 {
-						continue
+					if len(collectedTimestampArr)*DATA_PACKET_CHANNEL_SIZE == currentSampleRate {
+						packetTimestamp := collectedTimestampArr[0]
+						g.messageBus.Publish(time.UnixMilli(packetTimestamp), &g.deviceConfig, &g.deviceVariable, g.channelDataBuf)
+						g.deviceStatus.IncrementMessages()
+						collectedTimestampArr = []int64{}
+						g.channelDataBuf = []ChannelData{}
+					} else if len(collectedTimestampArr)*DATA_PACKET_CHANNEL_SIZE > currentSampleRate {
+						g.Logger.Warnf("packet timestamp is not in sync with current sample rate, packet timestamp: %v, current sample rate: %v", collectedTimestampArr[0], currentSampleRate)
+						collectedTimestampArr = []int64{}
+						g.channelDataBuf = []ChannelData{}
+						g.deviceStatus.IncrementErrors()
 					}
 
-					g.deviceConfig.SetSampleRate(targetSampleRate)
-					g.deviceConfig.SetPacketInterval(time.Duration((1000/targetSampleRate)*DATA_PACKET_CHANNEL_SIZE) * time.Millisecond)
-					packetTimestamp := collectedTimestampArr[0]
-					g.messageBus.Publish(time.UnixMilli(packetTimestamp), &g.deviceConfig, &g.deviceVariable, g.channelDataBuf)
-					g.deviceStatus.IncrementMessages()
-
-					collectedTimestampArr = []int64{}
-					g.channelDataBuf = []ChannelData{}
-				} else if timestamp-expectedNextTimestamp > ALLOWED_JITTER_MS_NTP {
-					g.Logger.Warnf("jitter detected, discarding this packet, expected %v, got %v", expectedNextTimestamp, timestamp)
-					g.deviceStatus.IncrementErrors()
-					// Update the next tick, clear the buffer if the jitter exceeds the threshold
-					expectedNextTimestamp = timestamp + time.Second.Milliseconds()
-					collectedTimestampArr = []int64{}
-					g.channelDataBuf = []ChannelData{}
+					g.deviceStatus.SetUpdatedAt(time.UnixMilli(timestamp))
 				}
-
-				g.deviceStatus.IncrementFrames()
-				g.deviceStatus.SetUpdatedAt(time.UnixMilli(timestamp))
 			case <-subCtx.Done():
 				g.Logger.Info("exiting from data packet decoder")
 				timer.Stop()
