@@ -46,26 +46,16 @@ func (g *ExplorerProtoImplV1) getPacketSize(headerSize, channelSize int) int {
 		1 // padding
 }
 
-func (g *ExplorerProtoImplV1) fixSampleRate(channelSize int64, duration time.Duration) int {
-	if duration <= 0 {
-		return 0
+func (g *ExplorerProtoImplV1) fixSampleRate(channelSize int64, duration time.Duration) (int, error) {
+	if duration.Milliseconds() == 0 {
+		return 0, errors.New("invalid duration")
 	}
 
 	currentSampleRate := int(1000 / duration.Milliseconds() * channelSize)
 	currentSampleRate = int(math.Round(float64(currentSampleRate)/5.0) * 5.0)
 
-	targetSampleRates := []int{
-		10, 30, 50, 75, 100,
-		125, 150, 175, 200, 225,
-		250, 275, 300, 325, 350,
-		375, 400, 425, 450, 475,
-		500, 525, 550, 575, 600,
-		625, 650, 675, 700, 725,
-		750, 775, 800, 825, 850,
-		875, 900, 925, 950, 975,
-		1000,
-	}
-
+	// All divisors of 5000 greater than or equal to 5
+	targetSampleRates := []int{50, 100, 125, 200, 250, 500, 1000, 1250, 2500, 5000}
 	closest := targetSampleRates[0]
 	minDiff := math.Abs(float64(currentSampleRate - closest))
 
@@ -77,7 +67,7 @@ func (g *ExplorerProtoImplV1) fixSampleRate(channelSize int64, duration time.Dur
 		}
 	}
 
-	return closest
+	return closest, nil
 }
 
 func (g *ExplorerProtoImplV1) getIndices(arr []byte, sep []byte) []int {
@@ -240,15 +230,19 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 				cancelFn()
 			}
 			elapsed := recvEndTime.Sub(recvStartTime)
-			totalLatency := elapsed + g.Transport.GetLatency(len(recvBuf))
+			latency := g.Transport.GetLatency(len(recvBuf))
 
 			// Calculate proper sample rate to avoid jitter
-			currentSampleRate := g.fixSampleRate(DATA_PACKET_CHANNEL_SIZE, elapsed)
+			currentSampleRate, err := g.fixSampleRate(DATA_PACKET_CHANNEL_SIZE, elapsed)
+			if err != nil {
+				g.Logger.Errorf("failed to determine current sample rate: %v", err)
+				continue
+			}
 			g.deviceConfig.SetSampleRate(currentSampleRate)
 			g.deviceConfig.SetPacketInterval(time.Duration(1000/currentSampleRate*DATA_PACKET_CHANNEL_SIZE) * time.Millisecond)
 
 			// Record the current time of the packet
-			currentTime := g.TimeSource.Now().UnixMilli() - totalLatency.Milliseconds()
+			currentTime := g.TimeSource.Now().UnixMilli() - (elapsed + latency).Milliseconds()
 			binary.BigEndian.PutUint64(timeBytes, uint64(currentTime))
 
 			// Find possible header in the buffer to insert current time next to the header
