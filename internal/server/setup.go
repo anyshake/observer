@@ -12,6 +12,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/anyshake/observer/internal/server/middleware/auth_jwt"
+	"github.com/anyshake/observer/internal/server/middleware/date_header"
 	"github.com/anyshake/observer/internal/server/middleware/httplog"
 	"github.com/anyshake/observer/internal/server/middleware/recovery"
 	"github.com/anyshake/observer/internal/server/response"
@@ -31,6 +32,7 @@ import (
 func (s *httpServer) Setup(listen string) error {
 	s.engine = gin.New()
 
+	s.engine.Use(date_header.New(s.resolver.TimeSource))
 	s.engine.Use(recovery.New(s.log.Logger))
 	s.engine.Use(httplog.New(s.log))
 	s.engine.Use(gzipHandler.Gzip(gzip.BestCompression))
