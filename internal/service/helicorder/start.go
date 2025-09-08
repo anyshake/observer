@@ -146,8 +146,7 @@ func (s *HelicorderServiceImpl) Start() error {
 					s.dataProvider.setChannelCode(channelCode, channelIdx)
 					logger.GetLogger(ID).Infof("start plotting helicorder for channel %s", channelCode)
 
-					err = helicorderCtx.Plot(currentTime, s.spanSamples, scaleFactor, s.lineWidth, nil)
-					if err != nil {
+					if err = helicorderCtx.Plot(currentTime, runtime.NumCPU()*4, s.spanSamples, scaleFactor, s.lineWidth, nil); err != nil {
 						logger.GetLogger(ID).Errorf("failed to plot helicorder for %s: %v", channelCode, err)
 						continue
 					}
@@ -160,8 +159,7 @@ func (s *HelicorderServiceImpl) Start() error {
 						continue
 					}
 
-					err = helicorderCtx.Save(s.imageSize, filePath)
-					if err != nil {
+					if err = helicorderCtx.Save(s.imageSize, filePath); err != nil {
 						logger.GetLogger(ID).Errorf("failed to save helicorder for %s: %v", channelCode, err)
 						continue
 					}
