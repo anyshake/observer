@@ -2,6 +2,7 @@ package metadata
 
 import (
 	"embed"
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -10,7 +11,7 @@ import (
 var library embed.FS
 
 func getMetadataFromLibrary(model, template string) (string, error) {
-	data, err := library.ReadFile(filepath.Join("library", model, template))
+	data, err := library.ReadFile(fmt.Sprintf("library/%s/%s", model, template))
 	if err != nil {
 		return "", err
 	}

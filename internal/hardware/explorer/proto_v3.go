@@ -283,8 +283,10 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 			default:
 			}
 
+			recvStartSysTime := time.Now()
 			recvBuf, timeout, recvElapsed, err := g.Transport.ReadUntil(subCtx, DATA_PACKET_TAILER, 32000, 5*time.Second)
 			recvEndTime := g.TimeSource.Now()
+			recvEndSysTime := time.Now()
 			if err != nil {
 				g.Logger.Errorf("failed to read data from transport: %v", err)
 				cancelFn()
@@ -301,7 +303,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 					gnssEnabled := g.parseGnssAvailibility(deviceConfig)
 
 					extraLatency := recvElapsed - g.Transport.GetLatency(len(recvBuf))
-					packetLatency := g.parsePacketInterval(deviceConfig) + recvElapsed + extraLatency
+					packetLatency := recvEndSysTime.Sub(recvStartSysTime) + recvElapsed - extraLatency
 					timeDiff := recvEndTime.UnixMilli() - mcuTimestamp - packetLatency.Milliseconds()
 
 					if !g.isTimeDiff4NonGnssModeStable && !gnssEnabled {
@@ -445,7 +447,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 				channelChunkLength, channelSize, channelData := g.getChannelSize(deviceConfig)
 				readSize := channelSize + 1 + len(DATA_PACKET_TAILER)
 				for g.fifoBuffer.Len() < readSize {
-					time.Sleep(10 * time.Millisecond)
+					time.Sleep(decodeInterval)
 				}
 				channelDataSection, err := g.fifoBuffer.Read(readSize)
 				if err != nil {
