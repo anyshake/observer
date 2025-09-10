@@ -328,13 +328,6 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 							g.deviceStatus.SetStartedAt(g.TimeSource.Now())
 						}
 
-						if g.deviceConfig.GetGnssAvailability() && g.isTimeDiff4NonGnssModeStable {
-							select {
-							case g.timeCalibrationChan4GnssMode <- [2]time.Time{recvEndTime, time.UnixMilli(mcuTimestamp).Add(packetLatency)}:
-							default:
-							}
-						}
-
 						// Compensate for oscillator drift on the AnyShake Explorer board (NTP mode only)
 						if !g.deviceConfig.GetGnssAvailability() {
 							timeOffset := g.getTimestamp(mcuTimestamp) - g.TimeSource.Now().UnixMilli()
@@ -362,6 +355,12 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 						timeDiffSamples = make([]int64, 0, STABLE_CHECK_SAMPLES)
 					}
 					if timeSourceInitialized && g.isTimeDiff4NonGnssModeStable {
+						if g.deviceConfig.GetGnssAvailability() && g.variableAllSet {
+							select {
+							case g.timeCalibrationChan4GnssMode <- [2]time.Time{recvEndTime, time.UnixMilli(mcuTimestamp).Add(packetLatency)}:
+							default:
+							}
+						}
 						g.prevMcuTimestamp = mcuTimestamp
 					}
 

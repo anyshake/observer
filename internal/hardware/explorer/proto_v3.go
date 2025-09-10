@@ -371,13 +371,6 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 							g.deviceStatus.SetStartedAt(g.TimeSource.Now())
 						}
 
-						if gnssEnabled && g.isTimeDiff4NonGnssModeStable {
-							select {
-							case g.timeCalibrationChan4GnssMode <- [2]time.Time{recvEndTime, time.UnixMilli(mcuTimestamp).Add(packetLatency)}:
-							default:
-							}
-						}
-
 						// Compensate for oscillator drift on the AnyShake Explorer board (NTP mode only)
 						if !gnssEnabled {
 							timeOffset := g.getTimestamp(mcuTimestamp) - g.TimeSource.Now().UnixMilli()
@@ -398,7 +391,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 					}
 
 					// Handle MCU time jumps (usually caused by Explorer power loss or PC hibernation)
-					// 1500 ms is a threshold determined by max packet interval with a safety margin (see getPacketInterval function)
+					// 5000 ms is a threshold determined by max packet interval with a safety margin (see getPacketInterval function)
 					if (mcuTimestamp < g.prevMcuTimestamp || math.Abs(float64(mcuTimestamp-g.prevMcuTimestamp)) >= 5000) && g.prevMcuTimestamp != 0 {
 						g.fifoBuffer.Reset()
 						g.resetVariables()
@@ -408,6 +401,12 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 						g.isTimeDiff4NonGnssModeStable = false
 						timeDiffSamples = make([]int64, 0, STABLE_CHECK_SAMPLES)
 					} else {
+						if gnssEnabled && g.isTimeDiff4NonGnssModeStable && g.variableAllSet {
+							select {
+							case g.timeCalibrationChan4GnssMode <- [2]time.Time{recvEndTime, time.UnixMilli(mcuTimestamp).Add(packetLatency)}:
+							default:
+							}
+						}
 						g.prevMcuTimestamp = mcuTimestamp
 						g.prevTimestamp4NonGnssMode = g.prevMcuTimestamp + g.timeDiff4NonGnssMode
 					}
