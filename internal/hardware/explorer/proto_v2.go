@@ -478,9 +478,14 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 	go func(resyncInterval time.Duration) {
 		<-readyChan
 
+		var prevCalibTime time.Time
 		for timer := time.NewTimer(resyncInterval); ; {
 			select {
 			case calibTimeData := <-g.timeCalibrationChan4GnssMode:
+				if prevCalibTime.Unix() == calibTimeData[1].Unix() {
+					continue
+				}
+				prevCalibTime = calibTimeData[1]
 				g.TimeSource.Update(calibTimeData[0], calibTimeData[1])
 			case <-timer.C:
 				if deviceConfig := g.GetConfig(); deviceConfig.GetGnssAvailability() || !g.variableAllSet {
