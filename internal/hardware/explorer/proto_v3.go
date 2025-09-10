@@ -301,9 +301,13 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 					mcuTimestamp := int64(binary.LittleEndian.Uint64(recvBuf[headerIdx+len(DATA_PACKET_HEADER) : headerIdx+len(DATA_PACKET_HEADER)+8]))
 					deviceConfig := binary.LittleEndian.Uint32(recvBuf[headerIdx+len(DATA_PACKET_HEADER)+8 : headerIdx+len(DATA_PACKET_HEADER)+8+4])
 					gnssEnabled := g.parseGnssAvailibility(deviceConfig)
+					packetInterval := g.parsePacketInterval(deviceConfig)
+					sampleRate := g.parseSampleRate(deviceConfig)
+					sampleSpan := time.Duration(1000/sampleRate) * time.Millisecond
 
-					extraLatency := recvElapsed - g.Transport.GetLatency(len(recvBuf))
-					packetLatency := recvEndSysTime.Sub(recvStartSysTime) + recvElapsed - extraLatency
+					estimatedPacketLatency := packetInterval + g.Transport.GetLatency(len(recvBuf)) - sampleSpan
+					actualPacketLatency := recvEndSysTime.Sub(recvStartSysTime) + recvElapsed - sampleSpan
+					packetLatency := estimatedPacketLatency + time.Duration(math.Abs(float64(actualPacketLatency-estimatedPacketLatency)))
 					timeDiff := recvEndTime.UnixMilli() - mcuTimestamp - packetLatency.Milliseconds()
 
 					if !g.isTimeDiff4NonGnssModeStable && !gnssEnabled {
