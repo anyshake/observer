@@ -8,6 +8,6 @@ func (s *Source) Update(localTime, refTime time.Time) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	s.localTime = time.Now()
-	s.refTime = refTime
+	s.localTime = localTime
+	s.refTime = refTime.UTC() // strip monotonic clock data
 }

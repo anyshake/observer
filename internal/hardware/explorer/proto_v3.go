@@ -285,8 +285,8 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 
 			recvStartSysTime := time.Now()
 			recvBuf, timeout, recvElapsed, err := g.Transport.ReadUntil(subCtx, DATA_PACKET_TAILER, 32000, 5*time.Second)
-			recvEndTime := g.TimeSource.Now()
 			recvEndSysTime := time.Now()
+			recvEndTime := g.TimeSource.Now()
 			if err != nil {
 				g.Logger.Errorf("failed to read data from transport: %v", err)
 				cancelFn()
@@ -337,7 +337,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 
 					if g.variableAllSet {
 						if gnssEnabled && !timeSourceInitialized {
-							g.TimeSource.Update(recvEndTime, time.UnixMilli(mcuTimestamp).Add(packetLatency))
+							g.TimeSource.Update(recvEndSysTime, time.UnixMilli(mcuTimestamp).Add(packetLatency))
 
 							g.isTimeDiff4NonGnssModeStable = false
 							timeSourceInitialized = true
@@ -403,7 +403,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 					} else {
 						if gnssEnabled && g.isTimeDiff4NonGnssModeStable && g.variableAllSet {
 							select {
-							case g.timeCalibrationChan4GnssMode <- [2]time.Time{recvEndTime, time.UnixMilli(mcuTimestamp).Add(packetLatency)}:
+							case g.timeCalibrationChan4GnssMode <- [2]time.Time{recvEndSysTime, time.UnixMilli(mcuTimestamp).Add(packetLatency)}:
 							default:
 							}
 						}

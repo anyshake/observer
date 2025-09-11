@@ -249,8 +249,9 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 			default:
 			}
 
-			recvStartTime := g.TimeSource.Now()
+			recvStartSysTime := g.TimeSource.Now()
 			n, err := g.Transport.Read(buf)
+			recvEndSysTime := time.Now()
 			recvEndTime := g.TimeSource.Now()
 			if err != nil {
 				g.Logger.Errorf("failed to read data from transport: %v", err)
@@ -258,7 +259,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 			}
 			recvBuf := buf[:n]
 
-			packetLatency := recvEndTime.Sub(recvStartTime)
+			packetLatency := recvEndSysTime.Sub(recvStartSysTime)
 			if headerIdx := bytes.Index(recvBuf, DATA_PACKET_HEADER); headerIdx != -1 && len(recvBuf) >= headerIdx+packetSize {
 				if err = g.verifyChecksum(recvBuf[headerIdx:headerIdx+packetSize], DATA_PACKET_HEADER); err == nil {
 					mcuTimestamp := int64(binary.LittleEndian.Uint64(recvBuf[headerIdx+len(DATA_PACKET_HEADER) : headerIdx+len(DATA_PACKET_HEADER)+int(unsafe.Sizeof(int64(0)))]))
@@ -292,7 +293,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 
 					if g.deviceConfig.GetSampleRate() > 0 && g.variableAllSet {
 						if g.deviceConfig.GetGnssAvailability() && !timeSourceInitialized {
-							g.TimeSource.Update(recvEndTime, time.UnixMilli(mcuTimestamp).Add(packetLatency))
+							g.TimeSource.Update(recvEndSysTime, time.UnixMilli(mcuTimestamp).Add(packetLatency))
 
 							timeSourceInitialized = true
 							g.isTimeDiff4NonGnssModeStable = true
@@ -357,7 +358,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 					if timeSourceInitialized && g.isTimeDiff4NonGnssModeStable {
 						if g.deviceConfig.GetGnssAvailability() && g.variableAllSet {
 							select {
-							case g.timeCalibrationChan4GnssMode <- [2]time.Time{recvEndTime, time.UnixMilli(mcuTimestamp).Add(packetLatency)}:
+							case g.timeCalibrationChan4GnssMode <- [2]time.Time{recvEndSysTime, time.UnixMilli(mcuTimestamp).Add(packetLatency)}:
 							default:
 							}
 						}
