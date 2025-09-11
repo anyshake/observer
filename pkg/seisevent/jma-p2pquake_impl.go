@@ -6,13 +6,15 @@ import (
 
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/request"
+	"github.com/bclswl0827/travel"
 	"github.com/corpix/uarand"
 )
 
 const JMA_P2PQUAKE_ID = "jma_p2pquake"
 
 type JMA_P2PQUAKE struct {
-	cache cache.AnyCache
+	travelTimeTable *travel.AK135
+	cache           cache.AnyCache
 }
 
 func (j *JMA_P2PQUAKE) GetProperty() DataSourceProperty {
@@ -87,7 +89,7 @@ func (j *JMA_P2PQUAKE) GetEvents(latitude, longitude float64) ([]Event, error) {
 			Magnitude: []Magnitude{{Type: ParseMagnitude("M"), Value: hypocenter["magnitude"].(float64)}},
 		}
 		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
-		seisEvent.Estimation = getSeismicEstimation(seisEvent.Depth, seisEvent.Distance)
+		seisEvent.Estimation = getSeismicEstimation(j.travelTimeTable, latitude, seisEvent.Latitude, longitude, seisEvent.Longitude, seisEvent.Depth)
 
 		resultArr = append(resultArr, seisEvent)
 	}

@@ -8,6 +8,7 @@ import (
 
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/request"
+	"github.com/bclswl0827/travel"
 	"github.com/corpix/uarand"
 	"github.com/sbabiv/xml2map"
 )
@@ -15,7 +16,8 @@ import (
 const HKO_ID = "hko"
 
 type HKO struct {
-	cache cache.AnyCache
+	travelTimeTable *travel.AK135
+	cache           cache.AnyCache
 }
 
 func (h *HKO) GetProperty() DataSourceProperty {
@@ -80,7 +82,7 @@ func (h *HKO) GetEvents(latitude, longitude float64) ([]Event, error) {
 			Magnitude: h.getMagnitude(v["Mag"].(string)),
 		}
 		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
-		seisEvent.Estimation = getSeismicEstimation(seisEvent.Depth, seisEvent.Distance)
+		seisEvent.Estimation = getSeismicEstimation(h.travelTimeTable, latitude, seisEvent.Latitude, longitude, seisEvent.Longitude, seisEvent.Depth)
 
 		resultArr = append(resultArr, seisEvent)
 	}

@@ -7,13 +7,15 @@ import (
 
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/request"
+	"github.com/bclswl0827/travel"
 	"github.com/corpix/uarand"
 )
 
 const KNDC_ID = "kndc"
 
 type KNDC struct {
-	cache cache.AnyCache
+	travelTimeTable *travel.AK135
+	cache           cache.AnyCache
 }
 
 func (c *KNDC) GetProperty() DataSourceProperty {
@@ -70,7 +72,7 @@ func (c *KNDC) GetEvents(latitude, longitude float64) ([]Event, error) {
 			Region:    fmt.Sprintf("%s (%s)", event["gregion"].(string), event["sregion"].(string)),
 		}
 		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
-		seisEvent.Estimation = getSeismicEstimation(seisEvent.Depth, seisEvent.Distance)
+		seisEvent.Estimation = getSeismicEstimation(c.travelTimeTable, latitude, seisEvent.Latitude, longitude, seisEvent.Longitude, seisEvent.Depth)
 
 		resultArr = append(resultArr, seisEvent)
 	}

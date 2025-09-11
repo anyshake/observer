@@ -5,13 +5,15 @@ import (
 
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/request"
+	"github.com/bclswl0827/travel"
 	"github.com/corpix/uarand"
 )
 
 const SED_ID = "eida"
 
 type SED struct {
-	cache cache.AnyCache
+	travelTimeTable *travel.AK135
+	cache           cache.AnyCache
 }
 
 func (c *SED) GetProperty() DataSourceProperty {
@@ -41,7 +43,7 @@ func (c *SED) GetEvents(latitude, longitude float64) ([]Event, error) {
 		return nil, err
 	}
 
-	resultArr, err := ParseFdsnwsEvent(string(res), "2006-01-02T15:04:05", latitude, longitude)
+	resultArr, err := ParseFdsnwsEvent(c.travelTimeTable, string(res), "2006-01-02T15:04:05", latitude, longitude)
 	if err != nil {
 		return nil, err
 	}

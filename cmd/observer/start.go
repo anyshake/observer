@@ -190,6 +190,11 @@ func appStart(args arguments) {
 		logger.GetLogger(serviceName).Infof("service %s has been started", serviceName)
 	}
 
+	seisEventSource, err := seisevent.New(30 * time.Second)
+	if err != nil {
+		logger.GetLogger(main).Errorf("failed to create seis event source: %v", err)
+	}
+
 	httpServer := server.New(
 		conf.Server.Debug,
 		conf.Server.CORS,
@@ -199,7 +204,7 @@ func appStart(args arguments) {
 			TimeSource:               timeSrc,
 			ActionHandler:            actionHandler,
 			LogBuffer:                logBuffer,
-			SeisEventSource:          seisevent.New(30 * time.Second),
+			SeisEventSource:          seisEventSource,
 			StationConfigConstraints: stationConfigConstraints,
 		},
 		logger.GetLogger("http_server"),

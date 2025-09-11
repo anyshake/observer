@@ -9,13 +9,15 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/request"
+	"github.com/bclswl0827/travel"
 	"github.com/corpix/uarand"
 )
 
 const DOST_ID = "dost"
 
 type DOST struct {
-	cache cache.AnyCache
+	travelTimeTable *travel.AK135
+	cache           cache.AnyCache
 }
 
 func (c *DOST) GetProperty() DataSourceProperty {
@@ -78,7 +80,7 @@ func (c *DOST) GetEvents(latitude, longitude float64) ([]Event, error) {
 					seisEvent.Event = fmt.Sprintf("%d", i/6+1)
 					seisEvent.Region = c.getRegion(s.Text())
 					seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
-					seisEvent.Estimation = getSeismicEstimation(seisEvent.Depth, seisEvent.Distance)
+					seisEvent.Estimation = getSeismicEstimation(c.travelTimeTable, latitude, seisEvent.Latitude, longitude, seisEvent.Longitude, seisEvent.Depth)
 					resultArr = append(resultArr, seisEvent)
 				}
 			})

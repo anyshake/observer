@@ -8,6 +8,7 @@ import (
 
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/request"
+	"github.com/bclswl0827/travel"
 	"github.com/corpix/uarand"
 	"github.com/sbabiv/xml2map"
 )
@@ -15,7 +16,8 @@ import (
 const NRCAN_ID = "nrcan"
 
 type NRCAN struct {
-	cache cache.AnyCache
+	travelTimeTable *travel.AK135
+	cache           cache.AnyCache
 }
 
 func (s *NRCAN) GetProperty() DataSourceProperty {
@@ -129,7 +131,7 @@ func (s *NRCAN) GetEvents(latitude, longitude float64) ([]Event, error) {
 			Event:     fmt.Sprintf("NRCAN-%d", index),
 		}
 		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
-		seisEvent.Estimation = getSeismicEstimation(seisEvent.Depth, seisEvent.Distance)
+		seisEvent.Estimation = getSeismicEstimation(s.travelTimeTable, latitude, seisEvent.Latitude, longitude, seisEvent.Longitude, seisEvent.Depth)
 
 		resultArr = append(resultArr, seisEvent)
 	}

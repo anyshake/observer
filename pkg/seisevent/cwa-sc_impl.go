@@ -14,6 +14,7 @@ import (
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/dnsquery"
 	"github.com/anyshake/observer/pkg/request"
+	"github.com/bclswl0827/travel"
 	"github.com/corpix/uarand"
 	"github.com/miekg/dns"
 )
@@ -21,7 +22,8 @@ import (
 const CWA_SC_ID = "cwa_sc"
 
 type CWA_SC struct {
-	cache cache.AnyCache
+	travelTimeTable *travel.AK135
+	cache           cache.AnyCache
 }
 
 // Magic function that bypasses the Great Firewall of China
@@ -150,7 +152,7 @@ func (c *CWA_SC) GetEvents(latitude, longitude float64) ([]Event, error) {
 			Timestamp: c.getTimestamp(eventData[2].(string)),
 		}
 		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
-		seisEvent.Estimation = getSeismicEstimation(seisEvent.Depth, seisEvent.Distance)
+		seisEvent.Estimation = getSeismicEstimation(c.travelTimeTable, latitude, seisEvent.Latitude, longitude, seisEvent.Longitude, seisEvent.Depth)
 
 		resultArr = append(resultArr, seisEvent)
 	}

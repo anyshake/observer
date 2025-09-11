@@ -6,9 +6,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/bclswl0827/travel"
 )
 
-func ParseFdsnwsEvent(dataText, timeLayout string, latitude, longitude float64) ([]Event, error) {
+func ParseFdsnwsEvent(travelTimeTable *travel.AK135, dataText, timeLayout string, latitude, longitude float64) ([]Event, error) {
 	// Convert to CSV format
 	csvDataStr := strings.ReplaceAll(dataText, ",", " - ")
 	csvDataStr = strings.ReplaceAll(csvDataStr, "|", ",")
@@ -56,7 +58,7 @@ func ParseFdsnwsEvent(dataText, timeLayout string, latitude, longitude float64) 
 			}
 		}
 		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
-		seisEvent.Estimation = getSeismicEstimation(seisEvent.Depth, seisEvent.Distance)
+		seisEvent.Estimation = getSeismicEstimation(travelTimeTable, latitude, seisEvent.Latitude, longitude, seisEvent.Longitude, seisEvent.Depth)
 
 		resultArr = append(resultArr, seisEvent)
 	}

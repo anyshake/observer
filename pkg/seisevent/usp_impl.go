@@ -5,13 +5,15 @@ import (
 
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/request"
+	"github.com/bclswl0827/travel"
 	"github.com/corpix/uarand"
 )
 
 const USP_ID = "usp"
 
 type USP struct {
-	cache cache.AnyCache
+	travelTimeTable *travel.AK135
+	cache           cache.AnyCache
 }
 
 func (c *USP) GetProperty() DataSourceProperty {
@@ -41,7 +43,7 @@ func (c *USP) GetEvents(latitude, longitude float64) ([]Event, error) {
 		return nil, err
 	}
 
-	resultArr, err := ParseFdsnwsEvent(string(res), "2006-01-02T15:04:05", latitude, longitude)
+	resultArr, err := ParseFdsnwsEvent(c.travelTimeTable, string(res), "2006-01-02T15:04:05", latitude, longitude)
 	if err != nil {
 		return nil, err
 	}

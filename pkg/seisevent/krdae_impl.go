@@ -10,13 +10,15 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/request"
+	"github.com/bclswl0827/travel"
 	"github.com/corpix/uarand"
 )
 
 const KRDAE_ID = "krdae"
 
 type KRDAE struct {
-	cache cache.AnyCache
+	travelTimeTable *travel.AK135
+	cache           cache.AnyCache
 }
 
 func (c *KRDAE) GetProperty() DataSourceProperty {
@@ -73,7 +75,7 @@ func (c *KRDAE) GetEvents(latitude, longitude float64) ([]Event, error) {
 				}
 
 				seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
-				seisEvent.Estimation = getSeismicEstimation(seisEvent.Depth, seisEvent.Distance)
+				seisEvent.Estimation = getSeismicEstimation(c.travelTimeTable, latitude, seisEvent.Latitude, longitude, seisEvent.Longitude, seisEvent.Depth)
 
 				resultArr = append(resultArr, seisEvent)
 			}

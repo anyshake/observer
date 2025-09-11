@@ -10,14 +10,16 @@ import (
 
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/request"
+	"github.com/bclswl0827/travel"
 	"github.com/corpix/uarand"
 )
 
 const AFAD_ID = "afad"
 
 type AFAD struct {
-	cache       cache.AnyCache
-	currentTime time.Time
+	travelTimeTable *travel.AK135
+	cache           cache.AnyCache
+	currentTime     time.Time
 }
 
 func (c *AFAD) GetProperty() DataSourceProperty {
@@ -102,7 +104,7 @@ func (c *AFAD) GetEvents(latitude, longitude float64) ([]Event, error) {
 			Magnitude: c.getMagnitudeType(event["type"].(string), event["magnitude"].(string)),
 		}
 		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
-		seisEvent.Estimation = getSeismicEstimation(seisEvent.Depth, seisEvent.Distance)
+		seisEvent.Estimation = getSeismicEstimation(c.travelTimeTable, latitude, seisEvent.Latitude, longitude, seisEvent.Longitude, seisEvent.Depth)
 
 		resultArr = append(resultArr, seisEvent)
 	}

@@ -5,13 +5,15 @@ import (
 
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/request"
+	"github.com/bclswl0827/travel"
 	"github.com/corpix/uarand"
 )
 
 const AUSPASS_ID = "auspass"
 
 type AUSPASS struct {
-	cache cache.AnyCache
+	travelTimeTable *travel.AK135
+	cache           cache.AnyCache
 }
 
 func (c *AUSPASS) GetProperty() DataSourceProperty {
@@ -42,7 +44,7 @@ func (c *AUSPASS) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 	c.cache.Set(res)
 
-	resultArr, err := ParseFdsnwsEvent(string(res), "2006-01-02T15:04:05", latitude, longitude)
+	resultArr, err := ParseFdsnwsEvent(c.travelTimeTable, string(res), "2006-01-02T15:04:05", latitude, longitude)
 	if err != nil {
 		return nil, err
 	}
