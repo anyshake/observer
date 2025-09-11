@@ -5,9 +5,10 @@ import (
 )
 
 func (g *Source) Now() time.Time {
+	elapsed := time.Since(g.localTime)
+
 	g.mu.RLock()
 	defer g.mu.RUnlock()
 
-	elapsed := time.Since(g.localTime)
 	return g.refTime.Add(elapsed).UTC()
 }
