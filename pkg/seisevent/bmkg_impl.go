@@ -1,11 +1,12 @@
 package seisevent
 
 import (
-	"bytes"
+	"encoding/xml"
+	"errors"
+	"fmt"
 	"strings"
 	"time"
 
-	"github.com/PuerkitoBio/goquery"
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/request"
 	"github.com/bclswl0827/travel"
@@ -38,80 +39,112 @@ func (c *BMKG) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	res, err := request.GET(
-		"https://www.bmkg.go.id/gempabumi/gempabumi-dirasakan.bmkg",
-		10*time.Second, time.Second, 3, false, nil,
+		"https://bmkg-content-inatews.storage.googleapis.com/last30feltevent.xml",
+		30*time.Second, time.Second, 3, false,
+		// Set custom frontend SNI (bmkg) to bypass GFW in China
+		createCustomResolver(getCustomDnsList(), "bmkg"),
 		map[string]string{"User-Agent": uarand.GetRandom()},
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	// Parse HTML response
-	htmlDoc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(res))
+	resultArr, err := c.parseXmlData(string(res), latitude, longitude)
 	if err != nil {
 		return nil, err
 	}
-
-	var resultArr []Event
-	htmlDoc.Find(".table-responsive").Each(func(i int, s *goquery.Selection) {
-		s.Find("tbody").Each(func(i int, s *goquery.Selection) {
-			s.Find("tr").Each(func(i int, s *goquery.Selection) {
-				var seisEvent Event
-				s.Find("td").Each(func(i int, s *goquery.Selection) {
-					textValue := strings.TrimSpace(s.Text())
-					switch i {
-					case 0:
-						seisEvent.Verfied = true
-						seisEvent.Event = textValue
-					case 1:
-						seisEvent.Timestamp = c.getTimestamp(textValue)
-					case 2:
-						seisEvent.Latitude = c.getLatitude(textValue)
-						seisEvent.Longitude = c.getLongitude(textValue)
-					case 3:
-						seisEvent.Magnitude = c.getMagnitude(textValue)
-					case 4:
-						seisEvent.Depth = c.getDepth(textValue)
-					case 5:
-						s.Find("a").Each(func(i int, s *goquery.Selection) {
-							seisEvent.Region = strings.TrimSpace(s.Text())
-						})
-					}
-				})
-				seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
-				seisEvent.Estimation = getSeismicEstimation(c.travelTimeTable, latitude, seisEvent.Latitude, longitude, seisEvent.Longitude, seisEvent.Depth)
-
-				resultArr = append(resultArr, seisEvent)
-			})
-		})
-	})
 
 	sortedEvents := sortSeismicEvents(resultArr)
 	c.cache.Set(sortedEvents)
 	return sortedEvents, nil
 }
 
-func (c *BMKG) getLatitude(data string) float64 {
-	d := strings.Split(data, " ")
-	if len(d) != 4 {
-		return 0
+func (c *BMKG) parseXmlData(xmlData string, latitude, longitude float64) ([]Event, error) {
+	decoder := xml.NewDecoder(strings.NewReader(xmlData))
+
+	var (
+		items          []map[string]string
+		current        map[string]string
+		currentElement string
+	)
+	for {
+		tok, err := decoder.Token()
+		if err != nil {
+			break
+		}
+		switch tok := tok.(type) {
+		case xml.StartElement:
+			currentElement = tok.Name.Local
+			if currentElement == "info" {
+				current = make(map[string]string)
+			}
+		case xml.EndElement:
+			if tok.Name.Local == "info" && current != nil {
+				items = append(items, current)
+				current = nil
+			}
+			currentElement = ""
+		case xml.CharData:
+			if current != nil && currentElement != "" {
+				text := strings.TrimSpace(string(tok))
+				if text != "" {
+					current[currentElement] = text
+				}
+			}
+		}
 	}
 
-	return string2Float(d[0])
-}
+	var events []Event
+	mapKeys := []string{"eventid", "date", "time", "magnitude", "depth", "area", "coordinates"}
 
-func (c *BMKG) getLongitude(data string) float64 {
-	d := strings.Split(data, " ")
-	if len(d) != 4 {
-		return 0
+	for _, item := range items {
+		if !isMapHasKeys(item, mapKeys) {
+			continue
+		}
+
+		lat, lng, err := c.getCoordinates(item["coordinates"])
+		if err != nil {
+			return nil, err
+		}
+		timestamp, err := c.getTimestamp(item["date"], item["time"])
+		if err != nil {
+			return nil, err
+		}
+		seisEvent := Event{
+			Verfied:   true,
+			Event:     item["eventid"],
+			Region:    item["area"],
+			Latitude:  lat,
+			Longitude: lng,
+			Depth:     c.getDepth(item["depth"]),
+			Magnitude: c.getMagnitude(item["magnitude"]),
+			Timestamp: timestamp,
+		}
+
+		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
+		seisEvent.Estimation = getSeismicEstimation(c.travelTimeTable, latitude, seisEvent.Latitude, longitude, seisEvent.Longitude, seisEvent.Depth)
+
+		events = append(events, seisEvent)
 	}
 
-	return string2Float(d[2])
+	return events, nil
 }
 
-func (c *BMKG) getTimestamp(data string) int64 {
-	t, _ := time.Parse("02/01/200615:04:05 WIB", data)
-	return t.Add(-7 * time.Hour).UnixMilli()
+func (c *BMKG) getCoordinates(data string) (float64, float64, error) {
+	split := strings.Split(data, ",")
+	if len(split) != 2 {
+		return 0, 0, errors.New("failed to parse coordinates")
+	}
+	return string2Float(split[1]), string2Float(split[0]), nil
+}
+
+func (c *BMKG) getTimestamp(dateStr, timeStr string) (int64, error) {
+	t, err := time.Parse("02-01-06 15:04:05 WIB", fmt.Sprintf("%s %s", dateStr, timeStr))
+	if err != nil {
+		return 0, err
+	}
+
+	return t.Add(-7 * time.Hour).UnixMilli(), nil
 }
 
 func (c *BMKG) getDepth(data string) float64 {

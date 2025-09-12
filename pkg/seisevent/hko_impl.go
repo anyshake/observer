@@ -58,7 +58,7 @@ func (h *HKO) GetEvents(latitude, longitude float64) ([]Event, error) {
 	}
 
 	// Ensure the response has the expected keys
-	expectedKeys := []string{"EventId", "Verify", "HKTDate", "HKTTime", "City", "Region", "Lat", "Lon", "Mag"}
+	expectedKeys := []string{"EventId", "Verify", "HKTDate", "HKTTime", "City", "Region", "Lat", "Lon", "Mag", "Depth"}
 
 	var resultArr []Event
 	for _, v := range dataMapEvents.([]map[string]any) {
@@ -72,7 +72,7 @@ func (h *HKO) GetEvents(latitude, longitude float64) ([]Event, error) {
 		}
 
 		seisEvent := Event{
-			Depth:     -1,
+			Depth:     string2Float(v["Depth"].(string)),
 			Timestamp: timestamp,
 			Event:     v["EventId"].(string),
 			Verfied:   v["Verify"].(string) == "Y",

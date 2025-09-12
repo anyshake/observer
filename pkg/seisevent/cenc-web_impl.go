@@ -2,6 +2,7 @@ package seisevent
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
@@ -56,7 +57,7 @@ func (c *CENC_WEB) GetEvents(latitude, longitude float64) ([]Event, error) {
 	expectedKeys := []string{"CATA_ID", "O_TIME", "EPI_LAT", "EPI_LON", "EPI_DEPTH", "M", "M_MS", "LOCATION_C"}
 
 	var resultArr []Event
-	for _, v := range dataMapEvents {
+	for idx, v := range dataMapEvents {
 		if !isMapHasKeys(v, expectedKeys) || !isMapKeysEmpty(v, expectedKeys) {
 			continue
 		}
@@ -79,7 +80,7 @@ func (c *CENC_WEB) GetEvents(latitude, longitude float64) ([]Event, error) {
 			Timestamp: timestamp,
 			Region:    region,
 			Depth:     c.getDepth(v["EPI_DEPTH"]),
-			Event:     v["CATA_ID"].(string),
+			Event:     fmt.Sprintf("%d-%s", idx, v["CATA_ID"].(string)),
 			Latitude:  string2Float(v["EPI_LAT"].(string)),
 			Longitude: string2Float(v["EPI_LON"].(string)),
 		}

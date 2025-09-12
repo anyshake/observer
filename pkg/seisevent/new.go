@@ -42,7 +42,6 @@ func New(cacheTTL time.Duration) (map[string]IDataSource, error) {
 		NCS_ID:          &NCS{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		NRCAN_ID:        &NRCAN{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		GEONET_ID:       &GEONET{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
-		FJEA_ID:         &FJEA{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		ICL_ID:          &ICL{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		BMKG_ID:         &BMKG{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		DOST_ID:         &DOST{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},

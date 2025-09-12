@@ -40,7 +40,8 @@ func (c *NCS) GetEvents(latitude, longitude float64) ([]Event, error) {
 
 	res, err := request.GET(
 		"https://riseq.seismo.gov.in/riseq/earthquake",
-		30*time.Second, time.Second, 3, false, nil,
+		30*time.Second, time.Second, 3, false,
+		createCustomResolver(getCustomDnsList(), ""),
 		map[string]string{"User-Agent": uarand.GetRandom()},
 	)
 	if err != nil {

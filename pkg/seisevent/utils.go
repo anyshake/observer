@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/bclswl0827/travel"
+	"github.com/samber/lo"
 )
 
 func string2Float(num string) float64 {
@@ -32,7 +33,7 @@ func isMapKeysEmpty(m map[string]any, keys []string) bool {
 	return true
 }
 
-func isMapHasKeys(m map[string]any, keys []string) bool {
+func isMapHasKeys[T any](m map[string]T, keys []string) bool {
 	for _, key := range keys {
 		if _, ok := m[key]; !ok {
 			return false
@@ -70,7 +71,7 @@ func getDistance(lat1, lat2, lng1, lng2 float64) float64 {
 }
 
 func getSeismicEstimation(table *travel.AK135, lat1, lat2, lng1, lng2, depth float64) Estimation {
-	result := table.Estimate(travel.GetDeltaByCoordinates(lat1, lng1, lat2, lng2), depth, true)
+	result := table.Estimate(travel.GetDeltaByCoordinates(lat1, lng1, lat2, lng2), lo.Ternary(depth > 0, depth, 0), true)
 	estObj := Estimation{P_Wave: -1, S_Wave: -1}
 
 	if result.P != nil {

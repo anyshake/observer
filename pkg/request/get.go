@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"net/textproto"
 	"time"
 )
 
@@ -21,12 +22,19 @@ func GET(url string, timeout, retryInterval time.Duration, maxRetries int, trimS
 			req.Header.Set(key, value)
 		}
 	}
+	requestHostname := req.Header.Get(textproto.CanonicalMIMEHeaderKey("Host"))
+	if len(requestHostname) > 0 && len(req.URL.Host) > 0 {
+		req.Host = requestHostname
+	}
 
 	for retries := 0; retries <= maxRetries; retries++ {
 		resp, err := client.Do(req)
 		if err != nil {
 			time.Sleep(retryInterval)
 			continue
+		}
+		if resp.StatusCode != http.StatusOK {
+			return nil, fmt.Errorf("unexpected status: %s", resp.Status)
 		}
 
 		var buf bytes.Buffer

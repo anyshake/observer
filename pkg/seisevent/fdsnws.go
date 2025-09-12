@@ -3,7 +3,7 @@ package seisevent
 import (
 	"encoding/csv"
 	"errors"
-	"strconv"
+	"fmt"
 	"strings"
 	"time"
 
@@ -35,23 +35,25 @@ func ParseFdsnwsEvent(travelTimeTable *travel.AK135, dataText, timeLayout string
 				seisEvent.Event = val
 			case 1:
 				seisEvent.Verfied = true
-				t, _ := time.Parse(timeLayout, val)
+				if len(val) > len(timeLayout) {
+					val = val[:len(timeLayout)]
+				}
+				t, err := time.Parse(timeLayout, val)
+				if err != nil {
+					return nil, err
+				}
 				seisEvent.Timestamp = t.UnixMilli()
 			case 2:
-				lat, _ := strconv.ParseFloat(val, 64)
-				seisEvent.Latitude = lat
+				seisEvent.Latitude = string2Float(val)
 			case 3:
-				lon, _ := strconv.ParseFloat(val, 64)
-				seisEvent.Longitude = lon
+				seisEvent.Longitude = string2Float(val)
 			case 4:
-				depth, _ := strconv.ParseFloat(val, 64)
-				seisEvent.Depth = depth
+				seisEvent.Depth = string2Float(val)
 			case 9:
 				magType = val
 			case 10:
-				m, _ := strconv.ParseFloat(val, 64)
 				seisEvent.Magnitude = []Magnitude{
-					{Type: ParseMagnitude(magType), Value: m},
+					{Type: ParseMagnitude(magType), Value: string2Float(val)},
 				}
 			case 12:
 				seisEvent.Region = val
@@ -60,6 +62,7 @@ func ParseFdsnwsEvent(travelTimeTable *travel.AK135, dataText, timeLayout string
 		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
 		seisEvent.Estimation = getSeismicEstimation(travelTimeTable, latitude, seisEvent.Latitude, longitude, seisEvent.Longitude, seisEvent.Depth)
 
+		fmt.Printf("%+v\n", seisEvent)
 		resultArr = append(resultArr, seisEvent)
 	}
 

@@ -16,7 +16,7 @@ require (
 	github.com/bclswl0827/sacio v1.0.6
 	github.com/bclswl0827/slgo v0.2.3
 	github.com/bclswl0827/sqlite v1.11.1-0.20240613172512-9e6ac9861470
-	github.com/bclswl0827/travel v0.0.0-20250911163801-9fd6547c8e81
+	github.com/bclswl0827/travel v0.0.0-20250912015306-ed88932998fe
 	github.com/beevik/ntp v1.4.3
 	github.com/blang/semver/v4 v4.0.0
 	github.com/bwmarrin/snowflake v0.3.0

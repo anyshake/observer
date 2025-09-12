@@ -43,7 +43,7 @@ func (c *EMSC) GetEvents(latitude, longitude float64) ([]Event, error) {
 		return nil, err
 	}
 
-	resultArr, err := ParseFdsnwsEvent(c.travelTimeTable, string(res), "2006-01-02T15:04:05Z", latitude, longitude)
+	resultArr, err := ParseFdsnwsEvent(c.travelTimeTable, string(res), "2006-01-02T15:04:05", latitude, longitude)
 	if err != nil {
 		return nil, err
 	}
