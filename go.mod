@@ -16,7 +16,7 @@ require (
 	github.com/bclswl0827/sacio v1.0.6
 	github.com/bclswl0827/slgo v0.2.3
 	github.com/bclswl0827/sqlite v1.11.1-0.20240613172512-9e6ac9861470
-	github.com/bclswl0827/travel v0.0.0-20250912015306-ed88932998fe
+	github.com/bclswl0827/travel v0.0.0-20250920120530-2f1b6e10e7ae
 	github.com/beevik/ntp v1.4.3
 	github.com/blang/semver/v4 v4.0.0
 	github.com/bwmarrin/snowflake v0.3.0
@@ -37,8 +37,8 @@ require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/jedisct1/go-dnsstamps v0.0.0-20240423203910-07a0735c7774
 	github.com/miekg/dns v1.1.65
-	github.com/ncruces/go-sqlite3 v0.18.2
-	github.com/ncruces/go-sqlite3/gormlite v0.18.0
+	github.com/ncruces/go-sqlite3 v0.24.0
+	github.com/ncruces/go-sqlite3/gormlite v0.24.0
 	github.com/samber/lo v1.51.0
 	github.com/sbabiv/xml2map v1.2.1
 	github.com/shirou/gopsutil/v4 v4.25.1
@@ -55,7 +55,7 @@ require (
 	gorm.io/driver/mysql v1.5.2
 	gorm.io/driver/postgres v1.5.7
 	gorm.io/driver/sqlserver v1.5.2
-	gorm.io/gorm v1.25.11
+	gorm.io/gorm v1.25.12
 	gorm.io/sharding v0.6.1
 )
 
@@ -156,7 +156,7 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/templexxx/cpu v0.1.1 // indirect
 	github.com/templexxx/xorsimd v0.4.3 // indirect
-	github.com/tetratelabs/wazero v1.8.0 // indirect
+	github.com/tetratelabs/wazero v1.9.0 // indirect
 	github.com/tjfoc/gmsm v1.4.1 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect

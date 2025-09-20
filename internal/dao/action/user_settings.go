@@ -5,6 +5,8 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
+	"strings"
+	"unicode"
 
 	"github.com/anyshake/observer/internal/dao/model"
 )
@@ -38,7 +40,7 @@ func (h *Handler) SettingsGet(namespace, key string) (any, SettingType, int, err
 
 	switch SettingType(settings.ConfigType) {
 	case String:
-		return string(settings.ConfigValue), String, settings.Version, nil
+		return h.removeInvisible(string(settings.ConfigValue)), String, settings.Version, nil
 	case Bool:
 		return settings.ConfigValue[0] == 1, Bool, settings.Version, nil
 	case Int:
@@ -92,6 +94,9 @@ func (h *Handler) SettingsSet(namespace, key string, valueType SettingType, vers
 			return fmt.Errorf("invalid value type for %s: expected string", valueType)
 		}
 		dataValBytes = []byte(str)
+		if len(dataValBytes) == 0 {
+			dataValBytes = []byte{0}
+		}
 	case Bool:
 		boolVal, ok := value.(bool)
 		if !ok {
@@ -151,4 +156,17 @@ func (h *Handler) SettingsInit(namespace, key string, valueType SettingType, ver
 	}
 
 	return false, nil
+}
+
+func (h *Handler) removeInvisible(s string) string {
+	return strings.Map(func(r rune) rune {
+		if unicode.IsControl(r) {
+			return -1
+		}
+		switch r {
+		case '\u200B', '\u200C', '\u200D', '\uFEFF':
+			return -1
+		}
+		return r
+	}, s)
 }
