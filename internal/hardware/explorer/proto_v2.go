@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"math"
 	"path/filepath"
-	"sync"
 	"sync/atomic"
 	"time"
 	"unsafe"
@@ -34,11 +33,8 @@ type ExplorerProtoImplV2 struct {
 	fifoBuffer fifo.Buffer[byte]
 	messageBus message.Bus[EventHandler]
 
-	timeDiffMutex                sync.Mutex
 	prevMcuTimestamp             int64
-	timeDiff4NonGnssMode         int64
-	prevTimeOffset4NonGnssMode   *int64
-	isTimeDiff4NonGnssModeStable bool
+	isDataStreamStable           bool
 	timeCalibrationChan4GnssMode chan [2]time.Time
 
 	variableAllSet bool
@@ -62,18 +58,6 @@ func (g *ExplorerProtoImplV2) getPacketSize(headerSize, channelSize int) int {
 			uintptr(channelSize)*unsafe.Sizeof(int32(0))+ // channel 2
 			uintptr(channelSize)*unsafe.Sizeof(int32(0))+ // channel 3
 			unsafe.Sizeof(uint8(0))) // checksum
-}
-
-func (g *ExplorerProtoImplV2) getTimestamp(mcuTimestamp int64) int64 {
-	if g.deviceConfig.GetGnssAvailability() {
-		return mcuTimestamp
-	}
-
-	g.timeDiffMutex.Lock()
-	timestamp := mcuTimestamp + g.timeDiff4NonGnssMode
-	g.timeDiffMutex.Unlock()
-
-	return timestamp
 }
 
 func (g *ExplorerProtoImplV2) getVariableData(mcuTimestamp int64, variableBytes uint32) {
@@ -235,8 +219,8 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 
 	go func() {
 		timeDiffSamples := make([]int64, 0, STABLE_CHECK_SAMPLES)
-		g.isTimeDiff4NonGnssModeStable = false
-		buf := make([]byte, packetSize*2)
+		g.isDataStreamStable = false
+		buf := make([]byte, packetSize)
 
 		for timeSourceInitialized := false; ; {
 			select {
@@ -268,7 +252,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 					packetLatency += estimatedTransportLatency
 					timeDiff := recvEndTime.UnixMilli() - mcuTimestamp - packetLatency.Milliseconds()
 
-					if !g.isTimeDiff4NonGnssModeStable {
+					if !g.isDataStreamStable {
 						timeDiffSamples = append(timeDiffSamples, timeDiff)
 						if len(timeDiffSamples) > STABLE_CHECK_SAMPLES {
 							timeDiffSamples = timeDiffSamples[1:]
@@ -276,7 +260,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 
 						if len(timeDiffSamples) == STABLE_CHECK_SAMPLES {
 							if minVal, maxVal := lo.Min(timeDiffSamples), lo.Max(timeDiffSamples); math.Abs(float64(maxVal-minVal)) <= 5 {
-								g.isTimeDiff4NonGnssModeStable = true
+								g.isDataStreamStable = true
 								if err = g.Flush(); err != nil {
 									g.Logger.Errorf("failed to flush transport: %v", err)
 									cancelFn()
@@ -296,7 +280,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 							g.TimeSource.Update(recvEndSysTime, time.UnixMilli(mcuTimestamp).Add(packetLatency))
 
 							timeSourceInitialized = true
-							g.isTimeDiff4NonGnssModeStable = true
+							g.isDataStreamStable = true
 
 							g.Logger.Infof("time synchronized with Explorer built-in GNSS module")
 						} else if !timeSourceInitialized {
@@ -317,10 +301,8 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 							g.TimeSource.Update(currentTime, currentTime.Add(offset))
 
 							g.prevMcuTimestamp = 0
-							g.prevTimeOffset4NonGnssMode = nil
-
 							timeSourceInitialized = true
-							g.isTimeDiff4NonGnssModeStable = true
+							g.isDataStreamStable = true
 						}
 
 						if atomic.LoadInt32(&initFlag) == 0 {
@@ -328,24 +310,6 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 							close(readyChan)
 							g.deviceStatus.SetStartedAt(g.TimeSource.Now())
 						}
-
-						// Compensate for oscillator drift on the AnyShake Explorer board (NTP mode only)
-						if !g.deviceConfig.GetGnssAvailability() {
-							timeOffset := g.getTimestamp(mcuTimestamp) - g.TimeSource.Now().UnixMilli()
-							if g.prevTimeOffset4NonGnssMode == nil {
-								g.prevTimeOffset4NonGnssMode = &timeOffset
-							}
-							if math.Abs(float64(timeOffset-*g.prevTimeOffset4NonGnssMode)) > 1 {
-								g.timeDiff4NonGnssMode = lo.Mean(timeDiffSamples)
-								g.prevTimeOffset4NonGnssMode = &timeOffset
-							}
-						}
-					}
-
-					g.timeDiffMutex.Lock()
-
-					if g.timeDiff4NonGnssMode == 0 && timeDiff != 0 {
-						g.timeDiff4NonGnssMode = timeDiff
 					}
 
 					// Handle MCU time jumps (usually caused by Explorer power loss or PC hibernation)
@@ -355,7 +319,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 						g.resetVariables()
 						timeDiffSamples = make([]int64, 0, STABLE_CHECK_SAMPLES)
 					}
-					if timeSourceInitialized && g.isTimeDiff4NonGnssModeStable {
+					if timeSourceInitialized && g.isDataStreamStable {
 						if g.deviceConfig.GetGnssAvailability() && g.variableAllSet {
 							select {
 							case g.timeCalibrationChan4GnssMode <- [2]time.Time{recvEndSysTime, time.UnixMilli(mcuTimestamp).Add(packetLatency)}:
@@ -365,11 +329,16 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 						g.prevMcuTimestamp = mcuTimestamp
 					}
 
-					g.timeDiffMutex.Unlock()
+					// Append actual timestamp to received packet
+					actualTimestamp := recvEndTime.UnixMilli() - packetLatency.Milliseconds()
+					newRecvBuf := make([]byte, len(recvBuf)+8)
+					copy(newRecvBuf, recvBuf)
+					binary.LittleEndian.PutUint64(newRecvBuf[len(newRecvBuf)-8:], uint64(actualTimestamp))
+					recvBuf = newRecvBuf
 				}
 			}
 
-			if g.isTimeDiff4NonGnssModeStable {
+			if g.isDataStreamStable {
 				_, _ = g.fifoBuffer.Write(recvBuf...)
 			}
 		}
@@ -377,15 +346,15 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 
 	go func(decodeInterval time.Duration) {
 		var (
-			expectedNextMcuTimestamp int64
-			collectedTimestampArr    []int64
+			expectedNextTimestamp int64
+			collectedTimestampArr []int64
 		)
 		for timer := time.NewTimer(decodeInterval); ; {
 			timer.Reset(decodeInterval)
 
 			select {
 			case <-timer.C:
-				dataPacket, err := g.fifoBuffer.Peek(DATA_PACKET_HEADER, packetSize)
+				dataPacket, err := g.fifoBuffer.Peek(DATA_PACKET_HEADER, packetSize+8) // 8 bytes used for actual timestamp for NTP mode
 				if err != nil {
 					continue
 				}
@@ -396,28 +365,23 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 
 				if !g.variableAllSet {
 					g.Logger.Warnln("waiting for device config to be fully collected, this may take a while")
-					expectedNextMcuTimestamp = 0
+					expectedNextTimestamp = 0
 					collectedTimestampArr = []int64{}
 					g.channelDataBuf = []ChannelData{}
 					continue
 				}
 
-				if !g.deviceConfig.GetGnssAvailability() && g.timeDiff4NonGnssMode == 0 {
-					expectedNextMcuTimestamp = 0
-					collectedTimestampArr = []int64{}
-					g.channelDataBuf = []ChannelData{}
-					continue
-				}
-
-				if err = g.verifyChecksum(dataPacket, DATA_PACKET_HEADER); err != nil {
+				if err = g.verifyChecksum(dataPacket[:len(dataPacket)-8], DATA_PACKET_HEADER); err != nil {
 					g.Logger.Errorln(err)
 					g.deviceStatus.IncrementErrors()
 					continue
 				}
 
-				timestamp := g.getTimestamp(mcuTimestamp)
-				if expectedNextMcuTimestamp == 0 {
-					expectedNextMcuTimestamp = mcuTimestamp + 1000
+				actualTimestamp := int64(binary.LittleEndian.Uint64(dataPacket[len(dataPacket)-8:]))
+				timestamp := lo.Ternary(g.deviceConfig.GetGnssAvailability(), mcuTimestamp, actualTimestamp)
+
+				if expectedNextTimestamp == 0 {
+					expectedNextTimestamp = timestamp + 1000
 				} else {
 					collectedTimestampArr = append(collectedTimestampArr, timestamp)
 					err = g.getChannelData(dataPacket, len(DATA_PACKET_HEADER), DATA_PACKET_CHANNEL_SIZE)
@@ -428,9 +392,9 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 					}
 				}
 
-				if math.Abs(float64(mcuTimestamp-expectedNextMcuTimestamp)) <= ALLOWED_JITTER_MS {
+				if math.Abs(float64(timestamp-expectedNextTimestamp)) <= ALLOWED_JITTER_MS {
 					// Update the next tick even if the buffer is empty
-					expectedNextMcuTimestamp = mcuTimestamp + time.Second.Milliseconds()
+					expectedNextTimestamp = timestamp + time.Second.Milliseconds()
 					if len(collectedTimestampArr) == 0 {
 						continue
 					}
@@ -451,16 +415,14 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 						collectedTimestampArr = []int64{}
 						g.channelDataBuf = []ChannelData{}
 					}
-				} else if expectedNextMcuTimestamp-mcuTimestamp > time.Second.Milliseconds()+ALLOWED_JITTER_MS || expectedNextMcuTimestamp-mcuTimestamp < 0 {
-					if expectedNextMcuTimestamp != 0 {
-						g.Logger.Warnf("jitter detected, discarding this packet, expected %v, got %v", g.getTimestamp(expectedNextMcuTimestamp), timestamp)
+				} else if expectedNextTimestamp-timestamp > time.Second.Milliseconds()+ALLOWED_JITTER_MS || expectedNextTimestamp-timestamp < 0 {
+					if expectedNextTimestamp != 0 {
+						g.Logger.Warnf("jitter detected, discarding this packet, expected %v, got %v", expectedNextTimestamp, timestamp)
 						g.prevMcuTimestamp = 0
-						g.timeDiff4NonGnssMode = 0
-						g.prevTimeOffset4NonGnssMode = nil
 						g.deviceStatus.IncrementErrors()
 					}
 					// Update the next tick, clear the buffer if the jitter exceeds the threshold
-					expectedNextMcuTimestamp = mcuTimestamp + time.Second.Milliseconds()
+					expectedNextTimestamp = timestamp + time.Second.Milliseconds()
 					collectedTimestampArr = []int64{}
 					g.channelDataBuf = []ChannelData{}
 				}
