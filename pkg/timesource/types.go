@@ -5,8 +5,12 @@ import (
 	"time"
 )
 
+type TimeFunc func() time.Time
+
 type Source struct {
-	mu        sync.RWMutex
+	mu       sync.RWMutex
+	timeFunc TimeFunc
+
 	refTime   time.Time
 	localTime time.Time
 }

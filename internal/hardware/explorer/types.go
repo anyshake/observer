@@ -6,12 +6,19 @@ import (
 )
 
 const (
-	EXPLORER_STREAM_TOPIC    = "/explorer/stream"
+	EXPLORER_STREAM_TOPIC          = "/explorer/stream"          // 1 message per second
+	EXPLORER_REALTIME_STREAM_TOPIC = "/explorer/stream/realtime" // 1 message per packet
+)
+
+const (
 	NTP_RESYNC_INTERVAL      = 5 * time.Minute
 	NTP_MEASUREMENT_ATTEMPTS = 5
-	STABLE_CHECK_SAMPLES     = 10
-	ALLOWED_JITTER_MS_GNSS   = 10
-	ALLOWED_JITTER_MS_NTP    = 20
+)
+
+const (
+	STABLE_CHECK_SAMPLES   = 10
+	ALLOWED_JITTER_MS_GNSS = 10
+	ALLOWED_JITTER_MS_NTP  = 20
 )
 
 type ExplorerOptions struct {

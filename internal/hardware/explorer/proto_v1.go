@@ -29,7 +29,11 @@ type ExplorerProtoImplV1 struct {
 
 	Transport  transport.ITransport
 	fifoBuffer fifo.Buffer[byte]
+
+	// 1 message per second, for archiving service, etc.
 	messageBus message.Bus[EventHandler]
+	// 1 message per packet, for realtime purposes
+	messageBusRealtime message.Bus[EventHandler]
 
 	deviceStatus   DeviceStatus
 	deviceConfig   DeviceConfig
@@ -166,7 +170,7 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 	if err := g.Transport.Open(); err != nil {
 		return nil, nil, fmt.Errorf("failed to open transport: %w", err)
 	}
-	ntpClient, err := ntpclient.New(g.NtpOptions.Pool, g.NtpOptions.Retry, g.NtpOptions.ReadTimeout)
+	ntpClient, err := ntpclient.New(g.NtpOptions.Pool, g.NtpOptions.Retry, g.NtpOptions.ReadTimeout, timesource.MonotonicNow)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create ntp client: %w", err)
 	}
@@ -177,9 +181,9 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 		return nil, nil, fmt.Errorf("failed to acquire time from NTP server: %w", err)
 	}
 
-	currentTime := time.Now()
-	g.TimeSource.Update(currentTime, currentTime.Add(offset))
-	g.Logger.Infof("time synchronized with NTP server, local time offset: %d ms", offset.Milliseconds())
+	currentMonotonicTime := timesource.MonotonicNow()
+	g.TimeSource.Update(currentMonotonicTime, currentMonotonicTime.Add(offset), timesource.MonotonicNow)
+	g.Logger.Infof("time synchronized with NTP server, local monotonic time offset: %d ms", offset.Milliseconds())
 	if err = g.Flush(); err != nil {
 		return nil, nil, fmt.Errorf("failed to flush transport: %w", err)
 	}
@@ -195,6 +199,7 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 	packetSize := g.getPacketSize(len(DATA_PACKET_HEADER), DATA_PACKET_CHANNEL_SIZE)
 	g.fifoBuffer = fifo.New[byte](10 * packetSize)
 	g.messageBus = message.NewBus[EventHandler](EXPLORER_STREAM_TOPIC, 1024)
+	g.messageBusRealtime = message.NewBus[EventHandler](EXPLORER_REALTIME_STREAM_TOPIC, 1024)
 	g.deviceConfig.SetGnssAvailability(false)
 
 	dummyDeviceId := uint32(0x12F81AC)
@@ -300,6 +305,7 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 					collectedTimestampArr = append(collectedTimestampArr, timestamp)
 					g.deviceStatus.IncrementFrames()
 
+					g.messageBusRealtime.Publish(time.UnixMilli(timestamp), &g.deviceConfig, &g.deviceVariable, g.channelDataBuf)
 					if len(collectedTimestampArr)*DATA_PACKET_CHANNEL_SIZE == currentSampleRate {
 						packetTimestamp := collectedTimestampArr[0]
 						g.messageBus.Publish(time.UnixMilli(packetTimestamp), &g.deviceConfig, &g.deviceVariable, g.channelDataBuf)
@@ -335,9 +341,9 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 					continue
 				}
 				timer.Reset(resyncInterval)
-				currentTime := time.Now()
-				g.TimeSource.Update(currentTime, currentTime.Add(offset))
-				g.Logger.Infof("time synchronized with NTP server, local time offset: %d ms", offset.Milliseconds())
+				currentMonotonicTime := timesource.MonotonicNow()
+				g.TimeSource.Update(currentMonotonicTime, currentMonotonicTime.Add(offset), nil)
+				g.Logger.Infof("time synchronized with NTP server, local monotonic time offset: %d ms", offset.Milliseconds())
 			case <-subCtx.Done():
 				timer.Stop()
 				return
@@ -362,6 +368,14 @@ func (g *ExplorerProtoImplV1) Subscribe(clientId string, handler EventHandler) e
 
 func (g *ExplorerProtoImplV1) Unsubscribe(clientId string) error {
 	return g.messageBus.Unsubscribe(clientId)
+}
+
+func (g *ExplorerProtoImplV1) SubscribeRealtime(clientId string, handler EventHandler) error {
+	return g.messageBusRealtime.Subscribe(clientId, handler)
+}
+
+func (g *ExplorerProtoImplV1) UnsubscribeRealtime(clientId string) error {
+	return g.messageBusRealtime.Unsubscribe(clientId)
 }
 
 func (g *ExplorerProtoImplV1) GetConfig() DeviceConfig {

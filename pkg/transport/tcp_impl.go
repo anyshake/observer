@@ -4,7 +4,6 @@
 package transport
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -75,9 +74,13 @@ func (t *TcpTransportImpl) SetTimeout(timeout time.Duration) error {
 	return nil
 }
 
-func (t *TcpTransportImpl) ReadUntil(ctx context.Context, delim []byte, maxBytes int, timeout time.Duration) ([]byte, bool, time.Duration, error) {
+func (t *TcpTransportImpl) ReadUntil(ctx context.Context, maxBytes int, doneFunc func(buf []byte, updatedAt *time.Time) bool, timeout time.Duration) ([]byte, bool, time.Duration, error) {
 	if t.conn == nil {
 		return nil, false, 0, errors.New("connection is not opened")
+	}
+
+	if doneFunc == nil {
+		return nil, false, 0, errors.New("doneFunc cannot be nil")
 	}
 
 	deadline := time.Now().Add(timeout)
@@ -113,14 +116,16 @@ func (t *TcpTransportImpl) ReadUntil(ctx context.Context, delim []byte, maxBytes
 		if firstByteTime.IsZero() {
 			firstByteTime = currentTime
 		}
-		lastByteTime = currentTime
 
 		buffer = append(buffer, temp[0])
 		if len(buffer) > maxBytes {
-			return nil, false, 0, fmt.Errorf("read exceeded maxBytes (%d) before delimiter", maxBytes)
+			return nil, false, 0, fmt.Errorf("read exceeded maxBytes (%d) before callback condition", maxBytes)
 		}
 
-		if len(buffer) >= len(delim) && bytes.HasSuffix(buffer, delim) {
+		if doneFunc(buffer, &lastByteTime) {
+			if lastByteTime.IsZero() {
+				lastByteTime = currentTime
+			}
 			duration := lastByteTime.Sub(firstByteTime)
 			return buffer, false, duration, nil
 		}

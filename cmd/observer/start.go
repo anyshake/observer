@@ -132,7 +132,7 @@ func appStart(args arguments) {
 		}
 	}
 
-	timeSrc := timesource.New()
+	timeSrc := timesource.New(nil)
 	hardwareDevice, err = hardware.New(
 		logger.GetLogger("explorer_driver"),
 		timeSrc,

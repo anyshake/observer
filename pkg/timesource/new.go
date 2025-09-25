@@ -4,9 +4,14 @@ import (
 	"time"
 )
 
-func New() *Source {
-	currentTime := time.Now()
+func New(timeFunc TimeFunc) *Source {
+	if timeFunc == nil {
+		timeFunc = time.Now
+	}
+
+	currentTime := timeFunc()
 	return &Source{
+		timeFunc:  timeFunc,
 		localTime: currentTime,
 		refTime:   currentTime,
 	}

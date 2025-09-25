@@ -3,7 +3,7 @@ package ntpclient
 import (
 	"time"
 
-	"github.com/beevik/ntp"
+	"github.com/bclswl0827/ntp"
 )
 
 const (
@@ -12,6 +12,7 @@ const (
 )
 
 type Client struct {
+	timeFunc    ntp.TimeFunc
 	pool        []string
 	retries     int
 	readTimeout time.Duration

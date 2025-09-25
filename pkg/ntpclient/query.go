@@ -9,11 +9,12 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/pkg/logger"
-	"github.com/beevik/ntp"
+	"github.com/bclswl0827/ntp"
 	"github.com/samber/lo"
 )
 
 func (c *Client) Query() (time.Duration, string, error) {
+	ntp.Now = c.timeFunc
 	probes := c.parallelProbe(c.pool)
 
 	filtered := lo.Filter(probes, func(p probeResult, _ int) bool {
@@ -147,7 +148,7 @@ func (c *Client) QueryAverage(attempts int) (time.Duration, error) {
 			return 0, err
 		}
 
-		logger.GetLogger("ntp_client").Infof("%d of %d attempts: current server %s, clock offset %d ms", i+1, attempts, server, resp.Milliseconds())
+		logger.GetLogger("ntp_client").Infof("%d of %d attempts: current server %s, monotonic clock offset %d ms", i+1, attempts, server, resp.Milliseconds())
 		results = append(results, resp.Milliseconds())
 
 		time.Sleep(time.Second)

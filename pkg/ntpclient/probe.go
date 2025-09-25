@@ -3,7 +3,7 @@ package ntpclient
 import (
 	"sync"
 
-	"github.com/beevik/ntp"
+	"github.com/bclswl0827/ntp"
 )
 
 func (c *Client) parallelProbe(servers []string) []probeResult {
