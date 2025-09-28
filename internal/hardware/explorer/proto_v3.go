@@ -49,8 +49,8 @@ type ExplorerProtoImplV3 struct {
 	flagMutex        sync.Mutex
 	variableAllSet   bool
 	collectedSamples int
-	packetTimeObj    time.Time
 
+	packetTimeObj  time.Time
 	deviceStatus   DeviceStatus
 	deviceConfig   DeviceConfig
 	deviceVariable DeviceVariable
@@ -188,7 +188,9 @@ func (g *ExplorerProtoImplV3) getVariableData(mcuTimestamp int64, deviceConfig u
 		}
 	}
 
+	g.flagMutex.Lock()
 	g.variableAllSet = variableAllSet
+	g.flagMutex.Unlock()
 }
 
 func (g *ExplorerProtoImplV3) getChannelData(channelData []*ChannelData, channelDataBytes []byte, channelChunkLength int) {
@@ -311,6 +313,10 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 			}
 			packetBytes := recvBuf[:len(recvBuf)-len(packetDelim)] // without header and tailer
 
+			g.flagMutex.Lock()
+			variableAllSet := g.variableAllSet
+			g.flagMutex.Unlock()
+
 			if err = g.verifyChecksum(packetBytes); err == nil {
 				mcuTimestamp := int64(binary.LittleEndian.Uint64(packetBytes[:8]))
 				deviceConfig := binary.LittleEndian.Uint32(packetBytes[8 : 8+4])
@@ -342,7 +348,11 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 					g.isDataStreamStable = true
 				}
 
-				if g.variableAllSet {
+				g.flagMutex.Lock()
+				variableAllSet := g.variableAllSet
+				g.flagMutex.Unlock()
+
+				if variableAllSet {
 					if gnssEnabled && !timeSourceInitialized {
 						g.TimeSource.Update(recvEndMonotonicTime, time.UnixMilli(mcuTimestamp).Add(packetLatency), timesource.MonotonicNow)
 
@@ -389,7 +399,11 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 					g.isDataStreamStable = false
 					timeDiffSamples = make([]int64, 0, STABLE_CHECK_SAMPLES)
 				} else {
-					if gnssEnabled && g.isDataStreamStable && g.variableAllSet {
+					g.flagMutex.Lock()
+					variableAllSet := g.variableAllSet
+					g.flagMutex.Unlock()
+
+					if gnssEnabled && g.isDataStreamStable && variableAllSet {
 						select {
 						case g.timeCalibrationChan <- [2]time.Time{recvEndMonotonicTime, time.UnixMilli(mcuTimestamp).Add(packetLatency)}:
 						default:
@@ -404,7 +418,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 						dataTime:  recvEndTime.Add(-packetLatency),
 					})
 				}
-			} else if g.isDataStreamStable && g.variableAllSet {
+			} else if g.isDataStreamStable && variableAllSet {
 				g.Logger.Errorln(err)
 				g.deviceStatus.IncrementErrors()
 			}
@@ -432,7 +446,11 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 				var variableBytes [4]byte
 				copy(variableBytes[:], dataPacketObj.dataBytes[8+4:8+4+4])
 				g.getVariableData(mcuTimestamp, deviceConfig, variableBytes)
-				if !g.variableAllSet {
+
+				g.flagMutex.Lock()
+				variableAllSet := g.variableAllSet
+				g.flagMutex.Unlock()
+				if !variableAllSet {
 					g.Logger.Warnln("waiting for device config to be fully collected, this may take a while")
 					continue
 				}
@@ -512,7 +530,10 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 				prevCalibTime = calibTimeData[1]
 				g.TimeSource.Update(calibTimeData[0], calibTimeData[1], nil)
 			case <-timer.C:
-				if deviceConfig := g.GetConfig(); deviceConfig.GetGnssAvailability() || !g.variableAllSet {
+				g.flagMutex.Lock()
+				variableAllSet := g.variableAllSet
+				g.flagMutex.Unlock()
+				if deviceConfig := g.GetConfig(); deviceConfig.GetGnssAvailability() || !variableAllSet {
 					timer.Reset(resyncInterval)
 					continue
 				}
