@@ -22,6 +22,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type explorerProtocolPacketV2 struct {
+	dataTime  time.Time
+	dataBytes []byte
+}
+
 type ExplorerProtoImplV2 struct {
 	ChannelCodes    []string
 	ExplorerOptions ExplorerOptions
@@ -30,7 +35,7 @@ type ExplorerProtoImplV2 struct {
 	TimeSource      *timesource.Source
 
 	Transport  transport.ITransport
-	fifoBuffer fifo.Buffer[byte]
+	fifoBuffer fifo.Buffer[*explorerProtocolPacketV2]
 
 	// 1 message per second, for archiving service, etc.
 	messageBus message.Bus[EventHandler]
@@ -112,12 +117,12 @@ func (g *ExplorerProtoImplV2) getVariableData(mcuTimestamp int64, variableBytes 
 	}
 }
 
-func (g *ExplorerProtoImplV2) getChannelData(packetBytes []byte, headerSize, channelSize int) error {
+func (g *ExplorerProtoImplV2) getChannelData(packetBytes []byte, channelSize int) error {
 	if len(g.channelDataBuf) != 3 {
 		g.channelDataBuf = make([]ChannelData, 3)
 	}
 
-	zOffset := headerSize + int(unsafe.Sizeof(int64(0))) + int(unsafe.Sizeof(uint32(0)))
+	zOffset := int(unsafe.Sizeof(int64(0))) + int(unsafe.Sizeof(uint32(0)))
 	zAxisData := make([]int32, channelSize)
 	eOffset := zOffset + (channelSize)*int(unsafe.Sizeof(int32(0)))
 	eAxisData := make([]int32, channelSize)
@@ -167,13 +172,10 @@ func (g *ExplorerProtoImplV2) getChannelData(packetBytes []byte, headerSize, cha
 	return nil
 }
 
-func (g *ExplorerProtoImplV2) verifyChecksum(packetData, header []byte) error {
-	if len(packetData) <= len(header) {
-		return errors.New("invalid packet length")
-	}
-	recvChecksum := packetData[len(packetData)-1]
+func (g *ExplorerProtoImplV2) verifyChecksum(dataBytes []byte) error {
+	recvChecksum := dataBytes[len(dataBytes)-1]
 	calcChecksum := uint8(0)
-	for _, b := range packetData[len(header) : len(packetData)-1] {
+	for _, b := range dataBytes[:len(dataBytes)-1] {
 		calcChecksum ^= b
 	}
 	if recvChecksum != calcChecksum {
@@ -193,6 +195,9 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 	if err := g.Transport.Open(); err != nil {
 		return nil, nil, fmt.Errorf("failed to open transport: %w", err)
 	}
+	if err := g.Flush(); err != nil {
+		return nil, nil, fmt.Errorf("failed to flush transport: %w", err)
+	}
 	ntpClient, err := ntpclient.New(g.NtpOptions.Pool, g.NtpOptions.Retry, g.NtpOptions.ReadTimeout, timesource.MonotonicNow)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create ntp client: %w", err)
@@ -210,7 +215,7 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 
 	DATA_PACKET_HEADER := []byte{0xFA, 0xDE}
 	packetSize := g.getPacketSize(len(DATA_PACKET_HEADER), DATA_PACKET_CHANNEL_SIZE)
-	g.fifoBuffer = fifo.New[byte](10 * packetSize)
+	g.fifoBuffer = fifo.New[*explorerProtocolPacketV2](512)
 	g.messageBus = message.NewBus[EventHandler](EXPLORER_STREAM_TOPIC, 1024)
 	g.messageBusRealtime = message.NewBus[EventHandler](EXPLORER_REALTIME_STREAM_TOPIC, 1024)
 	g.deviceStatus.SetUpdatedAt(time.Unix(0, 0))
@@ -225,7 +230,6 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 	go func() {
 		timeDiffSamples := make([]int64, 0, STABLE_CHECK_SAMPLES)
 		g.isDataStreamStable = false
-		buf := make([]byte, packetSize)
 
 		for timeSourceInitialized := false; ; {
 			select {
@@ -239,108 +243,125 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 			}
 
 			recvStartMonotonicTime := timesource.MonotonicNow()
-			n, err := g.Transport.Read(buf)
+			recvBuf, timeout, _, err := g.Transport.ReadUntil(
+				subCtx,
+				packetSize,
+				func(bufPtr *[]byte, updatedAt *time.Time) bool {
+					buf := *bufPtr
+					if len(buf) < len(DATA_PACKET_HEADER) {
+						return false
+					}
+					if !bytes.HasPrefix(buf, DATA_PACKET_HEADER) {
+						*bufPtr = buf[len(DATA_PACKET_HEADER):]
+						return false
+					}
+					return len(buf) == packetSize
+				},
+				2*time.Second,
+			)
 			recvEndMonotonicTime := timesource.MonotonicNow()
 			recvEndTime := g.TimeSource.Now()
 			if err != nil {
 				g.Logger.Errorf("failed to read data from transport: %v", err)
 				cancelFn()
 			}
-			recvBuf := buf[:n]
+			if timeout {
+				g.Logger.Error("timeout when reading data from transport")
+				continue
+			}
+			if len(recvBuf) == 0 {
+				continue
+			}
+			recvBuf = recvBuf[len(DATA_PACKET_HEADER):]
 
-			packetLatency := recvEndMonotonicTime.Sub(recvStartMonotonicTime)
-			if headerIdx := bytes.Index(recvBuf, DATA_PACKET_HEADER); headerIdx != -1 && len(recvBuf) >= headerIdx+packetSize {
-				if err = g.verifyChecksum(recvBuf[headerIdx:headerIdx+packetSize], DATA_PACKET_HEADER); err == nil {
-					mcuTimestamp := int64(binary.LittleEndian.Uint64(recvBuf[headerIdx+len(DATA_PACKET_HEADER) : headerIdx+len(DATA_PACKET_HEADER)+int(unsafe.Sizeof(int64(0)))]))
+			if err = g.verifyChecksum(recvBuf); err == nil {
+				mcuTimestamp := int64(binary.LittleEndian.Uint64(recvBuf[:8]))
 
-					estimatedTransportLatency := g.Transport.GetLatency(len(recvBuf))
-					packetLatency += estimatedTransportLatency
-					timeDiff := recvEndTime.UnixMilli() - mcuTimestamp - packetLatency.Milliseconds()
+				packetLatency := recvEndMonotonicTime.Sub(recvStartMonotonicTime) + g.Transport.GetLatency(len(recvBuf))
+				timeDiff := recvEndTime.UnixMilli() - mcuTimestamp - packetLatency.Milliseconds()
 
-					if !g.isDataStreamStable {
-						timeDiffSamples = append(timeDiffSamples, timeDiff)
-						if len(timeDiffSamples) > STABLE_CHECK_SAMPLES {
-							timeDiffSamples = timeDiffSamples[1:]
+				if !g.isDataStreamStable {
+					timeDiffSamples = append(timeDiffSamples, timeDiff)
+					if len(timeDiffSamples) > STABLE_CHECK_SAMPLES {
+						timeDiffSamples = timeDiffSamples[1:]
+					}
+
+					if len(timeDiffSamples) == STABLE_CHECK_SAMPLES {
+						if minVal, maxVal := lo.Min(timeDiffSamples), lo.Max(timeDiffSamples); math.Abs(float64(maxVal-minVal)) <= 5 {
+							g.isDataStreamStable = true
+							g.fifoBuffer.Reset()
+							g.Logger.Infof("data time series stabilized, final time difference = %d ms", timeDiff)
+						} else {
+							g.Logger.Warnf("waiting for data time series to settle down, this may take a while, current time difference = %d ms", timeDiff)
 						}
+					} else {
+						g.Logger.Warnln("collecting data time series, this may take a while")
+					}
+				}
 
-						if len(timeDiffSamples) == STABLE_CHECK_SAMPLES {
-							if minVal, maxVal := lo.Min(timeDiffSamples), lo.Max(timeDiffSamples); math.Abs(float64(maxVal-minVal)) <= 5 {
-								g.isDataStreamStable = true
-								g.fifoBuffer.Reset()
-								g.Logger.Infof("data time series stabilized, final time difference = %d ms", timeDiff)
+				if g.deviceConfig.GetSampleRate() > 0 && g.variableAllSet {
+					if g.deviceConfig.GetGnssAvailability() && !timeSourceInitialized {
+						g.TimeSource.Update(recvEndMonotonicTime, time.UnixMilli(mcuTimestamp).Add(packetLatency), timesource.MonotonicNow)
+
+						timeSourceInitialized = true
+						g.isDataStreamStable = true
+
+						g.Logger.Infof("time synchronized with Explorer built-in GNSS module")
+					} else if !timeSourceInitialized {
+						g.Logger.Infoln("synchronizing time with NTP servers, it may take a while")
+						offset, err := ntpClient.QueryAverage(NTP_MEASUREMENT_ATTEMPTS)
+						if err != nil {
+							g.Logger.Errorf("failed to synchronize time with NTP server: %v", err)
+							if atomic.LoadInt32(&initFlag) == 0 {
+								cancelFn()
 							} else {
-								g.Logger.Warnf("waiting for data time series to settle down, this may take a while, current time difference = %d ms", timeDiff)
+								continue
 							}
 						} else {
-							g.Logger.Warnln("collecting data time series, this may take a while")
-						}
-					}
-
-					if g.deviceConfig.GetSampleRate() > 0 && g.variableAllSet {
-						if g.deviceConfig.GetGnssAvailability() && !timeSourceInitialized {
-							g.TimeSource.Update(recvEndMonotonicTime, time.UnixMilli(mcuTimestamp).Add(packetLatency), timesource.MonotonicNow)
-
-							timeSourceInitialized = true
-							g.isDataStreamStable = true
-
-							g.Logger.Infof("time synchronized with Explorer built-in GNSS module")
-						} else if !timeSourceInitialized {
-							g.Logger.Infoln("synchronizing time with NTP servers, it may take a while")
-							offset, err := ntpClient.QueryAverage(NTP_MEASUREMENT_ATTEMPTS)
-							if err != nil {
-								g.Logger.Errorf("failed to synchronize time with NTP server: %v", err)
-								if atomic.LoadInt32(&initFlag) == 0 {
-									cancelFn()
-								} else {
-									continue
-								}
-							} else {
-								g.Logger.Infof("time synchronized with NTP server, local monotonic time offset: %d ms", offset.Milliseconds())
-							}
-
-							currentMonotonicTime := timesource.MonotonicNow()
-							g.TimeSource.Update(currentMonotonicTime, currentMonotonicTime.Add(offset), timesource.MonotonicNow)
-
-							g.prevMcuTimestamp = 0
-							timeSourceInitialized = true
-							g.isDataStreamStable = true
+							g.Logger.Infof("time synchronized with NTP server, local monotonic time offset: %d ms", offset.Milliseconds())
 						}
 
-						if atomic.LoadInt32(&initFlag) == 0 {
-							atomic.StoreInt32(&initFlag, 1)
-							close(readyChan)
-							g.deviceStatus.SetStartedAt(g.TimeSource.Now())
-						}
+						currentMonotonicTime := timesource.MonotonicNow()
+						g.TimeSource.Update(currentMonotonicTime, currentMonotonicTime.Add(offset), timesource.MonotonicNow)
+
+						g.prevMcuTimestamp = 0
+						timeSourceInitialized = true
+						g.isDataStreamStable = true
 					}
 
-					// Handle MCU time jumps (usually caused by Explorer power loss or PC hibernation)
-					// 5000 ms is a threshold determined by max packet interval with a minimum sample rate of 1 Hz
-					if (mcuTimestamp < g.prevMcuTimestamp || math.Abs(float64(mcuTimestamp-g.prevMcuTimestamp)) >= 5000) && g.prevMcuTimestamp != 0 && timeSourceInitialized {
-						g.fifoBuffer.Reset()
-						g.resetVariables()
-						timeDiffSamples = make([]int64, 0, STABLE_CHECK_SAMPLES)
+					if atomic.LoadInt32(&initFlag) == 0 {
+						atomic.StoreInt32(&initFlag, 1)
+						close(readyChan)
+						g.deviceStatus.SetStartedAt(g.TimeSource.Now())
 					}
-					if timeSourceInitialized && g.isDataStreamStable {
-						if g.deviceConfig.GetGnssAvailability() && g.variableAllSet {
-							select {
-							case g.timeCalibrationChan4GnssMode <- [2]time.Time{recvEndMonotonicTime, time.UnixMilli(mcuTimestamp).Add(packetLatency)}:
-							default:
-							}
-						}
-						g.prevMcuTimestamp = mcuTimestamp
-					}
-
-					// Append actual timestamp to received packet
-					actualTimestamp := recvEndTime.UnixMilli() - packetLatency.Milliseconds()
-					newRecvBuf := make([]byte, len(recvBuf)+8)
-					copy(newRecvBuf, recvBuf)
-					binary.LittleEndian.PutUint64(newRecvBuf[len(newRecvBuf)-8:], uint64(actualTimestamp))
-					recvBuf = newRecvBuf
 				}
-			}
 
-			if g.isDataStreamStable {
-				_, _ = g.fifoBuffer.Write(recvBuf...)
+				// Handle MCU time jumps (usually caused by Explorer power loss or PC hibernation)
+				// 5000 ms is a threshold determined by max packet interval with a minimum sample rate of 1 Hz
+				if (mcuTimestamp < g.prevMcuTimestamp || math.Abs(float64(mcuTimestamp-g.prevMcuTimestamp)) >= 5000) && g.prevMcuTimestamp != 0 && timeSourceInitialized {
+					g.fifoBuffer.Reset()
+					g.resetVariables()
+					timeDiffSamples = make([]int64, 0, STABLE_CHECK_SAMPLES)
+				}
+				if timeSourceInitialized && g.isDataStreamStable {
+					if g.deviceConfig.GetGnssAvailability() && g.variableAllSet {
+						select {
+						case g.timeCalibrationChan4GnssMode <- [2]time.Time{recvEndMonotonicTime, time.UnixMilli(mcuTimestamp).Add(packetLatency)}:
+						default:
+						}
+					}
+					g.prevMcuTimestamp = mcuTimestamp
+				}
+
+				if g.isDataStreamStable {
+					_, _ = g.fifoBuffer.Write(&explorerProtocolPacketV2{
+						dataBytes: recvBuf,
+						dataTime:  recvEndTime.Add(-packetLatency),
+					})
+				}
+			} else if g.isDataStreamStable && g.variableAllSet {
+				g.Logger.Errorln(err)
+				g.deviceStatus.IncrementErrors()
 			}
 		}
 	}()
@@ -355,13 +376,14 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 
 			select {
 			case <-timer.C:
-				dataPacket, err := g.fifoBuffer.Peek(DATA_PACKET_HEADER, packetSize+8) // 8 bytes used for actual timestamp for NTP mode
+				dataPackets, err := g.fifoBuffer.Read(1)
 				if err != nil {
 					continue
 				}
+				dataPacketObj := dataPackets[0]
 
-				mcuTimestamp := int64(binary.LittleEndian.Uint64(dataPacket[2:10]))
-				variableData := binary.LittleEndian.Uint32(dataPacket[10:14])
+				mcuTimestamp := int64(binary.LittleEndian.Uint64(dataPacketObj.dataBytes[:8]))
+				variableData := binary.LittleEndian.Uint32(dataPacketObj.dataBytes[8:12])
 				g.getVariableData(mcuTimestamp, variableData)
 
 				if !g.variableAllSet {
@@ -372,20 +394,13 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 					continue
 				}
 
-				if err = g.verifyChecksum(dataPacket[:len(dataPacket)-8], DATA_PACKET_HEADER); err != nil {
-					g.Logger.Errorln(err)
-					g.deviceStatus.IncrementErrors()
-					continue
-				}
-
-				actualTimestamp := int64(binary.LittleEndian.Uint64(dataPacket[len(dataPacket)-8:]))
-				timestamp := lo.Ternary(g.deviceConfig.GetGnssAvailability(), mcuTimestamp, actualTimestamp)
+				timestamp := lo.Ternary(g.deviceConfig.GetGnssAvailability(), mcuTimestamp, dataPacketObj.dataTime.UnixMilli())
 
 				if expectedNextTimestamp == 0 {
 					expectedNextTimestamp = timestamp + 1000
 				} else {
 					collectedTimestampArr = append(collectedTimestampArr, timestamp)
-					err = g.getChannelData(dataPacket, len(DATA_PACKET_HEADER), DATA_PACKET_CHANNEL_SIZE)
+					err = g.getChannelData(dataPacketObj.dataBytes, DATA_PACKET_CHANNEL_SIZE)
 					if err != nil {
 						g.Logger.Errorf("failed to get channel data: %v", err)
 						g.deviceStatus.IncrementErrors()

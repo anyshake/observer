@@ -282,7 +282,8 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 			recvBuf, timeout, _, err := g.Transport.ReadUntil(
 				subCtx,
 				2 /*header*/ +8 /*timestamp*/ +4 /*config*/ +4 /*variable*/ +32000 /*max channel data*/ +1 /*checksum*/ +2, /*tailer*/
-				func(buf []byte, updatedAt *time.Time) bool {
+				func(bufPtr *[]byte, updatedAt *time.Time) bool {
+					buf := *bufPtr
 					if len(buf) < len(packetDelim) {
 						return false
 					}

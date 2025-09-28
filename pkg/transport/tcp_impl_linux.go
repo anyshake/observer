@@ -96,7 +96,7 @@ func (t *TcpTransportImpl) SetTimeout(timeout time.Duration) error {
 	return nil
 }
 
-func (t *TcpTransportImpl) ReadUntil(ctx context.Context, maxBytes int, doneFunc func(buf []byte, updatedAt *time.Time) bool, timeout time.Duration) ([]byte, bool, time.Duration, error) {
+func (t *TcpTransportImpl) ReadUntil(ctx context.Context, maxBytes int, doneFunc func(buf *[]byte, updatedAt *time.Time) bool, timeout time.Duration) ([]byte, bool, time.Duration, error) {
 	if t.conn == nil {
 		return nil, false, 0, errors.New("connection is not opened")
 	}
@@ -144,7 +144,7 @@ func (t *TcpTransportImpl) ReadUntil(ctx context.Context, maxBytes int, doneFunc
 			return nil, false, 0, fmt.Errorf("read exceeded maxBytes (%d) before callback condition", maxBytes)
 		}
 
-		if doneFunc(buffer, &lastByteTime) {
+		if doneFunc(&buffer, &lastByteTime) {
 			if lastByteTime.IsZero() {
 				lastByteTime = currentTime
 			}

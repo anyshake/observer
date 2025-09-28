@@ -115,7 +115,7 @@ func (t *SerialTransportImpl) Flush() error {
 	return nil
 }
 
-func (t *SerialTransportImpl) ReadUntil(ctx context.Context, maxBytes int, doneFunc func(buf []byte, updatedAt *time.Time) bool, timeout time.Duration) ([]byte, bool, time.Duration, error) {
+func (t *SerialTransportImpl) ReadUntil(ctx context.Context, maxBytes int, doneFunc func(buf *[]byte, updatedAt *time.Time) bool, timeout time.Duration) ([]byte, bool, time.Duration, error) {
 	if t.conn == nil {
 		return nil, false, 0, errors.New("connection is not opened")
 	}
@@ -163,7 +163,7 @@ func (t *SerialTransportImpl) ReadUntil(ctx context.Context, maxBytes int, doneF
 			return nil, false, 0, fmt.Errorf("read exceeded maxBytes (%d) before callback condition", maxBytes)
 		}
 
-		if doneFunc(buffer, &lastByteTime) {
+		if doneFunc(&buffer, &lastByteTime) {
 			if lastByteTime.IsZero() {
 				lastByteTime = currentTime
 			}
