@@ -3,7 +3,7 @@ package ntpclient
 import (
 	"time"
 
-	"github.com/bclswl0827/ntp"
+	"github.com/beevik/ntp"
 )
 
 const (
@@ -11,8 +11,10 @@ const (
 	CONCURRENT_QUERIES = 5
 )
 
+type TimeFunc func() time.Time
+
 type Client struct {
-	timeFunc    ntp.TimeFunc
+	timeFunc    TimeFunc
 	pool        []string
 	retries     int
 	readTimeout time.Duration

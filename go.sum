@@ -78,8 +78,6 @@ github.com/bclswl0827/heligo v0.2.0 h1:Q2qypnKO/x3rn886YozNJI2T0aEqD1SdYl+l8zvne
 github.com/bclswl0827/heligo v0.2.0/go.mod h1:RPPNEO8ZCJH0i4qHZUuVunDSHZeLWWvzpUBQZn+/t1k=
 github.com/bclswl0827/mseedio v1.0.12 h1:TO/3fwHzwKpAbe3l1yRGHGVaINAvN2/WcQJaV28uYJE=
 github.com/bclswl0827/mseedio v1.0.12/go.mod h1:G9nOPR8epxb7ihX5pUpvs3HqYZMnMlXc1Ha1WSMWn7s=
-github.com/bclswl0827/ntp v0.0.2 h1:dZY69uJU4E7IraboGLQKDiecFwy/6WkisoBgqfh17fk=
-github.com/bclswl0827/ntp v0.0.2/go.mod h1:9djUgUe9AaXWMmVoYdJwTQ5SLmqfycE0GzZMA/cREg4=
 github.com/bclswl0827/sacio v1.0.6 h1:kR6ll6xjoQGO+YVEZvvvbAxKGUD3qUXsyIuQape1+vc=
 github.com/bclswl0827/sacio v1.0.6/go.mod h1:SuiIK7hBHCJvxUOC/rgbJRUO5IoFrEnuCY0xVJ7RyQk=
 github.com/bclswl0827/slgo v0.2.3 h1:wYVXnnRjmtWX6XAVPEWXV3HlArZtQi3HqQdPyaHD6bQ=
@@ -88,6 +86,8 @@ github.com/bclswl0827/sqlite v1.11.1-0.20240613172512-9e6ac9861470 h1:VYRieWhizT
 github.com/bclswl0827/sqlite v1.11.1-0.20240613172512-9e6ac9861470/go.mod h1:/xElCFPGgTMHBhfSjGBlITMQ/qe6CLTinWdxSbc4oDE=
 github.com/bclswl0827/travel v0.0.0-20250920120530-2f1b6e10e7ae h1:Dd5VOysqOVF1dSb8KEztKIZD/c86G0uh6ApUb6Xdkfc=
 github.com/bclswl0827/travel v0.0.0-20250920120530-2f1b6e10e7ae/go.mod h1:JzxGwTwZ+HsZhs9fb6PhMMfk0wZ0gbTtDdt50sfgMkY=
+github.com/beevik/ntp v1.4.4-0.20250929204306-3a6261ccfb8f h1:HBOVzssdy2Aj5dtTHz3OCnxjDTIiM3ZTeRA7wnqr2ZA=
+github.com/beevik/ntp v1.4.4-0.20250929204306-3a6261ccfb8f/go.mod h1:mJEhBrwT76w9D+IfOEGvuzyuudiW9E52U2BaTrMOYow=
 github.com/blang/semver/v4 v4.0.0 h1:1PFHFE6yCCTv8C1TeyNNarDzntLi7wMI5i/pzqYIsAM=
 github.com/blang/semver/v4 v4.0.0/go.mod h1:IbckMUScFkM3pff0VJDNKRiT6TG/YpiHIM2yvyW5YoQ=
 github.com/bwmarrin/snowflake v0.3.0 h1:xm67bEhkKh6ij1790JB83OujPR5CzNe8QuQqAgISZN0=

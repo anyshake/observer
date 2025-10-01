@@ -3,7 +3,7 @@ package ntpclient
 import (
 	"sync"
 
-	"github.com/bclswl0827/ntp"
+	"github.com/beevik/ntp"
 )
 
 func (c *Client) parallelProbe(servers []string) []probeResult {
@@ -14,7 +14,10 @@ func (c *Client) parallelProbe(servers []string) []probeResult {
 		wg.Add(1)
 		go func(i int, server string) {
 			defer wg.Done()
-			resp, err := ntp.QueryWithOptions(server, ntp.QueryOptions{Timeout: c.readTimeout})
+			resp, err := ntp.QueryWithOptions(server, ntp.QueryOptions{
+				Timeout:       c.readTimeout,
+				GetSystemTime: c.timeFunc,
+			})
 			results[i] = probeResult{server: server, resp: resp, err: err}
 		}(i, server)
 	}

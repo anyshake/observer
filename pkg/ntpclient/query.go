@@ -9,12 +9,11 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/pkg/logger"
-	"github.com/bclswl0827/ntp"
+	"github.com/beevik/ntp"
 	"github.com/samber/lo"
 )
 
 func (c *Client) Query() (time.Duration, string, error) {
-	ntp.Now = c.timeFunc
 	probes := c.parallelProbe(c.pool)
 
 	filtered := lo.Filter(probes, func(p probeResult, _ int) bool {
@@ -59,7 +58,10 @@ func (c *Client) Query() (time.Duration, string, error) {
 
 			retryCount := 0
 			for {
-				resp, err := ntp.QueryWithOptions(bestServer, ntp.QueryOptions{Timeout: c.readTimeout})
+				resp, err := ntp.QueryWithOptions(bestServer, ntp.QueryOptions{
+					Timeout:       c.readTimeout,
+					GetSystemTime: c.timeFunc,
+				})
 				if err != nil || resp == nil {
 					retryCount++
 					if retryCount > c.retries {

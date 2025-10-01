@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"net/url"
 	"time"
-
-	"github.com/bclswl0827/ntp"
 )
 
-func New(pool []string, retries int, timeout int, timeFunc ntp.TimeFunc) (Client, error) {
+func New(pool []string, retries int, timeout int, timeFunc TimeFunc) (Client, error) {
 	if len(pool) == 0 {
 		return Client{}, fmt.Errorf("NTP pool is empty")
 	}
