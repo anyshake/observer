@@ -338,10 +338,10 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 							g.isDataStreamStable = true
 							g.fifoBuffer.Reset()
 							g.Logger.Infof("data time series stabilized, final time difference = %d ms", timeDiff)
-						} else {
+						} else if (mcuTimestamp/1000)%10 == 0 {
 							g.Logger.Warnf("waiting for data time series to settle down, this may take a while, current time difference = %d ms", timeDiff)
 						}
-					} else {
+					} else if (mcuTimestamp/1000)%2 == 0 {
 						g.Logger.Warnln("collecting data time series, this may take a while")
 					}
 				} else if gnssEnabled {
@@ -451,7 +451,9 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 				variableAllSet := g.variableAllSet
 				g.flagMutex.Unlock()
 				if !variableAllSet {
-					g.Logger.Warnln("waiting for device config to be fully collected, this may take a while")
+					if (mcuTimestamp/1000)%4 == 0 {
+						g.Logger.Warnln("waiting for device config to be fully collected, this may take a while")
+					}
 					continue
 				}
 
