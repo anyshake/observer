@@ -422,6 +422,34 @@
                     "updated_at": "Updated At",
                     "actions": "Actions"
                 }
+            },
+            "Backup": {
+                "title": "Backup Management",
+                "select_mode": {
+                    "backup": "Create Backup",
+                    "restore": "Restore Backup"
+                },
+                "backup_config": {
+                    "title": "Create a Backup",
+                    "description": "This will export your configuration data as a JSON file. You can save this file and later use it to restore your setup, for example when migrating to a new system.",
+                    "submit_button": "Generate Backup",
+                    "generating": "Generating backup data...",
+                    "success": "Backup data has been generated successfully.",
+                    "error": "Failed to generate backup data: {{error}}"
+                },
+                "restore_config": {
+                    "title": "Select a Backup File",
+                    "description": "Choose a JSON backup file to restore your configuration. AnyShake Observer will overwrite your current settings with the data from the selected file.",
+                    "submit_button": "Restore Configuration",
+                    "no_file_selected": "No file selected.",
+                    "confirm_title": "Confirm Restore",
+                    "confirm_message": "Are you sure you want to restore the configuration? This action will overwrite your current settings.",
+                    "confirm_button": "Restore",
+                    "cancel_button": "Cancel",
+                    "restoring": "Restoring configuration...",
+                    "success": "Configuration has been restored successfully.",
+                    "error": "Failed to restore configuration: {{error}}"
+                }
             }
         }
     },
@@ -439,10 +467,6 @@
             "confirm_title": "Logout",
             "confirm_button": "OK",
             "cancel_button": "Cancel"
-        },
-        "newsletter": {
-            "title": "Newsletter",
-            "submit_button": "Subscribe"
         }
     },
     "Login": {
@@ -470,5 +494,4 @@
             "error": "Login failed."
         }
     }
-
 }

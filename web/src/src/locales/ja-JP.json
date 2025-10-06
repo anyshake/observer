@@ -422,6 +422,34 @@
                     "updated_at": "更新日時",
                     "actions": "操作"
                 }
+            },
+            "Backup": {
+                "title": "バックアップ管理",
+                "select_mode": {
+                    "backup": "バックアップを作成",
+                    "restore": "バックアップを復元"
+                },
+                "backup_config": {
+                    "title": "バックアップを作成",
+                    "description": "設定データを JSON ファイルとしてエクスポートします。このファイルを保存しておけば、システム移行などの際に設定を復元できます。",
+                    "submit_button": "バックアップを生成",
+                    "generating": "バックアップデータを生成中...",
+                    "success": "バックアップデータが正常に生成されました。",
+                    "error": "バックアップデータの生成に失敗しました: {{error}}"
+                },
+                "restore_config": {
+                    "title": "バックアップファイルを選択",
+                    "description": "JSON バックアップファイルを選択して設定を復元します。AnyShake Observer は現在の設定を上書きします。",
+                    "submit_button": "設定を復元",
+                    "no_file_selected": "ファイルが選択されていません。",
+                    "confirm_title": "復元の確認",
+                    "confirm_message": "本当に設定を復元しますか？この操作は現在の設定を上書きします。",
+                    "confirm_button": "復元",
+                    "cancel_button": "キャンセル",
+                    "restoring": "設定を復元中...",
+                    "success": "設定が正常に復元されました。",
+                    "error": "設定の復元に失敗しました: {{error}}"
+                }
             }
         }
     },

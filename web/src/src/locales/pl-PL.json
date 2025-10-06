@@ -160,7 +160,7 @@
             "go_back_button": "Wróć"
         },
         "RealTime": {
-             "reset_layout": {
+            "reset_layout": {
                 "reset_button": "Zresetuj wszystko",
                 "confirm_message": "Czy na pewno chcesz zresetować układ?",
                 "confirm_title": "Potwierdź reset",
@@ -422,6 +422,34 @@
                     "updated_at": "Zaktualizowano w",
                     "actions": "Akcje"
                 }
+            },
+            "Backup": {
+                "title": "Zarządzanie kopiami zapasowymi",
+                "select_mode": {
+                    "backup": "Utwórz kopię zapasową",
+                    "restore": "Przywróć kopię zapasową"
+                },
+                "backup_config": {
+                    "title": "Utwórz kopię zapasową",
+                    "description": "Eksportuje dane konfiguracji jako plik JSON. Możesz go zapisać i użyć później do przywrócenia ustawień, np. podczas migracji.",
+                    "submit_button": "Utwórz kopię zapasową",
+                    "generating": "Tworzenie danych kopii zapasowej...",
+                    "success": "Dane kopii zapasowej zostały pomyślnie utworzone.",
+                    "error": "Nie udało się utworzyć kopii zapasowej: {{error}}"
+                },
+                "restore_config": {
+                    "title": "Wybierz plik kopii zapasowej",
+                    "description": "Wybierz plik kopii zapasowej JSON, aby przywrócić konfigurację. AnyShake Observer nadpisze Twoje bieżące ustawienia.",
+                    "submit_button": "Przywróć konfigurację",
+                    "no_file_selected": "Nie wybrano pliku.",
+                    "confirm_title": "Potwierdź przywracanie",
+                    "confirm_message": "Czy na pewno chcesz przywrócić konfigurację? Spowoduje to nadpisanie bieżących ustawień.",
+                    "confirm_button": "Przywróć",
+                    "cancel_button": "Anuluj",
+                    "restoring": "Przywracanie konfiguracji...",
+                    "success": "Konfiguracja została pomyślnie przywrócona.",
+                    "error": "Nie udało się przywrócić konfiguracji: {{error}}"
+                }
             }
         }
     },
@@ -439,10 +467,6 @@
             "confirm_title": "Wyloguj",
             "confirm_button": "OK",
             "cancel_button": "Anuluj"
-        },
-        "newsletter": {
-            "title": "Newsletter",
-            "submit_button": "Subskrybuj"
         }
     },
     "Login": {

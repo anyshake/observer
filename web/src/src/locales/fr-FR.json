@@ -422,6 +422,34 @@
                     "updated_at": "Mis à jour le",
                     "actions": "Actions"
                 }
+            },
+            "Backup": {
+                "title": "Gestion des sauvegardes",
+                "select_mode": {
+                    "backup": "Créer une sauvegarde",
+                    "restore": "Restaurer une sauvegarde"
+                },
+                "backup_config": {
+                    "title": "Créer une sauvegarde",
+                    "description": "Cela exportera vos données de configuration sous forme de fichier JSON. Vous pouvez enregistrer ce fichier et l'utiliser plus tard pour restaurer votre configuration, par exemple lors d'une migration.",
+                    "submit_button": "Générer la sauvegarde",
+                    "generating": "Génération des données de sauvegarde...",
+                    "success": "Les données de sauvegarde ont été générées avec succès.",
+                    "error": "Échec de la génération des données de sauvegarde : {{error}}"
+                },
+                "restore_config": {
+                    "title": "Sélectionner un fichier de sauvegarde",
+                    "description": "Choisissez un fichier de sauvegarde JSON pour restaurer votre configuration. AnyShake Observer remplacera vos paramètres actuels par ceux du fichier sélectionné.",
+                    "submit_button": "Restaurer la configuration",
+                    "no_file_selected": "Aucun fichier sélectionné.",
+                    "confirm_title": "Confirmer la restauration",
+                    "confirm_message": "Êtes-vous sûr de vouloir restaurer la configuration ? Cette action remplacera vos paramètres actuels.",
+                    "confirm_button": "Restaurer",
+                    "cancel_button": "Annuler",
+                    "restoring": "Restauration de la configuration...",
+                    "success": "La configuration a été restaurée avec succès.",
+                    "error": "Échec de la restauration de la configuration : {{error}}"
+                }
             }
         }
     },

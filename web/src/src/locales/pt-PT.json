@@ -422,6 +422,34 @@
                     "updated_at": "Atualizado em",
                     "actions": "Ações"
                 }
+            },
+            "Backup": {
+                "title": "Gestão de Cópias de Segurança",
+                "select_mode": {
+                    "backup": "Criar Cópia de Segurança",
+                    "restore": "Restaurar Cópia de Segurança"
+                },
+                "backup_config": {
+                    "title": "Criar uma Cópia de Segurança",
+                    "description": "Isto exportará os seus dados de configuração como um ficheiro JSON. Pode guardar este ficheiro e utilizá-lo mais tarde para restaurar a sua configuração, por exemplo, ao migrar para um novo sistema.",
+                    "submit_button": "Gerar Cópia de Segurança",
+                    "generating": "A gerar dados da cópia de segurança...",
+                    "success": "Dados da cópia de segurança gerados com sucesso.",
+                    "error": "Falha ao gerar dados da cópia de segurança: {{error}}"
+                },
+                "restore_config": {
+                    "title": "Selecionar Ficheiro de Cópia de Segurança",
+                    "description": "Selecione um ficheiro JSON de cópia de segurança para restaurar a sua configuração. O AnyShake Observer substituirá as suas definições atuais.",
+                    "submit_button": "Restaurar Configuração",
+                    "no_file_selected": "Nenhum ficheiro selecionado.",
+                    "confirm_title": "Confirmar Restauração",
+                    "confirm_message": "Tem a certeza de que deseja restaurar a configuração? Esta ação substituirá as suas definições atuais.",
+                    "confirm_button": "Restaurar",
+                    "cancel_button": "Cancelar",
+                    "restoring": "A restaurar configuração...",
+                    "success": "Configuração restaurada com sucesso.",
+                    "error": "Falha ao restaurar configuração: {{error}}"
+                }
             }
         }
     },

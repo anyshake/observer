@@ -422,6 +422,34 @@
                     "updated_at": "更新於",
                     "actions": "操作"
                 }
+            },
+            "Backup": {
+                "title": "備份管理",
+                "select_mode": {
+                    "backup": "建立備份",
+                    "restore": "還原備份"
+                },
+                "backup_config": {
+                    "title": "建立備份",
+                    "description": "這將匯出您的設定資料為 JSON 檔案。您可以將此檔案保存起來，並在日後（例如系統遷移時）用於還原設定。",
+                    "submit_button": "生成備份",
+                    "generating": "正在生成備份資料...",
+                    "success": "備份資料已成功生成。",
+                    "error": "生成備份資料失敗：{{error}}"
+                },
+                "restore_config": {
+                    "title": "選擇備份檔案",
+                    "description": "選擇一個 JSON 備份檔案以還原設定。AnyShake Observer 將會覆寫您目前的設定。",
+                    "submit_button": "還原設定",
+                    "no_file_selected": "尚未選擇檔案。",
+                    "confirm_title": "確認還原",
+                    "confirm_message": "確定要還原設定嗎？此操作將覆寫您目前的設定。",
+                    "confirm_button": "還原",
+                    "cancel_button": "取消",
+                    "restoring": "正在還原設定...",
+                    "success": "設定已成功還原。",
+                    "error": "還原設定失敗：{{error}}"
+                }
             }
         }
     },

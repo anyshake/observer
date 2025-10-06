@@ -6,6 +6,7 @@ package graph_resolver
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -183,6 +184,82 @@ func (r *mutationResolver) RestoreStationConfig(ctx context.Context) (bool, erro
 	for _, obj := range r.StationConfigConstraints {
 		if err := obj.Restore(r.ActionHandler); err != nil {
 			return false, fmt.Errorf("failed to restore station config, key %s: %w", obj.GetKey(), err)
+		}
+	}
+
+	return true, nil
+}
+
+// ImportGlobalConfig is the resolver for the importGlobalConfig field.
+func (r *mutationResolver) ImportGlobalConfig(ctx context.Context, data string) (bool, error) {
+	if !r.checkIsAdmin(ctx) {
+		return false, errors.New("permission denied")
+	}
+
+	var globalConfig map[string]map[string]map[string]any
+	if err := json.Unmarshal([]byte(data), &globalConfig); err != nil {
+		return false, fmt.Errorf("failed to unmarshal config data: %w", err)
+	}
+	if len(globalConfig) == 0 {
+		return false, errors.New("config data is empty")
+	}
+
+	for _, constraint := range r.StationConfigConstraints {
+		configNamespace, ok := globalConfig[config.STATION_NAMESPACE]
+		if !ok {
+			continue
+		}
+		configObj, ok := configNamespace[constraint.GetKey()]
+		if !ok {
+			continue
+		}
+
+		dataType, ok := configObj["type"].(string)
+		if !ok || dataType != string(constraint.GetType()) {
+			continue
+		}
+		version, err := config.GetConfigValInt64(configObj["version"])
+		if err != nil && version != int64(constraint.GetVersion()) {
+			continue
+		}
+		value, ok := configObj["value"]
+		if !ok {
+			continue
+		}
+
+		if err := constraint.Set(r.ActionHandler, value); err != nil {
+			return false, fmt.Errorf("failed to import station config, key %s: %w", constraint.GetKey(), err)
+		}
+	}
+
+	for namespace, serviceObj := range r.ServiceMap {
+		serviceConfig, ok := globalConfig[namespace]
+		if !ok {
+			continue
+		}
+
+		for _, constraint := range serviceObj.GetConfigConstraint() {
+			configObj, ok := serviceConfig[constraint.GetKey()]
+			if !ok {
+				continue
+			}
+
+			dataType, ok := configObj["type"].(string)
+			if !ok || dataType != string(constraint.GetType()) {
+				continue
+			}
+			version, err := config.GetConfigValInt64(configObj["version"])
+			if err != nil && version != int64(constraint.GetVersion()) {
+				continue
+			}
+			value, ok := configObj["value"]
+			if !ok {
+				continue
+			}
+
+			if err := constraint.Set(r.ActionHandler, value); err != nil {
+				return false, fmt.Errorf("failed to import service config, namespace %s, key %s: %w", namespace, constraint.GetKey(), err)
+			}
 		}
 	}
 
@@ -760,6 +837,66 @@ func (r *queryResolver) GetApplicationLogs(ctx context.Context) ([]string, error
 	}
 
 	return r.LogBuffer.Values(), nil
+}
+
+// ExportGlobalConfig is the resolver for the exportGlobalConfig field.
+func (r *queryResolver) ExportGlobalConfig(ctx context.Context) (string, error) {
+	if !r.checkIsAdmin(ctx) {
+		return "", errors.New("permission denied")
+	}
+
+	/*
+		{
+			"namespace": {
+				"key": {
+					"value": "value",
+					"version": 1,
+					"type": "string"
+				}
+			}
+		}
+	*/
+	globalConfig := make(map[string]map[string]map[string]any)
+
+	for _, constraint := range r.StationConfigConstraints {
+		namespace := constraint.GetNamespace()
+		val, err := constraint.Get(r.ActionHandler)
+		if err != nil {
+			return "", err
+		}
+		if globalConfig[namespace] == nil {
+			globalConfig[namespace] = make(map[string]map[string]any)
+		}
+		globalConfig[namespace][constraint.GetKey()] = map[string]any{
+			"version": constraint.GetVersion(),
+			"value":   val,
+			"type":    string(constraint.GetType()),
+		}
+	}
+
+	for _, serviceObj := range r.ServiceMap {
+		for _, constraint := range serviceObj.GetConfigConstraint() {
+			namespace := constraint.GetNamespace()
+			val, err := constraint.Get(r.ActionHandler)
+			if err != nil {
+				return "", err
+			}
+			if globalConfig[namespace] == nil {
+				globalConfig[namespace] = make(map[string]map[string]any)
+			}
+			globalConfig[namespace][constraint.GetKey()] = map[string]any{
+				"version": constraint.GetVersion(),
+				"value":   val,
+				"type":    string(constraint.GetType()),
+			}
+		}
+	}
+
+	globalConfigJson, err := json.Marshal(globalConfig)
+	if err != nil {
+		return "", err
+	}
+	return string(globalConfigJson), nil
 }
 
 // Mutation returns MutationResolver implementation.

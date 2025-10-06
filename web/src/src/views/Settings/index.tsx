@@ -1,6 +1,7 @@
 import {
     mdiAccount,
     mdiAlertDecagram,
+    mdiBackupRestore,
     mdiCube,
     mdiHeart,
     mdiHomeEdit,
@@ -14,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { Skeleton } from '../../components/Skeleton';
 import { IRouterComponent } from '../../config/router';
 import { useIsCurrentUserAdminQuery } from '../../graphql';
+import { Backup } from './backup';
 import { Dangerous } from './dangerous';
 import { Logs } from './logs';
 import { Metadata } from './metadata';
@@ -55,6 +57,12 @@ const Settings = ({ currentLocale }: IRouterComponent) => {
                 icon: mdiAccount,
                 label: t('views.Settings.Users.title'),
                 element: <Users currentLocale={currentLocale} />
+            },
+            backup: {
+                adminOnly: true,
+                icon: mdiBackupRestore,
+                label: t('views.Settings.Backup.title'),
+                element: <Backup />
             },
             logs: {
                 adminOnly: true,

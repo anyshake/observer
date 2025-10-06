@@ -422,6 +422,34 @@
                     "updated_at": "Aktualisiert am",
                     "actions": "Aktionen"
                 }
+            },
+            "Backup": {
+                "title": "Backup-Verwaltung",
+                "select_mode": {
+                    "backup": "Backup erstellen",
+                    "restore": "Backup wiederherstellen"
+                },
+                "backup_config": {
+                    "title": "Backup erstellen",
+                    "description": "Dies exportiert Ihre Konfigurationsdaten als JSON-Datei. Sie können diese Datei speichern und später verwenden, um Ihre Einstellungen beispielsweise bei einer Migration wiederherzustellen.",
+                    "submit_button": "Backup erstellen",
+                    "generating": "Backup-Daten werden generiert...",
+                    "success": "Backup-Daten wurden erfolgreich erstellt.",
+                    "error": "Fehler beim Erstellen der Backup-Daten: {{error}}"
+                },
+                "restore_config": {
+                    "title": "Backup-Datei auswählen",
+                    "description": "Wählen Sie eine JSON-Backup-Datei aus, um Ihre Konfiguration wiederherzustellen. AnyShake Observer überschreibt dabei Ihre aktuellen Einstellungen.",
+                    "submit_button": "Konfiguration wiederherstellen",
+                    "no_file_selected": "Keine Datei ausgewählt.",
+                    "confirm_title": "Wiederherstellung bestätigen",
+                    "confirm_message": "Sind Sie sicher, dass Sie die Konfiguration wiederherstellen möchten? Dadurch werden Ihre aktuellen Einstellungen überschrieben.",
+                    "confirm_button": "Wiederherstellen",
+                    "cancel_button": "Abbrechen",
+                    "restoring": "Konfiguration wird wiederhergestellt...",
+                    "success": "Konfiguration wurde erfolgreich wiederhergestellt.",
+                    "error": "Fehler bei der Wiederherstellung der Konfiguration: {{error}}"
+                }
             }
         }
     },

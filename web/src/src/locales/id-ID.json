@@ -422,6 +422,34 @@
                     "updated_at": "Diperbarui Pada",
                     "actions": "Aksi"
                 }
+            },
+            "Backup": {
+                "title": "Manajemen Cadangan",
+                "select_mode": {
+                    "backup": "Buat Cadangan",
+                    "restore": "Pulihkan Cadangan"
+                },
+                "backup_config": {
+                    "title": "Buat Cadangan",
+                    "description": "Ini akan mengekspor data konfigurasi Anda sebagai file JSON. Anda dapat menyimpan file ini dan menggunakannya nanti untuk memulihkan pengaturan Anda, misalnya saat migrasi.",
+                    "submit_button": "Hasilkan Cadangan",
+                    "generating": "Sedang membuat data cadangan...",
+                    "success": "Data cadangan berhasil dibuat.",
+                    "error": "Gagal membuat data cadangan: {{error}}"
+                },
+                "restore_config": {
+                    "title": "Pilih File Cadangan",
+                    "description": "Pilih file cadangan JSON untuk memulihkan konfigurasi Anda. AnyShake Observer akan menimpa pengaturan Anda saat ini dengan data dari file tersebut.",
+                    "submit_button": "Pulihkan Konfigurasi",
+                    "no_file_selected": "Tidak ada file yang dipilih.",
+                    "confirm_title": "Konfirmasi Pemulihan",
+                    "confirm_message": "Apakah Anda yakin ingin memulihkan konfigurasi? Ini akan menimpa pengaturan Anda saat ini.",
+                    "confirm_button": "Pulihkan",
+                    "cancel_button": "Batal",
+                    "restoring": "Sedang memulihkan konfigurasi...",
+                    "success": "Konfigurasi berhasil dipulihkan.",
+                    "error": "Gagal memulihkan konfigurasi: {{error}}"
+                }
             }
         }
     },

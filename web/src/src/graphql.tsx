@@ -25,6 +25,7 @@ export type Scalars = {
 export type Mutation = {
   __typename?: 'Mutation';
   createSysUser: Scalars['String']['output'];
+  importGlobalConfig: Scalars['Boolean']['output'];
   purgeHelicorderFiles: Scalars['Boolean']['output'];
   purgeMiniSeedFiles: Scalars['Boolean']['output'];
   purgeSeisRecords: Scalars['Boolean']['output'];
@@ -44,6 +45,11 @@ export type MutationCreateSysUserArgs = {
   admin: Scalars['Boolean']['input'];
   password: Scalars['String']['input'];
   username: Scalars['String']['input'];
+};
+
+
+export type MutationImportGlobalConfigArgs = {
+  data: Scalars['String']['input'];
 };
 
 
@@ -94,6 +100,7 @@ export type MutationUpdateSysUserArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  exportGlobalConfig: Scalars['String']['output'];
   getApplicationLogs?: Maybe<Array<Scalars['String']['output']>>;
   getCurrentTime: Scalars['Int64']['output'];
   getCurrentUser: SysUser;
@@ -107,7 +114,6 @@ export type Query = {
   getMiniSeedFiles: Array<Maybe<ServiceAsset>>;
   getSeisRecordsByTime: Array<Maybe<SeisRecord>>;
   getServiceConfigConstraint: Array<ServiceConfigConstraint>;
-  getServiceLogs?: Maybe<Array<Scalars['String']['output']>>;
   getServiceStatus?: Maybe<Array<ServiceStatus>>;
   getStationConfig: Scalars['Map']['output'];
   getStationConfigConstraint: Array<ConfigConstraint>;
@@ -126,11 +132,6 @@ export type QueryGetEventsBySourceArgs = {
 export type QueryGetSeisRecordsByTimeArgs = {
   endTime: Scalars['Int64']['input'];
   startTime: Scalars['Int64']['input'];
-};
-
-
-export type QueryGetServiceLogsArgs = {
-  serviceId: Scalars['String']['input'];
 };
 
 
@@ -305,6 +306,11 @@ export type CreateUserMutationVariables = Exact<{
 
 export type CreateUserMutation = { __typename?: 'Mutation', createSysUser: string };
 
+export type ExportGlobalConfigQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ExportGlobalConfigQuery = { __typename?: 'Query', exportGlobalConfig: string };
+
 export type GetApplicationLogsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -331,6 +337,13 @@ export type GetUserListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetUserListQuery = { __typename?: 'Query', getSysUsers: Array<{ __typename?: 'sysUser', userId: string, username: string, createdAt: number, updatedAt: number, lastLogin: number, userIp: string, userAgent: string, admin: boolean }> };
+
+export type ImportGlobalConfigMutationVariables = Exact<{
+  data: Scalars['String']['input'];
+}>;
+
+
+export type ImportGlobalConfigMutation = { __typename?: 'Mutation', importGlobalConfig: boolean };
 
 export type IsCurrentUserAdminQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -751,6 +764,43 @@ export function useCreateUserMutation(baseOptions?: ApolloReactHooks.MutationHoo
 export type CreateUserMutationHookResult = ReturnType<typeof useCreateUserMutation>;
 export type CreateUserMutationResult = ApolloReactCommon.MutationResult<CreateUserMutation>;
 export type CreateUserMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
+export const ExportGlobalConfigDocument = gql`
+    query exportGlobalConfig {
+  exportGlobalConfig
+}
+    `;
+
+/**
+ * __useExportGlobalConfigQuery__
+ *
+ * To run a query within a React component, call `useExportGlobalConfigQuery` and pass it any options that fit your needs.
+ * When your component renders, `useExportGlobalConfigQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useExportGlobalConfigQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useExportGlobalConfigQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>(ExportGlobalConfigDocument, options);
+      }
+export function useExportGlobalConfigLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>(ExportGlobalConfigDocument, options);
+        }
+export function useExportGlobalConfigSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>(ExportGlobalConfigDocument, options);
+        }
+export type ExportGlobalConfigQueryHookResult = ReturnType<typeof useExportGlobalConfigQuery>;
+export type ExportGlobalConfigLazyQueryHookResult = ReturnType<typeof useExportGlobalConfigLazyQuery>;
+export type ExportGlobalConfigSuspenseQueryHookResult = ReturnType<typeof useExportGlobalConfigSuspenseQuery>;
+export type ExportGlobalConfigQueryResult = ApolloReactCommon.QueryResult<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>;
 export const GetApplicationLogsDocument = gql`
     query getApplicationLogs {
   getApplicationLogs
@@ -977,6 +1027,37 @@ export type GetUserListQueryHookResult = ReturnType<typeof useGetUserListQuery>;
 export type GetUserListLazyQueryHookResult = ReturnType<typeof useGetUserListLazyQuery>;
 export type GetUserListSuspenseQueryHookResult = ReturnType<typeof useGetUserListSuspenseQuery>;
 export type GetUserListQueryResult = ApolloReactCommon.QueryResult<GetUserListQuery, GetUserListQueryVariables>;
+export const ImportGlobalConfigDocument = gql`
+    mutation importGlobalConfig($data: String!) {
+  importGlobalConfig(data: $data)
+}
+    `;
+export type ImportGlobalConfigMutationFn = ApolloReactCommon.MutationFunction<ImportGlobalConfigMutation, ImportGlobalConfigMutationVariables>;
+
+/**
+ * __useImportGlobalConfigMutation__
+ *
+ * To run a mutation, you first call `useImportGlobalConfigMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useImportGlobalConfigMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [importGlobalConfigMutation, { data, loading, error }] = useImportGlobalConfigMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useImportGlobalConfigMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ImportGlobalConfigMutation, ImportGlobalConfigMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<ImportGlobalConfigMutation, ImportGlobalConfigMutationVariables>(ImportGlobalConfigDocument, options);
+      }
+export type ImportGlobalConfigMutationHookResult = ReturnType<typeof useImportGlobalConfigMutation>;
+export type ImportGlobalConfigMutationResult = ApolloReactCommon.MutationResult<ImportGlobalConfigMutation>;
+export type ImportGlobalConfigMutationOptions = ApolloReactCommon.BaseMutationOptions<ImportGlobalConfigMutation, ImportGlobalConfigMutationVariables>;
 export const IsCurrentUserAdminDocument = gql`
     query isCurrentUserAdmin {
   getCurrentUser {

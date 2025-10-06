@@ -422,6 +422,34 @@
                     "updated_at": "Güncellenme Zamanı",
                     "actions": "Eylemler"
                 }
+            },
+            "Backup": {
+                "title": "Yedekleme Yönetimi",
+                "select_mode": {
+                    "backup": "Yedek Oluştur",
+                    "restore": "Yedeği Geri Yükle"
+                },
+                "backup_config": {
+                    "title": "Yedek Oluştur",
+                    "description": "Yapılandırma verilerinizi JSON dosyası olarak dışa aktarır. Bu dosyayı kaydedebilir ve daha sonra örneğin sistem geçişi sırasında ayarlarınızı geri yüklemek için kullanabilirsiniz.",
+                    "submit_button": "Yedek Oluştur",
+                    "generating": "Yedekleme verileri oluşturuluyor...",
+                    "success": "Yedekleme verileri başarıyla oluşturuldu.",
+                    "error": "Yedekleme verileri oluşturulamadı: {{error}}"
+                },
+                "restore_config": {
+                    "title": "Yedek Dosyasını Seçin",
+                    "description": "Yapılandırmanızı geri yüklemek için bir JSON yedek dosyası seçin. AnyShake Observer mevcut ayarlarınızı üzerine yazacaktır.",
+                    "submit_button": "Yapılandırmayı Geri Yükle",
+                    "no_file_selected": "Dosya seçilmedi.",
+                    "confirm_title": "Geri Yüklemeyi Onayla",
+                    "confirm_message": "Yapılandırmayı geri yüklemek istediğinizden emin misiniz? Bu işlem mevcut ayarlarınızı üzerine yazacaktır.",
+                    "confirm_button": "Geri Yükle",
+                    "cancel_button": "İptal",
+                    "restoring": "Yapılandırma geri yükleniyor...",
+                    "success": "Yapılandırma başarıyla geri yüklendi.",
+                    "error": "Yapılandırma geri yüklenemedi: {{error}}"
+                }
             }
         }
     },

@@ -21,6 +21,9 @@ func GetConfigValInt64(val any) (int64, error) {
 }
 
 func GetConfigValInt64Array(val any) ([]int64, error) {
+	if val == nil {
+		return []int64{}, nil
+	}
 	arr, ok := val.([]any)
 	if !ok {
 		return nil, errors.New("integer array expected")
@@ -49,6 +52,9 @@ func GetConfigValFloat64(val any) (float64, error) {
 }
 
 func GetConfigValFloat64Array(val any) ([]float64, error) {
+	if val == nil {
+		return []float64{}, nil
+	}
 	arr, ok := val.([]any)
 	if !ok {
 		return nil, errors.New("float array expected")
@@ -73,6 +79,9 @@ func GetConfigValString(val any) (string, error) {
 }
 
 func GetConfigValStringArray(val any) ([]string, error) {
+	if val == nil {
+		return []string{}, nil
+	}
 	arr, ok := val.([]any)
 	if !ok {
 		return nil, errors.New("string array expected")

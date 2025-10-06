@@ -1,0 +1,3 @@
+mutation importGlobalConfig($data: String!) {
+    importGlobalConfig(data: $data)
+}

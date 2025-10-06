@@ -86,8 +86,8 @@ github.com/bclswl0827/sqlite v1.11.1-0.20240613172512-9e6ac9861470 h1:VYRieWhizT
 github.com/bclswl0827/sqlite v1.11.1-0.20240613172512-9e6ac9861470/go.mod h1:/xElCFPGgTMHBhfSjGBlITMQ/qe6CLTinWdxSbc4oDE=
 github.com/bclswl0827/travel v0.0.0-20250920120530-2f1b6e10e7ae h1:Dd5VOysqOVF1dSb8KEztKIZD/c86G0uh6ApUb6Xdkfc=
 github.com/bclswl0827/travel v0.0.0-20250920120530-2f1b6e10e7ae/go.mod h1:JzxGwTwZ+HsZhs9fb6PhMMfk0wZ0gbTtDdt50sfgMkY=
-github.com/beevik/ntp v1.4.4-0.20250929204306-3a6261ccfb8f h1:HBOVzssdy2Aj5dtTHz3OCnxjDTIiM3ZTeRA7wnqr2ZA=
-github.com/beevik/ntp v1.4.4-0.20250929204306-3a6261ccfb8f/go.mod h1:mJEhBrwT76w9D+IfOEGvuzyuudiW9E52U2BaTrMOYow=
+github.com/beevik/ntp v1.5.0 h1:y+uj/JjNwlY2JahivxYvtmv4ehfi3h74fAuABB9ZSM4=
+github.com/beevik/ntp v1.5.0/go.mod h1:mJEhBrwT76w9D+IfOEGvuzyuudiW9E52U2BaTrMOYow=
 github.com/blang/semver/v4 v4.0.0 h1:1PFHFE6yCCTv8C1TeyNNarDzntLi7wMI5i/pzqYIsAM=
 github.com/blang/semver/v4 v4.0.0/go.mod h1:IbckMUScFkM3pff0VJDNKRiT6TG/YpiHIM2yvyW5YoQ=
 github.com/bwmarrin/snowflake v0.3.0 h1:xm67bEhkKh6ij1790JB83OujPR5CzNe8QuQqAgISZN0=

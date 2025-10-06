@@ -132,6 +132,7 @@ type Mutation {
   # station management - admin only
   updateStationConfig(key: String!, value: Any!): Boolean!
   restoreStationConfig: Boolean!
+  importGlobalConfig(data: String!): Boolean!
 
   # service management - admin only
   stopService(serviceId: String!): Boolean!
@@ -167,4 +168,5 @@ type Query {
   getSysUsers: [sysUser!]! # admin only
   isGenuineProduct: Boolean! # admin only
   getApplicationLogs: [String!] # admin only
+  exportGlobalConfig: String! # admin only
 }
