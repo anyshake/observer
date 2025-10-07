@@ -37,7 +37,7 @@
         <DataLogger resourceId="Datalogger-E-D001"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>100.0</Value>
+            <Value>343597383520.0</Value>
             <Frequency>4.5</Frequency>
             <InputUnits>
               <Name>m/s</Name>
@@ -81,7 +81,7 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>858993458.8</Value>
+              <Value>343597383520.0</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
@@ -129,7 +129,7 @@
         <DataLogger resourceId="Datalogger-E-D001"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>100.0</Value>
+            <Value>343597383520.0</Value>
             <Frequency>4.5</Frequency>
             <InputUnits>
               <Name>m/s</Name>
@@ -173,7 +173,7 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>858993458.8</Value>
+              <Value>343597383520.0</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
@@ -221,7 +221,7 @@
         <DataLogger resourceId="Datalogger-E-D001"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>100.0</Value>
+            <Value>343597383520.0</Value>
             <Frequency>4.5</Frequency>
             <InputUnits>
               <Name>m/s</Name>
@@ -265,7 +265,7 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>858993458.8</Value>
+              <Value>343597383520.0</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>

@@ -22,7 +22,14 @@
         </datalogger>
         <responsePAZ publicID="ResponsePAZ-E-C121G-VEL" name="AS-E-C121G-VEL">
             <type>A</type>
-            <gain>858993458.8</gain>
+            <!--
+                Sensor Sensitivity: 100 V/m/s
+                Input amplifier gain: x1
+                ADC PGA gain: x1
+                ADC full-scale: 2.5 V
+                ==> (100 / (2.5 / ((2 ** 31) - 1))) * 2
+            -->
+            <gain>171798691760</gain>
             <gainFrequency>4.5</gainFrequency>
             <normalizationFactor>1</normalizationFactor>
             <normalizationFrequency>4.5</normalizationFrequency>
@@ -33,7 +40,7 @@
         </responsePAZ>
         <responsePAZ publicID="ResponsePAZ-E-C121G-ACC" name="AS-E-C121G-ACC">
             <type>D</type>
-            <gain>32768</gain>
+            <gain>65535</gain>
             <gainFrequency>1</gainFrequency>
             <normalizationFactor>1</normalizationFactor>
             <normalizationFrequency>1</normalizationFrequency>
@@ -70,7 +77,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>-90</dip>
-                        <gain>100</gain>
+                        <gain>171798691760</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>
@@ -85,7 +92,7 @@
                         <depth>0</depth>
                         <azimuth>90</azimuth>
                         <dip>0</dip>
-                        <gain>100</gain>
+                        <gain>171798691760</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>
@@ -100,7 +107,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>0</dip>
-                        <gain>100</gain>
+                        <gain>171798691760</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>
@@ -115,7 +122,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>-90</dip>
-                        <gain>1670.703</gain>
+                        <gain>65535</gain>
                         <gainUnit>m/s**2</gainUnit>
                     </stream>
                     <stream publicID="Stream/E-C121G-CH5" code="{{.ChannelCode5}}"
@@ -129,7 +136,7 @@
                         <depth>0</depth>
                         <azimuth>90</azimuth>
                         <dip>0</dip>
-                        <gain>1670.703</gain>
+                        <gain>65535</gain>
                         <gainUnit>m/s**2</gainUnit>
                     </stream>
                     <stream publicID="Stream/E-C121G-CH6" code="{{.ChannelCode6}}"
@@ -143,7 +150,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>0</dip>
-                        <gain>1670.703</gain>
+                        <gain>65535</gain>
                         <gainUnit>m/s**2</gainUnit>
                     </stream>
                 </sensorLocation>

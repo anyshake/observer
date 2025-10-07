@@ -16,7 +16,14 @@
         </datalogger>
         <responsePAZ publicID="ResponsePAZ-E-D001-VEL" name="AS-E-D001-VEL">
             <type>A</type>
-            <gain>858993458.8</gain>
+            <!--
+                Sensor Sensitivity: 100 V/m/s
+                Input amplifier gain: none
+                ADC PGA gain: x4
+                ADC full-scale: 0.625 V
+                ==> 100 / (0.625 / ((2 ** 31) - 1))
+            -->
+            <gain>343597383520</gain>
             <gainFrequency>4.5</gainFrequency>
             <normalizationFactor>171.99852139050935</normalizationFactor>
             <normalizationFrequency>4.5</normalizationFrequency>
@@ -57,7 +64,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>-90</dip>
-                        <gain>100</gain>
+                        <gain>343597383520</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>
@@ -72,7 +79,7 @@
                         <depth>0</depth>
                         <azimuth>90</azimuth>
                         <dip>0</dip>
-                        <gain>100</gain>
+                        <gain>343597383520</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>
@@ -87,7 +94,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>0</dip>
-                        <gain>100</gain>
+                        <gain>343597383520</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>
