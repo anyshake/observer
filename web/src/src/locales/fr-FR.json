@@ -171,6 +171,13 @@
                 "lock_button": "Verrouiller la disposition",
                 "unlock_button": "Déverrouiller la disposition"
             },
+            "record_data": {
+                "start_button": "Démarrer l'enregistrement",
+                "stop_button": "Arrêter l'enregistrement",
+                "start_recording": "L'enregistrement a commencé à {{startedAt}}.",
+                "link_created": "Enregistrement arrêté à {{endedAt}} ({{duration}} secondes). Un lien a été généré.",
+                "no_data_recorded": "Aucune donnée n'a été enregistrée pendant cette période."
+            },
             "connectivity": {
                 "connecting": "Pas de connexion, connexion en cours...",
                 "connected": "Connecté, dernière mise à jour à {{updatedAt}}."

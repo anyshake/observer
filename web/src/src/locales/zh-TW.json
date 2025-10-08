@@ -171,6 +171,13 @@
                 "lock_button": "鎖定佈局",
                 "unlock_button": "解鎖佈局"
             },
+            "record_data": {
+                "start_button": "開始錄製",
+                "stop_button": "停止錄製",
+                "start_recording": "錄製已於 {{startedAt}} 開始。",
+                "link_created": "錄製於 {{endedAt}} 停止（共 {{duration}} 秒）。已生成連結。",
+                "no_data_recorded": "此期間內未錄製任何資料。"
+            },
             "connectivity": {
                 "connecting": "沒有連線，正在嘗試連接...",
                 "connected": "已連線，最後更新於 {{updatedAt}}。"

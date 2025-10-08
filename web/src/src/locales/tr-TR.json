@@ -171,6 +171,13 @@
                 "lock_button": "Düzeni Kilitle",
                 "unlock_button": "Düzen Kilidini Aç"
             },
+            "record_data": {
+                "start_button": "Kaydı Başlat",
+                "stop_button": "Kaydı Durdur",
+                "start_recording": "Kayıt {{startedAt}} tarihinde başladı.",
+                "link_created": "Kayıt {{endedAt}} tarihinde durduruldu ({{duration}} saniye). Bir bağlantı oluşturuldu.",
+                "no_data_recorded": "Bu süre zarfında veri kaydedilmedi."
+            },
             "connectivity": {
                 "connecting": "Bağlantı yok, şimdi bağlanılıyor...",
                 "connected": "Bağlandı, son güncelleme {{updatedAt}}."

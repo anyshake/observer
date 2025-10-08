@@ -171,6 +171,13 @@
                 "lock_button": "Layout sperren",
                 "unlock_button": "Layout entsperren"
             },
+            "record_data": {
+                "start_button": "Aufnahme starten",
+                "stop_button": "Aufnahme stoppen",
+                "start_recording": "Aufnahme wurde um {{startedAt}} gestartet.",
+                "link_created": "Aufnahme gestoppt um {{endedAt}} ({{duration}} Sekunden). Ein Link wurde erstellt.",
+                "no_data_recorded": "Während dieses Zeitraums wurden keine Daten aufgezeichnet."
+            },
             "connectivity": {
                 "connecting": "Keine Verbindung, wird jetzt verbunden...",
                 "connected": "Verbunden, zuletzt aktualisiert um {{updatedAt}}."

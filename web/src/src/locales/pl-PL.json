@@ -171,6 +171,13 @@
                 "lock_button": "Zablokuj układ",
                 "unlock_button": "Odblokuj układ"
             },
+            "record_data": {
+                "start_button": "Rozpocznij nagrywanie",
+                "stop_button": "Zatrzymaj nagrywanie",
+                "start_recording": "Nagrywanie rozpoczęto o {{startedAt}}.",
+                "link_created": "Nagrywanie zatrzymano o {{endedAt}} ({{duration}} sekund). Utworzono link.",
+                "no_data_recorded": "W tym okresie nie zarejestrowano żadnych danych."
+            },
             "connectivity": {
                 "connecting": "Brak połączenia. Trwa łączenie...",
                 "connected": "Połączono, ostatnia aktualizacja o {{updatedAt}}."

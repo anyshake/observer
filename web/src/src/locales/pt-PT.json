@@ -171,6 +171,13 @@
                 "lock_button": "Bloquear Layout",
                 "unlock_button": "Desbloquear Layout"
             },
+            "record_data": {
+                "start_button": "Iniciar Gravação",
+                "stop_button": "Parar Gravação",
+                "start_recording": "A gravação começou às {{startedAt}}.",
+                "link_created": "Gravação parada às {{endedAt}} ({{duration}} segundos). Um link foi gerado.",
+                "no_data_recorded": "Nenhum dado foi gravado durante este período."
+            },
             "connectivity": {
                 "connecting": "Sem ligação, a ligar agora...",
                 "connected": "Ligado, última atualização às {{updatedAt}}."

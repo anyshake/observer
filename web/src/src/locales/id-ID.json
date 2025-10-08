@@ -171,6 +171,13 @@
                 "lock_button": "Kunci Tata Letak",
                 "unlock_button": "Buka Kunci Tata Letak"
             },
+            "record_data": {
+                "start_button": "Mulai Merekam",
+                "stop_button": "Berhenti Merekam",
+                "start_recording": "Perekaman dimulai pada {{startedAt}}.",
+                "link_created": "Perekaman dihentikan pada {{endedAt}} ({{duration}} detik). Sebuah tautan telah dibuat.",
+                "no_data_recorded": "Tidak ada data yang direkam selama periode ini."
+            },
             "connectivity": {
                 "connecting": "Tidak ada koneksi, sedang menghubungkan...",
                 "connected": "Terhubung, terakhir diperbarui pada {{updatedAt}}."

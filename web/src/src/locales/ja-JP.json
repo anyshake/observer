@@ -171,6 +171,13 @@
                 "lock_button": "レイアウトをロック",
                 "unlock_button": "レイアウトをアンロック"
             },
+            "record_data": {
+                "start_button": "録音開始",
+                "stop_button": "録音停止",
+                "start_recording": "{{startedAt}} に録音を開始しました。",
+                "link_created": "{{endedAt}} に録音を停止しました（{{duration}} 秒）。リンクが生成されました。",
+                "no_data_recorded": "この期間中に記録されたデータはありません。"
+            },
             "connectivity": {
                 "connecting": "接続なし、接続中...",
                 "connected": "接続済み、最終更新日時 {{updatedAt}}。"

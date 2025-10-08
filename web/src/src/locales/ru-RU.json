@@ -171,6 +171,13 @@
                 "lock_button": "Заблокировать макет",
                 "unlock_button": "Разблокировать макет"
             },
+            "record_data": {
+                "start_button": "Начать запись",
+                "stop_button": "Остановить запись",
+                "start_recording": "Запись началась в {{startedAt}}.",
+                "link_created": "Запись остановлена в {{endedAt}} ({{duration}} секунд). Ссылка была создана.",
+                "no_data_recorded": "В этот период данные не были записаны."
+            },
             "connectivity": {
                 "connecting": "Нет соединения, подключение...",
                 "connected": "Подключено, последнее обновление в {{updatedAt}}."

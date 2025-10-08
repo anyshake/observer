@@ -1,11 +1,21 @@
-import { mdiLock, mdiLockOpen, mdiLockReset } from '@mdi/js';
+import {
+    mdiClose,
+    mdiLock,
+    mdiLockOpen,
+    mdiLockReset,
+    mdiRecordCircle,
+    mdiRecordRec
+} from '@mdi/js';
 import Icon from '@mdi/react';
 import { createRef, RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 import { Connectivity } from '../../components/Connectivity';
 import { DequeChart, DequeChartHandle } from '../../components/DequeChart';
 import { DraggableBox } from '../../components/DraggableBox';
+import { routerConfig } from '../../config/router';
+import { sendUserAlert } from '../../helpers/alert/sendUserAlert';
 import { sendUserConfirm } from '../../helpers/alert/sendUserConfirm';
 import { getSocketApiUrl } from '../../helpers/app/getSocketApiUrl';
 import { useSocket } from '../../helpers/request/useSocket';
@@ -31,6 +41,12 @@ const RealTime = () => {
 
     const [sampleRate, setSampleRate] = useState(0);
     const [updatedAt, setUpdatedAt] = useState(0);
+    const [recordingState, setRecordingState] = useState({
+        isRecording: false,
+        startTime: 0,
+        endTime: 0
+    });
+    const [recordList, setRecordList] = useState<[number, number, string][]>([]);
     const [activeChannels, setActiveChannels] = useState<Record<string, { id: string }>>({});
 
     const chartRefs = useRef<{ [key: string]: RefObject<DequeChartHandle> }>({});
@@ -137,6 +153,49 @@ const RealTime = () => {
         });
     }, [t, activeChannels, resetLayoutConfig]);
 
+    const handleToggleRecording = useCallback(() => {
+        setRecordingState((prev) => {
+            const { isRecording, startTime } = prev;
+            if (!isRecording) {
+                if (updatedAt === 0) {
+                    return prev;
+                }
+                sendUserAlert(
+                    t('views.RealTime.record_data.start_recording', {
+                        startedAt: getTimeString(updatedAt)
+                    })
+                );
+                return { ...prev, isRecording: true, startTime: updatedAt };
+            }
+
+            const endTime = updatedAt;
+            if (startTime !== endTime) {
+                const search = new URLSearchParams({
+                    start_time: startTime.toString(),
+                    end_time: endTime.toString()
+                });
+                setRecordList((prevList) => [...prevList, [startTime, endTime, search.toString()]]);
+                sendUserAlert(
+                    t('views.RealTime.record_data.link_created', {
+                        endedAt: getTimeString(endTime),
+                        duration: ((endTime - startTime) / 1000).toFixed(1)
+                    })
+                );
+            } else {
+                sendUserAlert(t('views.RealTime.record_data.no_data_recorded'), true);
+            }
+
+            return { ...prev, isRecording: false, endTime };
+        });
+    }, [t, updatedAt]);
+
+    const handleRemoveRecord = useCallback(
+        (index: number) => {
+            setRecordList((prevList) => prevList.filter((_, i) => i !== index));
+        },
+        [setRecordList]
+    );
+
     const handleDragStop = useCallback(
         (channel: string, x: number, y: number) => {
             setLayoutConfig(channel, { ...getInitialLayout(channel), position: { x, y } });
@@ -184,6 +243,21 @@ const RealTime = () => {
                     <Icon className="flex-shrink-0" path={mdiLockReset} size={0.7} />
                     <span>{t('views.RealTime.reset_layout.reset_button')}</span>
                 </button>
+                <button
+                    className={`btn btn-sm flex items-center ${recordingState.isRecording ? 'text-pink-800' : ''}`}
+                    onClick={handleToggleRecording}
+                >
+                    <Icon
+                        className="flex-shrink-0"
+                        path={recordingState.isRecording ? mdiRecordRec : mdiRecordCircle}
+                        size={0.7}
+                    />
+                    <span className={recordingState.isRecording ? 'animate-pulse' : ''}>
+                        {recordingState.isRecording
+                            ? t('views.RealTime.record_data.stop_button')
+                            : t('views.RealTime.record_data.start_button')}
+                    </span>
+                </button>
                 <div className="flex flex-wrap gap-2">
                     <div className="badge badge-soft badge-primary font-medium">
                         {t('views.RealTime.stream_status.sample_rate', { value: sampleRate })}
@@ -198,6 +272,29 @@ const RealTime = () => {
                     </div>
                 </div>
             </div>
+
+            {recordList.length > 0 && (
+                <div className="flex w-fit flex-col rounded-lg border border-dashed border-gray-300 p-4">
+                    {recordList.map(([startTime, endTime, search], index) => (
+                        <li className="flex flex-row items-center space-x-2">
+                            <Link
+                                key={index}
+                                className="link link-primary text-sm font-medium"
+                                target="_blank"
+                                to={{ search, pathname: routerConfig.routes.history.uri }}
+                            >
+                                {`${getTimeString(startTime)} - ${getTimeString(endTime)}`}
+                            </Link>
+                            <button
+                                className="cursor-pointer text-gray-500 hover:text-gray-700 disabled:cursor-not-allowed disabled:text-gray-300"
+                                onClick={() => handleRemoveRecord(index)}
+                            >
+                                <Icon className="flex-shrink-0" path={mdiClose} size={0.7} />
+                            </button>
+                        </li>
+                    ))}
+                </div>
+            )}
 
             <div className="bg-base-300 relative h-[2000px] w-full overflow-scroll rounded-lg md:h-[1000px] lg:h-[800px] xl:h-screen">
                 {Object.keys(activeChannels)

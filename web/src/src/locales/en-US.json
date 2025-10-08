@@ -171,6 +171,13 @@
                 "lock_button": "Lock Layout",
                 "unlock_button": "Unlock Layout"
             },
+            "record_data": {
+                "start_button": "Start Recording",
+                "stop_button": "Stop Recording",
+                "start_recording": "Recording has started at {{startedAt}}.",
+                "link_created": "Recording stopped at {{endedAt}} ({{duration}} seconds). A link has been generated.",
+                "no_data_recorded": "No data was recorded during this period."
+            },
             "connectivity": {
                 "connecting": "No connection, connecting now...",
                 "connected": "Connected, last updated at {{updatedAt}}."
