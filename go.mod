@@ -12,9 +12,9 @@ require (
 	github.com/bclswl0827/eewgo v0.1.0
 	github.com/bclswl0827/go-serial v0.0.1
 	github.com/bclswl0827/heligo v0.2.0
-	github.com/bclswl0827/mseedio v1.0.12
+	github.com/bclswl0827/mseedio v1.1.1
 	github.com/bclswl0827/sacio v1.0.6
-	github.com/bclswl0827/slgo v0.2.3
+	github.com/bclswl0827/slgo v0.2.4
 	github.com/bclswl0827/sqlite v1.11.1-0.20240613172512-9e6ac9861470
 	github.com/bclswl0827/travel v0.0.0-20250920120530-2f1b6e10e7ae
 	github.com/beevik/ntp v1.5.0
