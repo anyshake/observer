@@ -20,12 +20,19 @@ type TcpTransportImpl struct {
 }
 
 func (t *TcpTransportImpl) Open() error {
-	conn, err := net.Dial("tcp", t.host)
+	if t.timeout == 0 {
+		t.timeout = 5 * time.Second
+	}
+
+	conn, err := net.DialTimeout("tcp", t.host, t.timeout)
 	if err != nil {
 		return fmt.Errorf("failed to open TCP connection to %s: %w", t.host, err)
 	}
 
+	t.mutex.Lock()
 	t.conn = conn
+	t.mutex.Unlock()
+
 	return nil
 }
 
@@ -33,15 +40,25 @@ func (t *TcpTransportImpl) Close() error {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
-	return t.conn.Close()
+	if t.conn == nil {
+		return errors.New("connection is not opened")
+	}
+
+	err := t.conn.Close()
+	t.conn = nil
+	return err
 }
 
 func (t *TcpTransportImpl) Read(buf []byte) (int, error) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
+	if t.conn == nil {
+		return 0, errors.New("connection is not opened")
+	}
+
 	if err := t.conn.SetReadDeadline(time.Now().Add(t.timeout)); err != nil {
-		return 0, fmt.Errorf("failed to set read timeout: %w", err)
+		return 0, fmt.Errorf("failed to set read deadline: %w", err)
 	}
 
 	return t.conn.Read(buf)
@@ -51,8 +68,12 @@ func (t *TcpTransportImpl) Write(buf []byte) (int, error) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
+	if t.conn == nil {
+		return 0, errors.New("connection is not open")
+	}
+
 	if err := t.conn.SetWriteDeadline(time.Now().Add(t.timeout)); err != nil {
-		return 0, fmt.Errorf("failed to set write timeout: %w", err)
+		return 0, fmt.Errorf("failed to set write deadline: %w", err)
 	}
 
 	return t.conn.Write(buf)
@@ -102,12 +123,16 @@ func (t *TcpTransportImpl) ReadUntil(ctx context.Context, maxBytes int, doneFunc
 		}
 
 		t.mutex.Lock()
+		_ = t.conn.SetReadDeadline(time.Now().Add(t.timeout))
 		n, err := t.conn.Read(temp)
 		currentTime := time.Now()
 		t.mutex.Unlock()
 
 		if err != nil {
-			return nil, false, 0, fmt.Errorf("read error: %w", err)
+			if nerr, ok := err.(net.Error); ok && nerr.Timeout() {
+				continue
+			}
+			return buffer, false, 0, fmt.Errorf("read error: %w", err)
 		}
 		if n == 0 {
 			continue
