@@ -38,7 +38,7 @@ jobs:
         with:
           node-version: "latest"
 
-      - name: Checkout source code
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 1

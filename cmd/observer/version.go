@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"runtime"
+	"sort"
 	"strings"
 	"time"
 
@@ -23,7 +24,16 @@ func printMap(m map[string]any, indentLevel int) {
 	indentRepeat := func(level int) string {
 		return string(make([]byte, level*2))
 	}
-	for key, value := range m {
+
+	keys := make([]string, 0, len(m))
+	for key := range m {
+		keys = append(keys, key)
+	}
+
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		value := m[key]
 		fmt.Printf(" %s%s:\n", indentRepeat(indentLevel), key)
 		switch v := value.(type) {
 		case map[string]any:
