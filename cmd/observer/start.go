@@ -21,7 +21,9 @@ import (
 	"github.com/anyshake/observer/internal/service"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/anyshake/observer/pkg/seisevent"
+	"github.com/anyshake/observer/pkg/semver"
 	"github.com/anyshake/observer/pkg/timesource"
+	"github.com/anyshake/observer/pkg/unibuild"
 
 	cleaner_close_database "github.com/anyshake/observer/internal/hook/cleaner/close_database"
 	cleaner_close_explorer "github.com/anyshake/observer/internal/hook/cleaner/close_explorer"
@@ -42,7 +44,7 @@ import (
 	service_watchcat "github.com/anyshake/observer/internal/service/watchcat"
 )
 
-func appStart(args arguments) {
+func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 	conf := &config.BaseConfig{}
 	if err := conf.Parse(args.configPath, "json"); err != nil {
 		logger.GetLogger(main).Fatalln(err)
@@ -166,7 +168,7 @@ func appStart(args arguments) {
 		service_forwarder.ID:  service_forwarder.New(hardwareDevice, actionHandler, timeSrc),
 		service_frp_client.ID: service_frp_client.New(conf.Server.Listen, actionHandler, timeSrc),
 		service_helicorder.ID: service_helicorder.New(hardwareDevice, actionHandler, timeSrc),
-		service_metrics.ID:    service_metrics.New(hardwareDevice, actionHandler, timeSrc, binaryVersion, commitHash, buildPlatform),
+		service_metrics.ID:    service_metrics.New(hardwareDevice, actionHandler, timeSrc, ver, build),
 		service_miniseed.ID:   service_miniseed.New(hardwareDevice, actionHandler, timeSrc),
 		service_ntp_server.ID: service_ntp_server.New(actionHandler, timeSrc),
 		service_quakesense.ID: service_quakesense.New(hardwareDevice, actionHandler, timeSrc),

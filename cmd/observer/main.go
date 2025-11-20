@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/anyshake/observer/pkg/logger"
+	"github.com/anyshake/observer/pkg/semver"
+	"github.com/anyshake/observer/pkg/unibuild"
 	"github.com/common-nighthawk/go-figure"
 )
 
@@ -17,5 +20,18 @@ func init() {
 }
 
 func main() {
-	appStart(parseCommandLine())
+	build := unibuild.New(buildToolchain, buildChannel, buildCommit, buildTimestamp)
+	ver := semver.New(versionMajor, versionMinor, versionPatch)
+	args := parseCommandLine()
+
+	PrintVersion(ver, build, args.showVersion)
+	if args.showVersion {
+		os.Exit(0)
+	}
+
+	if args.upgrade {
+		os.Exit(0)
+	}
+
+	appStart(ver, build, args)
 }

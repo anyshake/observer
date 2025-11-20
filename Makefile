@@ -1,23 +1,33 @@
-.PHONY: build digest clean run gen
+VERSION_MAJOR=4
+VERSION_MINOR=2
+VERSION_PATCH=1
+
+# Caution: software versioning mechanism depends on format of first three lines in this file
+
+.PHONY: build digest clean run gen sync
 
 GO ?= go
+
+ASSETS_DIR=./build/assets
+SRC_DIR=./cmd/observer
+DIST_DIR=./build/dist
 
 BINARY=observer
 ifeq (${GOOS}, windows)
     BINARY := $(BINARY).exe
 endif
 
-SRC_DIR=./cmd/observer
-DIST_DIR=./build/dist
-ASSETS_DIR=./build/assets
-
 COMMIT=$(shell git rev-parse --short HEAD)
-VERSION=$(shell cat ./VERSION)
+TIMESTAMP=$(shell date +%s)
 
 BUILD_FLAGS=-s -w \
-	-X main.binaryVersion=$(VERSION) \
-	-X main.commitHash=$(COMMIT)-$(shell date +%s) \
-	-X main.buildPlatform=${BUILD_PLATFORM}
+	-X main.versionMajor=$(VERSION_MAJOR) \
+	-X main.versionMinor=$(VERSION_MINOR) \
+	-X main.versionPatch=$(VERSION_PATCH) \
+	-X main.buildTimestamp=$(TIMESTAMP) \
+	-X main.buildToolchain=${BUILD_TOOLCHAIN} \
+	-X main.buildChannel=${BUILD_CHANNEL} \
+	-X main.buildCommit=$(COMMIT)
 BUILD_ARGS=-v -trimpath
 
 build:
@@ -59,3 +69,6 @@ ifeq ($(shell command -v gqlgen 2> /dev/null),)
 endif
 	@echo "[Info] Generating GraphQL code..."
 	@gqlgen generate
+
+sync:
+	@echo "not implemented"

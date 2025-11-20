@@ -8,7 +8,9 @@ import (
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/hardware"
 	"github.com/anyshake/observer/internal/service"
+	"github.com/anyshake/observer/pkg/semver"
 	"github.com/anyshake/observer/pkg/timesource"
+	"github.com/anyshake/observer/pkg/unibuild"
 	"github.com/shirou/gopsutil/v4/host"
 	"go.opentelemetry.io/otel/sdk/trace"
 )
@@ -44,7 +46,6 @@ type MetricsServiceImpl struct {
 	startTime time.Time
 	hostInfo  *host.InfoStat
 
-	binaryVersion string
-	commitHash    string
-	buildPlatform string
+	version *semver.Version
+	build   *unibuild.UniBuild
 }

@@ -6,10 +6,12 @@ import (
 
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/hardware"
+	"github.com/anyshake/observer/pkg/semver"
 	"github.com/anyshake/observer/pkg/timesource"
+	"github.com/anyshake/observer/pkg/unibuild"
 )
 
-func New(hardwareDev hardware.IHardware, actionHandler *action.Handler, timeSource *timesource.Source, binaryVersion, commitHash, buildPlatform string) *MetricsServiceImpl {
+func New(hardwareDev hardware.IHardware, actionHandler *action.Handler, timeSource *timesource.Source, version *semver.Version, build *unibuild.UniBuild) *MetricsServiceImpl {
 	ctx, cancelFn := context.WithCancel(context.Background())
 	obj := &MetricsServiceImpl{
 		ctx:      ctx,
@@ -19,9 +21,8 @@ func New(hardwareDev hardware.IHardware, actionHandler *action.Handler, timeSour
 		timeSource:    timeSource,
 		hardwareDev:   hardwareDev,
 
-		binaryVersion: binaryVersion,
-		commitHash:    commitHash,
-		buildPlatform: buildPlatform,
+		version: version,
+		build:   build,
 	}
 	obj.status.SetStartedAt(time.Unix(0, 0))
 	obj.status.SetStoppedAt(time.Unix(0, 0))

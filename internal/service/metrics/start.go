@@ -26,6 +26,26 @@ import (
 	_trace "go.opentelemetry.io/otel/trace"
 )
 
+func (s *MetricsServiceImpl) getBuildInfo() []attribute.KeyValue {
+	values := []attribute.KeyValue{
+		attribute.String("service.build.time", s.build.Time.Format(time.RFC3339)),
+		attribute.String("service.build.channel", s.build.Channel),
+		attribute.String("service.build.commit", s.build.Commit),
+		attribute.String("service.build.toolchainId", s.build.ToolchainId),
+	}
+	if s.build.Toolchain != nil {
+		extraValues := []attribute.KeyValue{
+			attribute.String("service.build.toolchain.name", s.build.Toolchain.Name),
+			attribute.String("service.build.toolchain.name", s.build.Toolchain.GOOS),
+			attribute.String("service.build.toolchain.name", s.build.Toolchain.GOARCH),
+			attribute.String("service.build.toolchain.name", s.build.Toolchain.GOARM),
+			attribute.String("service.build.toolchain.name", s.build.Toolchain.GOMIPS),
+		}
+		values = append(values, extraValues...)
+	}
+	return values
+}
+
 func (s *MetricsServiceImpl) handleInterrupt(ticker *time.Ticker) {
 	ticker.Stop()
 	s.wg.Done()
@@ -53,22 +73,23 @@ func (s *MetricsServiceImpl) Start() error {
 	}
 
 	hashedHostname := md5.Sum([]byte(s.hostInfo.Hostname))
+	resources := []attribute.KeyValue{
+		semconv.TelemetrySDKLanguageGo,
+		semconv.ServiceNameKey.String(OTLP_SERVICE_NAME),
+		semconv.ServiceVersionKey.String(s.version.String()),
+		semconv.ProcessRuntimeVersionKey.String(runtime.Version()),
+		semconv.OSVersionKey.String(s.hostInfo.PlatformVersion),
+		semconv.OSNameKey.String(s.hostInfo.Platform),
+		semconv.OSTypeKey.String(runtime.GOOS),
+		semconv.HostArchKey.String(runtime.GOARCH),
+		// Report only hashed hostname for privacy
+		semconv.HostNameKey.String(hex.EncodeToString(hashedHostname[:])),
+	}
+	resources = append(resources, s.getBuildInfo()...)
+
 	s.oltpTracerProvider = trace.NewTracerProvider(
 		trace.WithBatcher(exporter),
-		trace.WithResource(resource.NewSchemaless(
-			semconv.TelemetrySDKLanguageGo,
-			semconv.ServiceNameKey.String(OTLP_SERVICE_NAME),
-			semconv.ServiceVersionKey.String(s.binaryVersion),
-			attribute.String("service.build_platform", s.buildPlatform),
-			attribute.String("service.commit_hash", s.commitHash),
-			semconv.ProcessRuntimeVersionKey.String(runtime.Version()),
-			semconv.OSVersionKey.String(s.hostInfo.PlatformVersion),
-			semconv.OSNameKey.String(s.hostInfo.Platform),
-			semconv.OSTypeKey.String(runtime.GOOS),
-			semconv.HostArchKey.String(runtime.GOARCH),
-			// Report only hashed hostname for privacy
-			semconv.HostNameKey.String(hex.EncodeToString(hashedHostname[:])),
-		)),
+		trace.WithResource(resource.NewSchemaless(resources...)),
 	)
 	otel.SetTracerProvider(s.oltpTracerProvider)
 

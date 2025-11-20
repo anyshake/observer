@@ -23,8 +23,19 @@ const getBuildTag = () => {
 
     let version = 'custombuild';
     try {
-        const filePath = resolve(__dirname, '..', '..', 'VERSION');
-        version = readFileSync(filePath, 'utf-8').trim();
+        const filePath = resolve(__dirname, '..', '..', 'Makefile');
+        const makefileContent = readFileSync(filePath, 'utf-8').trim().split('\n');
+
+        const versionMajor =
+            makefileContent.find((line) => line.startsWith('VERSION_MAJOR='))?.split('=')[1] || '0';
+        const versionMinor =
+            makefileContent.find((line) => line.startsWith('VERSION_MINOR='))?.split('=')[1] || '0';
+        const versionPatch =
+            makefileContent.find((line) => line.startsWith('VERSION_PATCH='))?.split('=')[1] || '0';
+
+        if (versionMajor !== '0' || versionMinor !== '0' || versionPatch !== '0') {
+            version = `${versionMajor}.${versionMinor}.${versionPatch}`;
+        }
     } catch {
         version = 'custombuild';
     }

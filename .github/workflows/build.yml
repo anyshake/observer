@@ -1,10 +1,14 @@
-name: Build and release
+name: Build and Test/Release
 
 on:
   workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
   push:
-    tags:
+    branches:
       - "*"
+    tags:
+      - "v*"
 
 jobs:
   build_web:
@@ -34,7 +38,7 @@ jobs:
           name: web-dist
           path: web/web_dist.tar.gz
 
-  build_release:
+  build_core:
     runs-on: ubuntu-latest
 
     strategy:
@@ -81,7 +85,7 @@ jobs:
           - windows_arm64_v8a
           - windows7_386
           - windows7_amd64
-      fail-fast: false
+      fail-fast: true
 
     needs:
       - build_web
@@ -94,21 +98,21 @@ jobs:
 
       - name: Setup workflow env
         run: |
-          TOOLCHAIN=$(jq ".[\"${{ matrix.target_id }}\"].toolchain" -r < pkg/uniarch/arch_map.json)
+          TOOLCHAIN=$(jq ".[\"${{ matrix.target_id }}\"].toolchain" -r < pkg/unibuild/map.json)
           echo "TOOLCHAIN=$TOOLCHAIN" >> $GITHUB_ENV
-          GOOS=$(jq ".[\"${{ matrix.target_id }}\"].goos" -r < pkg/uniarch/arch_map.json)
+          GOOS=$(jq ".[\"${{ matrix.target_id }}\"].goos" -r < pkg/unibuild/map.json)
           echo "GOOS=$GOOS" >> $GITHUB_ENV
-          GOARCH=$(jq ".[\"${{ matrix.target_id }}\"].goarch" -r < pkg/uniarch/arch_map.json)
+          GOARCH=$(jq ".[\"${{ matrix.target_id }}\"].goarch" -r < pkg/unibuild/map.json)
           echo "GOARCH=$GOARCH" >> $GITHUB_ENV
-          GOARM=$(jq ".[\"${{ matrix.target_id }}\"].goarm" -r < pkg/uniarch/arch_map.json)
+          GOARM=$(jq ".[\"${{ matrix.target_id }}\"].goarm" -r < pkg/unibuild/map.json)
           echo "GOARM=$GOARM" >> $GITHUB_ENV
-          GOMIPS=$(jq ".[\"${{ matrix.target_id }}\"].gomips" -r < pkg/uniarch/arch_map.json)
+          GOMIPS=$(jq ".[\"${{ matrix.target_id }}\"].gomips" -r < pkg/unibuild/map.json)
           echo "GOMIPS=$GOMIPS" >> $GITHUB_ENV
-          RELEASE_NAME=$(jq ".[\"${{ matrix.target_id }}\"].name" -r < pkg/uniarch/arch_map.json)
+          RELEASE_NAME=$(jq ".[\"${{ matrix.target_id }}\"].name" -r < pkg/unibuild/map.json)
           echo "RELEASE_NAME=$RELEASE_NAME" >> $GITHUB_ENV
 
       - name: Setup Go toolchain
-        if: ${{ matrix.target_id != 'windows7_386' && matrix.target_id != 'windows7_amd64' }}
+        if: matrix.target_id != 'windows7_386' && matrix.target_id != 'windows7_amd64'
         uses: actions/setup-go@v5
         with:
           cache: false
@@ -116,7 +120,7 @@ jobs:
           check-latest: true
 
       - name: Setup Go toolchain (Windows 7)
-        if: ${{ matrix.target_id == 'windows7_386' || matrix.target_id == 'windows7_amd64' }}
+        if: matrix.target_id == 'windows7_386' || matrix.target_id == 'windows7_amd64'
         run: |
           curl -L -o /tmp/go-legacy-win7.tar.gz https://github.com/thongtech/go-legacy-win7/releases/download/v1.24.2-1/go-legacy-win7-1.24.2-1.linux_amd64.tar.gz
           tar -xvf /tmp/go-legacy-win7.tar.gz -C $HOME
@@ -124,6 +128,16 @@ jobs:
           export GOROOT=$HOME/go-legacy-win7
           echo "GOROOT=$GOROOT" >> $GITHUB_ENV
           $GOROOT/bin/go version
+
+      - name: Setup BUILD_CHANNEL env (Release)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          echo "BUILD_CHANNEL=gh-ci-release" >> $GITHUB_ENV
+
+      - name: Setup BUILD_CHANNEL env (Test)
+        if: ! startsWith(github.ref, 'refs/tags/')
+        run: |
+          echo "BUILD_CHANNEL=gh-ci-test" >> $GITHUB_ENV
 
       - name: Download web artifacts
         uses: actions/download-artifact@v4
@@ -138,36 +152,46 @@ jobs:
           rm -f web_dist.tar.gz
 
       - name: Build core application
-        if: ${{ matrix.target_id != 'windows7_386' && matrix.target_id != 'windows7_amd64' }}
+        if: matrix.target_id != 'windows7_386' && matrix.target_id != 'windows7_amd64'
         run: |
           GOOS=${{ env.GOOS }} \
           GOARCH=${{ env.GOARCH }} \
           GOARM=${{ env.GOARM }} \
           GOMIPS=${{ env.GOMIPS }} \
-          BUILD_PLATFORM=gh-ci-release \
+          BUILD_CHANNEL=${{env.BUILD_CHANNEL}} \
+          BUILD_TOOLCHAIN=${{ matrix.target_id }} \
           make build
 
       - name: Build core application (Windows 7)
-        if: ${{ matrix.target_id == 'windows7_386' || matrix.target_id == 'windows7_amd64' }}
+        if: matrix.target_id == 'windows7_386' || matrix.target_id == 'windows7_amd64'
         run: |
           GO=${{ env.GOROOT }}/bin/go \
           GOOS=${{ env.GOOS }} \
           GOARCH=${{ env.GOARCH }} \
           GOARM=${{ env.GOARM }} \
           GOMIPS=${{ env.GOMIPS }} \
-          BUILD_PLATFORM=gh-ci-release \
+          BUILD_CHANNEL=${{env.BUILD_CHANNEL}} \
+          BUILD_TOOLCHAIN=${{ matrix.target_id }} \
           make build
 
       - name: Create release digest
         run: |
           make digest | tee build/${{ matrix.target_id }}.dgst
 
-      - name: Package release to zip
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target_id }}
+          path: build/dist/*
+
+      - name: Package release
+        if: startsWith(github.ref, 'refs/tags/')
         working-directory: build/dist
         run: |
           zip -r ../${{ matrix.target_id }}.zip *
 
       - name: Create release note
+        if: startsWith(github.ref, 'refs/tags/')
         id: release_note
         uses: mikepenz/release-changelog-builder-action@v5
         with:
@@ -241,7 +265,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload packages to release
+      - name: Upload to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}

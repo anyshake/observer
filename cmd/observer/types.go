@@ -1,8 +1,16 @@
 package main
 
+const description = "Listen to the whispering earth."
+
 var (
-	buildPlatform  = "self-build"
-	commitHash     = "unknown"
-	binaryVersion  = "custom-version"
-	appDescription = "Listen to the whispering earth."
+	versionMajor string
+	versionMinor string
+	versionPatch string
+)
+
+var (
+	buildTimestamp string
+	buildToolchain string
+	buildChannel   string
+	buildCommit    string
 )
