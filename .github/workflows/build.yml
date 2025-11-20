@@ -98,8 +98,6 @@ jobs:
 
       - name: Setup workflow env
         run: |
-          TOOLCHAIN=$(jq ".[\"${{ matrix.target_id }}\"].toolchain" -r < pkg/unibuild/map.json)
-          echo "TOOLCHAIN=$TOOLCHAIN" >> $GITHUB_ENV
           GOOS=$(jq ".[\"${{ matrix.target_id }}\"].goos" -r < pkg/unibuild/map.json)
           echo "GOOS=$GOOS" >> $GITHUB_ENV
           GOARCH=$(jq ".[\"${{ matrix.target_id }}\"].goarch" -r < pkg/unibuild/map.json)
@@ -116,7 +114,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           cache: false
-          go-version: ${{ env.TOOLCHAIN }}
+          go-version: "stable"
           check-latest: true
 
       - name: Setup Go toolchain (Windows 7)
