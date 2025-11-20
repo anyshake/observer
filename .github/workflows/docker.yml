@@ -30,7 +30,7 @@ jobs:
           - linux/ppc64le
           - linux/riscv64
           - linux/s390x
-      fail-fast: false
+      fail-fast: true
 
     steps:
       - name: Setup Node.js
@@ -110,6 +110,7 @@ jobs:
 
     needs:
       - build_docker_image
+
     steps:
       - name: Download digests
         uses: actions/download-artifact@v4
@@ -121,12 +122,6 @@ jobs:
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.PACKAGE }}
-
       - name: Login to Registry
         uses: docker/login-action@v3
         with:
@@ -134,15 +129,26 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Detect version tag
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          echo "IMAGE_TAG=$TAG" >> $GITHUB_ENV
+
       - name: Create manifest list and push
         working-directory: /tmp/digests
         run: |
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.PACKAGE }}@sha256:%s ' *)
+          DIGESTS=""
+          for f in *; do
+            DIGESTS="$DIGESTS ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.PACKAGE }}@sha256:$f"
+          done
+          echo "Merging digests: $DIGESTS"
+          docker buildx imagetools create \
+            --tag ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.PACKAGE }}:${IMAGE_TAG} \
+            $DIGESTS
 
-      - name: Inspect image
+      - name: Inspect final manifest
         run: |
-          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.PACKAGE }}:${{ steps.meta.outputs.version }}
+          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.PACKAGE }}:${IMAGE_TAG}
 
       - name: Remove untagged images
         uses: actions/delete-package-versions@v5
