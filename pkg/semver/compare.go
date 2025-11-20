@@ -14,7 +14,7 @@ func (v *Version) LessThan(ver *Version) bool {
 	return v.Patch < ver.Patch
 }
 
-func (v *Version) MoreThan(ver *Version) bool {
+func (v *Version) GreaterThan(ver *Version) bool {
 	if v.Major < ver.Major {
 		return false
 	}
@@ -22,4 +22,12 @@ func (v *Version) MoreThan(ver *Version) bool {
 		return false
 	}
 	return v.Patch > ver.Patch
+}
+
+func (v *Version) LessThanOrEqual(ver *Version) bool {
+	return v.LessThan(ver) || v.Equal(ver)
+}
+
+func (v *Version) GreaterThanOrEqual(ver *Version) bool {
+	return v.GreaterThan(ver) || v.Equal(ver)
 }

@@ -10,6 +10,9 @@ on:
     tags:
       - "v*"
 
+env:
+  CLOUDFLARE_RECORD_NAME: observer.updates.anyshake.org
+
 jobs:
   build_web:
     runs-on: ubuntu-latest
@@ -20,7 +23,7 @@ jobs:
         with:
           node-version: "latest"
 
-      - name: Checkout source code
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
@@ -91,7 +94,7 @@ jobs:
       - build_web
 
     steps:
-      - name: Checkout source code
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
@@ -273,3 +276,53 @@ jobs:
           file_glob: true
           overwrite: true
           body: ${{ steps.release_note.outputs.changelog }}
+
+  sync_version:
+    runs-on: ubuntu-latest
+
+    # if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    needs:
+      - build_web
+      - build_core
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup utilities
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Generate version JSON
+        id: version
+        run: |
+          VERSION_JSON=$(make version)
+          echo $VERSION_JSON
+          VERSION_ESCAPED=$(echo "$VERSION_JSON" | jq -c | jq -R '@json')
+          echo VERSION_ESCAPED=$VERSION_ESCAPED >> $GITHUB_ENV
+
+      - name: Update DNS record
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_DNS_ZONE_ID: ${{ secrets.CLOUDFLARE_DNS_ZONE_ID }}
+        run: |
+          CLOUDFLARE_DNS_RECORD_ID=$(curl -X GET "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_DNS_ZONE_ID/dns_records?type=TXT&name=$CLOUDFLARE_RECORD_NAME" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            -s \
+            | \
+            jq -r '.result[0].id')
+          echo "Got Cloudflare DNS record ID: $CLOUDFLARE_DNS_RECORD_ID"
+          curl -X PATCH https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_DNS_ZONE_ID/dns_records/$CLOUDFLARE_DNS_RECORD_ID \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            -d '{
+                  "name": "'"$CLOUDFLARE_RECORD_NAME"'",
+                  "ttl": 3600,
+                  "type": "TXT",
+                  "comment": "updated at '"$(date -u "+%Y-%m-%d %H:%M:%S")"'",
+                  "content": '"$VERSION_ESCAPED"'
+                }' | jq .

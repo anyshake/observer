@@ -1,10 +1,14 @@
-VERSION_MAJOR=4
-VERSION_MINOR=2
-VERSION_PATCH=1
+CURRENT_VERSION_MAJOR=4
+CURRENT_VERSION_MINOR=3
+CURRENT_VERSION_PATCH=0
 
-# Caution: software versioning mechanism depends on format of first three lines in this file
+REQUIRED_VERSION_MAJOR=4
+REQUIRED_VERSION_MINOR=3
+REQUIRED_VERSION_PATCH=0
 
-.PHONY: build digest clean run gen sync
+# Caution: software versioning mechanism depends on format of above lines in this file
+
+.PHONY: build digest clean run gen version
 
 GO ?= go
 
@@ -17,16 +21,16 @@ ifeq (${GOOS}, windows)
     BINARY := $(BINARY).exe
 endif
 
-COMMIT=$(shell git rev-parse --short HEAD)
 TIMESTAMP=$(shell date +%s)
+COMMIT=$(shell git rev-parse --short HEAD)
 
 BUILD_FLAGS=-s -w \
-	-X main.versionMajor=$(VERSION_MAJOR) \
-	-X main.versionMinor=$(VERSION_MINOR) \
-	-X main.versionPatch=$(VERSION_PATCH) \
-	-X main.buildTimestamp=$(TIMESTAMP) \
+	-X main.versionMajor=$(CURRENT_VERSION_MAJOR) \
+	-X main.versionMinor=$(CURRENT_VERSION_MINOR) \
+	-X main.versionPatch=$(CURRENT_VERSION_PATCH) \
 	-X main.buildToolchain=${BUILD_TOOLCHAIN} \
 	-X main.buildChannel=${BUILD_CHANNEL} \
+	-X main.buildTimestamp=$(TIMESTAMP) \
 	-X main.buildCommit=$(COMMIT)
 BUILD_ARGS=-v -trimpath
 
@@ -70,5 +74,16 @@ endif
 	@echo "[Info] Generating GraphQL code..."
 	@gqlgen generate
 
-sync:
-	@echo "not implemented"
+version:
+	@echo '{'
+	@echo '  "current": {'
+	@echo '    "majorVersion": $(CURRENT_VERSION_MAJOR),'
+	@echo '    "minorVersion": $(CURRENT_VERSION_MINOR),'
+	@echo '    "patchVersion": $(CURRENT_VERSION_PATCH)'
+	@echo '  },'
+	@echo '  "required": {'
+	@echo '    "majorVersion": $(REQUIRED_VERSION_MAJOR),'
+	@echo '    "minorVersion": $(REQUIRED_VERSION_MINOR),'
+	@echo '    "patchVersion": $(REQUIRED_VERSION_PATCH)'
+	@echo '  }'
+	@echo '}'
