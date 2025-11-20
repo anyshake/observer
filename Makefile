@@ -28,6 +28,7 @@ BUILD_FLAGS=-s -w \
 	-X main.versionMajor=$(CURRENT_VERSION_MAJOR) \
 	-X main.versionMinor=$(CURRENT_VERSION_MINOR) \
 	-X main.versionPatch=$(CURRENT_VERSION_PATCH) \
+	-X main.versionPreRelease=${VERSION_PRE_RELEASE} \
 	-X main.buildToolchain=${BUILD_TOOLCHAIN} \
 	-X main.buildChannel=${BUILD_CHANNEL} \
 	-X main.buildTimestamp=$(TIMESTAMP) \
@@ -77,13 +78,13 @@ endif
 version:
 	@echo '{'
 	@echo '  "current": {'
-	@echo '    "majorVersion": $(CURRENT_VERSION_MAJOR),'
-	@echo '    "minorVersion": $(CURRENT_VERSION_MINOR),'
-	@echo '    "patchVersion": $(CURRENT_VERSION_PATCH)'
+	@echo '    "major": $(CURRENT_VERSION_MAJOR),'
+	@echo '    "minor": $(CURRENT_VERSION_MINOR),'
+	@echo '    "patch": $(CURRENT_VERSION_PATCH)'
 	@echo '  },'
 	@echo '  "required": {'
-	@echo '    "majorVersion": $(REQUIRED_VERSION_MAJOR),'
-	@echo '    "minorVersion": $(REQUIRED_VERSION_MINOR),'
-	@echo '    "patchVersion": $(REQUIRED_VERSION_PATCH)'
+	@echo '    "major": $(REQUIRED_VERSION_MAJOR),'
+	@echo '    "minor": $(REQUIRED_VERSION_MINOR),'
+	@echo '    "patch": $(REQUIRED_VERSION_PATCH)'
 	@echo '  }'
 	@echo '}'

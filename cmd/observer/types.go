@@ -3,9 +3,10 @@ package main
 const description = "Listen to the whispering earth."
 
 var (
-	versionMajor string
-	versionMinor string
-	versionPatch string
+	versionMajor      string
+	versionMinor      string
+	versionPatch      string
+	versionPreRelease string
 )
 
 var (

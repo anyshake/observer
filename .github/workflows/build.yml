@@ -11,6 +11,7 @@ on:
       - "v*"
 
 env:
+  OBSERVER_BUILD_CHANNEL: github-actions-ci
   CLOUDFLARE_RECORD_NAME: observer.updates.anyshake.org
 
 jobs:
@@ -130,16 +131,6 @@ jobs:
           echo "GOROOT=$GOROOT" >> $GITHUB_ENV
           $GOROOT/bin/go version
 
-      - name: Setup BUILD_CHANNEL env (Release)
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
-        run: |
-          echo "BUILD_CHANNEL=gh-ci-release" >> $GITHUB_ENV
-
-      - name: Setup BUILD_CHANNEL env (Test)
-        if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
-        run: |
-          echo "BUILD_CHANNEL=gh-ci-test" >> $GITHUB_ENV
-
       - name: Download web artifacts
         uses: actions/download-artifact@v4
         with:
@@ -152,27 +143,26 @@ jobs:
           tar -zxf web_dist.tar.gz
           rm -f web_dist.tar.gz
 
-      - name: Build core application
-        if: ${{ matrix.target_id != 'windows7_386' && matrix.target_id != 'windows7_amd64' }}
+      - name: Mark as pre-release
+        if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
         run: |
-          GOOS=${{ env.GOOS }} \
-          GOARCH=${{ env.GOARCH }} \
-          GOARM=${{ env.GOARM }} \
-          GOMIPS=${{ env.GOMIPS }} \
-          BUILD_CHANNEL=${{env.BUILD_CHANNEL}} \
-          BUILD_TOOLCHAIN=${{ matrix.target_id }} \
-          make build
+          echo "SNAPSHOT_TAG=snapshot" >> $GITHUB_ENV
 
-      - name: Build core application (Windows 7)
-        if: ${{ matrix.target_id == 'windows7_386' || matrix.target_id == 'windows7_amd64' }}
+      - name: Build core application
         run: |
-          GO=${{ env.GOROOT }}/bin/go \
+          if [[ "${{ matrix.target_id }}" == "windows7_386" || "${{ matrix.target_id }}" == "windows7_amd64" ]]; then
+            GOBIN=${{ env.GOROOT }}/bin/go
+          else
+            GOBIN=go
+          fi
+          GO=$GOBIN \
           GOOS=${{ env.GOOS }} \
           GOARCH=${{ env.GOARCH }} \
           GOARM=${{ env.GOARM }} \
           GOMIPS=${{ env.GOMIPS }} \
-          BUILD_CHANNEL=${{env.BUILD_CHANNEL}} \
+          BUILD_CHANNEL=${{ env.OBSERVER_BUILD_CHANNEL }} \
           BUILD_TOOLCHAIN=${{ matrix.target_id }} \
+          VERSION_PRE_RELEASE=${{ env.SNAPSHOT_TAG }} \
           make build
 
       - name: Create release digest

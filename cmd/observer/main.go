@@ -21,7 +21,7 @@ func init() {
 
 func main() {
 	build := unibuild.New(buildToolchain, buildChannel, buildCommit, buildTimestamp)
-	ver := semver.New(versionMajor, versionMinor, versionPatch)
+	ver := semver.New(versionMajor, versionMinor, versionPatch, versionPreRelease)
 	args := parseCommandLine()
 
 	PrintVersion(ver, build, args.showVersion)
