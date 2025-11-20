@@ -70,7 +70,7 @@ jobs:
           version: latest
           driver-opts: "image=moby/buildkit:v0.10.5"
 
-      - name: Login to Registry
+      - name: Login to registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -133,6 +133,11 @@ jobs:
         run: |
           TAG="${GITHUB_REF_NAME}"
           echo "IMAGE_TAG=$TAG" >> $GITHUB_ENV
+          LATEST=false
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            LATEST=true
+          fi
+          echo "LATEST=$LATEST" >> $GITHUB_ENV
 
       - name: Create manifest list and push
         working-directory: /tmp/digests
@@ -145,6 +150,12 @@ jobs:
           docker buildx imagetools create \
             --tag ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.PACKAGE }}:${IMAGE_TAG} \
             $DIGESTS
+          if [[ "${LATEST}" == "true" ]]; then
+            echo "Also tagging as latest"
+            docker buildx imagetools create \
+              --tag ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.PACKAGE }}:latest \
+              ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.PACKAGE }}:${IMAGE_TAG}
+          fi
 
       - name: Inspect final manifest
         run: |
