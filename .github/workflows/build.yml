@@ -110,7 +110,7 @@ jobs:
           echo "RELEASE_NAME=$RELEASE_NAME" >> $GITHUB_ENV
 
       - name: Setup Go toolchain
-        if: matrix.target_id != 'windows7_386' && matrix.target_id != 'windows7_amd64'
+        if: ${{ matrix.target_id != 'windows7_386' && matrix.target_id != 'windows7_amd64' }}
         uses: actions/setup-go@v5
         with:
           cache: false
@@ -118,7 +118,7 @@ jobs:
           check-latest: true
 
       - name: Setup Go toolchain (Windows 7)
-        if: matrix.target_id == 'windows7_386' || matrix.target_id == 'windows7_amd64'
+        if: ${{ matrix.target_id == 'windows7_386' || matrix.target_id == 'windows7_amd64'}}
         run: |
           curl -L -o /tmp/go-legacy-win7.tar.gz https://github.com/thongtech/go-legacy-win7/releases/download/v1.24.2-1/go-legacy-win7-1.24.2-1.linux_amd64.tar.gz
           tar -xvf /tmp/go-legacy-win7.tar.gz -C $HOME
@@ -128,12 +128,12 @@ jobs:
           $GOROOT/bin/go version
 
       - name: Setup BUILD_CHANNEL env (Release)
-        if: startsWith(github.ref, 'refs/tags/')
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
         run: |
           echo "BUILD_CHANNEL=gh-ci-release" >> $GITHUB_ENV
 
       - name: Setup BUILD_CHANNEL env (Test)
-        if: ! startsWith(github.ref, 'refs/tags/')
+        if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
         run: |
           echo "BUILD_CHANNEL=gh-ci-test" >> $GITHUB_ENV
 
@@ -150,7 +150,7 @@ jobs:
           rm -f web_dist.tar.gz
 
       - name: Build core application
-        if: matrix.target_id != 'windows7_386' && matrix.target_id != 'windows7_amd64'
+        if: ${{ matrix.target_id != 'windows7_386' && matrix.target_id != 'windows7_amd64' }}
         run: |
           GOOS=${{ env.GOOS }} \
           GOARCH=${{ env.GOARCH }} \
@@ -161,7 +161,7 @@ jobs:
           make build
 
       - name: Build core application (Windows 7)
-        if: matrix.target_id == 'windows7_386' || matrix.target_id == 'windows7_amd64'
+        if: ${{ matrix.target_id == 'windows7_386' || matrix.target_id == 'windows7_amd64' }}
         run: |
           GO=${{ env.GOROOT }}/bin/go \
           GOOS=${{ env.GOOS }} \
@@ -183,13 +183,13 @@ jobs:
           path: build/dist/*
 
       - name: Package release
-        if: startsWith(github.ref, 'refs/tags/')
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
         working-directory: build/dist
         run: |
           zip -r ../${{ matrix.target_id }}.zip *
 
       - name: Create release note
-        if: startsWith(github.ref, 'refs/tags/')
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
         id: release_note
         uses: mikepenz/release-changelog-builder-action@v5
         with:
@@ -264,7 +264,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload to GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
