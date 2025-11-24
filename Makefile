@@ -1,10 +1,10 @@
-CURRENT_VERSION_MAJOR=4
-CURRENT_VERSION_MINOR=3
-CURRENT_VERSION_PATCH=0
+CURRENT_VERSION_MAJOR = 4
+CURRENT_VERSION_MINOR = 3
+CURRENT_VERSION_PATCH = 0
 
-REQUIRED_VERSION_MAJOR=4
-REQUIRED_VERSION_MINOR=3
-REQUIRED_VERSION_PATCH=0
+REQUIRED_VERSION_MAJOR = 4
+REQUIRED_VERSION_MINOR = 3
+REQUIRED_VERSION_PATCH = 0
 
 # Caution: software versioning mechanism depends on format of above lines in this file
 
@@ -12,19 +12,19 @@ REQUIRED_VERSION_PATCH=0
 
 GO ?= go
 
-ASSETS_DIR=./build/assets
-SRC_DIR=./cmd/observer
-DIST_DIR=./build/dist
+ASSETS_DIR = ./build/assets
+SRC_DIR = ./cmd/observer
+DIST_DIR = ./build/dist
 
-BINARY=observer
+BINARY = observer
 ifeq (${GOOS}, windows)
     BINARY := $(BINARY).exe
 endif
 
-TIMESTAMP=$(shell date +%s)
-COMMIT=$(shell git rev-parse --short HEAD)
+TIMESTAMP = $(shell date +%s)
+COMMIT = $(shell git rev-parse --short HEAD)
 
-BUILD_FLAGS=-s -w \
+BUILD_FLAGS = -s -w \
 	-X main.versionMajor=$(CURRENT_VERSION_MAJOR) \
 	-X main.versionMinor=$(CURRENT_VERSION_MINOR) \
 	-X main.versionPatch=$(CURRENT_VERSION_PATCH) \
@@ -33,7 +33,7 @@ BUILD_FLAGS=-s -w \
 	-X main.buildChannel=${BUILD_CHANNEL} \
 	-X main.buildTimestamp=$(TIMESTAMP) \
 	-X main.buildCommit=$(COMMIT)
-BUILD_ARGS=-v -trimpath
+BUILD_ARGS = -v -trimpath
 
 build:
 	@echo "[Info] Building project, output file path: $(DIST_DIR)/$(BINARY)"
@@ -77,14 +77,14 @@ endif
 
 version:
 	@echo '{'
-	@echo '  "current": {'
-	@echo '    "major": $(CURRENT_VERSION_MAJOR),'
-	@echo '    "minor": $(CURRENT_VERSION_MINOR),'
-	@echo '    "patch": $(CURRENT_VERSION_PATCH)'
+	@echo '  "latest": {'
+	@echo '    "major": "$(CURRENT_VERSION_MAJOR)",'
+	@echo '    "minor": "$(CURRENT_VERSION_MINOR)",'
+	@echo '    "patch": "$(CURRENT_VERSION_PATCH)"'
 	@echo '  },'
 	@echo '  "required": {'
-	@echo '    "major": $(REQUIRED_VERSION_MAJOR),'
-	@echo '    "minor": $(REQUIRED_VERSION_MINOR),'
-	@echo '    "patch": $(REQUIRED_VERSION_PATCH)'
+	@echo '    "major": "$(REQUIRED_VERSION_MAJOR)",'
+	@echo '    "minor": "$(REQUIRED_VERSION_MINOR)",'
+	@echo '    "patch": "$(REQUIRED_VERSION_PATCH)"'
 	@echo '  }'
 	@echo '}'

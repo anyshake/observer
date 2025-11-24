@@ -27,19 +27,25 @@ import (
 )
 
 func (s *MetricsServiceImpl) getBuildInfo() []attribute.KeyValue {
+	buildTime := s.build.GetTime().Format(time.RFC3339)
+	buildChannel := s.build.GetChannel()
+	buildCommit := s.build.GetCommit()
+	toolchainId := s.build.GetToolchainId()
+	toolchainObj := s.build.GetToolchain()
+
 	values := []attribute.KeyValue{
-		attribute.String("service.build.time", s.build.Time.Format(time.RFC3339)),
-		attribute.String("service.build.channel", s.build.Channel),
-		attribute.String("service.build.commit", s.build.Commit),
-		attribute.String("service.build.toolchainId", s.build.ToolchainId),
+		attribute.String("service.build.time", buildTime),
+		attribute.String("service.build.channel", buildChannel),
+		attribute.String("service.build.commit", buildCommit),
+		attribute.String("service.build.toolchainId", toolchainId),
 	}
-	if s.build.Toolchain != nil {
+	if toolchainObj != nil {
 		extraValues := []attribute.KeyValue{
-			attribute.String("service.build.toolchain.name", s.build.Toolchain.Name),
-			attribute.String("service.build.toolchain.name", s.build.Toolchain.GOOS),
-			attribute.String("service.build.toolchain.name", s.build.Toolchain.GOARCH),
-			attribute.String("service.build.toolchain.name", s.build.Toolchain.GOARM),
-			attribute.String("service.build.toolchain.name", s.build.Toolchain.GOMIPS),
+			attribute.String("service.build.toolchain.name", toolchainObj.Name),
+			attribute.String("service.build.toolchain.name", toolchainObj.GOOS),
+			attribute.String("service.build.toolchain.name", toolchainObj.GOARCH),
+			attribute.String("service.build.toolchain.name", toolchainObj.GOARM),
+			attribute.String("service.build.toolchain.name", toolchainObj.GOMIPS),
 		}
 		values = append(values, extraValues...)
 	}

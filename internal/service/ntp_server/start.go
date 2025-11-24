@@ -26,7 +26,7 @@ func (s *NtpServerServiceImpl) Start() error {
 	}
 
 	ntpSrv, err := newNtpServer(s.listenHost, s.listenPort, func() time.Time {
-		return s.timeSource.Now()
+		return s.timeSource.Now().Add(time.Duration(s.delayControl) * time.Microsecond)
 	})
 	if err != nil {
 		return fmt.Errorf("failed to start NTP server: %w", err)

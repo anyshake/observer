@@ -143,6 +143,7 @@ type Mutation {
 }
 
 type Query {
+  getSoftwareVersion: String!
   getCurrentTime: Int64!
   getStationConfig: Map!
   getSystemStatus: systemStatus!

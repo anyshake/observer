@@ -1,12 +1,10 @@
 import logo from '/anyshake.svg';
 
-import { getVersionTag } from '../helpers/app/getVersionTag';
 import { Translation } from './locale';
 
 interface IGlobalConfig {
     readonly repository: string;
     readonly logo: string;
-    readonly version: string;
     readonly name: Translation;
     readonly copyright: string;
     readonly homepage: string;
@@ -15,7 +13,6 @@ interface IGlobalConfig {
 }
 
 export const globalConfig: IGlobalConfig = {
-    version: getVersionTag(),
     logo,
     name: {
         'de-DE': 'AnyShake Observer',

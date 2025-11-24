@@ -22,6 +22,7 @@ type NtpServerServiceImpl struct {
 	timeSource    *timesource.Source
 	actionHandler *action.Handler
 
-	listenHost string
-	listenPort int
+	listenHost   string
+	listenPort   int
+	delayControl int64
 }

@@ -1,39 +1,39 @@
 package semver
 
 func (v *Version) Equal(ver *Version) bool {
-	return v.Major == ver.Major && v.Minor == ver.Minor && v.Patch == ver.Patch && v.PreRelease == ver.PreRelease
+	return v.major == ver.major && v.minor == ver.minor && v.patch == ver.patch && v.preRelease == ver.preRelease
 }
 
 func (v *Version) LessThan(ver *Version) bool {
-	if v.Major < ver.Major {
+	if v.major < ver.major {
 		return true
 	}
-	if v.Major > ver.Major {
+	if v.major > ver.major {
 		return false
 	}
 
-	if v.Minor < ver.Minor {
+	if v.minor < ver.minor {
 		return true
 	}
-	if v.Minor > ver.Minor {
+	if v.minor > ver.minor {
 		return false
 	}
 
-	if v.Patch < ver.Patch {
+	if v.patch < ver.patch {
 		return true
 	}
-	if v.Patch > ver.Patch {
+	if v.patch > ver.patch {
 		return false
 	}
 
-	// Compare pre-release version if Major, Minor, Patch are equal
-	if v.PreRelease != "" && ver.PreRelease == "" {
+	// Compare pre-release version if major, minor, patch are equal
+	if v.preRelease != "" && ver.preRelease == "" {
 		return true
 	}
-	if v.PreRelease == "" && ver.PreRelease != "" {
+	if v.preRelease == "" && ver.preRelease != "" {
 		return false
 	}
-	return v.PreRelease < ver.PreRelease
+	return v.preRelease < ver.preRelease
 }
 
 func (v *Version) GreaterThan(ver *Version) bool {
@@ -48,6 +48,22 @@ func (v *Version) GreaterThanOrEqual(ver *Version) bool {
 	return v.GreaterThan(ver) || v.Equal(ver)
 }
 
-func (v *Version) IsStable() bool {
-	return v.PreRelease == ""
+func (v *Version) IsPreRelease() bool {
+	return v.preRelease != ""
+}
+
+func (v *Version) IsCompatible(ver *Version) bool {
+	if v.preRelease != "" {
+		return false
+	}
+
+	if v.major == 0 && v.minor == 0 && v.patch == 0 {
+		return false
+	}
+
+	if v.major != ver.major {
+		return false
+	}
+
+	return true
 }

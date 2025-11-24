@@ -24,5 +24,11 @@ func (s *NtpServerServiceImpl) Init() error {
 	}
 	s.listenPort = listenPort.(int)
 
+	delayControl, err := (&ntpServerConfigDelayControlImpl{}).Get(s.actionHandler)
+	if err != nil {
+		return err
+	}
+	s.delayControl = delayControl.(int64)
+
 	return nil
 }

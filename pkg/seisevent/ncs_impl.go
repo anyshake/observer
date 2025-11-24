@@ -8,6 +8,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/anyshake/observer/pkg/cache"
+	"github.com/anyshake/observer/pkg/dnsquery"
 	"github.com/anyshake/observer/pkg/request"
 	"github.com/bclswl0827/travel"
 	"github.com/corpix/uarand"
@@ -16,6 +17,7 @@ import (
 const NCS_ID = "ncs"
 
 type NCS struct {
+	resolvers       dnsquery.Resolvers
 	travelTimeTable *travel.AK135
 	cache           cache.AnyCache
 }
@@ -41,7 +43,7 @@ func (c *NCS) GetEvents(latitude, longitude float64) ([]Event, error) {
 	res, err := request.GET(
 		"https://riseq.seismo.gov.in/riseq/earthquake",
 		30*time.Second, time.Second, 3, false,
-		createCustomResolver(getCustomDnsList(), ""),
+		createCustomTransport(c.resolvers, "ncs"),
 		map[string]string{"User-Agent": uarand.GetRandom()},
 	)
 	if err != nil {

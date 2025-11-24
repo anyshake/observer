@@ -5,7 +5,6 @@ import (
 	"runtime"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/anyshake/observer/pkg/semver"
 	"github.com/anyshake/observer/pkg/unibuild"
@@ -47,19 +46,31 @@ func printMap(m map[string]any, indentLevel int) {
 
 func PrintVersion(ver *semver.Version, build *unibuild.UniBuild, verbose bool) {
 	binaryVersion := ver.String()
+	buildCommit := build.GetCommit()
+	buildChannel := build.GetChannel()
+	buildTime := build.GetTime()
+	toolchainId := build.GetToolchainId()
+
+	buildTimeStr := fmt.Sprintf("-%d", buildTime.Unix())
+	if buildTime.UnixMilli() == 0 {
+		buildTimeStr = ""
+	}
+
 	fmt.Println(concatText(
-		"AnyShake Observer ", binaryVersion, " (", description, ")\nRelease: ", binaryVersion, "-", build.Commit, "-", build.Time.Unix(), " ",
+		"AnyShake Observer ", binaryVersion, " (", startupDescription, ")\nRelease: ", binaryVersion, "-", buildCommit, buildTimeStr, " ",
 		runtime.Version(), " ", runtime.GOOS, "/", runtime.GOARCH, "\n",
 	))
 	if verbose {
 		detailedMap := map[string]any{
 			"Build Version": binaryVersion,
-			"Build Commit":  build.Commit,
-			"Build Channel": build.Channel,
+			"Build Commit":  buildCommit,
+			"Build Channel": buildChannel,
 		}
-		if build.ToolchainId != "" {
-			detailedMap["Build Toolchain"] = build.ToolchainId
-			detailedMap["Build Time"] = build.Time.Format(time.RFC3339)
+		if toolchainId != "" {
+			detailedMap["Build Toolchain"] = toolchainId
+		}
+		if buildTime.UnixMilli() != 0 {
+			detailedMap["Build Time"] = buildTime
 		}
 		printMap(detailedMap, 2)
 	}

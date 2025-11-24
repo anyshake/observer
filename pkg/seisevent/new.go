@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/pkg/cache"
+	"github.com/anyshake/observer/pkg/dnsquery"
 	"github.com/bclswl0827/travel"
 )
 
@@ -13,8 +14,10 @@ func New(cacheTTL time.Duration) (map[string]IDataSource, error) {
 		return nil, err
 	}
 
+	builtinResolvers := dnsquery.NewResolvers()
+
 	return map[string]IDataSource{
-		CWA_SC_ID:       &CWA_SC{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
+		CWA_SC_ID:       &CWA_SC{resolvers: builtinResolvers, cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		CWA_EXPTECH_ID:  &CWA_EXPTECH{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		PALERT_ID:       &PALERT{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		HKO_ID:          &HKO{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
@@ -39,11 +42,11 @@ func New(cacheTTL time.Duration) (map[string]IDataSource, error) {
 		INFP_ID:         &INFP{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		SED_ID:          &SED{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		KNMI_ID:         &KNMI{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
-		NCS_ID:          &NCS{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
+		NCS_ID:          &NCS{resolvers: builtinResolvers, cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		NRCAN_ID:        &NRCAN{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		GEONET_ID:       &GEONET{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		ICL_ID:          &ICL{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
-		BMKG_ID:         &BMKG{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
+		BMKG_ID:         &BMKG{resolvers: builtinResolvers, cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		DOST_ID:         &DOST{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		AFAD_ID:         &AFAD{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		KRDAE_ID:        &KRDAE{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},

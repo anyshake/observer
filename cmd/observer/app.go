@@ -201,6 +201,8 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		conf.Server.Debug,
 		conf.Server.CORS,
 		&graph_resolver.Resolver{
+			CurrentVersion:           ver,
+			CurrentBuild:             build,
 			ServiceMap:               serviceMap,
 			HardwareDev:              hardwareDevice,
 			TimeSource:               timeSrc,

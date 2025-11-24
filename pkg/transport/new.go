@@ -24,7 +24,7 @@ func New(endpoint string, timeout int) (ITransport, error) {
 			return nil, fmt.Errorf("failed to parse serial endpoint: %w", err)
 		}
 		deviceName := urlObj.Hostname()
-		if len(deviceName) == 0 {
+		if deviceName == "" {
 			deviceName = urlObj.Path
 		}
 		baudrate, err := strconv.Atoi(urlObj.Query().Get("baudrate"))

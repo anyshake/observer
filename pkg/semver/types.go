@@ -1,10 +1,8 @@
 package semver
 
-const UNKNOWN_VERSION = "custombuild"
-
 type Version struct {
-	Major      int64
-	Minor      int64
-	Patch      int64
-	PreRelease string
+	major      int64
+	minor      int64
+	patch      int64
+	preRelease string
 }

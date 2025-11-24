@@ -1,6 +1,9 @@
 package main
 
-const description = "Listen to the whispering earth."
+const (
+	officialBuildChannel = "github-actions-ci"
+	startupDescription   = "Listen to the whispering earth."
+)
 
 var (
 	versionMajor      string

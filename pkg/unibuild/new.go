@@ -7,13 +7,7 @@ import (
 
 func New(toolchainId, channel, commit, buildTime string) *UniBuild {
 	if toolchainId == "" {
-		toolchainId = "unsupported"
-	}
-	if channel == "" {
-		channel = "self-build"
-	}
-	if commit == "" {
-		commit = "unknown"
+		toolchainId = "unspecified"
 	}
 	if buildTime == "" {
 		buildTime = "0"
@@ -21,10 +15,10 @@ func New(toolchainId, channel, commit, buildTime string) *UniBuild {
 
 	timestamp, _ := strconv.ParseInt(buildTime, 10, 64)
 	return &UniBuild{
-		Toolchain:   getToolchainById(toolchainId),
-		ToolchainId: toolchainId,
-		Channel:     channel,
-		Commit:      commit,
-		Time:        time.Unix(timestamp, 0).UTC(),
+		toolchain:   matchToolchainById(toolchainId),
+		toolchainId: toolchainId,
+		channel:     channel,
+		commit:      commit,
+		time:        time.Unix(timestamp, 0).UTC(),
 	}
 }

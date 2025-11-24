@@ -7,9 +7,9 @@ func New(major, minor, patch, pre string) *Version {
 	minorInt, _ := strconv.ParseInt(minor, 10, 64)
 	patchInt, _ := strconv.ParseInt(patch, 10, 64)
 	return &Version{
-		Major:      majorInt,
-		Minor:      minorInt,
-		Patch:      patchInt,
-		PreRelease: pre,
+		major:      majorInt,
+		minor:      minorInt,
+		patch:      patchInt,
+		preRelease: pre,
 	}
 }

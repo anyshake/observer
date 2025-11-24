@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/pkg/cache"
+	"github.com/anyshake/observer/pkg/dnsquery"
 	"github.com/anyshake/observer/pkg/request"
 	"github.com/bclswl0827/travel"
 	"github.com/corpix/uarand"
@@ -15,6 +16,7 @@ import (
 const CWA_SC_ID = "cwa_sc"
 
 type CWA_SC struct {
+	resolvers       dnsquery.Resolvers
 	travelTimeTable *travel.AK135
 	cache           cache.AnyCache
 }
@@ -48,7 +50,7 @@ func (c *CWA_SC) GetEvents(latitude, longitude float64) ([]Event, error) {
 		"application/x-www-form-urlencoded; charset=UTF-8",
 		10*time.Second, time.Second, 3, false,
 		// Query CWA IP from custom encrypted DNS servers
-		createCustomResolver(getCustomDnsList(), ""),
+		createCustomTransport(c.resolvers, "cwa"),
 		map[string]string{"User-Agent": uarand.GetRandom()},
 	)
 	if err != nil {

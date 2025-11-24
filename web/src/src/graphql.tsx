@@ -115,6 +115,7 @@ export type Query = {
   getSeisRecordsByTime: Array<Maybe<SeisRecord>>;
   getServiceConfigConstraint: Array<ServiceConfigConstraint>;
   getServiceStatus?: Maybe<Array<ServiceStatus>>;
+  getSoftwareVersion: Scalars['String']['output'];
   getStationConfig: Scalars['Map']['output'];
   getStationConfigConstraint: Array<ConfigConstraint>;
   getStationMetadata: Scalars['String']['output'];
@@ -261,6 +262,11 @@ export type SystemStatus = {
   memory: Scalars['Float']['output'];
   uptime: Scalars['Int64']['output'];
 };
+
+export type GetSoftwareVersionQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetSoftwareVersionQuery = { __typename?: 'Query', getSoftwareVersion: string };
 
 export type IsGenuineProductQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -433,6 +439,43 @@ export type UpdateUserMutationVariables = Exact<{
 export type UpdateUserMutation = { __typename?: 'Mutation', updateSysUser: boolean };
 
 
+export const GetSoftwareVersionDocument = gql`
+    query getSoftwareVersion {
+  getSoftwareVersion
+}
+    `;
+
+/**
+ * __useGetSoftwareVersionQuery__
+ *
+ * To run a query within a React component, call `useGetSoftwareVersionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSoftwareVersionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSoftwareVersionQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetSoftwareVersionQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetSoftwareVersionQuery, GetSoftwareVersionQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetSoftwareVersionQuery, GetSoftwareVersionQueryVariables>(GetSoftwareVersionDocument, options);
+      }
+export function useGetSoftwareVersionLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetSoftwareVersionQuery, GetSoftwareVersionQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetSoftwareVersionQuery, GetSoftwareVersionQueryVariables>(GetSoftwareVersionDocument, options);
+        }
+export function useGetSoftwareVersionSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetSoftwareVersionQuery, GetSoftwareVersionQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetSoftwareVersionQuery, GetSoftwareVersionQueryVariables>(GetSoftwareVersionDocument, options);
+        }
+export type GetSoftwareVersionQueryHookResult = ReturnType<typeof useGetSoftwareVersionQuery>;
+export type GetSoftwareVersionLazyQueryHookResult = ReturnType<typeof useGetSoftwareVersionLazyQuery>;
+export type GetSoftwareVersionSuspenseQueryHookResult = ReturnType<typeof useGetSoftwareVersionSuspenseQuery>;
+export type GetSoftwareVersionQueryResult = ApolloReactCommon.QueryResult<GetSoftwareVersionQuery, GetSoftwareVersionQueryVariables>;
 export const IsGenuineProductDocument = gql`
     query isGenuineProduct {
   isGenuineProduct

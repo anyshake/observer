@@ -9,7 +9,9 @@ import (
 	"github.com/anyshake/observer/internal/service"
 	"github.com/anyshake/observer/pkg/ringbuf"
 	"github.com/anyshake/observer/pkg/seisevent"
+	"github.com/anyshake/observer/pkg/semver"
 	"github.com/anyshake/observer/pkg/timesource"
+	"github.com/anyshake/observer/pkg/unibuild"
 )
 
 // This file will not be regenerated automatically.
@@ -19,6 +21,8 @@ import (
 type ContextKey string
 
 type Resolver struct {
+	CurrentVersion           *semver.Version
+	CurrentBuild             *unibuild.UniBuild
 	HardwareDev              hardware.IHardware
 	TimeSource               *timesource.Source
 	ActionHandler            *action.Handler

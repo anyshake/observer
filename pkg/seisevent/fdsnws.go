@@ -3,7 +3,6 @@ package seisevent
 import (
 	"encoding/csv"
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
@@ -62,7 +61,6 @@ func ParseFdsnwsEvent(travelTimeTable *travel.AK135, dataText, timeLayout string
 		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
 		seisEvent.Estimation = getSeismicEstimation(travelTimeTable, latitude, seisEvent.Latitude, longitude, seisEvent.Longitude, seisEvent.Depth)
 
-		fmt.Printf("%+v\n", seisEvent)
 		resultArr = append(resultArr, seisEvent)
 	}
 

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/pkg/cache"
+	"github.com/anyshake/observer/pkg/dnsquery"
 	"github.com/anyshake/observer/pkg/request"
 	"github.com/bclswl0827/travel"
 	"github.com/corpix/uarand"
@@ -16,6 +17,7 @@ import (
 const BMKG_ID = "bmkg"
 
 type BMKG struct {
+	resolvers       dnsquery.Resolvers
 	travelTimeTable *travel.AK135
 	cache           cache.AnyCache
 }
@@ -42,7 +44,7 @@ func (c *BMKG) GetEvents(latitude, longitude float64) ([]Event, error) {
 		"https://bmkg-content-inatews.storage.googleapis.com/last30feltevent.xml",
 		30*time.Second, time.Second, 3, false,
 		// Set custom frontend SNI (bmkg) to bypass GFW in China
-		createCustomResolver(getCustomDnsList(), "bmkg"),
+		createCustomTransport(c.resolvers, "bmkg"),
 		map[string]string{"User-Agent": uarand.GetRandom()},
 	)
 	if err != nil {

@@ -21,7 +21,7 @@ func extractMapValue[T any](m map[string]any, key string) (T, bool) {
 	return n, true
 }
 
-func getToolchainById(id string) *Toolchain {
+func matchToolchainById(id string) *Toolchain {
 	if id == "" {
 		return nil
 	}

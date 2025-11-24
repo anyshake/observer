@@ -18,7 +18,7 @@ import { globalConfig } from './config/global';
 import { localeConfig } from './config/locale';
 import { menuConfig } from './config/menu';
 import { routerConfig } from './config/router';
-import { useIsGenuineProductLazyQuery } from './graphql';
+import { useGetSoftwareVersionQuery, useIsGenuineProductLazyQuery } from './graphql';
 import { sendUserConfirm } from './helpers/alert/sendUserConfirm';
 import { getCtaMessageDataUrl } from './helpers/app/getCtaMessageDataUrl';
 import { useCredentialStore } from './stores/credential';
@@ -33,13 +33,17 @@ interface IEntry {
 export const Entry = ({ currentLocale, locales, onSwitchLocale }: IEntry) => {
     const { t } = useTranslation();
 
+    const { data: getSoftwareVersionData, loading: getSoftwareVersionLoading } =
+        useGetSoftwareVersionQuery();
     useEffect(() => {
-        // eslint-disable-next-line no-console
-        console.log(
-            `%c${globalConfig.version}`,
-            'background: #945cff; color: #ffffff; font-weight: bold; font-size: 12px; padding: 2px 4px;'
-        );
-    }, []);
+        if (!getSoftwareVersionLoading && getSoftwareVersionData?.getSoftwareVersion) {
+            // eslint-disable-next-line no-console
+            console.log(
+                `%c${getSoftwareVersionData.getSoftwareVersion}`,
+                'background: #945cff; color: #ffffff; font-weight: bold; font-size: 12px; padding: 2px 4px;'
+            );
+        }
+    }, [getSoftwareVersionData, getSoftwareVersionLoading]);
 
     const { pathname } = useLocation();
     const [currentTitle, setCurrentTitle] = useState(globalConfig.name[currentLocale]);

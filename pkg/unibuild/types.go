@@ -11,9 +11,9 @@ type Toolchain struct {
 }
 
 type UniBuild struct {
-	Toolchain   *Toolchain
-	ToolchainId string
-	Commit      string
-	Channel     string
-	Time        time.Time
+	toolchain   *Toolchain
+	toolchainId string
+	commit      string
+	channel     string
+	time        time.Time
 }
