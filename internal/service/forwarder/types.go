@@ -34,6 +34,7 @@ type ForwarderServiceImpl struct {
 	listenHost string
 	listenPort int
 
-	messageBus message.Bus[explorer.EventHandler]
-	listener   net.Listener
+	messageBusRealtime message.Bus[explorer.EventHandler]
+	messageBus         message.Bus[explorer.EventHandler]
+	listener           net.Listener
 }

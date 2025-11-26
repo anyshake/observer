@@ -15,6 +15,7 @@ func (s *ForwarderServiceImpl) Stop() error {
 
 	done := make(chan struct{})
 	go func() {
+		_ = s.hardwareDev.UnsubscribeRealtime(ID)
 		_ = s.hardwareDev.Unsubscribe(ID)
 		if s.listener != nil {
 			_ = s.listener.Close()

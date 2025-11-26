@@ -88,7 +88,7 @@ func (g *ExplorerProtoImplV1) getIndices(arr []byte, sep []byte) []int {
 	return indices
 }
 
-func (g *ExplorerProtoImplV1) getChannelData(packetBytes []byte, headerSize, channelSize int) error {
+func (g *ExplorerProtoImplV1) getChannelData(packetBytes []byte, headerSize, channelSize int) (channelData []ChannelData, err error) {
 	zOffset := headerSize + int(unsafe.Sizeof(int64(0)))
 	zAxisData := make([]int32, channelSize)
 	eOffset := zOffset + channelSize*int(unsafe.Sizeof(int32(0)))
@@ -109,21 +109,18 @@ func (g *ExplorerProtoImplV1) getChannelData(packetBytes []byte, headerSize, cha
 	}
 	for i := 0; i < len(calcChecksum); i++ {
 		if calcChecksum[i] != recvChecksum[i] {
-			return fmt.Errorf("checksum mismatch, expected %v, got %v", recvChecksum, calcChecksum)
+			return nil, fmt.Errorf("checksum mismatch, expected %v, got %v", recvChecksum, calcChecksum)
 		}
 	}
 
-	err := binary.Read(bytes.NewReader(packetBytes[zOffset:eOffset]), binary.LittleEndian, &zAxisData)
-	if err != nil {
-		return fmt.Errorf("failed to read z-axis data: %w", err)
+	if err = binary.Read(bytes.NewReader(packetBytes[zOffset:eOffset]), binary.LittleEndian, &zAxisData); err != nil {
+		return nil, fmt.Errorf("failed to read z-axis data: %w", err)
 	}
-	err = binary.Read(bytes.NewReader(packetBytes[eOffset:nOffset]), binary.LittleEndian, &eAxisData)
-	if err != nil {
-		return fmt.Errorf("failed to read e-axis data: %w", err)
+	if err = binary.Read(bytes.NewReader(packetBytes[eOffset:nOffset]), binary.LittleEndian, &eAxisData); err != nil {
+		return nil, fmt.Errorf("failed to read e-axis data: %w", err)
 	}
-	err = binary.Read(bytes.NewReader(packetBytes[nOffset:len(packetBytes)-1-3]), binary.LittleEndian, &nAxisData)
-	if err != nil {
-		return fmt.Errorf("failed to read n-axis data: %w", err)
+	if err = binary.Read(bytes.NewReader(packetBytes[nOffset:len(packetBytes)-1-3]), binary.LittleEndian, &nAxisData); err != nil {
+		return nil, fmt.Errorf("failed to read n-axis data: %w", err)
 	}
 
 	if len(g.channelDataBuf) != 3 {
@@ -156,7 +153,29 @@ func (g *ExplorerProtoImplV1) getChannelData(packetBytes []byte, headerSize, cha
 	}
 	g.deviceConfig.SetChannelCodes(currentChannelCodes)
 
-	return nil
+	result := make([]ChannelData, 3)
+	result[0] = ChannelData{
+		ChannelCode: g.channelDataBuf[0].ChannelCode,
+		ChannelId:   1,
+		ByteSize:    4,
+		DataType:    "int32",
+		Data:        zAxisData,
+	}
+	result[1] = ChannelData{
+		ChannelCode: g.channelDataBuf[1].ChannelCode,
+		ChannelId:   2,
+		ByteSize:    4,
+		DataType:    "int32",
+		Data:        eAxisData,
+	}
+	result[2] = ChannelData{
+		ChannelCode: g.channelDataBuf[2].ChannelCode,
+		ChannelId:   3,
+		ByteSize:    4,
+		DataType:    "int32",
+		Data:        nAxisData,
+	}
+	return result, nil
 }
 
 func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, context.CancelFunc, error) {
@@ -296,7 +315,8 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 				currentSampleRate := g.deviceConfig.GetSampleRate()
 				if currentSampleRate > 0 {
 					timestamp := int64(binary.BigEndian.Uint64(dataPacket[2:10]))
-					if err = g.getChannelData(dataPacket, len(DATA_PACKET_HEADER), DATA_PACKET_CHANNEL_SIZE); err != nil {
+					channelData, err := g.getChannelData(dataPacket, len(DATA_PACKET_HEADER), DATA_PACKET_CHANNEL_SIZE)
+					if err != nil {
 						g.Logger.Errorf("failed to get channel data: %v", err)
 						g.deviceStatus.IncrementErrors()
 						continue
@@ -305,7 +325,7 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 					collectedTimestampArr = append(collectedTimestampArr, timestamp)
 					g.deviceStatus.IncrementFrames()
 
-					g.messageBusRealtime.Publish(time.UnixMilli(timestamp), &g.deviceConfig, &g.deviceVariable, g.channelDataBuf)
+					g.messageBusRealtime.Publish(time.UnixMilli(timestamp), &g.deviceConfig, &g.deviceVariable, channelData)
 					if len(collectedTimestampArr)*DATA_PACKET_CHANNEL_SIZE == currentSampleRate {
 						packetTimestamp := collectedTimestampArr[0]
 						g.messageBus.Publish(time.UnixMilli(packetTimestamp), &g.deviceConfig, &g.deviceVariable, g.channelDataBuf)

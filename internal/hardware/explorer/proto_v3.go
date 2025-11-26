@@ -483,18 +483,20 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 					g.channelDataBuf = make([]ChannelData, len(channelData))
 				}
 				for idx, ch := range channelData {
-					chVal := *ch
 					channelCodes[idx] = ch.ChannelCode
 					g.channelDataBuf[idx].ByteSize = ch.ByteSize
 					g.channelDataBuf[idx].ChannelCode = ch.ChannelCode
 					g.channelDataBuf[idx].ChannelId = ch.ChannelId
 					g.channelDataBuf[idx].DataType = ch.DataType
-					g.channelDataBuf[idx].Data = append(g.channelDataBuf[idx].Data, chVal.Data...)
+					g.channelDataBuf[idx].Data = append(g.channelDataBuf[idx].Data, ch.Data...)
 				}
 				g.deviceConfig.SetChannelCodes(channelCodes)
 
 				sampleRate := g.deviceConfig.GetSampleRate()
-				g.messageBusRealtime.Publish(timeObj, &g.deviceConfig, &g.deviceVariable, g.channelDataBuf)
+				g.messageBusRealtime.Publish(timeObj, &g.deviceConfig, &g.deviceVariable, lo.Map(
+					channelData,
+					func(ch *ChannelData, _ int) ChannelData { return *ch },
+				))
 
 				g.flagMutex.Lock()
 				collectedSamples := g.collectedSamples

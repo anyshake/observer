@@ -128,7 +128,7 @@ func (g *ExplorerProtoImplV2) getVariableData(mcuTimestamp int64, variableBytes 
 	}
 }
 
-func (g *ExplorerProtoImplV2) getChannelData(packetBytes []byte, headerSize, channelSize int) error {
+func (g *ExplorerProtoImplV2) getChannelData(packetBytes []byte, headerSize, channelSize int) (channelData []ChannelData, err error) {
 	if len(g.channelDataBuf) != 3 {
 		g.channelDataBuf = make([]ChannelData, 3)
 	}
@@ -140,17 +140,14 @@ func (g *ExplorerProtoImplV2) getChannelData(packetBytes []byte, headerSize, cha
 	nOffset := eOffset + (channelSize)*int(unsafe.Sizeof(int32(0)))
 	nAxisData := make([]int32, channelSize)
 
-	err := binary.Read(bytes.NewReader(packetBytes[zOffset:eOffset]), binary.LittleEndian, &zAxisData)
-	if err != nil {
-		return fmt.Errorf("failed to read z-axis data: %w", err)
+	if err := binary.Read(bytes.NewReader(packetBytes[zOffset:eOffset]), binary.LittleEndian, &zAxisData); err != nil {
+		return nil, fmt.Errorf("failed to read z-axis data: %w", err)
 	}
-	err = binary.Read(bytes.NewReader(packetBytes[eOffset:nOffset]), binary.LittleEndian, &eAxisData)
-	if err != nil {
-		return fmt.Errorf("failed to read e-axis data: %w", err)
+	if err = binary.Read(bytes.NewReader(packetBytes[eOffset:nOffset]), binary.LittleEndian, &eAxisData); err != nil {
+		return nil, fmt.Errorf("failed to read e-axis data: %w", err)
 	}
-	err = binary.Read(bytes.NewReader(packetBytes[nOffset:len(packetBytes)-1]), binary.LittleEndian, &nAxisData)
-	if err != nil {
-		return fmt.Errorf("failed to read n-axis data: %w", err)
+	if err = binary.Read(bytes.NewReader(packetBytes[nOffset:len(packetBytes)-1]), binary.LittleEndian, &nAxisData); err != nil {
+		return nil, fmt.Errorf("failed to read n-axis data: %w", err)
 	}
 
 	for i := 0; i < len(g.channelDataBuf); i++ {
@@ -180,7 +177,29 @@ func (g *ExplorerProtoImplV2) getChannelData(packetBytes []byte, headerSize, cha
 	}
 	g.deviceConfig.SetChannelCodes(currentChannelCodes)
 
-	return nil
+	result := make([]ChannelData, 3)
+	result[0] = ChannelData{
+		ChannelCode: g.channelDataBuf[0].ChannelCode,
+		ChannelId:   1,
+		ByteSize:    4,
+		DataType:    "int32",
+		Data:        zAxisData,
+	}
+	result[1] = ChannelData{
+		ChannelCode: g.channelDataBuf[1].ChannelCode,
+		ChannelId:   2,
+		ByteSize:    4,
+		DataType:    "int32",
+		Data:        eAxisData,
+	}
+	result[2] = ChannelData{
+		ChannelCode: g.channelDataBuf[2].ChannelCode,
+		ChannelId:   3,
+		ByteSize:    4,
+		DataType:    "int32",
+		Data:        nAxisData,
+	}
+	return result, nil
 }
 
 func (g *ExplorerProtoImplV2) verifyChecksum(packetData, header []byte) error {
@@ -424,12 +443,13 @@ func (g *ExplorerProtoImplV2) Open(ctx context.Context) (context.Context, contex
 					expectedNextMcuTimestamp = mcuTimestamp + 1000
 				} else {
 					collectedTimestampArr = append(collectedTimestampArr, timestamp)
-					err = g.getChannelData(dataPacket, len(DATA_PACKET_HEADER), DATA_PACKET_CHANNEL_SIZE)
+					channelData, err := g.getChannelData(dataPacket, len(DATA_PACKET_HEADER), DATA_PACKET_CHANNEL_SIZE)
 					if err != nil {
 						g.Logger.Errorf("failed to get channel data: %v", err)
 						g.deviceStatus.IncrementErrors()
 						continue
 					}
+					g.messageBusRealtime.Publish(time.UnixMilli(timestamp), &g.deviceConfig, &g.deviceVariable, channelData)
 				}
 
 				if math.Abs(float64(mcuTimestamp-expectedNextMcuTimestamp)) <= ALLOWED_JITTER_MS {

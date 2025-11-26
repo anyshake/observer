@@ -45,6 +45,13 @@ func (s *ForwarderServiceImpl) Start() error {
 			}
 		}()
 
+		err = s.hardwareDev.SubscribeRealtime(ID, func(t time.Time, di *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
+			s.messageBusRealtime.Publish(t, di, dv, cd)
+		})
+		if err != nil {
+			logger.GetLogger(ID).Errorf("failed to subscribe to realtime hardware message bus: %v", err)
+			return
+		}
 		err = s.hardwareDev.Subscribe(ID, func(t time.Time, di *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
 			s.messageBus.Publish(t, di, dv, cd)
 		})
@@ -88,7 +95,7 @@ func (a *ForwarderServiceImpl) getChecksum(arr []int32) (checksum uint8) {
 func (a *ForwarderServiceImpl) getDataBytes(tm time.Time, sampleRate int, channelData []explorer.ChannelData) []byte {
 	var dataBytes []byte
 	for _, channel := range channelData {
-		dataStr := strings.Trim(strings.Replace(fmt.Sprint(channel.Data), " ", ",", -1), "[]")
+		dataStr := strings.Trim(strings.ReplaceAll(fmt.Sprint(channel.Data), " ", ","), "[]")
 		msg := fmt.Sprintf(
 			"$%d,%s,%s,%s,%s,%d,%d,%s,*%02X\r\n",
 			channel.ChannelId,
@@ -108,24 +115,58 @@ func (a *ForwarderServiceImpl) getDataBytes(tm time.Time, sampleRate int, channe
 }
 
 func (a *ForwarderServiceImpl) handleConnection(conn net.Conn) {
-	defer a.messageBus.Unsubscribe(conn.RemoteAddr().String())
+	key := conn.RemoteAddr().String()
 	defer conn.Close()
 
-	logger.GetLogger(ID).Infof("%s - client connected to forwarder service", conn.RemoteAddr().String())
-	defer logger.GetLogger(ID).Infof("%s - client disconnected from forwarder service", conn.RemoteAddr().String())
+	logger.GetLogger(ID).Infof("%s - client connected to forwarder service", key)
+	defer logger.GetLogger(ID).Infof("%s - client disconnected from forwarder service", key)
 
-	a.messageBus.Subscribe(conn.RemoteAddr().String(), func(t time.Time, di *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
-		_, err := conn.Write(a.getDataBytes(t, di.GetSampleRate(), cd))
+	subscribeNormal := func() {
+		a.messageBus.Subscribe(key, func(t time.Time, di *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
+			_, err := conn.Write(a.getDataBytes(t, di.GetSampleRate(), cd))
+			if err != nil {
+				logger.GetLogger(ID).Errorln(err)
+			}
+		})
+	}
+	subscribeRealtime := func() {
+		a.messageBusRealtime.Subscribe(key, func(t time.Time, di *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
+			_, err := conn.Write(a.getDataBytes(t, di.GetSampleRate(), cd))
+			if err != nil {
+				logger.GetLogger(ID).Errorln(err)
+			}
+		})
+	}
+	unsubscribeAll := func() {
+		a.messageBus.Unsubscribe(key)
+		a.messageBusRealtime.Unsubscribe(key)
+	}
+
+	subscribeNormal()
+	buf := make([]byte, 64)
+	for useRealtime := false; ; {
+		n, err := conn.Read(buf)
 		if err != nil {
-			logger.GetLogger(ID).Errorln(err)
+			unsubscribeAll()
 			return
 		}
-	})
 
-	for {
-		_, err := conn.Read(make([]byte, 1))
-		if err != nil {
-			return
+		cmd := string(buf[:n])
+		switch cmd {
+		case "AT+REALTIME=1\r\n":
+			if !useRealtime {
+				unsubscribeAll()
+				subscribeRealtime()
+				useRealtime = true
+				logger.GetLogger(ID).Infof("%s switched to REALTIME bus", key)
+			}
+		case "AT+REALTIME=0\r\n":
+			if useRealtime {
+				unsubscribeAll()
+				subscribeNormal()
+				useRealtime = false
+				logger.GetLogger(ID).Infof("%s switched to NORMAL bus", key)
+			}
 		}
 	}
 }
