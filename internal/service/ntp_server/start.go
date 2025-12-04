@@ -68,7 +68,7 @@ const (
 )
 
 const (
-	REFERENCE_ID      = "NICT"
+	REFERENCE_ID      = "GNSS"
 	FROM_1900_TO_1970 = 2208988800
 )
 
