@@ -11,8 +11,9 @@ const (
 )
 
 const (
-	NTP_RESYNC_INTERVAL      = 5 * time.Minute
+	NTP_RESYNC_INTERVAL      = 2 * time.Minute
 	NTP_MEASUREMENT_ATTEMPTS = 5
+	NTP_PPM_MEASURE_WINDOW   = time.Hour
 )
 
 const (

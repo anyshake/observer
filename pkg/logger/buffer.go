@@ -36,9 +36,9 @@ func RegisterBufferLogger(bufSize int) *ringbuf.Buffer[string] {
 		formatter: &logrus.JSONFormatter{
 			TimestampFormat: TIMESTAMP_FORMAT,
 		},
-		buffer: &buf,
+		buffer: buf,
 	}
 
 	logrus.AddHook(&bufLogger)
-	return &buf
+	return buf
 }

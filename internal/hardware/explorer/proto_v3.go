@@ -16,6 +16,7 @@ import (
 	"github.com/anyshake/observer/pkg/message"
 	"github.com/anyshake/observer/pkg/metadata"
 	"github.com/anyshake/observer/pkg/ntpclient"
+	"github.com/anyshake/observer/pkg/ringbuf"
 	"github.com/anyshake/observer/pkg/timesource"
 	"github.com/anyshake/observer/pkg/transport"
 	"github.com/samber/lo"
@@ -35,7 +36,10 @@ type ExplorerProtoImplV3 struct {
 	TimeSource      *timesource.Source
 
 	Transport  transport.ITransport
-	fifoBuffer fifo.Buffer[*explorerProtocolPacketV3]
+	fifoBuffer *fifo.Buffer[*explorerProtocolPacketV3]
+
+	// buf length: 100; ppm window: 60 min
+	clockDriftBuf *ringbuf.Buffer[clockDrift]
 
 	// 1 message per second, for archiving service, etc.
 	messageBus message.Bus[EventHandler]
@@ -248,6 +252,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 	subCtx, cancelFn := context.WithCancel(ctx)
 
 	g.fifoBuffer = fifo.New[*explorerProtocolPacketV3](512)
+	g.clockDriftBuf = ringbuf.New[clockDrift](100)
 	g.messageBus = message.NewBus[EventHandler](EXPLORER_STREAM_TOPIC, 1024)
 	g.messageBusRealtime = message.NewBus[EventHandler](EXPLORER_REALTIME_STREAM_TOPIC, 1024)
 	g.deviceStatus.SetUpdatedAt(time.Unix(0, 0))
@@ -354,7 +359,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 
 				if variableAllSet {
 					if gnssEnabled && !timeSourceInitialized {
-						g.TimeSource.Update(recvEndMonotonicTime, time.UnixMilli(mcuTimestamp).Add(packetLatency), timesource.MonotonicNow)
+						g.TimeSource.Update(recvEndMonotonicTime, time.UnixMilli(mcuTimestamp).Add(packetLatency), 0, timesource.MonotonicNow)
 
 						g.isDataStreamStable = false
 						timeSourceInitialized = true
@@ -376,7 +381,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 						}
 
 						currentMonotonicTime := timesource.MonotonicNow()
-						g.TimeSource.Update(currentMonotonicTime, currentMonotonicTime.Add(offset), timesource.MonotonicNow)
+						g.TimeSource.Update(currentMonotonicTime, currentMonotonicTime.Add(offset), 0, timesource.MonotonicNow)
 						g.isDataStreamStable = false
 						timeSourceInitialized = true
 						g.resetFlags()
@@ -532,7 +537,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 					continue
 				}
 				prevCalibTime = calibTimeData[1]
-				g.TimeSource.Update(calibTimeData[0], calibTimeData[1], nil)
+				g.TimeSource.Update(calibTimeData[0], calibTimeData[1], 0, nil)
 			case <-timer.C:
 				g.flagMutex.Lock()
 				variableAllSet := g.variableAllSet
@@ -542,7 +547,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 					continue
 				}
 				g.Logger.Info("re-synchronizing time with NTP servers")
-				offset, err := ntpClient.QueryAverage(NTP_MEASUREMENT_ATTEMPTS)
+				offset, server, err := ntpClient.Query()
 				if err != nil {
 					g.Logger.Warnf("error occurred while re-synchronizing time with NTP: %v", err)
 					timer.Reset(resyncInterval)
@@ -550,8 +555,10 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 				}
 				timer.Reset(resyncInterval)
 				currentMonotonicTime := timesource.MonotonicNow()
-				g.TimeSource.Update(currentMonotonicTime, currentMonotonicTime.Add(offset), nil)
-				g.Logger.Infof("time synchronized with NTP server, local monotonic time offset: %d ms", offset.Milliseconds())
+				g.clockDriftBuf.Push(clockDrift{offset: offset, measuredAt: currentMonotonicTime})
+				ppm := getLongTermClockDriftPPM(g.clockDriftBuf, NTP_PPM_MEASURE_WINDOW)
+				g.TimeSource.Update(currentMonotonicTime, currentMonotonicTime.Add(offset), ppm, nil)
+				g.Logger.Infof("time synchronized with NTP server: %s, local monotonic time offset: %d ms, clock drift PPM: %.2f", server, offset.Milliseconds(), ppm)
 			case <-subCtx.Done():
 				timer.Stop()
 				return

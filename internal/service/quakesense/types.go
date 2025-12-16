@@ -42,7 +42,7 @@ type QuakeSenseServiceImpl struct {
 	timeSource    *timesource.Source
 	actionHandler *action.Handler
 
-	channelBuffer  ringbuf.Buffer[float64]
+	channelBuffer  *ringbuf.Buffer[float64]
 	prevSamplerate int
 
 	mqttBroker   string

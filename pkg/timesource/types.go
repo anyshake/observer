@@ -13,4 +13,6 @@ type Source struct {
 
 	refTime   time.Time
 	localTime time.Time
+
+	driftPPM float64
 }
