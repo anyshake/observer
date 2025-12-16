@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/netip"
+	"runtime"
 	"runtime/debug"
 	"sync"
 	"time"
@@ -44,7 +45,11 @@ func (s *NtpServerServiceImpl) Start() error {
 		}()
 
 		logger.GetLogger(ID).Infof("starting NTP server service, listening on %s:%d", s.listenHost, s.listenPort)
-		ntpSrv.Run(s.ctx)
+		if err := ntpSrv.Run(s.ctx); err != nil {
+			logger.GetLogger(ID).Errorf("failed to run NTP server service: %v", err)
+			s.handleInterrupt()
+			_ = s.Stop()
+		}
 		s.wg.Done()
 	}()
 
@@ -97,55 +102,43 @@ func newNtpServer(addr string, port int, timeFn func() time.Time) (*ntpServer, e
 	return &ntpServer{conn: c, timeFn: timeFn}, nil
 }
 
-func (p *ntpServer) Run(ctx context.Context) {
-	readBuf := make([]byte, 512)
+func (p *ntpServer) Run(ctx context.Context) error {
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
-	for {
+	if err := p.conn.SetReadDeadline(time.Now().Add(100 * time.Millisecond)); err != nil {
+		return err
+	}
+
+	for readBuf := make([]byte, 512); ; {
 		select {
 		case <-ctx.Done():
 			p.wg.Wait()
 			p.closeOnce.Do(func() { p.conn.Close() })
-			return
+			return nil
 		default:
 		}
 
-		_ = p.conn.SetReadDeadline(time.Now().Add(500 * time.Millisecond))
 		n, remoteAddr, err := p.conn.ReadFromUDP(readBuf)
+		t2 := p.timeFn()
 		if err != nil {
 			if ne, ok := err.(net.Error); ok && ne.Timeout() {
+				if err := p.conn.SetReadDeadline(time.Now().Add(100 * time.Millisecond)); err != nil {
+					return err
+				}
 				continue
 			}
-			logger.GetLogger(ID).Errorf("read from UDP error: %v, exiting...", err)
-			break
+			return err
 		}
+
 		if n > 0 {
-			currentTime := p.timeFn()
-
-			data := make([]byte, n)
-			copy(data, readBuf[:n])
-
-			p.wg.Add(1)
-			go func(d []byte, addr *net.UDPAddr) {
-				defer p.wg.Done()
-				defer func() {
-					if r := recover(); r != nil {
-						logger.GetLogger(ID).Errorf("recovered from panic in handler: %v\n%s", r, debug.Stack())
-					}
-				}()
-
-				p.handleData(currentTime, addr, d)
-			}(data, remoteAddr)
+			p.handleData(t2, remoteAddr, readBuf[:n])
 		}
 	}
 }
 
-func (p *ntpServer) write(data []byte, addr string) error {
-	laddr, err := net.ResolveUDPAddr("udp", addr)
-	if err != nil {
-		return err
-	}
-
-	_, err = p.conn.WriteTo(data, laddr)
+func (p *ntpServer) write(data []byte, laddr *net.UDPAddr) error {
+	_, err := p.conn.WriteTo(data, laddr)
 	if err != nil {
 		return err
 	}
@@ -153,7 +146,7 @@ func (p *ntpServer) write(data []byte, addr string) error {
 	return nil
 }
 
-func (p *ntpServer) handleData(tm time.Time, addr net.Addr, data []byte) {
+func (p *ntpServer) handleData(t2 time.Time, addr net.Addr, data []byte) {
 	addrPort, err := netip.ParseAddrPort(addr.String())
 	if err != nil {
 		logger.GetLogger(ID).Errorf("failed to parse address and port: %v", err)
@@ -166,13 +159,13 @@ func (p *ntpServer) handleData(tm time.Time, addr net.Addr, data []byte) {
 	if p.isDataValid(ipAddr, data) {
 		logger.GetLogger(ID).Infof("accepted connection from %s", addrPortStr)
 
-		resp, err := p.encodePacket(tm, data)
+		resp, err := p.encodePacket(t2, data)
 		if err != nil {
 			logger.GetLogger(ID).Errorf("failed to encode NTP response packet: %v", err)
 			return
 		}
 
-		if err := p.write(resp, addrPortStr); err != nil {
+		if err := p.write(resp, addr.(*net.UDPAddr)); err != nil {
 			logger.GetLogger(ID).Errorf("write NTP response error: %v", err)
 		}
 	} else {
@@ -180,10 +173,10 @@ func (p *ntpServer) handleData(tm time.Time, addr net.Addr, data []byte) {
 	}
 }
 
-func (p *ntpServer) encodePacket(tm time.Time, req []byte) ([]byte, error) {
-	sec := uint32(tm.Unix() + FROM_1900_TO_1970)
+func (p *ntpServer) encodePacket(t2 time.Time, req []byte) ([]byte, error) {
+	secT2 := uint32(t2.Unix() + FROM_1900_TO_1970)
 	// convert nanoseconds to 32-bit fraction of a second
-	frac := uint32((uint64(tm.Nanosecond()) * (1 << 32)) / 1_000_000_000)
+	fracT2 := uint32((uint64(t2.Nanosecond()) * (1 << 32)) / 1_000_000_000)
 
 	res := make([]byte, 48)
 	vn := req[0] & 0x38
@@ -196,18 +189,21 @@ func (p *ntpServer) encodePacket(tm time.Time, req []byte) ([]byte, error) {
 	copy(res[12:16], []byte(REFERENCE_ID[:4]))
 
 	// reference timestamp (seconds)
-	binary.BigEndian.PutUint32(res[16:20], sec)
+	binary.BigEndian.PutUint32(res[16:20], secT2)
 
 	// originate timestamp: client's transmit timestamp (bytes 40..48 of request)
 	copy(res[24:32], req[40:48])
 
-	// receive timestamp: mirror current time
-	binary.BigEndian.PutUint32(res[32:36], sec)
-	binary.BigEndian.PutUint32(res[36:40], frac)
+	// receive timestamp (T2)
+	binary.BigEndian.PutUint32(res[32:36], secT2)
+	binary.BigEndian.PutUint32(res[36:40], fracT2)
 
-	// transmit timestamp: current time
-	binary.BigEndian.PutUint32(res[40:44], sec)
-	binary.BigEndian.PutUint32(res[44:48], frac)
+	// transmit timestamp (T3)
+	t3 := p.timeFn()
+	secT3 := uint32(t3.Unix() + FROM_1900_TO_1970)
+	fracT3 := uint32((uint64(t3.Nanosecond()) * (1 << 32)) / 1_000_000_000)
+	binary.BigEndian.PutUint32(res[40:44], secT3)
+	binary.BigEndian.PutUint32(res[44:48], fracT3)
 
 	return res, nil
 }

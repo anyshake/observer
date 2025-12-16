@@ -1,19 +1,15 @@
-//go:build !linux
-// +build !linux
-
 package timesource
 
 import (
 	"time"
-	_ "unsafe"
+
+	"golang.org/x/sys/unix"
 )
 
-//go:noescape
-//go:linkname nanotime runtime.nanotime
-func nanotime() int64
-
 func Monotonic() time.Duration {
-	return time.Duration(nanotime())
+	var ts unix.Timespec
+	unix.ClockGettime(unix.CLOCK_MONOTONIC_RAW, &ts)
+	return time.Duration(ts.Nano())
 }
 
 func MonotonicNow() time.Time {
