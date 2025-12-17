@@ -5,9 +5,9 @@
   <Module/>
   <ModuleURI/>
   <Created>{{.StartTime}}</Created>
-  <Network code="{{.NetworkCode}}" startDate="{{.StartTime}}" restrictedStatus="open">
+  <Network code="{{.NetworkCode}}" startDate="1970-01-01T00:00:00.000000Z" restrictedStatus="open">
     <Description>Realtime seismic network of AnyShake Project.</Description>
-    <Station code="{{.StationCode}}" startDate="{{.StartTime}}" restrictedStatus="open">
+    <Station code="{{.StationCode}}" startDate="1970-01-01T00:00:00.000000Z" restrictedStatus="open">
       <Latitude unit="DEGREES">{{.Latitude}}</Latitude>
       <Longitude unit="DEGREES">{{.Longitude}}</Longitude>
       <Elevation>{{.Elevation}}</Elevation>
@@ -16,8 +16,8 @@
         <Town>{{.StationPlace}}</Town>
         <Country>{{.StationCountry}}</Country>
       </Site>
-      <CreationDate>{{.StartTime}}</CreationDate>
-      <Channel code="{{.ChannelCode1}}" startDate="{{.StartTime}}" restrictedStatus="open" locationCode="{{.LocationCode}}">
+      <CreationDate>1970-01-01T00:00:00.000000Z</CreationDate>
+      <Channel code="{{.ChannelCode1}}" startDate="1970-01-01T00:00:00.000000Z" restrictedStatus="open" locationCode="{{.LocationCode}}">
         <ns0:format xmlns:ns0="http://geofon.gfz-potsdam.de/ns/seiscomp3-schema/0.10">None</ns0:format>
         <Latitude unit="DEGREES">{{.Latitude}}</Latitude>
         <Longitude unit="DEGREES">{{.Longitude}}</Longitude>
@@ -34,7 +34,7 @@
         <Sensor resourceId="Sensor-E-C121G-VEL">
           <Model>LGT-4.5C</Model>
         </Sensor>
-        <DataLogger resourceId="Datalogger-E-C121G"/>
+        <DataLogger resourceId="Datalogger-E-C121G-VEL"/>
         <Response>
           <InstrumentSensitivity>
             <Value>171798691760.0</Value>
@@ -77,12 +77,12 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>171798691760.0</Value>
+              <Value>100.0</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">
-            <Coefficients name="DL-E-C121G" resourceId="Datalogger-E-C121G">
+            <Coefficients name="DL-E-C121G-VEL" resourceId="Datalogger-E-C121G-VEL">
               <InputUnits>
                 <Name>V</Name>
               </InputUnits>
@@ -99,13 +99,13 @@
               <Correction>0.0</Correction>
             </Decimation>
             <StageGain>
-              <Value>1.0</Value>
+              <Value>1717986917.6</Value>
               <Frequency>0.0</Frequency>
             </StageGain>
           </Stage>
         </Response>
       </Channel>
-      <Channel code="{{.ChannelCode2}}" startDate="{{.StartTime}}" restrictedStatus="open" locationCode="{{.LocationCode}}">
+      <Channel code="{{.ChannelCode2}}" startDate="1970-01-01T00:00:00.000000Z" restrictedStatus="open" locationCode="{{.LocationCode}}">
         <ns1:format xmlns:ns1="http://geofon.gfz-potsdam.de/ns/seiscomp3-schema/0.10">None</ns1:format>
         <Latitude unit="DEGREES">{{.Latitude}}</Latitude>
         <Longitude unit="DEGREES">{{.Longitude}}</Longitude>
@@ -122,7 +122,7 @@
         <Sensor resourceId="Sensor-E-C121G-VEL">
           <Model>LGT-4.5C</Model>
         </Sensor>
-        <DataLogger resourceId="Datalogger-E-C121G"/>
+        <DataLogger resourceId="Datalogger-E-C121G-VEL"/>
         <Response>
           <InstrumentSensitivity>
             <Value>171798691760.0</Value>
@@ -165,12 +165,12 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>171798691760.0</Value>
+              <Value>100.0</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">
-            <Coefficients name="DL-E-C121G" resourceId="Datalogger-E-C121G">
+            <Coefficients name="DL-E-C121G-VEL" resourceId="Datalogger-E-C121G-VEL">
               <InputUnits>
                 <Name>V</Name>
               </InputUnits>
@@ -187,13 +187,13 @@
               <Correction>0.0</Correction>
             </Decimation>
             <StageGain>
-              <Value>1.0</Value>
+              <Value>1717986917.6</Value>
               <Frequency>0.0</Frequency>
             </StageGain>
           </Stage>
         </Response>
       </Channel>
-      <Channel code="{{.ChannelCode3}}" startDate="{{.StartTime}}" restrictedStatus="open" locationCode="{{.LocationCode}}">
+      <Channel code="{{.ChannelCode3}}" startDate="1970-01-01T00:00:00.000000Z" restrictedStatus="open" locationCode="{{.LocationCode}}">
         <ns2:format xmlns:ns2="http://geofon.gfz-potsdam.de/ns/seiscomp3-schema/0.10">None</ns2:format>
         <Latitude unit="DEGREES">{{.Latitude}}</Latitude>
         <Longitude unit="DEGREES">{{.Longitude}}</Longitude>
@@ -210,7 +210,7 @@
         <Sensor resourceId="Sensor-E-C121G-VEL">
           <Model>LGT-4.5C</Model>
         </Sensor>
-        <DataLogger resourceId="Datalogger-E-C121G"/>
+        <DataLogger resourceId="Datalogger-E-C121G-VEL"/>
         <Response>
           <InstrumentSensitivity>
             <Value>171798691760.0</Value>
@@ -253,12 +253,12 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>171798691760.0</Value>
+              <Value>100.0</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">
-            <Coefficients name="DL-E-C121G" resourceId="Datalogger-E-C121G">
+            <Coefficients name="DL-E-C121G-VEL" resourceId="Datalogger-E-C121G-VEL">
               <InputUnits>
                 <Name>V</Name>
               </InputUnits>
@@ -275,13 +275,13 @@
               <Correction>0.0</Correction>
             </Decimation>
             <StageGain>
-              <Value>1.0</Value>
+              <Value>1717986917.6</Value>
               <Frequency>0.0</Frequency>
             </StageGain>
           </Stage>
         </Response>
       </Channel>
-      <Channel code="{{.ChannelCode4}}" startDate="{{.StartTime}}" restrictedStatus="open" locationCode="{{.LocationCode}}">
+      <Channel code="{{.ChannelCode4}}" startDate="1970-01-01T00:00:00.000000Z" restrictedStatus="open" locationCode="{{.LocationCode}}">
         <ns3:format xmlns:ns3="http://geofon.gfz-potsdam.de/ns/seiscomp3-schema/0.10">None</ns3:format>
         <Latitude unit="DEGREES">{{.Latitude}}</Latitude>
         <Longitude unit="DEGREES">{{.Longitude}}</Longitude>
@@ -298,10 +298,10 @@
         <Sensor resourceId="Sensor-E-C121G-ACC">
           <Model>ICM-42688-P</Model>
         </Sensor>
-        <DataLogger resourceId="Datalogger-E-C121G"/>
+        <DataLogger resourceId="Datalogger-E-C121G-ACC"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>65535.0</Value>
+            <Value>1670.96</Value>
             <Frequency>None</Frequency>
             <InputUnits>
               <Name>m/s**2</Name>
@@ -325,12 +325,12 @@
               <NormalizationFrequency unit="HERTZ">1.0</NormalizationFrequency>
             </PolesZeros>
             <StageGain>
-              <Value>65535.0</Value>
+              <Value>1670.96</Value>
               <Frequency>1.0</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">
-            <Coefficients name="DL-E-C121G" resourceId="Datalogger-E-C121G">
+            <Coefficients name="DL-E-C121G-ACC" resourceId="Datalogger-E-C121G-ACC">
               <InputUnits>
                 <Name>V</Name>
               </InputUnits>
@@ -353,7 +353,7 @@
           </Stage>
         </Response>
       </Channel>
-      <Channel code="{{.ChannelCode5}}" startDate="{{.StartTime}}" restrictedStatus="open" locationCode="{{.LocationCode}}">
+      <Channel code="{{.ChannelCode5}}" startDate="1970-01-01T00:00:00.000000Z" restrictedStatus="open" locationCode="{{.LocationCode}}">
         <ns4:format xmlns:ns4="http://geofon.gfz-potsdam.de/ns/seiscomp3-schema/0.10">None</ns4:format>
         <Latitude unit="DEGREES">{{.Latitude}}</Latitude>
         <Longitude unit="DEGREES">{{.Longitude}}</Longitude>
@@ -370,10 +370,10 @@
         <Sensor resourceId="Sensor-E-C121G-ACC">
           <Model>ICM-42688-P</Model>
         </Sensor>
-        <DataLogger resourceId="Datalogger-E-C121G"/>
+        <DataLogger resourceId="Datalogger-E-C121G-ACC"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>65535.0</Value>
+            <Value>1670.96</Value>
             <Frequency>None</Frequency>
             <InputUnits>
               <Name>m/s**2</Name>
@@ -397,12 +397,12 @@
               <NormalizationFrequency unit="HERTZ">1.0</NormalizationFrequency>
             </PolesZeros>
             <StageGain>
-              <Value>65535.0</Value>
+              <Value>1670.96</Value>
               <Frequency>1.0</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">
-            <Coefficients name="DL-E-C121G" resourceId="Datalogger-E-C121G">
+            <Coefficients name="DL-E-C121G-ACC" resourceId="Datalogger-E-C121G-ACC">
               <InputUnits>
                 <Name>V</Name>
               </InputUnits>
@@ -425,7 +425,7 @@
           </Stage>
         </Response>
       </Channel>
-      <Channel code="{{.ChannelCode6}}" startDate="{{.StartTime}}" restrictedStatus="open" locationCode="{{.LocationCode}}">
+      <Channel code="{{.ChannelCode6}}" startDate="1970-01-01T00:00:00.000000Z" restrictedStatus="open" locationCode="{{.LocationCode}}">
         <ns5:format xmlns:ns5="http://geofon.gfz-potsdam.de/ns/seiscomp3-schema/0.10">None</ns5:format>
         <Latitude unit="DEGREES">{{.Latitude}}</Latitude>
         <Longitude unit="DEGREES">{{.Longitude}}</Longitude>
@@ -442,10 +442,10 @@
         <Sensor resourceId="Sensor-E-C121G-ACC">
           <Model>ICM-42688-P</Model>
         </Sensor>
-        <DataLogger resourceId="Datalogger-E-C121G"/>
+        <DataLogger resourceId="Datalogger-E-C121G-ACC"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>65535.0</Value>
+            <Value>1670.96</Value>
             <Frequency>None</Frequency>
             <InputUnits>
               <Name>m/s**2</Name>
@@ -469,12 +469,12 @@
               <NormalizationFrequency unit="HERTZ">1.0</NormalizationFrequency>
             </PolesZeros>
             <StageGain>
-              <Value>65535.0</Value>
+              <Value>1670.96</Value>
               <Frequency>1.0</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">
-            <Coefficients name="DL-E-C121G" resourceId="Datalogger-E-C121G">
+            <Coefficients name="DL-E-C121G-ACC" resourceId="Datalogger-E-C121G-ACC">
               <InputUnits>
                 <Name>V</Name>
               </InputUnits>
@@ -484,7 +484,7 @@
               <CfTransferFunctionType>DIGITAL</CfTransferFunctionType>
             </Coefficients>
             <Decimation>
-              <InputSampleRate unit="HERTZ">{{.SampleRate}}</InputSampleRate>
+              <InputSampleRate unit="HERTZ">250.0</InputSampleRate>
               <Factor>1</Factor>
               <Offset>0</Offset>
               <Delay>0.0</Delay>

@@ -5,9 +5,9 @@
   <Module/>
   <ModuleURI/>
   <Created>{{.StartTime}}</Created>
-  <Network code="{{.NetworkCode}}" startDate="{{.StartTime}}" restrictedStatus="open">
+  <Network code="{{.NetworkCode}}" startDate="1970-01-01T00:00:00.000000Z" restrictedStatus="open">
     <Description>Realtime seismic network of AnyShake Project.</Description>
-    <Station code="{{.StationCode}}" startDate="{{.StartTime}}" restrictedStatus="open">
+    <Station code="{{.StationCode}}" startDate="1970-01-01T00:00:00.000000Z" restrictedStatus="open">
       <Latitude unit="DEGREES">{{.Latitude}}</Latitude>
       <Longitude unit="DEGREES">{{.Longitude}}</Longitude>
       <Elevation>{{.Elevation}}</Elevation>
@@ -16,8 +16,8 @@
         <Town>{{.StationPlace}}</Town>
         <Country>{{.StationCountry}}</Country>
       </Site>
-      <CreationDate>{{.StartTime}}</CreationDate>
-      <Channel code="{{.ChannelCode1}}" startDate="{{.StartTime}}" restrictedStatus="open" locationCode="{{.LocationCode}}">
+      <CreationDate>1970-01-01T00:00:00.000000Z</CreationDate>
+      <Channel code="{{.ChannelCode1}}" startDate="1970-01-01T00:00:00.000000Z" restrictedStatus="open" locationCode="{{.LocationCode}}">
         <ns0:format xmlns:ns0="http://geofon.gfz-potsdam.de/ns/seiscomp3-schema/0.10">None</ns0:format>
         <Latitude unit="DEGREES">{{.Latitude}}</Latitude>
         <Longitude unit="DEGREES">{{.Longitude}}</Longitude>
@@ -34,7 +34,7 @@
         <Sensor resourceId="Sensor-E-D001-VEL">
           <Model>LGT-4.5C</Model>
         </Sensor>
-        <DataLogger resourceId="Datalogger-E-D001"/>
+        <DataLogger resourceId="Datalogger-E-D001-VEL"/>
         <Response>
           <InstrumentSensitivity>
             <Value>343597383520.0</Value>
@@ -81,12 +81,12 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>343597383520.0</Value>
+              <Value>100.0</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">
-            <Coefficients name="DL-E-D001" resourceId="Datalogger-E-D001">
+            <Coefficients name="DL-E-D001-VEL" resourceId="Datalogger-E-D001-VEL">
               <InputUnits>
                 <Name>V</Name>
               </InputUnits>
@@ -103,13 +103,13 @@
               <Correction>0.0</Correction>
             </Decimation>
             <StageGain>
-              <Value>1.0</Value>
+              <Value>3435973835.2</Value>
               <Frequency>0.0</Frequency>
             </StageGain>
           </Stage>
         </Response>
       </Channel>
-      <Channel code="{{.ChannelCode2}}" startDate="{{.StartTime}}" restrictedStatus="open" locationCode="{{.LocationCode}}">
+      <Channel code="{{.ChannelCode2}}" startDate="1970-01-01T00:00:00.000000Z" restrictedStatus="open" locationCode="{{.LocationCode}}">
         <ns1:format xmlns:ns1="http://geofon.gfz-potsdam.de/ns/seiscomp3-schema/0.10">None</ns1:format>
         <Latitude unit="DEGREES">{{.Latitude}}</Latitude>
         <Longitude unit="DEGREES">{{.Longitude}}</Longitude>
@@ -126,7 +126,7 @@
         <Sensor resourceId="Sensor-E-D001-VEL">
           <Model>LGT-4.5C</Model>
         </Sensor>
-        <DataLogger resourceId="Datalogger-E-D001"/>
+        <DataLogger resourceId="Datalogger-E-D001-VEL"/>
         <Response>
           <InstrumentSensitivity>
             <Value>343597383520.0</Value>
@@ -173,12 +173,12 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>343597383520.0</Value>
+              <Value>100.0</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">
-            <Coefficients name="DL-E-D001" resourceId="Datalogger-E-D001">
+            <Coefficients name="DL-E-D001-VEL" resourceId="Datalogger-E-D001-VEL">
               <InputUnits>
                 <Name>V</Name>
               </InputUnits>
@@ -195,13 +195,13 @@
               <Correction>0.0</Correction>
             </Decimation>
             <StageGain>
-              <Value>1.0</Value>
+              <Value>3435973835.2</Value>
               <Frequency>0.0</Frequency>
             </StageGain>
           </Stage>
         </Response>
       </Channel>
-      <Channel code="{{.ChannelCode3}}" startDate="{{.StartTime}}" restrictedStatus="open" locationCode="{{.LocationCode}}">
+      <Channel code="{{.ChannelCode3}}" startDate="1970-01-01T00:00:00.000000Z" restrictedStatus="open" locationCode="{{.LocationCode}}">
         <ns2:format xmlns:ns2="http://geofon.gfz-potsdam.de/ns/seiscomp3-schema/0.10">None</ns2:format>
         <Latitude unit="DEGREES">{{.Latitude}}</Latitude>
         <Longitude unit="DEGREES">{{.Longitude}}</Longitude>
@@ -218,7 +218,7 @@
         <Sensor resourceId="Sensor-E-D001-VEL">
           <Model>LGT-4.5C</Model>
         </Sensor>
-        <DataLogger resourceId="Datalogger-E-D001"/>
+        <DataLogger resourceId="Datalogger-E-D001-VEL"/>
         <Response>
           <InstrumentSensitivity>
             <Value>343597383520.0</Value>
@@ -265,12 +265,12 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>343597383520.0</Value>
+              <Value>100.0</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
           <Stage number="2">
-            <Coefficients name="DL-E-D001" resourceId="Datalogger-E-D001">
+            <Coefficients name="DL-E-D001-VEL" resourceId="Datalogger-E-D001-VEL">
               <InputUnits>
                 <Name>V</Name>
               </InputUnits>
@@ -287,7 +287,7 @@
               <Correction>0.0</Correction>
             </Decimation>
             <StageGain>
-              <Value>1.0</Value>
+              <Value>3435973835.2</Value>
               <Frequency>0.0</Frequency>
             </StageGain>
           </Stage>
