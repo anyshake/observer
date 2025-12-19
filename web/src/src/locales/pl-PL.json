@@ -138,6 +138,11 @@
                 "success": "Połączono ze stacją, serwer włączony przez {{uptime}} sekund, zaktualizowano o {{updatedAt}}.",
                 "error": "Wystąpił błąd podczas łączenia ze stacją. Sprawdź połączenie."
             },
+            "upgrade": {
+                "update_available": "Dostępna jest nowa wersja {{latest}}. Możesz włączyć automatyczne aktualizacje lub pobrać i zainstalować ją ręcznie.",
+                "restart_needed": "Najnowsza wersja {{latest}} została zainstalowana, ale obecnie działa {{current}}. Aby zastosować aktualizację, uruchom ponownie oprogramowanie w dogodnym momencie.",
+                "manual_upgrade_needed": "Wykryto nową wersję {{latest}}, jednak bieżąca wersja {{current}} jest niższa niż minimalna wersja kompatybilna {{required}}. Wymagana jest ręczna aktualizacja."
+            },
             "station_location": {
                 "title": "Lokalizacja stacji"
             },

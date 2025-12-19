@@ -45,7 +45,7 @@ type FrpClientServiceImpl struct {
 	user string
 	// Count of connection pool
 	connPoolCount int64
-	// TCP multiplexing availablity, should be same as FRP server config
+	// TCP multiplexing availability, should be same as FRP server config
 	tcpMux bool
 	// Enable TLS encryption for connection to FRP server
 	tlsEnable bool

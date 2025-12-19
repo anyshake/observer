@@ -138,6 +138,11 @@
                 "success": "已連接到測站，伺服器已運行 {{uptime}} 秒，更新於 {{updatedAt}}。",
                 "error": "連接測站時發生錯誤，請檢查您的連線。"
             },
+            "upgrade": {
+                "update_available": "有可用更新版本 {{latest}}。您可啟用自動更新，或手動下載並安裝。",
+                "restart_needed": "已完成最新版本 {{latest}} 的安裝，目前仍在執行 {{current}}。請於合適的時間重新啟動軟體以套用更新。",
+                "manual_upgrade_needed": "已偵測到新版本 {{latest}}，但目前版本 {{current}} 低於最低相容版本 {{required}}，需手動升級。"
+            },
             "station_location": {
                 "title": "測站位置"
             },

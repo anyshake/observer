@@ -207,6 +207,10 @@ func (g *ExplorerProtoImplV2) getChannelData(packetBytes []byte, headerSize, cha
 }
 
 func (g *ExplorerProtoImplV2) verifyChecksum(packetData, header []byte) error {
+	if len(packetData) == 0 {
+		return errors.New("empty packet data")
+	}
+
 	if len(packetData) <= len(header) {
 		return errors.New("invalid packet length")
 	}

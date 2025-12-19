@@ -141,6 +141,11 @@
             "station_location": {
                 "title": "Station Location"
             },
+            "upgrade": {
+                "update_available": "A new version {{latest}} is available. You can enable automatic updates or download and install it manually.",
+                "restart_needed": "The latest version {{latest}} has been installed, but {{current}} is still running. Please restart the software at a convenient time to apply the update.",
+                "manual_upgrade_needed": "A new version {{latest}} is available, but the current version {{current}} is below the minimum compatible version {{required}}. Manual upgrade is required."
+            },
             "service_status": {
                 "title": "Service Status"
             },

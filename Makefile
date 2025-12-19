@@ -76,15 +76,9 @@ endif
 	@gqlgen generate
 
 version:
-	@echo '{'
-	@echo '  "latest": {'
-	@echo '    "major": "$(CURRENT_VERSION_MAJOR)",'
-	@echo '    "minor": "$(CURRENT_VERSION_MINOR)",'
-	@echo '    "patch": "$(CURRENT_VERSION_PATCH)"'
-	@echo '  },'
-	@echo '  "required": {'
-	@echo '    "major": "$(REQUIRED_VERSION_MAJOR)",'
-	@echo '    "minor": "$(REQUIRED_VERSION_MINOR)",'
-	@echo '    "patch": "$(REQUIRED_VERSION_PATCH)"'
-	@echo '  }'
-	@echo '}'
+	@echo -n 'latest_major=$(CURRENT_VERSION_MAJOR);'
+	@echo -n 'latest_minor=$(CURRENT_VERSION_MINOR);'
+	@echo -n 'latest_patch=$(CURRENT_VERSION_PATCH);'
+	@echo -n 'required_major=$(REQUIRED_VERSION_MAJOR);'
+	@echo -n 'required_minor=$(REQUIRED_VERSION_MINOR);'
+	@echo -n 'required_patch=$(REQUIRED_VERSION_PATCH)'

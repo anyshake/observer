@@ -281,13 +281,12 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Generate version JSON
+      - name: Generate version metadata
         id: version
         run: |
-          VERSION_JSON=$(make version)
-          echo $VERSION_JSON
-          VERSION_ESCAPED=$(echo "$VERSION_JSON" | jq -c | jq -R '@json')
-          echo VERSION_ESCAPED=$VERSION_ESCAPED >> $GITHUB_ENV
+          VERSION_DATA=$(make version)
+          echo $VERSION_DATA
+          echo VERSION_DATA=$VERSION_DATA >> $GITHUB_ENV
 
       - name: Update DNS record
         env:
@@ -305,9 +304,9 @@ jobs:
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
             -d '{
-                  "name": "'"$CLOUDFLARE_RECORD_NAME"'",
-                  "ttl": 3600,
+                  "name": '"\"$CLOUDFLARE_RECORD_NAME\""',
+                  "ttl": 60,
                   "type": "TXT",
                   "comment": "updated at '"$(date -u "+%Y-%m-%d %H:%M:%S")"'",
-                  "content": '"$VERSION_ESCAPED"'
+                  "content": '"\"$VERSION_DATA\""'
                 }' | jq .

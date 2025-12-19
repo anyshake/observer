@@ -219,6 +219,10 @@ func (g *ExplorerProtoImplV3) getChannelData(channelData []*ChannelData, channel
 }
 
 func (g *ExplorerProtoImplV3) verifyChecksum(packetData []byte) error {
+	if len(packetData) == 0 {
+		return errors.New("empty packet data")
+	}
+
 	recvChecksum := packetData[len(packetData)-1]
 	calcChecksum := uint8(0)
 	for _, b := range packetData[:len(packetData)-1] {

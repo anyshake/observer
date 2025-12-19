@@ -11,7 +11,7 @@ import { createRef, RefObject, useCallback, useEffect, useRef, useState } from '
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-import { Connectivity } from '../../components/Connectivity';
+import { Banner } from '../../components/Banner';
 import { DequeChart, DequeChartHandle } from '../../components/DequeChart';
 import { DraggableBox } from '../../components/DraggableBox';
 import { routerConfig } from '../../config/router';
@@ -212,7 +212,7 @@ const RealTime = () => {
 
     return (
         <div className="container mx-auto space-y-6 p-4">
-            <Connectivity
+            <Banner
                 status={readyState === 1 ? 'ok' : 'warning'}
                 message={
                     readyState === 1

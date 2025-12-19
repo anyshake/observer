@@ -23,7 +23,7 @@ func (s *archiverConfigEnabledImpl) GetDescription() string {
 }
 func (s *archiverConfigEnabledImpl) Init(handler *action.Handler) error {
 	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
-		return fmt.Errorf("failed to set default archiver service availablity: %w", err)
+		return fmt.Errorf("failed to set default archiver service availability: %w", err)
 	}
 	return nil
 }
@@ -33,14 +33,14 @@ func (s *archiverConfigEnabledImpl) Set(handler *action.Handler, newVal any) err
 		return err
 	}
 	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
-		return fmt.Errorf("failed to set archiver service availablity: %w", err)
+		return fmt.Errorf("failed to set archiver service availability: %w", err)
 	}
 	return nil
 }
 func (s *archiverConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
 	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
 	if err != nil {
-		return nil, fmt.Errorf("failed to get archiver service availablity: %w", err)
+		return nil, fmt.Errorf("failed to get archiver service availability: %w", err)
 	}
 	enabled, ok := val.(bool)
 	if !ok {
@@ -50,7 +50,7 @@ func (s *archiverConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
 }
 func (s *archiverConfigEnabledImpl) Restore(handler *action.Handler) error {
 	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
-		return fmt.Errorf("failed to reset archiver service availablity: %w", err)
+		return fmt.Errorf("failed to reset archiver service availability: %w", err)
 	}
 	return nil
 }

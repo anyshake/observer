@@ -19,6 +19,7 @@ import (
 	"github.com/anyshake/observer/internal/hook"
 	"github.com/anyshake/observer/internal/server"
 	"github.com/anyshake/observer/internal/service"
+	"github.com/anyshake/observer/internal/upgrade"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/anyshake/observer/pkg/seisevent"
 	"github.com/anyshake/observer/pkg/semver"
@@ -41,6 +42,7 @@ import (
 	service_ntp_server "github.com/anyshake/observer/internal/service/ntp_server"
 	service_quakesense "github.com/anyshake/observer/internal/service/quakesense"
 	service_seedlink "github.com/anyshake/observer/internal/service/seedlink"
+	service_updater "github.com/anyshake/observer/internal/service/updater"
 	service_watchcat "github.com/anyshake/observer/internal/service/watchcat"
 )
 
@@ -175,6 +177,11 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		service_seedlink.ID:   service_seedlink.New(hardwareDevice, actionHandler, timeSrc),
 		service_watchcat.ID:   service_watchcat.New(hardwareDevice, timeSrc),
 	}
+	var upgradeHelper *upgrade.Helper
+	if !ver.IsPreRelease() && build.GetChannel() == officialBuildChannel {
+		upgradeHelper = upgrade.NewHelper(ver, build)
+		serviceMap[service_updater.ID] = service_updater.New(actionHandler, timeSrc, upgradeHelper)
+	}
 
 	for serviceName, serviceObj := range serviceMap {
 		if err = serviceObj.Init(); err != nil {
@@ -203,6 +210,7 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		&graph_resolver.Resolver{
 			CurrentVersion:           ver,
 			CurrentBuild:             build,
+			UpgradeHelper:            upgradeHelper,
 			ServiceMap:               serviceMap,
 			HardwareDev:              hardwareDevice,
 			TimeSource:               timeSrc,

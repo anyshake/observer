@@ -1,0 +1,9 @@
+query getUpgradeStatus {
+    getUpgradeStatus {
+        current
+        required
+        latest
+        eligible
+        applied
+    }
+}

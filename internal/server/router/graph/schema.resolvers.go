@@ -913,6 +913,29 @@ func (r *queryResolver) ExportGlobalConfig(ctx context.Context) (string, error) 
 	return string(globalConfigJson), nil
 }
 
+// GetUpgradeStatus is the resolver for the getUpgradeStatus field.
+func (r *queryResolver) GetUpgradeStatus(ctx context.Context) (*graph_model.UpgradeStatus, error) {
+	if !r.checkIsAdmin(ctx) {
+		return nil, errors.New("permission denied")
+	}
+
+	if r.UpgradeHelper == nil {
+		return nil, nil
+	}
+
+	latest, required, eligible, applied, err := r.UpgradeHelper.CheckUpdate()
+	if err != nil {
+		return nil, err
+	}
+	return &graph_model.UpgradeStatus{
+		Current:  r.CurrentVersion.String(),
+		Latest:   latest.String(),
+		Required: required.String(),
+		Eligible: eligible,
+		Applied:  applied,
+	}, nil
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 

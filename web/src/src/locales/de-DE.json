@@ -138,6 +138,11 @@
                 "success": "Mit Station verbunden, Server läuft seit {{uptime}} Sekunden, aktualisiert um {{updatedAt}}.",
                 "error": "Fehler beim Verbinden mit der Station, bitte überprüfen Sie Ihre Verbindung."
             },
+            "upgrade": {
+                "update_available": "Eine neue Version {{latest}} ist verfügbar. Sie können automatische Updates aktivieren oder das Update manuell herunterladen und installieren.",
+                "restart_needed": "Die neueste Version {{latest}} wurde installiert, derzeit läuft noch {{current}}. Bitte starten Sie die Software zu einem geeigneten Zeitpunkt neu, um das Update zu übernehmen.",
+                "manual_upgrade_needed": "Eine neue Version {{latest}} wurde erkannt, aber die aktuelle Version {{current}} liegt unter der minimal kompatiblen Version {{required}}. Ein manuelles Upgrade ist erforderlich."
+            },
             "station_location": {
                 "title": "Stationsstandort"
             },

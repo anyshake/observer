@@ -24,7 +24,7 @@ func (s *miniSeedConfigEnabledImpl) GetDescription() string {
 }
 func (s *miniSeedConfigEnabledImpl) Init(handler *action.Handler) error {
 	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
-		return fmt.Errorf("failed to set default MiniSEED service availablity: %w", err)
+		return fmt.Errorf("failed to set default MiniSEED service availability: %w", err)
 	}
 	return nil
 }
@@ -34,14 +34,14 @@ func (s *miniSeedConfigEnabledImpl) Set(handler *action.Handler, newVal any) err
 		return err
 	}
 	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
-		return fmt.Errorf("failed to set MiniSEED service availablity: %w", err)
+		return fmt.Errorf("failed to set MiniSEED service availability: %w", err)
 	}
 	return nil
 }
 func (s *miniSeedConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
 	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
 	if err != nil {
-		return nil, fmt.Errorf("failed to get MiniSEED service availablity: %w", err)
+		return nil, fmt.Errorf("failed to get MiniSEED service availability: %w", err)
 	}
 	enabled, ok := val.(bool)
 	if !ok {
@@ -51,7 +51,7 @@ func (s *miniSeedConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
 }
 func (s *miniSeedConfigEnabledImpl) Restore(handler *action.Handler) error {
 	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
-		return fmt.Errorf("failed to reset MiniSEED service availablity: %w", err)
+		return fmt.Errorf("failed to reset MiniSEED service availability: %w", err)
 	}
 	return nil
 }

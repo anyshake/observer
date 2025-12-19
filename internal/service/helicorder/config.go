@@ -25,7 +25,7 @@ func (s *helicorderConfigEnabledImpl) GetDescription() string {
 }
 func (s *helicorderConfigEnabledImpl) Init(handler *action.Handler) error {
 	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
-		return fmt.Errorf("failed to set default helicorder service availablity: %w", err)
+		return fmt.Errorf("failed to set default helicorder service availability: %w", err)
 	}
 	return nil
 }
@@ -35,14 +35,14 @@ func (s *helicorderConfigEnabledImpl) Set(handler *action.Handler, newVal any) e
 		return err
 	}
 	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
-		return fmt.Errorf("failed to set helicorder service availablity: %w", err)
+		return fmt.Errorf("failed to set helicorder service availability: %w", err)
 	}
 	return nil
 }
 func (s *helicorderConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
 	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
 	if err != nil {
-		return nil, fmt.Errorf("failed to get helicorder service availablity: %w", err)
+		return nil, fmt.Errorf("failed to get helicorder service availability: %w", err)
 	}
 	enabled, ok := val.(bool)
 	if !ok {
@@ -52,7 +52,7 @@ func (s *helicorderConfigEnabledImpl) Get(handler *action.Handler) (any, error) 
 }
 func (s *helicorderConfigEnabledImpl) Restore(handler *action.Handler) error {
 	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
-		return fmt.Errorf("failed to reset helicorder service availablity: %w", err)
+		return fmt.Errorf("failed to reset helicorder service availability: %w", err)
 	}
 	return nil
 }
@@ -72,7 +72,7 @@ func (s *helicorderConfigFilePathImpl) GetDescription() string {
 }
 func (s *helicorderConfigFilePathImpl) Init(handler *action.Handler) error {
 	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
-		return fmt.Errorf("failed to set default helicorder service availablity: %w", err)
+		return fmt.Errorf("failed to set default helicorder service availability: %w", err)
 	}
 	return nil
 }
@@ -86,14 +86,14 @@ func (s *helicorderConfigFilePathImpl) Set(handler *action.Handler, newVal any) 
 	}
 	filePath = filepath.Clean(filePath)
 	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), filePath); err != nil {
-		return fmt.Errorf("failed to set helicorder service availablity: %w", err)
+		return fmt.Errorf("failed to set helicorder service availability: %w", err)
 	}
 	return nil
 }
 func (s *helicorderConfigFilePathImpl) Get(handler *action.Handler) (any, error) {
 	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
 	if err != nil {
-		return nil, fmt.Errorf("failed to get helicorder service availablity: %w", err)
+		return nil, fmt.Errorf("failed to get helicorder service availability: %w", err)
 	}
 	filePath, ok := val.(string)
 	if !ok {
@@ -103,7 +103,7 @@ func (s *helicorderConfigFilePathImpl) Get(handler *action.Handler) (any, error)
 }
 func (s *helicorderConfigFilePathImpl) Restore(handler *action.Handler) error {
 	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
-		return fmt.Errorf("failed to reset helicorder service availablity: %w", err)
+		return fmt.Errorf("failed to reset helicorder service availability: %w", err)
 	}
 	return nil
 }

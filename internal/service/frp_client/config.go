@@ -27,7 +27,7 @@ func (s *frpClientConfigEnabledImpl) GetDescription() string {
 }
 func (s *frpClientConfigEnabledImpl) Init(handler *action.Handler) error {
 	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
-		return fmt.Errorf("failed to set default FRP client service availablity: %w", err)
+		return fmt.Errorf("failed to set default FRP client service availability: %w", err)
 	}
 	return nil
 }
@@ -37,14 +37,14 @@ func (s *frpClientConfigEnabledImpl) Set(handler *action.Handler, newVal any) er
 		return err
 	}
 	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
-		return fmt.Errorf("failed to set FRP client service availablity: %w", err)
+		return fmt.Errorf("failed to set FRP client service availability: %w", err)
 	}
 	return nil
 }
 func (s *frpClientConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
 	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
 	if err != nil {
-		return nil, fmt.Errorf("failed to get FRP client service availablity: %w", err)
+		return nil, fmt.Errorf("failed to get FRP client service availability: %w", err)
 	}
 	enabled, ok := val.(bool)
 	if !ok {
@@ -54,7 +54,7 @@ func (s *frpClientConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
 }
 func (s *frpClientConfigEnabledImpl) Restore(handler *action.Handler) error {
 	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
-		return fmt.Errorf("failed to reset FRP client service availablity: %w", err)
+		return fmt.Errorf("failed to reset FRP client service availability: %w", err)
 	}
 	return nil
 }

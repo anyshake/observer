@@ -113,6 +113,14 @@ type sysUser {
   updatedAt: Int64!
 }
 
+type upgradeStatus {
+  required: String!
+  current: String!
+  latest: String!
+  eligible: Boolean!
+  applied: Boolean!
+}
+
 type Mutation {
   # user management - admin only
   createSysUser(username: String!, password: String!, admin: Boolean!): String!
@@ -170,4 +178,5 @@ type Query {
   isGenuineProduct: Boolean! # admin only
   getApplicationLogs: [String!] # admin only
   exportGlobalConfig: String! # admin only
+  getUpgradeStatus: upgradeStatus # admin only
 }

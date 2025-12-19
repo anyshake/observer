@@ -86,6 +86,7 @@ type ComplexityRoot struct {
 		GetStationMetadata         func(childComplexity int, format string) int
 		GetSysUsers                func(childComplexity int) int
 		GetSystemStatus            func(childComplexity int) int
+		GetUpgradeStatus           func(childComplexity int) int
 		IsGenuineProduct           func(childComplexity int) int
 	}
 
@@ -198,6 +199,14 @@ type ComplexityRoot struct {
 		Memory func(childComplexity int) int
 		Uptime func(childComplexity int) int
 	}
+
+	UpgradeStatus struct {
+		Applied  func(childComplexity int) int
+		Current  func(childComplexity int) int
+		Eligible func(childComplexity int) int
+		Latest   func(childComplexity int) int
+		Required func(childComplexity int) int
+	}
 }
 
 type MutationResolver interface {
@@ -239,6 +248,7 @@ type QueryResolver interface {
 	IsGenuineProduct(ctx context.Context) (bool, error)
 	GetApplicationLogs(ctx context.Context) ([]string, error)
 	ExportGlobalConfig(ctx context.Context) (string, error)
+	GetUpgradeStatus(ctx context.Context) (*graph_model.UpgradeStatus, error)
 }
 
 type executableSchema struct {
@@ -536,6 +546,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.GetSystemStatus(childComplexity), true
+	case "Query.getUpgradeStatus":
+		if e.complexity.Query.GetUpgradeStatus == nil {
+			break
+		}
+
+		return e.complexity.Query.GetUpgradeStatus(childComplexity), true
 	case "Query.isGenuineProduct":
 		if e.complexity.Query.IsGenuineProduct == nil {
 			break
@@ -981,6 +997,37 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.SystemStatus.Uptime(childComplexity), true
+
+	case "upgradeStatus.applied":
+		if e.complexity.UpgradeStatus.Applied == nil {
+			break
+		}
+
+		return e.complexity.UpgradeStatus.Applied(childComplexity), true
+	case "upgradeStatus.current":
+		if e.complexity.UpgradeStatus.Current == nil {
+			break
+		}
+
+		return e.complexity.UpgradeStatus.Current(childComplexity), true
+	case "upgradeStatus.eligible":
+		if e.complexity.UpgradeStatus.Eligible == nil {
+			break
+		}
+
+		return e.complexity.UpgradeStatus.Eligible(childComplexity), true
+	case "upgradeStatus.latest":
+		if e.complexity.UpgradeStatus.Latest == nil {
+			break
+		}
+
+		return e.complexity.UpgradeStatus.Latest(childComplexity), true
+	case "upgradeStatus.required":
+		if e.complexity.UpgradeStatus.Required == nil {
+			break
+		}
+
+		return e.complexity.UpgradeStatus.Required(childComplexity), true
 
 	}
 	return 0, false
@@ -2753,6 +2800,47 @@ func (ec *executionContext) fieldContext_Query_exportGlobalConfig(_ context.Cont
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getUpgradeStatus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_getUpgradeStatus,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Query().GetUpgradeStatus(ctx)
+		},
+		nil,
+		ec.marshalOupgradeStatus2ᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐUpgradeStatus,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_getUpgradeStatus(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "required":
+				return ec.fieldContext_upgradeStatus_required(ctx, field)
+			case "current":
+				return ec.fieldContext_upgradeStatus_current(ctx, field)
+			case "latest":
+				return ec.fieldContext_upgradeStatus_latest(ctx, field)
+			case "eligible":
+				return ec.fieldContext_upgradeStatus_eligible(ctx, field)
+			case "applied":
+				return ec.fieldContext_upgradeStatus_applied(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type upgradeStatus", field.Name)
 		},
 	}
 	return fc, nil
@@ -6393,6 +6481,151 @@ func (ec *executionContext) fieldContext_systemStatus_uptime(_ context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _upgradeStatus_required(ctx context.Context, field graphql.CollectedField, obj *graph_model.UpgradeStatus) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_upgradeStatus_required,
+		func(ctx context.Context) (any, error) {
+			return obj.Required, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_upgradeStatus_required(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "upgradeStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _upgradeStatus_current(ctx context.Context, field graphql.CollectedField, obj *graph_model.UpgradeStatus) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_upgradeStatus_current,
+		func(ctx context.Context) (any, error) {
+			return obj.Current, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_upgradeStatus_current(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "upgradeStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _upgradeStatus_latest(ctx context.Context, field graphql.CollectedField, obj *graph_model.UpgradeStatus) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_upgradeStatus_latest,
+		func(ctx context.Context) (any, error) {
+			return obj.Latest, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_upgradeStatus_latest(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "upgradeStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _upgradeStatus_eligible(ctx context.Context, field graphql.CollectedField, obj *graph_model.UpgradeStatus) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_upgradeStatus_eligible,
+		func(ctx context.Context) (any, error) {
+			return obj.Eligible, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_upgradeStatus_eligible(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "upgradeStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _upgradeStatus_applied(ctx context.Context, field graphql.CollectedField, obj *graph_model.UpgradeStatus) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_upgradeStatus_applied,
+		func(ctx context.Context) (any, error) {
+			return obj.Applied, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_upgradeStatus_applied(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "upgradeStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 // endregion **************************** field.gotpl *****************************
 
 // region    **************************** input.gotpl *****************************
@@ -7033,6 +7266,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getUpgradeStatus":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getUpgradeStatus(ctx, field)
 				return res
 			}
 
@@ -8160,6 +8412,65 @@ func (ec *executionContext) _systemStatus(ctx context.Context, sel ast.Selection
 			}
 		case "uptime":
 			out.Values[i] = ec._systemStatus_uptime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var upgradeStatusImplementors = []string{"upgradeStatus"}
+
+func (ec *executionContext) _upgradeStatus(ctx context.Context, sel ast.SelectionSet, obj *graph_model.UpgradeStatus) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, upgradeStatusImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("upgradeStatus")
+		case "required":
+			out.Values[i] = ec._upgradeStatus_required(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "current":
+			out.Values[i] = ec._upgradeStatus_current(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "latest":
+			out.Values[i] = ec._upgradeStatus_latest(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "eligible":
+			out.Values[i] = ec._upgradeStatus_eligible(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "applied":
+			out.Values[i] = ec._upgradeStatus_applied(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -9559,6 +9870,13 @@ func (ec *executionContext) marshalOserviceStatus2ᚕᚖgithubᚗcomᚋanyshake�
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalOupgradeStatus2ᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐUpgradeStatus(ctx context.Context, sel ast.SelectionSet, v *graph_model.UpgradeStatus) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._upgradeStatus(ctx, sel, v)
 }
 
 // endregion ***************************** type.gotpl *****************************

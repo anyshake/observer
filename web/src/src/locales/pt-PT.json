@@ -138,6 +138,11 @@
                 "success": "Ligado à estação, servidor ativo há {{uptime}} segundos, atualizado às {{updatedAt}}.",
                 "error": "Ocorreu um erro ao ligar à estação, por favor verifique a sua ligação."
             },
+            "upgrade": {
+                "update_available": "Está disponível uma nova versão {{latest}}. Pode ativar as atualizações automáticas ou transferir e instalar manualmente.",
+                "restart_needed": "A versão mais recente {{latest}} foi instalada, mas {{current}} ainda está em execução. Reinicie o software numa altura conveniente para aplicar a atualização.",
+                "manual_upgrade_needed": "Foi detetada uma nova versão {{latest}}, mas a versão atual {{current}} é inferior à versão mínima compatível {{required}}. É necessária uma atualização manual."
+            },
             "station_location": {
                 "title": "Localização da Estação"
             },

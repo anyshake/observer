@@ -117,3 +117,11 @@ type SystemStatus struct {
 	Disk   float64 `json:"disk"`
 	Uptime int64   `json:"uptime"`
 }
+
+type UpgradeStatus struct {
+	Required string `json:"required"`
+	Current  string `json:"current"`
+	Latest   string `json:"latest"`
+	Eligible bool   `json:"eligible"`
+	Applied  bool   `json:"applied"`
+}

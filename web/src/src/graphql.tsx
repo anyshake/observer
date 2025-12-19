@@ -121,6 +121,7 @@ export type Query = {
   getStationMetadata: Scalars['String']['output'];
   getSysUsers: Array<SysUser>;
   getSystemStatus: SystemStatus;
+  getUpgradeStatus: UpgradeStatus;
   isGenuineProduct: Scalars['Boolean']['output'];
 };
 
@@ -263,6 +264,15 @@ export type SystemStatus = {
   uptime: Scalars['Int64']['output'];
 };
 
+export type UpgradeStatus = {
+  __typename?: 'upgradeStatus';
+  applied: Scalars['Boolean']['output'];
+  current: Scalars['String']['output'];
+  eligible: Scalars['Boolean']['output'];
+  latest: Scalars['String']['output'];
+  required: Scalars['String']['output'];
+};
+
 export type GetSoftwareVersionQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -301,7 +311,12 @@ export type GetSeismicRecordsQuery = { __typename?: 'Query', getSeisRecordsByTim
 export type GetHomeDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetHomeDataQuery = { __typename?: 'Query', getCurrentTime: number, getStationConfig: any, getDeviceId: string, getDeviceConfig: { __typename?: 'deviceConfig', packetInterval: number, sampleRate: number, channelCodes: Array<string>, gnssEnabled: boolean, model: string, protocol: string }, getDeviceInfo: { __typename?: 'deviceInfo', latitude?: number | null, longitude?: number | null, elevation?: number | null, temperature?: number | null }, getDeviceStatus: { __typename?: 'deviceStatus', startedAt: number, updatedAt: number, frames: number, errors: number, messages: number }, getServiceStatus?: Array<{ __typename?: 'serviceStatus', serviceId: string, isRunning: boolean, name: string, description: string }> | null, getSystemStatus: { __typename?: 'systemStatus', cpu: number, memory: number, disk: number, uptime: number } };
+export type GetHomeDataQuery = { __typename?: 'Query', getCurrentTime: number, getStationConfig: any, getDeviceId: string, getCurrentUser: { __typename?: 'sysUser', admin: boolean }, getDeviceConfig: { __typename?: 'deviceConfig', packetInterval: number, sampleRate: number, channelCodes: Array<string>, gnssEnabled: boolean, model: string, protocol: string }, getDeviceInfo: { __typename?: 'deviceInfo', latitude?: number | null, longitude?: number | null, elevation?: number | null, temperature?: number | null }, getDeviceStatus: { __typename?: 'deviceStatus', startedAt: number, updatedAt: number, frames: number, errors: number, messages: number }, getServiceStatus?: Array<{ __typename?: 'serviceStatus', serviceId: string, isRunning: boolean, name: string, description: string }> | null, getSystemStatus: { __typename?: 'systemStatus', cpu: number, memory: number, disk: number, uptime: number } };
+
+export type GetUpgradeStatusQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUpgradeStatusQuery = { __typename?: 'Query', getUpgradeStatus: { __typename?: 'upgradeStatus', current: string, required: string, latest: string, eligible: boolean, applied: boolean } };
 
 export type CreateUserMutationVariables = Exact<{
   username: Scalars['String']['input'];
@@ -707,6 +722,9 @@ export const GetHomeDataDocument = gql`
   getCurrentTime
   getStationConfig
   getDeviceId
+  getCurrentUser {
+    admin
+  }
   getDeviceConfig {
     packetInterval
     sampleRate
@@ -774,6 +792,49 @@ export type GetHomeDataQueryHookResult = ReturnType<typeof useGetHomeDataQuery>;
 export type GetHomeDataLazyQueryHookResult = ReturnType<typeof useGetHomeDataLazyQuery>;
 export type GetHomeDataSuspenseQueryHookResult = ReturnType<typeof useGetHomeDataSuspenseQuery>;
 export type GetHomeDataQueryResult = ApolloReactCommon.QueryResult<GetHomeDataQuery, GetHomeDataQueryVariables>;
+export const GetUpgradeStatusDocument = gql`
+    query getUpgradeStatus {
+  getUpgradeStatus {
+    current
+    required
+    latest
+    eligible
+    applied
+  }
+}
+    `;
+
+/**
+ * __useGetUpgradeStatusQuery__
+ *
+ * To run a query within a React component, call `useGetUpgradeStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUpgradeStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUpgradeStatusQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetUpgradeStatusQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetUpgradeStatusQuery, GetUpgradeStatusQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetUpgradeStatusQuery, GetUpgradeStatusQueryVariables>(GetUpgradeStatusDocument, options);
+      }
+export function useGetUpgradeStatusLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetUpgradeStatusQuery, GetUpgradeStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetUpgradeStatusQuery, GetUpgradeStatusQueryVariables>(GetUpgradeStatusDocument, options);
+        }
+export function useGetUpgradeStatusSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetUpgradeStatusQuery, GetUpgradeStatusQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetUpgradeStatusQuery, GetUpgradeStatusQueryVariables>(GetUpgradeStatusDocument, options);
+        }
+export type GetUpgradeStatusQueryHookResult = ReturnType<typeof useGetUpgradeStatusQuery>;
+export type GetUpgradeStatusLazyQueryHookResult = ReturnType<typeof useGetUpgradeStatusLazyQuery>;
+export type GetUpgradeStatusSuspenseQueryHookResult = ReturnType<typeof useGetUpgradeStatusSuspenseQuery>;
+export type GetUpgradeStatusQueryResult = ApolloReactCommon.QueryResult<GetUpgradeStatusQuery, GetUpgradeStatusQueryVariables>;
 export const CreateUserDocument = gql`
     mutation createUser($username: String!, $password: String!, $admin: Boolean!) {
   createSysUser(username: $username, password: $password, admin: $admin)

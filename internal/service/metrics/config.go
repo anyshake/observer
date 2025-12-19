@@ -23,7 +23,7 @@ func (s *metricsConfigEnabledImpl) GetDescription() string {
 }
 func (s *metricsConfigEnabledImpl) Init(handler *action.Handler) error {
 	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
-		return fmt.Errorf("failed to set default metrics service availablity: %w", err)
+		return fmt.Errorf("failed to set default metrics service availability: %w", err)
 	}
 	return nil
 }
@@ -33,14 +33,14 @@ func (s *metricsConfigEnabledImpl) Set(handler *action.Handler, newVal any) erro
 		return err
 	}
 	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
-		return fmt.Errorf("failed to set SeedLink service availablity: %w", err)
+		return fmt.Errorf("failed to set SeedLink service availability: %w", err)
 	}
 	return nil
 }
 func (s *metricsConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
 	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
 	if err != nil {
-		return nil, fmt.Errorf("failed to get SeedLink service availablity: %w", err)
+		return nil, fmt.Errorf("failed to get SeedLink service availability: %w", err)
 	}
 	enabled, ok := val.(bool)
 	if !ok {
@@ -50,7 +50,7 @@ func (s *metricsConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
 }
 func (s *metricsConfigEnabledImpl) Restore(handler *action.Handler) error {
 	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
-		return fmt.Errorf("failed to reset SeedLink service availablity: %w", err)
+		return fmt.Errorf("failed to reset SeedLink service availability: %w", err)
 	}
 	return nil
 }

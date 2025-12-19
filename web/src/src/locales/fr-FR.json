@@ -138,6 +138,11 @@
                 "success": "Connecté à la station, serveur actif depuis {{uptime}} secondes, mis à jour à {{updatedAt}}.",
                 "error": "Erreur lors de la connexion à la station, veuillez vérifier votre connexion."
             },
+            "upgrade": {
+                "update_available": "Une nouvelle version {{latest}} est disponible. Vous pouvez activer les mises à jour automatiques ou télécharger et installer la mise à jour manuellement.",
+                "restart_needed": "La dernière version {{latest}} a été installée, mais {{current}} est toujours en cours d’exécution. Veuillez redémarrer le logiciel à un moment approprié pour appliquer la mise à jour.",
+                "manual_upgrade_needed": "Une nouvelle version {{latest}} a été détectée, mais la version actuelle {{current}} est inférieure à la version minimale compatible {{required}}. Une mise à niveau manuelle est requise."
+            },
             "station_location": {
                 "title": "Emplacement de la station"
             },
