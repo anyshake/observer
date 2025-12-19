@@ -47,10 +47,10 @@ func (c *CWA_SC) GetEvents(latitude, longitude float64) ([]Event, error) {
 	res, err := request.POST(
 		"https://scweb.cwa.gov.tw/zh-tw/earthquake/ajaxhandler",
 		c.getRequestBody(100),
-		"application/x-www-form-urlencoded; charset=UTF-8",
+		"application/x-www-form-urlencoded",
 		10*time.Second, time.Second, 3, false,
 		// Query CWA IP from custom encrypted DNS servers
-		createCustomTransport(c.resolvers, "cwa"),
+		createCustomTransport(c.resolvers, ""),
 		map[string]string{"User-Agent": uarand.GetRandom()},
 	)
 	if err != nil {

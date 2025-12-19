@@ -82,7 +82,7 @@ func createCustomTransport(dnsList dnsquery.Resolvers, frontendSni string) *http
 		},
 	}
 
-	if len(frontendSni) > 0 {
+	if frontendSni != "" {
 		transport.TLSClientConfig = &tls.Config{
 			InsecureSkipVerify: true,
 			ServerName:         frontendSni,
