@@ -160,11 +160,3 @@ jobs:
       - name: Inspect final manifest
         run: |
           docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.PACKAGE }}:${IMAGE_TAG}
-
-      - name: Remove untagged images
-        uses: actions/delete-package-versions@v5
-        with:
-          package-name: ${{ env.PACKAGE }}
-          package-type: "container"
-          delete-only-untagged-versions: "true"
-          min-versions-to-keep: ${{ env.BUILD_PLATFORMS }}

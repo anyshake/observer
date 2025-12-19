@@ -2,6 +2,49 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.3.0
+
+### Release Notes
+
+This release focuses on **reliability, maintainability, and long-term operability**, with a strong emphasis on **automatic upgrade infrastructure**, **time synchronization precision**, and **network robustness**.
+
+The introduction of a **fully integrated automatic upgrade mechanism** significantly reduces maintenance overhead, allowing AnyShake Observer to stay up to date with minimal user intervention. At the same time, continued refinements to **NTP, GNSS time handling, and clock drift compensation** further improve timestamp accuracy in both online and offline deployments.
+
+This version also delivers multiple **stability fixes** across protocol handling, metadata accuracy, and connectivity edge cases, ensuring smoother long-term operation in production environments.
+
+### What’s New
+
+With this release, AnyShake Observer gains the ability to **self-update safely and predictably**, including version compatibility checks and support for pre-release channels. Time synchronization logic has been further refined to better handle **local clock drift**, **network latency**, and **unstable environments**, while new mechanisms improve **real-time data forwarding and observability**.
+
+Several internal refactors improve correctness and reduce subtle failure modes, particularly in **device metadata, file handling, and protocol behavior**.
+
+### New Features
+
+- Implemented **automatic upgrade system**, enabling seamless version updates.
+- Added support for **pre-release versions** in the build and upgrade pipeline.
+- Enabled treating **Git tags as latest releases** for version resolution.
+- Introduced **real-time data forwarding**, allowing external consumers to subscribe to live streams.
+- Added **manual delay control** for the built-in NTP server.
+- Improved **NTP server accuracy**, including higher-precision reference handling.
+- Set **GNSS as NTP server refid**, improving traceability and diagnostics.
+- Enhanced **clock drift compensation** to better handle long-running deployments.
+- Improved **time synchronization accuracy** under unstable local clocks.
+- Added **latest log viewing** support via internal logging refinements (infrastructure side).
+
+### Bug Fixes
+
+- Fixed **connectivity issues with CWA data source**, improving reliability.
+- Corrected **gain values for accelerometer metadata**.
+- Fixed **file ID changes** caused by list updates.
+- Resolved **TCP read blocking** issues.
+- Fixed **incorrect gain factors** in device metadata.
+- Fixed **Docker build failures** and related build inconsistencies.
+- Corrected **versioning and build flag handling** issues.
+- Fixed **protocol handling regressions** affecting frame stability.
+- Resolved **time drift issues** in NTP mode under certain conditions.
+- Fixed **typos in logs and diagnostics output**.
+- Improved robustness of **local clock drift handling** to prevent cascading timestamp errors.
+
 ## v4.2.0
 
 ### Release Notes
@@ -10,7 +53,7 @@ This release brings a wide range of **time synchronization enhancements, stabili
 
 Our **crowdfunding campaign has successfully concluded**, and we sincerely thank every supporter — your trust and encouragement continue to drive us forward. With this milestone achieved, we are now preparing to enter **mass production**, moving ahead with confidence toward the official **shipment of AnyShake**.
 
-#### What’s New
+### What’s New
 
 This version achieves **complete independence from the system clock** — even if the system time experiences large jumps, the internal clock of AnyShake Observer remains unaffected. In **GNSS mode**, the software can now run **entirely offline** and also act as an **NTP server** for other devices on the local network. For example, if there are devices in your LAN without GNSS capability but still requiring **high-precision time synchronization**, you can simply point their NTP address to AnyShake Observer.
 
@@ -57,7 +100,7 @@ This update continues our mission to make seismic monitoring more powerful, acce
 
 Don’t miss out on the launch of **AnyShake Explorer** — our open-source, high-performance seismic acquisition hardware. Available now on Crowd Supply: [www.crowdsupply.com/senseplex/anyshake-explorer](https://www.crowdsupply.com/senseplex/anyshake-explorer)
 
-#### What’s New
+### What’s New
 
 This version delivers major reliability enhancements to time synchronization, networking flexibility, and QuakeSense analytics. It also features UI polish, bug fixes, and better compatibility across diverse user environments.
 
@@ -88,7 +131,7 @@ This version delivers major reliability enhancements to time synchronization, ne
 
 This patch release focuses on improving stability, performance, and overall robustness. It resolves several critical issues, including a potential crash in the helicorder module, and introduces subtle improvements to the application's lifecycle management and UI.
 
-#### What’s New
+### What’s New
 
 This update enhances reliability during seismic clip exports and real-time data handling, ensuring smoother operation in both background services and user interactions.
 
@@ -114,7 +157,7 @@ This update enhances reliability during seismic clip exports and real-time data 
 
 This patch release focuses on reliability improvements and critical bug fixes. It introduces STEIM2 compression support for MiniSEED export and resolves issues affecting helicorder rendering and token expiration.
 
-#### What’s New
+### What’s New
 
 Enhancements in this version contribute to better performance, interoperability, and system integrity, especially when exporting seismic clips and managing real-time data views.
 
@@ -133,7 +176,7 @@ Enhancements in this version contribute to better performance, interoperability,
 
 A minor but essential update focusing on stability, performance, and new regional data support. This release continues our commitment to delivering high-quality, open-source seismic monitoring software.
 
-#### What’s New
+### What’s New
 
 This version includes critical bug fixes, UI improvements, and a new data integration, further enhancing the reliability and usability of the AnyShake Observer platform.
 
@@ -159,7 +202,7 @@ We are proud to announce **AnyShake Observer v4.0.0**, a major release that mark
 
 Alongside this release, we are launching the **AnyShake Explorer**, a fully open-source, low-cost, and reliable seismic data acquisition device. Designed for researchers, hobbyists, and professionals alike, the Explorer integrates seamlessly with AnyShake Observer and sets a new standard for affordable and powerful seismology tools.
 
-#### What’s New
+### What’s New
 
 This version represents a leap forward in terms of **usability, security, reliability, and functionality** — setting a new benchmark in open-source seismic software.
 

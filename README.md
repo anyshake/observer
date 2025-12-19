@@ -5,7 +5,7 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/7b75168a5b03403987122835d74bb448)](https://app.codacy.com/gh/anyshake/observer/dashboard)
 [![Downloads](https://img.shields.io/github/downloads/anyshake/observer/total.svg)](https://github.com/anyshake/observer/releases/latest)
 [![Go Report Card](https://goreportcard.com/badge/github.com/anyshake/observer)](https://goreportcard.com/report/github.com/anyshake/observer)
-[![Build Status](https://github.com/anyshake/observer/actions/workflows/release.yml/badge.svg)](https://github.com/anyshake/observer/actions/workflows/release.yml)
+[![Build Status](https://github.com/anyshake/observer/actions/workflows/build.yml/badge.svg)](https://github.com/anyshake/observer/actions/workflows/build.yml)
 [![Latest Release](https://img.shields.io/github/release/anyshake/observer.svg)](https://github.com/anyshake/observer/releases/latest)
 
 ## 🚀 **Join the Open Science Movement!** 🚀
