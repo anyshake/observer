@@ -301,7 +301,7 @@
         <DataLogger resourceId="Datalogger-E-C121G-ACC"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>1670.96</Value>
+            <Value>1670.7030433430377</Value>
             <Frequency>None</Frequency>
             <InputUnits>
               <Name>m/s**2</Name>
@@ -325,7 +325,7 @@
               <NormalizationFrequency unit="HERTZ">1.0</NormalizationFrequency>
             </PolesZeros>
             <StageGain>
-              <Value>1670.96</Value>
+              <Value>1670.7030433430377</Value>
               <Frequency>1.0</Frequency>
             </StageGain>
           </Stage>
@@ -373,7 +373,7 @@
         <DataLogger resourceId="Datalogger-E-C121G-ACC"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>1670.96</Value>
+            <Value>1670.7030433430377</Value>
             <Frequency>None</Frequency>
             <InputUnits>
               <Name>m/s**2</Name>
@@ -397,7 +397,7 @@
               <NormalizationFrequency unit="HERTZ">1.0</NormalizationFrequency>
             </PolesZeros>
             <StageGain>
-              <Value>1670.96</Value>
+              <Value>1670.7030433430377</Value>
               <Frequency>1.0</Frequency>
             </StageGain>
           </Stage>
@@ -445,7 +445,7 @@
         <DataLogger resourceId="Datalogger-E-C121G-ACC"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>1670.96</Value>
+            <Value>1670.7030433430377</Value>
             <Frequency>None</Frequency>
             <InputUnits>
               <Name>m/s**2</Name>
@@ -469,7 +469,7 @@
               <NormalizationFrequency unit="HERTZ">1.0</NormalizationFrequency>
             </PolesZeros>
             <StageGain>
-              <Value>1670.96</Value>
+              <Value>1670.7030433430377</Value>
               <Frequency>1.0</Frequency>
             </StageGain>
           </Stage>

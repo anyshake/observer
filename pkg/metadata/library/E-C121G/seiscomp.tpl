@@ -54,9 +54,9 @@
                 Measurement range: ±2 g = ±32768 counts
                 Gain = 16384 / 1 g
                      = 16384 / 9.80665
-                     ≈ 1670.96
+                     ≈ 1670.7030433430377
             -->
-            <gain>1670.96</gain>
+            <gain>1670.7030433430377</gain>
             <gainFrequency>1</gainFrequency>
             <normalizationFactor>1</normalizationFactor>
             <normalizationFrequency>1</normalizationFrequency>
@@ -145,7 +145,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>-90</dip>
-                        <gain>1670.96</gain>
+                        <gain>1670.7030433430377</gain>
                         <gainUnit>m/s**2</gainUnit>
                     </stream>
                     <stream publicID="Stream/E-C121G-CH5" code="{{.ChannelCode5}}"
@@ -160,7 +160,7 @@
                         <depth>0</depth>
                         <azimuth>90</azimuth>
                         <dip>0</dip>
-                        <gain>1670.96</gain>
+                        <gain>1670.7030433430377</gain>
                         <gainUnit>m/s**2</gainUnit>
                     </stream>
                     <stream publicID="Stream/E-C121G-CH6" code="{{.ChannelCode6}}"
@@ -175,7 +175,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>0</dip>
-                        <gain>1670.96</gain>
+                        <gain>1670.7030433430377</gain>
                         <gainUnit>m/s**2</gainUnit>
                     </stream>
                 </sensorLocation>
