@@ -208,7 +208,8 @@ func (g *ExplorerProtoImplV3) getChannelData(channelData []*ChannelData, channel
 				ch.Data[i] = int32(int16(binary.LittleEndian.Uint16(channelDataBytes[offset : offset+2])))
 				offset += 2
 			case "int24":
-				ch.Data[i] = int32(channelDataBytes[offset]) | int32(channelDataBytes[offset+1])<<8 | int32(channelDataBytes[offset+2])<<16
+				v := int32(channelDataBytes[offset]) | int32(channelDataBytes[offset+1])<<8 | int32(channelDataBytes[offset+2])<<16
+				ch.Data[i] = (v << 8) >> 8 // sign extend for 24-bit
 				offset += 3
 			case "int32":
 				ch.Data[i] = int32(binary.LittleEndian.Uint32(channelDataBytes[offset : offset+4]))
