@@ -2,6 +2,21 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.3.1
+
+### Release Notes
+
+This is a **minor bugfix release** focused on **data correctness and metadata accuracy**, addressing issues discovered after v4.3.0.
+
+### New Features
+
+- Support **E-C131G** device metadata.
+
+### Bug Fixes
+
+- Fixed **sign extension for 24-bit signed integer data**, correcting decoding errors caused by non-standard integer width.
+- Updated **device gain values** to ensure metadata accuracy and correct amplitude scaling.
+
 ## v4.3.0
 
 ### Release Notes
