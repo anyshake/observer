@@ -10,6 +10,7 @@ import (
 type Render struct {
 	options            *Options
 	channels           int
+	attributes         map[string]string
 	templateSeisComP   *template.Template
 	templateStationXML *template.Template
 }
@@ -36,6 +37,7 @@ func (r *Render) SeisComP() string {
 			dataMap[fmt.Sprintf("ChannelCode%d", idx)] = r.options.ChannelCodes[idx-1]
 		}
 	}
+	dataMap = mergeMap(dataMap, r.attributes)
 
 	var stringBuf strings.Builder
 	if err := r.templateSeisComP.Execute(&stringBuf, dataMap); err != nil {
@@ -67,6 +69,7 @@ func (r *Render) StationXML() string {
 			dataMap[fmt.Sprintf("ChannelCode%d", idx)] = r.options.ChannelCodes[idx-1]
 		}
 	}
+	dataMap = mergeMap(dataMap, r.attributes)
 
 	var stringBuf strings.Builder
 	if err := r.templateStationXML.Execute(&stringBuf, dataMap); err != nil {

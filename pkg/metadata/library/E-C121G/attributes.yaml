@@ -1,0 +1,12 @@
+VelocityDataLoggerGain: 858993458.8
+VelocitySensorModel: LGT-4.5C
+VelocitySensorGain: 100
+AcceleroDataLoggerGain: 1
+AcceleroSensorModel: ICM-42688-P
+AcceleroSensorGain: 1670.7030433430377
+Channel1Gain: 85899345880
+Channel2Gain: 85899345880
+Channel3Gain: 85899345880
+Channel4Gain: 1670.7030433430377
+Channel5Gain: 1670.7030433430377
+Channel6Gain: 1670.7030433430377

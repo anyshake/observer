@@ -32,12 +32,12 @@
         </SampleRateRatio>
         <ClockDrift unit="SECONDS/SAMPLE">0.0</ClockDrift>
         <Sensor resourceId="Sensor-E-C131G-VEL">
-          <Model>LGT-4.5C</Model>
+          <Model>{{.VelocitySensorModel}}</Model>
         </Sensor>
         <DataLogger resourceId="Datalogger-E-C131G-VEL"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>171798691760.0</Value>
+            <Value>{{.Channel1Gain}}</Value>
             <Frequency>4.5</Frequency>
             <InputUnits>
               <Name>m/s</Name>
@@ -81,7 +81,7 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>100.0</Value>
+              <Value>{{.VelocitySensorGain}}</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
@@ -103,7 +103,7 @@
               <Correction>0.0</Correction>
             </Decimation>
             <StageGain>
-              <Value>1717986917.6</Value>
+              <Value>{{.VelocityDataLoggerGain}}</Value>
               <Frequency>0.0</Frequency>
             </StageGain>
           </Stage>
@@ -124,12 +124,12 @@
         </SampleRateRatio>
         <ClockDrift unit="SECONDS/SAMPLE">0.0</ClockDrift>
         <Sensor resourceId="Sensor-E-C131G-VEL">
-          <Model>LGT-4.5C</Model>
+          <Model>{{.VelocitySensorModel}}</Model>
         </Sensor>
         <DataLogger resourceId="Datalogger-E-C131G-VEL"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>171798691760.0</Value>
+            <Value>{{.Channel2Gain}}</Value>
             <Frequency>4.5</Frequency>
             <InputUnits>
               <Name>m/s</Name>
@@ -173,7 +173,7 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>100.0</Value>
+              <Value>{{.VelocitySensorGain}}</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
@@ -195,7 +195,7 @@
               <Correction>0.0</Correction>
             </Decimation>
             <StageGain>
-              <Value>1717986917.6</Value>
+              <Value>{{.VelocityDataLoggerGain}}</Value>
               <Frequency>0.0</Frequency>
             </StageGain>
           </Stage>
@@ -216,12 +216,12 @@
         </SampleRateRatio>
         <ClockDrift unit="SECONDS/SAMPLE">0.0</ClockDrift>
         <Sensor resourceId="Sensor-E-C131G-VEL">
-          <Model>LGT-4.5C</Model>
+          <Model>{{.VelocitySensorModel}}</Model>
         </Sensor>
         <DataLogger resourceId="Datalogger-E-C131G-VEL"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>171798691760.0</Value>
+            <Value>{{.Channel3Gain}}</Value>
             <Frequency>4.5</Frequency>
             <InputUnits>
               <Name>m/s</Name>
@@ -265,7 +265,7 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>100.0</Value>
+              <Value>{{.VelocitySensorGain}}</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
@@ -287,7 +287,7 @@
               <Correction>0.0</Correction>
             </Decimation>
             <StageGain>
-              <Value>1717986917.6</Value>
+              <Value>{{.VelocityDataLoggerGain}}</Value>
               <Frequency>0.0</Frequency>
             </StageGain>
           </Stage>
@@ -308,12 +308,12 @@
         </SampleRateRatio>
         <ClockDrift unit="SECONDS/SAMPLE">0.0</ClockDrift>
         <Sensor resourceId="Sensor-E-C131G-ACC">
-          <Model>ADXL355BEZ</Model>
+          <Model>{{.AcceleroSensorModel}}</Model>
         </Sensor>
         <DataLogger resourceId="Datalogger-E-C131G-ACC"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>26104.735052234966</Value>
+            <Value>{{.Channel4Gain}}</Value>
             <Frequency>None</Frequency>
             <InputUnits>
               <Name>m/s**2</Name>
@@ -337,7 +337,7 @@
               <NormalizationFrequency unit="HERTZ">1.0</NormalizationFrequency>
             </PolesZeros>
             <StageGain>
-              <Value>26104.735052234966</Value>
+              <Value>{{.AcceleroSensorGain}}</Value>
               <Frequency>1.0</Frequency>
             </StageGain>
           </Stage>
@@ -359,7 +359,7 @@
               <Correction>0.0</Correction>
             </Decimation>
             <StageGain>
-              <Value>1.0</Value>
+              <Value>{{.AcceleroDataLoggerGain}}</Value>
               <Frequency>0.0</Frequency>
             </StageGain>
           </Stage>
@@ -380,12 +380,12 @@
         </SampleRateRatio>
         <ClockDrift unit="SECONDS/SAMPLE">0.0</ClockDrift>
         <Sensor resourceId="Sensor-E-C131G-ACC">
-          <Model>ADXL355BEZ</Model>
+          <Model>{{.AcceleroSensorModel}}</Model>
         </Sensor>
         <DataLogger resourceId="Datalogger-E-C131G-ACC"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>26104.735052234966</Value>
+            <Value>{{.Channel5Gain}}</Value>
             <Frequency>None</Frequency>
             <InputUnits>
               <Name>m/s**2</Name>
@@ -409,7 +409,7 @@
               <NormalizationFrequency unit="HERTZ">1.0</NormalizationFrequency>
             </PolesZeros>
             <StageGain>
-              <Value>26104.735052234966</Value>
+              <Value>{{.AcceleroSensorGain}}</Value>
               <Frequency>1.0</Frequency>
             </StageGain>
           </Stage>
@@ -431,7 +431,7 @@
               <Correction>0.0</Correction>
             </Decimation>
             <StageGain>
-              <Value>1.0</Value>
+              <Value>{{.AcceleroDataLoggerGain}}</Value>
               <Frequency>0.0</Frequency>
             </StageGain>
           </Stage>
@@ -452,12 +452,12 @@
         </SampleRateRatio>
         <ClockDrift unit="SECONDS/SAMPLE">0.0</ClockDrift>
         <Sensor resourceId="Sensor-E-C131G-ACC">
-          <Model>ADXL355BEZ</Model>
+          <Model>{{.AcceleroSensorModel}}</Model>
         </Sensor>
         <DataLogger resourceId="Datalogger-E-C131G-ACC"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>26104.735052234966</Value>
+            <Value>{{.Channel6Gain}}</Value>
             <Frequency>None</Frequency>
             <InputUnits>
               <Name>m/s**2</Name>
@@ -481,7 +481,7 @@
               <NormalizationFrequency unit="HERTZ">1.0</NormalizationFrequency>
             </PolesZeros>
             <StageGain>
-              <Value>26104.735052234966</Value>
+              <Value>{{.AcceleroSensorGain}}</Value>
               <Frequency>1.0</Frequency>
             </StageGain>
           </Stage>
@@ -503,7 +503,7 @@
               <Correction>0.0</Correction>
             </Decimation>
             <StageGain>
-              <Value>1.0</Value>
+              <Value>{{.AcceleroDataLoggerGain}}</Value>
               <Frequency>0.0</Frequency>
             </StageGain>
           </Stage>

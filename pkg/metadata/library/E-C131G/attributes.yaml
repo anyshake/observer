@@ -1,0 +1,12 @@
+VelocityDataLoggerGain: 858993458.8
+VelocitySensorModel: LGT-4.5C
+VelocitySensorGain: 100
+AcceleroDataLoggerGain: 1
+AcceleroSensorGain: 26104.735052234966
+AcceleroSensorModel: ADXL355BEZ
+Channel1Gain: 85899345880
+Channel2Gain: 85899345880
+Channel3Gain: 85899345880
+Channel4Gain: 26104.735052234966
+Channel5Gain: 26104.735052234966
+Channel6Gain: 26104.735052234966

@@ -3,20 +3,14 @@
     <Inventory>
         <sensor publicID="Sensor-E-D001-VEL" name="S-E-D001-VEL"
             response="ResponsePAZ-E-D001-VEL">
-            <model>LGT-4.5C</model>
+            <model>{{.VelocitySensorModel}}</model>
             <unit>m/s</unit>
             <remark>{"unit":"Velocity in Meters Per Second"}</remark>
         </sensor>
         <datalogger publicID="Datalogger-E-D001-VEL" name="DL-E-D001-VEL">
             <recorderModel>E-D001</recorderModel>
             <recorderManufacturer>SensePlex Limited</recorderManufacturer>
-            <!--
-                Input amplifier gain: none
-                ADC PGA gain: x4
-                ADC full-scale: 0.625 V
-                ==> ((2 ** 31) - 1) / 0.625
-            -->
-            <gain>3435973835.2</gain>
+            <gain>{{.VelocityDataLoggerGain}}</gain>
             <maxClockDrift>0</maxClockDrift>
             <decimation sampleRateNumerator="{{.SampleRate}}" sampleRateDenominator="1" />
         </datalogger>
@@ -25,7 +19,7 @@
             <!--
                 Gain = Sensor sensitivity = 100 V/m/s
             -->
-            <gain>100</gain>
+            <gain>{{.VelocitySensorGain}}</gain>
             <gainFrequency>4.5</gainFrequency>
             <normalizationFactor>171.99852139050935</normalizationFactor>
             <normalizationFrequency>4.5</normalizationFrequency>
@@ -70,7 +64,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>-90</dip>
-                        <gain>343597383520</gain>
+                        <gain>{{.Channel1Gain}}</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>
@@ -86,7 +80,7 @@
                         <depth>0</depth>
                         <azimuth>90</azimuth>
                         <dip>0</dip>
-                        <gain>343597383520</gain>
+                        <gain>{{.Channel2Gain}}</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>
@@ -102,7 +96,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>0</dip>
-                        <gain>343597383520</gain>
+                        <gain>{{.Channel3Gain}}</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>

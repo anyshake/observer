@@ -3,42 +3,33 @@
     <Inventory>
         <sensor publicID="Sensor-E-C121G-VEL" name="S-E-C121G-VEL"
             response="ResponsePAZ-E-C121G-VEL">
-            <model>LGT-4.5C</model>
+            <model>{{.VelocitySensorModel}}</model>
             <unit>m/s</unit>
             <remark>{"unit":"Velocity in Meters Per Second"}</remark>
         </sensor>
         <sensor publicID="Sensor-E-C121G-ACC" name="S-E-C121G-ACC"
             response="ResponsePAZ-E-C121G-ACC">
-            <model>ICM-42688-P</model>
+            <model>{{.AcceleroSensorModel}}</model>
             <unit>m/s**2</unit>
             <remark>{"unit":"Acceleration in Meters Per Second Squared"}</remark>
         </sensor>
         <datalogger publicID="Datalogger-E-C121G-VEL" name="DL-E-C121G-VEL">
             <recorderModel>E-C121G</recorderModel>
             <recorderManufacturer>SensePlex Limited</recorderManufacturer>
-            <!--
-                Input amplifier gain: x1
-                ADC PGA gain: x1
-                ADC full-scale: 2.5 V
-                ==> ((2 ** 31) - 1) * 2 / 2.5
-            -->
-            <gain>1717986917.6</gain>
+            <gain>{{.VelocityDataLoggerGain}}</gain>
             <maxClockDrift>0</maxClockDrift>
             <decimation sampleRateNumerator="{{.SampleRate}}" sampleRateDenominator="1" />
         </datalogger>
         <datalogger publicID="Datalogger-E-C121G-ACC" name="DL-E-C121G-ACC">
             <recorderModel>E-C121G</recorderModel>
             <recorderManufacturer>SensePlex Limited</recorderManufacturer>
-            <gain>1</gain>
+            <gain>{{.AcceleroDataLoggerGain}}</gain>
             <maxClockDrift>0</maxClockDrift>
             <decimation sampleRateNumerator="{{.SampleRate}}" sampleRateDenominator="1" />
         </datalogger>
         <responsePAZ publicID="ResponsePAZ-E-C121G-VEL" name="AS-E-C121G-VEL">
             <type>A</type>
-            <!--
-                Gain = Sensor sensitivity = 100 V/m/s
-            -->
-            <gain>100</gain>
+            <gain>{{.VelocitySensorGain}}</gain>
             <gainFrequency>4.5</gainFrequency>
             <normalizationFactor>171.99852139050935</normalizationFactor>
             <normalizationFrequency>4.5</normalizationFrequency>
@@ -49,14 +40,7 @@
         </responsePAZ>
         <responsePAZ publicID="ResponsePAZ-E-C121G-ACC" name="AS-E-C121G-ACC">
             <type>D</type>
-            <!--
-                1 g = 32768 / 2 = 16384 counts ≈ 9.80665 m/s²
-                Measurement range: ±2 g = ±32768 counts
-                Gain = 16384 / 1 g
-                     = 16384 / 9.80665
-                     ≈ 1670.7030433430377
-            -->
-            <gain>1670.7030433430377</gain>
+            <gain>{{.AcceleroSensorGain}}</gain>
             <gainFrequency>1</gainFrequency>
             <normalizationFactor>1</normalizationFactor>
             <normalizationFrequency>1</normalizationFrequency>
@@ -97,7 +81,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>-90</dip>
-                        <gain>171798691760</gain>
+                        <gain>{{.Channel1Gain}}</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>
@@ -113,7 +97,7 @@
                         <depth>0</depth>
                         <azimuth>90</azimuth>
                         <dip>0</dip>
-                        <gain>171798691760</gain>
+                        <gain>{{.Channel2Gain}}</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>
@@ -129,7 +113,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>0</dip>
-                        <gain>171798691760</gain>
+                        <gain>{{.Channel3Gain}}</gain>
                         <gainFrequency>4.5</gainFrequency>
                         <gainUnit>m/s</gainUnit>
                     </stream>
@@ -145,7 +129,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>-90</dip>
-                        <gain>1670.7030433430377</gain>
+                        <gain>{{.Channel4Gain}}</gain>
                         <gainUnit>m/s**2</gainUnit>
                     </stream>
                     <stream publicID="Stream/E-C121G-CH5" code="{{.ChannelCode5}}"
@@ -160,7 +144,7 @@
                         <depth>0</depth>
                         <azimuth>90</azimuth>
                         <dip>0</dip>
-                        <gain>1670.7030433430377</gain>
+                        <gain>{{.Channel5Gain}}</gain>
                         <gainUnit>m/s**2</gainUnit>
                     </stream>
                     <stream publicID="Stream/E-C121G-CH6" code="{{.ChannelCode6}}"
@@ -175,7 +159,7 @@
                         <depth>0</depth>
                         <azimuth>0</azimuth>
                         <dip>0</dip>
-                        <gain>1670.7030433430377</gain>
+                        <gain>{{.Channel6Gain}}</gain>
                         <gainUnit>m/s**2</gainUnit>
                     </stream>
                 </sensorLocation>

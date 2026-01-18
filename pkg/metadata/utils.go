@@ -3,6 +3,7 @@ package metadata
 import (
 	"embed"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 )
@@ -26,4 +27,11 @@ func getMetadataFromLocalDisk(model, template string) (string, error) {
 	}
 
 	return string(data), nil
+}
+
+func mergeMap(a, b map[string]string) map[string]string {
+	out := make(map[string]string, len(a)+len(b))
+	maps.Copy(out, a)
+	maps.Copy(out, b)
+	return out
 }

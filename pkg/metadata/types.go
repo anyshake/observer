@@ -3,6 +3,7 @@ package metadata
 import "time"
 
 const (
+	ATTRIBUTES_DATA     = "attributes.yaml"
 	SEISCOMP_TEMPLATE   = "seiscomp.tpl"
 	STATIONXML_TEMPLATE = "stationxml.tpl"
 )

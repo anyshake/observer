@@ -32,12 +32,12 @@
         </SampleRateRatio>
         <ClockDrift unit="SECONDS/SAMPLE">0.0</ClockDrift>
         <Sensor resourceId="Sensor-E-D001-VEL">
-          <Model>LGT-4.5C</Model>
+          <Model>{{.VelocitySensorModel}}</Model>
         </Sensor>
         <DataLogger resourceId="Datalogger-E-D001-VEL"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>343597383520.0</Value>
+            <Value>{{.Channel1Gain}}</Value>
             <Frequency>4.5</Frequency>
             <InputUnits>
               <Name>m/s</Name>
@@ -81,7 +81,7 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>100.0</Value>
+              <Value>{{.VelocitySensorGain}}</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
@@ -103,7 +103,7 @@
               <Correction>0.0</Correction>
             </Decimation>
             <StageGain>
-              <Value>3435973835.2</Value>
+              <Value>{{.VelocityDataLoggerGain}}</Value>
               <Frequency>0.0</Frequency>
             </StageGain>
           </Stage>
@@ -124,12 +124,12 @@
         </SampleRateRatio>
         <ClockDrift unit="SECONDS/SAMPLE">0.0</ClockDrift>
         <Sensor resourceId="Sensor-E-D001-VEL">
-          <Model>LGT-4.5C</Model>
+          <Model>{{.VelocitySensorModel}}</Model>
         </Sensor>
         <DataLogger resourceId="Datalogger-E-D001-VEL"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>343597383520.0</Value>
+            <Value>{{.Channel2Gain}}</Value>
             <Frequency>4.5</Frequency>
             <InputUnits>
               <Name>m/s</Name>
@@ -173,7 +173,7 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>100.0</Value>
+              <Value>{{.VelocitySensorGain}}</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
@@ -195,7 +195,7 @@
               <Correction>0.0</Correction>
             </Decimation>
             <StageGain>
-              <Value>3435973835.2</Value>
+              <Value>{{.VelocityDataLoggerGain}}</Value>
               <Frequency>0.0</Frequency>
             </StageGain>
           </Stage>
@@ -216,12 +216,12 @@
         </SampleRateRatio>
         <ClockDrift unit="SECONDS/SAMPLE">0.0</ClockDrift>
         <Sensor resourceId="Sensor-E-D001-VEL">
-          <Model>LGT-4.5C</Model>
+          <Model>{{.VelocitySensorModel}}</Model>
         </Sensor>
         <DataLogger resourceId="Datalogger-E-D001-VEL"/>
         <Response>
           <InstrumentSensitivity>
-            <Value>343597383520.0</Value>
+            <Value>{{.Channel3Gain}}</Value>
             <Frequency>4.5</Frequency>
             <InputUnits>
               <Name>m/s</Name>
@@ -265,7 +265,7 @@
               </Pole>
             </PolesZeros>
             <StageGain>
-              <Value>100.0</Value>
+              <Value>{{.VelocitySensorGain}}</Value>
               <Frequency>4.5</Frequency>
             </StageGain>
           </Stage>
@@ -287,7 +287,7 @@
               <Correction>0.0</Correction>
             </Decimation>
             <StageGain>
-              <Value>3435973835.2</Value>
+              <Value>{{.VelocityDataLoggerGain}}</Value>
               <Frequency>0.0</Frequency>
             </StageGain>
           </Stage>
