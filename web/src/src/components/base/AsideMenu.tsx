@@ -3,8 +3,8 @@ import Icon from '@mdi/react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-import { localeConfig } from '../config/locale';
-import { IMenuItem } from '../config/menu';
+import { localeConfig } from '../../config/locale';
+import { IMenuItem } from '../../config/menu';
 
 interface IAsideMenu {
     readonly title: string;

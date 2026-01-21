@@ -5,7 +5,7 @@ import { useCallback, useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import theme from 'react-syntax-highlighter/dist/esm/styles/prism/atom-dark';
 
-import { setClipboardText } from '../helpers/utils/setClipboardText';
+import { setClipboardText } from '../../helpers/utils/setClipboardText';
 
 interface ICodeBlock {
     readonly language?: string;

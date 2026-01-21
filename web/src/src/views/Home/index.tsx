@@ -13,19 +13,16 @@ import Icon from '@mdi/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Banner } from '../../components/Banner';
-import { GaugeChart } from '../../components/GaugeChart';
-import { LineChart } from '../../components/LineChart';
-import { MapContainer } from '../../components/MapContainer';
-import { Skeleton } from '../../components/Skeleton';
-import { StatusCard } from '../../components/StatusCard';
-import { StatusList } from '../../components/StatusList';
+import { GaugeChart } from '../../components/chart/GaugeChart';
+import { LineChart } from '../../components/chart/LineChart';
+import { Skeleton } from '../../components/ui/Skeleton';
+import { Banner } from '../../components/widget/Banner';
+import { MapContainer } from '../../components/widget/MapContainer';
+import { StatusCard } from '../../components/widget/StatusCard';
+import { StatusList } from '../../components/widget/StatusList';
+import { HomeConstraints } from '../../config/constraints';
 import { useGetHomeDataQuery, useGetUpgradeStatusLazyQuery } from '../../graphql';
 import { getTimeString } from '../../helpers/utils/getTimeString';
-
-const lineChartRetention = 100;
-const pollInterval = 2000;
-const maxGapSeconds = 5 * (pollInterval / 1000);
 
 const Home = () => {
     const { t } = useTranslation();
@@ -46,7 +43,7 @@ const Home = () => {
         data: getHomeDataData,
         error: getHomeDataError,
         loading: getHomeDataLoading
-    } = useGetHomeDataQuery({ pollInterval });
+    } = useGetHomeDataQuery({ pollInterval: HomeConstraints.pollInterval });
     const getStationCoordinates = useMemo(
         () =>
             getHomeDataData
@@ -223,8 +220,8 @@ const Home = () => {
             const newCpuData = processChartData(
                 cpuDataRef.current,
                 [getHomeDataData.getCurrentTime, getHomeDataData.getSystemStatus.cpu ?? 0],
-                lineChartRetention,
-                maxGapSeconds
+                HomeConstraints.lineChartRetention,
+                HomeConstraints.maxGapSeconds
             );
             cpuDataRef.current = newCpuData;
             setCpuData(newCpuData);
@@ -232,8 +229,8 @@ const Home = () => {
             const newMemoryData = processChartData(
                 memoryDataRef.current,
                 [getHomeDataData.getCurrentTime, getHomeDataData.getSystemStatus.memory ?? 0],
-                lineChartRetention,
-                maxGapSeconds
+                HomeConstraints.lineChartRetention,
+                HomeConstraints.maxGapSeconds
             );
             memoryDataRef.current = newMemoryData;
             setMemoryData(newMemoryData);

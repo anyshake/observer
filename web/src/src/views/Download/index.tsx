@@ -7,8 +7,8 @@ import { GridColDef, GridValidRowModel } from '@mui/x-data-grid';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Card } from '../../components/Card';
-import { TableList } from '../../components/TableList';
+import { Card } from '../../components/widget/Card';
+import { TableList } from '../../components/widget/TableList';
 import { IRouterComponent } from '../../config/router';
 import { useGetFileListDataQuery } from '../../graphql';
 import { sendPromiseAlert } from '../../helpers/alert/sendPromiseAlert';

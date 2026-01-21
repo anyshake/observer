@@ -1,4 +1,5 @@
 import {
+    mdiBlurLinear,
     mdiCalendarSearch,
     mdiClock,
     mdiLink,
@@ -6,7 +7,8 @@ import {
     mdiLockOpen,
     mdiLockReset,
     mdiTarget,
-    mdiViewDashboard
+    mdiViewDashboard,
+    mdiWaveform
 } from '@mdi/js';
 import Icon from '@mdi/react';
 import { Buffer } from 'buffer';
@@ -14,13 +16,16 @@ import * as _countryFlags from 'country-flag-icons/string/3x2';
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
+import { FFTExecutor } from 'spectrogram-js';
 
-import { Card } from '../../components/Card';
-import { DialogModal } from '../../components/DialogModal';
-import { DraggableBox } from '../../components/DraggableBox';
-import { LineChart } from '../../components/LineChart';
-import { List } from '../../components/List';
-import { TimePicker } from '../../components/TimePicker';
+import { LineChart } from '../../components/chart/LineChart';
+import { Spectrogram } from '../../components/chart/Spectrogram';
+import { DialogModal } from '../../components/ui/DialogModal';
+import { DraggableBox } from '../../components/ui/DraggableBox';
+import { Card } from '../../components/widget/Card';
+import { List } from '../../components/widget/List';
+import { TimePicker } from '../../components/widget/TimePicker';
+import { HistoryConstraints } from '../../config/constraints';
 import { IRouterComponent } from '../../config/router';
 import {
     useGetSeismicEventBySourceLazyQuery,
@@ -35,15 +40,9 @@ import { ApiClient } from '../../helpers/request/ApiClient';
 import { useUrlParams } from '../../helpers/request/useUrlParams';
 import { getTimeString } from '../../helpers/utils/getTimeString';
 import { setClipboardText } from '../../helpers/utils/setClipboardText';
+import { useThrottleFnTrailing } from '../../helpers/utils/useThrottleFnTrailing';
 import { useLayoutStore } from '../../stores/layout';
-
-const constraints = {
-    id: 'history',
-    minWidth: 200,
-    minHeight: 150,
-    maxWidth: 800,
-    maxHeight: 600
-};
+import { useRetentionStore } from '../../stores/retention';
 
 const History = ({ currentLocale }: IRouterComponent) => {
     const { t } = useTranslation();
@@ -57,6 +56,12 @@ const History = ({ currentLocale }: IRouterComponent) => {
             ),
         []
     );
+    const sharedFFTExecutor = useMemo(() => new FFTExecutor(HistoryConstraints.fftSize), []);
+
+    const [displayMode, setDisplayMode] = useState<'waveform' | 'spectrogram'>('waveform');
+    const handleToggleDisplayMode = useCallback(() => {
+        setDisplayMode((prevMode) => (prevMode === 'waveform' ? 'spectrogram' : 'waveform'));
+    }, []);
 
     const [isBusy, setIsBusy] = useState(true);
     const [searchParams, setSearchParams] = useSearchParams();
@@ -269,6 +274,7 @@ const History = ({ currentLocale }: IRouterComponent) => {
         availableExports?.formats
     ]);
 
+    const [sampleRate, setSampleRate] = useState(0);
     const [chartData, setChartData] = useState<{ [key: string]: Array<[number, number | null]> }>(
         {}
     );
@@ -279,6 +285,7 @@ const History = ({ currentLocale }: IRouterComponent) => {
             return;
         }
         const requestFn = async () => {
+            setSampleRate(0);
             setChartData({});
             setIsBusy(true);
             const { data, error } = await getSeismicRecords({ variables: { startTime, endTime } });
@@ -311,9 +318,12 @@ const History = ({ currentLocale }: IRouterComponent) => {
                 ) {
                     setActiveChannels((prevChannels) => {
                         const newChannels = { ...prevChannels };
-                        Array.from(currentChannels).forEach((channel) => {
+                        Array.from(currentChannels).forEach((channel, index) => {
                             if (!newChannels[channel]) {
-                                newChannels[channel] = { id: `${constraints.id}_${channel}` };
+                                newChannels[channel] = {
+                                    id: `${HistoryConstraints.id}_${channel}`,
+                                    index
+                                };
                             }
                         });
                         Object.keys(newChannels).forEach((channel) => {
@@ -361,6 +371,7 @@ const History = ({ currentLocale }: IRouterComponent) => {
 
                         lastTimestamp = timestamp;
                     });
+                    setSampleRate(records.length > 0 ? records[0]!.sampleRate : 0);
 
                     return newChartData;
                 });
@@ -371,13 +382,16 @@ const History = ({ currentLocale }: IRouterComponent) => {
         );
     }, [t, startTime, endTime, getSeismicRecords]);
 
-    const [activeChannels, setActiveChannels] = useState<Record<string, { id: string }>>({});
+    const [activeChannels, setActiveChannels] = useState<
+        Record<string, { id: string; index: number }>
+    >({});
     const { config, locks, toggleLock, setLayoutConfig, resetLayoutConfig } = useLayoutStore();
+    const { retention } = useRetentionStore();
     const prevChannelsRef = useRef<string[]>([]);
     const [activeChart, setActiveChart] = useState<string | null>(null); // Track the active chart
 
     const getInitialLayout = useCallback(
-        (id: string) => {
+        (id: string, index: number) => {
             if (config[id]?.position && config[id]?.size) {
                 return config[id];
             }
@@ -396,13 +410,14 @@ const History = ({ currentLocale }: IRouterComponent) => {
                 size: {
                     width:
                         document.documentElement.clientWidth > 768
-                            ? constraints.minWidth * 2
-                            : constraints.minWidth,
+                            ? HistoryConstraints.minWidth * 2
+                            : HistoryConstraints.minWidth,
                     height:
                         document.documentElement.clientWidth > 768
-                            ? constraints.minWidth * 2
-                            : constraints.minHeight
-                }
+                            ? HistoryConstraints.minWidth * 2
+                            : HistoryConstraints.minHeight
+                },
+                spectrogram: { ...HistoryConstraints.getDynamicDB(index) }
             };
         },
         [config]
@@ -429,17 +444,33 @@ const History = ({ currentLocale }: IRouterComponent) => {
     }, [t, searchParams, startTime, endTime, setSearchParams]);
 
     const handleDragStop = useCallback(
-        (channel: string, x: number, y: number) => {
-            setLayoutConfig(channel, { ...getInitialLayout(channel), position: { x, y } });
+        (channel: string, index: number, x: number, y: number) => {
+            setLayoutConfig(channel, { ...getInitialLayout(channel, index), position: { x, y } });
         },
         [getInitialLayout, setLayoutConfig]
     );
 
     const handleResizeStop = useCallback(
-        (channel: string, width: number, height: number) => {
-            setLayoutConfig(channel, { ...getInitialLayout(channel), size: { width, height } });
+        (channel: string, index: number, width: number, height: number) => {
+            setLayoutConfig(channel, {
+                ...getInitialLayout(channel, index),
+                size: { width, height }
+            });
         },
         [getInitialLayout, setLayoutConfig]
+    );
+
+    const handleSpectrogramUpdate = useThrottleFnTrailing(
+        useCallback(
+            (channel: string, index: number, minDB: number, maxDB: number) => {
+                setLayoutConfig(channel, {
+                    ...getInitialLayout(channel, index),
+                    spectrogram: { maxDB, minDB }
+                });
+            },
+            [getInitialLayout, setLayoutConfig]
+        ),
+        500
     );
 
     return (
@@ -654,9 +685,9 @@ const History = ({ currentLocale }: IRouterComponent) => {
             <div className="flex flex-wrap items-center gap-2">
                 <button
                     className="btn btn-sm flex items-center"
-                    onClick={() => toggleLock(constraints.id)}
+                    onClick={() => toggleLock(HistoryConstraints.id)}
                 >
-                    {locks[constraints.id] ? (
+                    {locks[HistoryConstraints.id] ? (
                         <>
                             <Icon className="flex-shrink-0" path={mdiLock} size={0.7} />
                             <span>{t('views.History.layout_locker.unlock_button')}</span>
@@ -672,6 +703,23 @@ const History = ({ currentLocale }: IRouterComponent) => {
                     <Icon className="flex-shrink-0" path={mdiLockReset} size={0.7} />
                     <span>{t('views.History.reset_layout.reset_button')}</span>
                 </button>
+                {sampleRate >= HistoryConstraints.freqRange[1] * 2 && (
+                    <button
+                        className="btn btn-sm flex items-center"
+                        onClick={handleToggleDisplayMode}
+                    >
+                        <Icon
+                            className="flex-shrink-0"
+                            path={displayMode === 'waveform' ? mdiBlurLinear : mdiWaveform}
+                            size={0.7}
+                        />
+                        <span>
+                            {displayMode === 'waveform'
+                                ? t('views.History.display_mode.spectrogram_mode')
+                                : t('views.History.display_mode.waveform_mode')}
+                        </span>
+                    </button>
+                )}
                 <button className="btn btn-sm" onClick={handleShareLink}>
                     <Icon className="flex-shrink-0" path={mdiLink} size={0.7} />
                     <span>{t('views.History.share_link.share_button')}</span>
@@ -691,34 +739,90 @@ const History = ({ currentLocale }: IRouterComponent) => {
                         }
                         return 0;
                     })
-                    .map((channel, index) => (
-                        <DraggableBox
-                            layout={getInitialLayout(activeChannels[channel].id)}
-                            locked={locks[constraints.id]}
-                            constraints={constraints}
-                            key={`${index}-${channel}`}
-                            onDragStart={() => {
-                                setActiveChart(channel);
-                            }}
-                            onDragStop={(x, y) => {
-                                handleDragStop(activeChannels[channel].id, x, y);
-                            }}
-                            onResizeStop={(width, height) =>
-                                handleResizeStop(activeChannels[channel].id, width, height)
-                            }
-                        >
-                            <LineChart
-                                title={channel}
-                                lineColor="#8A3EED"
-                                height={'100%'}
-                                yPosition="right"
-                                zoom={true}
-                                minSpanValue={100}
-                                animation={false}
-                                data={chartData[channel]}
-                            />
-                        </DraggableBox>
-                    ))}
+                    .map((channel) => {
+                        const initialLayout = getInitialLayout(
+                            activeChannels[channel].id,
+                            activeChannels[channel].index
+                        );
+                        return (
+                            <DraggableBox
+                                key={channel}
+                                layout={initialLayout}
+                                locked={locks[HistoryConstraints.id]}
+                                constraints={HistoryConstraints}
+                                onDragStart={() => setActiveChart(channel)}
+                                onDragStop={(x, y) =>
+                                    handleDragStop(
+                                        activeChannels[channel].id,
+                                        activeChannels[channel].index,
+                                        x,
+                                        y
+                                    )
+                                }
+                                onResizeStop={(width, height) =>
+                                    handleResizeStop(
+                                        activeChannels[channel].id,
+                                        activeChannels[channel].index,
+                                        width,
+                                        height
+                                    )
+                                }
+                            >
+                                <div
+                                    className={
+                                        displayMode === 'waveform'
+                                            ? 'block h-full w-full'
+                                            : 'hidden'
+                                    }
+                                >
+                                    <LineChart
+                                        minSpanValue={HistoryConstraints.minSpanValue}
+                                        lineColor={HistoryConstraints.lineColor}
+                                        height={'100%'}
+                                        yPosition="right"
+                                        title={channel}
+                                        zoom={true}
+                                        animation={false}
+                                        data={chartData[channel]}
+                                    />
+                                </div>
+                                <div
+                                    className={
+                                        displayMode === 'spectrogram'
+                                            ? 'block h-full w-full'
+                                            : 'hidden'
+                                    }
+                                >
+                                    <Spectrogram
+                                        title={channel}
+                                        duration={retention}
+                                        overlap={HistoryConstraints.overlap}
+                                        freqRange={HistoryConstraints.freqRange}
+                                        windowSize={HistoryConstraints.windowSize}
+                                        maxDB={initialLayout.spectrogram.maxDB}
+                                        minDB={initialLayout.spectrogram.minDB}
+                                        fftExecutor={sharedFFTExecutor}
+                                        data={
+                                            chartData[channel]
+                                                ? chartData[channel].filter(
+                                                      (v): v is [number, number] => v[1] !== null
+                                                  )
+                                                : []
+                                        }
+                                        sampleRate={sampleRate}
+                                        onSpectrogramUpdate={(minDB, maxDB) =>
+                                            handleSpectrogramUpdate(
+                                                activeChannels[channel].id,
+                                                activeChannels[channel].index,
+                                                minDB,
+                                                maxDB
+                                            )
+                                        }
+                                    />
+                                </div>
+                            </DraggableBox>
+                        );
+                    })}
             </div>
 
             <DialogModal

@@ -14,9 +14,9 @@ import { Field, Form, Formik } from 'formik';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { DialogModal } from '../../components/DialogModal';
-import { ErrorPage } from '../../components/ErrorPage';
-import { TableList } from '../../components/TableList';
+import { DialogModal } from '../../components/ui/DialogModal';
+import { ErrorPage } from '../../components/ui/ErrorPage';
+import { TableList } from '../../components/widget/TableList';
 import {
     useCreateUserMutation,
     useGetUserListQuery,

@@ -2,6 +2,7 @@ import ReactECharts from 'echarts-for-react';
 import { memo, useEffect, useMemo, useRef } from 'react';
 
 interface ILineChart {
+    readonly hidden?: boolean;
     readonly title?: string;
     readonly animation?: boolean;
     readonly lineColor?: string;
@@ -18,6 +19,7 @@ interface ILineChart {
 
 export const LineChart = memo(
     ({
+        hidden,
         title,
         animation = true,
         lineColor = '#7e59ff',
@@ -123,10 +125,15 @@ export const LineChart = memo(
             <ReactECharts
                 ref={chartRef}
                 option={option}
-                style={{
-                    height: typeof height === 'number' ? `${height}px` : height,
-                    width: '100%'
-                }}
+                style={
+                    hidden
+                        ? { display: 'none' }
+                        : {
+                              height: typeof height === 'number' ? `${height}px` : height,
+                              width: '100%',
+                              display: 'block'
+                          }
+                }
                 opts={{ renderer: 'canvas' }}
                 notMerge={true}
                 lazyUpdate={true}

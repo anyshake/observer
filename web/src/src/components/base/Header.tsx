@@ -1,7 +1,7 @@
 import { mdiEarth, mdiExitToApp } from '@mdi/js';
 import Icon from '@mdi/react';
 
-import { localeConfig } from '../config/locale';
+import { localeConfig } from '../../config/locale';
 
 interface IHeader {
     readonly title: string;

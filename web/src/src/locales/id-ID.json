@@ -9,6 +9,20 @@
             "no": "Tidak",
             "add_new_item": "Masukkan item baru.",
             "editing_list": "Mengedit Daftar {{fieldName}}"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "Pengaturan Spektrogram",
+                "min_db": "dB Minimum",
+                "max_db": "dB Maksimum"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "Pengaturan Spektrogram",
+                "min_db": "dB Minimum",
+                "max_db": "dB Maksimum"
+            }
         }
     },
     "views": {
@@ -93,6 +107,10 @@
                 "confirm_button": "Reset",
                 "cancel_button": "Batal"
             },
+            "display_mode": {
+                "waveform_mode": "Mode Gelombang",
+                "spectrogram_mode": "Mode Spektrogram"
+            },
             "share_link": {
                 "share_button": "Bagikan Tautan",
                 "link_copied": "Tautan yang dibagikan telah disalin ke clipboard."
@@ -165,6 +183,10 @@
             "go_back_button": "Kembali"
         },
         "RealTime": {
+            "display_mode": {
+                "waveform_mode": "Mode Gelombang",
+                "spectrogram_mode": "Mode Spektrogram"
+            },
             "reset_layout": {
                 "reset_button": "Reset Semua",
                 "confirm_message": "Apakah Anda yakin ingin mereset tata letak?",

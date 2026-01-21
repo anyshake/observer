@@ -12,10 +12,10 @@ import Icon from '@mdi/react';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { DialogModal } from '../../components/DialogModal';
-import { ErrorPage } from '../../components/ErrorPage';
-import { StatusCard } from '../../components/StatusCard';
-import { InputType, TypedInput } from '../../components/TypedInput';
+import { DialogModal } from '../../components/ui/DialogModal';
+import { ErrorPage } from '../../components/ui/ErrorPage';
+import { InputType, TypedInput } from '../../components/ui/TypedInput';
+import { StatusCard } from '../../components/widget/StatusCard';
 import {
     useGetServiceDataQuery,
     useRestartServiceMutation,

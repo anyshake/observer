@@ -3,7 +3,7 @@ import * as dataGridLocales from '@mui/x-data-grid/locales';
 import { Localization } from '@mui/x-data-grid/utils/getGridLocalization';
 import { useEffect, useMemo, useState } from 'react';
 
-import { localeConfig } from '../config/locale';
+import { localeConfig } from '../../config/locale';
 
 interface TableListProps {
     readonly currentLocale: keyof typeof localeConfig.resources;

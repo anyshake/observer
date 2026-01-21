@@ -5,8 +5,8 @@ import { createRoot } from 'react-dom/client';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import App from './App.tsx';
-import { ErrorPage } from './components/ErrorPage.tsx';
-import { RouterWrapper } from './components/RouterWrapper';
+import { ErrorPage } from './components/ui/ErrorPage.tsx';
+import { RouterWrapper } from './components/ui/RouterWrapper.tsx';
 import { routerConfig } from './config/router';
 import { getGraphQlApiUrl } from './helpers/app/getGraphQlApiUrl.tsx';
 import { ApiClient } from './helpers/request/ApiClient.tsx';

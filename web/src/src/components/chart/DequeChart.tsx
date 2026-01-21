@@ -9,7 +9,7 @@ import {
     useRef
 } from 'react';
 
-import TimeSeriesBuffer from '../helpers/storage/TimeSeriesBuffer';
+import TimeSeriesBuffer from '../../helpers/storage/TimeSeriesBuffer';
 
 export interface DequeChartHandle {
     addData: (
@@ -178,7 +178,8 @@ export const DequeChart = memo(
                     option={option}
                     style={{
                         height: typeof height === 'number' ? `${height}px` : height,
-                        width: '100%'
+                        width: '100%',
+                        display: 'block'
                     }}
                     opts={{ renderer: 'canvas' }}
                     notMerge={true}

@@ -130,7 +130,7 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
     };
 
     return (
-        <div className="animate-fade animate-duration-500 animate-delay-300 flex min-h-screen flex-col bg-gradient-to-br from-purple-500 to-blue-500 p-20 px-4">
+        <div className="animate-fade animate-duration-500 animate-delay-300 flex min-h-screen flex-col bg-gradient-to-br from-purple-300 via-purple-200 to-purple-300 p-20 px-4">
             <div className="m-auto w-full max-w-md rounded-lg bg-white p-12 shadow-xl md:max-w-xl">
                 <img
                     src={globalConfig.logo}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { CodeBlock } from '../../components/CodeBlock';
-import { ErrorPage } from '../../components/ErrorPage';
+import { ErrorPage } from '../../components/ui/ErrorPage';
+import { CodeBlock } from '../../components/widget/CodeBlock';
 import { useGetApplicationLogsQuery } from '../../graphql';
 
 export const Logs = () => {

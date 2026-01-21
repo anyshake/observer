@@ -9,6 +9,20 @@
             "no": "Não",
             "add_new_item": "Inserir novo item.",
             "editing_list": "A editar Lista de {{fieldName}}"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "Configurações do espectrograma",
+                "min_db": "dB mínimo",
+                "max_db": "dB máximo"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "Configurações do espectrograma",
+                "min_db": "dB mínimo",
+                "max_db": "dB máximo"
+            }
         }
     },
     "views": {
@@ -93,6 +107,10 @@
                 "confirm_button": "Repor",
                 "cancel_button": "Cancelar"
             },
+            "display_mode": {
+                "waveform_mode": "Modo de forma de onda",
+                "spectrogram_mode": "Modo de espectrograma"
+            },
             "share_link": {
                 "share_button": "Partilhar Link",
                 "link_copied": "Link partilhado copiado para a área de transferência."
@@ -165,6 +183,10 @@
             "go_back_button": "Voltar"
         },
         "RealTime": {
+            "display_mode": {
+                "waveform_mode": "Modo de forma de onda",
+                "spectrogram_mode": "Modo de espectrograma"
+            },
             "reset_layout": {
                 "reset_button": "Repor Tudo",
                 "confirm_message": "Tem a certeza de que deseja repor o layout?",

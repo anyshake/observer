@@ -81,7 +81,7 @@ export const DraggableBox = ({
         >
             <div
                 ref={dragRef}
-                className="absolute m-2 cursor-move overflow-hidden rounded-lg bg-white p-2 shadow-lg"
+                className={`absolute m-2 overflow-hidden rounded-lg bg-white p-2 shadow-lg ${!locked ? 'cursor-move' : ''}`}
             >
                 <ResizableBox
                     axis="both"

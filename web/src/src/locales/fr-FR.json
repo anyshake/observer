@@ -9,6 +9,20 @@
             "no": "Non",
             "add_new_item": "Saisir un nouvel élément.",
             "editing_list": "Modification de la liste de {{fieldName}}"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "Paramètres du spectrogramme",
+                "min_db": "dB min",
+                "max_db": "dB max"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "Paramètres du spectrogramme",
+                "min_db": "dB min",
+                "max_db": "dB max"
+            }
         }
     },
     "views": {
@@ -93,6 +107,10 @@
                 "confirm_button": "Réinitialiser",
                 "cancel_button": "Annuler"
             },
+            "display_mode": {
+                "waveform_mode": "Mode forme d’onde",
+                "spectrogram_mode": "Mode spectrogramme"
+            },
             "share_link": {
                 "share_button": "Partager le lien",
                 "link_copied": "Le lien partagé a été copié dans le presse-papiers."
@@ -165,6 +183,10 @@
             "go_back_button": "Retour"
         },
         "RealTime": {
+            "display_mode": {
+                "waveform_mode": "Mode forme d’onde",
+                "spectrogram_mode": "Mode spectrogramme"
+            },
             "reset_layout": {
                 "reset_button": "Tout réinitialiser",
                 "confirm_message": "Êtes-vous sûr de vouloir réinitialiser la disposition ?",

@@ -1,6 +1,6 @@
 import { JSX, lazy, LazyExoticComponent } from 'react';
 
-import { RouterMode } from '../components/RouterWrapper';
+import { RouterMode } from '../components/ui/RouterWrapper';
 import { Translation } from './locale';
 
 export type RouterProp<T> = Record<string, T>;

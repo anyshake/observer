@@ -1,8 +1,8 @@
 import { ReactNode, Suspense, useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
-import { localeConfig, Translation } from '../config/locale';
-import { IRoute, IRouterComponent } from '../config/router';
+import { localeConfig, Translation } from '../../config/locale';
+import { IRoute, IRouterComponent } from '../../config/router';
 
 interface IRouterView {
     readonly currentLocale: keyof typeof localeConfig.resources;

@@ -3,8 +3,8 @@ import Icon from '@mdi/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { hideLoaderAnimation } from '../helpers/app/hideLoaderAnimation';
-import { CodeBlock } from './CodeBlock';
+import { hideLoaderAnimation } from '../../helpers/app/hideLoaderAnimation';
+import { CodeBlock } from '../widget/CodeBlock';
 
 interface IErrorPage {
     readonly code?: number;

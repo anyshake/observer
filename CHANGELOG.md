@@ -2,6 +2,23 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.3.2
+
+### Release Notes
+
+This release introduces **configuration flexibility and frontend observability improvements**, focusing on **custom sensor adaptability** and **web-based data visualization**.
+
+By allowing users to define **custom sensor parameters**, AnyShake Observer can now better support experimental setups. In parallel, the **web frontend gains spectrogram viewing capability**, improving real-time signal inspection directly from the browser without requiring local analysis tools.
+
+### New Features
+
+- Added support for **custom sensor parameters**, enabling flexible definition of sensor characteristics beyond predefined device profiles.
+- Added **spectrogram viewer** to the **web frontend**, allowing users to visualize frequency-domain data directly in the browser.
+
+### Bug Fixes
+
+- Removed unavailable earthquake event data sources: **Sichuan Earthquake Administration (Bulletin)**, **Australian Passive Seismic Server**.
+
 ## v4.3.1
 
 ### Release Notes

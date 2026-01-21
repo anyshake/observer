@@ -9,6 +9,20 @@
             "no": "Nie",
             "add_new_item": "Wprowadź nowy element.",
             "editing_list": "Edycja listy {{fieldName}}"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "Ustawienia spektrogramu",
+                "min_db": "Min dB",
+                "max_db": "Max dB"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "Ustawienia spektrogramu",
+                "min_db": "Min dB",
+                "max_db": "Max dB"
+            }
         }
     },
     "views": {
@@ -93,6 +107,10 @@
                 "confirm_button": "Zresetuj",
                 "cancel_button": "Anuluj"
             },
+            "display_mode": {
+                "waveform_mode": "Tryb przebiegu",
+                "spectrogram_mode": "Tryb spektrogramu"
+            },
             "share_link": {
                 "share_button": "Udostępnij link",
                 "link_copied": "Udostępniony link został skopiowany do schowka."
@@ -165,6 +183,10 @@
             "go_back_button": "Wróć"
         },
         "RealTime": {
+            "display_mode": {
+                "waveform_mode": "Tryb przebiegu",
+                "spectrogram_mode": "Tryb spektrogramu"
+            },
             "reset_layout": {
                 "reset_button": "Zresetuj wszystko",
                 "confirm_message": "Czy na pewno chcesz zresetować układ?",

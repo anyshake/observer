@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ErrorPage } from '../../components/ErrorPage';
-import { InputType, TypedInput } from '../../components/TypedInput';
+import { ErrorPage } from '../../components/ui/ErrorPage';
+import { InputType, TypedInput } from '../../components/ui/TypedInput';
 import { useGetStationConfigQuery, useUpdateStationConfigMutation } from '../../graphql';
 import { sendPromiseAlert } from '../../helpers/alert/sendPromiseAlert';
 import { sendUserAlert } from '../../helpers/alert/sendUserAlert';

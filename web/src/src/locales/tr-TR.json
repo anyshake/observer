@@ -9,6 +9,20 @@
             "no": "Hayır",
             "add_new_item": "Yeni öğe girin.",
             "editing_list": "{{fieldName}} Listesi Düzenleniyor"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "Spektrogram Ayarları",
+                "min_db": "Minimum dB",
+                "max_db": "Maksimum dB"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "Spektrogram Ayarları",
+                "min_db": "Minimum dB",
+                "max_db": "Maksimum dB"
+            }
         }
     },
     "views": {
@@ -93,6 +107,10 @@
                 "confirm_button": "Sıfırla",
                 "cancel_button": "İptal"
             },
+            "display_mode": {
+                "waveform_mode": "Dalga Formu Modu",
+                "spectrogram_mode": "Spektrogram Modu"
+            },
             "share_link": {
                 "share_button": "Bağlantıyı Paylaş",
                 "link_copied": "Paylaşılan bağlantı panoya kopyalandı."
@@ -165,6 +183,10 @@
             "go_back_button": "Geri Git"
         },
         "RealTime": {
+            "display_mode": {
+                "waveform_mode": "Dalga Formu Modu",
+                "spectrogram_mode": "Spektrogram Modu"
+            },
             "reset_layout": {
                 "reset_button": "Tümünü Sıfırla",
                 "confirm_message": "Düzeni sıfırlamak istediğinizden emin misiniz?",

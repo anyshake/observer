@@ -9,8 +9,8 @@ import * as XDatePickers from '@mui/x-date-pickers/locales';
 import * as DateFnsLang from 'date-fns/locale';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { localeConfig } from '../config/locale';
-import { getTimeString } from '../helpers/utils/getTimeString';
+import { localeConfig } from '../../config/locale';
+import { getTimeString } from '../../helpers/utils/getTimeString';
 
 export interface TimePickerProps {
     readonly value?: number;

@@ -9,6 +9,20 @@
             "no": "いいえ",
             "add_new_item": "新しい項目を入力してください。",
             "editing_list": "{{fieldName}} のリストを編集中"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "スペクトログラム設定",
+                "min_db": "最小 dB",
+                "max_db": "最大 dB"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "スペクトログラム設定",
+                "min_db": "最小 dB",
+                "max_db": "最大 dB"
+            }
         }
     },
     "views": {
@@ -93,6 +107,10 @@
                 "confirm_button": "リセット",
                 "cancel_button": "キャンセル"
             },
+            "display_mode": {
+                "waveform_mode": "波形モード",
+                "spectrogram_mode": "スペクトログラムモード"
+            },
             "share_link": {
                 "share_button": "リンクを共有",
                 "link_copied": "共有リンクがクリップボードにコピーされました。"
@@ -165,6 +183,10 @@
             "go_back_button": "戻る"
         },
         "RealTime": {
+            "display_mode": {
+                "waveform_mode": "波形モード",
+                "spectrogram_mode": "スペクトログラムモード"
+            },
             "reset_layout": {
                 "reset_button": "すべてリセット",
                 "confirm_message": "レイアウトをリセットしてもよろしいですか？",

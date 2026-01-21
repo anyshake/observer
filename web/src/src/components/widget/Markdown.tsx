@@ -9,7 +9,7 @@ import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 
-import { CodeBlock } from './CodeBlock';
+import { CodeBlock } from '../widget/CodeBlock';
 
 interface IMarkdown {
     readonly className?: string;

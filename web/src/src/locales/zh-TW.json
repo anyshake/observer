@@ -9,6 +9,20 @@
             "no": "否",
             "add_new_item": "輸入新項目。",
             "editing_list": "編輯 {{fieldName}} 列表"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "頻譜圖設定",
+                "min_db": "最小 dB",
+                "max_db": "最大 dB"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "頻譜圖設定",
+                "min_db": "最小 dB",
+                "max_db": "最大 dB"
+            }
         }
     },
     "views": {
@@ -93,6 +107,10 @@
                 "confirm_button": "重設",
                 "cancel_button": "取消"
             },
+            "display_mode": {
+                "waveform_mode": "波形模式",
+                "spectrogram_mode": "頻譜圖模式"
+            },
             "share_link": {
                 "share_button": "分享連結",
                 "link_copied": "分享連結已複製到剪貼簿。"
@@ -165,6 +183,10 @@
             "go_back_button": "返回"
         },
         "RealTime": {
+            "display_mode": {
+                "waveform_mode": "波形模式",
+                "spectrogram_mode": "頻譜圖模式"
+            },
             "reset_layout": {
                 "reset_button": "全部重設",
                 "confirm_message": "您確定要重設佈局嗎？",

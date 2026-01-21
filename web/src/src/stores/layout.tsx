@@ -9,6 +9,7 @@ const layoutStoreKey = 'layout-store';
 type LayoutConfig = {
     readonly position: { x: number; y: number };
     readonly size: { width: number; height: number };
+    readonly spectrogram: { maxDB: number; minDB: number };
 };
 
 interface ILayout {

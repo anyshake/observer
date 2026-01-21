@@ -7,7 +7,7 @@ export const getRestfulApiUrl = (resource: string) => {
 
     if (isProduction) {
         return baseHost
-            ? `${apiBasePath}${resource}`
+            ? `${baseHost}${apiBasePath}${resource}`
             : `${protocol}${window.location.host}${apiBasePath}${resource}`;
     }
 

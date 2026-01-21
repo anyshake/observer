@@ -3,7 +3,7 @@ import Icon from '@mdi/react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { localeConfig } from '../config/locale';
+import { localeConfig } from '../../config/locale';
 
 interface IFooter {
     readonly copyright: string;

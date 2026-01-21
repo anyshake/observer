@@ -6,7 +6,7 @@ export const getSocketApiUrl = (token?: string) => {
     const getWebSocketProtocol = (url: string) => (url.startsWith('https:') ? 'wss://' : 'ws://');
 
     if (isProduction) {
-        const protocol = getWebSocketProtocol(window.location.protocol);
+        const protocol = getWebSocketProtocol(baseHost ? baseHost : window.location.protocol);
         return baseHost
             ? `${baseHost.replace(/^https?:\/\//, protocol)}${wsEndpoint}${token ? `?token=${token}` : ''}`
             : `${protocol}${window.location.host}${wsEndpoint}${token ? `?token=${token}` : ''}`;

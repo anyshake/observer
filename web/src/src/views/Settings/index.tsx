@@ -12,7 +12,7 @@ import Icon from '@mdi/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Skeleton } from '../../components/Skeleton';
+import { Skeleton } from '../../components/ui/Skeleton';
 import { IRouterComponent } from '../../config/router';
 import { useIsCurrentUserAdminQuery } from '../../graphql';
 import { Backup } from './backup';

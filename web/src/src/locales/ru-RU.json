@@ -9,6 +9,20 @@
             "no": "Нет",
             "add_new_item": "Введите новый элемент.",
             "editing_list": "Редактирование списка {{fieldName}}"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "Настройки спектрограммы",
+                "min_db": "Мин. dB",
+                "max_db": "Макс. dB"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "Настройки спектрограммы",
+                "min_db": "Мин. dB",
+                "max_db": "Макс. dB"
+            }
         }
     },
     "views": {
@@ -93,6 +107,10 @@
                 "confirm_button": "Сбросить",
                 "cancel_button": "Отмена"
             },
+            "display_mode": {
+                "waveform_mode": "Режим волновой формы",
+                "spectrogram_mode": "Режим спектрограммы"
+            },
             "share_link": {
                 "share_button": "Поделиться ссылкой",
                 "link_copied": "Ссылка скопирована в буфер обмена."
@@ -165,6 +183,10 @@
             "go_back_button": "Назад"
         },
         "RealTime": {
+            "display_mode": {
+                "waveform_mode": "Режим волновой формы",
+                "spectrogram_mode": "Режим спектрограммы"
+            },
             "reset_layout": {
                 "reset_button": "Сбросить все",
                 "confirm_message": "Вы уверены, что хотите сбросить макет?",
