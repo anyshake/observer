@@ -2,6 +2,25 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.3.3
+
+### Release Notes
+
+This is a **minor performance and stability release** focused on **UI responsiveness** and **upgrade robustness**.
+
+The main highlight is **spectrogram rendering optimization**, significantly improving smoothness and reducing frame drops during real-time visualization. In addition, several **upgrade and startup edge cases** have been tightened to avoid misleading states and permission-related failures.
+
+### Improvements
+
+- Optimized **spectrogram rendering pipeline**, improving **frame rate and interaction smoothness** during real-time display.
+- Reduced unnecessary redraws in the frontend, lowering CPU usage under continuous data streams.
+
+### Bug Fixes
+
+- Fixed **upgrade status priority logic**, ensuring correct status reporting when multiple upgrade conditions overlap.
+- Added **write permission checks before startup** to prevent silent failures during initialization.
+- Explicitly specified **HTTPS scheme in CSP sources**, avoiding mixed-content and policy resolution issues in some browsers.
+
 ## v4.3.2
 
 ### Release Notes

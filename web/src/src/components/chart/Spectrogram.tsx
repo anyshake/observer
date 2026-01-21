@@ -81,7 +81,7 @@ export const Spectrogram = memo(
             return () => ro.disconnect();
         }, []);
 
-        const [timePercent, setTimePercent] = useState(0);
+        const [timePercent, setTimePercent] = useState(0.5);
         const dataDuration = useMemo<number | null>(() => {
             if (data.length === 0) {
                 return null;
@@ -94,7 +94,16 @@ export const Spectrogram = memo(
                 return;
             }
 
-            const id = setInterval(() => {
+            let rafId: number;
+            let lastRenderTime = 0;
+            const frameInterval = 1000 / renderFPS;
+
+            const renderLoop = (now: number) => {
+                rafId = requestAnimationFrame(renderLoop);
+                if (now - lastRenderTime < frameInterval) {
+                    return;
+                }
+                lastRenderTime = now;
                 const canvas = canvasRef.current;
                 const sp = spectrogramRef.current;
                 if (!canvas || !sp) {
@@ -118,10 +127,10 @@ export const Spectrogram = memo(
                     timeRange: [start, end],
                     freqRange
                 });
-            }, 1000 / renderFPS);
-
-            return () => clearInterval(id);
-        }, [data, dataDuration, duration, freqRange, initialized, renderFPS, timePercent]);
+            };
+            rafId = requestAnimationFrame(renderLoop);
+            return () => cancelAnimationFrame(rafId);
+        }, [dataDuration, duration, freqRange, initialized, renderFPS, timePercent]);
 
         useEffect(() => {
             if (initialized) {

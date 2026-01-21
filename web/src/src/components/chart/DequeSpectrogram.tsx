@@ -121,9 +121,20 @@ export const DequeSpectrogram = memo(
 
             const timeRangeRef = useRef<[number, number]>([0, 0.001]);
             useEffect(() => {
-                const renderLoop = setInterval(() => {
+                let rafId: number;
+                let lastRenderTime = 0;
+                const frameInterval = 1000 / renderFPS;
+                const renderLoop = (now: number) => {
+                    rafId = requestAnimationFrame(renderLoop);
+
+                    if (now - lastRenderTime < frameInterval) {
+                        return;
+                    }
+                    lastRenderTime = now;
+
                     const canvas = canvasRef.current;
-                    if (!canvas || !spectrogramRef.current || !initialized) {
+                    const sp = spectrogramRef.current;
+                    if (!canvas || !sp || !initialized) {
                         return;
                     }
                     if (needsUpdateRef.current) {
@@ -131,9 +142,9 @@ export const DequeSpectrogram = memo(
                         const bufData = bufferRef.current
                             .getData()
                             .filter((v): v is [number, number] => v[1] !== null);
-                        spectrogramRef.current.setData(bufData);
+                        sp.setData(bufData);
                         if (bufData.length > 0) {
-                            const end = spectrogramRef.current.getDuration();
+                            const end = sp.getDuration();
                             timeRangeRef.current = [end - duration, end];
                         }
                     }
@@ -142,16 +153,17 @@ export const DequeSpectrogram = memo(
                     if (!width || !height) {
                         return;
                     }
-                    spectrogramRef.current.render({
+                    sp.render({
                         timeRange: timeRangeRef.current,
                         canvas,
                         width,
                         height,
                         freqRange
                     });
-                }, 1000 / renderFPS);
-                return () => clearInterval(renderLoop);
-            }, [duration, freqRange, initialized, renderFPS, spectrogramRef]);
+                };
+                rafId = requestAnimationFrame(renderLoop);
+                return () => cancelAnimationFrame(rafId);
+            }, [duration, freqRange, initialized, renderFPS]);
 
             const handlePreviewMinDB = useCallback((value: number) => {
                 setMinDBState(value);

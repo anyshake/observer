@@ -392,7 +392,7 @@ const History = ({ currentLocale }: IRouterComponent) => {
 
     const getInitialLayout = useCallback(
         (id: string, index: number) => {
-            if (config[id]?.position && config[id]?.size) {
+            if (config[id]?.position && config[id]?.size && config[id]?.spectrogram) {
                 return config[id];
             }
 
