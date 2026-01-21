@@ -1,12 +1,48 @@
 package updater
 
 import (
+	"bytes"
 	"context"
+	"fmt"
+	"os"
+	"path/filepath"
 	"runtime/debug"
 	"time"
 
 	"github.com/anyshake/observer/pkg/logger"
 )
+
+func (s *UpdaterServiceImpl) checkReadWritePermission() error {
+	execPath, err := os.Executable()
+	if err != nil {
+		return fmt.Errorf("failed to get executable path: %w", err)
+	}
+
+	execDir := filepath.Dir(execPath)
+	testFile := filepath.Join(execDir, ".observer_updater_write_test")
+	testContent := fmt.Appendf(nil, "anyshake-observer-updater-service-%d", time.Now().UnixNano())
+
+	if err := os.WriteFile(testFile, testContent, 0o644); err != nil {
+		return fmt.Errorf("no write permission on executable dir %s: %w", execDir, err)
+	}
+
+	readBack, err := os.ReadFile(testFile)
+	if err != nil {
+		_ = os.Remove(testFile)
+		return fmt.Errorf("failed to read test file in executable dir %s: %w", execDir, err)
+	}
+
+	if !bytes.Equal(readBack, testContent) {
+		_ = os.Remove(testFile)
+		return fmt.Errorf("content mismatch when testing write permission in %s", execDir)
+	}
+
+	if err := os.Remove(testFile); err != nil {
+		return fmt.Errorf("failed to cleanup test file in %s: %w", execDir, err)
+	}
+
+	return nil
+}
 
 func (s *UpdaterServiceImpl) handleInterrupt(ticker *time.Ticker) {
 	ticker.Stop()
@@ -19,6 +55,10 @@ func (s *UpdaterServiceImpl) Start() error {
 
 	if s.ctx.Err() != nil {
 		s.ctx, s.cancelFn = context.WithCancel(context.Background())
+	}
+
+	if err := s.checkReadWritePermission(); err != nil {
+		return fmt.Errorf("insufficient file system permissions for updater service: %w", err)
 	}
 
 	go func() {
