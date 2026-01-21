@@ -249,10 +249,10 @@ const Home = () => {
             applied: boolean
         ) => {
             if (eligible) {
-                if (applied) {
-                    return t('views.Home.upgrade.restart_needed', { latest, current });
-                }
                 return t('views.Home.upgrade.update_available', { latest });
+            }
+            if (applied) {
+                return t('views.Home.upgrade.restart_needed', { latest, current });
             }
             if (current !== latest) {
                 return t('views.Home.upgrade.manual_upgrade_needed', { latest, current, required });
