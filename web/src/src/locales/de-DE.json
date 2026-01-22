@@ -221,6 +221,18 @@
             },
             "Dangerous": {
                 "title": "Gefahrenbereich",
+                "restart_application": {
+                    "title": "Gesamte Anwendung neu starten",
+                    "description": "Die gesamte Anwendung wird neu gestartet. Dies kann einen kurzen Moment dauern und schließt vorübergehend alle aktiven Verbindungen, wodurch Dienste und Aufzeichnungen unterbrochen werden.",
+                    "submit_button": "Anwendung neu starten",
+                    "confirm_title": "Neustart bestätigen",
+                    "confirm_message": "Möchten Sie die Anwendung wirklich neu starten?",
+                    "confirm_button": "Neu starten",
+                    "cancel_button": "Abbrechen",
+                    "restarting": "Neustartanforderung wird gesendet...",
+                    "success": "Neustartanforderung gesendet. Die Anwendung wird in wenigen Sekunden neu gestartet.",
+                    "error": "Neustart der Anwendung konnte nicht angefordert werden: {{error}}"
+                },
                 "purge_waveform_records": {
                     "title": "Wellenform-Aufzeichnungen löschen",
                     "description": "Dies löscht alle Wellenform-Aufzeichnungen in der Datenbank. Dieser Vorgang kann nicht rückgängig gemacht werden.",

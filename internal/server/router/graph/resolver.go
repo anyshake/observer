@@ -22,6 +22,7 @@ import (
 type ContextKey string
 
 type Resolver struct {
+	RestartChan              chan struct{}
 	CurrentVersion           *semver.Version
 	CurrentBuild             *unibuild.UniBuild
 	UpgradeHelper            *upgrade.Helper

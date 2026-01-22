@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func (s *httpServer) Start() error {
+func (s *HttpServer) Start() error {
 	if s.debug {
 		go func() {
 			for {

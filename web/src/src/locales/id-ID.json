@@ -221,6 +221,18 @@
             },
             "Dangerous": {
                 "title": "Zona Berbahaya",
+                "restart_application": {
+                    "title": "Mulai Ulang Seluruh Aplikasi",
+                    "description": "Tindakan ini akan memulai ulang seluruh aplikasi. Proses ini mungkin memerlukan waktu singkat dan akan menutup sementara semua koneksi aktif, sehingga layanan dan perekaman akan terhenti.",
+                    "submit_button": "Mulai Ulang Aplikasi",
+                    "confirm_title": "Konfirmasi Mulai Ulang",
+                    "confirm_message": "Apakah Anda yakin ingin memulai ulang aplikasi?",
+                    "confirm_button": "Mulai Ulang",
+                    "cancel_button": "Batal",
+                    "restarting": "Mengirim permintaan mulai ulang aplikasi...",
+                    "success": "Permintaan mulai ulang telah dikirim. Aplikasi akan dimulai ulang dalam beberapa detik.",
+                    "error": "Gagal meminta mulai ulang aplikasi: {{error}}"
+                },
                 "purge_waveform_records": {
                     "title": "Hapus Rekaman Waveform",
                     "description": "Ini akan menghapus semua rekaman waveform di database, operasi ini tidak dapat dibatalkan.",

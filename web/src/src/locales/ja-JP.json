@@ -221,6 +221,18 @@
             },
             "Dangerous": {
                 "title": "危険ゾーン",
+                "restart_application": {
+                    "title": "アプリケーション全体を再起動",
+                    "description": "アプリケーション全体を再起動します。完了までに少し時間がかかる場合があり、その間すべての接続が一時的に切断され、サービスおよび記録が中断されます。",
+                    "submit_button": "アプリケーションを再起動",
+                    "confirm_title": "再起動の確認",
+                    "confirm_message": "アプリケーションを再起動してもよろしいですか？",
+                    "confirm_button": "再起動",
+                    "cancel_button": "キャンセル",
+                    "restarting": "再起動リクエストを送信しています...",
+                    "success": "再起動リクエストを送信しました。数秒後にアプリケーションが再起動されます。",
+                    "error": "アプリケーションの再起動リクエストに失敗しました: {{error}}"
+                },
                 "purge_waveform_records": {
                     "title": "波形記録を消去",
                     "description": "データベース内のすべての波形記録が削除されます。この操作は元に戻せません。",

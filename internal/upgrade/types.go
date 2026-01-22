@@ -15,8 +15,9 @@ type Helper struct {
 	releaseFetchUrl    string
 	resolvers          dnsquery.Resolvers
 
-	currentBuild *unibuild.UniBuild
-	currentVer   *semver.Version
+	currentExePath string
+	currentBuild   *unibuild.UniBuild
+	currentVer     *semver.Version
 
 	latestVer   cache.AnyCache
 	requiredVer cache.AnyCache

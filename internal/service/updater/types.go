@@ -26,7 +26,11 @@ type UpdaterServiceImpl struct {
 	ctx      context.Context
 	cancelFn context.CancelFunc
 
-	actionHandler *action.Handler
-	timeSource    *timesource.Source
-	upgradeHelper *upgrade.Helper
+	actionHandler  *action.Handler
+	timeSource     *timesource.Source
+	upgradeHelper  *upgrade.Helper
+	currentExePath string
+	restartChan    chan struct{}
+
+	autoRestartEnabled bool
 }

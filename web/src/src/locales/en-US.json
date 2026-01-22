@@ -221,6 +221,18 @@
             },
             "Dangerous": {
                 "title": "Dangerous Zone",
+                "restart_application": {
+                    "title": "Restart Entire Application",
+                    "description": "This will restart the entire application, it may take a short while to complete and will temporarily close all active connections, causing interruption to services and recording.",
+                    "submit_button": "Restart Application",
+                    "confirm_title": "Confirm Restart",
+                    "confirm_message": "Are you sure you want to restart the application?",
+                    "confirm_button": "Restart",
+                    "cancel_button": "Cancel",
+                    "restarting": "Sending application restart request...",
+                    "success": "Restarting request sent, application will restart in a few seconds.",
+                    "error": "Failed to request application restart: {{error}}"
+                },
                 "purge_waveform_records": {
                     "title": "Purge Waveform Records",
                     "description": "This will delete all waveform records in the database, operation is irreversible.",

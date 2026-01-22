@@ -29,7 +29,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *httpServer) Setup(listen string) error {
+func (s *HttpServer) Setup(listen string) error {
 	s.engine = gin.New()
 
 	s.engine.Use(date_header.New(s.resolver.TimeSource))

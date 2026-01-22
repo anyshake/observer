@@ -20,5 +20,11 @@ func (s *UpdaterServiceImpl) Init() error {
 	}
 	s.upgradeHelper.SetReleaseFetchUrl(releaseFetchUrl.(string))
 
+	autoRestart, err := (&updaterConfigAutoRestartImpl{}).Get(s.actionHandler)
+	if err != nil {
+		return err
+	}
+	s.autoRestartEnabled = autoRestart.(bool)
+
 	return nil
 }

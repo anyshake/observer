@@ -54,6 +54,7 @@ type ComplexityRoot struct {
 		PurgeMiniSeedFiles   func(childComplexity int) int
 		PurgeSeisRecords     func(childComplexity int) int
 		RemoveSysUser        func(childComplexity int, userID string) int
+		RestartApplication   func(childComplexity int) int
 		RestartService       func(childComplexity int, serviceID string) int
 		RestoreServiceConfig func(childComplexity int, serviceID *string) int
 		RestoreStationConfig func(childComplexity int) int
@@ -219,6 +220,7 @@ type MutationResolver interface {
 	UpdateStationConfig(ctx context.Context, key string, value any) (bool, error)
 	RestoreStationConfig(ctx context.Context) (bool, error)
 	ImportGlobalConfig(ctx context.Context, data string) (bool, error)
+	RestartApplication(ctx context.Context) (bool, error)
 	StopService(ctx context.Context, serviceID string) (bool, error)
 	StartService(ctx context.Context, serviceID string) (bool, error)
 	RestartService(ctx context.Context, serviceID string) (bool, error)
@@ -321,6 +323,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.RemoveSysUser(childComplexity, args["userId"].(string)), true
+	case "Mutation.restartApplication":
+		if e.complexity.Mutation.RestartApplication == nil {
+			break
+		}
+
+		return e.complexity.Mutation.RestartApplication(childComplexity), true
 	case "Mutation.restartService":
 		if e.complexity.Mutation.RestartService == nil {
 			break
@@ -1726,6 +1734,35 @@ func (ec *executionContext) fieldContext_Mutation_importGlobalConfig(ctx context
 	if fc.Args, err = ec.field_Mutation_importGlobalConfig_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_restartApplication(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_restartApplication,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Mutation().RestartApplication(ctx)
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_restartApplication(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
 	}
 	return fc, nil
 }
@@ -6716,6 +6753,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "importGlobalConfig":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_importGlobalConfig(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "restartApplication":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_restartApplication(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++

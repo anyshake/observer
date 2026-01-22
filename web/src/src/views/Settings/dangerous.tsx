@@ -5,6 +5,7 @@ import {
     usePurgeHelicorderFilesMutation,
     usePurgeMiniSeedFilesMutation,
     usePurgeSeisRecordsMutation,
+    useRestartApplicationMutation,
     useRestoreServiceConfigMutation,
     useRestoreStationConfigMutation
 } from '../../graphql';
@@ -14,18 +15,42 @@ import { sendUserConfirm } from '../../helpers/alert/sendUserConfirm';
 export const Dangerous = () => {
     const { t } = useTranslation();
 
-    const [[purgeSeisRecords], [purgeMiniSeedFiles], [purgeHelicorderFiles]] = [
+    const [
+        [restartApplication],
+        [purgeSeisRecords],
+        [purgeMiniSeedFiles],
+        [purgeHelicorderFiles],
+        [resetStationConfig],
+        [resetServiceConfig]
+    ] = [
+        useRestartApplicationMutation(),
         usePurgeSeisRecordsMutation(),
         usePurgeMiniSeedFilesMutation(),
-        usePurgeHelicorderFilesMutation()
-    ];
-    const [[resetStationConfig], [resetServiceConfig]] = [
+        usePurgeHelicorderFilesMutation(),
         useRestoreStationConfigMutation(),
         useRestoreServiceConfigMutation()
     ];
 
     const actions = useMemo(
         () => [
+            {
+                title: t('views.Settings.Dangerous.restart_application.title'),
+                description: t('views.Settings.Dangerous.restart_application.description'),
+                buttonText: t('views.Settings.Dangerous.restart_application.submit_button'),
+                confirmMessage: t('views.Settings.Dangerous.restart_application.confirm_message'),
+                confirmBtnText: t('views.Settings.Dangerous.restart_application.confirm_button'),
+                cancelBtnText: t('views.Settings.Dangerous.restart_application.cancel_button'),
+                onConfirmed: async () =>
+                    await sendPromiseAlert(
+                        restartApplication(),
+                        t('views.Settings.Dangerous.restart_application.restarting'),
+                        t('views.Settings.Dangerous.restart_application.success'),
+                        (error) =>
+                            t('views.Settings.Dangerous.restart_application.error', {
+                                error
+                            })
+                    )
+            },
             {
                 title: t('views.Settings.Dangerous.purge_waveform_records.title'),
                 description: t('views.Settings.Dangerous.purge_waveform_records.description'),
@@ -113,11 +138,12 @@ export const Dangerous = () => {
         ],
         [
             t,
-            purgeHelicorderFiles,
-            purgeMiniSeedFiles,
+            restartApplication,
             purgeSeisRecords,
-            resetServiceConfig,
-            resetStationConfig
+            purgeMiniSeedFiles,
+            purgeHelicorderFiles,
+            resetStationConfig,
+            resetServiceConfig
         ]
     );
 

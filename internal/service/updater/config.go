@@ -104,9 +104,57 @@ func (s *updaterConfigReleaseFetchUrlImpl) Restore(handler *action.Handler) erro
 	return nil
 }
 
+type updaterConfigAutoRestartImpl struct{}
+
+func (s *updaterConfigAutoRestartImpl) GetName() string             { return "Auto Restart" }
+func (s *updaterConfigAutoRestartImpl) GetNamespace() string        { return ID }
+func (s *updaterConfigAutoRestartImpl) GetKey() string              { return "auto_restart" }
+func (s *updaterConfigAutoRestartImpl) GetType() action.SettingType { return action.Bool }
+func (s *updaterConfigAutoRestartImpl) IsRequired() bool            { return true }
+func (s *updaterConfigAutoRestartImpl) GetVersion() int             { return 0 }
+func (s *updaterConfigAutoRestartImpl) GetOptions() map[string]any  { return nil }
+func (s *updaterConfigAutoRestartImpl) GetDefaultValue() any        { return false }
+func (s *updaterConfigAutoRestartImpl) GetDescription() string {
+	return "Automatically restarts the entire application when upgrade is applied."
+}
+func (s *updaterConfigAutoRestartImpl) Init(handler *action.Handler) error {
+	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+		return fmt.Errorf("failed to set default updater auto restart availability: %w", err)
+	}
+	return nil
+}
+func (s *updaterConfigAutoRestartImpl) Set(handler *action.Handler, newVal any) error {
+	enabled, err := config.GetConfigValBool(newVal)
+	if err != nil {
+		return err
+	}
+	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
+		return fmt.Errorf("failed to set updater auto restart availability: %w", err)
+	}
+	return nil
+}
+func (s *updaterConfigAutoRestartImpl) Get(handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+	if err != nil {
+		return nil, fmt.Errorf("failed to get updater auto restart availability: %w", err)
+	}
+	enabled, ok := val.(bool)
+	if !ok {
+		return nil, errors.New("boolean expected")
+	}
+	return enabled, nil
+}
+func (s *updaterConfigAutoRestartImpl) Restore(handler *action.Handler) error {
+	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+		return fmt.Errorf("failed to reset updater service auto restart availability: %w", err)
+	}
+	return nil
+}
+
 func (s *UpdaterServiceImpl) GetConfigConstraint() []config.IConstraint {
 	return []config.IConstraint{
 		&updaterConfigEnabledImpl{},
 		&updaterConfigReleaseFetchUrlImpl{},
+		&updaterConfigAutoRestartImpl{},
 	}
 }

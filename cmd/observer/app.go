@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
+	"sync"
 	"syscall"
 	"time"
 
@@ -46,6 +49,20 @@ import (
 	service_watchcat "github.com/anyshake/observer/internal/service/watchcat"
 )
 
+func getExecutablePath() (string, error) {
+	exePath, err := os.Executable()
+	if err != nil {
+		return "", fmt.Errorf("failed to get executable path: %w", err)
+	}
+
+	exePath, err = filepath.EvalSymlinks(exePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to resolve symlinks: %w", err)
+	}
+
+	return exePath, nil
+}
+
 func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 	conf := &config.BaseConfig{}
 	if err := conf.Parse(args.configPath, "json"); err != nil {
@@ -75,6 +92,11 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 	}
 	if len(logPath) != 0 {
 		logger.GetLogger(main).Infof("logs will be saved to: %s", logPath)
+	}
+
+	exePath, err := getExecutablePath()
+	if err != nil {
+		logger.GetLogger(main).Fatalf("failed to get current executable path: %v", err)
 	}
 
 	daoObj, err := dao.New(
@@ -165,6 +187,11 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 	}
 	logger.GetLogger(main).Infof("hardware device has been connected, current time in UTC: %s", timeSrc.Now().Format(time.RFC3339))
 
+	var (
+		restartOnce sync.Once
+		restartChan = make(chan struct{}, 1)
+	)
+
 	serviceMap := map[string]service.IService{
 		service_archiver.ID:   service_archiver.New(hardwareDevice, actionHandler, timeSrc),
 		service_forwarder.ID:  service_forwarder.New(hardwareDevice, actionHandler, timeSrc),
@@ -179,8 +206,8 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 	}
 	var upgradeHelper *upgrade.Helper
 	if !ver.IsPreRelease() && build.GetChannel() == officialBuildChannel {
-		upgradeHelper = upgrade.NewHelper(ver, build)
-		serviceMap[service_updater.ID] = service_updater.New(actionHandler, timeSrc, upgradeHelper)
+		upgradeHelper = upgrade.NewHelper(exePath, ver, build)
+		serviceMap[service_updater.ID] = service_updater.New(actionHandler, timeSrc, upgradeHelper, exePath, restartChan)
 	}
 
 	for serviceName, serviceObj := range serviceMap {
@@ -208,6 +235,7 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		conf.Server.Debug,
 		conf.Server.CORS,
 		&graph_resolver.Resolver{
+			RestartChan:              restartChan,
 			CurrentVersion:           ver,
 			CurrentBuild:             build,
 			UpgradeHelper:            upgradeHelper,
@@ -239,12 +267,16 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 	signal.Notify(signalChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	defer signal.Stop(signalChan)
 
-	exitWithError := false
+	var exitWithReason ExitReason
 	select {
 	case <-signalChan:
+		exitWithReason = ExitInterrupt
 		logger.GetLogger(main).Warnln("interrupt signal received (e.g. Ctrl+C), shutting down...")
+	case <-restartChan:
+		exitWithReason = ExitRestart
+		logger.GetLogger(main).Infoln("application restart request received, shutting down...")
 	case <-hardwareCtx.Done():
-		exitWithError = true
+		exitWithReason = ExitError
 		logger.GetLogger(main).Warnln("fatal error detected (probably hardware connection lost), shutting down...")
 	}
 
@@ -271,7 +303,7 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		}
 	}()
 
-	handleExit := func(reason string, warn bool) {
+	handleExit := func(reason string, warn bool, callback func()) {
 		sendHardwareAbortSignal()
 		runCleanerTasks()
 		if warn {
@@ -279,17 +311,27 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		} else {
 			logger.GetLogger(main).Info(reason)
 		}
-		if warn || exitWithError {
-			os.Exit(1)
-		} else {
+		if callback != nil {
+			callback()
+		}
+		switch {
+		case exitWithReason == ExitInterrupt:
 			os.Exit(0)
+		case exitWithReason == ExitRestart:
+			os.Exit(0)
+		case exitWithReason == ExitError || warn:
+			os.Exit(1)
 		}
 	}
 
 	select {
 	case <-done:
-		handleExit("program exited successfully, goodbye", false)
+		handleExit("program exited successfully, goodbye", false, func() {
+			if exitWithReason == ExitRestart {
+				restartOnce.Do(func() { executeBinary(exePath) })
+			}
+		})
 	case <-shutdownCtx.Done():
-		handleExit("shutdown timed out, forcing exit", true)
+		handleExit("shutdown timed out, forcing exit", true, nil)
 	}
 }

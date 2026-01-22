@@ -221,6 +221,18 @@
             },
             "Dangerous": {
                 "title": "Tehlikeli Bölge",
+                "restart_application": {
+                    "title": "Tüm Uygulamayı Yeniden Başlat",
+                    "description": "Bu işlem tüm uygulamayı yeniden başlatır. Kısa bir süre alabilir ve tüm etkin bağlantıları geçici olarak kapatarak hizmetlerde ve kayıtlarda kesintiye neden olur.",
+                    "submit_button": "Uygulamayı Yeniden Başlat",
+                    "confirm_title": "Yeniden Başlatmayı Onayla",
+                    "confirm_message": "Uygulamayı yeniden başlatmak istediğinizden emin misiniz?",
+                    "confirm_button": "Yeniden Başlat",
+                    "cancel_button": "İptal",
+                    "restarting": "Uygulama yeniden başlatma isteği gönderiliyor...",
+                    "success": "Yeniden başlatma isteği gönderildi. Uygulama birkaç saniye içinde yeniden başlatılacak.",
+                    "error": "Uygulama yeniden başlatma isteği başarısız oldu: {{error}}"
+                },
                 "purge_waveform_records": {
                     "title": "Dalga Formu Kayıtlarını Temizle",
                     "description": "Bu, veritabanındaki tüm dalga formu kayıtlarını silecektir, işlem geri alınamaz.",

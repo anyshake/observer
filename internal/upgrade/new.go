@@ -9,12 +9,13 @@ import (
 	"github.com/anyshake/observer/pkg/unibuild"
 )
 
-func NewHelper(currentVer *semver.Version, currentBuild *unibuild.UniBuild) *Helper {
+func NewHelper(currentExePath string, currentVer *semver.Version, currentBuild *unibuild.UniBuild) *Helper {
 	const cacheTimeout = time.Hour
 	return &Helper{
 		versionCheckDomain: VERSION_CHECK_DOMAIN,
 		releaseFetchUrl:    RELEASE_FETCH_URL_TEMPLATE,
 		resolvers:          dnsquery.NewResolvers(),
+		currentExePath:     currentExePath,
 		currentVer:         currentVer,
 		currentBuild:       currentBuild,
 		latestVer:          cache.New(cacheTimeout),

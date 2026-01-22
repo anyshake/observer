@@ -221,6 +221,18 @@
             },
             "Dangerous": {
                 "title": "Strefa Niebezpieczna",
+                "restart_application": {
+                    "title": "Restart całej aplikacji",
+                    "description": "Spowoduje to ponowne uruchomienie całej aplikacji. Może to chwilę potrwać i tymczasowo zamknie wszystkie aktywne połączenia, powodując przerwy w działaniu usług i nagrywania.",
+                    "submit_button": "Restartuj aplikację",
+                    "confirm_title": "Potwierdź restart",
+                    "confirm_message": "Czy na pewno chcesz zrestartować aplikację?",
+                    "confirm_button": "Restartuj",
+                    "cancel_button": "Anuluj",
+                    "restarting": "Wysyłanie żądania restartu aplikacji...",
+                    "success": "Żądanie restartu wysłane. Aplikacja zostanie ponownie uruchomiona za kilka sekund.",
+                    "error": "Nie udało się wysłać żądania restartu aplikacji: {{error}}"
+                },
                 "purge_waveform_records": {
                     "title": "Usuń rekordy falogramów",
                     "description": "Spowoduje to usunięcie wszystkich falogramów w bazie danych, Operacja jest nieodwracalna.",

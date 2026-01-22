@@ -11,7 +11,7 @@ import (
 
 const AUTH_TIMEOUT = 24 * time.Hour
 
-type httpServer struct {
+type HttpServer struct {
 	debug bool
 	cors  bool
 

@@ -7,7 +7,6 @@ import (
 type arguments struct {
 	configPath  string
 	showVersion bool
-	upgrade     bool
 }
 
 func parseCommandLine() (args arguments) {

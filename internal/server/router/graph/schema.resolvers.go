@@ -266,6 +266,16 @@ func (r *mutationResolver) ImportGlobalConfig(ctx context.Context, data string) 
 	return true, nil
 }
 
+// RestartApplication is the resolver for the restartApplication field.
+func (r *mutationResolver) RestartApplication(ctx context.Context) (bool, error) {
+	if !r.checkIsAdmin(ctx) {
+		return false, errors.New("permission denied")
+	}
+
+	time.AfterFunc(3*time.Second, func() { r.RestartChan <- struct{}{} })
+	return true, nil
+}
+
 // StopService is the resolver for the stopService field.
 func (r *mutationResolver) StopService(ctx context.Context, serviceID string) (bool, error) {
 	if !r.checkIsAdmin(ctx) {

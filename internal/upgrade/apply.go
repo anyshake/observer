@@ -22,17 +22,8 @@ func (u *Helper) ApplyUpgrade(version *semver.Version, release []byte) error {
 		}
 	}
 
-	exePath, err := os.Executable()
-	if err != nil {
-		return err
-	}
-	exePath, err = filepath.EvalSymlinks(exePath)
-	if err != nil {
-		return err
-	}
-
 	// Check for write permission
-	dir := filepath.Dir(exePath)
+	dir := filepath.Dir(u.currentExePath)
 	probe, err := os.CreateTemp(dir, ".upgrade-perm-*")
 	if err != nil {
 		return err
@@ -41,10 +32,10 @@ func (u *Helper) ApplyUpgrade(version *semver.Version, release []byte) error {
 	_ = os.Remove(probe.Name())
 
 	ts := time.Now().UTC().Format("20060102150405")
-	tmp := fmt.Sprintf("%s.%s.new", exePath, ts)
-	old := fmt.Sprintf("%s.%s", exePath, ts)
+	tmp := fmt.Sprintf("%s.%s.new", u.currentExePath, ts)
+	old := fmt.Sprintf("%s.%s", u.currentExePath, ts)
 
-	st, _ := os.Stat(exePath)
+	st, _ := os.Stat(u.currentExePath)
 	mode := os.FileMode(0755)
 	if st != nil {
 		mode = st.Mode().Perm()
@@ -53,13 +44,13 @@ func (u *Helper) ApplyUpgrade(version *semver.Version, release []byte) error {
 		return err
 	}
 
-	if err := os.Rename(exePath, old); err != nil {
+	if err := os.Rename(u.currentExePath, old); err != nil {
 		_ = os.Remove(tmp)
 		return err
 	}
 
-	if err := os.Rename(tmp, exePath); err != nil {
-		_ = os.Rename(old, exePath)
+	if err := os.Rename(tmp, u.currentExePath); err != nil {
+		_ = os.Rename(old, u.currentExePath)
 		_ = os.Remove(tmp)
 		return err
 	}

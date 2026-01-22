@@ -29,9 +29,5 @@ func main() {
 		os.Exit(0)
 	}
 
-	if args.upgrade {
-		os.Exit(0)
-	}
-
 	appStart(ver, build, args)
 }

@@ -13,12 +13,7 @@ import (
 )
 
 func (s *UpdaterServiceImpl) checkReadWritePermission() error {
-	execPath, err := os.Executable()
-	if err != nil {
-		return fmt.Errorf("failed to get executable path: %w", err)
-	}
-
-	execDir := filepath.Dir(execPath)
+	execDir := filepath.Dir(s.currentExePath)
 	testFile := filepath.Join(execDir, ".observer_updater_write_test")
 	testContent := fmt.Appendf(nil, "anyshake-observer-updater-service-%d", time.Now().UnixNano())
 
@@ -85,6 +80,9 @@ func (s *UpdaterServiceImpl) Start() error {
 					logger.GetLogger(ID).Errorf("failed to check update: %v", err)
 					continue
 				}
+
+				needRestart := false
+
 				if needUpdate && !isApplied {
 					logger.GetLogger(ID).Infof("found new version %s, upgrading process will start now", latestVer.String())
 					release, url, err := s.upgradeHelper.FetchRelease(latestVer, UPDATE_FETCH_TIMEOUT)
@@ -97,11 +95,23 @@ func (s *UpdaterServiceImpl) Start() error {
 						logger.GetLogger(ID).Errorf("failed to apply upgrade: %v", err)
 						continue
 					}
-					logger.GetLogger(ID).Infof("new release %s has been applied successfully, restart to take effect", latestVer.String())
+					if !s.autoRestartEnabled {
+						logger.GetLogger(ID).Infof("new release %s has been applied successfully, restart to take effect", latestVer.String())
+					}
+					needRestart = s.autoRestartEnabled
 				} else if needUpdate && isApplied {
-					logger.GetLogger(ID).Infoln("the latest version has already been applied, restart to take effect")
+					if !s.autoRestartEnabled {
+						logger.GetLogger(ID).Infoln("the new version has already been applied, restart to take effect")
+					}
+					needRestart = s.autoRestartEnabled
 				} else {
 					logger.GetLogger(ID).Infoln("no new version found for current software")
+					needRestart = false
+				}
+
+				if needRestart {
+					logger.GetLogger(ID).Infoln("restarting application in 3 second...")
+					time.AfterFunc(3*time.Second, func() { s.restartChan <- struct{}{} })
 				}
 			}
 		}

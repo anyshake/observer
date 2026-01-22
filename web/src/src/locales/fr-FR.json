@@ -221,6 +221,18 @@
             },
             "Dangerous": {
                 "title": "Zone dangereuse",
+                "restart_application": {
+                    "title": "Redémarrer toute l’application",
+                    "description": "Cela redémarrera l’ensemble de l’application. L’opération peut prendre un court instant et fermera temporairement toutes les connexions actives, interrompant les services et les enregistrements.",
+                    "submit_button": "Redémarrer l’application",
+                    "confirm_title": "Confirmer le redémarrage",
+                    "confirm_message": "Êtes-vous sûr de vouloir redémarrer l’application ?",
+                    "confirm_button": "Redémarrer",
+                    "cancel_button": "Annuler",
+                    "restarting": "Envoi de la demande de redémarrage...",
+                    "success": "Demande de redémarrage envoyée. L’application redémarrera dans quelques secondes.",
+                    "error": "Échec de la demande de redémarrage de l’application : {{error}}"
+                },
                 "purge_waveform_records": {
                     "title": "Purger les enregistrements de forme d'onde",
                     "description": "Ceci supprimera tous les enregistrements de forme d'onde de la base de données, l'opération est irréversible.",

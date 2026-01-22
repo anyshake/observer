@@ -39,7 +39,7 @@ build:
 	@echo "[Info] Building project, output file path: $(DIST_DIR)/$(BINARY)"
 	@mkdir -p $(DIST_DIR)
 	CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} GOARM=${GOARM} GOMIPS=${GOMIPS} \
-		$(GO) build -ldflags="$(BUILD_FLAGS)" $(BUILD_ARGS) -o $(DIST_DIR)/$(BINARY) $(SRC_DIR)/*.go
+		$(GO) build -ldflags="$(BUILD_FLAGS)" $(BUILD_ARGS) -o $(DIST_DIR)/$(BINARY) $(SRC_DIR)
 	@cp -r $(ASSETS_DIR) $(DIST_DIR)
 	@echo "[Info] Build completed."
 

@@ -141,6 +141,7 @@ type Mutation {
   updateStationConfig(key: String!, value: Any!): Boolean!
   restoreStationConfig: Boolean!
   importGlobalConfig(data: String!): Boolean!
+  restartApplication: Boolean!
 
   # service management - admin only
   stopService(serviceId: String!): Boolean!

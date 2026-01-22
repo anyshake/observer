@@ -30,6 +30,7 @@ export type Mutation = {
   purgeMiniSeedFiles: Scalars['Boolean']['output'];
   purgeSeisRecords: Scalars['Boolean']['output'];
   removeSysUser: Scalars['Boolean']['output'];
+  restartApplication: Scalars['Boolean']['output'];
   restartService: Scalars['Boolean']['output'];
   restoreServiceConfig: Scalars['Boolean']['output'];
   restoreStationConfig: Scalars['Boolean']['output'];
@@ -121,7 +122,7 @@ export type Query = {
   getStationMetadata: Scalars['String']['output'];
   getSysUsers: Array<SysUser>;
   getSystemStatus: SystemStatus;
-  getUpgradeStatus: UpgradeStatus;
+  getUpgradeStatus?: Maybe<UpgradeStatus>;
   isGenuineProduct: Scalars['Boolean']['output'];
 };
 
@@ -316,7 +317,7 @@ export type GetHomeDataQuery = { __typename?: 'Query', getCurrentTime: number, g
 export type GetUpgradeStatusQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUpgradeStatusQuery = { __typename?: 'Query', getUpgradeStatus: { __typename?: 'upgradeStatus', current: string, required: string, latest: string, eligible: boolean, applied: boolean } };
+export type GetUpgradeStatusQuery = { __typename?: 'Query', getUpgradeStatus?: { __typename?: 'upgradeStatus', current: string, required: string, latest: string, eligible: boolean, applied: boolean } | null };
 
 export type CreateUserMutationVariables = Exact<{
   username: Scalars['String']['input'];
@@ -404,6 +405,11 @@ export type RemoveUserMutationVariables = Exact<{
 
 
 export type RemoveUserMutation = { __typename?: 'Mutation', removeSysUser: boolean };
+
+export type RestartApplicationMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RestartApplicationMutation = { __typename?: 'Mutation', restartApplication: boolean };
 
 export type RestartServiceMutationVariables = Exact<{
   serviceId: Scalars['String']['input'];
@@ -1383,6 +1389,36 @@ export function useRemoveUserMutation(baseOptions?: ApolloReactHooks.MutationHoo
 export type RemoveUserMutationHookResult = ReturnType<typeof useRemoveUserMutation>;
 export type RemoveUserMutationResult = ApolloReactCommon.MutationResult<RemoveUserMutation>;
 export type RemoveUserMutationOptions = ApolloReactCommon.BaseMutationOptions<RemoveUserMutation, RemoveUserMutationVariables>;
+export const RestartApplicationDocument = gql`
+    mutation restartApplication {
+  restartApplication
+}
+    `;
+export type RestartApplicationMutationFn = ApolloReactCommon.MutationFunction<RestartApplicationMutation, RestartApplicationMutationVariables>;
+
+/**
+ * __useRestartApplicationMutation__
+ *
+ * To run a mutation, you first call `useRestartApplicationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRestartApplicationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [restartApplicationMutation, { data, loading, error }] = useRestartApplicationMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useRestartApplicationMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RestartApplicationMutation, RestartApplicationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<RestartApplicationMutation, RestartApplicationMutationVariables>(RestartApplicationDocument, options);
+      }
+export type RestartApplicationMutationHookResult = ReturnType<typeof useRestartApplicationMutation>;
+export type RestartApplicationMutationResult = ApolloReactCommon.MutationResult<RestartApplicationMutation>;
+export type RestartApplicationMutationOptions = ApolloReactCommon.BaseMutationOptions<RestartApplicationMutation, RestartApplicationMutationVariables>;
 export const RestartServiceDocument = gql`
     mutation restartService($serviceId: String!) {
   restartService(serviceId: $serviceId)

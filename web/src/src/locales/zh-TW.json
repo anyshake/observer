@@ -221,6 +221,18 @@
             },
             "Dangerous": {
                 "title": "危險區域",
+                "restart_application": {
+                    "title": "重新啟動整個應用程式",
+                    "description": "此操作將重新啟動整個應用程式，可能需要短暫時間，並會暫時關閉所有使用中的連線，導致服務與記錄中斷。",
+                    "submit_button": "重新啟動應用程式",
+                    "confirm_title": "確認重新啟動",
+                    "confirm_message": "您確定要重新啟動應用程式嗎？",
+                    "confirm_button": "重新啟動",
+                    "cancel_button": "取消",
+                    "restarting": "正在送出重新啟動請求...",
+                    "success": "重新啟動請求已送出，應用程式將在數秒後重新啟動。",
+                    "error": "重新啟動應用程式請求失敗：{{error}}"
+                },
                 "purge_waveform_records": {
                     "title": "清除波形紀錄",
                     "description": "這將刪除資料庫中的所有波形紀錄，此操作不可逆。",

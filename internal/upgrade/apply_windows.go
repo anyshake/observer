@@ -21,17 +21,8 @@ func (u *Helper) ApplyUpgrade(version *semver.Version, release []byte) error {
 		}
 	}
 
-	exePath, err := os.Executable()
-	if err != nil {
-		return err
-	}
-	exePath, err = filepath.EvalSymlinks(exePath)
-	if err != nil {
-		return err
-	}
-
 	sysTime := time.Now().UTC().Format("20060102150405")
-	basename := strings.TrimSuffix(exePath, filepath.Ext(exePath))
+	basename := strings.TrimSuffix(u.currentExePath, filepath.Ext(u.currentExePath))
 	tmp := fmt.Sprintf("%s.%s.new", basename, sysTime)
 	old := fmt.Sprintf("%s.%s.exe", basename, sysTime)
 
@@ -41,7 +32,7 @@ func (u *Helper) ApplyUpgrade(version *semver.Version, release []byte) error {
 
 	// exe -> old
 	if err := windows.MoveFileEx(
-		windows.StringToUTF16Ptr(exePath),
+		windows.StringToUTF16Ptr(u.currentExePath),
 		windows.StringToUTF16Ptr(old),
 		windows.MOVEFILE_REPLACE_EXISTING|windows.MOVEFILE_WRITE_THROUGH,
 	); err != nil {
@@ -52,12 +43,12 @@ func (u *Helper) ApplyUpgrade(version *semver.Version, release []byte) error {
 	// tmp -> exe
 	if err := windows.MoveFileEx(
 		windows.StringToUTF16Ptr(tmp),
-		windows.StringToUTF16Ptr(exePath),
+		windows.StringToUTF16Ptr(u.currentExePath),
 		windows.MOVEFILE_REPLACE_EXISTING|windows.MOVEFILE_WRITE_THROUGH,
 	); err != nil {
 		_ = windows.MoveFileEx(
 			windows.StringToUTF16Ptr(old),
-			windows.StringToUTF16Ptr(exePath),
+			windows.StringToUTF16Ptr(u.currentExePath),
 			windows.MOVEFILE_REPLACE_EXISTING|windows.MOVEFILE_WRITE_THROUGH,
 		)
 		return err

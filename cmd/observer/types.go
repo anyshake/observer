@@ -1,5 +1,13 @@
 package main
 
+type ExitReason int
+
+const (
+	ExitInterrupt ExitReason = iota
+	ExitRestart
+	ExitError
+)
+
 const (
 	officialBuildChannel = "github-actions-ci"
 	startupDescription   = "Listen to the whispering earth."
