@@ -70,7 +70,6 @@ export const menuConfig: IMenuItem[] = [
             'fr-FR': 'Téléchargement des données',
             'ja-JP': 'データダウンロード',
             'zh-CN': '数据下载',
-            'zh-CN': '系统设置',
             'zh-TW': '資料下載',
             'pt-PT': 'Download de Dados',
             'ru-RU': 'Загрузка данных',
