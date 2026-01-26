@@ -11,7 +11,8 @@ REQUIRED_VERSION_PATCH = 0
 .PHONY: build digest clean run gen version
 
 GO ?= go
-
+override GOOS := linux
+override GOARCH := amd64
 ASSETS_DIR = ./build/assets
 SRC_DIR = ./cmd/observer
 DIST_DIR = ./build/dist
