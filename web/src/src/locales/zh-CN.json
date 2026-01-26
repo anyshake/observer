@@ -49,12 +49,12 @@
             "request_file": {
                 "requesting": "正在请求下载文件 {{fileName}} 的链接。",
                 "success": "已成功获取下载文件 {{fileName}} 的链接。",
-                "error": "请求文件 {{fileName}} 的链接失败惹：{{error}}"
+                "error": "请求文件 {{fileName}} 的链接失败惹..(っ °Д °;)っ：{{error}}"
             },
             "preview_file": {
                 "requesting": "正在请求预览文件 {{fileName}} 的链接。",
                 "success": "已成功获取预览文件 {{fileName}} 的链接。",
-                "error": "请求文件 {{fileName}} 的链接失败惹：{{error}}"
+                "error": "请求文件 {{fileName}} 的链接失败惹..(っ °Д °;)っ：{{error}}"
             }
         },
         "History": {
@@ -65,7 +65,7 @@
                 "searching": "正在从选定来源搜索事件中。",
                 "success": "从选定来源找到了 {{count}} 个事件。",
                 "no_data": "在选定来源中找不到任何事件。",
-                "error": "搜索事件失败惹：{{error}}"
+                "error": "搜索事件失败惹..(っ °Д °;)っ：{{error}}"
             },
             "event_list_modal": {
                 "title": "选择一个地震事件",
@@ -83,7 +83,7 @@
                 "export_button": "获取数据",
                 "exporting": "正在将频道 {{channel}} 导出为 {{format}} 格式。",
                 "success": "已成功将频道 {{channel}} 导出为 {{format}} 格式。",
-                "error": "将频道 {{channel}} 导出为 {{format}} 格式时失败惹：{{error}}"
+                "error": "将频道 {{channel}} 导出为 {{format}} 格式时失败惹..(っ °Д °;)っ：{{error}}"
             },
             "search_records": {
                 "title": "时间查询",
@@ -94,7 +94,7 @@
                 "searching": "正在从数据库搜索地震记录。",
                 "success": "从数据库找到了 {{count}} 条地震记录。",
                 "no_data": "在数据库中找不到任何地震记录。",
-                "error": "搜索记录失败惹：{{error}}"
+                "error": "搜索记录失败惹..(っ °Д °;)っ：{{error}}"
             },
             "layout_locker": {
                 "lock_button": "锁定UI",
@@ -126,8 +126,8 @@
                 "channels": "频道"
             },
             "device_info": {
-                "yes": "确认",
-                "no": "取消",
+                "yes": "Y",
+                "no": "N/A",
                 "title": "设备信息",
                 "product_model": "产品型号",
                 "device_id": "设备 ID",
@@ -144,7 +144,7 @@
                 "temperature": "设备温度"
             },
             "link_status": {
-                "title": "链接状态",
+                "title": "连接状态",
                 "started_at": "启动于",
                 "last_frame": "最后数据帧",
                 "frames": "数据帧",
@@ -206,8 +206,8 @@
                 "no_data_recorded": "此期间内未录制任何数据。"
             },
             "connectivity": {
-                "connecting": "没有连线，正在尝试连接...",
-                "connected": "已连线，最后更新于 {{updatedAt}}。"
+                "connecting": "没有数据，正在尝试连接...",
+                "connected": "已连接，最后更新于 {{updatedAt}}。"
             },
             "stream_status": {
                 "sample_rate": "{{value}} SPS",
@@ -231,7 +231,7 @@
                     "cancel_button": "取消",
                     "restarting": "正在发送重新启动请求...",
                     "success": "重新启动请求已发送，应用程序将在数秒后重新启动。",
-                    "error": "重新启动应用程序请求失败惹：{{error}}"
+                    "error": "重新启动应用程序请求失败惹..(っ °Д °;)っ：{{error}}"
                 },
                 "purge_waveform_records": {
                     "title": "清除波形记录",
@@ -243,7 +243,7 @@
                     "cancel_button": "取消",
                     "purging": "正在清除波形记录...",
                     "success": "已成功清除波形记录。",
-                    "error": "清除波形记录失败惹：{{error}}"
+                    "error": "清除波形记录失败惹..(っ °Д °;)っ：{{error}}"
                 },
                 "purge_miniseed_files": {
                     "title": "清除 MiniSEED 文件",
@@ -255,7 +255,7 @@
                     "cancel_button": "取消",
                     "purging": "正在清除 MiniSEED 文件...",
                     "success": "已成功清除 MiniSEED 文件。",
-                    "error": "清除 MiniSEED 文件失败惹：{{error}}"
+                    "error": "清除 MiniSEED 文件失败惹..(っ °Д °;)っ：{{error}}"
                 },
                 "purge_helicorder_files": {
                     "title": "清除 Helicorder 文件",
@@ -267,7 +267,7 @@
                     "cancel_button": "取消",
                     "purging": "正在清除 Helicorder 文件...",
                     "success": "已成功清除 Helicorder 文件。",
-                    "error": "清除 Helicorder 文件失败惹：{{error}}"
+                    "error": "清除 Helicorder 文件失败惹..(っ °Д °;)っ：{{error}}"
                 },
                 "reset_station_config": {
                     "title": "重设测站配置",
@@ -279,7 +279,7 @@
                     "cancel_button": "取消",
                     "resetting": "正在重设测站配置...",
                     "success": "已成功重设测站配置。",
-                    "error": "重设测站配置失败惹：{{error}}"
+                    "error": "重设测站配置失败惹..(っ °Д °;)っ：{{error}}"
                 },
                 "reset_service_config": {
                     "title": "重设服务配置",
@@ -291,7 +291,7 @@
                     "cancel_button": "取消",
                     "resetting": "正在重设服务配置...",
                     "success": "已成功重设服务配置。",
-                    "error": "重设服务配置失败惹：{{error}}"
+                    "error": "重设服务配置失败惹..(っ °Д °;)っ：{{error}}"
                 }
             },
             "Metadata": {
@@ -320,7 +320,7 @@
                     "cancel_button": "取消",
                     "restarting": "正在重新启动服务...",
                     "success": "已成功重新启动服务。",
-                    "error": "重新启动服务失败惹：{{error}}"
+                    "error": "重新启动服务失败惹..(っ °Д °;)っ：{{error}}"
                 },
                 "start_service": {
                     "submit_button": "启动",
@@ -330,7 +330,7 @@
                     "cancel_button": "取消",
                     "starting": "正在启动服务...",
                     "success": "已成功启动服务。",
-                    "error": "启动服务失败惹：{{error}}"
+                    "error": "启动服务失败惹..(っ °Д °;)っ：{{error}}"
                 },
                 "stop_service": {
                     "submit_button": "停止",
@@ -340,7 +340,7 @@
                     "cancel_button": "取消",
                     "stopping": "正在停止服务...",
                     "success": "已成功停止服务。",
-                    "error": "停止服务失败惹：{{error}}"
+                    "error": "停止服务失败惹..(っ °Д °;)っ：{{error}}"
                 },
                 "reset_service": {
                     "submit_button": "重置",
@@ -350,20 +350,20 @@
                     "cancel_button": "取消",
                     "resetting": "正在重置服务...",
                     "success": "已成功重置服务。",
-                    "error": "重置服务失败惹：{{error}}"
+                    "error": "重置服务失败惹..(っ °Д °;)っ：{{error}}"
                 },
                 "edit_service": {
                     "submit_button": "编辑",
                     "updating": "正在应用新变更...",
                     "success": "变更已成功应用。",
-                    "error": "更新服务设置失败惹：{{error}}"
+                    "error": "更新服务设置失败惹..(っ °Д °;)っ：{{error}}"
                 },
                 "edit_service_modal": {
                     "title": "编辑服务：{{name}}"
                 },
                 "service_status": {
-                    "yes": "确认",
-                    "no": "取消",
+                    "yes": "是",
+                    "no": "否",
                     "is_running": "运行中",
                     "restarts": "重新启动次数",
                     "stopped_at": "停止于",
@@ -377,7 +377,7 @@
                     "field_required": "此字段为必填项。",
                     "updating": "正在更新测站设置...",
                     "success": "已成功更新测站设置。",
-                    "error": "更新测站设置失败惹：{{error}}"
+                    "error": "更新测站设置失败惹..(っ °Д °;)っ：{{error}}"
                 }
             },
             "Users": {
@@ -389,7 +389,7 @@
                     "submit_button": "刷新",
                     "refreshing": "正在刷新用户列表...",
                     "success": "已成功刷新用户列表。",
-                    "error": "刷新用户列表失败惹：{{error}}"
+                    "error": "刷新用户列表失败惹..(っ °Д °;)っ：{{error}}"
                 },
                 "remove_users": {
                     "submit_button": "移除用户",
@@ -399,13 +399,13 @@
                     "cancel_button": "取消",
                     "removing": "正在移除选定的用户...",
                     "success": "已移除 {{num}} 位用户。",
-                    "error": "移除选定的用户失败惹：{{error}}"
+                    "error": "移除选定的用户失败惹..(っ °Д °;)っ：{{error}}"
                 },
                 "create_user": {
                     "submit_button": "创建用户",
                     "creating": "正在创建新用户...",
                     "success": "用户 {{username}} 已创建。",
-                    "error": "创建新用户失败惹：{{error}}"
+                    "error": "创建新用户失败惹..(っ °Д °;)っ：{{error}}"
                 },
                 "create_user_modal": {
                     "title": "创建新用户",
@@ -426,7 +426,7 @@
                     "submit_button": "编辑",
                     "updating": "正在更新用户...",
                     "success": "用户 {{username}} 已更新。",
-                    "error": "更新用户失败惹：{{error}}"
+                    "error": "更新用户失败惹..(っ °Д °;)っ：{{error}}"
                 },
                 "edit_user_modal": {
                     "title": "编辑用户",
@@ -451,7 +451,7 @@
                     "cancel_button": "取消",
                     "removing": "正在移除用户...",
                     "success": "用户 {{username}} 已被移除。",
-                    "error": "移除用户失败惹：{{error}}"
+                    "error": "移除用户失败惹..(っ °Д °;)っ：{{error}}"
                 },
                 "user_list_columns": {
                     "yes": "确认",
@@ -481,7 +481,7 @@
                     "submit_button": "生成备份",
                     "generating": "正在生成备份数据...",
                     "success": "备份数据已成功生成。",
-                    "error": "生成备份数据失败惹：{{error}}"
+                    "error": "生成备份数据失败惹..(っ °Д °;)っ：{{error}}"
                 },
                 "restore_config": {
                     "title": "选择备份文件",
@@ -494,7 +494,7 @@
                     "cancel_button": "取消",
                     "restoring": "正在还原配置...",
                     "success": "配置已成功还原。",
-                    "error": "还原配置失败惹：{{error}}"
+                    "error": "还原配置失败惹..(っ °Д °;)っ：{{error}}"
                 }
             }
         }
@@ -527,17 +527,17 @@
         "captcha": {
             "label": "输入验证码",
             "loading": "正在加载验证码...",
-            "error": "加载验证码失败惹",
+            "error": "加载验证码失败惹..(っ °Д °;)っ",
             "placeholder": "验证码",
             "refreshing": "正在刷新验证码。",
             "refresh_success": "已成功刷新验证码。",
-            "refresh_error": "刷新验证码失败惹。"
+            "refresh_error": "刷新验证码失败惹..(っ °Д °;)っ。"
         },
         "signin": {
             "button": "登录",
             "loading": "正在登录...",
             "success": "您已成功登录！ヾ(≧▽≦*)o",
-            "error": "登录失败惹..(っ °Д °;)っ"
+            "error": "登录失败惹..(っ °Д °;)っ..(っ °Д °;)っ"
         }
     }
 }
