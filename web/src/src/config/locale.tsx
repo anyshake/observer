@@ -10,6 +10,7 @@ import plPL from '../locales/pl-PL.json';
 import ptPT from '../locales/pt-PT.json';
 import ruRU from '../locales/ru-RU.json';
 import trTR from '../locales/tr-TR.json';
+import zhCN from '../locales/zh-CN.json';
 import zhTW from '../locales/zh-TW.json';
 
 interface ILocaleConfig {
@@ -31,6 +32,7 @@ export const localeConfig: ILocaleConfig = {
         'pt-PT': { label: 'Português', translation: ptPT },
         'ru-RU': { label: 'Русский', translation: ruRU },
         'tr-TR': { label: 'Türkçe', translation: trTR },
+        'zh-CN': { label: '简体中文', translation: zhCN }
         'zh-TW': { label: '正體中文', translation: zhTW }
     }
 };
