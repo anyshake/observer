@@ -18,9 +18,6 @@ SRC_DIR = ./cmd/observer
 DIST_DIR = ./build/dist
 
 BINARY = observer
-ifeq (${GOOS}, windows)
-    BINARY := $(BINARY).exe
-endif
 
 TIMESTAMP = $(shell date +%s)
 COMMIT = $(shell git rev-parse --short HEAD)
