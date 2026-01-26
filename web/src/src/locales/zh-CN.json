@@ -1,0 +1,543 @@
+{
+    "components": {
+        "ErrorPage": {
+            "something_went_wrong": "呜呜QAQ..出错惹。",
+            "try_again_later": "请尝试刷新页面或稍后再回来。"
+        },
+        "TypedInput": {
+            "yes": "确认",
+            "no": "取消",
+            "add_new_item": "输入新项目名字。",
+            "editing_list": "正在编辑 {{fieldName}} 列表"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "频谱图设置",
+                "min_db": "最小 dB",
+                "max_db": "最大 dB"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "频谱图设置",
+                "min_db": "最小 dB",
+                "max_db": "最大 dB"
+            }
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "文件名",
+                "time": "修改时间",
+                "size": "文件大小",
+                "actions": "操作"
+            },
+            "file_list_actions": {
+                "download": "下载",
+                "preview": "预览"
+            },
+            "miniseed_list": {
+                "title": "每日 MiniSEED",
+                "search": "搜索"
+            },
+            "helicorder_list": {
+                "title": "Helicorder 列表",
+                "search": "搜索"
+            },
+            "request_file": {
+                "requesting": "正在请求下载文件 {{fileName}} 的链接。",
+                "success": "已成功获取下载文件 {{fileName}} 的链接。",
+                "error": "请求文件 {{fileName}} 的链接失败惹：{{error}}"
+            },
+            "preview_file": {
+                "requesting": "正在请求预览文件 {{fileName}} 的链接。",
+                "success": "已成功获取预览文件 {{fileName}} 的链接。",
+                "error": "请求文件 {{fileName}} 的链接失败惹：{{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "事件查询",
+                "data_agency": "数据机构",
+                "search_button": "搜索事件",
+                "searching": "正在从选定来源搜索事件中。",
+                "success": "从选定来源找到了 {{count}} 个事件。",
+                "no_data": "在选定来源中找不到任何事件。",
+                "error": "搜索事件失败惹：{{error}}"
+            },
+            "event_list_modal": {
+                "title": "选择一个地震事件",
+                "earthquake_at": "地震发生于 {{time}}",
+                "p_wave_arrival": "P 波到达 {{time}} 秒",
+                "s_wave_arrival": "S 波到达 {{time}} 秒",
+                "epicenter_distance": "震中距离 {{distance}} 公里",
+                "earthquake_depth": "深度 {{depth}} 公里",
+                "selected_an_event": "已选择位于 {{region}} 于 {{time}} 发生的地震事件。"
+            },
+            "data_export": {
+                "title": "数据导出",
+                "file_format": "文件格式",
+                "channel_code": "频道代码",
+                "export_button": "获取数据",
+                "exporting": "正在将频道 {{channel}} 导出为 {{format}} 格式。",
+                "success": "已成功将频道 {{channel}} 导出为 {{format}} 格式。",
+                "error": "将频道 {{channel}} 导出为 {{format}} 格式时失败惹：{{error}}"
+            },
+            "search_records": {
+                "title": "时间查询",
+                "start_time": "开始时间",
+                "end_time": "结束时间",
+                "invalid_time": "开始时间必须早于结束时间哦~",
+                "search_button": "搜索记录",
+                "searching": "正在从数据库搜索地震记录。",
+                "success": "从数据库找到了 {{count}} 条地震记录。",
+                "no_data": "在数据库中找不到任何地震记录。",
+                "error": "搜索记录失败惹：{{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "锁定UI",
+                "unlock_button": "解锁UI"
+            },
+            "reset_layout": {
+                "reset_button": "全部重置",
+                "confirm_message": "您确定要重置UI嘛？",
+                "confirm_title": "确认重置",
+                "confirm_button": "重置",
+                "cancel_button": "取消"
+            },
+            "display_mode": {
+                "waveform_mode": "波形模式",
+                "spectrogram_mode": "频谱图模式"
+            },
+            "share_link": {
+                "share_button": "分享链接",
+                "link_copied": "分享链接已复制到剪贴板啦~"
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "测站信息",
+                "name": "名称",
+                "country": "国家",
+                "place": "地点",
+                "affiliation": "机构名字",
+                "channels": "频道"
+            },
+            "device_info": {
+                "yes": "确认",
+                "no": "取消",
+                "title": "设备信息",
+                "product_model": "产品型号",
+                "device_id": "设备 ID",
+                "link_protocol": "链接协议",
+                "packet_interval": "数据包间隔",
+                "gnss_active": "GNSS 状态"
+            },
+            "device_status": {
+                "title": "设备状态",
+                "sample_rate": "采样率",
+                "latitude": "纬度",
+                "longitude": "经度",
+                "elevation": "海拔高度",
+                "temperature": "设备温度"
+            },
+            "link_status": {
+                "title": "链接状态",
+                "started_at": "启动于",
+                "last_frame": "最后数据帧",
+                "frames": "数据帧",
+                "errors": "错误",
+                "messages": "消息"
+            },
+            "connectivity": {
+                "loading": "正在连接到测站...",
+                "success": "已连接到测站，服务器已运行 {{uptime}} 秒，更新于 {{updatedAt}}。",
+                "error": "连接测站时发生错误惹QAQ...请检查您的网络连接！"
+            },
+            "upgrade": {
+                "update_available": "有可用更新版本 {{latest}} 啦！您可启用自动更新，或手动下载并安装。",
+                "restart_needed": "已完成最新版本 {{latest}} 的安装，当前仍在运行 {{current}}。请于合适的时间重启软件以应用更新。",
+                "manual_upgrade_needed": "已检测到新版本 {{latest}}，但当前版本 {{current}} 低于最低兼容版本 {{required}}，需手动升级。"
+            },
+            "station_location": {
+                "title": "测站位置"
+            },
+            "service_status": {
+                "title": "服务状态"
+            },
+            "cpu_usage": {
+                "title": "CPU 使用率"
+            },
+            "memory_usage": {
+                "title": "内存使用率"
+            },
+            "disk_usage": {
+                "title": "硬盘使用率"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "唔！找不到页面惹。",
+            "check_your_url": "请检查您的 URL 并再试一次qwq",
+            "go_back_button": "返回"
+        },
+        "RealTime": {
+            "display_mode": {
+                "waveform_mode": "波形模式",
+                "spectrogram_mode": "频谱图模式"
+            },
+            "reset_layout": {
+                "reset_button": "全部重置",
+                "confirm_message": "您确定要重置UI嘛？",
+                "confirm_title": "确认重置",
+                "confirm_button": "重置",
+                "cancel_button": "取消"
+            },
+            "layout_locker": {
+                "lock_button": "锁定UI",
+                "unlock_button": "解锁UI"
+            },
+            "record_data": {
+                "start_button": "开始录制",
+                "stop_button": "停止录制",
+                "start_recording": "录制已于 {{startedAt}} 开始。",
+                "link_created": "录制于 {{endedAt}} 停止（共 {{duration}} 秒）。已生成链接。",
+                "no_data_recorded": "此期间内未录制任何数据。"
+            },
+            "connectivity": {
+                "connecting": "没有连线，正在尝试连接...",
+                "connected": "已连线，最后更新于 {{updatedAt}}。"
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} SPS",
+                "channels": "{{num}} 个频道",
+                "retention": "保留 {{retention}} 秒"
+            }
+        },
+        "Settings": {
+            "Logs": {
+                "title": "应用程序日志"
+            },
+            "Dangerous": {
+                "title": "危险区域",
+                "restart_application": {
+                    "title": "重新启动整个应用程序",
+                    "description": "此操作将重新启动整个应用程序，可能需要短暂时间，并会暂时关闭所有使用中的连接，导致服务与记录中断。",
+                    "submit_button": "重新启动应用程序",
+                    "confirm_title": "确认重新启动",
+                    "confirm_message": "您确定要重新启动应用程序嘛？",
+                    "confirm_button": "重新启动",
+                    "cancel_button": "取消",
+                    "restarting": "正在发送重新启动请求...",
+                    "success": "重新启动请求已发送，应用程序将在数秒后重新启动。",
+                    "error": "重新启动应用程序请求失败惹：{{error}}"
+                },
+                "purge_waveform_records": {
+                    "title": "清除波形记录",
+                    "description": "这将删除数据库中的所有波形记录，此操作不可逆！",
+                    "submit_button": "清除记录",
+                    "confirm_title": "确认清除",
+                    "confirm_message": "您确定要清除所有波形记录嘛？",
+                    "confirm_button": "清除",
+                    "cancel_button": "取消",
+                    "purging": "正在清除波形记录...",
+                    "success": "已成功清除波形记录。",
+                    "error": "清除波形记录失败惹：{{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "清除 MiniSEED 文件",
+                    "description": "这将删除系统中的所有 MiniSEED 文件，此操作不可逆！",
+                    "submit_button": "清除 MiniSEED",
+                    "confirm_title": "确认清除",
+                    "confirm_message": "您确定要清除所有 MiniSEED 文件嘛？",
+                    "confirm_button": "清除",
+                    "cancel_button": "取消",
+                    "purging": "正在清除 MiniSEED 文件...",
+                    "success": "已成功清除 MiniSEED 文件。",
+                    "error": "清除 MiniSEED 文件失败惹：{{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "清除 Helicorder 文件",
+                    "description": "这将删除系统中的所有 Helicorder 文件，此操作不可逆！",
+                    "submit_button": "清除 Helicorder",
+                    "confirm_title": "确认清除",
+                    "confirm_message": "您确定要清除所有 Helicorder 文件嘛？",
+                    "confirm_button": "清除",
+                    "cancel_button": "取消",
+                    "purging": "正在清除 Helicorder 文件...",
+                    "success": "已成功清除 Helicorder 文件。",
+                    "error": "清除 Helicorder 文件失败惹：{{error}}"
+                },
+                "reset_station_config": {
+                    "title": "重设测站配置",
+                    "description": "这将重设所有测站配置，此操作不可逆且需要重新启动才能生效！",
+                    "submit_button": "重设测站",
+                    "confirm_title": "确认重设",
+                    "confirm_message": "您确定要重设所有测站配置嘛？",
+                    "confirm_button": "重设",
+                    "cancel_button": "取消",
+                    "resetting": "正在重设测站配置...",
+                    "success": "已成功重设测站配置。",
+                    "error": "重设测站配置失败惹：{{error}}"
+                },
+                "reset_service_config": {
+                    "title": "重设服务配置",
+                    "description": "这将重设所有服务配置，此操作不可逆且需要重新启动才能生效！",
+                    "submit_button": "重设服务",
+                    "confirm_title": "确认重设",
+                    "confirm_message": "您确定要重设所有服务配置嘛？",
+                    "confirm_button": "重设",
+                    "cancel_button": "取消",
+                    "resetting": "正在重设服务配置...",
+                    "success": "已成功重设服务配置。",
+                    "error": "重设服务配置失败惹：{{error}}"
+                }
+            },
+            "Metadata": {
+                "title": "测站元数据"
+            },
+            "Preference": {
+                "title": "网页偏好设置",
+                "reset_layout_preference": {
+                    "title": "重置UI偏好",
+                    "description": "这将重置所有UI偏好，此操作不可逆！",
+                    "submit_button": "重置偏好",
+                    "confirm_title": "确认重置",
+                    "confirm_message": "您确定要重置所有UI偏好嘛？",
+                    "confirm_button": "重置",
+                    "cancel_button": "取消",
+                    "success": "已成功重置UI偏好。"
+                }
+            },
+            "Service": {
+                "title": "服务控制",
+                "restart_service": {
+                    "submit_button": "重新启动",
+                    "confirm_title": "确认重新启动",
+                    "confirm_message": "您确定要重新启动服务嘛？",
+                    "confirm_button": "重新启动",
+                    "cancel_button": "取消",
+                    "restarting": "正在重新启动服务...",
+                    "success": "已成功重新启动服务。",
+                    "error": "重新启动服务失败惹：{{error}}"
+                },
+                "start_service": {
+                    "submit_button": "启动",
+                    "confirm_title": "确认启动",
+                    "confirm_message": "您确定要启动服务嘛？",
+                    "confirm_button": "启动",
+                    "cancel_button": "取消",
+                    "starting": "正在启动服务...",
+                    "success": "已成功启动服务。",
+                    "error": "启动服务失败惹：{{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "停止",
+                    "confirm_title": "确认停止",
+                    "confirm_message": "您确定要停止服务嘛？",
+                    "confirm_button": "停止",
+                    "cancel_button": "取消",
+                    "stopping": "正在停止服务...",
+                    "success": "已成功停止服务。",
+                    "error": "停止服务失败惹：{{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "重置",
+                    "confirm_title": "确认重置",
+                    "confirm_message": "您确定要重置服务嘛？",
+                    "confirm_button": "重置",
+                    "cancel_button": "取消",
+                    "resetting": "正在重置服务...",
+                    "success": "已成功重置服务。",
+                    "error": "重置服务失败惹：{{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "编辑",
+                    "updating": "正在应用新变更...",
+                    "success": "变更已成功应用。",
+                    "error": "更新服务设置失败惹：{{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "编辑服务：{{name}}"
+                },
+                "service_status": {
+                    "yes": "确认",
+                    "no": "取消",
+                    "is_running": "运行中",
+                    "restarts": "重新启动次数",
+                    "stopped_at": "停止于",
+                    "started_at": "启动于",
+                    "updated_at": "更新于"
+                }
+            },
+            "Station": {
+                "title": "测站设置",
+                "update_station": {
+                    "field_required": "此字段为必填项。",
+                    "updating": "正在更新测站设置...",
+                    "success": "已成功更新测站设置。",
+                    "error": "更新测站设置失败惹：{{error}}"
+                }
+            },
+            "Users": {
+                "title": "用户管理",
+                "search_users": {
+                    "placeholder": "搜索用户"
+                },
+                "refresh_list": {
+                    "submit_button": "刷新",
+                    "refreshing": "正在刷新用户列表...",
+                    "success": "已成功刷新用户列表。",
+                    "error": "刷新用户列表失败惹：{{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "移除用户",
+                    "confirm_title": "确认移除",
+                    "confirm_message": "您确定要移除选定的用户嘛？",
+                    "confirm_button": "移除",
+                    "cancel_button": "取消",
+                    "removing": "正在移除选定的用户...",
+                    "success": "已移除 {{num}} 位用户。",
+                    "error": "移除选定的用户失败惹：{{error}}"
+                },
+                "create_user": {
+                    "submit_button": "创建用户",
+                    "creating": "正在创建新用户...",
+                    "success": "用户 {{username}} 已创建。",
+                    "error": "创建新用户失败惹：{{error}}"
+                },
+                "create_user_modal": {
+                    "title": "创建新用户",
+                    "username": {
+                        "label": "用户名",
+                        "placeholder": "新用户的名称"
+                    },
+                    "password": {
+                        "label": "密码",
+                        "placeholder": "新用户的密码"
+                    },
+                    "admin": {
+                        "label": "具有管理员权限的用户"
+                    },
+                    "create_button": "创建"
+                },
+                "edit_user": {
+                    "submit_button": "编辑",
+                    "updating": "正在更新用户...",
+                    "success": "用户 {{username}} 已更新。",
+                    "error": "更新用户失败惹：{{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "编辑用户",
+                    "username": {
+                        "label": "用户名",
+                        "placeholder": "留空表示不变更。"
+                    },
+                    "password": {
+                        "label": "密码",
+                        "placeholder": "留空表示不变更。"
+                    },
+                    "admin": {
+                        "label": "具有管理员权限的用户"
+                    },
+                    "update_button": "更新"
+                },
+                "remove_user": {
+                    "submit_button": "移除",
+                    "confirm_title": "确认移除",
+                    "confirm_message": "您确定要移除用户 {{username}} 嘛？",
+                    "confirm_button": "移除",
+                    "cancel_button": "取消",
+                    "removing": "正在移除用户...",
+                    "success": "用户 {{username}} 已被移除。",
+                    "error": "移除用户失败惹：{{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "确认",
+                    "no": "取消",
+                    "never": "从未",
+                    "id": "ID",
+                    "user_id": "用户 ID",
+                    "username": "用户名",
+                    "admin": "管理员",
+                    "created_at": "创建于",
+                    "last_login": "上次登录",
+                    "user_ip": "用户 IP",
+                    "user_agent": "用户代理",
+                    "updated_at": "更新于",
+                    "actions": "操作"
+                }
+            },
+            "Backup": {
+                "title": "备份管理",
+                "select_mode": {
+                    "backup": "创建备份",
+                    "restore": "还原备份"
+                },
+                "backup_config": {
+                    "title": "创建备份",
+                    "description": "这将导出您的配置数据为 JSON 文件。您可以将此文件保存起来，并在日后（例如系统迁移时）用于还原配置。",
+                    "submit_button": "生成备份",
+                    "generating": "正在生成备份数据...",
+                    "success": "备份数据已成功生成。",
+                    "error": "生成备份数据失败惹：{{error}}"
+                },
+                "restore_config": {
+                    "title": "选择备份文件",
+                    "description": "选择一个 JSON 备份文件以还原配置。AnyShake Observer 将会覆盖您目前的配置。",
+                    "submit_button": "还原配置",
+                    "no_file_selected": "尚未选择文件。",
+                    "confirm_title": "确认还原",
+                    "confirm_message": "确定要还原配置嘛？此操作将覆盖您目前的配置。",
+                    "confirm_button": "还原",
+                    "cancel_button": "取消",
+                    "restoring": "正在还原配置...",
+                    "success": "配置已成功还原。",
+                    "error": "还原配置失败惹：{{error}}"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "有可用的新更新，您想现在更新嘛？",
+            "confirm_title": "有可用更新",
+            "confirm_button": "更新",
+            "cancel_button": "取消"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "您确定要退出登录嘛？",
+            "confirm_title": "退出登录",
+            "confirm_button": "确定",
+            "cancel_button": "取消"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "用户名",
+            "placeholder": "您的用户名"
+        },
+        "password": {
+            "label": "密码",
+            "placeholder": "您的密码"
+        },
+        "captcha": {
+            "label": "输入验证码",
+            "loading": "正在加载验证码...",
+            "error": "加载验证码失败惹",
+            "placeholder": "验证码",
+            "refreshing": "正在刷新验证码。",
+            "refresh_success": "已成功刷新验证码。",
+            "refresh_error": "刷新验证码失败惹。"
+        },
+        "signin": {
+            "button": "登录",
+            "loading": "正在登录...",
+            "success": "您已成功登录！ヾ(≧▽≦*)o",
+            "error": "登录失败惹..(っ °Д °;)っ"
+        }
+    }
+}
