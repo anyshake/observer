@@ -32,7 +32,7 @@ func (s *QuakeSenseServiceImpl) Start() error {
 	mqttClientOptions.AddBroker(s.mqttBroker)
 	mqttClientOptions.SetAutoReconnect(true)
 	mqttClientOptions.SetKeepAlive(30 * time.Second)
-	mqttClientOptions.SetClientID("anyshake-observer")
+	mqttClientOptions.SetClientID(s.mqttClientId)
 	mqttClientOptions.SetConnectTimeout(10 * time.Second)
 	if s.mqttUsername != "" && s.mqttPassword != "" {
 		mqttClientOptions.SetUsername(s.mqttUsername)

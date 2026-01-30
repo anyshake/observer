@@ -49,6 +49,7 @@ type QuakeSenseServiceImpl struct {
 	mqttTopic    string
 	mqttUsername string
 	mqttPassword string
+	mqttClientId string
 	mqttClient   mqtt.Client
 
 	stationName        string

@@ -40,6 +40,12 @@ func (s *QuakeSenseServiceImpl) Init() error {
 	}
 	s.mqttPassword = mqttPassword.(string)
 
+	mqttClientId, err := (&quakeSenseConfigMqttClientIdImpl{}).Get(s.actionHandler)
+	if err != nil {
+		return fmt.Errorf("failed to get quakeSense MQTT client ID: %w", err)
+	}
+	s.mqttClientId = mqttClientId.(string)
+
 	stationName, err := (&config.StationNameConfigConstraintImpl{}).Get(s.actionHandler)
 	if err != nil {
 		return fmt.Errorf("failed to get quakeSense station name: %w", err)

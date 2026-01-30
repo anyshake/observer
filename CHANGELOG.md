@@ -2,6 +2,19 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.3.4
+
+### Release Notes
+
+This release focuses on **MQTT connectivity robustness and operational convenience**, introducing **configurable MQTT Client ID support** and **in-app restart capability**.
+
+By allowing explicit control over the **MQTT Client ID**, AnyShake Observer can now avoid client collisions and better integrate with managed brokers and shared infrastructures. In addition, the new **in-app restart mechanism** improves maintainability by enabling controlled restarts without external process management.
+
+### New Features
+
+- Added support for **configurable MQTT Client ID**, allowing users to explicitly define the client identifier used when connecting to the MQTT broker.
+- Added support for **in-app restart**, enabling the service to restart itself without external supervisors or manual intervention.
+
 ## v4.3.3
 
 ### Release Notes
