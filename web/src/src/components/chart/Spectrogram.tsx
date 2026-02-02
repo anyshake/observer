@@ -1,4 +1,4 @@
-import { mdiClose, mdiCog } from '@mdi/js';
+import { mdiClose, mdiCog, mdiMagnifyMinus, mdiMagnifyPlus } from '@mdi/js';
 import Icon from '@mdi/react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,7 @@ interface ISpectrogram {
     readonly data: [number, number][];
     readonly fftExecutor?: FFTExecutor;
     readonly renderFPS?: number;
+    readonly zoomStep?: number;
     readonly onSpectrogramUpdate?: (minDB: number, maxDB: number) => void;
 }
 
@@ -32,6 +33,7 @@ export const Spectrogram = memo(
         data,
         fftExecutor,
         renderFPS = 2,
+        zoomStep = 0.2,
         onSpectrogramUpdate
     }: ISpectrogram) => {
         const { t } = useTranslation();
@@ -39,6 +41,7 @@ export const Spectrogram = memo(
         const [showSettings, setShowSettings] = useState(false);
         const [minDBState, setMinDBState] = useState(minDB);
         const [maxDBState, setMaxDBState] = useState(maxDB);
+        const [zoomDuration, setZoomDuration] = useState(duration);
 
         const [initialized, setInitialized] = useState(false);
         const spectrogramRef = useRef<SpectrogramCore | null>(null);
@@ -116,7 +119,7 @@ export const Spectrogram = memo(
                 }
 
                 const total = dataDuration ?? 0;
-                const window = duration;
+                const window = zoomDuration;
                 const maxStart = Math.max(0, total - window);
                 const start = maxStart * timePercent;
                 const end = start + window;
@@ -130,7 +133,7 @@ export const Spectrogram = memo(
             };
             rafId = requestAnimationFrame(renderLoop);
             return () => cancelAnimationFrame(rafId);
-        }, [dataDuration, duration, freqRange, initialized, renderFPS, timePercent]);
+        }, [dataDuration, duration, freqRange, initialized, renderFPS, timePercent, zoomDuration]);
 
         useEffect(() => {
             if (initialized) {
@@ -170,11 +173,29 @@ export const Spectrogram = memo(
             [minDBState, onSpectrogramUpdate, spectrogramRef]
         );
 
+        const handleZoomIn = useCallback(() => {
+            if (dataDuration) {
+                setZoomDuration((prev) => {
+                    const next = prev * (1 - zoomStep);
+                    return Math.max(next, dataDuration * 0.01);
+                });
+            }
+        }, [dataDuration, zoomStep]);
+
+        const handleZoomOut = useCallback(() => {
+            if (dataDuration) {
+                setZoomDuration((prev) => {
+                    const next = prev * (1 + zoomStep);
+                    return Math.min(next, dataDuration);
+                });
+            }
+        }, [dataDuration, zoomStep]);
+
         return (
             <div className="relative flex h-full w-full flex-col">
                 <canvas className="block" ref={canvasRef} />
 
-                <div className="absolute top-5 left-15 flex items-center space-x-1">
+                <div className="absolute top-5 left-15 mr-15 flex flex-wrap items-center gap-1">
                     {title && (
                         <div className="flex h-6 items-center rounded bg-black/50 px-3 text-sm font-bold text-white select-none">
                             {title}
@@ -182,13 +203,27 @@ export const Spectrogram = memo(
                     )}
 
                     <button
-                        className="flex size-6 cursor-pointer items-center justify-center rounded bg-black/50 text-white opacity-50 transition-all hover:opacity-100"
+                        className="flex size-6 flex-shrink-0 cursor-pointer items-center justify-center rounded bg-black/50 text-white opacity-50 transition-all hover:opacity-100"
                         onClick={() => setShowSettings((v) => !v)}
                     >
-                        <Icon path={mdiCog} size={0.6} />
+                        <Icon path={mdiCog} size={0.7} />
                     </button>
 
-                    <div className="flex h-6 items-center rounded bg-black/50 opacity-50 transition-all hover:opacity-100">
+                    <button
+                        className="flex size-6 flex-shrink-0 cursor-pointer items-center justify-center rounded bg-black/50 text-white opacity-50 transition-all hover:opacity-100"
+                        onClick={handleZoomIn}
+                    >
+                        <Icon path={mdiMagnifyPlus} size={0.7} />
+                    </button>
+
+                    <button
+                        className="flex size-6 flex-shrink-0 cursor-pointer items-center justify-center rounded bg-black/50 text-white opacity-50 transition-all hover:opacity-100"
+                        onClick={handleZoomOut}
+                    >
+                        <Icon path={mdiMagnifyMinus} size={0.7} />
+                    </button>
+
+                    <div className="flex h-6 max-w-36 items-center rounded bg-black/50 opacity-50 transition-all hover:opacity-100">
                         <input
                             type="range"
                             min={0}

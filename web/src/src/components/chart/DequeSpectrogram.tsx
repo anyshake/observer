@@ -201,7 +201,7 @@ export const DequeSpectrogram = memo(
                 <div className="relative h-full w-full">
                     <canvas ref={canvasRef} className="block h-full w-full" />
 
-                    <div className="absolute top-5 left-15 flex items-center space-x-1">
+                    <div className="absolute top-5 left-15 flex items-center gap-1">
                         {title && (
                             <div className="flex h-6 items-center rounded bg-black/50 px-3 text-sm font-bold text-white select-none">
                                 {title}
@@ -209,10 +209,10 @@ export const DequeSpectrogram = memo(
                         )}
 
                         <button
-                            className="flex size-6 cursor-pointer items-center justify-center rounded bg-black/50 text-white opacity-50 transition-all hover:opacity-100"
+                            className="flex size-6 flex-shrink-0 cursor-pointer items-center justify-center rounded bg-black/50 text-white opacity-50 transition-all hover:opacity-100"
                             onClick={() => setShowSettings((v) => !v)}
                         >
-                            <Icon path={mdiCog} size={0.6} />
+                            <Icon path={mdiCog} size={0.7} />
                         </button>
                     </div>
 
