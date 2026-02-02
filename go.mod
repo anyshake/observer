@@ -5,7 +5,7 @@ go 1.24.1
 require (
 	github.com/99designs/gqlgen v0.17.81
 	github.com/PuerkitoBio/goquery v1.10.3
-	github.com/alphadose/haxmap v1.4.0
+	github.com/alphadose/haxmap v1.4.1
 	github.com/ameshkov/dnscrypt/v2 v2.4.0
 	github.com/antonfisher/nested-logrus-formatter v1.3.1
 	github.com/appleboy/gin-jwt/v2 v2.10.1
@@ -34,6 +34,7 @@ require (
 	github.com/go-audio/wav v1.1.0
 	github.com/go-logr/logr v1.4.2
 	github.com/gorilla/websocket v1.5.3
+	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/jedisct1/go-dnsstamps v0.0.0-20240423203910-07a0735c7774
 	github.com/miekg/dns v1.1.65
 	github.com/ncruces/go-sqlite3 v0.24.0
@@ -120,7 +121,6 @@ require (
 	github.com/google/pprof v0.0.0-20241206021119-61a79c692802 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3 // indirect
-	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hashicorp/yamux v0.1.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect

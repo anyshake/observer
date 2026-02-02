@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"crypto/sha1"
+	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
 	"time"
@@ -10,32 +10,32 @@ import (
 )
 
 type keyPair struct {
-	expiration time.Duration
+	ttl        time.Duration
 	createAt   time.Time
 	rsaKeyPair cryption.RsaKeyPair
 }
 
-func (n *keyPair) init(expiration time.Duration) error {
+func newKeyPair(ttl time.Duration) (*keyPair, error) {
 	rsaKeyPair, err := cryption.New(2048)
 	if err != nil {
-		return fmt.Errorf("failed to create RSA key pair: %w", err)
+		return nil, fmt.Errorf("failed to create RSA key pair: %w", err)
 	}
 
-	n.createAt = time.Now()
-	n.expiration = expiration
-	n.rsaKeyPair = rsaKeyPair
-
-	return nil
+	return &keyPair{
+		ttl:        ttl,
+		createAt:   time.Now(),
+		rsaKeyPair: rsaKeyPair,
+	}, nil
 }
 
-func (n *keyPair) getNonce() string {
+func (n *keyPair) getKeyPairId() string {
 	_, pemPubKey, _ := n.rsaKeyPair.GetPEM(false)
-	h := sha1.New()
+	h := sha512.New()
 	h.Write([]byte(pemPubKey))
 
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func (n *keyPair) isValid() bool {
-	return time.Now().Before(n.createAt.Add(n.expiration))
+func (n *keyPair) isKeyPairAlive() bool {
+	return time.Now().Before(n.createAt.Add(n.ttl))
 }

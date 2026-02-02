@@ -10,22 +10,20 @@ import (
 	"github.com/dchest/captcha"
 )
 
-func (h *auth) preauth(expiration time.Duration) (code int, msg string, res any, err error) {
-	// Create a nonce for the client
-	var nc keyPair
-	err = nc.init(expiration)
+func (h *auth) preauth(ttl time.Duration) (code int, msg string, res any, err error) {
+	kp, err := newKeyPair(ttl)
 	if err != nil {
-		return http.StatusInternalServerError, "failed to create nonce", nil, fmt.Errorf("failed to create nonce: %w", err)
+		errText := "failed to generate new RSA key pair"
+		return http.StatusInternalServerError, errText, nil, fmt.Errorf("%s: %w", errText, err)
 	}
-	h.keyPairDataPool.Set(nc.getNonce(), nc)
+	h.keyPairDataPool.Set(kp.getKeyPairId(), kp)
 
-	// Return base64 encoded public key to the client
-	_, pemPubKey, err := nc.rsaKeyPair.GetPEM(true)
+	_, pemPubKey, err := kp.rsaKeyPair.GetPEM(true)
 	if err != nil {
-		return http.StatusInternalServerError, "failed to create preauth key", nil, fmt.Errorf("failed to create preauth key: %w", err)
+		errText := "failed to create RSA public key for preauth"
+		return http.StatusInternalServerError, errText, nil, fmt.Errorf("%s: %w", errText, err)
 	}
 
-	// Generate a captcha for the client
 	var buf bytes.Buffer
 	captchaId := captcha.New()
 	err = captcha.WriteImage(&buf, captchaId, captcha.StdWidth, captcha.StdHeight)
@@ -34,8 +32,8 @@ func (h *auth) preauth(expiration time.Duration) (code int, msg string, res any,
 	}
 
 	return http.StatusOK, "successfully created preauth key", map[string]any{
-		"ttl":         expiration.Milliseconds(),
-		"encrypt_key": pemPubKey,
+		"ttl":         ttl.Milliseconds(),
+		"public_key":  pemPubKey,
 		"captcha_id":  captchaId,
 		"captcha_img": base64.StdEncoding.EncodeToString(buf.Bytes()),
 	}, nil

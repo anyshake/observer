@@ -7,6 +7,7 @@ import {
     mdiShieldCheck
 } from '@mdi/js';
 import Icon from '@mdi/react';
+import { Buffer } from 'buffer';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import { md, pki, util } from 'node-forge';
 import { useCallback, useEffect, useState } from 'react';
@@ -33,7 +34,7 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
     // State for pre-authentication data (captcha, encrypt key, etc.)
     const [preAuthTTL, setPreAuthTTL] = useState(0);
     const [preAuthData, setPreAuthData] = useState({
-        encrypt_key: '',
+        public_key: '',
         captcha_id: '',
         captcha_img: '',
         error: false
@@ -41,11 +42,11 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
     const { t } = useTranslation();
     const getPreAuthData = useCallback(
         async (notify: boolean) => {
-            setPreAuthData({ encrypt_key: '', captcha_id: '', captcha_img: '', error: false });
+            setPreAuthData({ public_key: '', captcha_id: '', captcha_img: '', error: false });
             const requestFn = async (throwError: boolean) => {
                 const result = await ApiClient.request<{
                     ttl: number;
-                    encrypt_key: string;
+                    public_key: string;
                     captcha_id: string;
                     captcha_img: string;
                 }>({
@@ -73,10 +74,10 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                     : await requestFn(false)
             )!;
             if (res?.data) {
-                const { ttl, encrypt_key, captcha_id, captcha_img } = res.data;
+                const { ttl, public_key, captcha_id, captcha_img } = res.data;
                 setPreAuthData({
                     error: false,
-                    encrypt_key,
+                    public_key,
                     captcha_id,
                     captcha_img: `data:image/png;base64,${captcha_img}`
                 });
@@ -98,17 +99,74 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
 
     const { setCredential, credential } = useCredentialStore();
     const handleLoginSubmit = async (username: string, password: string, captcha: string) => {
-        // Load public key and encrypt credential
-        const publicKey = util.decode64(preAuthData.encrypt_key);
-        const credential = pki.publicKeyFromPem(publicKey).encrypt(
-            JSON.stringify({
-                username,
-                password,
-                timestamp: Date.now(),
-                captcha_solution: captcha,
-                captcha_id: preAuthData.captcha_id
-            }),
-            'RSA-OAEP'
+        const encrypt = async (
+            secret: Uint8Array<ArrayBuffer>,
+            data: Uint8Array<ArrayBuffer>,
+            aad: Uint8Array<ArrayBuffer>
+        ): Promise<string> => {
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw',
+                secret,
+                { name: 'HKDF' },
+                false,
+                ['deriveKey']
+            );
+            const key = await crypto.subtle.deriveKey(
+                {
+                    name: 'HKDF',
+                    hash: 'SHA-512',
+                    salt: new Uint8Array([]),
+                    info: new Uint8Array([])
+                },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt']
+            );
+
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const ciphertextBuffer = await crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv, additionalData: aad, tagLength: 128 },
+                key,
+                data
+            );
+
+            const ciphertext = new Uint8Array(ciphertextBuffer);
+            const payload = new Uint8Array(iv.length + ciphertext.length);
+            payload.set(iv, 0);
+            payload.set(ciphertext, iv.length);
+
+            return Buffer.from(payload).toString('base64');
+        };
+
+        const publicKey = util.decode64(preAuthData.public_key);
+        const sessionId = md.sha512.create().update(publicKey).digest().toHex();
+        const sessionIdBuffer = Buffer.from(sessionId);
+
+        const secret = crypto.getRandomValues(new Uint8Array(32));
+        const encryptedSecret = util.encode64(
+            pki
+                .publicKeyFromPem(publicKey)
+                .encrypt(Buffer.from(secret).toString('base64'), 'RSA-OAEP')
+        );
+
+        const encryptedNonce = await encrypt(
+            secret,
+            crypto.getRandomValues(new Uint8Array(16)),
+            sessionIdBuffer
+        );
+        const encryptedPayload = await encrypt(
+            secret,
+            Buffer.from(
+                JSON.stringify({
+                    timestamp: Date.now(), // currently not used in backend
+                    username,
+                    password,
+                    captcha_solution: captcha,
+                    captcha_id: preAuthData.captcha_id
+                })
+            ),
+            sessionIdBuffer
         );
 
         const res = await ApiClient.request<{ token: string; life_time: number }>({
@@ -116,8 +174,10 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
             method: 'post',
             data: {
                 action: 'login',
-                credential: util.encode64(credential),
-                nonce: md.sha1.create().update(publicKey).digest().toHex()
+                session: sessionId,
+                nonce: encryptedNonce,
+                secret: encryptedSecret,
+                payload: encryptedPayload
             }
         });
         if (res.error) {
