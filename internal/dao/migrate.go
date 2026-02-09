@@ -14,7 +14,7 @@ func (d *DAO) AutoMigrate(tables ...ITable) error {
 		tableName := table.GetName(d.prefix)
 
 		if table.UseAutoMigrate() {
-			if err := d.Database.AutoMigrate(tableRecord); err != nil {
+			if err := d.Database.Table(tableName).AutoMigrate(tableRecord); err != nil {
 				return fmt.Errorf("failed to auto migrate %s table: %w", tableName, err)
 			}
 		}

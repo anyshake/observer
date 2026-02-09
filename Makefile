@@ -60,7 +60,7 @@ ifeq ($(wildcard $(DIST_DIR)/config.json.local),)
 	@cp $(ASSETS_DIR)/config.json $(DIST_DIR)/config.json.local
 endif
 	@echo "[Info] Running project..."
-	$(GO) run -gcflags="all=-N -l" -race $(SRC_DIR)/*.go --config $(DIST_DIR)/config.json.local
+	$(GO) run -gcflags="all=-N -l" -race $(SRC_DIR) --config $(DIST_DIR)/config.json.local
 
 clean:
 	@echo "[Warn] Cleaning up project..."
