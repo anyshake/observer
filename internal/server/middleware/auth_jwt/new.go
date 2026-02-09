@@ -27,7 +27,7 @@ func New(timeSource *timesource.Source, actionHandler *action.Handler, expiratio
 			}
 			userModel, err := actionHandler.SysUserGetByUserId(userId)
 			if userModel.UserId != "" && err == nil {
-				c.Set("is_admin", userModel.IsAdmin == model.ADMIN)
+				c.Set(IsAdminKey, userModel.IsAdmin == model.ADMIN)
 				return true
 			}
 			return false
@@ -37,18 +37,18 @@ func New(timeSource *timesource.Source, actionHandler *action.Handler, expiratio
 			response.Error(c, http.StatusUnauthorized, fmt.Sprintf("%s: %s", baseMessage, message))
 		},
 		Authenticator: func(c *gin.Context) (any, error) {
-			userId, ok := c.MustGet("user_id").(string)
+			userId, ok := c.MustGet(UserIdKey).(string)
 			if !ok {
 				return nil, jwt.ErrInvalidAuthHeader
 			}
-			return map[string]any{"user_id": userId}, nil
+			return map[string]any{UserIdKey: userId}, nil
 		},
 		PayloadFunc: func(data any) jwt.MapClaims {
 			val, ok := data.(map[string]any)
 			if !ok {
 				return nil
 			}
-			return jwt.MapClaims{"user_id": val["user_id"]}
+			return jwt.MapClaims{UserIdKey: val[UserIdKey]}
 		},
 		LoginResponse: func(c *gin.Context, code int, tokenStr string, t time.Time) {
 			response.Data(c, code, "login succeed and token has been created", token{
@@ -63,7 +63,7 @@ func New(timeSource *timesource.Source, actionHandler *action.Handler, expiratio
 			})
 		},
 		Key:         secret,
-		IdentityKey: "user_id",
+		IdentityKey: UserIdKey,
 		Realm:       "anyshake-observer",
 		Timeout:     expiration,
 		MaxRefresh:  expiration,

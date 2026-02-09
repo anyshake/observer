@@ -78,8 +78,8 @@ func (s *HttpServer) Setup(listen string) error {
 
 	api.POST("/graphql", jwtMiddlewareFn, func(ctx *gin.Context) {
 		ctxWithUserStatus := context.WithValue(ctx.Request.Context(), graph_resolver.ContextKey("user_status"), map[string]any{
-			"is_admin": ctx.GetBool("is_admin"),
-			"user_id":  ctx.GetString("user_id"),
+			auth_jwt.IsAdminKey: ctx.GetBool(auth_jwt.IsAdminKey),
+			auth_jwt.UserIdKey:  ctx.GetString(auth_jwt.UserIdKey),
 		})
 		ctx.Request = ctx.Request.WithContext(ctxWithUserStatus)
 		graphql.ServeHTTP(ctx.Writer, ctx.Request)

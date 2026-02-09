@@ -6,6 +6,7 @@ import (
 
 	"github.com/alphadose/haxmap"
 	"github.com/anyshake/observer/internal/dao/action"
+	"github.com/anyshake/observer/internal/server/middleware/auth_jwt"
 	"github.com/anyshake/observer/internal/server/response"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/gin-gonic/gin"
@@ -67,7 +68,7 @@ func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, jwtMiddl
 					response.Error(c, code, err.Error())
 					return
 				}
-				c.Set("user_id", userId)
+				c.Set(auth_jwt.UserIdKey, userId)
 				loginCallback(c)
 			case "refresh":
 				refreshCallback(c)

@@ -6,6 +6,7 @@ import (
 	"github.com/anyshake/observer/config"
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/hardware"
+	"github.com/anyshake/observer/internal/server/middleware/auth_jwt"
 	"github.com/anyshake/observer/internal/service"
 	"github.com/anyshake/observer/internal/upgrade"
 	"github.com/anyshake/observer/pkg/ringbuf"
@@ -46,7 +47,7 @@ func (r *Resolver) getCurrentUserId(ctx context.Context) string {
 		return ""
 	}
 
-	user, ok = userStatusMap["user_id"]
+	user, ok = userStatusMap[auth_jwt.UserIdKey]
 	if !ok {
 		return ""
 	}
@@ -65,7 +66,7 @@ func (r *Resolver) checkIsAdmin(ctx context.Context) bool {
 		return false
 	}
 
-	isAdmin, ok := userStatusMap["is_admin"]
+	isAdmin, ok := userStatusMap[auth_jwt.IsAdminKey]
 	if !ok {
 		return false
 	}
