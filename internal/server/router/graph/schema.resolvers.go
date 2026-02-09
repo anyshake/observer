@@ -86,7 +86,7 @@ func (r *mutationResolver) UpdateSysUser(ctx context.Context, userID string, use
 	}
 	user.IsAdmin = lo.Ternary(admin, model.ADMIN, model.NON_ADMIN)
 
-	if err := r.ActionHandler.SysUserUpdte(userID, user); err != nil {
+	if err := r.ActionHandler.SysUserUpdate(userID, user); err != nil {
 		return false, fmt.Errorf("failed to update user: %w", err)
 	}
 

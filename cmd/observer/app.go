@@ -31,6 +31,7 @@ import (
 
 	cleaner_close_database "github.com/anyshake/observer/internal/hook/cleaner/close_database"
 	cleaner_close_explorer "github.com/anyshake/observer/internal/hook/cleaner/close_explorer"
+	startup_migrate_database "github.com/anyshake/observer/internal/hook/startup/migrate_database"
 	startup_setup_admin "github.com/anyshake/observer/internal/hook/startup/setup_admin"
 	startup_setup_station "github.com/anyshake/observer/internal/hook/startup/setup_station"
 
@@ -68,7 +69,7 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 	if err := conf.Parse(args.configPath, "json"); err != nil {
 		logger.GetLogger(main).Fatalln(err)
 	}
-	if err := migrateConfig(conf); err != nil {
+	if err := conf.Migrate(logger.GetLogger(main)); err != nil {
 		logger.GetLogger(main).Fatalln(err)
 	}
 	logger.GetLogger(main).Info("global configuration has been loaded")
@@ -114,7 +115,8 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 	}
 	logger.GetLogger(main).Info("database connection has been established")
 
-	if err = daoObj.Migrate(
+	if err = daoObj.AutoMigrate(
+		&model.SchemaVersion{},
 		&model.SeisRecord{},
 		&model.SysUser{},
 		&model.UserSettings{},
@@ -122,7 +124,7 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		logger.GetLogger(main).Fatalln(err)
 	}
 	logger.GetLogger(main).Info("database schema has been configured")
-	actionHandler := action.New(daoObj)
+	actionHandler := action.NewHandler(daoObj)
 
 	var hardwareDevice hardware.IHardware
 
@@ -142,6 +144,9 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 
 	stationConfigConstraints := config.NewStationConstraints()
 	startupTasks := []hook.IHook{
+		&startup_migrate_database.MigrateDatabaseStartupImpl{
+			ActionHandler: actionHandler,
+		},
 		&startup_setup_station.SetupStationStartupImpl{
 			ActionHandler:            actionHandler,
 			StationConfigConstraints: stationConfigConstraints,

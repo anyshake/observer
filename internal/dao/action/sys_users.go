@@ -129,7 +129,7 @@ func (h *Handler) SysUserLogin(username, password, userAgent, userIp string) (us
 		user.LastLogin = time.Now().UnixMilli()
 		user.UserAgent = userAgent
 		user.UserIp = userIp
-		err = h.SysUserUpdte(user.UserId, user)
+		err = h.SysUserUpdate(user.UserId, user)
 		if err != nil {
 			return "", fmt.Errorf("failed to update login status: %w", err)
 		}
@@ -138,7 +138,7 @@ func (h *Handler) SysUserLogin(username, password, userAgent, userIp string) (us
 	return user.UserId, nil
 }
 
-func (h *Handler) SysUserUpdte(userId string, user model.SysUser) error {
+func (h *Handler) SysUserUpdate(userId string, user model.SysUser) error {
 	if h.daoObj == nil {
 		return errors.New("database is not opened")
 	}

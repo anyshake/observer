@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func (d *DAO) Migrate(tables ...ITable) error {
+func (d *DAO) AutoMigrate(tables ...ITable) error {
 	if d.Database == nil {
 		return fmt.Errorf("database is not opened")
 	}

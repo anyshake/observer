@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -21,7 +22,7 @@ type hardware struct {
 }
 
 type ntpClient struct {
-	// Endpoint is a deprecated field since v4.2.0, use Pool instead
+	// Deprecated: Endpoint is a deprecated field since v4.2.0, use Pool instead
 	Endpoint string   `mapstructure:"endpoint"`
 	Timeout  int      `mapstructure:"timeout" validate:"gte=0"`
 	Retry    int      `mapstructure:"retry" validate:"gte=0"`
@@ -75,6 +76,17 @@ func (c *BaseConfig) Parse(configPath, configType string) error {
 	validate := validator.New()
 	if err := validate.Struct(c); err != nil {
 		return fmt.Errorf("failed to validate config: %w", err)
+	}
+
+	return nil
+}
+
+func (cfg *BaseConfig) Migrate(logger *logrus.Entry) error {
+	// 2025-08-22: starting from v4.2.0, NTP Client configuration has deprecated the `endpoint` field.
+	if cfg.NtpClient.Endpoint != "" && len(cfg.NtpClient.Pool) == 0 {
+		cfg.NtpClient.Pool = []string{cfg.NtpClient.Endpoint}
+		cfg.NtpClient.Endpoint = ""
+		logger.Warnln("configuration field `ntpclient.endpoint` has been deprecated, please use the `ntpclient.pool` field instead")
 	}
 
 	return nil
