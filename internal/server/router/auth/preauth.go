@@ -10,7 +10,7 @@ import (
 	"github.com/dchest/captcha"
 )
 
-func (h *auth) preauth(ttl time.Duration) (code int, msg string, res any, err error) {
+func (h *auth) preAuth(ttl time.Duration) (code int, msg string, res any, err error) {
 	kp, err := newKeyPair(ttl)
 	if err != nil {
 		errText := "failed to generate new RSA key pair"
@@ -20,7 +20,7 @@ func (h *auth) preauth(ttl time.Duration) (code int, msg string, res any, err er
 
 	_, pemPubKey, err := kp.rsaKeyPair.GetPEM(true)
 	if err != nil {
-		errText := "failed to create RSA public key for preauth"
+		errText := "failed to create RSA public key for pre-auth"
 		return http.StatusInternalServerError, errText, nil, fmt.Errorf("%s: %w", errText, err)
 	}
 
@@ -31,7 +31,7 @@ func (h *auth) preauth(ttl time.Duration) (code int, msg string, res any, err er
 		return http.StatusInternalServerError, "failed to create captcha", nil, fmt.Errorf("failed to create captcha: %w", err)
 	}
 
-	return http.StatusOK, "successfully created preauth key", map[string]any{
+	return http.StatusOK, "successfully created pre-auth key", map[string]any{
 		"ttl":         ttl.Milliseconds(),
 		"public_key":  pemPubKey,
 		"captcha_id":  captchaId,

@@ -118,7 +118,7 @@ func (h *Handler) SysUserLogin(username, password, userAgent, userIp string) (us
 
 	user, err := h.SysUserGetByUsername(username)
 	if err != nil {
-		return "", fmt.Errorf("failed to get user info: %w", err)
+		return "", err
 	}
 
 	if !user.IsPasswordCorrect(password) {

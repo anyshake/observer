@@ -22,6 +22,7 @@ require (
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/corpix/uarand v0.2.0
 	github.com/dchest/captcha v1.1.0
+	github.com/dgraph-io/ristretto v0.2.0
 	github.com/eclipse/paho.mqtt.golang v1.5.0
 	github.com/fatedier/frp v0.62.1
 	github.com/fatedier/golib v0.5.1
@@ -102,6 +103,7 @@ require (
 	github.com/bytedance/sonic/loader v0.2.2 // indirect
 	github.com/campoy/embedmd v1.0.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/clbanning/anyxml v1.2.2 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/coreos/go-oidc/v3 v3.14.1 // indirect

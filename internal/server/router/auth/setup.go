@@ -33,7 +33,7 @@ func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, jwtMiddl
 		},
 		func(c *gin.Context) {
 			var requestModel struct {
-				Action  string `form:"action" json:"action" xml:"action" binding:"required,oneof=preauth login refresh"`
+				Action  string `form:"action" json:"action" xml:"action" binding:"required"`
 				Session string `form:"session" json:"session" xml:"session"`
 				Secret  string `form:"secret" json:"secret" xml:"secret"`    // AES secret encrypted with RSA public key
 				Nonce   string `form:"nonce" json:"nonce" xml:"nonce"`       // nonce encrypted with AES secret
@@ -47,7 +47,7 @@ func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, jwtMiddl
 
 			switch requestModel.Action {
 			case "preauth":
-				code, msg, res, err := h.preauth(30 * time.Second)
+				code, msg, res, err := h.preAuth(30 * time.Second)
 				if err != nil {
 					logger.GetLogger(LOG_PREFIX).Errorln(err)
 					response.Error(c, code, msg)
@@ -72,6 +72,8 @@ func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, jwtMiddl
 				loginCallback(c)
 			case "refresh":
 				refreshCallback(c)
+			default:
+				response.Error(c, http.StatusBadRequest, "invalid action")
 			}
 		})
 }
