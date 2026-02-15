@@ -83,9 +83,6 @@ jobs:
           - openbsd_arm64_v8a
           - windows_386
           - windows_amd64
-          - windows_arm32_v5
-          - windows_arm32_v6
-          - windows_arm32_v7a
           - windows_arm64_v8a
           - windows7_386
           - windows7_amd64

@@ -258,27 +258,6 @@
         "gomips": "",
         "name": "windows-amd64"
     },
-    "windows_arm32_v5": {
-        "goos": "windows",
-        "goarch": "arm",
-        "goarm": "5",
-        "gomips": "",
-        "name": "windows-arm32-v5"
-    },
-    "windows_arm32_v6": {
-        "goos": "windows",
-        "goarch": "arm",
-        "goarm": "6",
-        "gomips": "",
-        "name": "windows-arm32-v6"
-    },
-    "windows_arm32_v7a": {
-        "goos": "windows",
-        "goarch": "arm",
-        "goarm": "7",
-        "gomips": "",
-        "name": "windows-arm32-v7a"
-    },
     "windows_arm64_v8a": {
         "goos": "windows",
         "goarch": "arm64",
