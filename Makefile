@@ -12,7 +12,8 @@ REQUIRED_VERSION_PATCH = 0
 
 GO ?= go
 override GOOS := linux
-override GOARCH := amd64
+override GOARCH := arm
+override GOARM := 7
 ASSETS_DIR = ./build/assets
 SRC_DIR = ./cmd/observer
 DIST_DIR = ./build/dist
@@ -34,9 +35,9 @@ BUILD_FLAGS = -s -w \
 BUILD_ARGS = -v -trimpath
 
 build:
-	@echo "[Info] Building project, output file path: $(DIST_DIR)/$(BINARY)"
+	@echo "[Info] Building project for ARM32 (linux/arm/GOARM=7), output file path: $(DIST_DIR)/$(BINARY)"
 	@mkdir -p $(DIST_DIR)
-	CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} GOARM=${GOARM} GOMIPS=${GOMIPS} \
+	CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} GOARM=${GOARM} \
 		$(GO) build -ldflags="$(BUILD_FLAGS)" $(BUILD_ARGS) -o $(DIST_DIR)/$(BINARY) $(SRC_DIR)
 	@cp -r $(ASSETS_DIR) $(DIST_DIR)
 	@echo "[Info] Build completed."
