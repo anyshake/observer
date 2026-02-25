@@ -66,11 +66,11 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
             const res = (
                 notify
                     ? await sendPromiseAlert(
-                          requestFn(true),
-                          t('Login.captcha.refreshing'),
-                          t('Login.captcha.refresh_success'),
-                          t('Login.captcha.refresh_error')
-                      )
+                        requestFn(true),
+                        t('Login.captcha.refreshing'),
+                        t('Login.captcha.refresh_success'),
+                        t('Login.captcha.refresh_error')
+                    )
                     : await requestFn(false)
             )!;
             if (res?.data) {
@@ -299,8 +299,8 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                                             preAuthData.captcha_img.length
                                                 ? 'Login.captcha.placeholder'
                                                 : preAuthData.error
-                                                  ? 'Login.captcha.error'
-                                                  : 'Login.captcha.loading'
+                                                    ? 'Login.captcha.error'
+                                                    : 'Login.captcha.loading'
                                         )}
                                     />
                                     <div
