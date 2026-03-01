@@ -1,4 +1,18 @@
 {
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "Hoher Geist der Erde."
+        },
+        "router": {
+            "home": "Stationsstatus",
+            "realtime": "Echtzeit-Wellenform",
+            "history": "Historische Wellenform",
+            "download": "Daten herunterladen",
+            "settings": "Systemeinstellungen",
+            "default": "Seite nicht gefunden"
+        }
+    },
     "components": {
         "ErrorPage": {
             "something_went_wrong": "Hoppla! Etwas ist schiefgelaufen.",

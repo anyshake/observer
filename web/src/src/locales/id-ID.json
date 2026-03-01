@@ -1,4 +1,18 @@
 {
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "Dengarkan bisikan bumi."
+        },
+        "router": {
+            "home": "Status Stasiun",
+            "realtime": "Gelombang Waktu Nyata",
+            "history": "Gelombang Sejarah",
+            "download": "Unduh Data",
+            "settings": "Pengaturan Sistem",
+            "default": "Halaman Tidak Ditemukan"
+        }
+    },
     "components": {
         "ErrorPage": {
             "something_went_wrong": "Ups! Terjadi kesalahan.",

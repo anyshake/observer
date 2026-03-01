@@ -27,6 +27,7 @@ import {
 import { sendPromiseAlert } from '../../helpers/alert/sendPromiseAlert';
 import { sendUserConfirm } from '../../helpers/alert/sendUserConfirm';
 import { getTimeString } from '../../helpers/utils/getTimeString';
+import { SettingsConstraints } from '../../config/constraints';
 
 export const Service = () => {
     const { t } = useTranslation();
@@ -36,7 +37,7 @@ export const Service = () => {
         refetch: getServiceDataRefetch,
         error: getServiceDataError,
         loading: getServiceDataLoading
-    } = useGetServiceDataQuery({ pollInterval: 5000 });
+    } = useGetServiceDataQuery({ pollInterval: SettingsConstraints.pollInterval });
 
     const [serviceConfig, setServiceConfig] = useState<
         Record<

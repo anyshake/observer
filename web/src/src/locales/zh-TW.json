@@ -1,4 +1,18 @@
 {
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "聽見地球"
+        },
+        "router": {
+            "home": "當前站況",
+            "realtime": "即時波形",
+            "history": "歷史資料",
+            "download": "資料下載",
+            "settings": "系統設定",
+            "default": "找不到頁面"
+        }
+    },
     "components": {
         "ErrorPage": {
             "something_went_wrong": "哎呀！ 出錯了。",

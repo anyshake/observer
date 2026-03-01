@@ -1,4 +1,18 @@
 {
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "Ouça a terra sussurrar."
+        },
+        "router": {
+            "home": "Status da Estação",
+            "realtime": "Forma de Onda em Tempo Real",
+            "history": "Forma de Onda Histórica",
+            "download": "Download de Dados",
+            "settings": "Configurações do Sistema",
+            "default": "Página não encontrada"
+        }
+    },
     "components": {
         "ErrorPage": {
             "something_went_wrong": "Oops! Algo correu mal.",

@@ -1,6 +1,6 @@
 import { mdiBugPause } from '@mdi/js';
 import Icon from '@mdi/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { hideLoaderAnimation } from '../../helpers/app/hideLoaderAnimation';
@@ -20,7 +20,7 @@ interface IErrorPage {
 export const ErrorPage = ({ code, heading, content, action, debug }: IErrorPage) => {
     const { t } = useTranslation();
 
-    const [currentTime] = useState(Date.now());
+    const currentTime = useMemo(() => Date.now(), []);
     const [isDebug, setIsDebug] = useState(false);
 
     useEffect(() => {

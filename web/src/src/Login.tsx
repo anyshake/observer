@@ -27,9 +27,10 @@ interface ILogin {
 }
 
 export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
+    const { t } = useTranslation();
     useEffect(() => {
-        document.title = globalConfig.name[currentLocale];
-    }, [currentLocale]);
+        document.title = t(globalConfig.name);
+    }, [currentLocale, t]);
 
     // State for pre-authentication data (captcha, encrypt key, etc.)
     const [preAuthTTL, setPreAuthTTL] = useState(0);
@@ -39,7 +40,6 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
         captcha_img: '',
         error: false
     });
-    const { t } = useTranslation();
     const getPreAuthData = useCallback(
         async (notify: boolean) => {
             setPreAuthData({ public_key: '', captcha_id: '', captcha_img: '', error: false });

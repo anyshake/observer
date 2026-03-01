@@ -35,8 +35,6 @@ export const localeConfig: ILocaleConfig = {
     }
 };
 
-export type Translation = Record<keyof typeof localeConfig.resources, string>;
-
 const i18n = createI18n(localeConfig.fallback, localeConfig.key, localeConfig.resources);
 
 export default i18n;

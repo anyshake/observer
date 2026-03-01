@@ -2,19 +2,18 @@ import { mdiArrowExpandAll } from '@mdi/js';
 import Icon from '@mdi/react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-
-import { localeConfig } from '../../config/locale';
+import { useTranslation } from 'react-i18next';
 import { IMenuItem } from '../../config/menu';
 
 interface IAsideMenu {
     readonly title: string;
     readonly menu: IMenuItem[];
-    readonly currentLocale: keyof typeof localeConfig.resources;
 }
 
-export const AsideMenu = ({ title, menu, currentLocale }: IAsideMenu) => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+export const AsideMenu = ({ title, menu }: IAsideMenu) => {
     const { hash, pathname } = useLocation();
+    const [t] = useTranslation();
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
         <aside
@@ -57,7 +56,7 @@ export const AsideMenu = ({ title, menu, currentLocale }: IAsideMenu) => {
                         key={url}
                     >
                         <Icon className="flex-shrink-0" path={icon} size={0.8} />
-                        <span className="ml-4">{label[currentLocale]}</span>
+                        <span className="ml-4">{t(label)}</span>
                     </Link>
                 ))}
             </div>

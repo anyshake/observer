@@ -1,4 +1,18 @@
 {
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "Listen to the whispering earth."
+        },
+        "router": {
+            "home": "Station Status",
+            "realtime": "Real-time Waveform",
+            "history": "History Waveform",
+            "download": "Data Download",
+            "settings": "System Settings",
+            "default": "Page Not Found"
+        }
+    },
     "components": {
         "ErrorPage": {
             "something_went_wrong": "Oops! Something went wrong.",

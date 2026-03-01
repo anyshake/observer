@@ -48,6 +48,10 @@ export const HistoryConstraints = {
     }
 };
 
-export const DownloadConstraints = {};
+export const DownloadConstraints = {
+    pollInterval: 5000
+};
 
-export const SettingsConstraints = {};
+export const SettingsConstraints = {
+    pollInterval: 5000
+};

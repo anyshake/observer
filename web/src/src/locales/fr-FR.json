@@ -1,4 +1,18 @@
 {
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "Ecouter le murmure de la terre."
+        },
+        "router": {
+            "home": "Etat de la station",
+            "realtime": "Ondes en direct",
+            "history": "Historique des ondes",
+            "download": "Téléchargement des données",
+            "settings": "Paramètres du système",
+            "default": "Page introuvable"
+        }
+    },
     "components": {
         "ErrorPage": {
             "something_went_wrong": "Oups ! Quelque chose s'est mal passé.",

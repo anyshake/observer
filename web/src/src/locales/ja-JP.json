@@ -1,4 +1,18 @@
 {
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "地球のささやき"
+        },
+        "router": {
+            "home": "現在の状況",
+            "realtime": "リアルタイム波形",
+            "history": "履歴波形",
+            "download": "データダウンロード",
+            "settings": "システム設定",
+            "default": "ページが見つかりません"
+        }
+    },
     "components": {
         "ErrorPage": {
             "something_went_wrong": "おっと！ 何か問題が発生しました。",

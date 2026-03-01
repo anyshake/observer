@@ -15,11 +15,12 @@ import { sendPromiseAlert } from '../../helpers/alert/sendPromiseAlert';
 import { getRestfulApiUrl } from '../../helpers/app/getRestfulApiUrl';
 import { ApiClient } from '../../helpers/request/ApiClient';
 import { getTimeString } from '../../helpers/utils/getTimeString';
+import { DownloadConstraints } from '../../config/constraints';
 
 const Download = ({ currentLocale }: IRouterComponent) => {
     const { t } = useTranslation();
     const { loading: getFileListDataLoading, data: getFileListDataData } = useGetFileListDataQuery({
-        pollInterval: 5000
+        pollInterval: DownloadConstraints.pollInterval
     });
 
     const parseMseedFileName = (filename: string) => {

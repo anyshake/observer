@@ -1,4 +1,18 @@
 {
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "Wsłuchaj się w szept Ziemi."
+        },
+        "router": {
+            "home": "Status Stacji",
+            "realtime": "Fala w Czasie Rzeczywistym",
+            "history": "Fala Historyczna",
+            "download": "Pobieranie Danych",
+            "settings": "Ustawienia Systemu",
+            "default": "Strona nie znaleziona"
+        }
+    },
     "components": {
         "ErrorPage": {
             "something_went_wrong": "Ups! Coś poszło nie tak.",

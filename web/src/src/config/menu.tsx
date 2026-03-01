@@ -1,13 +1,12 @@
 import { mdiCog, mdiDatabaseExport, mdiFileClock, mdiServerNetwork, mdiWaveform } from '@mdi/js';
 
-import { Translation } from './locale';
 import { routerConfig } from './router';
 
 export interface IMenuItem {
     readonly url: string;
     readonly icon: string;
     readonly home?: boolean;
-    readonly label: Translation;
+    readonly label: string;
 }
 
 export const menuConfig: IMenuItem[] = [

@@ -3,13 +3,14 @@ import { useEffect, useState } from 'react';
 import { ErrorPage } from '../../components/ui/ErrorPage';
 import { CodeBlock } from '../../components/widget/CodeBlock';
 import { useGetApplicationLogsQuery } from '../../graphql';
+import { SettingsConstraints } from '../../config/constraints';
 
 export const Logs = () => {
     const {
         data: getApplicationLogsData,
         loading: getApplicationLogsLoading,
         error: getApplicationLogsError
-    } = useGetApplicationLogsQuery({ pollInterval: 5000 });
+    } = useGetApplicationLogsQuery({ pollInterval: SettingsConstraints.pollInterval });
 
     const [applicationLogs, setApplicationLogs] = useState<string>('');
     useEffect(() => {

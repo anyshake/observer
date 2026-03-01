@@ -1,4 +1,18 @@
 {
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "Прислушайтесь к шепоту Земли."
+        },
+        "router": {
+            "home": "Статус станции",
+            "realtime": "Волновая форма в реальном времени",
+            "history": "Историческая волновая форма",
+            "download": "Загрузка данных",
+            "settings": "Настройки системы",
+            "default": "Страница не найдена"
+        }
+    },
     "components": {
         "ErrorPage": {
             "something_went_wrong": "Ой! Что-то пошло не так.",

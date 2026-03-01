@@ -46,17 +46,17 @@ export const Entry = ({ currentLocale, locales, onSwitchLocale }: IEntry) => {
     }, [getSoftwareVersionData, getSoftwareVersionLoading]);
 
     const { pathname } = useLocation();
-    const [currentTitle, setCurrentTitle] = useState(globalConfig.name[currentLocale]);
+    const [currentTitle, setCurrentTitle] = useState(t(globalConfig.name));
     useEffect(() => {
         for (const key in routerConfig.routes) {
             const { uri } = routerConfig.routes[key];
             if (pathname === uri) {
-                setCurrentTitle(routerConfig.routes[key].title[currentLocale]);
+                setCurrentTitle(t(routerConfig.routes[key].title));
                 return;
             }
         }
-        setCurrentTitle(routerConfig.routes.default.title[currentLocale]);
-    }, [pathname, currentLocale]);
+        setCurrentTitle(t(routerConfig.routes.default.title));
+    }, [pathname, currentLocale, t]);
 
     const { clearCredential } = useCredentialStore();
     const handleLogoutSubmit = () => {
@@ -127,17 +127,13 @@ export const Entry = ({ currentLocale, locales, onSwitchLocale }: IEntry) => {
     return (
         <div className="animate-fade animate-duration-500 animate-delay-300">
             <Header
-                title={globalConfig.name[currentLocale]}
+                title={t(globalConfig.name)}
                 onLogout={handleLogoutSubmit}
                 currentLocale={currentLocale}
                 onSwitchLocale={onSwitchLocale}
                 locales={locales}
             />
-            <AsideMenu
-                title={globalConfig.name[currentLocale]}
-                menu={menuConfig}
-                currentLocale={currentLocale}
-            />
+            <AsideMenu title={t(globalConfig.name)} menu={menuConfig} />
 
             <div className="ml-10 flex min-h-screen flex-col space-y-4 p-20 px-4">
                 <BreadCrumb
@@ -146,8 +142,7 @@ export const Entry = ({ currentLocale, locales, onSwitchLocale }: IEntry) => {
                     title={currentTitle}
                 />
                 <RouterView
-                    routerProps={{ currentLocale }}
-                    currentLocale={currentLocale}
+                    routerProps={{ currentLocale, onSwitchLocale, locales }}
                     appName={globalConfig.name}
                     routes={routerConfig.routes}
                     suspense={<Skeleton />}
@@ -157,8 +152,7 @@ export const Entry = ({ currentLocale, locales, onSwitchLocale }: IEntry) => {
             <Footer
                 copyright={globalConfig.copyright}
                 repository={globalConfig.repository}
-                currentLocale={currentLocale}
-                text={globalConfig.footer}
+                text={t(globalConfig.footer)}
                 homepage={globalConfig.homepage}
             />
             <Scroller threshold={100} />

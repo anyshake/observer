@@ -1,4 +1,18 @@
 {
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "Dünyanın fısıltısını dinleyin."
+        },
+        "router": {
+            "home": "Stationsstatus",
+            "realtime": "Echtzeit-Wellenform",
+            "history": "Geçmiş Dalga Formu",
+            "download": "Veri İndir",
+            "settings": "Sistem Ayarları",
+            "default": "Sayfa Bulunamadı"
+        }
+    },
     "components": {
         "ErrorPage": {
             "something_went_wrong": "Hoppa! Bir şeyler ters gitti.",
