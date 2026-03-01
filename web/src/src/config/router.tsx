@@ -78,7 +78,7 @@ export const routerConfig: IRouterConfig = {
                 'pl-PL': 'Fala Historyczna'
             }
         },
-        export: {
+        download: {
             uri: '/download',
             element: Download,
             title: {
@@ -94,7 +94,7 @@ export const routerConfig: IRouterConfig = {
                 'pl-PL': 'Pobieranie Danych'
             }
         },
-        setting: {
+        settings: {
             uri: '/settings',
             element: Settings,
             title: {

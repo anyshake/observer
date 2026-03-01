@@ -6,3 +6,9 @@
 @plugin "daisyui" {
     themes: light --default;
 }
+
+.menu li > a:active,
+.menu li > a:hover,
+.menu li > a:focus {
+    background-color: transparent !important;
+}

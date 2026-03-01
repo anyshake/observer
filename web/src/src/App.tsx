@@ -16,6 +16,10 @@ import { Login } from './Login';
 import { useCredentialStore } from './stores/credential';
 
 const App = () => {
+    useEffect(() => {
+        hideLoaderAnimation();
+    }, []);
+
     const { t } = useTranslation();
 
     const {
@@ -53,7 +57,6 @@ const App = () => {
         if (!error && code === 200) {
             setHasLoggedIn(true);
         }
-        hideLoaderAnimation();
     }, []);
     useEffect(() => {
         const { token, lifeTime } = credential;
@@ -103,7 +106,7 @@ const App = () => {
     }, [t]);
 
     return (
-        <div>
+        <>
             {hasLoggedIn ? (
                 <Entry
                     currentLocale={currentLocale}
@@ -118,7 +121,7 @@ const App = () => {
                 />
             )}
             <Toaster />
-        </div>
+        </>
     );
 };
 
