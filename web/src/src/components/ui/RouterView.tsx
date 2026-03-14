@@ -1,8 +1,8 @@
 import { ReactNode, Suspense, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
 import { IRoute, IRouterComponent } from '../../config/router';
-import { useTranslation } from 'react-i18next';
 
 interface IRouterView {
     readonly routes: Record<string, IRoute>;

@@ -1,8 +1,8 @@
 import { mdiGithub } from '@mdi/js';
 import Icon from '@mdi/react';
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 interface IFooter {
     readonly copyright: string;

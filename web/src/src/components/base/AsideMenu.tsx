@@ -1,8 +1,9 @@
 import { mdiArrowExpandAll } from '@mdi/js';
 import Icon from '@mdi/react';
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Link, useLocation } from 'react-router-dom';
+
 import { IMenuItem } from '../../config/menu';
 
 interface IAsideMenu {
@@ -11,7 +12,7 @@ interface IAsideMenu {
 }
 
 export const AsideMenu = ({ title, menu }: IAsideMenu) => {
-    const { hash, pathname } = useLocation();
+    const { pathname } = useLocation();
     const [t] = useTranslation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -48,9 +49,7 @@ export const AsideMenu = ({ title, menu }: IAsideMenu) => {
                 {menu.map(({ url, icon, label }) => (
                     <Link
                         className={`flex w-full cursor-pointer items-center rounded-full bg-gray-800 p-3 pl-6 duration-300 ${
-                            url === hash || url === pathname
-                                ? 'ml-2 font-bold'
-                                : 'hover:ml-2 hover:font-bold'
+                            url === pathname ? 'ml-2 font-bold' : 'hover:ml-2 hover:font-bold'
                         }`}
                         to={url}
                         key={url}
@@ -70,7 +69,7 @@ export const AsideMenu = ({ title, menu }: IAsideMenu) => {
                         key={url}
                         to={url}
                         className={`flex w-full cursor-pointer justify-end rounded-full bg-gray-800 p-3 duration-300 ${
-                            url === hash || url === pathname ? 'ml-2' : 'hover:ml-2'
+                            url === pathname ? 'ml-2' : 'hover:ml-2'
                         }`}
                     >
                         <Icon className="flex-shrink-0" path={icon} size={0.8} />

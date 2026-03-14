@@ -47,17 +47,19 @@ const App = () => {
     }, [t, needRefreshApp, setNeedRefreshApp, updateServiceWorker]);
 
     const [hasLoggedIn, setHasLoggedIn] = useState(false);
-    const { needRefresh, credential, setCredential } = useCredentialStore();
+    const { needRefresh, credential, setCredential, clearCredential } = useCredentialStore();
     const getUserLoginStatus = useCallback(async () => {
         const { error, code } = await ApiClient.request({
             url: getRestfulApiUrl('/auth'),
             method: 'get',
             ignoreErrors: true
         });
-        if (!error && code === 200) {
-            setHasLoggedIn(true);
+        const ok = !error && code === 200;
+        if (!ok) {
+            clearCredential();
         }
-    }, []);
+        setHasLoggedIn(ok);
+    }, [clearCredential]);
     useEffect(() => {
         const { token, lifeTime } = credential;
         if (token.length > 0 && lifeTime > 0) {

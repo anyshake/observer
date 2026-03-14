@@ -7,8 +7,11 @@ import {
     mdiShieldCheck
 } from '@mdi/js';
 import Icon from '@mdi/react';
+import { gcm } from '@noble/ciphers/aes.js';
+import { hkdf } from '@noble/hashes/hkdf.js';
+import { sha512 } from '@noble/hashes/sha2.js';
 import { Buffer } from 'buffer';
-import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import { md, pki, util } from 'node-forge';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -99,39 +102,12 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
 
     const { setCredential, credential } = useCredentialStore();
     const handleLoginSubmit = async (username: string, password: string, captcha: string) => {
-        const encrypt = async (
-            secret: Uint8Array<ArrayBuffer>,
-            data: Uint8Array<ArrayBuffer>,
-            aad: Uint8Array<ArrayBuffer>
-        ): Promise<string> => {
-            const keyMaterial = await crypto.subtle.importKey(
-                'raw',
-                secret,
-                { name: 'HKDF' },
-                false,
-                ['deriveKey']
-            );
-            const key = await crypto.subtle.deriveKey(
-                {
-                    name: 'HKDF',
-                    hash: 'SHA-512',
-                    salt: new Uint8Array([]),
-                    info: new Uint8Array([])
-                },
-                keyMaterial,
-                { name: 'AES-GCM', length: 256 },
-                false,
-                ['encrypt']
-            );
-
+        const encrypt = async (secret: Uint8Array, data: Uint8Array, aad: Uint8Array) => {
+            const key = hkdf(sha512, secret, new Uint8Array([]), new Uint8Array([]), 32);
             const iv = crypto.getRandomValues(new Uint8Array(12));
-            const ciphertextBuffer = await crypto.subtle.encrypt(
-                { name: 'AES-GCM', iv, additionalData: aad, tagLength: 128 },
-                key,
-                data
-            );
+            const cipher = gcm(key, iv, aad);
+            const ciphertext = cipher.encrypt(data);
 
-            const ciphertext = new Uint8Array(ciphertextBuffer);
             const payload = new Uint8Array(iv.length + ciphertext.length);
             payload.set(iv, 0);
             payload.set(ciphertext, iv.length);
@@ -231,11 +207,6 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                                     />
                                     {t('Login.username.label')}
                                 </label>
-                                <ErrorMessage
-                                    className="text-sm text-red-500"
-                                    name="username"
-                                    component="div"
-                                />
                                 <Field
                                     required
                                     id="username"
@@ -254,11 +225,6 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                                     <Icon className="mr-2 flex-shrink-0" path={mdiKey} size={0.8} />
                                     {t('Login.password.label')}
                                 </label>
-                                <ErrorMessage
-                                    className="text-sm text-red-500"
-                                    name="password"
-                                    component="div"
-                                />
                                 <Field
                                     required
                                     id="password"
@@ -281,11 +247,6 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                                     />
                                     {t('Login.captcha.label')}
                                 </label>
-                                <ErrorMessage
-                                    className="text-sm text-red-500"
-                                    name="captcha"
-                                    component="div"
-                                />
                                 <div className="mt-1 flex items-center justify-between space-x-2">
                                     <Field
                                         required
@@ -306,7 +267,12 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                                     <div
                                         className="flex w-24 cursor-pointer items-center justify-center rounded-md border border-gray-300 py-2 transition-all hover:border-gray-400 md:w-32"
                                         onClick={() => {
-                                            getPreAuthData(true);
+                                            if (
+                                                preAuthData.captcha_img.length ||
+                                                preAuthData.error
+                                            ) {
+                                                getPreAuthData(true);
+                                            }
                                         }}
                                     >
                                         {preAuthData.captcha_img.length ? (
