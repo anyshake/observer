@@ -20,6 +20,7 @@ import { globalConfig } from './config/global';
 import { localeConfig } from './config/locale';
 import { sendPromiseAlert } from './helpers/alert/sendPromiseAlert';
 import { getRestfulApiUrl } from './helpers/app/getRestfulApiUrl';
+import { solvePoWChallenge } from './helpers/app/solvePoWChallenge';
 import { ApiClient } from './helpers/request/ApiClient';
 import { useCredentialStore } from './stores/credential';
 
@@ -40,18 +41,29 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
     const [preAuthData, setPreAuthData] = useState({
         public_key: '',
         captcha_id: '',
+        challenge_id: '',
+        challenge_seed: '',
         captcha_img: '',
         error: false
     });
     const getPreAuthData = useCallback(
         async (notify: boolean) => {
-            setPreAuthData({ public_key: '', captcha_id: '', captcha_img: '', error: false });
+            setPreAuthData({
+                public_key: '',
+                captcha_id: '',
+                challenge_id: '',
+                challenge_seed: '',
+                captcha_img: '',
+                error: false
+            });
             const requestFn = async (throwError: boolean) => {
                 const result = await ApiClient.request<{
                     ttl: number;
                     public_key: string;
                     captcha_id: string;
                     captcha_img: string;
+                    challenge_id: string;
+                    challenge_seed: string;
                 }>({
                     url: getRestfulApiUrl('/auth'),
                     method: 'post',
@@ -77,11 +89,14 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                     : await requestFn(false)
             )!;
             if (res?.data) {
-                const { ttl, public_key, captcha_id, captcha_img } = res.data;
+                const { ttl, public_key, captcha_id, challenge_id, challenge_seed, captcha_img } =
+                    res.data;
                 setPreAuthData({
                     error: false,
                     public_key,
                     captcha_id,
+                    challenge_id,
+                    challenge_seed,
                     captcha_img: `data:image/png;base64,${captcha_img}`
                 });
                 setPreAuthTTL(ttl);
@@ -133,15 +148,7 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
         );
         const encryptedPayload = await encrypt(
             secret,
-            Buffer.from(
-                JSON.stringify({
-                    timestamp: Date.now(), // currently not used in backend
-                    username,
-                    password,
-                    captcha_solution: captcha,
-                    captcha_id: preAuthData.captcha_id
-                })
-            ),
+            Buffer.from(JSON.stringify({ username, password })),
             sessionIdBuffer
         );
 
@@ -153,7 +160,11 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                 session: sessionId,
                 nonce: encryptedNonce,
                 secret: encryptedSecret,
-                payload: encryptedPayload
+                payload: encryptedPayload,
+                captcha_val: captcha,
+                captcha_id: preAuthData.captcha_id,
+                challenge_id: preAuthData.challenge_id,
+                challenge_solution: await solvePoWChallenge(preAuthData.challenge_seed)
             }
         });
         if (res.error) {

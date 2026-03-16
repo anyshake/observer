@@ -11,7 +11,7 @@ import (
 
 type keyPair struct {
 	ttl        time.Duration
-	createAt   time.Time
+	createdAt  time.Time
 	rsaKeyPair cryption.RsaKeyPair
 }
 
@@ -23,7 +23,7 @@ func newKeyPair(ttl time.Duration) (*keyPair, error) {
 
 	return &keyPair{
 		ttl:        ttl,
-		createAt:   time.Now(),
+		createdAt:  time.Now(),
 		rsaKeyPair: rsaKeyPair,
 	}, nil
 }
@@ -37,5 +37,5 @@ func (n *keyPair) getKeyPairId() string {
 }
 
 func (n *keyPair) isKeyPairAlive() bool {
-	return time.Now().Before(n.createAt.Add(n.ttl))
+	return time.Now().Before(n.createdAt.Add(n.ttl))
 }

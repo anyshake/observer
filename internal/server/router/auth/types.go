@@ -11,7 +11,8 @@ import (
 const LOG_PREFIX = "restful_api_auth"
 
 type auth struct {
-	actionHandler   *action.Handler               // action handler for accessing the database
-	nonceCache      *lru.Cache[string, time.Time] // key: nonce, value: time.Time
-	keyPairDataPool *haxmap.Map[string, *keyPair] // key: SHA-1 hash of the public key, value: keyPair
+	actionHandler     *action.Handler                     // action handler for accessing the database
+	nonceCache        *lru.Cache[string, time.Time]       // key: nonce, value: time.Time
+	keyPairDataPool   *haxmap.Map[string, *keyPair]       // key: SHA-512 hash of the public key, value: keyPair
+	authChallengePool *haxmap.Map[string, *authChallenge] // key: Random string as ID, value: authChallenge
 }
