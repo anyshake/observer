@@ -2,6 +2,36 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.4.0
+
+### Release Notes
+
+This release focuses on **LAN accessibility and deployment security**, introducing **mDNS-based local network discovery** and a stronger authentication pipeline.
+
+With built-in **mDNS discovery**, AnyShake Observer can now be found more easily on the same local network without manual IP lookup, improving setup convenience in home and lab environments. In parallel, authentication and runtime hardening updates improve reliability across both plain HTTP and constrained deployment scenarios.
+
+### New Features
+
+- Added **mDNS local network discovery**, allowing clients on the same LAN to discover AnyShake Observer instances automatically.
+- Added **Proof-of-Work (PoW) validation** in authentication flow to improve resistance against abusive login traffic.
+- Implemented **AES-GCM + RSA hybrid login** support over plain HTTP environments.
+- Added support for running the Observer service as **`nobody`** for reduced privilege operation.
+- Added **spectrogram zoom in/out** support in the web frontend.
+- Introduced **`schema_version`** table for future database migration compatibility.
+
+### Improvements
+
+- Improved frontend localization consistency by merging and refining translation resources.
+- Cached user status data to reduce repeated computation and improve response performance.
+- Reduced hard-coded keys in code paths to improve maintainability.
+- Refined active menu item styles for better UI consistency.
+
+### Bug Fixes
+
+- Fixed login failures in specific **plain HTTP** deployment environments.
+- Fixed CI build failure in release pipeline.
+- Fixed database migration behavior by using the explicitly specified table name.
+
 ## v4.3.4
 
 ### Release Notes
