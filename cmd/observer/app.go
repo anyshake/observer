@@ -38,6 +38,7 @@ import (
 	graph_resolver "github.com/anyshake/observer/internal/server/router/graph"
 
 	service_archiver "github.com/anyshake/observer/internal/service/archiver"
+	service_discovery "github.com/anyshake/observer/internal/service/discovery"
 	service_forwarder "github.com/anyshake/observer/internal/service/forwarder"
 	service_frp_client "github.com/anyshake/observer/internal/service/frp_client"
 	service_helicorder "github.com/anyshake/observer/internal/service/helicorder"
@@ -208,6 +209,7 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		service_quakesense.ID: service_quakesense.New(hardwareDevice, actionHandler, timeSrc),
 		service_seedlink.ID:   service_seedlink.New(hardwareDevice, actionHandler, timeSrc),
 		service_watchcat.ID:   service_watchcat.New(hardwareDevice, timeSrc),
+		service_discovery.ID:  service_discovery.New(conf.Server.Listen, actionHandler, timeSrc),
 	}
 	var upgradeHelper *upgrade.Helper
 	if !ver.IsPreRelease() && build.GetChannel() == officialBuildChannel {

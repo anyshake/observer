@@ -49,8 +49,10 @@ func (s *NtpServerServiceImpl) Start() error {
 			logger.GetLogger(ID).Errorf("failed to run NTP server service: %v", err)
 			s.handleInterrupt()
 			_ = s.Stop()
+			return
 		}
-		s.wg.Done()
+
+		s.handleInterrupt()
 	}()
 
 	s.wg.Add(1)

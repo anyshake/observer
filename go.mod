@@ -35,6 +35,7 @@ require (
 	github.com/go-audio/wav v1.1.0
 	github.com/go-logr/logr v1.4.2
 	github.com/gorilla/websocket v1.5.3
+	github.com/grandcat/zeroconf v1.0.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/jedisct1/go-dnsstamps v0.0.0-20240423203910-07a0735c7774
 	github.com/miekg/dns v1.1.65
@@ -102,6 +103,7 @@ require (
 	github.com/bytedance/sonic v1.12.7 // indirect
 	github.com/bytedance/sonic/loader v0.2.2 // indirect
 	github.com/campoy/embedmd v1.0.0 // indirect
+	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/clbanning/anyxml v1.2.2 // indirect
