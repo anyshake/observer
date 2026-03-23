@@ -140,29 +140,31 @@ const History = ({ currentLocale }: IRouterComponent) => {
                                         </li>
                                         <li>
                                             {t('views.History.event_list_modal.p_wave_arrival', {
-                                                time: item.estimation[0].toFixed(1)
+                                                time: getTimeString(
+                                                    item.timestamp + item.estimation[0] * 1000
+                                                ),
+                                                seconds: item.estimation[0].toFixed(1)
                                             })}
                                         </li>
                                         <li>
                                             {t('views.History.event_list_modal.s_wave_arrival', {
-                                                time: item.estimation[1].toFixed(1)
+                                                time: getTimeString(
+                                                    item.timestamp + item.estimation[1] * 1000
+                                                ),
+                                                seconds: item.estimation[1].toFixed(1)
                                             })}
                                         </li>
                                         <li>
                                             {t(
                                                 'views.History.event_list_modal.epicenter_distance',
-                                                {
-                                                    distance: item.distance.toFixed(1)
-                                                }
+                                                { distance: item.distance.toFixed(1) }
                                             )}
                                         </li>
                                         {item.depth !== -1 && (
                                             <li>
                                                 {t(
                                                     'views.History.event_list_modal.earthquake_depth',
-                                                    {
-                                                        depth: item.depth.toFixed(1)
-                                                    }
+                                                    { depth: item.depth.toFixed(1) }
                                                 )}
                                             </li>
                                         )}
@@ -629,8 +631,19 @@ const History = ({ currentLocale }: IRouterComponent) => {
                                     ? [...getSeismicEventSourceListData.getEventSource]
                                     : []
                                 )
-                                    .sort((a, b) => a?.country.localeCompare(b?.country ?? '') ?? 0)
-                                    .sort((a, b) => a?.id.localeCompare(b?.id ?? '') ?? 0)
+                                    .sort((a, b) => {
+                                        const nameA =
+                                            a?.locales[currentLocale] ??
+                                            a?.locales[a!.defaultLocale] ??
+                                            a?.id ??
+                                            '';
+                                        const nameB =
+                                            b?.locales[currentLocale] ??
+                                            b?.locales[b!.defaultLocale] ??
+                                            b?.id ??
+                                            '';
+                                        return nameA.localeCompare(nameB);
+                                    })
                                     .map((item, index) => {
                                         const countryFlagImg = countryFlags[item!.country];
                                         return (
@@ -850,7 +863,7 @@ const History = ({ currentLocale }: IRouterComponent) => {
                 onClose={() => setIsSelectModalOpen(false)}
             >
                 <List
-                    className="h-96"
+                    className="max-h-[80vh] overflow-y-scroll"
                     onClick={(id) => handleChooseEvent(id)}
                     data={seismicEventsData}
                 />

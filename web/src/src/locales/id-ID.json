@@ -84,8 +84,8 @@
             "event_list_modal": {
                 "title": "Pilih Kejadian Seismik",
                 "earthquake_at": "Gempa bumi pada {{time}}",
-                "p_wave_arrival": "Kedatangan Gelombang P {{time}} detik",
-                "s_wave_arrival": "Kedatangan Gelombang S {{time}} detik",
+                "p_wave_arrival": "Kedatangan Gelombang P {{time}} ({{seconds}} detik)",
+                "s_wave_arrival": "Kedatangan Gelombang S {{time}} ({{seconds}} detik)",
                 "epicenter_distance": "Episentrum {{distance}} km",
                 "earthquake_depth": "Kedalaman {{depth}} km",
                 "selected_an_event": "Memilih kejadian gempa bumi di {{region}} pada {{time}}."

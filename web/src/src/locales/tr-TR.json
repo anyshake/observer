@@ -84,8 +84,8 @@
             "event_list_modal": {
                 "title": "Bir Sismik Olay Seçin",
                 "earthquake_at": "{{time}} zamanında deprem",
-                "p_wave_arrival": "P-Dalgası Varışı {{time}} saniye",
-                "s_wave_arrival": "S-Dalgası Varışı {{time}} saniye",
+                "p_wave_arrival": "P-Dalgası Varışı {{time}} ({{seconds}} sn)",
+                "s_wave_arrival": "S-Dalgası Varışı {{time}} ({{seconds}} sn)",
                 "epicenter_distance": "Episantr {{distance}} km",
                 "earthquake_depth": "Derinlik {{depth}} km",
                 "selected_an_event": "{{region}} bölgesinde {{time}} zamanında bir deprem olayı seçildi."

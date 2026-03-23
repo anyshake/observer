@@ -84,8 +84,8 @@
             "event_list_modal": {
                 "title": "Wybierz wydarzenie sejsmiczne",
                 "earthquake_at": "Trzęsienie ziemi o {{time}}",
-                "p_wave_arrival": "Przybycie fali P {{time}} sekund",
-                "s_wave_arrival": "Przybycie fali S {{time}} sekund",
+                "p_wave_arrival": "Przybycie fali P {{time}} ({{seconds}} sek)",
+                "s_wave_arrival": "Przybycie fali S {{time}} ({{seconds}} sek)",
                 "epicenter_distance": "Epicentrum {{distance}} km",
                 "earthquake_depth": "Głębokość {{depth}} km",
                 "selected_an_event": "Wybrano zdarzenie trzęsienia ziemi w {{region}} o {{time}}."

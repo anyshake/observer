@@ -63,7 +63,7 @@ export const DialogModal = ({
                     </button>
                 </form>
                 {heading}
-                <div className="py-4">{children}</div>
+                <div className="pt-4">{children}</div>
             </div>
         </dialog>
     );

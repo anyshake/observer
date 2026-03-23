@@ -84,8 +84,8 @@
             "event_list_modal": {
                 "title": "地震イベントを選択",
                 "earthquake_at": "{{time}} に地震発生",
-                "p_wave_arrival": "P 波到達 {{time}} 秒",
-                "s_wave_arrival": "S 波到達 {{time}} 秒",
+                "p_wave_arrival": "P 波到達 {{time}} ({{seconds}} 秒)",
+                "s_wave_arrival": "S 波到達 {{time}} ({{seconds}} 秒)",
                 "epicenter_distance": "震源距離 {{distance}} km",
                 "earthquake_depth": "深さ {{depth}} km",
                 "selected_an_event": "{{region}} で {{time}} に発生した地震イベントを選択しました。"
