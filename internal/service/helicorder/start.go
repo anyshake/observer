@@ -32,8 +32,7 @@ type provider struct {
 	networkCode  string
 	locationCode string
 
-	channelCode      string
-	channelCodeIndex int
+	channelCode string
 }
 
 func (d *provider) GetPlotName() string { return "AnyShake Observer" }
@@ -71,21 +70,22 @@ func (d *provider) GetPlotData(startTime, endTime time.Time) ([]heligo.PlotData,
 	for _, record := range seisRecords {
 		data := make([]heligo.PlotData, record.sampleRate)
 		for i := range record.sampleRate {
-			timeOffset := int64(i * 1000 / record.sampleRate)
-			data[i].Time = time.UnixMilli(record.timestamp + timeOffset)
-			if d.channelCodeIndex >= len(record.channelData) {
-				continue
+			record.channelData = lo.Filter(record.channelData, func(item explorer.ChannelData, _ int) bool {
+				return item.ChannelCode == d.channelCode
+			})
+			if len(record.channelData) > 0 {
+				timeOffset := int64(i * 1000 / record.sampleRate)
+				data[i].Time = time.UnixMilli(record.timestamp + timeOffset)
+				data[i].Value = float64(record.channelData[0].Data[i])
 			}
-			data[i].Value = float64(record.channelData[d.channelCodeIndex].Data[i])
 		}
 		plotData = append(plotData, data...)
 	}
 
 	return plotData, nil
 }
-func (d *provider) setChannelCode(channelCode string, channelCodeIndex int) {
+func (d *provider) setChannelCode(channelCode string) {
 	d.channelCode = channelCode
-	d.channelCodeIndex = channelCodeIndex
 }
 
 func (s *HelicorderServiceImpl) handleInterrupt(timer *time.Timer) {
@@ -156,7 +156,7 @@ func (s *HelicorderServiceImpl) Start() error {
 					}
 
 					// Update current channel code
-					s.dataProvider.setChannelCode(channelCode, channelIdx)
+					s.dataProvider.setChannelCode(channelCode)
 					logger.GetLogger(ID).Infof("start plotting helicorder for channel %s", channelCode)
 
 					if err = helicorderCtx.Plot(currentTime, runtime.NumCPU()*4, s.spanSamples, scaleFactor, s.lineWidth, nil); err != nil {
