@@ -9,11 +9,13 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/anyshake/observer/config"
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/bclswl0827/heligo"
+	"github.com/samber/lo"
 )
 
 type queryCacheData struct {
@@ -101,6 +103,12 @@ func (s *HelicorderServiceImpl) Start() error {
 		s.ctx, s.cancelFn = context.WithCancel(context.Background())
 	}
 
+	channelCodes, err := (&config.StationChannelCodesConfigConstraintImpl{}).Get(s.dataProvider.actionHandler)
+	if err != nil {
+		logger.GetLogger(ID).Errorf("failed to get station channel codes: %v", err)
+		return err
+	}
+
 	logger.GetLogger(ID).Infof("generated helicorder images will be saved to %s", s.filePath)
 
 	go func() {
@@ -126,9 +134,14 @@ func (s *HelicorderServiceImpl) Start() error {
 				currentTime := s.timeSource.Now().Add(-time.Minute)
 
 				hardwareConfig := s.hardwareDev.GetConfig()
-				s.channelCodes = hardwareConfig.GetChannelCodes()
+				availableChannelCode := hardwareConfig.GetChannelCodes()
 
-				for channelIdx, channelCode := range s.channelCodes {
+				for channelIdx, channelCode := range channelCodes.([]string) {
+					if !lo.Contains(availableChannelCode, channelCode) {
+						logger.GetLogger(ID).Infof("skipping channel %s: not available in current hardware configuration", channelCode)
+						continue
+					}
+
 					// Discard channels which scale factor is zero or undefined
 					if channelIdx >= len(s.scaleFactors) || s.scaleFactors[channelIdx] == 0 {
 						logger.GetLogger(ID).Warnf("skipping channel %s: scale factor is zero or undefined", channelCode)

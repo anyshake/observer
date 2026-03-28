@@ -33,7 +33,6 @@ type HelicorderServiceImpl struct {
 	timeSource   *timesource.Source
 	hardwareDev  hardware.IHardware
 	dataProvider provider
-	channelCodes []string
 
 	filePath    string
 	imageFormat string
