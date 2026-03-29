@@ -231,6 +231,8 @@ export const Spectrogram = memo(
                             step={0.01}
                             value={timePercent}
                             onChange={({ target }) => setTimePercent(Number(target.value))}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onTouchStart={(e) => e.stopPropagation()}
                             className="range range-xs rounded py-3 pl-2 text-gray-300 [--range-bg:#fff] [--range-fill:0]"
                         />
                         <span className="px-2 font-mono text-xs text-white select-none">
@@ -271,8 +273,22 @@ export const Spectrogram = memo(
                                         onChange={({ target }) =>
                                             handlePreviewMinDB(Number(target.value))
                                         }
-                                        onMouseUp={() => handleApplyMinDB(minDBState)}
-                                        onTouchEnd={() => handleApplyMinDB(minDBState)}
+                                        onMouseUp={(e) => {
+                                            handleApplyMinDB(minDBState);
+                                            e.stopPropagation();
+                                        }}
+                                        onMouseDown={(e) => {
+                                            handleApplyMinDB(minDBState);
+                                            e.stopPropagation();
+                                        }}
+                                        onTouchStart={(e) => {
+                                            handleApplyMinDB(minDBState);
+                                            e.stopPropagation();
+                                        }}
+                                        onTouchEnd={(e) => {
+                                            handleApplyMinDB(minDBState);
+                                            e.stopPropagation();
+                                        }}
                                     />
                                 </>
 
@@ -291,8 +307,22 @@ export const Spectrogram = memo(
                                         onChange={({ target }) =>
                                             handlePreviewMaxDB(Number(target.value))
                                         }
-                                        onMouseUp={() => handleApplyMaxDB(maxDBState)}
-                                        onTouchEnd={() => handleApplyMaxDB(maxDBState)}
+                                        onMouseUp={(e) => {
+                                            handleApplyMaxDB(maxDBState);
+                                            e.stopPropagation();
+                                        }}
+                                        onMouseDown={(e) => {
+                                            handleApplyMaxDB(maxDBState);
+                                            e.stopPropagation();
+                                        }}
+                                        onTouchStart={(e) => {
+                                            handleApplyMaxDB(maxDBState);
+                                            e.stopPropagation();
+                                        }}
+                                        onTouchEnd={(e) => {
+                                            handleApplyMaxDB(maxDBState);
+                                            e.stopPropagation();
+                                        }}
                                     />
                                 </>
                             </div>

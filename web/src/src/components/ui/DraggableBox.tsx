@@ -70,6 +70,7 @@ export const DraggableBox = ({
             cancel=".react-resizable-handle"
             defaultClassNameDragging="border-2 border-dashed border-gray-300"
             bounds="parent"
+            grid={[1, 1]}
             position={position}
             onStart={() => {
                 onDragStart?.();
@@ -86,6 +87,7 @@ export const DraggableBox = ({
                 <ResizableBox
                     axis="both"
                     resizeHandles={locked ? [] : ['se', 'ne', 'sw']}
+                    draggableOpts={{ grid: [1, 1] }}
                     onResizeStop={(_, { size }) => {
                         onResizeStop?.(size.width, size.height);
                     }}

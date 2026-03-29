@@ -252,8 +252,22 @@ export const DequeSpectrogram = memo(
                                             onChange={({ target }) =>
                                                 handlePreviewMinDB(Number(target.value))
                                             }
-                                            onMouseUp={() => handleApplyMinDB(minDBState)}
-                                            onTouchEnd={() => handleApplyMinDB(minDBState)}
+                                            onMouseUp={(e) => {
+                                                handleApplyMinDB(minDBState);
+                                                e.stopPropagation();
+                                            }}
+                                            onMouseDown={(e) => {
+                                                handleApplyMinDB(minDBState);
+                                                e.stopPropagation();
+                                            }}
+                                            onTouchStart={(e) => {
+                                                handleApplyMinDB(minDBState);
+                                                e.stopPropagation();
+                                            }}
+                                            onTouchEnd={(e) => {
+                                                handleApplyMinDB(minDBState);
+                                                e.stopPropagation();
+                                            }}
                                         />
                                     </>
 
@@ -274,8 +288,22 @@ export const DequeSpectrogram = memo(
                                             onChange={({ target }) =>
                                                 handlePreviewMaxDB(Number(target.value))
                                             }
-                                            onMouseUp={() => handleApplyMaxDB(maxDBState)}
-                                            onTouchEnd={() => handleApplyMaxDB(maxDBState)}
+                                            onMouseUp={(e) => {
+                                                handleApplyMaxDB(maxDBState);
+                                                e.stopPropagation();
+                                            }}
+                                            onMouseDown={(e) => {
+                                                handleApplyMaxDB(maxDBState);
+                                                e.stopPropagation();
+                                            }}
+                                            onTouchStart={(e) => {
+                                                handleApplyMaxDB(maxDBState);
+                                                e.stopPropagation();
+                                            }}
+                                            onTouchEnd={(e) => {
+                                                handleApplyMaxDB(maxDBState);
+                                                e.stopPropagation();
+                                            }}
                                         />
                                     </>
                                 </div>

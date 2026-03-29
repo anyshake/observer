@@ -859,11 +859,12 @@ const History = ({ currentLocale }: IRouterComponent) => {
                         </div>
                     </div>
                 }
+                enlarge={true}
                 open={isSelectModalOpen}
                 onClose={() => setIsSelectModalOpen(false)}
             >
                 <List
-                    className="max-h-[80vh] overflow-y-scroll"
+                    className="overflow-y-scroll"
                     onClick={(id) => handleChooseEvent(id)}
                     data={seismicEventsData}
                 />

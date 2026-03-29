@@ -55,7 +55,7 @@ export const DialogModal = ({
     return (
         <dialog ref={dialogRef} className="modal">
             <div
-                className={`modal-box ${fullScreen ? 'h-screen w-full max-w-none' : enlarge ? 'w-[90%] max-w-none sm:w-[80%] md:w-[60%]' : ''}`}
+                className={`modal-box ${fullScreen ? 'h-screen w-full max-w-none' : enlarge ? 'max-h-[90vh] w-[90%] max-w-2xl sm:w-[80%] md:w-[60%]' : ''}`}
             >
                 <form method="dialog">
                     <button className="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">
