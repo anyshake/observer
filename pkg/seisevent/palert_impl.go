@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"regexp"
 	"time"
 
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/request"
+	"github.com/anyshake/observer/pkg/timesource"
 	"github.com/bclswl0827/travel"
 	"github.com/corpix/uarand"
 )
@@ -18,6 +18,7 @@ const PALERT_ID = "p-alert"
 type PALERT struct {
 	travelTimeTable *travel.AK135
 	cache           cache.AnyCache
+	timeSource      *timesource.Source
 }
 
 func (c *PALERT) GetProperty() DataSourceProperty {
@@ -38,23 +39,8 @@ func (c *PALERT) GetEvents(latitude, longitude float64) ([]Event, error) {
 		return c.cache.Get().([]Event), nil
 	}
 
-	// To build the query for P-Alert, we need to get the current timestamp
-	res, err := request.GET(
-		"https://www.cloudflare.com/cdn-cgi/trace",
-		10*time.Second, time.Second, 3, false,
-		nil,
-		map[string]string{"User-Agent": uarand.GetRandom()},
-	)
-	if err != nil {
-		return nil, err
-	}
-	ts := regexp.MustCompile(`ts=(\d+)`).FindStringSubmatch(string(res))
-	if len(ts) == 0 {
-		return nil, errors.New("failed to get current time from Cloudflare")
-	}
-	currentTime := time.Unix(int64(string2Float(ts[1])), 0)
-
-	res, err = request.POST(
+	currentTime := c.timeSource.Now()
+	res, err := request.POST(
 		"https://palert.earth.sinica.edu.tw/graphql/",
 		fmt.Sprintf(
 			`{"query":"query ($date: [Date!], $depth: [Float!], $ml: [Float!], $dateTime: DateTime, $needHaspga: Boolean!) {\n  eventList(\n    QueryEvent: {depth: $depth, date: $date, ml: $ml, dateTime: $dateTime}\n    needHaspga: $needHaspga\n  ) {\n    DateUTC\n    Depth\n    Latitude\n    Longitude\n    ML\n    hasPGA @include(if: $needHaspga)\n  }\n}","variables":{"date":["%s","%s"],"ml":[0,10],"depth":[0,1000],"needHaspga":false}}`,

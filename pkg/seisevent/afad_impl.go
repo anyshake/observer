@@ -2,14 +2,13 @@ package seisevent
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/url"
-	"regexp"
 	"time"
 
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/request"
+	"github.com/anyshake/observer/pkg/timesource"
 	"github.com/bclswl0827/travel"
 	"github.com/corpix/uarand"
 )
@@ -19,7 +18,7 @@ const AFAD_ID = "afad"
 type AFAD struct {
 	travelTimeTable *travel.AK135
 	cache           cache.AnyCache
-	currentTime     time.Time
+	timeSource      *timesource.Source
 }
 
 func (c *AFAD) GetProperty() DataSourceProperty {
@@ -35,9 +34,9 @@ func (c *AFAD) GetProperty() DataSourceProperty {
 	}
 }
 
-func (c *AFAD) getRequestParam() string {
-	startTime := url.QueryEscape(c.currentTime.AddDate(0, 0, -5).UTC().Format("2006-01-02 15:04:05"))
-	endTime := url.QueryEscape(c.currentTime.UTC().Format("2006-01-02 15:04:05"))
+func (c *AFAD) getRequestParam(currentTime time.Time) string {
+	startTime := url.QueryEscape(currentTime.AddDate(0, 0, -5).UTC().Format("2006-01-02 15:04:05"))
+	endTime := url.QueryEscape(currentTime.UTC().Format("2006-01-02 15:04:05"))
 	return fmt.Sprintf("start=%s&end=%s&orderby=timedesc", startTime, endTime)
 }
 
@@ -46,25 +45,9 @@ func (c *AFAD) GetEvents(latitude, longitude float64) ([]Event, error) {
 		return c.cache.Get().([]Event), nil
 	}
 
-	// Get current time to construct the request parameter
-	res, err := request.GET(
-		"https://www.cloudflare.com/cdn-cgi/trace",
-		10*time.Second, time.Second, 3, false,
-		nil,
-		map[string]string{"User-Agent": uarand.GetRandom()},
-	)
-	if err != nil {
-		return nil, err
-	}
-	ts := regexp.MustCompile(`ts=(\d+)`).FindStringSubmatch(string(res))
-	if len(ts) == 0 {
-		return nil, errors.New("failed to get current time from Cloudflare")
-	}
-	c.currentTime = time.Unix(int64(string2Float(ts[1])), 0)
-
 	// Make AFAD API request
-	res, err = request.GET(
-		fmt.Sprintf("https://deprem.afad.gov.tr/apiv2/event/filter?%s", c.getRequestParam()),
+	res, err := request.GET(
+		fmt.Sprintf("https://deprem.afad.gov.tr/apiv2/event/filter?%s", c.getRequestParam(c.timeSource.Now())),
 		30*time.Second, time.Second, 3, false, nil,
 		map[string]string{"User-Agent": uarand.GetRandom()},
 	)

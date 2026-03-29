@@ -233,7 +233,7 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		logger.GetLogger(serviceName).Infof("service %s has been started", serviceName)
 	}
 
-	seisEventSource, err := seisevent.New(30 * time.Second)
+	seisEventSource, err := seisevent.New(timeSrc, 30*time.Second)
 	if err != nil {
 		logger.GetLogger(main).Errorf("failed to create seis event source: %v", err)
 	}

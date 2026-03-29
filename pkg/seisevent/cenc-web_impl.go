@@ -2,12 +2,14 @@ package seisevent
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-	"strings"
+	"net/url"
 	"time"
 
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/request"
+	"github.com/anyshake/observer/pkg/timesource"
 	"github.com/bclswl0827/travel"
 	"github.com/corpix/uarand"
 )
@@ -17,6 +19,7 @@ const CENC_WEB_ID = "cenc_web"
 type CENC_WEB struct {
 	travelTimeTable *travel.AK135
 	cache           cache.AnyCache
+	timeSource      *timesource.Source
 }
 
 func (c *CENC_WEB) GetProperty() DataSourceProperty {
@@ -32,13 +35,19 @@ func (c *CENC_WEB) GetProperty() DataSourceProperty {
 	}
 }
 
+func (c *CENC_WEB) getRequestParam(currentTime time.Time) string {
+	startTime := url.QueryEscape(currentTime.AddDate(0, 0, -30).UTC().Add(8 * time.Hour).Format("2006-01-02 15:04:05"))
+	endTime := url.QueryEscape(currentTime.UTC().Add(8 * time.Hour).Format("2006-01-02 15:04:05"))
+	return fmt.Sprintf("orderBy=id&isAsc=false&startMg=1&startTime=%s&endTime=%s", startTime, endTime)
+}
+
 func (c *CENC_WEB) GetEvents(latitude, longitude float64) ([]Event, error) {
 	if c.cache.Valid() {
 		return c.cache.Get().([]Event), nil
 	}
 
 	res, err := request.GET(
-		"https://www.ceic.ac.cn/ajax/google",
+		fmt.Sprintf("https://www.cenc.ac.cn/prodlaunch-web-backend/open/data/geojson/catalogs?%s", c.getRequestParam(c.timeSource.Now())),
 		10*time.Second, time.Second, 3, false, nil,
 		map[string]string{"User-Agent": uarand.GetRandom()},
 	)
@@ -46,53 +55,53 @@ func (c *CENC_WEB) GetEvents(latitude, longitude float64) ([]Event, error) {
 		return nil, err
 	}
 
-	// Parse CENC JSON response
-	var dataMapEvents []map[string]any
-	err = json.Unmarshal(res, &dataMapEvents)
+	// Parse CENC GeoJSON response
+	var dataMap map[string]any
+	err = json.Unmarshal(res, &dataMap)
 	if err != nil {
 		return nil, err
 	}
 
-	// Ensure the response has the expected keys and they are not empty
-	expectedKeys := []string{"CATA_ID", "O_TIME", "EPI_LAT", "EPI_LON", "EPI_DEPTH", "M", "M_MS", "LOCATION_C"}
+	dataMapEvents, ok := dataMap["features"].([]any)
+	if !ok {
+		return nil, errors.New("seismic event data is not available")
+	}
+
+	// Ensure the response has the expected keys and values
+	expectedKeysInDataMap := []string{"properties", "geometry", "id"}
+	expectedKeysInProperties := []string{"震级", "参考位置", "发震时刻", "深度（千米）"}
+	expectedKeysInGeometry := []string{"coordinates"}
 
 	var resultArr []Event
-	for idx, v := range dataMapEvents {
-		if !isMapHasKeys(v, expectedKeys) || !isMapKeysEmpty(v, expectedKeys) {
+	for _, event := range dataMapEvents {
+		if !isMapHasKeys(event.(map[string]any), expectedKeysInDataMap) {
 			continue
 		}
 
-		timestamp, err := c.getTimestamp(v["O_TIME"].(string))
+		var (
+			properties = event.(map[string]any)["properties"]
+			geometry   = event.(map[string]any)["geometry"]
+		)
+		if !isMapHasKeys(properties.(map[string]any), expectedKeysInProperties) || !isMapHasKeys(geometry.(map[string]any), expectedKeysInGeometry) {
+			continue
+		}
+		coordinates := geometry.(map[string]any)["coordinates"]
+
+		ts, err := c.getTimestamp(properties.(map[string]any)["发震时刻"].(string))
 		if err != nil {
 			continue
 		}
 
-		region := v["LOCATION_C"].(string)
-		if strings.HasPrefix(region, "中国") {
-			region = strings.ReplaceAll(region, "中国", "")
-		}
-		if strings.HasPrefix(region, "台湾省") {
-			region = strings.ReplaceAll(region, "台湾", "")
-		}
-
 		seisEvent := Event{
 			Verfied:   true,
-			Timestamp: timestamp,
-			Region:    region,
-			Depth:     c.getDepth(v["EPI_DEPTH"]),
-			Event:     fmt.Sprintf("%d-%s", idx, v["CATA_ID"].(string)),
-			Latitude:  string2Float(v["EPI_LAT"].(string)),
-			Longitude: string2Float(v["EPI_LON"].(string)),
+			Timestamp: ts,
+			Depth:     c.getDepth(properties.(map[string]any)["深度（千米）"]),
+			Event:     event.(map[string]any)["id"].(string),
+			Region:    properties.(map[string]any)["参考位置"].(string),
+			Latitude:  coordinates.([]any)[1].(float64),
+			Longitude: coordinates.([]any)[0].(float64),
+			Magnitude: []Magnitude{c.getMagnitude("M", properties.(map[string]any)["震级"].(string))},
 		}
-
-		if v["M_MS"].(string) != "0" {
-			seisEvent.Magnitude = append(seisEvent.Magnitude, c.getMagnitude("MS", v["M_MS"].(string)))
-		} else if v["M"].(string) != "0" {
-			seisEvent.Magnitude = append(seisEvent.Magnitude, c.getMagnitude("M", v["M"].(string)))
-		} else {
-			continue
-		}
-
 		seisEvent.Distance = getDistance(latitude, seisEvent.Latitude, longitude, seisEvent.Longitude)
 		seisEvent.Estimation = getSeismicEstimation(c.travelTimeTable, latitude, seisEvent.Latitude, longitude, seisEvent.Longitude, seisEvent.Depth)
 

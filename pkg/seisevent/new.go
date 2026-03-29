@@ -5,10 +5,15 @@ import (
 
 	"github.com/anyshake/observer/pkg/cache"
 	"github.com/anyshake/observer/pkg/dnsquery"
+	"github.com/anyshake/observer/pkg/timesource"
 	"github.com/bclswl0827/travel"
 )
 
-func New(cacheTTL time.Duration) (map[string]IDataSource, error) {
+func New(timeSrc *timesource.Source, cacheTTL time.Duration) (map[string]IDataSource, error) {
+	if timeSrc == nil {
+		timeSrc = timesource.New(time.Now)
+	}
+
 	travelTimeTable, err := travel.NewAK135()
 	if err != nil {
 		return nil, err
@@ -18,13 +23,13 @@ func New(cacheTTL time.Duration) (map[string]IDataSource, error) {
 
 	return map[string]IDataSource{
 		CWA_SC_ID:       &CWA_SC{resolvers: builtinResolvers, cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
-		PALERT_ID:       &PALERT{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
+		PALERT_ID:       &PALERT{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable, timeSource: timeSrc},
 		HKO_ID:          &HKO{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		JMA_OFFICIAL_ID: &JMA_OFFICIAL{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		JMA_P2PQUAKE_ID: &JMA_P2PQUAKE{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		JMA_WOLFX_ID:    &JMA_WOLFX{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		KMA_ID:          &KMA{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
-		CENC_WEB_ID:     &CENC_WEB{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
+		CENC_WEB_ID:     &CENC_WEB{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable, timeSource: timeSrc},
 		CENC_APP_ID:     &CENC_APP{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		CENC_WOLFX_ID:   &CENC_WOLFX{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		USGS_ID:         &USGS{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
@@ -45,7 +50,7 @@ func New(cacheTTL time.Duration) (map[string]IDataSource, error) {
 		ICL_ID:          &ICL{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		BMKG_ID:         &BMKG{resolvers: builtinResolvers, cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		DOST_ID:         &DOST{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
-		AFAD_ID:         &AFAD{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
+		AFAD_ID:         &AFAD{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable, timeSource: timeSrc},
 		KRDAE_ID:        &KRDAE{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		KNDC_ID:         &KNDC{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
 		TMD_ID:          &TMD{cache: cache.New(cacheTTL), travelTimeTable: travelTimeTable},
