@@ -35,7 +35,12 @@ func (s *HttpServer) Setup(listen string) error {
 	s.engine.Use(date_header.New(s.resolver.TimeSource))
 	s.engine.Use(recovery.New(s.log.Logger))
 	s.engine.Use(httplog.New(s.log))
-	s.engine.Use(gzipHandler.Gzip(gzip.BestCompression))
+	s.engine.Use(gzipHandler.Gzip(
+		gzip.BestCompression,
+		gzipHandler.WithExcludedPaths([]string{
+			"/tiles", // Map tiles are already compressed
+		}),
+	))
 	s.engine.Use(secure.Secure(secure.Options{
 		FrameDeny:             true,
 		BrowserXssFilter:      true,
@@ -91,7 +96,13 @@ func (s *HttpServer) Setup(listen string) error {
 		})
 	}
 
-	webFs, webPath := web.NewEmbedFs()
+	mapTileHandler, err := web.NewMapTilesHandler(128)
+	if err != nil {
+		return fmt.Errorf("failed to create map tile handler: %w", err)
+	}
+	s.engine.GET("/tiles", mapTileHandler)
+
+	webFs, webPath := web.NewWebDist()
 	s.engine.Use(static.Serve("/", static.EmbedFolder(webFs, webPath)))
 
 	s.server.Addr = listen

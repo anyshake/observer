@@ -332,11 +332,12 @@ const Home = () => {
                         scrollWheelZoom
                         zoomControl
                         dragging
-                        zoom={6}
-                        maxZoom={7}
-                        minZoom={3}
                         height={300}
-                        tile="/tiles/{z}/{x}/{y}.webp"
+                        zoom={HomeConstraints.mapDefaultZoom}
+                        maxZoom={HomeConstraints.mapMaxZoom}
+                        minZoom={HomeConstraints.mapMinZoom}
+                        tileUrl={HomeConstraints.mapTileUrl}
+                        layers={HomeConstraints.mapTileLayers}
                         coordinates={getStationCoordinates}
                     />
                 </div>

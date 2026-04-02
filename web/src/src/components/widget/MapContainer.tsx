@@ -1,16 +1,16 @@
-import 'leaflet/dist/leaflet.css';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { mdiMapMarker } from '@mdi/js';
-import { divIcon, LeafletMouseEvent, Map } from 'leaflet';
+import maplibregl from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { MapContainer as MapBox, Marker, TileLayer } from 'react-leaflet';
 
 export interface IMapContainer {
     readonly height: number;
     readonly minZoom: number;
     readonly maxZoom: number;
     readonly zoom: number;
-    readonly tile: string;
+    readonly tileUrl: string;
+    readonly layers: maplibregl.LayerSpecification[];
     readonly coordinates: number[];
     readonly scrollWheelZoom?: boolean;
     readonly zoomControl?: boolean;
@@ -19,12 +19,155 @@ export interface IMapContainer {
     readonly onClick?: (coordinates: [number, number]) => void;
 }
 
+const createMapStyle = (
+    minZoom: number,
+    maxZoom: number,
+    tileUrl: string,
+    layers: maplibregl.LayerSpecification[]
+): maplibregl.StyleSpecification => ({
+    version: 8,
+    layers,
+    sources: {
+        naturalearth: {
+            type: 'vector',
+            tiles: [tileUrl],
+            minzoom: minZoom,
+            maxzoom: maxZoom
+        }
+    }
+});
+
+const createMarkerElement = (): HTMLDivElement => {
+    const el = document.createElement('div');
+    el.innerHTML = `<svg viewBox="0 0 24 24" style="width: 32px; height: 32px; fill: #364153; filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.5));">
+        <path d="${mdiMapMarker}" stroke="white" stroke-width="0.7" />
+    </svg>`;
+    el.style.cursor = 'pointer';
+    return el;
+};
+
+const animateMapTo = (
+    map: maplibregl.Map,
+    center: [number, number],
+    zoom: number,
+    minZoom: number,
+    animationId: number,
+    getAnimationId: () => number,
+    onComplete?: () => void
+) => {
+    const currentCenter = map.getCenter();
+    const currentZoom = map.getZoom();
+    const targetTravelZoom = Math.max(minZoom, 1);
+    const travelZoom = Math.min(currentZoom, zoom, targetTravelZoom);
+    const hasCenterChanged = currentCenter.lng !== center[0] || currentCenter.lat !== center[1];
+    const hasZoomChanged = currentZoom !== zoom;
+
+    if (!hasCenterChanged && !hasZoomChanged) {
+        onComplete?.();
+        return;
+    }
+
+    const runStage = (action: () => void, next?: () => void) => {
+        if (getAnimationId() !== animationId) {
+            return;
+        }
+
+        map.once('moveend', () => {
+            if (getAnimationId() !== animationId) {
+                return;
+            }
+
+            if (next) {
+                next();
+                return;
+            }
+
+            onComplete?.();
+        });
+        action();
+    };
+
+    map.stop();
+
+    if (currentZoom > travelZoom) {
+        runStage(
+            () => {
+                map.easeTo({
+                    duration: 500,
+                    easing: (t) => t,
+                    essential: true,
+                    zoom: travelZoom
+                });
+            },
+            () => {
+                runStage(
+                    () => {
+                        map.easeTo({
+                            center,
+                            duration: 1000,
+                            easing: (t) => t,
+                            essential: true,
+                            zoom: travelZoom
+                        });
+                    },
+                    () => {
+                        if (zoom !== travelZoom) {
+                            runStage(() => {
+                                map.easeTo({
+                                    center,
+                                    duration: 500,
+                                    easing: (t) => t,
+                                    essential: true,
+                                    zoom
+                                });
+                            });
+                            return;
+                        }
+
+                        onComplete?.();
+                    }
+                );
+            }
+        );
+        return;
+    }
+
+    runStage(
+        () => {
+            map.easeTo({
+                center,
+                duration: 1000,
+                easing: (t) => t,
+                essential: true,
+                zoom: travelZoom
+            });
+        },
+        () => {
+            if (zoom !== travelZoom) {
+                runStage(() => {
+                    map.easeTo({
+                        center,
+                        duration: 500,
+                        easing: (t) => t,
+                        essential: true,
+                        zoom
+                    });
+                });
+                return;
+            }
+
+            onComplete?.();
+        }
+    );
+};
+
 export const MapContainer = ({
     height,
     minZoom,
     maxZoom,
     zoom,
-    tile,
+    tileUrl,
+    layers,
     borderRadius = '8px',
     coordinates,
     scrollWheelZoom,
@@ -32,31 +175,128 @@ export const MapContainer = ({
     dragging,
     onClick
 }: IMapContainer) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const mapRef = useRef<maplibregl.Map | null>(null);
+    const markerRef = useRef<maplibregl.Marker | null>(null);
+    const isMapLoadedRef = useRef(false);
+    const hasAnimatedToTargetRef = useRef(false);
+    const animationIdRef = useRef(0);
     const [latitude, longitude] = useMemo(() => coordinates, [coordinates]);
-    const icon = useMemo(
-        () =>
-            divIcon({
-                className: 'leaflet-data-marker',
-                html: `<svg viewBox="0 0 24 24" style="width: 32px; height: 32px; fill: #364153; filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.5));">
-            <path d="${mdiMapMarker}" stroke="white" stroke-width="0.7" />
-        </svg>`,
-                iconAnchor: [16, 32]
-            }),
-        []
-    );
+    const latestViewRef = useRef({ latitude, longitude, zoom });
 
-    const mapRef = useRef<Map>(null);
     useEffect(() => {
-        const map = mapRef.current;
-        if (map) {
-            map.flyTo([latitude, longitude], zoom);
-        }
+        latestViewRef.current = { latitude, longitude, zoom };
     }, [latitude, longitude, zoom]);
 
+    const showMarkerAt = useCallback((target: [number, number]) => {
+        const marker = markerRef.current;
+        const map = mapRef.current;
+
+        if (!marker || !map) {
+            return;
+        }
+
+        marker.setLngLat(target).addTo(map);
+    }, []);
+
+    useEffect(() => {
+        if (!containerRef.current) {
+            return;
+        }
+
+        const { latitude: currentLatitude, longitude: currentLongitude } = latestViewRef.current;
+
+        const map = new maplibregl.Map({
+            container: containerRef.current,
+            style: createMapStyle(minZoom, maxZoom, tileUrl, layers),
+            center: [0, 0],
+            zoom,
+            minZoom,
+            maxZoom,
+            attributionControl: false,
+            doubleClickZoom: false,
+            dragPan: dragging ?? true,
+            scrollZoom: scrollWheelZoom ?? true
+        });
+
+        if (zoomControl) {
+            map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+        }
+
+        const marker = new maplibregl.Marker({
+            element: createMarkerElement(),
+            anchor: 'bottom'
+        }).setLngLat([currentLongitude, currentLatitude]);
+
+        mapRef.current = map;
+        markerRef.current = marker;
+        isMapLoadedRef.current = false;
+        hasAnimatedToTargetRef.current = false;
+
+        map.once('load', () => {
+            const {
+                latitude: currentLatitude,
+                longitude: currentLongitude,
+                zoom: currentZoom
+            } = latestViewRef.current;
+            isMapLoadedRef.current = true;
+            animationIdRef.current += 1;
+            animateMapTo(
+                map,
+                [currentLongitude, currentLatitude],
+                currentZoom,
+                minZoom,
+                animationIdRef.current,
+                () => animationIdRef.current,
+                () => showMarkerAt([currentLongitude, currentLatitude])
+            );
+            hasAnimatedToTargetRef.current = true;
+        });
+
+        return () => {
+            animationIdRef.current += 1;
+            isMapLoadedRef.current = false;
+            hasAnimatedToTargetRef.current = false;
+            marker.remove();
+            map.remove();
+            mapRef.current = null;
+            markerRef.current = null;
+        };
+    }, [
+        dragging,
+        layers,
+        maxZoom,
+        minZoom,
+        scrollWheelZoom,
+        tileUrl,
+        showMarkerAt,
+        zoom,
+        zoomControl
+    ]);
+
+    useEffect(() => {
+        const map = mapRef.current;
+        if (!map || !isMapLoadedRef.current) {
+            return;
+        }
+
+        if (hasAnimatedToTargetRef.current) {
+            animationIdRef.current += 1;
+            animateMapTo(
+                map,
+                [longitude, latitude],
+                zoom,
+                minZoom,
+                animationIdRef.current,
+                () => animationIdRef.current,
+                () => showMarkerAt([longitude, latitude])
+            );
+        }
+    }, [latitude, longitude, minZoom, showMarkerAt, zoom]);
+
     const handleClick = useCallback(
-        (e: LeafletMouseEvent) => {
-            const { lat, lng } = e.latlng;
-            onClick?.([lat, lng]);
+        (e: maplibregl.MapMouseEvent) => {
+            onClick?.([e.lngLat.lat, e.lngLat.lng]);
         },
         [onClick]
     );
@@ -72,22 +312,10 @@ export const MapContainer = ({
     }, [handleClick]);
 
     return (
-        <MapBox
-            ref={mapRef}
+        <div
+            ref={containerRef}
             className="z-0"
-            scrollWheelZoom={scrollWheelZoom}
-            zoomControl={zoomControl}
-            attributionControl={false}
-            doubleClickZoom={false}
-            dragging={dragging}
-            maxZoom={maxZoom}
-            minZoom={minZoom}
-            center={[latitude, longitude]}
-            zoom={zoom}
-            style={{ cursor: 'default', borderRadius, height }}
-        >
-            <TileLayer url={tile} />
-            <Marker position={[latitude, longitude]} icon={icon} />
-        </MapBox>
+            style={{ cursor: 'default', borderRadius, height, overflow: 'hidden' }}
+        />
     );
 };
