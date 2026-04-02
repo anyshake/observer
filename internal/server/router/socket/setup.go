@@ -6,6 +6,7 @@ import (
 
 	"github.com/anyshake/observer/internal/hardware"
 	"github.com/anyshake/observer/internal/hardware/explorer"
+	"github.com/anyshake/observer/internal/server/middleware/auth_jwt"
 	"github.com/anyshake/observer/internal/server/response"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/anyshake/observer/pkg/message"
@@ -25,7 +26,7 @@ func Setup(routerGroup *gin.RouterGroup, timeSource *timesource.Source, hardware
 		s.storeHistory(t, di, cd)
 	})
 
-	routerGroup.GET("/socket", jwtMiddleware, func(ctx *gin.Context) {
+	routerGroup.GET("/socket", auth_jwt.NewWebsocketAuthAdapter(), jwtMiddleware, func(ctx *gin.Context) {
 		upgrader := websocket.Upgrader{
 			ReadBufferSize:    1024,
 			WriteBufferSize:   1024,

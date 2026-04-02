@@ -96,7 +96,8 @@ const RealTime = () => {
 
     const { readyState, sendMessage } = useSocket(
         {
-            url: getSocketApiUrl(getCredential().token),
+            protocols: [`Bearer#${getCredential().token.replace(/=/g, '')}`],
+            url: getSocketApiUrl(),
             onData: ({ data }) => {
                 const { channel_data, sample_rate, record_time, current_time } = data;
 

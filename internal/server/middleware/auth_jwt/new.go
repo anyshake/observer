@@ -96,7 +96,7 @@ func New(timeSource *timesource.Source, actionHandler *action.Handler, expiratio
 		Timeout:     expiration,
 		MaxRefresh:  expiration,
 		TimeFunc:    timeSource.Now,
-		TokenLookup: "header: Authorization, query: token",
+		TokenLookup: "header: Authorization",
 	})
 	if err != nil {
 		return nil, err

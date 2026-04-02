@@ -21,6 +21,7 @@ import (
 	"github.com/anyshake/observer/internal/server/router/files"
 	graph_resolver "github.com/anyshake/observer/internal/server/router/graph"
 	"github.com/anyshake/observer/internal/server/router/socket"
+	"github.com/anyshake/observer/internal/server/router/tiles"
 	"github.com/anyshake/observer/web"
 	"github.com/gin-contrib/cors"
 	gzipHandler "github.com/gin-contrib/gzip"
@@ -38,14 +39,14 @@ func (s *HttpServer) Setup(listen string) error {
 	s.engine.Use(gzipHandler.Gzip(
 		gzip.BestCompression,
 		gzipHandler.WithExcludedPaths([]string{
-			"/tiles", // Map tiles are already compressed
+			"/api/tiles", // Map tiles are already compressed
 		}),
 	))
 	s.engine.Use(secure.Secure(secure.Options{
 		FrameDeny:             true,
 		BrowserXssFilter:      true,
 		ContentTypeNosniff:    true,
-		ContentSecurityPolicy: "default-src 'self'; connect-src 'self' https://anyshake.org; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline' 'wasm-unsafe-eval'; font-src 'self' data:; img-src 'self' data: blob:;",
+		ContentSecurityPolicy: "default-src 'self'; connect-src 'self' https://anyshake.org; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline' 'wasm-unsafe-eval'; font-src 'self' data:; img-src 'self' data: blob:;worker-src 'self' blob:;",
 	}))
 	if s.cors {
 		s.engine.Use(cors.New(cors.Config{
@@ -74,6 +75,7 @@ func (s *HttpServer) Setup(listen string) error {
 	export.Setup(api, s.resolver.ActionHandler, s.resolver.HardwareDev, jwtMiddlewareFn)
 	socket.Setup(api, s.resolver.TimeSource, s.resolver.HardwareDev, jwtMiddlewareFn)
 	files.Setup(api, s.resolver.ServiceMap, jwtMiddlewareFn)
+	tiles.Setup(api, s.resolver.CurrentVersion.String(), jwtMiddlewareFn)
 
 	graphql := handler.NewDefaultServer(graph_resolver.NewExecutableSchema(graph_resolver.Config{Resolvers: s.resolver}))
 	graphql.SetRecoverFunc(func(ctx context.Context, err any) (userMessage error) {
@@ -95,12 +97,6 @@ func (s *HttpServer) Setup(listen string) error {
 			playground.Handler("GraphQL API Debug", request.URL.Path).ServeHTTP(writer, request)
 		})
 	}
-
-	mapTileHandler, err := web.NewMapTilesHandler(128)
-	if err != nil {
-		return fmt.Errorf("failed to create map tile handler: %w", err)
-	}
-	s.engine.GET("/tiles", mapTileHandler)
 
 	webFs, webPath := web.NewWebDist()
 	s.engine.Use(static.Serve("/", static.EmbedFolder(webFs, webPath)))

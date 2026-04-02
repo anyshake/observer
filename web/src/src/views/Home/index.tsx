@@ -23,9 +23,11 @@ import { StatusList } from '../../components/widget/StatusList';
 import { HomeConstraints } from '../../config/constraints';
 import { useGetHomeDataQuery, useGetUpgradeStatusLazyQuery } from '../../graphql';
 import { getTimeString } from '../../helpers/utils/getTimeString';
+import { useCredentialStore } from '../../stores/credential';
 
 const Home = () => {
     const { t } = useTranslation();
+    const { getCredential } = useCredentialStore();
     const lineChartConfig = useMemo(
         () => ({
             height: 250,
@@ -337,6 +339,7 @@ const Home = () => {
                         maxZoom={HomeConstraints.mapMaxZoom}
                         minZoom={HomeConstraints.mapMinZoom}
                         tileUrl={HomeConstraints.mapTileUrl}
+                        tileToken={getCredential().token}
                         layers={HomeConstraints.mapTileLayers}
                         coordinates={getStationCoordinates}
                     />

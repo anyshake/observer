@@ -16,6 +16,9 @@ export default defineConfig({
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
                 navigateFallbackDenylist: [/^\/api/],
                 maximumFileSizeToCacheInBytes: 3000000
+            },
+            manifest: {
+                theme_color: '#8d59ef'
             }
         })
     ],

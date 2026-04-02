@@ -10,6 +10,7 @@ export interface IMapContainer {
     readonly maxZoom: number;
     readonly zoom: number;
     readonly tileUrl: string;
+    readonly tileToken?: string;
     readonly layers: maplibregl.LayerSpecification[];
     readonly coordinates: number[];
     readonly scrollWheelZoom?: boolean;
@@ -167,6 +168,7 @@ export const MapContainer = ({
     maxZoom,
     zoom,
     tileUrl,
+    tileToken,
     layers,
     borderRadius = '8px',
     coordinates,
@@ -216,7 +218,13 @@ export const MapContainer = ({
             attributionControl: false,
             doubleClickZoom: false,
             dragPan: dragging ?? true,
-            scrollZoom: scrollWheelZoom ?? true
+            scrollZoom: scrollWheelZoom ?? true,
+            transformRequest: (url, resourceType) => {
+                if (resourceType === 'Tile' && tileToken) {
+                    return { url, headers: { Authorization: `Bearer ${tileToken}` } };
+                }
+                return { url };
+            }
         });
 
         if (zoomControl) {
@@ -271,7 +279,8 @@ export const MapContainer = ({
         tileUrl,
         showMarkerAt,
         zoom,
-        zoomControl
+        zoomControl,
+        tileToken
     ]);
 
     useEffect(() => {
