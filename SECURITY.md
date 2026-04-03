@@ -18,10 +18,10 @@ Vulnerabilities should be reported to `anyshake@senseplex.net` - the official em
 When reporting an issue, where possible, please provide at least:
 
 - The commit version the issue was identified at
-- A proof of concept (plaintext; no binaries)
+- A proof of concept (e.g. code snippet, video, etc.)
 - Steps to reproduce
 - Your recommended remediation(s), if any
 
-The AnyShake team is a volunteer-only effort, and may reach back out for clarification.
+The AnyShake team may reach back out for clarification.
 
-> Note: Please do not open public issues for security issues, as GitHub does not provide facility for private issues, and deleting the issue makes it hard to triage/respond back to the reporter.
+> Note: Please DO NOT disclose vulnerabilities publicly until we have had a chance to address them.

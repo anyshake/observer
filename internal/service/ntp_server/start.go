@@ -77,7 +77,16 @@ const (
 const (
 	REFERENCE_ID      = "GNSS"
 	FROM_1900_TO_1970 = 2208988800
+	udpBufferSize     = 4 << 20
+	readDeadline      = 100 * time.Millisecond
+	packetQueueFactor = 128
 )
+
+type ntpPacket struct {
+	addr *net.UDPAddr
+	t2   time.Time
+	data []byte
+}
 
 type ntpServer struct {
 	conn      *net.UDPConn
@@ -97,6 +106,16 @@ func newNtpServer(addr string, port int, timeFn func() time.Time) (*ntpServer, e
 		return nil, err
 	}
 
+	if err := c.SetReadBuffer(udpBufferSize); err != nil {
+		_ = c.Close()
+		return nil, err
+	}
+
+	if err := c.SetWriteBuffer(udpBufferSize); err != nil {
+		_ = c.Close()
+		return nil, err
+	}
+
 	if timeFn == nil {
 		timeFn = time.Now
 	}
@@ -105,18 +124,30 @@ func newNtpServer(addr string, port int, timeFn func() time.Time) (*ntpServer, e
 }
 
 func (p *ntpServer) Run(ctx context.Context) error {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
+	workerCount := p.workerCount()
+	packets := make(chan ntpPacket, workerCount*packetQueueFactor)
+	for i := 0; i < workerCount; i++ {
+		p.wg.Add(1)
+		go func() {
+			defer p.wg.Done()
+			for packet := range packets {
+				p.handleData(packet.t2, packet.addr, packet.data)
+			}
+		}()
+	}
+	defer func() {
+		close(packets)
+		p.wg.Wait()
+		p.closeOnce.Do(func() { _ = p.conn.Close() })
+	}()
 
-	if err := p.conn.SetReadDeadline(time.Now().Add(100 * time.Millisecond)); err != nil {
+	if err := p.conn.SetReadDeadline(time.Now().Add(readDeadline)); err != nil {
 		return err
 	}
 
 	for readBuf := make([]byte, 512); ; {
 		select {
 		case <-ctx.Done():
-			p.wg.Wait()
-			p.closeOnce.Do(func() { p.conn.Close() })
 			return nil
 		default:
 		}
@@ -125,18 +156,46 @@ func (p *ntpServer) Run(ctx context.Context) error {
 		t2 := p.timeFn()
 		if err != nil {
 			if ne, ok := err.(net.Error); ok && ne.Timeout() {
-				if err := p.conn.SetReadDeadline(time.Now().Add(100 * time.Millisecond)); err != nil {
+				if err := p.conn.SetReadDeadline(time.Now().Add(readDeadline)); err != nil {
 					return err
 				}
 				continue
 			}
+
+			select {
+			case <-ctx.Done():
+				return nil
+			default:
+			}
+
 			return err
 		}
 
 		if n > 0 {
-			p.handleData(t2, remoteAddr, readBuf[:n])
+			packet := ntpPacket{
+				addr: remoteAddr,
+				t2:   t2,
+				data: append([]byte(nil), readBuf[:n]...),
+			}
+
+			select {
+			case packets <- packet:
+			case <-ctx.Done():
+				return nil
+			}
 		}
 	}
+}
+
+func (p *ntpServer) workerCount() int {
+	count := 2 * runtime.NumCPU()
+	if count < 4 {
+		return 4
+	}
+	if count > 32 {
+		return 32
+	}
+	return count
 }
 
 func (p *ntpServer) write(data []byte, laddr *net.UDPAddr) error {
@@ -148,7 +207,7 @@ func (p *ntpServer) write(data []byte, laddr *net.UDPAddr) error {
 	return nil
 }
 
-func (p *ntpServer) handleData(t2 time.Time, addr net.Addr, data []byte) {
+func (p *ntpServer) handleData(t2 time.Time, addr *net.UDPAddr, data []byte) {
 	addrPort, err := netip.ParseAddrPort(addr.String())
 	if err != nil {
 		logger.GetLogger(ID).Errorf("failed to parse address and port: %v", err)
@@ -167,7 +226,7 @@ func (p *ntpServer) handleData(t2 time.Time, addr net.Addr, data []byte) {
 			return
 		}
 
-		if err := p.write(resp, addr.(*net.UDPAddr)); err != nil {
+		if err := p.write(resp, addr); err != nil {
 			logger.GetLogger(ID).Errorf("write NTP response error: %v", err)
 		}
 	} else {
