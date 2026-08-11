@@ -1,0 +1,585 @@
+{
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "Escucha el susurro de la Tierra."
+        },
+        "router": {
+            "home": "Estado de la estación",
+            "realtime": "Forma de onda en tiempo real",
+            "history": "Historial de formas de onda",
+            "download": "Descarga de datos",
+            "settings": "Configuración del sistema",
+            "default": "Página no encontrada"
+        }
+    },
+    "components": {
+        "ErrorPage": {
+            "something_went_wrong": "¡Ups! Algo salió mal.",
+            "try_again_later": "Intenta actualizar la página o vuelve a intentarlo más tarde."
+        },
+        "TypedInput": {
+            "yes": "Sí",
+            "no": "No",
+            "add_new_item": "Introduce un nuevo elemento.",
+            "editing_list": "Editando la lista de {{fieldName}}",
+            "table_value": "Valor",
+            "table_actions": "Acciones"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "Configuración del espectrograma",
+                "min_db": "dB mínimo",
+                "max_db": "dB máximo"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "Configuración del espectrograma",
+                "min_db": "dB mínimo",
+                "max_db": "dB máximo"
+            }
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "Nombre del archivo",
+                "time": "Fecha de modificación",
+                "size": "Tamaño del archivo",
+                "actions": "Acciones"
+            },
+            "file_list_actions": {
+                "download": "Descargar",
+                "preview": "Vista previa"
+            },
+            "miniseed_list": {
+                "title": "MiniSEED diario",
+                "search": "Buscar"
+            },
+            "helicorder_list": {
+                "title": "Lista de helicorders",
+                "search": "Buscar"
+            },
+            "request_file": {
+                "requesting": "Solicitando el enlace para descargar el archivo {{fileName}}.",
+                "success": "Se obtuvo el enlace para descargar el archivo {{fileName}}.",
+                "error": "No se pudo solicitar el enlace del archivo {{fileName}}: {{error}}"
+            },
+            "preview_file": {
+                "requesting": "Solicitando el enlace para visualizar el archivo {{fileName}}.",
+                "success": "Se obtuvo el enlace para visualizar el archivo {{fileName}}.",
+                "error": "No se pudo solicitar el enlace del archivo {{fileName}}: {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "Consulta de eventos sísmicos",
+                "data_agency": "Agencia",
+                "search_button": "Buscar eventos",
+                "searching": "Buscando eventos en la fuente seleccionada.",
+                "success": "Se encontraron {{count}} eventos en la fuente seleccionada.",
+                "no_data": "No se encontraron eventos en la fuente seleccionada.",
+                "error": "No se pudieron buscar los eventos: {{error}}"
+            },
+            "event_list_modal": {
+                "title": "Selecciona un evento sísmico",
+                "earthquake_at": "Sismo a las {{time}}",
+                "p_wave_arrival": "Llegada de la onda P: {{time}} ({{seconds}} s)",
+                "s_wave_arrival": "Llegada de la onda S: {{time}} ({{seconds}} s)",
+                "epicenter_distance": "Distancia al epicentro: {{distance}} km",
+                "earthquake_depth": "Profundidad: {{depth}} km",
+                "selected_an_event": "Se seleccionó un evento sísmico en {{region}} a las {{time}}."
+            },
+            "data_export": {
+                "title": "Exportación de datos",
+                "file_format": "Formato de archivo",
+                "channel_code": "Código de canal",
+                "export_button": "Obtener datos",
+                "exporting": "Exportando el canal {{channel}} al formato {{format}}.",
+                "success": "El canal {{channel}} se exportó correctamente al formato {{format}}.",
+                "error": "No se pudo exportar el canal {{channel}} al formato {{format}}: {{error}}"
+            },
+            "search_records": {
+                "title": "Consulta de tiempo",
+                "start_time": "Hora de inicio",
+                "end_time": "Hora de finalización",
+                "invalid_time": "La hora de inicio debe ser anterior a la hora de finalización.",
+                "search_button": "Buscar registros",
+                "searching": "Buscando registros sísmicos en la base de datos.",
+                "success": "Se encontraron {{count}} registros sísmicos en la base de datos.",
+                "no_data": "No se encontraron registros sísmicos en la base de datos.",
+                "error": "No se pudieron buscar los registros: {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "Bloquear diseño",
+                "unlock_button": "Desbloquear diseño"
+            },
+            "reset_layout": {
+                "reset_button": "Restablecer todo",
+                "confirm_message": "¿Seguro que quieres restablecer el diseño?",
+                "confirm_title": "Confirmar restablecimiento",
+                "confirm_button": "Restablecer",
+                "cancel_button": "Cancelar"
+            },
+            "display_mode": {
+                "waveform_mode": "Modo de forma de onda",
+                "spectrogram_mode": "Modo de espectrograma"
+            },
+            "share_link": {
+                "share_button": "Compartir enlace",
+                "link_copied": "El enlace compartido se copió al portapapeles."
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "Información de la estación",
+                "name": "Nombre",
+                "country": "País",
+                "place": "Lugar",
+                "affiliation": "Afiliación",
+                "channels": "Canales"
+            },
+            "device_info": {
+                "yes": "Sí",
+                "no": "No",
+                "title": "Información del dispositivo",
+                "product_model": "Modelo del dispositivo",
+                "device_id": "ID del dispositivo",
+                "link_protocol": "Protocolo de conexión",
+                "packet_interval": "Intervalo de paquetes",
+                "gnss_active": "GNSS activo"
+            },
+            "device_status": {
+                "title": "Estado del dispositivo",
+                "sample_rate": "Frecuencia de muestreo",
+                "latitude": "Latitud",
+                "longitude": "Longitud",
+                "elevation": "Altitud",
+                "temperature": "Temperatura del dispositivo"
+            },
+            "link_status": {
+                "title": "Estado de conexión",
+                "started_at": "Iniciado a las",
+                "last_frame": "Última trama",
+                "frames": "Tramas",
+                "errors": "Errores",
+                "messages": "Mensajes"
+            },
+            "connectivity": {
+                "loading": "Conectando con la estación...",
+                "success": "Conectado con la estación; el servidor lleva {{uptime}} segundos activo. Última actualización: {{updatedAt}}.",
+                "error": "Ocurrió un error al conectar con la estación. Comprueba tu conexión."
+            },
+            "station_location": {
+                "title": "Ubicación de la estación"
+            },
+            "upgrade": {
+                "update_available": "Hay una nueva versión disponible: {{latest}}. Puedes activar las actualizaciones automáticas o descargarla e instalarla manualmente.",
+                "restart_needed": "La última versión, {{latest}}, ya está instalada, pero sigue ejecutándose la versión {{current}}. Reinicia el software cuando sea conveniente para aplicar la actualización.",
+                "manual_upgrade_needed": "Hay una nueva versión disponible: {{latest}}, pero la versión actual, {{current}}, es inferior a la versión mínima compatible, {{required}}. Es necesario actualizar manualmente."
+            },
+            "service_status": {
+                "title": "Estado del servicio"
+            },
+            "cpu_usage": {
+                "title": "Uso de CPU"
+            },
+            "memory_usage": {
+                "title": "Uso de memoria"
+            },
+            "disk_usage": {
+                "title": "Uso del disco"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "¡Ups! Página no encontrada.",
+            "check_your_url": "Comprueba la URL e inténtalo de nuevo.",
+            "go_back_button": "Volver"
+        },
+        "RealTime": {
+            "display_mode": {
+                "waveform_mode": "Modo de forma de onda",
+                "spectrogram_mode": "Modo de espectrograma"
+            },
+            "reset_layout": {
+                "reset_button": "Restablecer todo",
+                "confirm_message": "¿Seguro que quieres restablecer el diseño?",
+                "confirm_title": "Confirmar restablecimiento",
+                "confirm_button": "Restablecer",
+                "cancel_button": "Cancelar"
+            },
+            "layout_locker": {
+                "lock_button": "Bloquear diseño",
+                "unlock_button": "Desbloquear diseño"
+            },
+            "record_data": {
+                "start_button": "Iniciar grabación",
+                "stop_button": "Detener grabación",
+                "start_recording": "La grabación comenzó a las {{startedAt}}.",
+                "link_created": "La grabación terminó a las {{endedAt}} ({{duration}} segundos). Se generó un enlace.",
+                "no_data_recorded": "No se registraron datos durante este periodo."
+            },
+            "connectivity": {
+                "connecting": "Sin conexión. Conectando ahora...",
+                "connected": "Conectado. Última actualización: {{updatedAt}}."
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} SPS",
+                "channels": "{{num}} canales",
+                "retention": "{{retention}} segundos"
+            }
+        },
+        "Settings": {
+            "Logs": {
+                "title": "Registros de la aplicación"
+            },
+            "Dangerous": {
+                "title": "Zona de riesgo",
+                "restart_application": {
+                    "title": "Reiniciar toda la aplicación",
+                    "description": "Esto reiniciará toda la aplicación. El proceso puede tardar un momento y cerrará temporalmente todas las conexiones activas, lo que interrumpirá los servicios y las grabaciones.",
+                    "submit_button": "Reiniciar aplicación",
+                    "confirm_title": "Confirmar reinicio",
+                    "confirm_message": "¿Seguro que quieres reiniciar la aplicación?",
+                    "confirm_button": "Reiniciar",
+                    "cancel_button": "Cancelar",
+                    "restarting": "Enviando solicitud para reiniciar la aplicación...",
+                    "success": "Se envió la solicitud de reinicio. La aplicación se reiniciará en unos segundos.",
+                    "error": "No se pudo solicitar el reinicio de la aplicación: {{error}}"
+                },
+                "purge_waveform_records": {
+                    "title": "Eliminar permanentemente registros de formas de onda",
+                    "description": "Esto eliminará permanentemente todos los registros de formas de onda de la base de datos. Esta operación es irreversible.",
+                    "submit_button": "Eliminar permanentemente registros",
+                    "confirm_title": "Confirmar eliminación permanente",
+                    "confirm_message": "¿Seguro que quieres eliminar permanentemente todos los registros de formas de onda?",
+                    "confirm_button": "Purge",
+                    "cancel_button": "Cancelar",
+                    "purging": "Eliminando permanentemente los registros de formas de onda...",
+                    "success": "Los registros de formas de onda se eliminaron permanentemente correctamente.",
+                    "error": "No se pudieron eliminar permanentemente los registros de formas de onda: {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "Eliminar permanentemente archivos MiniSEED",
+                    "description": "Esto eliminará permanentemente todos los archivos MiniSEED del sistema. Esta operación es irreversible.",
+                    "submit_button": "Eliminar permanentemente MiniSEED",
+                    "confirm_title": "Confirmar eliminación permanente",
+                    "confirm_message": "¿Seguro que quieres eliminar permanentemente todos los archivos MiniSEED?",
+                    "confirm_button": "Eliminar",
+                    "cancel_button": "Cancelar",
+                    "purging": "Eliminando permanentemente los archivos MiniSEED...",
+                    "success": "Los archivos MiniSEED se eliminaron permanentemente correctamente.",
+                    "error": "No se pudieron eliminar permanentemente los archivos MiniSEED: {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "Eliminar permanentemente archivos de helicorder",
+                    "description": "Esto eliminará permanentemente todos los archivos de helicorder del sistema. Esta operación es irreversible.",
+                    "submit_button": "Eliminar permanentemente helicorder",
+                    "confirm_title": "Confirmar eliminación permanente",
+                    "confirm_message": "¿Seguro que quieres eliminar permanentemente todos los archivos de helicorder?",
+                    "confirm_button": "Eliminar",
+                    "cancel_button": "Cancelar",
+                    "purging": "Eliminando permanentemente los archivos de helicorder...",
+                    "success": "Los archivos de helicorder se eliminaron permanentemente correctamente.",
+                    "error": "No se pudieron eliminar permanentemente los archivos de helicorder: {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "Restablecer configuración de la estación",
+                    "description": "Esto restablecerá toda la configuración de la estación. Esta operación es irreversible y es necesario reiniciar para que los cambios surtan efecto.",
+                    "submit_button": "Restablecer estación",
+                    "confirm_title": "Confirmar restablecimiento",
+                    "confirm_message": "¿Seguro que quieres restablecer toda la configuración de la estación?",
+                    "confirm_button": "Restablecer",
+                    "cancel_button": "Cancelar",
+                    "resetting": "Restableciendo la configuración de la estación...",
+                    "success": "La configuración de la estación se restableció correctamente.",
+                    "error": "No se pudo restablecer la configuración de la estación: {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "Restablecer configuración del servicio",
+                    "description": "Esto restablecerá toda la configuración del servicio. Esta operación es irreversible y es necesario reiniciar para que los cambios surtan efecto.",
+                    "submit_button": "Restablecer servicio",
+                    "confirm_title": "Confirmar restablecimiento",
+                    "confirm_message": "¿Seguro que quieres restablecer toda la configuración del servicio?",
+                    "confirm_button": "Restablecer",
+                    "cancel_button": "Cancelar",
+                    "resetting": "Restableciendo la configuración del servicio...",
+                    "success": "La configuración del servicio se restableció correctamente.",
+                    "error": "No se pudo restablecer la configuración del servicio: {{error}}"
+                },
+                "purge_data": {
+                    "mode_running": "En ejecución",
+                    "invalid_range": "Selecciona una fecha de inicio y una fecha de finalización válidas.",
+                    "started": "Se inició la tarea de eliminación permanente.",
+                    "request_failed": "No se pudo iniciar la tarea de eliminación permanente: {{error}}",
+                    "running_hint": "No se puede iniciar otra operación de eliminación permanente hasta que termine la actual.",
+                    "status_query_failed": "No se pudo consultar el estado de la eliminación permanente: {{error}}",
+                    "status_idle": "No hay ninguna tarea de eliminación permanente en ejecución.",
+                    "status_running": "Eliminando permanentemente: {{kind}}.",
+                    "status_success": "Eliminación permanente completada: {{kind}}.",
+                    "status_failed": "La eliminación permanente falló: {{kind}}: {{error}}",
+                    "verification_label": "Texto de verificación",
+                    "verification_help": "Introduce \"{{verificationText}}\" para habilitar el botón de ejecución.",
+                    "kind_seis_records_full": "Registros de formas de onda",
+                    "kind_seis_records_by_date": "Registros de formas de onda en el intervalo de fechas especificado",
+                    "kind_miniseed_full": "Archivos MiniSEED",
+                    "kind_miniseed_by_date": "Archivos MiniSEED en el intervalo de fechas especificado",
+                    "kind_helicorder_full": "Archivos de helicorder",
+                    "kind_helicorder_by_date": "Archivos de helicorder en el intervalo de fechas especificado",
+                    "kind_unknown": "Tarea de eliminación permanente",
+                    "start_date": "Fecha de inicio",
+                    "end_date": "Fecha de finalización",
+                    "mode_label": "Modo de eliminación permanente",
+                    "mode_all": "Todo",
+                    "mode_range": "Intervalo de fechas"
+                }
+            },
+            "Metadata": {
+                "title": "Metadatos de la estación"
+            },
+            "Preference": {
+                "title": "Preferencias web",
+                "reset_layout_preference": {
+                    "title": "Restablecer preferencias de diseño",
+                    "description": "Esto restablecerá todas las preferencias de diseño. Esta operación es irreversible.",
+                    "submit_button": "Restablecer preferencias",
+                    "confirm_title": "Confirmar restablecimiento",
+                    "confirm_message": "¿Seguro que quieres restablecer todas las preferencias de diseño?",
+                    "confirm_button": "Restablecer",
+                    "cancel_button": "Cancelar",
+                    "success": "Las preferencias de diseño se restablecieron correctamente."
+                }
+            },
+            "Service": {
+                "title": "Control del servicio",
+                "restart_service": {
+                    "submit_button": "Reiniciar",
+                    "confirm_title": "Confirmar reinicio",
+                    "confirm_message": "¿Seguro que quieres reiniciar el servicio?",
+                    "confirm_button": "Reiniciar",
+                    "cancel_button": "Cancelar",
+                    "restarting": "Reiniciando el servicio...",
+                    "success": "El servicio se reinició correctamente.",
+                    "error": "No se pudo reiniciar el servicio: {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "Iniciar",
+                    "confirm_title": "Confirmar inicio",
+                    "confirm_message": "¿Seguro que quieres iniciar el servicio?",
+                    "confirm_button": "Iniciar",
+                    "cancel_button": "Cancelar",
+                    "starting": "Iniciando el servicio...",
+                    "success": "El servicio se inició correctamente.",
+                    "error": "No se pudo iniciar el servicio: {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "Detener",
+                    "confirm_title": "Confirmar detención",
+                    "confirm_message": "¿Seguro que quieres detener el servicio?",
+                    "confirm_button": "Detener",
+                    "cancel_button": "Cancelar",
+                    "stopping": "Deteniendo el servicio...",
+                    "success": "El servicio se detuvo correctamente.",
+                    "error": "No se pudo detener el servicio: {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "Restablecer",
+                    "confirm_title": "Confirmar restablecimiento",
+                    "confirm_message": "¿Seguro que quieres restablecer el servicio?",
+                    "confirm_button": "Restablecer",
+                    "cancel_button": "Cancelar",
+                    "resetting": "Restableciendo el servicio...",
+                    "success": "El servicio se restableció correctamente.",
+                    "error": "No se pudo restablecer el servicio: {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "Editar",
+                    "updating": "Aplicando los cambios...",
+                    "success": "Los cambios se aplicaron correctamente.",
+                    "error": "No se pudo actualizar la configuración del servicio: {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "Editando servicio: {{name}}"
+                },
+                "service_status": {
+                    "yes": "Sí",
+                    "no": "No",
+                    "is_running": "En ejecución",
+                    "restarts": "Reinicios",
+                    "stopped_at": "Detenido a las",
+                    "started_at": "Iniciado a las",
+                    "updated_at": "Actualizado a las"
+                }
+            },
+            "Station": {
+                "title": "Configuración de la estación",
+                "update_station": {
+                    "field_required": "Este campo es obligatorio.",
+                    "updating": "Actualizando la configuración de la estación...",
+                    "success": "La configuración de la estación se actualizó correctamente.",
+                    "error": "No se pudo actualizar la configuración de la estación: {{error}}"
+                }
+            },
+            "Users": {
+                "title": "Administración de usuarios",
+                "search_users": {
+                    "placeholder": "Buscar usuarios"
+                },
+                "refresh_list": {
+                    "submit_button": "Actualizar",
+                    "refreshing": "Actualizando la lista de usuarios...",
+                    "success": "La lista de usuarios se actualizó correctamente.",
+                    "error": "No se pudo actualizar la lista de usuarios: {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "Eliminar usuarios",
+                    "confirm_title": "Confirmar eliminación",
+                    "confirm_message": "¿Seguro que quieres eliminar los usuarios seleccionados?",
+                    "confirm_button": "Eliminar",
+                    "cancel_button": "Cancelar",
+                    "removing": "Eliminando los usuarios seleccionados...",
+                    "success": "Se eliminó {{num}} usuario.",
+                    "error": "No se pudieron eliminar los usuarios seleccionados: {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "Crear usuario",
+                    "creating": "Creando nuevo usuario...",
+                    "success": "Se creó el usuario {{username}}.",
+                    "error": "No se pudo crear el usuario: {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "Crear nuevo usuario",
+                    "username": {
+                        "label": "Nombre de usuario",
+                        "placeholder": "Nombre de usuario del nuevo usuario"
+                    },
+                    "password": {
+                        "label": "Contraseña",
+                        "placeholder": "Contraseña del nuevo usuario"
+                    },
+                    "admin": {
+                        "label": "Usuario con privilegios de administrador"
+                    },
+                    "create_button": "Crear"
+                },
+                "edit_user": {
+                    "submit_button": "Editar",
+                    "updating": "Actualizando usuario...",
+                    "success": "Se actualizó el usuario {{username}}.",
+                    "error": "No se pudo actualizar el usuario: {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "Editar usuario",
+                    "username": {
+                        "label": "Nombre de usuario",
+                        "placeholder": "Déjalo vacío para no realizar cambios."
+                    },
+                    "password": {
+                        "label": "Contraseña",
+                        "placeholder": "Déjalo vacío para no realizar cambios."
+                    },
+                    "admin": {
+                        "label": "Usuario con privilegios de administrador"
+                    },
+                    "update_button": "Actualizar"
+                },
+                "remove_user": {
+                    "submit_button": "Eliminar",
+                    "confirm_title": "Confirmar eliminación",
+                    "confirm_message": "¿Seguro que quieres eliminar al usuario {{username}}?",
+                    "confirm_button": "Eliminar",
+                    "cancel_button": "Cancelar",
+                    "removing": "Eliminando usuario...",
+                    "success": "Se eliminó el usuario {{username}}.",
+                    "error": "No se pudo eliminar al usuario: {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "Sí",
+                    "no": "No",
+                    "never": "Nunca",
+                    "id": "ID",
+                    "user_id": "ID de usuario",
+                    "username": "Nombre de usuario",
+                    "admin": "Administrador",
+                    "created_at": "Creado el",
+                    "last_login": "Último inicio de sesión",
+                    "user_ip": "IP del usuario",
+                    "user_agent": "Agente de usuario",
+                    "updated_at": "Actualizado a las",
+                    "actions": "Acciones"
+                }
+            },
+            "Backup": {
+                "title": "Administración de copias de seguridad",
+                "select_mode": {
+                    "backup": "Crear copia de seguridad",
+                    "restore": "Restaurar copia de seguridad"
+                },
+                "backup_config": {
+                    "title": "Crear una copia de seguridad",
+                    "description": "Esto exportará los datos de configuración como un archivo JSON. Puedes guardar este archivo y utilizarlo posteriormente para restaurar la configuración, por ejemplo, al migrar a un sistema nuevo.",
+                    "submit_button": "Generar copia de seguridad",
+                    "generating": "Generando los datos de la copia de seguridad...",
+                    "success": "Los datos de la copia de seguridad se generaron correctamente.",
+                    "error": "No se pudieron generar los datos de la copia de seguridad: {{error}}"
+                },
+                "restore_config": {
+                    "title": "Selecciona un archivo de copia de seguridad",
+                    "description": "Selecciona un archivo JSON de copia de seguridad para restaurar la configuración. AnyShake Observer sobrescribirá la configuración actual con los datos del archivo seleccionado.",
+                    "submit_button": "Restaurar configuración",
+                    "no_file_selected": "No se seleccionó ningún archivo.",
+                    "confirm_title": "Confirmar restauración",
+                    "confirm_message": "¿Seguro que quieres restaurar la configuración? Esta acción sobrescribirá la configuración actual.",
+                    "confirm_button": "Restaurar",
+                    "cancel_button": "Cancelar",
+                    "restoring": "Restaurando la configuración...",
+                    "success": "La configuración se restauró correctamente.",
+                    "error": "No se pudo restaurar la configuración: {{error}}"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "Hay una nueva actualización disponible. ¿Quieres actualizar ahora?",
+            "confirm_title": "Actualización disponible",
+            "confirm_button": "Actualizar",
+            "cancel_button": "Cancelar"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "¿Seguro que quieres cerrar sesión?",
+            "confirm_title": "Cerrar sesión",
+            "confirm_button": "Aceptar",
+            "cancel_button": "Cancelar"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "Nombre de usuario",
+            "placeholder": "Tu nombre de usuario"
+        },
+        "password": {
+            "label": "Contraseña",
+            "placeholder": "Tu contraseña"
+        },
+        "captcha": {
+            "label": "Introduce el CAPTCHA",
+            "loading": "Cargando CAPTCHA...",
+            "error": "No se pudo cargar el CAPTCHA",
+            "placeholder": "Código CAPTCHA",
+            "refreshing": "Actualizando el CAPTCHA.",
+            "refresh_success": "El CAPTCHA se actualizó correctamente.",
+            "refresh_error": "No se pudo actualizar el CAPTCHA."
+        },
+        "signin": {
+            "button": "Iniciar sesión",
+            "loading": "Iniciando sesión...",
+            "success": "Has iniciado sesión correctamente.",
+            "error": "No se pudo iniciar sesión."
+        }
+    }
+}
