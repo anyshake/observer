@@ -3,6 +3,7 @@ import { ResourceLanguage } from 'i18next';
 import { createI18n } from '../helpers/locale/createI18n';
 import deDE from '../locales/de-DE.json';
 import enUS from '../locales/en-US.json';
+import esMX from '../locales/es-MX.json';
 import frFR from '../locales/fr-FR.json';
 import idID from '../locales/id-ID.json';
 import jaJP from '../locales/ja-JP.json';
@@ -24,6 +25,7 @@ export const localeConfig: ILocaleConfig = {
     resources: {
         'de-DE': { label: 'Deutsch', translation: deDE },
         'en-US': { label: 'English', translation: enUS },
+        'es-MX': { label: 'Español (México)', translation: esMX },
         'fr-FR': { label: 'Français', translation: frFR },
         'id-ID': { label: 'Bahasa Indonesia', translation: idID },
         'ja-JP': { label: '日本語', translation: jaJP },
