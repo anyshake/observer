@@ -255,7 +255,7 @@
                     "submit_button": "Eliminar permanentemente registros",
                     "confirm_title": "Confirmar eliminación permanente",
                     "confirm_message": "¿Seguro que quieres eliminar permanentemente todos los registros de formas de onda?",
-                    "confirm_button": "Purge",
+                    "confirm_button": "Eliminar",
                     "cancel_button": "Cancelar",
                     "purging": "Eliminando permanentemente los registros de formas de onda...",
                     "success": "Los registros de formas de onda se eliminaron permanentemente correctamente.",
