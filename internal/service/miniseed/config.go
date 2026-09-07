@@ -67,7 +67,7 @@ func (s *miniSeedConfigUseCompressImpl) GetVersion() int             { return 0 
 func (s *miniSeedConfigUseCompressImpl) GetOptions() map[string]any  { return nil }
 func (s *miniSeedConfigUseCompressImpl) GetDefaultValue() any        { return false }
 func (s *miniSeedConfigUseCompressImpl) GetDescription() string {
-	return "Whether to compress MiniSEED files. If true, files will use STEIM-2 compression, encoding the count data as 30-bit instead of 32-bit. This may cause data overflow and checksum errors if a 32-bit ADC reaches full scale."
+	return "Whether to compress MiniSEED files."
 }
 func (s *miniSeedConfigUseCompressImpl) Init(handler *action.Handler) error {
 	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
@@ -99,6 +99,65 @@ func (s *miniSeedConfigUseCompressImpl) Get(handler *action.Handler) (any, error
 func (s *miniSeedConfigUseCompressImpl) Restore(handler *action.Handler) error {
 	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset MiniSEED compression flag: %w", err)
+	}
+	return nil
+}
+
+type miniSeedConfigCompressSchemeImpl struct{}
+
+func (s *miniSeedConfigCompressSchemeImpl) GetName() string      { return "Compression Scheme" }
+func (s *miniSeedConfigCompressSchemeImpl) GetNamespace() string { return ID }
+func (s *miniSeedConfigCompressSchemeImpl) GetKey() string       { return "compress_scheme" }
+func (s *miniSeedConfigCompressSchemeImpl) GetType() action.SettingType {
+	return action.String
+}
+func (s *miniSeedConfigCompressSchemeImpl) IsRequired() bool { return true }
+func (s *miniSeedConfigCompressSchemeImpl) GetVersion() int  { return 0 }
+func (s *miniSeedConfigCompressSchemeImpl) GetOptions() map[string]any {
+	return map[string]any{
+		"STEIM-1": COMPRESS_SCHEME_STEIM_1,
+		"STEIM-2": COMPRESS_SCHEME_STEIM_2,
+	}
+}
+func (s *miniSeedConfigCompressSchemeImpl) GetDefaultValue() any {
+	return COMPRESS_SCHEME_STEIM_1
+}
+func (s *miniSeedConfigCompressSchemeImpl) GetDescription() string {
+	return "Compression scheme used when compression is enabled. STEIM-2 encodes count data as 30-bit instead of 32-bit, which may cause data overflow and checksum errors if a 32-bit ADC reaches full scale."
+}
+func (s *miniSeedConfigCompressSchemeImpl) Init(handler *action.Handler) error {
+	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+		return fmt.Errorf("failed to set default MiniSEED compression scheme: %w", err)
+	}
+	return nil
+}
+func (s *miniSeedConfigCompressSchemeImpl) Set(handler *action.Handler, newVal any) error {
+	compressScheme, err := config.GetConfigValString(newVal)
+	if err != nil {
+		return err
+	}
+	if compressScheme != COMPRESS_SCHEME_STEIM_1 && compressScheme != COMPRESS_SCHEME_STEIM_2 {
+		return errors.New("compression scheme must be one of STEIM-1 or STEIM-2")
+	}
+	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), compressScheme); err != nil {
+		return fmt.Errorf("failed to set MiniSEED compression scheme: %w", err)
+	}
+	return nil
+}
+func (s *miniSeedConfigCompressSchemeImpl) Get(handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+	if err != nil {
+		return nil, fmt.Errorf("failed to get MiniSEED compression scheme: %w", err)
+	}
+	compressScheme, ok := val.(string)
+	if !ok {
+		return nil, errors.New("string expected")
+	}
+	return compressScheme, nil
+}
+func (s *miniSeedConfigCompressSchemeImpl) Restore(handler *action.Handler) error {
+	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+		return fmt.Errorf("failed to reset MiniSEED compression scheme: %w", err)
 	}
 	return nil
 }
@@ -208,6 +267,7 @@ func (s *MiniSeedServiceImpl) GetConfigConstraint() []config.IConstraint {
 	return []config.IConstraint{
 		&miniSeedConfigEnabledImpl{},
 		&miniSeedConfigUseCompressImpl{},
+		&miniSeedConfigCompressSchemeImpl{},
 		&miniSeedConfigLifeCycleImpl{},
 		&miniSeedConfigFilePathImpl{},
 	}

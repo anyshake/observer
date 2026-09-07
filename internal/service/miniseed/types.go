@@ -18,6 +18,11 @@ const (
 	MINISEED_CLEANUP_INTERVAL = 3600
 )
 
+const (
+	COMPRESS_SCHEME_STEIM_1 = "steim-1"
+	COMPRESS_SCHEME_STEIM_2 = "steim-2"
+)
+
 type buffer struct {
 	SampleRate int
 	Timestamp  int64
@@ -36,12 +41,13 @@ type MiniSeedServiceImpl struct {
 	timeSource    *timesource.Source
 	actionHandler *action.Handler
 
-	stationCode  string
-	networkCode  string
-	locationCode string
-	filePath     string
-	lifeCycle    int
-	useCompress  bool
+	stationCode    string
+	networkCode    string
+	locationCode   string
+	filePath       string
+	lifeCycle      int
+	useCompress    bool
+	compressScheme string
 
 	cleanupCountDown int
 	appendCountDown  int

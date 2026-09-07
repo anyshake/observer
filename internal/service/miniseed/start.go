@@ -237,12 +237,17 @@ func (s *MiniSeedServiceImpl) saveMiniSeedRecords(cfg *explorer.DeviceConfig) (i
 			channelBuffer = append(channelBuffer, s.recordBuffer[recordIdx][channelIdx].Data...)
 		}
 
-		encodeing := mseedio.INT32
+		encoding := mseedio.INT32
 		if s.useCompress {
-			encodeing = mseedio.STEIM2
+			switch s.compressScheme {
+			case COMPRESS_SCHEME_STEIM_2:
+				encoding = mseedio.STEIM2
+			default:
+				encoding = mseedio.STEIM1
+			}
 		}
 		var miniseed mseedio.MiniSeedData
-		if err := miniseed.Init(encodeing, mseedio.MSBFIRST); err != nil {
+		if err := miniseed.Init(encoding, mseedio.MSBFIRST); err != nil {
 			return 0, err
 		}
 

@@ -35,6 +35,14 @@ func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, hardware
 			locationCodeConfig: locationCodeConfig,
 			networkCodeConfig:  networkCodeConfig,
 		},
+		"mseed_steim1": &seismicDataEncoderMseedImpl{
+			encodeType:         mseedio.STEIM1,
+			name:               "MiniSEED (STEIM1)",
+			actionHandler:      actionHandler,
+			stationCodeConfig:  stationCodeConfig,
+			locationCodeConfig: locationCodeConfig,
+			networkCodeConfig:  networkCodeConfig,
+		},
 		"mseed_steim2": &seismicDataEncoderMseedImpl{
 			encodeType:         mseedio.STEIM2,
 			name:               "MiniSEED (STEIM2)",

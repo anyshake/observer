@@ -52,5 +52,11 @@ func (s *MiniSeedServiceImpl) Init() error {
 	}
 	s.useCompress = useCompress.(bool)
 
+	compressScheme, err := (&miniSeedConfigCompressSchemeImpl{}).Get(s.actionHandler)
+	if err != nil {
+		return err
+	}
+	s.compressScheme = compressScheme.(string)
+
 	return nil
 }
