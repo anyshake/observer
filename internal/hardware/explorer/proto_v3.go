@@ -42,9 +42,9 @@ type ExplorerProtoImplV3 struct {
 	clockDriftBuf *ringbuf.Buffer[clockDrift]
 
 	// 1 message per second, for archiving service, etc.
-	messageBus message.Bus[EventHandler]
+	messageBus *message.Bus[Event]
 	// 1 message per packet, for realtime purposes
-	messageBusRealtime message.Bus[EventHandler]
+	messageBusRealtime *message.Bus[Event]
 
 	prevMcuTimestamp    int64
 	isDataStreamStable  bool
@@ -258,8 +258,8 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 
 	g.fifoBuffer = fifo.New[*explorerProtocolPacketV3](512)
 	g.clockDriftBuf = ringbuf.New[clockDrift](100)
-	g.messageBus = message.NewBus[EventHandler](EXPLORER_STREAM_TOPIC, 1024)
-	g.messageBusRealtime = message.NewBus[EventHandler](EXPLORER_REALTIME_STREAM_TOPIC, 1024)
+	g.messageBus = message.NewBus[Event](EXPLORER_STREAM_TOPIC)
+	g.messageBusRealtime = message.NewBus[Event](EXPLORER_REALTIME_STREAM_TOPIC)
 	g.deviceStatus.SetUpdatedAt(time.Unix(0, 0))
 	g.deviceConfig.SetProtocol(g.ExplorerOptions.Protocol)
 	g.deviceConfig.SetModel(filepath.Base(g.ExplorerOptions.Model))
@@ -503,10 +503,10 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 				g.deviceConfig.SetChannelCodes(channelCodes)
 
 				sampleRate := g.deviceConfig.GetSampleRate()
-				g.messageBusRealtime.Publish(timeObj, &g.deviceConfig, &g.deviceVariable, lo.Map(
+				g.messageBusRealtime.Publish(NewEvent(timeObj, &g.deviceConfig, lo.Map(
 					channelData,
 					func(ch *ChannelData, _ int) ChannelData { return *ch },
-				))
+				)))
 
 				g.flagMutex.Lock()
 				collectedSamples := g.collectedSamples
@@ -515,7 +515,7 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 				if collectedSamples < sampleRate {
 					continue
 				} else if collectedSamples == sampleRate {
-					g.messageBus.Publish(g.packetTimeObj, &g.deviceConfig, &g.deviceVariable, g.channelDataBuf)
+					g.messageBus.Publish(NewEvent(g.packetTimeObj, &g.deviceConfig, g.channelDataBuf))
 					g.deviceStatus.IncrementMessages()
 				} else {
 					g.Logger.Warnln("collected samples exceeded the sample rate, resetting counters")
@@ -579,12 +579,22 @@ func (g *ExplorerProtoImplV3) Close() error {
 	if g.Transport == nil {
 		return errors.New("transport is not opened")
 	}
+	if g.messageBus != nil {
+		g.messageBus.Close()
+	}
+	if g.messageBusRealtime != nil {
+		g.messageBusRealtime.Close()
+	}
 
 	return g.Transport.Close()
 }
 
 func (g *ExplorerProtoImplV3) Subscribe(clientId string, handler EventHandler) error {
-	return g.messageBus.Subscribe(clientId, handler)
+	return g.messageBus.Subscribe(clientId, normalStreamSubscriptionOptions(func(err error) {
+		if !errors.Is(err, message.ErrBusClosed) {
+			g.Logger.Errorf("normal stream subscriber %s failed: %v", clientId, err)
+		}
+	}), handler)
 }
 
 func (g *ExplorerProtoImplV3) Unsubscribe(clientId string) error {
@@ -592,7 +602,11 @@ func (g *ExplorerProtoImplV3) Unsubscribe(clientId string) error {
 }
 
 func (g *ExplorerProtoImplV3) SubscribeRealtime(clientId string, handler EventHandler) error {
-	return g.messageBusRealtime.Subscribe(clientId, handler)
+	return g.messageBusRealtime.Subscribe(clientId, realtimeStreamSubscriptionOptions(func(err error) {
+		if !errors.Is(err, message.ErrBusClosed) {
+			g.Logger.Errorf("realtime stream subscriber %s failed: %v", clientId, err)
+		}
+	}), handler)
 }
 
 func (g *ExplorerProtoImplV3) UnsubscribeRealtime(clientId string) error {

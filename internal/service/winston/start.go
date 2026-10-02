@@ -70,11 +70,11 @@ func (s *WinstonServiceImpl) Start() error {
 	)
 	server.DisableHelicorder = true
 
-	err := s.hardwareDev.Subscribe(ID, func(t time.Time, dc *explorer.DeviceConfig, _ *explorer.DeviceVariable, data []explorer.ChannelData) {
+	err := s.hardwareDev.Subscribe(ID, func(event explorer.Event) {
 		s.ringBuffer.Push(winstonRingBuffer{
-			timestamp:   t,
-			sampleRate:  dc.GetSampleRate(),
-			channelData: cloneChannelData(data),
+			timestamp:   event.Timestamp,
+			sampleRate:  event.SampleRate,
+			channelData: cloneChannelData(event.ChannelData),
 		})
 	})
 	if err != nil {

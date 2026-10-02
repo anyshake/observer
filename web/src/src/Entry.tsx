@@ -19,8 +19,14 @@ import { localeConfig } from './config/locale';
 import { menuConfig } from './config/menu';
 import { routerConfig } from './config/router';
 import { useGetSoftwareVersionQuery, useIsGenuineProductLazyQuery } from './graphql';
+import {
+    sendServiceNotification,
+    ServiceNotificationLevel
+} from './helpers/alert/sendServiceNotification';
 import { sendUserConfirm } from './helpers/alert/sendUserConfirm';
 import { getCtaMessageDataUrl } from './helpers/app/getCtaMessageDataUrl';
+import { getRestfulApiUrl } from './helpers/app/getRestfulApiUrl';
+import { IEventStreamMessage, useEventStream } from './helpers/request/useEventStream';
 import { useCredentialStore } from './stores/credential';
 import { useCtaMessageStore } from './stores/ctaMessage';
 
@@ -29,6 +35,29 @@ interface IEntry {
     readonly locales: Record<string, string>;
     readonly onSwitchLocale: (newLocale: string) => void;
 }
+
+interface IServiceNotification {
+    readonly id: string;
+    readonly service_id: string;
+    readonly message: string;
+    readonly level: ServiceNotificationLevel;
+    readonly occurred_at: number;
+}
+
+const isServiceNotification = (value: unknown): value is IServiceNotification => {
+    if (!value || typeof value !== 'object') {
+        return false;
+    }
+
+    const notification = value as Partial<IServiceNotification>;
+    return (
+        typeof notification.id === 'string' &&
+        typeof notification.service_id === 'string' &&
+        typeof notification.message === 'string' &&
+        typeof notification.occurred_at === 'number' &&
+        ['info', 'success', 'warning', 'error'].includes(notification.level ?? '')
+    );
+};
 
 export const Entry = ({ currentLocale, locales, onSwitchLocale }: IEntry) => {
     const { t } = useTranslation();
@@ -58,7 +87,34 @@ export const Entry = ({ currentLocale, locales, onSwitchLocale }: IEntry) => {
         setCurrentTitle(t(routerConfig.routes.default.title));
     }, [pathname, currentLocale, t]);
 
-    const { clearCredential } = useCredentialStore();
+    const { clearCredential, credential } = useCredentialStore();
+    const handleServiceNotification = useCallback((message: IEventStreamMessage) => {
+        if (message.event !== 'service-notification') {
+            return;
+        }
+
+        try {
+            const notification: unknown = JSON.parse(message.data);
+            if (!isServiceNotification(notification)) {
+                return;
+            }
+
+            sendServiceNotification(
+                notification.level,
+                notification.service_id,
+                notification.message
+            );
+        } catch {
+            return;
+        }
+    }, []);
+    useEventStream({
+        url: getRestfulApiUrl('/notifications'),
+        token: credential.token,
+        onEvent: handleServiceNotification,
+        onUnauthorized: clearCredential
+    });
+
     const handleLogoutSubmit = () => {
         sendUserConfirm(t('Entry.signout.confirm_message'), {
             title: t('Entry.signout.confirm_title'),

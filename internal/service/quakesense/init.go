@@ -24,6 +24,12 @@ func (s *QuakeSenseServiceImpl) Init() error {
 		}
 	}
 
+	webNotificationEnabled, err := (&quakeSenseConfigWebNotificationEnabledImpl{}).Get(s.actionHandler)
+	if err != nil {
+		return fmt.Errorf("failed to get QuakeSense web notification availability: %w", err)
+	}
+	s.webNotificationEnabled = webNotificationEnabled.(bool)
+
 	mqttBroker, err := (&quakeSenseConfigMqttBrokerImpl{}).Get(s.actionHandler)
 	if err != nil {
 		return fmt.Errorf("failed to get quakeSense MQTT broker: %w", err)

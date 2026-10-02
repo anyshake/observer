@@ -20,6 +20,7 @@ import (
 	"github.com/anyshake/observer/internal/hardware"
 	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/internal/hook"
+	"github.com/anyshake/observer/internal/notification"
 	"github.com/anyshake/observer/internal/server"
 	"github.com/anyshake/observer/internal/service"
 	"github.com/anyshake/observer/internal/upgrade"
@@ -198,6 +199,7 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		restartOnce sync.Once
 		restartChan = make(chan struct{}, 1)
 	)
+	notificationHub := notification.NewHub(32)
 
 	serviceMap := map[string]service.IService{
 		service_archiver.ID:   service_archiver.New(hardwareDevice, actionHandler, timeSrc),
@@ -207,7 +209,7 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		service_metrics.ID:    service_metrics.New(hardwareDevice, actionHandler, timeSrc, ver, build),
 		service_miniseed.ID:   service_miniseed.New(hardwareDevice, actionHandler, timeSrc),
 		service_ntp_server.ID: service_ntp_server.New(actionHandler, timeSrc),
-		service_quakesense.ID: service_quakesense.New(hardwareDevice, actionHandler, timeSrc),
+		service_quakesense.ID: service_quakesense.New(hardwareDevice, actionHandler, timeSrc, notificationHub),
 		service_seedlink.ID:   service_seedlink.New(hardwareDevice, actionHandler, timeSrc),
 		service_watchcat.ID:   service_watchcat.New(hardwareDevice, timeSrc),
 		service_winston.ID:    service_winston.New(hardwareDevice, actionHandler, timeSrc),
@@ -254,7 +256,7 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		StationConfigConstraints: stationConfigConstraints,
 	}
 	graphqlResolver.DataPurgeJob = graph_resolver.LoadOrCreatePurgeDataJob(graphqlResolver)
-	httpServer := server.New(conf.Server.Debug, conf.Server.CORS, graphqlResolver, logger.GetLogger("http_server"))
+	httpServer := server.New(conf.Server.Debug, conf.Server.CORS, graphqlResolver, notificationHub, logger.GetLogger("http_server"))
 	if err = httpServer.Setup(conf.Server.Listen); err != nil {
 		logger.GetLogger(main).Errorln(err)
 		runCleanerTasks()

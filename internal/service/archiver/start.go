@@ -68,12 +68,12 @@ func (s *ArchiverServiceImpl) Start() error {
 			}
 		}()
 
-		err := s.hardwareDev.Subscribe(ID, func(t time.Time, di *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
+		err := s.hardwareDev.Subscribe(ID, func(event explorer.Event) {
 			s.mu.Lock()
 			defer s.mu.Unlock()
 
 			record := model.SeisRecord{}
-			if err := record.Encode(t, di.GetSampleRate(), cd); err != nil {
+			if err := record.Encode(event.Timestamp, event.SampleRate, event.ChannelData); err != nil {
 				logger.GetLogger(ID).Errorf("failed to encode seismic waveform record: %v", err)
 				return
 			}
@@ -94,7 +94,7 @@ func (s *ArchiverServiceImpl) Start() error {
 			}
 			if s.cleanupCountDown == 0 {
 				s.cleanupCountDown = RECORDS_CLEANUP_INTERVAL
-				endTime := t.Add(time.Duration(-s.rotation) * time.Hour * 24)
+				endTime := event.Timestamp.Add(time.Duration(-s.rotation) * time.Hour * 24)
 				s.startExpiredSeisRecordsPurge(endTime)
 			}
 		})

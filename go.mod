@@ -47,7 +47,6 @@ require (
 	github.com/sbabiv/xml2map v1.2.1
 	github.com/shirou/gopsutil/v4 v4.25.1
 	github.com/spf13/viper v1.19.0
-	github.com/vardius/message-bus v1.1.5
 	github.com/vektah/gqlparser/v2 v2.5.30
 	go.bug.st/serial v1.6.2
 	go.opentelemetry.io/otel v1.35.0

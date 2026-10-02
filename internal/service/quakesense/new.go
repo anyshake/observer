@@ -6,10 +6,11 @@ import (
 
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/hardware"
+	"github.com/anyshake/observer/internal/notification"
 	"github.com/anyshake/observer/pkg/timesource"
 )
 
-func New(hardwareDev hardware.IHardware, actionHandler *action.Handler, timeSource *timesource.Source) *QuakeSenseServiceImpl {
+func New(hardwareDev hardware.IHardware, actionHandler *action.Handler, timeSource *timesource.Source, notifications notification.Publisher) *QuakeSenseServiceImpl {
 	ctx, cancelFn := context.WithCancel(context.Background())
 	obj := &QuakeSenseServiceImpl{
 		hardwareDev:   hardwareDev,
@@ -17,6 +18,7 @@ func New(hardwareDev hardware.IHardware, actionHandler *action.Handler, timeSour
 		cancelFn:      cancelFn,
 		actionHandler: actionHandler,
 		timeSource:    timeSource,
+		notifications: notifications,
 	}
 	obj.status.SetStartedAt(time.Unix(0, 0))
 	obj.status.SetStoppedAt(time.Unix(0, 0))

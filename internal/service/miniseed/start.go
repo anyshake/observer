@@ -21,15 +21,11 @@ func (s *MiniSeedServiceImpl) handleInterrupt() {
 	s.wg.Done()
 }
 
-func (s *MiniSeedServiceImpl) getAppendInterval(cfg *explorer.DeviceConfig) int {
-	if cfg == nil {
-		cfgVal := s.hardwareDev.GetConfig()
-		cfg = &cfgVal
-	}
+func (s *MiniSeedServiceImpl) getAppendInterval(gnssAvailable bool) int {
 	// Set write interval to 1 if GNSS time is not available
 	// This is a simple solution to sample rate and timestamp jittering
 	// However, it will increase the disk I/O and file size
-	if !cfg.GetGnssAvailability() {
+	if !gnssAvailable {
 		return 1
 	}
 	return MINISEED_APPEND_INTERVAL
@@ -48,7 +44,8 @@ func (s *MiniSeedServiceImpl) Start() error {
 	s.dataSequence.sequenceData = make(map[string]uint32)
 	s.cleanupCountDown = MINISEED_CLEANUP_INTERVAL
 
-	s.appendCountDown = s.getAppendInterval(nil)
+	hardwareConfig := s.hardwareDev.GetConfig()
+	s.appendCountDown = s.getAppendInterval(hardwareConfig.GetGnssAvailability())
 	s.recordBuffer = make([][]buffer, s.appendCountDown)
 
 	go func() {
@@ -62,11 +59,11 @@ func (s *MiniSeedServiceImpl) Start() error {
 			}
 		}()
 
-		err := s.hardwareDev.Subscribe(ID, func(t time.Time, di *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
+		err := s.hardwareDev.Subscribe(ID, func(event explorer.Event) {
 			s.mu.Lock()
 			defer s.mu.Unlock()
 
-			currentInterval := s.getAppendInterval(di)
+			currentInterval := s.getAppendInterval(event.GNSSAvailable)
 			if len(s.recordBuffer) != currentInterval {
 				s.recordBuffer = make([][]buffer, currentInterval)
 				s.appendCountDown = currentInterval
@@ -74,12 +71,12 @@ func (s *MiniSeedServiceImpl) Start() error {
 
 			bufferIndex := len(s.recordBuffer) - s.appendCountDown
 			if bufferIndex >= 0 && bufferIndex < len(s.recordBuffer) {
-				s.recordBuffer[bufferIndex] = make([]buffer, len(cd))
+				s.recordBuffer[bufferIndex] = make([]buffer, len(event.ChannelData))
 			}
-			lo.ForEach(cd, func(ch explorer.ChannelData, idx int) {
+			lo.ForEach(event.ChannelData, func(ch explorer.ChannelData, idx int) {
 				s.recordBuffer[bufferIndex][idx] = buffer{
-					Timestamp:   t.UnixMilli(),
-					SampleRate:  di.GetSampleRate(),
+					Timestamp:   event.Timestamp.UnixMilli(),
+					SampleRate:  event.SampleRate,
 					ChannelData: ch,
 				}
 			})
@@ -91,7 +88,7 @@ func (s *MiniSeedServiceImpl) Start() error {
 
 			if s.appendCountDown == 0 {
 				s.appendCountDown = currentInterval
-				channels, err := s.saveMiniSeedRecords(di)
+				channels, err := s.saveMiniSeedRecords(event.GNSSAvailable)
 				if err != nil {
 					logger.GetLogger(ID).Errorf("failed to append records to MiniSEED file: %v", err)
 					return
@@ -100,7 +97,7 @@ func (s *MiniSeedServiceImpl) Start() error {
 			}
 			if s.cleanupCountDown == 0 {
 				s.cleanupCountDown = MINISEED_CLEANUP_INTERVAL
-				endTime := t.Add(time.Duration(-s.lifeCycle) * time.Hour * 24)
+				endTime := event.Timestamp.Add(time.Duration(-s.lifeCycle) * time.Hour * 24)
 				if err := s.cleanupMiniSeedRecords(endTime); err != nil {
 					logger.GetLogger(ID).Errorf("failed to purge expired MiniSEED files: %v", err)
 					return
@@ -184,7 +181,7 @@ func (m *MiniSeedServiceImpl) getMiniSeedFileName(tm time.Time, channelCode stri
 	)
 }
 
-func (s *MiniSeedServiceImpl) saveMiniSeedRecords(cfg *explorer.DeviceConfig) (int, error) {
+func (s *MiniSeedServiceImpl) saveMiniSeedRecords(gnssAvailable bool) (int, error) {
 	if len(s.recordBuffer) == 0 || len(s.recordBuffer[0]) == 0 {
 		return 0, errors.New("no data to save")
 	}
@@ -194,11 +191,7 @@ func (s *MiniSeedServiceImpl) saveMiniSeedRecords(cfg *explorer.DeviceConfig) (i
 		logger.GetLogger(ID).Warnf("failed to read data sequence, starting from 0: %v", err)
 	}
 
-	if cfg == nil {
-		cfgVal := s.hardwareDev.GetConfig()
-		cfg = &cfgVal
-	}
-	allowedJitterMs := lo.Ternary[float64](cfg.GetGnssAvailability(), explorer.ALLOWED_JITTER_MS_GNSS, explorer.ALLOWED_JITTER_MS_NTP)
+	allowedJitterMs := lo.Ternary[float64](gnssAvailable, explorer.ALLOWED_JITTER_MS_GNSS, explorer.ALLOWED_JITTER_MS_NTP)
 
 	startTimestamp := s.recordBuffer[0][0].Timestamp
 	startSampleRate := s.recordBuffer[0][0].SampleRate

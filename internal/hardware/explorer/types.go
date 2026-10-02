@@ -3,6 +3,8 @@ package explorer
 import (
 	"sync"
 	"time"
+
+	"github.com/anyshake/observer/pkg/message"
 )
 
 const (
@@ -77,4 +79,43 @@ type ChannelData struct {
 	Data        []int32
 }
 
-type EventHandler = func(time.Time, *DeviceConfig, *DeviceVariable, []ChannelData)
+type Event struct {
+	Timestamp     time.Time
+	SampleRate    int
+	GNSSAvailable bool
+	ChannelData   []ChannelData
+}
+
+type EventHandler = func(Event)
+
+func NewEvent(timestamp time.Time, deviceConfig *DeviceConfig, channelData []ChannelData) Event {
+	clonedChannelData := make([]ChannelData, len(channelData))
+	for i := range channelData {
+		clonedChannelData[i] = channelData[i]
+		clonedChannelData[i].Data = append([]int32(nil), channelData[i].Data...)
+	}
+
+	return Event{
+		Timestamp:     timestamp,
+		SampleRate:    deviceConfig.GetSampleRate(),
+		GNSSAvailable: deviceConfig.GetGnssAvailability(),
+		ChannelData:   clonedChannelData,
+	}
+}
+
+func normalStreamSubscriptionOptions(onError func(error)) message.SubscriptionOptions {
+	return message.SubscriptionOptions{
+		BufferSize:     32,
+		Overflow:       message.OverflowBlock,
+		EnqueueTimeout: 250 * time.Millisecond,
+		OnError:        onError,
+	}
+}
+
+func realtimeStreamSubscriptionOptions(onError func(error)) message.SubscriptionOptions {
+	return message.SubscriptionOptions{
+		BufferSize: 8,
+		Overflow:   message.OverflowDropOldest,
+		OnError:    onError,
+	}
+}

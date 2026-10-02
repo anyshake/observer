@@ -59,6 +59,61 @@ func (s *quakeSenseConfigEnabledImpl) Restore(handler *action.Handler) error {
 	return nil
 }
 
+type quakeSenseConfigWebNotificationEnabledImpl struct{}
+
+func (s *quakeSenseConfigWebNotificationEnabledImpl) GetName() string {
+	return "Enable Web Notifications"
+}
+func (s *quakeSenseConfigWebNotificationEnabledImpl) GetNamespace() string { return ID }
+func (s *quakeSenseConfigWebNotificationEnabledImpl) GetKey() string {
+	return "web_notification_enabled"
+}
+func (s *quakeSenseConfigWebNotificationEnabledImpl) GetType() action.SettingType {
+	return action.Bool
+}
+func (s *quakeSenseConfigWebNotificationEnabledImpl) IsRequired() bool { return true }
+func (s *quakeSenseConfigWebNotificationEnabledImpl) GetVersion() int  { return 0 }
+func (s *quakeSenseConfigWebNotificationEnabledImpl) GetOptions() map[string]any {
+	return nil
+}
+func (s *quakeSenseConfigWebNotificationEnabledImpl) GetDefaultValue() any { return true }
+func (s *quakeSenseConfigWebNotificationEnabledImpl) GetDescription() string {
+	return "Send earthquake detection notifications to connected web dashboards."
+}
+func (s *quakeSenseConfigWebNotificationEnabledImpl) Init(handler *action.Handler) error {
+	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+		return fmt.Errorf("failed to set default QuakeSense web notification availability: %w", err)
+	}
+	return nil
+}
+func (s *quakeSenseConfigWebNotificationEnabledImpl) Set(handler *action.Handler, newVal any) error {
+	enabled, err := config.GetConfigValBool(newVal)
+	if err != nil {
+		return err
+	}
+	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
+		return fmt.Errorf("failed to set QuakeSense web notification availability: %w", err)
+	}
+	return nil
+}
+func (s *quakeSenseConfigWebNotificationEnabledImpl) Get(handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+	if err != nil {
+		return nil, fmt.Errorf("failed to get QuakeSense web notification availability: %w", err)
+	}
+	enabled, ok := val.(bool)
+	if !ok {
+		return nil, errors.New("boolean expected")
+	}
+	return enabled, nil
+}
+func (s *quakeSenseConfigWebNotificationEnabledImpl) Restore(handler *action.Handler) error {
+	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+		return fmt.Errorf("failed to reset QuakeSense web notification availability: %w", err)
+	}
+	return nil
+}
+
 type quakeSenseConfigMqttBrokerImpl struct{}
 
 func (s *quakeSenseConfigMqttBrokerImpl) GetName() string             { return "MQTT Broker" }
@@ -836,6 +891,7 @@ func (s *quakeSenseConfigThrottleImpl) Restore(handler *action.Handler) error {
 func (s *QuakeSenseServiceImpl) GetConfigConstraint() []config.IConstraint {
 	return []config.IConstraint{
 		&quakeSenseConfigEnabledImpl{},
+		&quakeSenseConfigWebNotificationEnabledImpl{},
 		&quakeSenseConfigMqttBrokerImpl{},
 		&quakeSenseConfigMqttTopicImpl{},
 		&quakeSenseConfigMqttUsernameImpl{},

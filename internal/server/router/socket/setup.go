@@ -2,6 +2,7 @@ package socket
 
 import (
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/anyshake/observer/internal/hardware"
@@ -17,14 +18,16 @@ import (
 
 func Setup(routerGroup *gin.RouterGroup, timeSource *timesource.Source, hardware hardware.IHardware, jwtMiddleware gin.HandlerFunc) {
 	s := socket{
-		messageBus:     message.NewBus[explorer.EventHandler](LOG_PREFIX, 65535),
+		messageBus:     message.NewBus[explorer.Event](LOG_PREFIX),
 		historyBuffer:  make([]buffer, 0, HISTORY_BUFFER_SIZE),
 		tokenValidator: newTokenValidator(jwtMiddleware),
 	}
-	hardware.Subscribe(LOG_PREFIX, func(t time.Time, di *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
-		s.messageBus.Publish(t, di, dv, cd)
-		s.storeHistory(t, di, cd)
-	})
+	if err := hardware.Subscribe(LOG_PREFIX, func(event explorer.Event) {
+		s.messageBus.Publish(event)
+		s.storeHistory(event)
+	}); err != nil {
+		logger.GetLogger(LOG_PREFIX).Errorf("failed to subscribe to hardware message bus: %v", err)
+	}
 
 	routerGroup.GET("/socket", func(ctx *gin.Context) {
 		upgrader := websocket.Upgrader{
@@ -49,21 +52,27 @@ func Setup(routerGroup *gin.RouterGroup, timeSource *timesource.Source, hardware
 	})
 }
 
-func (s *socket) storeHistory(t time.Time, di *explorer.DeviceConfig, cd []explorer.ChannelData) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+func (s *socket) storeHistory(event explorer.Event) {
+	channelData := make([]explorer.ChannelData, len(event.ChannelData))
+	for i := range event.ChannelData {
+		channelData[i] = event.ChannelData[i]
+		channelData[i].Data = append([]int32(nil), event.ChannelData[i].Data...)
+	}
+
+	s.historyMu.Lock()
+	defer s.historyMu.Unlock()
 	if len(s.historyBuffer) >= HISTORY_BUFFER_SIZE {
 		s.historyBuffer = s.historyBuffer[1:]
 	}
 	s.historyBuffer = append(s.historyBuffer, buffer{
-		Timestamp:   t.UnixMilli(),
-		SampleRate:  di.GetSampleRate(),
-		ChannelData: cd,
+		Timestamp:   event.Timestamp.UnixMilli(),
+		SampleRate:  event.SampleRate,
+		ChannelData: channelData,
 	})
 }
 
-func (s *socket) sendHistory(conn *websocket.Conn, timeSource *timesource.Source) error {
-	s.mu.Lock()
+func (s *socket) sendHistory(conn *websocket.Conn, writeMu *sync.Mutex, timeSource *timesource.Source) error {
+	s.historyMu.RLock()
 	historyMessages := lo.Map(s.historyBuffer, func(history buffer, _ int) map[string]any {
 		return map[string]any{
 			"current_time": timeSource.Now().UnixMilli(),
@@ -79,12 +88,27 @@ func (s *socket) sendHistory(conn *websocket.Conn, timeSource *timesource.Source
 			}),
 		}
 	})
-	s.mu.Unlock()
+	s.historyMu.RUnlock()
 
 	for _, message := range historyMessages {
-		s.mu.Lock()
-		_ = conn.WriteJSON(message)
-		s.mu.Unlock()
+		if err := writeWebSocketJSON(conn, writeMu, message); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func writeWebSocketJSON(conn *websocket.Conn, writeMu *sync.Mutex, data any) error {
+	writeMu.Lock()
+	defer writeMu.Unlock()
+
+	if err := conn.SetWriteDeadline(time.Now().Add(5 * time.Second)); err != nil {
+		_ = conn.Close()
+		return err
+	}
+	if err := conn.WriteJSON(data); err != nil {
+		_ = conn.Close()
+		return err
 	}
 	return nil
 }
@@ -108,12 +132,13 @@ func (s *socket) handleWebSocket(_ *gin.Context, conn *websocket.Conn, timeSourc
 	subscribedAt := time.Now()
 	logger.GetLogger(LOG_PREFIX).Infof("%s - authenticated and subscribed to message bus", clientID)
 
-	callbackFn := func(t time.Time, di *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
+	var writeMu sync.Mutex
+	callbackFn := func(event explorer.Event) {
 		data := map[string]any{
 			"current_time": timeSource.Now().UnixMilli(),
-			"record_time":  t.UnixMilli(),
-			"sample_rate":  di.GetSampleRate(),
-			"channel_data": lo.SliceToMap(cd, func(v explorer.ChannelData) (string, any) {
+			"record_time":  event.Timestamp.UnixMilli(),
+			"sample_rate":  event.SampleRate,
+			"channel_data": lo.SliceToMap(event.ChannelData, func(v explorer.ChannelData) (string, any) {
 				return v.ChannelCode, map[string]any{
 					"channel_id":   v.ChannelId,
 					"channel_code": v.ChannelCode,
@@ -122,12 +147,19 @@ func (s *socket) handleWebSocket(_ *gin.Context, conn *websocket.Conn, timeSourc
 				}
 			}),
 		}
-		s.mu.Lock()
-		_ = conn.WriteJSON(data)
-		s.mu.Unlock()
+		if err := writeWebSocketJSON(conn, &writeMu, data); err != nil {
+			logger.GetLogger(LOG_PREFIX).Warnf("%s - failed to write websocket data: %v", clientID, err)
+		}
 	}
 
-	if err := s.messageBus.Subscribe(clientID, callbackFn); err != nil {
+	if err := s.messageBus.Subscribe(clientID, message.SubscriptionOptions{
+		BufferSize: 2,
+		Overflow:   message.OverflowDropOldest,
+		OnError: func(err error) {
+			logger.GetLogger(LOG_PREFIX).Warnf("%s - websocket subscription closed: %v", clientID, err)
+			_ = conn.Close()
+		},
+	}, callbackFn); err != nil {
 		logger.GetLogger(LOG_PREFIX).Errorf("failed to subscribe: %v", err)
 		return
 	}
@@ -139,7 +171,8 @@ func (s *socket) handleWebSocket(_ *gin.Context, conn *websocket.Conn, timeSourc
 			break
 		}
 		if string(dataBytes) == "client hello" {
-			if err := s.sendHistory(conn, timeSource); err != nil {
+			if err := s.sendHistory(conn, &writeMu, timeSource); err != nil {
+				logger.GetLogger(LOG_PREFIX).Warnf("%s - failed to write websocket history: %v", clientID, err)
 				break
 			}
 		}

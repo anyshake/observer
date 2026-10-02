@@ -3,6 +3,7 @@ package seedlink
 import (
 	"context"
 	"runtime/debug"
+	"sync"
 	"time"
 
 	"github.com/anyshake/observer/internal/dao/action"
@@ -15,9 +16,7 @@ import (
 	"github.com/bclswl0827/slgo/handlers"
 )
 
-func (s *SeedLinkServiceImpl) handleInterrupt() {
-	s.wg.Done()
-}
+const seedLinkWriteTimeout = 5 * time.Second
 
 func (s *SeedLinkServiceImpl) Start() error {
 	s.mu.Lock()
@@ -27,7 +26,8 @@ func (s *SeedLinkServiceImpl) Start() error {
 		s.ctx, s.cancelFn = context.WithCancel(context.Background())
 	}
 
-	seedlinkMessageBus := message.NewBus[explorer.EventHandler](ID, 65535)
+	seedlinkMessageBus := message.NewBus[explorer.Event](ID)
+	clients := newSeedLinkClientRegistry()
 	server := slgo.New(
 		&provider{
 			hardwareDev:   s.hardwareDev,
@@ -40,23 +40,27 @@ func (s *SeedLinkServiceImpl) Start() error {
 		},
 		&consumer{
 			messageBus: seedlinkMessageBus,
+			clients:    clients,
 		},
-		&hooks{},
+		&hooks{clients: clients},
 	)
 
 	go func() {
 		s.status.SetStartedAt(s.timeSource.Now())
 		s.status.SetIsRunning(true)
 		defer func() {
+			seedlinkMessageBus.Close()
+			_ = s.hardwareDev.Unsubscribe(ID)
+			s.status.SetStoppedAt(s.timeSource.Now())
+			s.status.SetIsRunning(false)
 			if r := recover(); r != nil {
-				logger.GetLogger(ID).Errorf("service unexpectly crashed, recovered from panic: %v\n%s", r, debug.Stack())
-				s.handleInterrupt()
-				_ = s.Stop()
+				logger.GetLogger(ID).Errorf("service unexpectedly crashed, recovered from panic: %v\n%s", r, debug.Stack())
 			}
+			s.wg.Done()
 		}()
 
-		err := s.hardwareDev.Subscribe(ID, func(t time.Time, di *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
-			seedlinkMessageBus.Publish(t, di, dv, cd)
+		err := s.hardwareDev.Subscribe(ID, func(event explorer.Event) {
+			seedlinkMessageBus.Publish(event)
 		})
 		if err != nil {
 			logger.GetLogger(ID).Errorf("failed to subscribe to hardware message bus: %v", err)
@@ -66,12 +70,7 @@ func (s *SeedLinkServiceImpl) Start() error {
 		logger.GetLogger(ID).Infof("service seedlink is listening on %s:%d", s.listenHost, s.listenPort)
 		if err := server.Start(s.ctx, s.listenHost, s.listenPort, s.useCompress); err != nil {
 			logger.GetLogger(ID).Errorf("failed to start seedlink server: %v", err)
-			s.status.SetStoppedAt(s.timeSource.Now())
-			s.status.SetIsRunning(false)
-			_ = s.hardwareDev.Unsubscribe(ID)
 		}
-
-		s.handleInterrupt()
 	}()
 
 	s.wg.Add(1)
@@ -170,7 +169,8 @@ func (p *provider) QueryHistory(startTime, endTime time.Time, channels []handler
 }
 
 type consumer struct {
-	messageBus message.Bus[explorer.EventHandler]
+	messageBus *message.Bus[explorer.Event]
+	clients    *seedLinkClientRegistry
 }
 
 func (c *consumer) Subscribe(clientId string, channels []handlers.SeedLinkChannel, eventHandler func(handlers.SeedLinkDataPacket)) error {
@@ -179,13 +179,20 @@ func (c *consumer) Subscribe(clientId string, channels []handlers.SeedLinkChanne
 		channelSet[ch.ChannelName] = struct{}{}
 	}
 
-	handler := func(tm time.Time, dc *explorer.DeviceConfig, dv *explorer.DeviceVariable, cd []explorer.ChannelData) {
-		sampleRate := dc.GetSampleRate()
-		for _, data := range cd {
+	handler := func(event explorer.Event) {
+		client, ok := c.clients.Get(clientId)
+		if !ok {
+			return
+		}
+		for _, data := range event.ChannelData {
 			if _, exists := channelSet[data.ChannelCode]; exists {
+				if err := client.SetWriteDeadline(time.Now().Add(seedLinkWriteTimeout)); err != nil {
+					_ = client.Close()
+					return
+				}
 				eventHandler(handlers.SeedLinkDataPacket{
-					Timestamp:  tm.UnixMilli(),
-					SampleRate: sampleRate,
+					Timestamp:  event.Timestamp.UnixMilli(),
+					SampleRate: event.SampleRate,
 					Channel:    data.ChannelCode,
 					DataArr:    data.Data,
 				})
@@ -193,21 +200,68 @@ func (c *consumer) Subscribe(clientId string, channels []handlers.SeedLinkChanne
 		}
 	}
 
-	return c.messageBus.Subscribe(clientId, handler)
+	return c.messageBus.Subscribe(clientId, message.SubscriptionOptions{
+		BufferSize: 16,
+		Overflow:   message.OverflowDisconnect,
+		OnError: func(err error) {
+			logger.GetLogger(ID).Warnf("%s - SeedLink subscription closed: %v", clientId, err)
+			if client, ok := c.clients.Get(clientId); ok {
+				_ = client.Close()
+			}
+		},
+	}, handler)
 }
 func (c *consumer) Unsubscribe(clientId string) error {
 	return c.messageBus.Unsubscribe(clientId)
 }
 
-type hooks struct{}
+type seedLinkClientRegistry struct {
+	mu      sync.RWMutex
+	clients map[string]*handlers.SeedLinkClient
+}
 
-func (h *hooks) OnData(client *handlers.SeedLinkClient, data []byte) {}
+func newSeedLinkClientRegistry() *seedLinkClientRegistry {
+	return &seedLinkClientRegistry{clients: make(map[string]*handlers.SeedLinkClient)}
+}
+
+func (r *seedLinkClientRegistry) Add(client *handlers.SeedLinkClient) {
+	r.mu.Lock()
+	r.clients[client.RemoteAddr().String()] = client
+	r.mu.Unlock()
+}
+
+func (r *seedLinkClientRegistry) Remove(client *handlers.SeedLinkClient) {
+	clientID := client.RemoteAddr().String()
+	r.mu.Lock()
+	if current, ok := r.clients[clientID]; ok && current == client {
+		delete(r.clients, clientID)
+	}
+	r.mu.Unlock()
+}
+
+func (r *seedLinkClientRegistry) Get(clientID string) (*handlers.SeedLinkClient, bool) {
+	r.mu.RLock()
+	client, ok := r.clients[clientID]
+	r.mu.RUnlock()
+	return client, ok
+}
+
+type hooks struct {
+	clients *seedLinkClientRegistry
+}
+
+func (h *hooks) OnData(client *handlers.SeedLinkClient, _ []byte) {
+	_ = client.SetWriteDeadline(time.Now().Add(seedLinkWriteTimeout))
+}
 func (h *hooks) OnConnection(client *handlers.SeedLinkClient) {
+	h.clients.Add(client)
 	logger.GetLogger(ID).Infof("%s - client connected to SeedLink service", client.RemoteAddr().String())
 }
 func (h *hooks) OnClose(client *handlers.SeedLinkClient) {
+	h.clients.Remove(client)
 	logger.GetLogger(ID).Infof("%s - client disconnected from SeedLink service", client.RemoteAddr().String())
 }
 func (h *hooks) OnCommand(client *handlers.SeedLinkClient, command []string) {
+	_ = client.SetWriteDeadline(time.Now().Add(seedLinkWriteTimeout))
 	logger.GetLogger(ID).Infof("%s - client sent command to SeedLink service: %s", client.RemoteAddr().String(), command)
 }

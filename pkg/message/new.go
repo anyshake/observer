@@ -1,13 +1,10 @@
 package message
 
-import (
-	"github.com/alphadose/haxmap"
-	messagebus "github.com/vardius/message-bus"
-)
-
-func NewBus[T any](topicName string, size int) Bus[T] {
-	return Bus[T]{
-		messageBus:  messagebus.New(size),
-		subscribers: haxmap.New[string, T](),
+func NewBus[T any](topicName string) *Bus[T] {
+	bus := &Bus[T]{
+		topicName:   topicName,
+		subscribers: make(map[string]*subscriber[T]),
 	}
+	bus.snapshot.Store(&subscriberSnapshot[T]{})
+	return bus
 }

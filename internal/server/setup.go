@@ -20,6 +20,7 @@ import (
 	"github.com/anyshake/observer/internal/server/router/export"
 	"github.com/anyshake/observer/internal/server/router/files"
 	graph_resolver "github.com/anyshake/observer/internal/server/router/graph"
+	"github.com/anyshake/observer/internal/server/router/notifications"
 	"github.com/anyshake/observer/internal/server/router/socket"
 	"github.com/anyshake/observer/internal/server/router/tiles"
 	"github.com/anyshake/observer/web"
@@ -39,6 +40,7 @@ func (s *HttpServer) Setup(listen string) error {
 	s.engine.Use(gzipHandler.Gzip(
 		gzip.BestCompression,
 		gzipHandler.WithExcludedPaths([]string{
+			"/api/notifications",
 			"/api/tiles", // Map tiles are already compressed
 		}),
 	))
@@ -73,6 +75,7 @@ func (s *HttpServer) Setup(listen string) error {
 	api := s.engine.Group("/api")
 	auth.Setup(api, s.resolver.ActionHandler, jwtMiddlewareFn, jwtHandler.LoginHandler, jwtHandler.RefreshHandler)
 	export.Setup(api, s.resolver.ActionHandler, s.resolver.HardwareDev, jwtMiddlewareFn)
+	notifications.Setup(api, s.notificationHub, jwtMiddlewareFn, s.shutdownCtx)
 	socket.Setup(api, s.resolver.TimeSource, s.resolver.HardwareDev, jwtMiddlewareFn)
 	if err := files.Setup(api, s.resolver.ServiceMap, jwtMiddlewareFn); err != nil {
 		return fmt.Errorf("failed to setup files router: %w", err)

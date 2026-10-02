@@ -6,6 +6,7 @@ import (
 
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/hardware"
+	"github.com/anyshake/observer/internal/notification"
 	"github.com/anyshake/observer/internal/service"
 	"github.com/anyshake/observer/pkg/ringbuf"
 	"github.com/anyshake/observer/pkg/timesource"
@@ -41,6 +42,7 @@ type QuakeSenseServiceImpl struct {
 	hardwareDev   hardware.IHardware
 	timeSource    *timesource.Source
 	actionHandler *action.Handler
+	notifications notification.Publisher
 
 	channelBuffer  *ringbuf.Buffer[float64]
 	prevSamplerate int
@@ -62,8 +64,9 @@ type QuakeSenseServiceImpl struct {
 	networkCode  string
 	locationCode string
 
-	monitorChannel  string
-	throttleSeconds int
+	monitorChannel         string
+	throttleSeconds        int
+	webNotificationEnabled bool
 
 	triggerMethod string
 	staWindow     float64

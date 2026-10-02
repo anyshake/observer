@@ -9,12 +9,9 @@ import (
 func (s *HttpServer) Stop() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+	s.shutdownCancel()
 
 	if err := s.server.Shutdown(ctx); err != nil {
-		return fmt.Errorf("failed to shutdown http server: %w", err)
-	}
-
-	if err := ctx.Err(); err != nil {
 		return fmt.Errorf("failed to shutdown http server: %w", err)
 	}
 

@@ -35,9 +35,9 @@ type ExplorerProtoImplV1 struct {
 	clockDriftBuf *ringbuf.Buffer[clockDrift]
 
 	// 1 message per second, for archiving service, etc.
-	messageBus message.Bus[EventHandler]
+	messageBus *message.Bus[Event]
 	// 1 message per packet, for realtime purposes
-	messageBusRealtime message.Bus[EventHandler]
+	messageBusRealtime *message.Bus[Event]
 
 	deviceStatus   DeviceStatus
 	deviceConfig   DeviceConfig
@@ -222,8 +222,8 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 	packetSize := g.getPacketSize(len(DATA_PACKET_HEADER), DATA_PACKET_CHANNEL_SIZE)
 	g.fifoBuffer = fifo.New[byte](10 * packetSize)
 	g.clockDriftBuf = ringbuf.New[clockDrift](100)
-	g.messageBus = message.NewBus[EventHandler](EXPLORER_STREAM_TOPIC, 1024)
-	g.messageBusRealtime = message.NewBus[EventHandler](EXPLORER_REALTIME_STREAM_TOPIC, 1024)
+	g.messageBus = message.NewBus[Event](EXPLORER_STREAM_TOPIC)
+	g.messageBusRealtime = message.NewBus[Event](EXPLORER_REALTIME_STREAM_TOPIC)
 	g.deviceConfig.SetGnssAvailability(false)
 
 	dummyDeviceId := uint32(0x12F81AC)
@@ -330,10 +330,10 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 					collectedTimestampArr = append(collectedTimestampArr, timestamp)
 					g.deviceStatus.IncrementFrames()
 
-					g.messageBusRealtime.Publish(time.UnixMilli(timestamp), &g.deviceConfig, &g.deviceVariable, channelData)
+					g.messageBusRealtime.Publish(NewEvent(time.UnixMilli(timestamp), &g.deviceConfig, channelData))
 					if len(collectedTimestampArr)*DATA_PACKET_CHANNEL_SIZE == currentSampleRate {
 						packetTimestamp := collectedTimestampArr[0]
-						g.messageBus.Publish(time.UnixMilli(packetTimestamp), &g.deviceConfig, &g.deviceVariable, g.channelDataBuf)
+						g.messageBus.Publish(NewEvent(time.UnixMilli(packetTimestamp), &g.deviceConfig, g.channelDataBuf))
 						g.deviceStatus.IncrementMessages()
 						collectedTimestampArr = []int64{}
 						g.channelDataBuf = []ChannelData{}
@@ -385,12 +385,22 @@ func (g *ExplorerProtoImplV1) Close() error {
 	if g.Transport == nil {
 		return errors.New("transport is not opened")
 	}
+	if g.messageBus != nil {
+		g.messageBus.Close()
+	}
+	if g.messageBusRealtime != nil {
+		g.messageBusRealtime.Close()
+	}
 
 	return g.Transport.Close()
 }
 
 func (g *ExplorerProtoImplV1) Subscribe(clientId string, handler EventHandler) error {
-	return g.messageBus.Subscribe(clientId, handler)
+	return g.messageBus.Subscribe(clientId, normalStreamSubscriptionOptions(func(err error) {
+		if !errors.Is(err, message.ErrBusClosed) {
+			g.Logger.Errorf("normal stream subscriber %s failed: %v", clientId, err)
+		}
+	}), handler)
 }
 
 func (g *ExplorerProtoImplV1) Unsubscribe(clientId string) error {
@@ -398,7 +408,11 @@ func (g *ExplorerProtoImplV1) Unsubscribe(clientId string) error {
 }
 
 func (g *ExplorerProtoImplV1) SubscribeRealtime(clientId string, handler EventHandler) error {
-	return g.messageBusRealtime.Subscribe(clientId, handler)
+	return g.messageBusRealtime.Subscribe(clientId, realtimeStreamSubscriptionOptions(func(err error) {
+		if !errors.Is(err, message.ErrBusClosed) {
+			g.Logger.Errorf("realtime stream subscriber %s failed: %v", clientId, err)
+		}
+	}), handler)
 }
 
 func (g *ExplorerProtoImplV1) UnsubscribeRealtime(clientId string) error {
