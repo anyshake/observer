@@ -16,7 +16,7 @@ export const createI18n = async (fallbackLng: string, storageKey: string, resour
                 caches: ['localStorage'],
                 order: ['localStorage', 'navigator']
             },
-            interpolation: { escapeValue: true }
+            interpolation: { escapeValue: false }
         });
 
     return i18n;

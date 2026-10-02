@@ -3,13 +3,25 @@ package logger
 import (
 	"fmt"
 	"io"
+	stdlog "log"
 	"os"
+	"strings"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
 var logWriters = []io.Writer{}
+
+type standardLogWriter struct{}
+
+func (standardLogWriter) Write(data []byte) (int, error) {
+	message := strings.TrimSpace(string(data))
+	if message != "" {
+		GetLogger("stdlib").Infof("%s", message)
+	}
+	return len(data), nil
+}
 
 func Init() {
 	zerolog.TimeFieldFormat = "2006-01-02 15:04:05.000"
@@ -36,4 +48,7 @@ func Init() {
 		With().
 		Timestamp().
 		Logger()
+	stdlog.SetFlags(0)
+	stdlog.SetPrefix("")
+	stdlog.SetOutput(standardLogWriter{})
 }

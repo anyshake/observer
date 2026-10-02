@@ -48,6 +48,7 @@ import (
 	service_ntp_server "github.com/anyshake/observer/internal/service/ntp_server"
 	service_quakesense "github.com/anyshake/observer/internal/service/quakesense"
 	service_seedlink "github.com/anyshake/observer/internal/service/seedlink"
+	service_tailscale "github.com/anyshake/observer/internal/service/tailscale"
 	service_updater "github.com/anyshake/observer/internal/service/updater"
 	service_watchcat "github.com/anyshake/observer/internal/service/watchcat"
 	service_winston "github.com/anyshake/observer/internal/service/winston"
@@ -211,8 +212,13 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		service_ntp_server.ID: service_ntp_server.New(actionHandler, timeSrc),
 		service_quakesense.ID: service_quakesense.New(hardwareDevice, actionHandler, timeSrc, notificationHub),
 		service_seedlink.ID:   service_seedlink.New(hardwareDevice, actionHandler, timeSrc),
-		service_watchcat.ID:   service_watchcat.New(hardwareDevice, timeSrc),
-		service_winston.ID:    service_winston.New(hardwareDevice, actionHandler, timeSrc),
+		service_tailscale.ID: service_tailscale.New(
+			conf.Server.Listen,
+			actionHandler,
+			timeSrc,
+		),
+		service_watchcat.ID: service_watchcat.New(hardwareDevice, timeSrc),
+		service_winston.ID:  service_winston.New(hardwareDevice, actionHandler, timeSrc),
 	}
 	var upgradeHelper *upgrade.Helper
 	if !ver.IsPreRelease() && build.GetChannel() == officialBuildChannel {
