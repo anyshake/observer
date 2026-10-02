@@ -2,6 +2,32 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.6.0
+
+### Release Notes
+
+This release expands **secure remote access, real-time service notifications, and MiniSEED flexibility**. AnyShake Observer can now join Tailscale or Headscale networks through an embedded node, exposing the web interface and selected local TCP or UDP services without requiring a separate Tailscale daemon.
+
+The web dashboard now receives authenticated live service notifications, with QuakeSense earthquake detections shown directly in the browser. MiniSEED output gains selectable STEIM-1 and STEIM-2 compression, and the interface is now available in Spanish (Mexico).
+
+### New Features
+
+- Added an embedded **Tailscale VPN service** with configurable hostname, coordination server, authentication key, and TCP/UDP port forwarding.
+- Added **Headscale compatibility** through support for custom coordination server URLs.
+- Added authenticated **Server-Sent Events (SSE) service notifications** with automatic browser reconnection and severity-based toast messages.
+- Added configurable **QuakeSense web notifications** for detected seismic events.
+- Added selectable **STEIM-1 and STEIM-2 compression schemes** for generated MiniSEED files, with STEIM-1 as the default compressed format.
+- Added **STEIM-1** as an option when exporting waveform data in MiniSEED format.
+- Added **Spanish (Mexico)** localization to the web interface.
+
+### Improvements
+
+- Persisted Tailscale node identity in the application database so subsequent starts can reconnect without reusing the authentication key.
+- Reworked waveform event delivery with bounded per-subscriber queues and explicit overflow policies, preventing slow consumers from blocking real-time data processing.
+- Added connection write timeouts and slow-client handling to the TCP forwarder and SeedLink services.
+- Improved service shutdown and subscription cleanup across waveform consumers.
+- Updated the legacy Windows 7 Go toolchain used by the release workflow.
+
 ## v4.5.2
 
 ### Release Notes
