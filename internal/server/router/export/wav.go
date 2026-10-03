@@ -9,11 +9,9 @@ import (
 	"github.com/anyshake/observer/config"
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/dao/model"
-	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/pkg/seekbuf"
 	"github.com/go-audio/audio"
 	"github.com/go-audio/wav"
-	"github.com/samber/lo"
 )
 
 const FILTER_NUM_TAPS = 101
@@ -30,42 +28,22 @@ func (e *seismicDataEncoderWavImpl) GetName() string {
 	return "WAV (Audio)"
 }
 
-func (e *seismicDataEncoderWavImpl) Encode(records []model.SeisRecord, channelCode string) ([]byte, error) {
-	var (
-		startSampleRate = records[0].SampleRate
-		startTimestamp  = records[0].RecordTime
-	)
-
+func (e *seismicDataEncoderWavImpl) Encode(records seismicRecordIterator, channelCode string) ([]byte, error) {
 	var channelBuffer []int32
-	for index, record := range records {
-		_, _, channelDataArr, err := record.Decode()
-		if err != nil {
-			return nil, err
-		}
-		channelData, ok := lo.Find(channelDataArr, func(item explorer.ChannelData) bool { return item.ChannelCode == channelCode })
-		if !ok {
-			continue
-		}
-
-		if math.Abs(float64(record.RecordTime-startTimestamp-int64(index*1000))) >= explorer.ALLOWED_JITTER_MS_NTP {
-			return nil, fmt.Errorf(
-				"timestamp is not within allowed jitter %d ms, expected %d, got %d",
-				explorer.ALLOWED_JITTER_MS_NTP,
-				startTimestamp+int64(index*1000),
-				record.RecordTime,
-			)
-		}
-
-		if record.SampleRate != startSampleRate {
-			return nil, fmt.Errorf("sample rate is not the same, expected %d, got %d", startSampleRate, record.SampleRate)
-		}
-
-		channelBuffer = append(channelBuffer, channelData.Data...)
+	recordRange, err := forEachContinuousChannelRecord(records, channelCode, func(_ model.SeisRecord, samples []int32) error {
+		channelBuffer = append(channelBuffer, samples...)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if recordRange.Count == 0 {
+		return nil, nil
 	}
 
 	audioData := e.normalizeToInt16(channelBuffer)
 
-	timeDiff := e.computeTimeDuration(records)
+	timeDiff := time.UnixMilli(recordRange.EndTimestamp).Sub(time.UnixMilli(recordRange.StartTimestamp)).Seconds()
 	if timeDiff == 0 {
 		return nil, errors.New("invalid time difference")
 	}
@@ -116,20 +94,22 @@ func (e *seismicDataEncoderWavImpl) GetFileName(startTime time.Time, channelCode
 }
 
 func (e *seismicDataEncoderWavImpl) normalizeToInt16(data []int32) []int16 {
-	absMaxVal := lo.Max(lo.Map(data, func(v int32, _ int) int32 { return int32(math.Abs(float64(v))) }))
+	var absMaxVal float64
+	for _, value := range data {
+		absValue := math.Abs(float64(value))
+		if absValue > absMaxVal {
+			absMaxVal = absValue
+		}
+	}
 	if absMaxVal == 0 {
 		return nil
 	}
-	scaleFactor := float64(math.MaxInt16) / float64(absMaxVal)
-	return lo.Map(data, func(v int32, _ int) int16 {
-		return int16(float64(v) * scaleFactor)
-	})
-}
-
-func (e *seismicDataEncoderWavImpl) computeTimeDuration(records []model.SeisRecord) float64 {
-	startTime := records[0].RecordTime
-	endTime := records[len(records)-1].RecordTime
-	return time.UnixMilli(endTime).Sub(time.UnixMilli(startTime)).Seconds()
+	scaleFactor := float64(math.MaxInt16) / absMaxVal
+	normalized := make([]int16, len(data))
+	for i, value := range data {
+		normalized[i] = int16(float64(value) * scaleFactor)
+	}
+	return normalized
 }
 
 func (e *seismicDataEncoderWavImpl) linearInterpolate(data []int16, oldRate, newRate int) []int16 {
@@ -205,8 +185,12 @@ func (e *seismicDataEncoderWavImpl) applyFilter(data []int16, kernel []float64) 
 func (e *seismicDataEncoderWavImpl) saveToWavBytes(data []int16, sampleRate int) ([]byte, error) {
 	var buf seekbuf.Buffer
 	encoder := wav.NewEncoder(&buf, sampleRate, 16, 1, 1)
+	audioSamples := make([]int, len(data))
+	for i, value := range data {
+		audioSamples[i] = int(value)
+	}
 	buffer := &audio.IntBuffer{
-		Data:   lo.Map(data, func(v int16, _ int) int { return int(v) }),
+		Data:   audioSamples,
 		Format: &audio.Format{SampleRate: sampleRate, NumChannels: 1},
 	}
 

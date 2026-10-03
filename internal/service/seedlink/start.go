@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/internal/dao/action"
+	"github.com/anyshake/observer/internal/dao/model"
 	"github.com/anyshake/observer/internal/hardware"
 	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/pkg/logger"
@@ -30,6 +31,7 @@ func (s *SeedLinkServiceImpl) Start() error {
 	clients := newSeedLinkClientRegistry()
 	server := slgo.New(
 		&provider{
+			ctx:           s.ctx,
 			hardwareDev:   s.hardwareDev,
 			timeSource:    s.timeSource,
 			actionHandler: s.actionHandler,
@@ -92,6 +94,7 @@ func (s *SeedLinkServiceImpl) GetListenPort() int {
 }
 
 type provider struct {
+	ctx           context.Context
 	hardwareDev   hardware.IHardware
 	timeSource    *timesource.Source
 	actionHandler *action.Handler
@@ -146,33 +149,36 @@ func (p *provider) QueryHistory(startTime, endTime time.Time, channels []handler
 	if endTime.IsZero() {
 		endTime = p.timeSource.Now()
 	}
-	recordsRawData, err := p.actionHandler.SeisRecordsQuery(startTime, endTime)
-	if err != nil {
-		return nil, err
-	}
 
 	channelSet := make(map[string]struct{}, len(channels))
 	for _, ch := range channels {
 		channelSet[ch.ChannelName] = struct{}{}
 	}
+	if len(channelSet) == 0 {
+		return nil, nil
+	}
 
 	var dataPackets []handlers.SeedLinkDataPacket
-	for _, record := range recordsRawData {
-		tm, sampleRate, channelData, err := record.Decode()
+	err := p.actionHandler.SeisRecordsQueryEachContext(p.ctx, startTime, endTime, func(record model.SeisRecord) error {
+		_, sampleRate, channelData, err := record.Decode()
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		for _, data := range channelData {
 			if _, exists := channelSet[data.ChannelCode]; exists {
 				dataPackets = append(dataPackets, handlers.SeedLinkDataPacket{
-					Timestamp:  tm.UnixMilli(),
+					Timestamp:  record.RecordTime,
 					SampleRate: sampleRate,
 					Channel:    data.ChannelCode,
 					DataArr:    data.Data,
 				})
 			}
 		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	return dataPackets, nil

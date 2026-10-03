@@ -19,6 +19,7 @@ func New(hardwareDev hardware.IHardware, actionHandler *action.Handler, timeSour
 		cacheStorage: CACHE_STORAGE_DISABLED,
 		cachePath:    CACHE_DEFAULT_PATH,
 		dataProvider: provider{
+			ctx:           ctx,
 			actionHandler: actionHandler,
 		},
 	}

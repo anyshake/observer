@@ -1,6 +1,7 @@
 package action
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"runtime"
@@ -44,38 +45,88 @@ func (h *Handler) SeisRecordsCreate(records ...model.SeisRecord) error {
 }
 
 func (h *Handler) SeisRecordsQuery(startTime, endTime time.Time) ([]model.SeisRecord, error) {
+	var records []model.SeisRecord
+	err := h.SeisRecordsQueryEach(startTime, endTime, func(record model.SeisRecord) error {
+		records = append(records, record)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return records, nil
+}
+
+func (h *Handler) SeisRecordsQueryEach(startTime, endTime time.Time, callback func(model.SeisRecord) error) error {
+	return h.SeisRecordsQueryEachContext(context.Background(), startTime, endTime, callback)
+}
+
+func (h *Handler) SeisRecordsQueryEachContext(ctx context.Context, startTime, endTime time.Time, callback func(model.SeisRecord) error) error {
 	if h.daoObj == nil {
-		return nil, errors.New("database is not opened")
+		return errors.New("database is not opened")
+	}
+	if ctx == nil {
+		return errors.New("query context is nil")
+	}
+	if callback == nil {
+		return errors.New("query callback is nil")
 	}
 
 	if startTime.After(endTime) {
-		return nil, errors.New("start time is after end time")
+		return errors.New("start time is after end time")
 	}
 
 	queryWindowLimit := h.SeisRecordsGetQueryWindow()
 	if endTime.Sub(startTime) > queryWindowLimit {
-		return nil, fmt.Errorf("duration between start time and end time exceeds %.0f minutes limit", queryWindowLimit.Minutes())
+		return fmt.Errorf("duration between start time and end time exceeds %.0f minutes limit", queryWindowLimit.Minutes())
 	}
 
-	var records []model.SeisRecord
-	for currentDay := startTime.UTC().YearDay(); currentDay <= endTime.UTC().YearDay(); currentDay++ {
-		tableName := fmt.Sprintf("%sseis_records_%d", h.daoObj.GetPrefix(), currentDay%model.SEIS_RECORD_SHARDS)
-
-		var tempRecords []model.SeisRecord
-		err := h.daoObj.Database.
+	startTimeUTC := startTime.UTC()
+	endTimeUTC := endTime.UTC()
+	currentDate := time.Date(startTimeUTC.Year(), startTimeUTC.Month(), startTimeUTC.Day(), 0, 0, 0, 0, time.UTC)
+	endDate := time.Date(endTimeUTC.Year(), endTimeUTC.Month(), endTimeUTC.Day(), 0, 0, 0, 0, time.UTC)
+	for !currentDate.After(endDate) {
+		tableName := fmt.Sprintf("%sseis_records_%d", h.daoObj.GetPrefix(), currentDate.YearDay()%model.SEIS_RECORD_SHARDS)
+		rows, err := h.daoObj.Database.
+			WithContext(ctx).
 			Table(tableName).
+			Select("id", "created_at", "record_time", "sample_rate", "channel_data").
 			Where("record_time >= ? AND record_time <= ?", startTime.UnixMilli(), endTime.UnixMilli()).
 			Order("record_time ASC").
-			Find(&tempRecords).
-			Error
+			Rows()
 		if err != nil {
-			return nil, fmt.Errorf("failed to query seismic waveform records in table %s: %w", tableName, err)
+			return fmt.Errorf("failed to query seismic waveform records in table %s: %w", tableName, err)
 		}
 
-		records = append(records, tempRecords...)
+		queryErr := func() error {
+			defer rows.Close()
+			for rows.Next() {
+				var record model.SeisRecord
+				if err := rows.Scan(
+					&record.PrimaryKey,
+					&record.CreatedAt,
+					&record.RecordTime,
+					&record.SampleRate,
+					&record.ChannelData,
+				); err != nil {
+					return fmt.Errorf("failed to scan seismic waveform record in table %s: %w", tableName, err)
+				}
+				if err := callback(record); err != nil {
+					return err
+				}
+			}
+			if err := rows.Err(); err != nil {
+				return fmt.Errorf("failed to iterate seismic waveform records in table %s: %w", tableName, err)
+			}
+			return nil
+		}()
+		if queryErr != nil {
+			return queryErr
+		}
+
+		currentDate = currentDate.AddDate(0, 0, 1)
 	}
 
-	return records, nil
+	return nil
 }
 
 func (h *Handler) SeisRecordsPurge(startTime, endTime time.Time) error {

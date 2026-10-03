@@ -26,7 +26,7 @@ func (e *seismicDataEncoderMseedImpl) GetName() string {
 	return e.name
 }
 
-func (e *seismicDataEncoderMseedImpl) Encode(records []model.SeisRecord, channelCode string) ([]byte, error) {
+func (e *seismicDataEncoderMseedImpl) Encode(records seismicRecordIterator, channelCode string) ([]byte, error) {
 	stationCode, err := e.stationCodeConfig.Get(e.actionHandler)
 	if err != nil {
 		return nil, err
@@ -50,14 +50,17 @@ func (e *seismicDataEncoderMseedImpl) Encode(records []model.SeisRecord, channel
 		return nil, err
 	}
 
-	for sequence, record := range records {
+	recordCount := 0
+	err = records(func(record model.SeisRecord) error {
+		sequence := recordCount
+		recordCount++
 		tm, sampleRate, channelDataArr, err := record.Decode()
 		if err != nil {
-			return nil, err
+			return err
 		}
 		channelData, ok := lo.Find(channelDataArr, func(item explorer.ChannelData) bool { return item.ChannelCode == channelCode })
 		if !ok {
-			continue
+			return nil
 		}
 		err = miniseed.Append(channelData.Data, &mseedio.AppendOptions{
 			SequenceNumber: fmt.Sprintf("%06d", sequence),
@@ -68,9 +71,13 @@ func (e *seismicDataEncoderMseedImpl) Encode(records []model.SeisRecord, channel
 			NetworkCode:    networkCodeStr,
 			LocationCode:   locationCodeStr,
 		})
-		if err != nil {
-			return nil, err
-		}
+		return err
+	})
+	if err != nil {
+		return nil, err
+	}
+	if recordCount == 0 {
+		return nil, nil
 	}
 
 	dataBytes, err := miniseed.Encode(mseedio.OVERWRITE, mseedio.MSBFIRST)

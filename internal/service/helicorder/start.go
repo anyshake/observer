@@ -11,6 +11,7 @@ import (
 
 	"github.com/anyshake/observer/config"
 	"github.com/anyshake/observer/internal/dao/action"
+	"github.com/anyshake/observer/internal/dao/model"
 	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/bclswl0827/heligo"
@@ -22,6 +23,7 @@ import (
 const plotWorkers = 2
 
 type provider struct {
+	ctx           context.Context
 	actionHandler *action.Handler
 	queryCache    queryCache
 
@@ -57,26 +59,19 @@ func (d *provider) GetPlotData(startTime, endTime time.Time) ([]heligo.PlotData,
 		}
 	}
 
-	records, err := d.actionHandler.SeisRecordsQuery(startTimestamp, endTimestamp)
-	if err != nil {
-		return nil, fmt.Errorf("failed to query seismic waveform records: %w", err)
-	}
-
 	var plotData []heligo.PlotData
 	var cacheWriter queryCacheWriter
+	var err error
 	if d.queryCache != nil {
 		cacheWriter, err = d.queryCache.NewWriter(cacheKey)
 		if err != nil {
 			logger.GetLogger(ID).Warnf("failed to create waveform cache for timestamp %d: %v", cacheKey.StartUnixMilli, err)
 		}
 	}
-	for _, record := range records {
+	err = d.actionHandler.SeisRecordsQueryEachContext(d.ctx, startTimestamp, endTimestamp, func(record model.SeisRecord) error {
 		_, sampleRate, channelData, err := record.Decode()
 		if err != nil {
-			if cacheWriter != nil {
-				cacheWriter.Abort()
-			}
-			return nil, fmt.Errorf("failed to decode seismic waveform record on timestamp %d: %w", record.RecordTime, err)
+			return fmt.Errorf("failed to decode seismic waveform record on timestamp %d: %w", record.RecordTime, err)
 		}
 		plotData = appendChannelPlotData(plotData, sampleRate, record.RecordTime, channelData, d.channelCode)
 		if cacheWriter != nil {
@@ -90,6 +85,13 @@ func (d *provider) GetPlotData(startTime, endTime time.Time) ([]heligo.PlotData,
 				cacheWriter = nil
 			}
 		}
+		return nil
+	})
+	if err != nil {
+		if cacheWriter != nil {
+			cacheWriter.Abort()
+		}
+		return nil, fmt.Errorf("failed to query seismic waveform records: %w", err)
 	}
 
 	if cacheWriter != nil {
@@ -164,6 +166,7 @@ func (s *HelicorderServiceImpl) Start() error {
 	if s.ctx.Err() != nil {
 		s.ctx, s.cancelFn = context.WithCancel(context.Background())
 	}
+	s.dataProvider.ctx = s.ctx
 
 	channelCodes, err := (&config.StationChannelCodesConfigConstraintImpl{}).Get(s.dataProvider.actionHandler)
 	if err != nil {

@@ -69,12 +69,7 @@ func (t *SeisRecord) Encode(recordTime time.Time, sampleRate int, channelData []
 }
 
 func (t *SeisRecord) Decode() (recordTime time.Time, sampleRate int, channelData []explorer.ChannelData, err error) {
-	buf := bytes.Buffer{}
-	decoder := gob.NewDecoder(&buf)
-
-	if _, err = buf.Write(t.ChannelData); err != nil {
-		return time.Time{}, 0, nil, fmt.Errorf("failed to write channel data: %w", err)
-	}
+	decoder := gob.NewDecoder(bytes.NewReader(t.ChannelData))
 	if err = decoder.Decode(&channelData); err != nil {
 		return time.Time{}, 0, nil, fmt.Errorf("failed to decode channel data: %w", err)
 	}

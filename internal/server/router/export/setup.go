@@ -7,6 +7,7 @@ import (
 
 	"github.com/anyshake/observer/config"
 	"github.com/anyshake/observer/internal/dao/action"
+	"github.com/anyshake/observer/internal/dao/model"
 	"github.com/anyshake/observer/internal/hardware"
 	"github.com/anyshake/observer/internal/server/response"
 	"github.com/bclswl0827/mseedio"
@@ -102,27 +103,28 @@ func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, hardware
 		}
 
 		startTime, endTime := requestModel.StartTime, requestModel.EndTime
-		seisRecords, err := actionHandler.SeisRecordsQuery(time.UnixMilli(startTime), time.UnixMilli(endTime))
-		if err != nil {
-			err = fmt.Errorf("failed to query seis records: %w", err)
-			response.Error(ctx, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		if len(seisRecords) == 0 {
-			response.Error(ctx, http.StatusNotFound, "no seis records found in given time range")
-			return
-		}
-
-		dataBytes, err := encoder.Encode(seisRecords, requestModel.ChannelCode)
+		startTimestamp := time.UnixMilli(startTime)
+		endTimestamp := time.UnixMilli(endTime)
+		recordFound := false
+		records := seismicRecordIterator(func(callback func(model.SeisRecord) error) error {
+			return actionHandler.SeisRecordsQueryEachContext(ctx.Request.Context(), startTimestamp, endTimestamp, func(record model.SeisRecord) error {
+				recordFound = true
+				return callback(record)
+			})
+		})
+		dataBytes, err := encoder.Encode(records, requestModel.ChannelCode)
 		if err != nil {
 			err = fmt.Errorf("failed to encode seismic records: %w", err)
 			response.Error(ctx, http.StatusInternalServerError, err.Error())
 			return
 		}
+		if !recordFound {
+			response.Error(ctx, http.StatusNotFound, "no seis records found in given time range")
+			return
+		}
 
 		if len(dataBytes) > 0 {
-			fileName, err := encoder.GetFileName(time.UnixMilli(startTime), requestModel.ChannelCode)
+			fileName, err := encoder.GetFileName(startTimestamp, requestModel.ChannelCode)
 			if err != nil {
 				err = fmt.Errorf("failed to get file name: %w", err)
 				response.Error(ctx, http.StatusInternalServerError, err.Error())

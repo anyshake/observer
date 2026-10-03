@@ -795,20 +795,11 @@ func (r *queryResolver) GetEventsBySource(ctx context.Context, code string) ([]*
 
 // GetSeisRecordsByTime is the resolver for the getSeisRecordsByTime field.
 func (r *queryResolver) GetSeisRecordsByTime(ctx context.Context, startTime int64, endTime int64) ([]*graph_model.SeisRecord, error) {
-	if endTime-startTime > time.Hour.Milliseconds() {
-		return nil, fmt.Errorf("duration between start time and end time exceeds 1 hour limit")
-	}
-
-	records, err := r.ActionHandler.SeisRecordsQuery(time.UnixMilli(startTime), time.UnixMilli(endTime))
-	if err != nil {
-		return nil, fmt.Errorf("failed to query seismic waveform records: %w", err)
-	}
-
 	var respRecords []*graph_model.SeisRecord
-	for _, record := range records {
-		t, sampleRate, channelData, err := record.Decode()
+	err := r.ActionHandler.SeisRecordsQueryEachContext(ctx, time.UnixMilli(startTime), time.UnixMilli(endTime), func(record model.SeisRecord) error {
+		_, sampleRate, channelData, err := record.Decode()
 		if err != nil {
-			return nil, fmt.Errorf("failed to decode seismic waveform record: %w", err)
+			return fmt.Errorf("failed to decode seismic waveform record: %w", err)
 		}
 		respChannelData := make([]*graph_model.ChannelData, len(channelData))
 		for i, data := range channelData {
@@ -819,10 +810,14 @@ func (r *queryResolver) GetSeisRecordsByTime(ctx context.Context, startTime int6
 			}
 		}
 		respRecords = append(respRecords, &graph_model.SeisRecord{
-			Timestamp:   t.UnixMilli(),
+			Timestamp:   record.RecordTime,
 			SampleRate:  sampleRate,
 			ChannelData: respChannelData,
 		})
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to query seismic waveform records: %w", err)
 	}
 
 	return respRecords, nil

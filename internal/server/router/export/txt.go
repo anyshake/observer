@@ -1,16 +1,14 @@
 package export
 
 import (
+	"bytes"
 	"fmt"
-	"math"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/anyshake/observer/config"
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/dao/model"
-	"github.com/anyshake/observer/internal/hardware/explorer"
 )
 
 type seismicDataEncoderTxtImpl struct {
@@ -24,58 +22,29 @@ func (e *seismicDataEncoderTxtImpl) GetName() string {
 	return "TXT"
 }
 
-func (e *seismicDataEncoderTxtImpl) Encode(records []model.SeisRecord, channelCode string) ([]byte, error) {
-	var builder strings.Builder
-	builder.Grow(1024 * len(records))
-
-	var (
-		startSampleRate = records[0].SampleRate
-		startTimestamp  = records[0].RecordTime
-	)
-
-	for index, record := range records {
-		_, _, channelDataArr, err := record.Decode()
-		if err != nil {
-			return nil, err
-		}
-
-		var channelData *explorer.ChannelData
-		for i := range channelDataArr {
-			if channelDataArr[i].ChannelCode == channelCode {
-				channelData = &channelDataArr[i]
-				break
-			}
-		}
-		if channelData == nil {
-			continue
-		}
-
-		// Make sure timestamp is continuous
-		if math.Abs(float64(record.RecordTime-startTimestamp-int64(index*1000))) >= explorer.ALLOWED_JITTER_MS_NTP {
-			return nil, fmt.Errorf(
-				"timestamp is not within allowed jitter %d ms, expected %d, got %d",
-				explorer.ALLOWED_JITTER_MS_NTP,
-				startTimestamp+int64(index*1000),
-				record.RecordTime,
-			)
-		}
-
-		// Make sure sample rate is the same
-		if record.SampleRate != startSampleRate {
-			return nil, fmt.Errorf("sample rate is not the same, expected %d, got %d", startSampleRate, record.SampleRate)
-		}
-
+func (e *seismicDataEncoderTxtImpl) Encode(records seismicRecordIterator, channelCode string) ([]byte, error) {
+	var buffer bytes.Buffer
+	line := make([]byte, 0, 48)
+	recordRange, err := forEachContinuousChannelRecord(records, channelCode, func(record model.SeisRecord, samples []int32) error {
 		sampleSpanMs := 1000.0 / float64(record.SampleRate)
-		for i, v := range channelData.Data {
+		for i, sample := range samples {
 			timestampMs := float64(record.RecordTime) + sampleSpanMs*float64(i)
-			builder.WriteString(strconv.FormatFloat(timestampMs, 'f', 0, 64))
-			builder.WriteByte(' ')
-			builder.WriteString(strconv.Itoa(int(v)))
-			builder.WriteByte('\n')
+			line = strconv.AppendFloat(line[:0], timestampMs, 'f', 0, 64)
+			line = append(line, ' ')
+			line = strconv.AppendInt(line, int64(sample), 10)
+			line = append(line, '\n')
+			_, _ = buffer.Write(line)
 		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if recordRange.Count == 0 {
+		return nil, nil
 	}
 
-	return []byte(builder.String()), nil
+	return buffer.Bytes(), nil
 }
 
 func (e *seismicDataEncoderTxtImpl) GetFileName(startTime time.Time, channelCode string) (string, error) {
