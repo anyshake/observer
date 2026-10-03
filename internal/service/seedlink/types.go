@@ -12,6 +12,11 @@ import (
 
 const ID = "service_seedlink"
 
+const (
+	COMPRESS_SCHEME_STEIM_1 = "steim-1"
+	COMPRESS_SCHEME_STEIM_2 = "steim-2"
+)
+
 type SeedLinkServiceImpl struct {
 	mu     sync.Mutex
 	status service.Status
@@ -28,7 +33,8 @@ type SeedLinkServiceImpl struct {
 	networkCode  string
 	locationCode string
 
-	listenHost  string
-	listenPort  int
-	useCompress bool
+	listenHost     string
+	listenPort     int
+	useCompress    bool
+	compressScheme string
 }

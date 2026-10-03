@@ -40,6 +40,12 @@ func (s *SeedLinkServiceImpl) Init() error {
 	}
 	s.useCompress = useCompress.(bool)
 
+	compressScheme, err := (&seedlinkConfigCompressSchemeImpl{}).Get(s.actionHandler)
+	if err != nil {
+		return err
+	}
+	s.compressScheme = compressScheme.(string)
+
 	listenHost, err := (&seedlinkConfigListenHostImpl{}).Get(s.actionHandler)
 	if err != nil {
 		return err

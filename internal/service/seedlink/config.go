@@ -66,7 +66,7 @@ func (s *seedlinkConfigCompressImpl) GetVersion() int             { return 0 }
 func (s *seedlinkConfigCompressImpl) GetOptions() map[string]any  { return nil }
 func (s *seedlinkConfigCompressImpl) GetDefaultValue() any        { return false }
 func (s *seedlinkConfigCompressImpl) GetDescription() string {
-	return "Whether to compress SeedLink data stream. If true, files will use STEIM-2 compression, encoding the count data as 30-bit instead of 32-bit. This may cause data overflow and checksum errors if a 32-bit ADC reaches full scale."
+	return "Whether to compress SeedLink data stream."
 }
 func (s *seedlinkConfigCompressImpl) Init(handler *action.Handler) error {
 	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
@@ -98,6 +98,65 @@ func (s *seedlinkConfigCompressImpl) Get(handler *action.Handler) (any, error) {
 func (s *seedlinkConfigCompressImpl) Restore(handler *action.Handler) error {
 	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset SeedLink compression flag: %w", err)
+	}
+	return nil
+}
+
+type seedlinkConfigCompressSchemeImpl struct{}
+
+func (s *seedlinkConfigCompressSchemeImpl) GetName() string      { return "Compression Scheme" }
+func (s *seedlinkConfigCompressSchemeImpl) GetNamespace() string { return ID }
+func (s *seedlinkConfigCompressSchemeImpl) GetKey() string       { return "compress_scheme" }
+func (s *seedlinkConfigCompressSchemeImpl) GetType() action.SettingType {
+	return action.String
+}
+func (s *seedlinkConfigCompressSchemeImpl) IsRequired() bool { return true }
+func (s *seedlinkConfigCompressSchemeImpl) GetVersion() int  { return 0 }
+func (s *seedlinkConfigCompressSchemeImpl) GetOptions() map[string]any {
+	return map[string]any{
+		"STEIM-1": COMPRESS_SCHEME_STEIM_1,
+		"STEIM-2": COMPRESS_SCHEME_STEIM_2,
+	}
+}
+func (s *seedlinkConfigCompressSchemeImpl) GetDefaultValue() any {
+	return COMPRESS_SCHEME_STEIM_1
+}
+func (s *seedlinkConfigCompressSchemeImpl) GetDescription() string {
+	return "Compression scheme used when compression is enabled. STEIM-2 encodes count data as 30-bit instead of 32-bit, which may cause data overflow and checksum errors if a 32-bit ADC reaches full scale."
+}
+func (s *seedlinkConfigCompressSchemeImpl) Init(handler *action.Handler) error {
+	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+		return fmt.Errorf("failed to set default SeedLink compression scheme: %w", err)
+	}
+	return nil
+}
+func (s *seedlinkConfigCompressSchemeImpl) Set(handler *action.Handler, newVal any) error {
+	compressScheme, err := config.GetConfigValString(newVal)
+	if err != nil {
+		return err
+	}
+	if compressScheme != COMPRESS_SCHEME_STEIM_1 && compressScheme != COMPRESS_SCHEME_STEIM_2 {
+		return errors.New("compression scheme must be one of STEIM-1 or STEIM-2")
+	}
+	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), compressScheme); err != nil {
+		return fmt.Errorf("failed to set SeedLink compression scheme: %w", err)
+	}
+	return nil
+}
+func (s *seedlinkConfigCompressSchemeImpl) Get(handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+	if err != nil {
+		return nil, fmt.Errorf("failed to get SeedLink compression scheme: %w", err)
+	}
+	compressScheme, ok := val.(string)
+	if !ok {
+		return nil, errors.New("string expected")
+	}
+	return compressScheme, nil
+}
+func (s *seedlinkConfigCompressSchemeImpl) Restore(handler *action.Handler) error {
+	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+		return fmt.Errorf("failed to reset SeedLink compression scheme: %w", err)
 	}
 	return nil
 }
@@ -203,6 +262,7 @@ func (s *SeedLinkServiceImpl) GetConfigConstraint() []config.IConstraint {
 	return []config.IConstraint{
 		&seedlinkConfigEnabledImpl{},
 		&seedlinkConfigCompressImpl{},
+		&seedlinkConfigCompressSchemeImpl{},
 		&seedlinkConfigListenHostImpl{},
 		&seedlinkConfigListenPortImpl{},
 	}

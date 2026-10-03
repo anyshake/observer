@@ -67,8 +67,18 @@ func (s *SeedLinkServiceImpl) Start() error {
 			return
 		}
 
+		compression := slgo.CompressionNone
+		if s.useCompress {
+			switch s.compressScheme {
+			case COMPRESS_SCHEME_STEIM_2:
+				compression = slgo.CompressionSteim2
+			default:
+				compression = slgo.CompressionSteim1
+			}
+		}
+
 		logger.GetLogger(ID).Infof("service seedlink is listening on %s:%d", s.listenHost, s.listenPort)
-		if err := server.Start(s.ctx, s.listenHost, s.listenPort, s.useCompress); err != nil {
+		if err := server.Start(s.ctx, s.listenHost, s.listenPort, compression); err != nil {
 			logger.GetLogger(ID).Errorf("failed to start seedlink server: %v", err)
 		}
 	}()

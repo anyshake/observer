@@ -124,8 +124,8 @@ github.com/bclswl0827/obsgo v1.0.0 h1:m4c45nKz1lS4dVOo+vBLY3AlAPm40LIOmkKHM6gjHY
 github.com/bclswl0827/obsgo v1.0.0/go.mod h1:yQoQgDKYxe12seGRPxasey40Hb2RpeQrZO7sWw1AKK4=
 github.com/bclswl0827/sacio v1.0.6 h1:kR6ll6xjoQGO+YVEZvvvbAxKGUD3qUXsyIuQape1+vc=
 github.com/bclswl0827/sacio v1.0.6/go.mod h1:SuiIK7hBHCJvxUOC/rgbJRUO5IoFrEnuCY0xVJ7RyQk=
-github.com/bclswl0827/slgo v0.3.1 h1:RsiUjfzz0MC1DuexEa65TRsimdHfimNGddfEkIQy1Sk=
-github.com/bclswl0827/slgo v0.3.1/go.mod h1:EieZGCQ610HVCte4UNYqfLEJHU8uJY1+kbMccx36LjU=
+github.com/bclswl0827/slgo v0.4.0 h1:mMJ2zUFQhy1N3BkqNNXH+rstvCkegg82RalwE8ef9ws=
+github.com/bclswl0827/slgo v0.4.0/go.mod h1:EieZGCQ610HVCte4UNYqfLEJHU8uJY1+kbMccx36LjU=
 github.com/bclswl0827/sqlite v1.11.1-0.20240613172512-9e6ac9861470 h1:VYRieWhizTvSnQ3iJ9cVvB+4go+f/2mTp6CC2MSXnn4=
 github.com/bclswl0827/sqlite v1.11.1-0.20240613172512-9e6ac9861470/go.mod h1:/xElCFPGgTMHBhfSjGBlITMQ/qe6CLTinWdxSbc4oDE=
 github.com/bclswl0827/travel v0.0.1 h1:nP903ucJuq7hWB1Upbzlh8zIZ4gFVHRpCi1xLnprvbw=
