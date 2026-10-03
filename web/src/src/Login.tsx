@@ -1,6 +1,6 @@
 import {
     mdiAccount,
-    mdiChevronUp,
+    mdiChevronDown,
     mdiEarth,
     mdiKey,
     mdiRefreshCircle,
@@ -15,6 +15,8 @@ import { Field, Form, Formik } from 'formik';
 import { md, pki, util } from 'node-forge';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import loginBackground from '/login_bg.webp?url';
 
 import { globalConfig } from './config/global';
 import { localeConfig } from './config/locale';
@@ -178,166 +180,47 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
     };
 
     return (
-        <div className="animate-fade animate-duration-500 animate-delay-300 flex min-h-screen flex-col bg-gradient-to-br from-purple-300 via-purple-200 to-purple-300 p-20 px-4">
-            <div className="m-auto w-full max-w-md rounded-lg bg-white p-12 shadow-xl md:max-w-xl">
-                <img
-                    src={globalConfig.logo}
-                    alt="Login"
-                    className="mx-auto mb-6 size-24 md:size-32"
-                />
-                <Formik
-                    enableReinitialize
-                    initialValues={{ username: '', password: '', captcha: '' }}
-                    onSubmit={async ({ username, password, captcha }, { setSubmitting }) => {
-                        try {
-                            await sendPromiseAlert(
-                                handleLoginSubmit(username, password, captcha),
-                                t('Login.signin.loading'),
-                                t('Login.signin.success'),
-                                () => {
-                                    setSubmitting(false);
-                                    return t('Login.signin.error');
-                                },
-                                false
-                            );
-                        } catch {
-                            getPreAuthData(false);
-                        }
-                    }}
-                >
-                    {({ isSubmitting }) => (
-                        <Form className="space-y-4">
-                            <div>
-                                <label
-                                    htmlFor="username"
-                                    className="flex items-center text-gray-700"
-                                >
-                                    <Icon
-                                        className="mr-2 flex-shrink-0"
-                                        path={mdiAccount}
-                                        size={0.8}
-                                    />
-                                    {t('Login.username.label')}
-                                </label>
-                                <Field
-                                    required
-                                    id="username"
-                                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none disabled:bg-gray-100"
-                                    type="text"
-                                    name="username"
-                                    placeholder={t('Login.username.placeholder')}
+        <div className="bg-base-200 animate-fade animate-duration-500 animate-delay-300 flex min-h-screen flex-col text-gray-700">
+            <main className="flex flex-1 items-center justify-center px-4 py-10 sm:px-6 lg:py-14">
+                <div className="bg-base-100 grid w-full max-w-4xl overflow-hidden rounded-xl shadow-xl lg:grid-cols-[0.9fr_1.1fr]">
+                    <section className="relative hidden min-h-[590px] overflow-hidden bg-gray-800 lg:block">
+                        <img
+                            src={loginBackground}
+                            alt=""
+                            className="absolute -inset-3 h-[calc(100%+1.5rem)] w-[calc(100%+1.5rem)] scale-105 object-cover brightness-50"
+                        />
+                    </section>
+
+                    <section className="p-7 sm:p-10 lg:p-12">
+                        <div className="mb-8">
+                            <div className="flex items-center justify-between gap-4">
+                                <img
+                                    src={globalConfig.logo}
+                                    alt=""
+                                    className="flex size-18 items-center gap-4"
                                 />
-                            </div>
 
-                            <div>
-                                <label
-                                    htmlFor="password"
-                                    className="flex items-center text-gray-700"
-                                >
-                                    <Icon className="mr-2 flex-shrink-0" path={mdiKey} size={0.8} />
-                                    {t('Login.password.label')}
-                                </label>
-                                <Field
-                                    required
-                                    id="password"
-                                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none disabled:bg-gray-100"
-                                    type="password"
-                                    name="password"
-                                    placeholder={t('Login.password.placeholder')}
-                                />
-                            </div>
-
-                            <div>
-                                <label
-                                    htmlFor="captcha"
-                                    className="flex items-center text-gray-700"
-                                >
-                                    <Icon
-                                        className="mr-2 flex-shrink-0"
-                                        path={mdiShieldCheck}
-                                        size={0.8}
-                                    />
-                                    {t('Login.captcha.label')}
-                                </label>
-                                <div className="mt-1 flex items-center justify-between space-x-2">
-                                    <Field
-                                        required
-                                        autoComplete="off"
-                                        id="captcha"
-                                        className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none disabled:bg-gray-100"
-                                        type="text"
-                                        name="captcha"
-                                        disabled={!preAuthData.captcha_img.length}
-                                        placeholder={t(
-                                            preAuthData.captcha_img.length
-                                                ? 'Login.captcha.placeholder'
-                                                : preAuthData.error
-                                                  ? 'Login.captcha.error'
-                                                  : 'Login.captcha.loading'
-                                        )}
-                                    />
-                                    <div
-                                        className="flex w-24 cursor-pointer items-center justify-center rounded-md border border-gray-300 py-2 transition-all hover:border-gray-400 md:w-32"
-                                        onClick={() => {
-                                            if (
-                                                preAuthData.captcha_img.length ||
-                                                preAuthData.error
-                                            ) {
-                                                getPreAuthData(true);
-                                            }
-                                        }}
-                                    >
-                                        {preAuthData.captcha_img.length ? (
-                                            <img
-                                                className="h-6"
-                                                src={preAuthData.captcha_img}
-                                                alt=""
-                                            />
-                                        ) : preAuthData.error ? (
-                                            <Icon
-                                                className="size-6 flex-shrink-0 text-red-400"
-                                                path={mdiRefreshCircle}
-                                            />
-                                        ) : (
-                                            <span className="loading loading-dots loading-sm size-6 bg-gray-500" />
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <button
-                                className="btn mt-4 mb-8 w-full rounded-lg bg-purple-500 py-2 font-medium text-white shadow-lg transition-all hover:bg-purple-700"
-                                type="submit"
-                                disabled={
-                                    isSubmitting ||
-                                    !preAuthData.captcha_img.length ||
-                                    credential.token.length > 0
-                                }
-                            >
-                                {t('Login.signin.button')}
-                            </button>
-
-                            <div className="flex items-center justify-center text-xs">
-                                <div className="dropdown dropdown-top dropdown-end">
-                                    <summary
+                                <div className="dropdown dropdown-end">
+                                    <button
+                                        type="button"
                                         tabIndex={0}
-                                        className="flex cursor-pointer items-center space-x-2 text-gray-500 select-none hover:text-gray-700"
+                                        className="btn btn-sm btn-ghost gap-2 text-gray-500"
                                     >
                                         <Icon
                                             className="flex-shrink-0"
                                             path={mdiEarth}
-                                            size={0.6}
+                                            size={0.8}
                                         />
                                         <span>{locales[currentLocale]}</span>
                                         <Icon
                                             className="flex-shrink-0"
-                                            path={mdiChevronUp}
+                                            path={mdiChevronDown}
                                             size={0.6}
                                         />
-                                    </summary>
+                                    </button>
                                     <ul
                                         tabIndex={0}
-                                        className="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                                        className="menu dropdown-content bg-base-100 rounded-box z-20 mt-2 w-52 p-2 shadow-md"
                                     >
                                         {Object.entries(locales).map(([key, value]) => (
                                             <li
@@ -350,10 +233,160 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                                     </ul>
                                 </div>
                             </div>
-                        </Form>
-                    )}
-                </Formik>
-            </div>
+                            <hr className="mt-6 text-gray-200" />
+                        </div>
+
+                        <Formik
+                            enableReinitialize
+                            initialValues={{ username: '', password: '', captcha: '' }}
+                            onSubmit={async (
+                                { username, password, captcha },
+                                { setSubmitting }
+                            ) => {
+                                try {
+                                    await sendPromiseAlert(
+                                        handleLoginSubmit(username, password, captcha),
+                                        t('Login.signin.loading'),
+                                        t('Login.signin.success'),
+                                        () => {
+                                            setSubmitting(false);
+                                            return t('Login.signin.error');
+                                        },
+                                        false
+                                    );
+                                } catch {
+                                    getPreAuthData(false);
+                                }
+                            }}
+                        >
+                            {({ isSubmitting }) => (
+                                <Form className="space-y-5">
+                                    <div>
+                                        <label
+                                            htmlFor="username"
+                                            className="flex items-center text-sm font-medium text-gray-700"
+                                        >
+                                            <Icon
+                                                className="mr-2 flex-shrink-0"
+                                                path={mdiAccount}
+                                                size={0.8}
+                                            />
+                                            {t('Login.username.label')}
+                                        </label>
+                                        <Field
+                                            required
+                                            id="username"
+                                            autoComplete="username"
+                                            className="input mt-2 w-full border border-gray-300 shadow-sm transition-all hover:ring focus:outline-none"
+                                            type="text"
+                                            name="username"
+                                            placeholder={t('Login.username.placeholder')}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label
+                                            htmlFor="password"
+                                            className="flex items-center text-sm font-medium text-gray-700"
+                                        >
+                                            <Icon
+                                                className="mr-2 flex-shrink-0"
+                                                path={mdiKey}
+                                                size={0.8}
+                                            />
+                                            {t('Login.password.label')}
+                                        </label>
+                                        <Field
+                                            required
+                                            id="password"
+                                            autoComplete="current-password"
+                                            className="input mt-2 w-full border border-gray-300 shadow-sm transition-all hover:ring focus:outline-none"
+                                            type="password"
+                                            name="password"
+                                            placeholder={t('Login.password.placeholder')}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label
+                                            htmlFor="captcha"
+                                            className="flex items-center text-sm font-medium text-gray-700"
+                                        >
+                                            <Icon
+                                                className="mr-2 flex-shrink-0"
+                                                path={mdiShieldCheck}
+                                                size={0.8}
+                                            />
+                                            {t('Login.captcha.label')}
+                                        </label>
+                                        <div className="mt-2 flex items-stretch justify-between space-x-2">
+                                            <Field
+                                                required
+                                                autoComplete="off"
+                                                id="captcha"
+                                                className="input min-w-0 flex-1 border border-gray-300 shadow-sm transition-all hover:ring focus:outline-none"
+                                                type="text"
+                                                name="captcha"
+                                                disabled={!preAuthData.captcha_img.length}
+                                                placeholder={t(
+                                                    preAuthData.captcha_img.length
+                                                        ? 'Login.captcha.placeholder'
+                                                        : preAuthData.error
+                                                          ? 'Login.captcha.error'
+                                                          : 'Login.captcha.loading'
+                                                )}
+                                            />
+                                            <button
+                                                type="button"
+                                                className="btn w-28 flex-shrink-0 border border-gray-300 shadow-sm transition-all hover:ring sm:w-32"
+                                                disabled={
+                                                    !preAuthData.captcha_img.length &&
+                                                    !preAuthData.error
+                                                }
+                                                onClick={() => {
+                                                    if (
+                                                        preAuthData.captcha_img.length ||
+                                                        preAuthData.error
+                                                    ) {
+                                                        getPreAuthData(true);
+                                                    }
+                                                }}
+                                            >
+                                                {preAuthData.captcha_img.length ? (
+                                                    <img
+                                                        className="h-6"
+                                                        src={preAuthData.captcha_img}
+                                                        alt={t('Login.captcha.label')}
+                                                    />
+                                                ) : preAuthData.error ? (
+                                                    <Icon
+                                                        className="size-6 flex-shrink-0 text-red-400"
+                                                        path={mdiRefreshCircle}
+                                                    />
+                                                ) : (
+                                                    <span className="loading loading-dots loading-sm size-6 bg-gray-500" />
+                                                )}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        className="btn mt-3 w-full rounded-lg bg-purple-500 py-2 font-medium text-white shadow-lg transition-all hover:bg-purple-700"
+                                        type="submit"
+                                        disabled={
+                                            isSubmitting ||
+                                            !preAuthData.captcha_img.length ||
+                                            credential.token.length > 0
+                                        }
+                                    >
+                                        {t('Login.signin.button')}
+                                    </button>
+                                </Form>
+                            )}
+                        </Formik>
+                    </section>
+                </div>
+            </main>
         </div>
     );
 };
