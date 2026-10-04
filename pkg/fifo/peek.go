@@ -5,8 +5,12 @@ import (
 )
 
 func (b *Buffer[T]) Peek(header []T, size int) ([]T, error) {
-	b.mutex.RLock()
-	defer b.mutex.RUnlock()
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
+	if size < 0 || len(header) > size {
+		return nil, errors.New("invalid packet size")
+	}
 
 	for {
 		if (b.writeIndex-b.readIndex+b.capacity)%b.capacity < size {

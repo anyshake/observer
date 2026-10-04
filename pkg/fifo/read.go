@@ -3,8 +3,12 @@ package fifo
 import "errors"
 
 func (b *Buffer[T]) Read(size int) ([]T, error) {
-	b.mutex.RLock()
-	defer b.mutex.RUnlock()
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
+	if size < 0 {
+		return nil, errors.New("invalid read size")
+	}
 
 	if (b.writeIndex-b.readIndex+b.capacity)%b.capacity < size {
 		return nil, errors.New("not enough data")

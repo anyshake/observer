@@ -1,5 +1,7 @@
 package semver
 
+import "strings"
+
 func (v *Version) Equal(ver *Version) bool {
 	return v.major == ver.major && v.minor == ver.minor && v.patch == ver.patch && v.preRelease == ver.preRelease
 }
@@ -33,7 +35,33 @@ func (v *Version) LessThan(ver *Version) bool {
 	if v.preRelease == "" && ver.preRelease != "" {
 		return false
 	}
-	return v.preRelease < ver.preRelease
+	left, right := strings.Split(v.preRelease, "."), strings.Split(ver.preRelease, ".")
+	for i := 0; i < len(left) && i < len(right); i++ {
+		if left[i] == right[i] {
+			continue
+		}
+		leftNumeric, rightNumeric := isNumericIdentifier(left[i]), isNumericIdentifier(right[i])
+		if leftNumeric != rightNumeric {
+			return leftNumeric
+		}
+		if leftNumeric && len(left[i]) != len(right[i]) {
+			return len(left[i]) < len(right[i])
+		}
+		return left[i] < right[i]
+	}
+	return len(left) < len(right)
+}
+
+func isNumericIdentifier(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, c := range s {
+		if c < '0' || c > '9' {
+			return false
+		}
+	}
+	return true
 }
 
 func (v *Version) GreaterThan(ver *Version) bool {

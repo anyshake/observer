@@ -2,6 +2,7 @@ package fifo_test
 
 import (
 	"bytes"
+	"sync"
 	"testing"
 
 	"github.com/anyshake/observer/pkg/fifo"
@@ -88,5 +89,71 @@ func writeBytes(t *testing.T, buffer *fifo.Buffer[byte], data []byte) {
 	t.Helper()
 	if n, err := buffer.Write(data...); err != nil || n != len(data) {
 		t.Fatalf("Write() = %d, %v, want %d, nil", n, err, len(data))
+	}
+}
+
+func TestInvalidReadSizesDoNotConsumeData(t *testing.T) {
+	t.Parallel()
+	buffer := fifo.New[byte](8)
+	writeBytes(t, buffer, []byte{1, 2, 3})
+	if _, err := buffer.Read(-1); err == nil {
+		t.Fatal("negative Read() size accepted")
+	}
+	if _, err := buffer.Peek(nil, -1); err == nil {
+		t.Fatal("negative Peek() size accepted")
+	}
+	if _, err := buffer.Peek([]byte{1, 2}, 1); err == nil {
+		t.Fatal("header larger than packet accepted")
+	}
+	if got, err := buffer.Read(3); err != nil || !bytes.Equal(got, []byte{1, 2, 3}) {
+		t.Fatalf("invalid reads consumed data: %v, %v", got, err)
+	}
+}
+
+func TestConcurrentConsumersDeliverEachValueOnce(t *testing.T) {
+	t.Parallel()
+	const count = 2048
+	buffer := fifo.New[int](count + 1)
+	values := make([]int, count)
+	for i := range values {
+		values[i] = i
+	}
+	if _, err := buffer.Write(values...); err != nil {
+		t.Fatal(err)
+	}
+	received := make(chan int, count)
+	var wg sync.WaitGroup
+	for i := 0; i < 8; i++ {
+		wg.Add(1)
+		go func(usePeek bool) {
+			defer wg.Done()
+			for {
+				var data []int
+				var err error
+				if usePeek {
+					data, err = buffer.Peek(nil, 1)
+				} else {
+					data, err = buffer.Read(1)
+				}
+				if err != nil {
+					return
+				}
+				received <- data[0]
+				_ = buffer.Len()
+			}
+		}(i%2 == 0)
+	}
+	go func() { wg.Wait(); close(received) }()
+	seen := make(map[int]int)
+	for value := range received {
+		seen[value]++
+	}
+	for _, value := range values {
+		if seen[value] != 1 {
+			t.Fatalf("value %d delivered %d times, want once", value, seen[value])
+		}
+	}
+	if buffer.Len() != 0 {
+		t.Fatal("consumers left unread values")
 	}
 }

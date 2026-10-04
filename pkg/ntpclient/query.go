@@ -1,164 +1,250 @@
 package ntpclient
 
 import (
+	"cmp"
+	"context"
 	"errors"
 	"fmt"
-	"math"
 	"slices"
-	"sync"
 	"time"
 
-	"github.com/anyshake/observer/pkg/logger"
 	"github.com/beevik/ntp"
-	"github.com/samber/lo"
 )
 
+// Query combines fresh measurements from up to five preferred servers.
+// The returned server is the lowest-distance member of the agreeing group.
 func (c *Client) Query() (time.Duration, string, error) {
-	probes := Probe(c.pool, c.readTimeout, c.timeFunc)
-
-	filtered := lo.Filter(probes, func(p ProbeResult, _ int) bool { return p.Err == nil && p.Resp != nil })
-	if len(filtered) == 0 {
-		return 0, "", errors.New("no available servers in NTP pool")
-	}
-
-	type scoredServer struct {
-		server       string
-		rootDistance time.Duration
-		rtt          time.Duration
-	}
-	var candidates []scoredServer
-	for _, p := range filtered {
-		rd := p.Resp.RootDelay/2 + p.Resp.RootDispersion + p.Resp.RTT/2
-		candidates = append(candidates, scoredServer{p.Server, rd, p.Resp.RTT})
-	}
-
-	bestCandidate := lo.MinBy(candidates, func(a, b scoredServer) bool { return a.rootDistance < b.rootDistance })
-	bestServer := bestCandidate.server
-	bestRD := bestCandidate.rootDistance
-	bestRTT := bestCandidate.rtt
-
-	type attemptResult struct {
-		offset time.Duration
-		rtt    time.Duration
-		err    error
-	}
-	attempts := make([]attemptResult, QUERY_ATTEMPT)
-
-	sem := make(chan struct{}, CONCURRENT_QUERIES)
-	var wg sync.WaitGroup
-
-	for i := 0; i < QUERY_ATTEMPT; i++ {
-		wg.Add(1)
-		go func(idx int) {
-			defer wg.Done()
-			sem <- struct{}{}
-			defer func() { <-sem }()
-
-			retryCount := 0
-			for {
-				resp, err := ntp.QueryWithOptions(bestServer, ntp.QueryOptions{
-					Timeout:       c.readTimeout,
-					GetSystemTime: c.timeFunc,
-				})
-				if err != nil || resp == nil {
-					retryCount++
-					if retryCount > c.retries {
-						attempts[idx] = attemptResult{err: fmt.Errorf("all retries failed")}
-						return
-					}
-					continue
-				}
-
-				rd := resp.RootDelay/2 + resp.RootDispersion + resp.RTT/2
-				if resp.RTT > time.Duration(float64(bestRTT)*1.2) || rd > time.Duration(float64(bestRD)*1.2) {
-					retryCount++
-					if retryCount > c.retries {
-						attempts[idx] = attemptResult{err: fmt.Errorf("RTT/RootDistance too high after retries")}
-						return
-					}
-					continue
-				}
-
-				attempts[idx] = attemptResult{offset: resp.ClockOffset, rtt: resp.RTT, err: nil}
-				return
-			}
-		}(i)
-	}
-	wg.Wait()
-
-	// Keep only valid attempts
-	validAttempts := lo.Filter(attempts, func(a attemptResult, _ int) bool { return a.err == nil })
-	if len(validAttempts) == 0 {
-		return 0, bestServer, errors.New("all query attempts failed")
-	}
-
-	// Trim outliers
-	slices.SortFunc(validAttempts, func(a, b attemptResult) int { return int(a.offset - b.offset) })
-	trim := len(validAttempts) / 10 // remove 10%
-	if trim > 0 && len(validAttempts) > 2*trim {
-		validAttempts = validAttempts[trim : len(validAttempts)-trim]
-	}
-
-	if len(validAttempts) <= 2 {
-		median := validAttempts[len(validAttempts)/2].offset
-		return median, bestServer, nil
-	}
-
-	// Calculate RTT jitter
-	var rtts []float64
-	for _, a := range validAttempts {
-		rtts = append(rtts, float64(a.rtt.Microseconds()))
-	}
-	mean := 0.0
-	for _, r := range rtts {
-		mean += r
-	}
-	mean /= float64(len(rtts))
-	var variance float64
-	for _, r := range rtts {
-		variance += (r - mean) * (r - mean)
-	}
-	jitter := math.Sqrt(variance / float64(len(rtts))) // stddev (µs)
-
-	// weight average offset by 1/RTT^exponent
-	var (
-		weightedSum float64
-		weightSum   float64
-	)
-	for _, a := range validAttempts {
-		rtt := float64(a.rtt.Microseconds() + 1)
-		weight := 1.0 / math.Pow(rtt, lo.Ternary(jitter >= 5000, 8.0, 4.0))
-		weightedSum += float64(a.offset) * weight
-		weightSum += weight
-	}
-	if weightSum == 0 {
-		return 0, bestServer, errors.New("weightSum=0, all weights dropped")
-	}
-	finalOffset := time.Duration(weightedSum / weightSum)
-
-	return finalOffset, bestServer, nil
+	return c.QueryContext(context.Background())
 }
 
+// QueryContext also cancels queued probes and in-flight network I/O when ctx ends.
+func (c *Client) QueryContext(ctx context.Context) (time.Duration, string, error) {
+	return c.measure(ctx, QUERY_ATTEMPT)
+}
+
+// QueryAverage combines up to attempts distinct sources, not repeated bursts
+// against one server. Discovery and fallback may query additional sources.
 func (c *Client) QueryAverage(attempts int) (time.Duration, error) {
-	var results []int64
+	return c.QueryAverageContext(context.Background(), attempts)
+}
 
-	for i := 0; i < attempts; i++ {
-		resp, server, err := c.Query()
-		if err != nil {
-			return 0, err
+func (c *Client) QueryAverageContext(ctx context.Context, attempts int) (time.Duration, error) {
+	if attempts <= 0 {
+		return 0, errors.New("NTP query attempts must be positive")
+	}
+	offset, _, err := c.measure(ctx, attempts)
+	return offset, err
+}
+
+func (c *Client) measure(ctx context.Context, target int) (offset time.Duration, server string, err error) {
+	started := time.Now()
+	c.infof("NTP synchronization requested: target=%d pool=%d", target, len(c.pool))
+	defer func() {
+		if err == nil {
+			return
 		}
+		// Per-server timeouts are wrapped failures, not cancellation of this operation.
+		if err == context.Canceled || err == context.DeadlineExceeded || errors.Is(err, ErrClosed) {
+			c.infof("NTP synchronization stopped: %v (elapsed=%s)", err, time.Since(started))
+		} else {
+			c.warnf("NTP synchronization failed: %v (elapsed=%s)", err, time.Since(started))
+		}
+	}()
+	if len(c.pool) == 0 {
+		return 0, "", errors.New("NTP pool is empty")
+	}
+	if c.ctx.Err() != nil {
+		return 0, "", ErrClosed
+	}
+	ctx, cancel := context.WithCancel(ctx)
+	stop := context.AfterFunc(c.ctx, cancel)
+	defer stop()
+	defer cancel()
 
-		logger.GetLogger("ntp_client").Infof("%d of %d attempts: current server %s, monotonic clock offset %d ms", i+1, attempts, server, resp.Milliseconds())
-		results = append(results, resp.Milliseconds())
+	// Serialize polling decisions, but allow callers waiting their turn to cancel.
+	select {
+	case c.gate <- struct{}{}:
+	default:
+		c.infof("NTP synchronization waiting for the active query")
+		select {
+		case c.gate <- struct{}{}:
+		case <-ctx.Done():
+			return 0, "", ctx.Err()
+		}
+	}
+	defer func() { <-c.gate }()
+	if c.ctx.Err() != nil {
+		return 0, "", ErrClosed
+	}
+	if err := ctx.Err(); err != nil {
+		return 0, "", err
+	}
+	target = min(target, len(c.pool))
+	discover := c.lastDiscovery.IsZero() || time.Since(c.lastDiscovery) >= poolRefreshInterval
+	if discover {
+		c.infof("NTP pool discovery: checking eligible endpoints in pool of %d", len(c.pool))
+	} else {
+		c.infof("NTP preferred-source sampling: target=%d", target)
+	}
+	seen := make(map[string]bool, len(c.pool))
+	var samples []clockSample
+	var lastErr error
 
-		time.Sleep(time.Second)
+	for round := 0; round <= c.retries; round++ {
+		if err := ctx.Err(); err != nil {
+			return 0, "", err
+		}
+		servers := c.selectServers(seen, time.Now())
+		if len(servers) == 0 {
+			c.infof("NTP no eligible unqueried sources: endpoints are cooling down, disabled, or already tried")
+			break
+		}
+		if !discover || round > 0 {
+			needed := target - len(samples)
+			if needed <= 0 {
+				needed = target // Resolve disagreement using other sources.
+			}
+			servers = servers[:min(len(servers), needed)]
+		}
+		for _, server := range servers {
+			seen[server] = true
+		}
+		if round > 0 {
+			c.infof("NTP fallback: querying other endpoints, usable_samples=%d target=%d", len(samples), target)
+		}
+		c.infof("NTP probe batch %d: querying %d endpoints", round+1, len(servers))
+		var onResult func(ProbeResult)
+		if c.logger != nil {
+			completed := 0
+			onResult = func(result ProbeResult) {
+				completed++
+				if ctx.Err() != nil {
+					return
+				}
+				if result.Err != nil || result.Resp == nil {
+					c.infof("NTP probe progress: batch=%d completed=%d/%d server=%s no usable reply", round+1, completed, len(servers), result.Server)
+				} else {
+					c.infof("NTP probe progress: batch=%d completed=%d/%d server=%s offset=%s rtt=%s", round+1, completed, len(servers), result.Server, result.Resp.ClockOffset, result.Resp.RTT)
+				}
+			}
+		}
+		results := probeContext(ctx, servers, c.readTimeout, c.timeFunc, c.query, onResult)
+		if err := ctx.Err(); err != nil {
+			// Cancellation is not a source failure, but must not bypass polling limits.
+			for _, server := range servers {
+				c.servers[server].nextPoll = time.Now().Add(c.servers[server].interval)
+			}
+			return 0, "", err
+		}
+		for _, result := range results {
+			sample, err := c.recordResult(result, time.Now())
+			if err != nil {
+				lastErr = fmt.Errorf("NTP server %s: %w", result.Server, err)
+				state := c.servers[result.Server]
+				if state.disabled {
+					c.warnf("NTP source disabled: server=%s kiss_code=%s", result.Server, result.Resp.KissCode)
+				} else if result.Resp != nil && result.Resp.IsKissOfDeath() {
+					c.warnf("NTP source backoff: server=%s kiss_code=%s retry_after=%s", result.Server, result.Resp.KissCode, max(state.interval, state.backoff))
+				} else {
+					c.warnf("NTP sample rejected: server=%s error=%v retry_after=%s", result.Server, err, max(state.interval, state.backoff))
+				}
+				continue
+			}
+			samples = append(samples, sample)
+		}
+		if discover {
+			c.lastDiscovery = time.Now()
+		}
+		c.infof("NTP sample collection: usable=%d target=%d", len(samples), target)
+		if len(samples) >= target {
+			if _, _, err := combineSamples(samples, target); err == nil {
+				break
+			} else {
+				c.warnf("NTP consensus not reached: %v (samples=%d)", err, len(samples))
+			}
+		}
 	}
 
-	var sum int64
-	for _, v := range results {
-		sum += v
+	if len(samples) == 0 {
+		if lastErr != nil {
+			return 0, "", fmt.Errorf("no usable NTP samples: %w", lastErr)
+		}
+		return 0, "", errors.New("no NTP servers ready to poll; servers are cooling down or disabled")
 	}
-	avg := float64(sum) / float64(len(results))
+	c.infof("NTP checking consensus: usable_samples=%d", len(samples))
+	offset, server, err = combineSamples(samples, target)
+	if ctx.Err() != nil {
+		return 0, "", ctx.Err()
+	}
+	if err == nil {
+		agreeing := 0
+		for _, sample := range samples {
+			if offset < sample.offset-sample.distance || offset > sample.offset+sample.distance {
+				c.servers[sample.server].valid = false
+				c.warnf("NTP source disagrees: server=%s offset=%s distance=%s; deprioritized", sample.server, sample.offset, sample.distance)
+			} else {
+				agreeing++
+			}
+		}
+		if len(samples) == 1 {
+			c.warnf("NTP single-source synchronization: server=%s; no independent clock cross-check", server)
+		}
+		c.infof("NTP synchronization complete: server=%s offset=%s agreeing=%d/%d weighted_sources=%d elapsed=%s", server, offset, agreeing, len(samples), min(target, agreeing), time.Since(started))
+	}
+	return offset, server, err
+}
 
-	return time.Duration(math.Round(avg)) * time.Millisecond, nil
+func (c *Client) selectServers(seen map[string]bool, now time.Time) []string {
+	var servers []string
+	for _, server := range c.pool {
+		state := c.servers[server]
+		if !seen[server] && !state.disabled && !now.Before(state.nextPoll) {
+			servers = append(servers, server)
+		}
+	}
+	slices.SortStableFunc(servers, func(a, b string) int {
+		left, right := c.servers[a], c.servers[b]
+		if left.valid != right.valid {
+			if left.valid {
+				return -1
+			}
+			return 1
+		}
+		return cmp.Compare(left.distance, right.distance)
+	})
+	return servers
+}
+
+func (c *Client) recordResult(result ProbeResult, now time.Time) (clockSample, error) {
+	state := c.servers[result.Server]
+	err := result.Err
+	if result.Resp != nil && result.Resp.IsKissOfDeath() {
+		if result.Resp.KissCode == "DENY" || result.Resp.KissCode == "RSTR" {
+			state.disabled = true
+		}
+		if result.Resp.KissCode == "RATE" {
+			state.interval = max(state.interval, min(maxFailureBackoff, state.interval*2), result.Resp.Poll)
+		}
+		err = ntp.ErrKissOfDeath
+	}
+	if err == nil {
+		if result.Resp == nil {
+			err = errors.New("empty NTP response")
+		} else {
+			err = result.Resp.Validate()
+		}
+	}
+	if err != nil {
+		state.valid = false
+		state.backoff = min(maxFailureBackoff, max(minPollInterval, state.backoff*2))
+		state.nextPoll = now.Add(max(state.interval, state.backoff))
+		return clockSample{}, err
+	}
+
+	response := result.Resp
+	state.distance = max(response.RTT/2+response.RootDelay/2+response.RootDispersion, response.Precision, time.Microsecond)
+	state.valid = true
+	state.backoff = 0
+	state.nextPoll = now.Add(state.interval)
+	return clockSample{server: result.Server, offset: response.ClockOffset, distance: state.distance}, nil
 }

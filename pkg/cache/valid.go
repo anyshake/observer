@@ -5,11 +5,11 @@ import "time"
 func (c *GenericCache[T]) Valid() bool {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
-	return time.Since(c.createdAt) < c.ttl
+	return !c.createdAt.IsZero() && time.Since(c.createdAt) < c.ttl
 }
 
 func (c *KvCache[T]) Valid() bool {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
-	return time.Since(c.createdAt) < c.ttl
+	return !c.createdAt.IsZero() && time.Since(c.createdAt) < c.ttl
 }

@@ -1,7 +1,9 @@
 package metadata
 
 import (
+	"bytes"
 	"embed"
+	"encoding/xml"
 	"fmt"
 	"maps"
 	"os"
@@ -34,4 +36,13 @@ func mergeMap(a, b map[string]string) map[string]string {
 	maps.Copy(out, a)
 	maps.Copy(out, b)
 	return out
+}
+
+func escapeXMLMap(data map[string]string) map[string]string {
+	for key, value := range data {
+		var escaped bytes.Buffer
+		_ = xml.EscapeText(&escaped, []byte(value))
+		data[key] = escaped.String()
+	}
+	return data
 }

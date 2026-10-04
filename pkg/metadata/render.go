@@ -37,7 +37,7 @@ func (r *Render) SeisComP() string {
 			dataMap[fmt.Sprintf("ChannelCode%d", idx)] = r.options.ChannelCodes[idx-1]
 		}
 	}
-	dataMap = mergeMap(dataMap, r.attributes)
+	dataMap = escapeXMLMap(mergeMap(dataMap, r.attributes))
 
 	var stringBuf strings.Builder
 	if err := r.templateSeisComP.Execute(&stringBuf, dataMap); err != nil {
@@ -69,7 +69,7 @@ func (r *Render) StationXML() string {
 			dataMap[fmt.Sprintf("ChannelCode%d", idx)] = r.options.ChannelCodes[idx-1]
 		}
 	}
-	dataMap = mergeMap(dataMap, r.attributes)
+	dataMap = escapeXMLMap(mergeMap(dataMap, r.attributes))
 
 	var stringBuf strings.Builder
 	if err := r.templateStationXML.Execute(&stringBuf, dataMap); err != nil {

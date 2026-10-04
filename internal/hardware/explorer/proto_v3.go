@@ -37,6 +37,9 @@ type ExplorerProtoImplV3 struct {
 
 	Transport  transport.ITransport
 	fifoBuffer *fifo.Buffer[*explorerProtocolPacketV3]
+	ntpClient  *ntpclient.Client
+	cancelFn   context.CancelFunc
+	ntpDone    chan struct{}
 
 	// buf length: 100; ppm window: 60 min
 	clockDriftBuf *ringbuf.Buffer[clockDrift]
@@ -242,6 +245,12 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 	if err := g.Transport.Open(); err != nil {
 		return nil, nil, fmt.Errorf("failed to open transport: %w", err)
 	}
+	opened := false
+	defer func() {
+		if !opened {
+			_ = g.Close()
+		}
+	}()
 	if err := g.Flush(); err != nil {
 		return nil, nil, fmt.Errorf("failed to flush transport: %w", err)
 	}
@@ -249,12 +258,13 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 	if g.Logger == nil {
 		return nil, nil, errors.New("logger is not set")
 	}
-	ntpClient, err := ntpclient.New(g.NtpOptions.Pool, g.NtpOptions.Retry, g.NtpOptions.ReadTimeout, timesource.MonotonicNow)
+	ntpClient, err := ntpclient.New(g.NtpOptions.Pool, g.NtpOptions.Retry, g.NtpOptions.ReadTimeout, timesource.MonotonicNow, ntpclient.WithLogger(g.Logger))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create ntp client: %w", err)
 	}
 
 	subCtx, cancelFn := context.WithCancel(ctx)
+	g.ntpClient, g.cancelFn = ntpClient, cancelFn
 
 	g.fifoBuffer = fifo.New[*explorerProtocolPacketV3](512)
 	g.clockDriftBuf = ringbuf.New[clockDrift](100)
@@ -373,14 +383,16 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 						g.Logger.Infof("time synchronized with Explorer built-in GNSS module")
 					} else if !timeSourceInitialized {
 						g.Logger.Infoln("synchronizing time with NTP servers, it may take a while")
-						offset, err := ntpClient.QueryAverage(NTP_MEASUREMENT_ATTEMPTS)
+						offset, err := ntpClient.QueryAverageContext(subCtx, NTP_MEASUREMENT_ATTEMPTS)
+						if subCtx.Err() != nil {
+							continue
+						}
 						if err != nil {
 							g.Logger.Errorf("failed to synchronize time with NTP server: %v", err)
 							if atomic.LoadInt32(&initFlag) == 0 {
 								cancelFn()
-							} else {
-								continue
 							}
+							continue
 						} else {
 							g.Logger.Infof("time synchronized with NTP server, local monotonic time offset: %d ms", offset.Milliseconds())
 						}
@@ -531,11 +543,20 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 		}
 	}(10 * time.Millisecond)
 
+	ntpDone := make(chan struct{})
+	g.ntpDone = ntpDone
 	go func(resyncInterval time.Duration) {
-		<-readyChan
+		defer close(ntpDone)
+		select {
+		case <-readyChan:
+		case <-subCtx.Done():
+			return
+		}
 
 		var prevCalibTime time.Time
-		for timer := time.NewTimer(resyncInterval); ; {
+		timer := time.NewTimer(resyncInterval)
+		defer timer.Stop()
+		for {
 			select {
 			case calibTimeData := <-g.timeCalibrationChan:
 				if prevCalibTime.Unix() == calibTimeData[1].Unix() {
@@ -552,7 +573,10 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 					continue
 				}
 				g.Logger.Infoln("re-synchronizing time with NTP servers")
-				offset, server, err := ntpClient.Query()
+				offset, server, err := ntpClient.QueryContext(subCtx)
+				if subCtx.Err() != nil {
+					return
+				}
 				if err != nil {
 					g.Logger.Warnf("error occurred while re-synchronizing time with NTP: %v", err)
 					timer.Reset(resyncInterval)
@@ -565,17 +589,32 @@ func (g *ExplorerProtoImplV3) Open(ctx context.Context) (context.Context, contex
 				g.TimeSource.Update(currentMonotonicTime, currentMonotonicTime.Add(offset), ppm, nil)
 				g.Logger.Infof("time synchronized with NTP server: %s, local monotonic time offset: %d ms, clock drift PPM: %.2f", server, offset.Milliseconds(), ppm)
 			case <-subCtx.Done():
-				timer.Stop()
 				return
 			}
 		}
 	}(NTP_RESYNC_INTERVAL)
 
-	<-readyChan
+	select {
+	case <-readyChan:
+	case <-subCtx.Done():
+	}
+	if err := subCtx.Err(); err != nil {
+		return nil, nil, err
+	}
+	opened = true
 	return subCtx, cancelFn, nil
 }
 
 func (g *ExplorerProtoImplV3) Close() error {
+	if g.cancelFn != nil {
+		g.cancelFn()
+	}
+	if g.ntpClient != nil {
+		_ = g.ntpClient.Close()
+	}
+	if g.ntpDone != nil {
+		<-g.ntpDone
+	}
 	if g.Transport == nil {
 		return errors.New("transport is not opened")
 	}

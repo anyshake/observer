@@ -2,7 +2,6 @@ package request
 
 import (
 	"bytes"
-	"crypto/tls"
 	"fmt"
 	"net/http"
 	"net/textproto"
@@ -11,7 +10,9 @@ import (
 )
 
 func POST(url, payload, contentType string, timeout, retryInterval time.Duration, maxRetries int, trimSpace bool, customTransport http.RoundTripper, headers ...map[string]string) ([]byte, error) {
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true, MinVersion: tls.VersionTLS12}
+	if customTransport == nil {
+		customTransport = defaultTransport
+	}
 	client := http.Client{Timeout: timeout, Transport: customTransport}
 	req, err := http.NewRequest("POST", url, strings.NewReader(payload))
 	if err != nil {

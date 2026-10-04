@@ -3,15 +3,16 @@ package seisevent
 import (
 	"encoding/csv"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 )
 
 func ParseFdsnwsEvent(dataText, timeLayout string) ([]Event, error) {
-	// Convert to CSV format
-	csvDataStr := strings.ReplaceAll(dataText, ",", " - ")
-	csvDataStr = strings.ReplaceAll(csvDataStr, "|", ",")
-	csvRecords, err := csv.NewReader(strings.NewReader(csvDataStr)).ReadAll()
+	reader := csv.NewReader(strings.NewReader(dataText))
+	reader.Comma = '|'
+	reader.LazyQuotes = true
+	csvRecords, err := reader.ReadAll()
 	if err != nil {
 		return nil, err
 	}
@@ -22,6 +23,9 @@ func ParseFdsnwsEvent(dataText, timeLayout string) ([]Event, error) {
 
 	var resultArr []Event
 	for _, record := range csvRecords[1:] {
+		if len(record) < 13 {
+			return nil, errors.New("incomplete seismic event record")
+		}
 		var (
 			seisEvent Event
 			magType   string
@@ -55,6 +59,9 @@ func ParseFdsnwsEvent(dataText, timeLayout string) ([]Event, error) {
 			case 12:
 				seisEvent.Region = val
 			}
+		}
+		if strings.TrimSpace(seisEvent.Region) == "" {
+			seisEvent.Region = fmt.Sprintf("Latitude: %.4f°, Longitude: %.4f°", seisEvent.Latitude, seisEvent.Longitude)
 		}
 		resultArr = append(resultArr, seisEvent)
 	}
