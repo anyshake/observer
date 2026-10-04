@@ -82,7 +82,7 @@ export const DialogModal = ({
 
         return (
             <div
-                className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4"
+                className="fixed inset-0 z-40 flex h-dvh items-center justify-center bg-black/40 p-4"
                 role="dialog"
                 aria-modal="true"
                 onMouseDown={({ currentTarget, target }) => {
@@ -92,7 +92,7 @@ export const DialogModal = ({
                 }}
             >
                 <div
-                    className={`relative rounded-lg bg-white p-6 shadow-2xl ${fullScreen ? 'h-screen w-full max-w-none' : 'max-h-[90vh] w-[90%] max-w-2xl overflow-y-auto sm:w-[80%] md:w-[60%]'}`}
+                    className={`relative min-h-0 overflow-y-auto rounded-lg bg-white p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-2xl ${fullScreen ? 'h-full max-h-full w-full max-w-none' : 'max-h-[90dvh] w-[90%] max-w-2xl sm:w-[80%] md:w-[60%]'}`}
                 >
                     <button
                         className="btn btn-sm btn-circle btn-ghost absolute top-2 right-2"
@@ -108,9 +108,9 @@ export const DialogModal = ({
     }
 
     return (
-        <dialog ref={dialogRef} className="modal">
+        <dialog ref={dialogRef} className="modal h-dvh">
             <div
-                className={`modal-box ${fullScreen ? 'h-screen w-full max-w-none' : 'max-h-[90vh] w-[90%] max-w-2xl sm:w-[80%] md:w-[60%]'}`}
+                className={`modal-box min-h-0 overflow-y-auto pb-[calc(1.5rem+env(safe-area-inset-bottom))] ${fullScreen ? 'h-full max-h-full w-full max-w-none' : 'max-h-[90dvh] w-[90%] max-w-2xl sm:w-[80%] md:w-[60%]'}`}
             >
                 <form method="dialog">
                     <button className="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">
