@@ -2,6 +2,36 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.6.1
+
+### Release Notes
+
+This release focuses on **seismic query efficiency, time synchronization reliability, and Tailscale compatibility**. It fixes a panic that could occur when querying seismic events after enabling Tailscale, adds configurable SeedLink compression, and improves waveform processing and the web interface.
+
+### New Features
+
+- Added selectable **STEIM-1 and STEIM-2 compression schemes** for SeedLink streams, with STEIM-1 as the default when compression is enabled.
+
+### Improvements
+
+- Reworked historical waveform queries to process database records incrementally, reducing memory usage in data exports, GraphQL queries, helicorder rendering, and SeedLink playback.
+- Added cancellation support to waveform queries and reduced unnecessary copies when decoding stored channel data.
+- Optimized **NTP synchronization** with preferred-source selection, polling limits, failure backoff, and consensus-based offset estimation to reduce network requests and reject disagreeing measurements.
+- Added NTP progress logging and cancellation-aware shutdown, including cleanup after failed Explorer initialization.
+- Refreshed the login page and improved dialog scrolling, mobile viewport sizing, and safe-area spacing.
+- Expanded unit test coverage for core components, hardware protocol handling, authentication, and network helpers.
+
+### Bug Fixes
+
+- Fixed a panic that could occur when querying **seismic events with Tailscale enabled**, caused by assuming the global HTTP transport was always a `*http.Transport`. HTTP requests now use a dedicated reusable transport without modifying the global transport.
+- Fixed **FDSN event parsing** to preserve commas and quoted location names, reject incomplete records, and display epicenter coordinates when the location name is missing.
+- Fixed XML escaping in **StationXML and SeisComP metadata** for values containing special characters.
+- Fixed concurrent FIFO reads and packet peeking, and added validation for invalid buffer sizes.
+- Fixed seekable-buffer read position updates, end-of-file handling, invalid seek offsets, and writes beyond the current data length.
+- Fixed DNS-over-UDP queries applying the requested timeout only after the query completed.
+- Fixed semantic version comparisons for numeric and multi-part prerelease identifiers.
+- Fixed uninitialized or cleared caches potentially being treated as valid with very long expiration periods.
+
 ## v4.6.0
 
 ### Release Notes
