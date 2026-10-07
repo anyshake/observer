@@ -19,7 +19,7 @@ import (
 func Setup(routerGroup *gin.RouterGroup, timeSource *timesource.Source, hardware hardware.IHardware, jwtMiddleware gin.HandlerFunc) {
 	s := socket{
 		messageBus:     message.NewBus[explorer.Event](LOG_PREFIX),
-		historyBuffer:  make([]buffer, 0, HISTORY_BUFFER_SIZE),
+		historyBuffer:  make([]buffer, HISTORY_BUFFER_SIZE),
 		tokenValidator: newTokenValidator(jwtMiddleware),
 	}
 	if err := hardware.Subscribe(LOG_PREFIX, func(event explorer.Event) {
@@ -60,21 +60,35 @@ func (s *socket) storeHistory(event explorer.Event) {
 	}
 
 	s.historyMu.Lock()
-	defer s.historyMu.Unlock()
-	if len(s.historyBuffer) >= HISTORY_BUFFER_SIZE {
-		s.historyBuffer = s.historyBuffer[1:]
-	}
-	s.historyBuffer = append(s.historyBuffer, buffer{
+	s.historyBuffer[s.historyPos] = buffer{
 		Timestamp:   event.Timestamp.UnixMilli(),
 		SampleRate:  event.SampleRate,
 		ChannelData: channelData,
-	})
+	}
+	s.historyPos++
+	if s.historyPos == HISTORY_BUFFER_SIZE {
+		s.historyPos = 0
+	}
+	if s.historyLen < HISTORY_BUFFER_SIZE {
+		s.historyLen++
+	}
+	s.historyMu.Unlock()
+}
+
+func (s *socket) historyAt(index int) buffer {
+	start := 0
+	if s.historyLen == HISTORY_BUFFER_SIZE {
+		start = s.historyPos
+	}
+	return s.historyBuffer[(start+index)%HISTORY_BUFFER_SIZE]
 }
 
 func (s *socket) sendHistory(conn *websocket.Conn, writeMu *sync.Mutex, timeSource *timesource.Source) error {
 	s.historyMu.RLock()
-	historyMessages := lo.Map(s.historyBuffer, func(history buffer, _ int) map[string]any {
-		return map[string]any{
+	historyMessages := make([]map[string]any, s.historyLen)
+	for i := range historyMessages {
+		history := s.historyAt(i)
+		historyMessages[i] = map[string]any{
 			"current_time": timeSource.Now().UnixMilli(),
 			"record_time":  history.Timestamp,
 			"sample_rate":  history.SampleRate,
@@ -87,7 +101,7 @@ func (s *socket) sendHistory(conn *websocket.Conn, writeMu *sync.Mutex, timeSour
 				}
 			}),
 		}
-	})
+	}
 	s.historyMu.RUnlock()
 
 	for _, message := range historyMessages {

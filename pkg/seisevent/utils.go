@@ -61,22 +61,20 @@ func sortSeismicEvents(events []Event) []Event {
 }
 
 func getDistance(lat1, lat2, lng1, lng2 float64) float64 {
-	var (
+	const (
 		radius = 6378.137
 		rad    = math.Pi / 180.0
 	)
-	lat1 = lat1 * rad
-	lng1 = lng1 * rad
-	lat2 = lat2 * rad
-	lng2 = lng2 * rad
+	lat1 *= rad
+	lng1 *= rad
+	lat2 *= rad
+	lng2 *= rad
 
-	var (
-		a      = lat1 - lat2
-		b      = lng1 - lng2
-		cal    = 2 * math.Asin(math.Sqrt(math.Pow(math.Sin(a/2), 2)+math.Cos(lat1)*math.Cos(lat2)*math.Pow(math.Sin(b/2), 2))) * radius
-		result = math.Round(cal*10000) / 10000
-	)
-	return result
+	sinLat := math.Sin((lat1 - lat2) / 2)
+	sinLng := math.Sin((lng1 - lng2) / 2)
+	h := sinLat*sinLat + math.Cos(lat1)*math.Cos(lat2)*sinLng*sinLng
+	cal := 2 * math.Asin(math.Sqrt(h)) * radius
+	return math.Round(cal*10000) / 10000
 }
 
 func getSeismicEstimation(table *travel.AK135, lat1, lat2, lng1, lng2, depth float64) Estimation {

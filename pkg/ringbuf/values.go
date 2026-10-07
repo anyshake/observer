@@ -5,8 +5,16 @@ func (r *Buffer[T]) Values() []T {
 	defer r.mutex.RUnlock()
 
 	vals := make([]T, r.count)
-	for i := 0; i < r.count; i++ {
-		vals[i] = r.data[(r.start+i)%r.size]
+	if r.count == 0 {
+		return vals
 	}
+
+	tail := r.size - r.start
+	if r.count <= tail {
+		copy(vals, r.data[r.start:r.start+r.count])
+		return vals
+	}
+	copy(vals, r.data[r.start:])
+	copy(vals[tail:], r.data[:r.count-tail])
 	return vals
 }

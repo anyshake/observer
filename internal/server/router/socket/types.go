@@ -22,4 +22,6 @@ type socket struct {
 	messageBus     *message.Bus[explorer.Event]
 	tokenValidator func(string) bool
 	historyBuffer  []buffer
+	historyPos     int
+	historyLen     int
 }

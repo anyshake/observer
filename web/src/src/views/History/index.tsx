@@ -45,6 +45,18 @@ import { useThrottleFnTrailing } from '../../helpers/utils/useThrottleFnTrailing
 import { useLayoutStore } from '../../stores/layout';
 import { useRetentionStore } from '../../stores/retention';
 
+const sameStrings = (left: string[], right: string[]) => {
+    if (left.length !== right.length) {
+        return false;
+    }
+    for (let i = 0; i < left.length; i++) {
+        if (left[i] !== right[i]) {
+            return false;
+        }
+    }
+    return true;
+};
+
 const History = ({ currentLocale }: IRouterComponent) => {
     const { t } = useTranslation();
     const countryFlags = useMemo(
@@ -297,6 +309,28 @@ const History = ({ currentLocale }: IRouterComponent) => {
     const [chartData, setChartData] = useState<{ [key: string]: Array<[number, number | null]> }>(
         {}
     );
+    const spectrogramSeries = useMemo(() => {
+        const series: { [key: string]: Array<[number, number]> } = {};
+        for (const channel in chartData) {
+            const source = chartData[channel];
+            let count = 0;
+            for (let i = 0; i < source.length; i++) {
+                if (source[i][1] !== null) {
+                    count++;
+                }
+            }
+            const points = new Array<[number, number]>(count);
+            let offset = 0;
+            for (let i = 0; i < source.length; i++) {
+                const point = source[i];
+                if (point[1] !== null) {
+                    points[offset++] = [point[0], point[1]];
+                }
+            }
+            series[channel] = points;
+        }
+        return series;
+    }, [chartData]);
     const [getSeismicRecords] = useGetSeismicRecordsLazyQuery();
     const handleSearchRecords = useCallback(async () => {
         if (startTime > endTime) {
@@ -330,14 +364,12 @@ const History = ({ currentLocale }: IRouterComponent) => {
                         currentChannels.add(channel.channelCode);
                     });
                 });
+                const channels = Array.from(currentChannels);
 
-                if (
-                    JSON.stringify(Array.from(currentChannels)) !==
-                    JSON.stringify(prevChannelsRef.current)
-                ) {
+                if (!sameStrings(channels, prevChannelsRef.current)) {
                     setActiveChannels((prevChannels) => {
                         const newChannels = { ...prevChannels };
-                        Array.from(currentChannels).forEach((channel, index) => {
+                        channels.forEach((channel, index) => {
                             if (!newChannels[channel]) {
                                 newChannels[channel] = {
                                     id: `${HistoryConstraints.id}_${channel}`,
@@ -350,46 +382,89 @@ const History = ({ currentLocale }: IRouterComponent) => {
                                 delete newChannels[channel];
                             }
                         });
-                        prevChannelsRef.current = Array.from(currentChannels);
+                        prevChannelsRef.current = channels;
                         return newChannels;
                     });
                 }
 
+                const sampleCounts: Record<string, number> = {};
+                let gapCount = 0;
+                let previousTimestamp: number | null = null;
+                for (let recordIndex = 0; recordIndex < records.length; recordIndex++) {
+                    const record = records[recordIndex]!;
+                    if (previousTimestamp !== null && record.timestamp - previousTimestamp > 2000) {
+                        gapCount++;
+                    }
+                    previousTimestamp = record.timestamp;
+                    for (
+                        let channelIndex = 0;
+                        channelIndex < record.channelData.length;
+                        channelIndex++
+                    ) {
+                        const channel = record.channelData[channelIndex];
+                        sampleCounts[channel.channelCode] =
+                            (sampleCounts[channel.channelCode] ?? 0) + channel.data.length;
+                    }
+                }
+
                 setChartData((prevChartData) => {
                     const newChartData: typeof prevChartData = {};
+                    const writeAt: Record<string, number> = {};
 
-                    // Initialize chart data for current channels
-                    Array.from(currentChannels).forEach((channel) => {
-                        newChartData[channel] = prevChartData[channel] ?? [];
-                    });
+                    for (let channelIndex = 0; channelIndex < channels.length; channelIndex++) {
+                        const channel = channels[channelIndex];
+                        const previous = prevChartData[channel];
+                        const base = previous?.length ?? 0;
+                        const total = base + (sampleCounts[channel] ?? 0) + gapCount;
+                        const dataArray = previous ?? new Array<[number, number | null]>(total);
+                        if (previous) {
+                            dataArray.length = total;
+                        }
+                        newChartData[channel] = dataArray;
+                        writeAt[channel] = base;
+                    }
 
                     let lastTimestamp: number | null = null;
-
-                    // Fill data with gap checking
-                    records.forEach((record) => {
-                        const { timestamp, sampleRate, channelData } = record!;
+                    for (let recordIndex = 0; recordIndex < records.length; recordIndex++) {
+                        const { timestamp, sampleRate, channelData } = records[recordIndex]!;
                         const interval = 1000 / sampleRate;
 
-                        // Check gap from previous timestamp
                         if (lastTimestamp !== null && timestamp - lastTimestamp > 2000) {
-                            Array.from(currentChannels).forEach((channel) => {
-                                newChartData[channel].push([lastTimestamp! + 1, null]);
-                            });
+                            for (
+                                let channelIndex = 0;
+                                channelIndex < channels.length;
+                                channelIndex++
+                            ) {
+                                const channel = channels[channelIndex];
+                                const offset = writeAt[channel];
+                                newChartData[channel][offset] = [lastTimestamp + 1, null];
+                                writeAt[channel] = offset + 1;
+                            }
                         }
 
-                        // Append current record data
-                        channelData.forEach((channel) => {
-                            const channelCode = channel.channelCode;
-                            const dataArray = newChartData[channelCode];
-                            if (dataArray) {
-                                for (let i = 0; i < channel.data.length; i++) {
-                                    dataArray.push([timestamp + i * interval, channel.data[i]]);
-                                }
+                        for (
+                            let channelIndex = 0;
+                            channelIndex < channelData.length;
+                            channelIndex++
+                        ) {
+                            const channel = channelData[channelIndex];
+                            const dataArray = newChartData[channel.channelCode];
+                            if (!dataArray) {
+                                continue;
                             }
-                        });
+                            let offset = writeAt[channel.channelCode];
+                            const samples = channel.data;
+                            for (let sampleIndex = 0; sampleIndex < samples.length; sampleIndex++) {
+                                dataArray[offset++] = [
+                                    timestamp + sampleIndex * interval,
+                                    samples[sampleIndex]
+                                ];
+                            }
+                            writeAt[channel.channelCode] = offset;
+                        }
 
                         lastTimestamp = timestamp;
-                    });
+                    }
                     setSampleRate(records.length > 0 ? records[0]!.sampleRate : 0);
 
                     return newChartData;
@@ -842,14 +917,9 @@ const History = ({ currentLocale }: IRouterComponent) => {
                                         minDB={initialLayout.spectrogram.minDB}
                                         colorMap={initialLayout.spectrogram.colorMap}
                                         fftExecutor={sharedFFTExecutor}
-                                        data={
-                                            chartData[channel]
-                                                ? chartData[channel].filter(
-                                                      (v): v is [number, number] => v[1] !== null
-                                                  )
-                                                : []
-                                        }
+                                        data={spectrogramSeries[channel] ?? []}
                                         sampleRate={sampleRate}
+                                        paused={displayMode !== 'spectrogram'}
                                         onSpectrogramUpdate={(minDB, maxDB, colorMap) =>
                                             handleSpectrogramUpdate(
                                                 activeChannels[channel].id,
