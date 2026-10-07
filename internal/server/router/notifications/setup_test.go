@@ -6,12 +6,59 @@ import (
 	"errors"
 	"net"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/anyshake/observer/internal/notification"
 	"github.com/gin-gonic/gin"
 )
+
+func TestNotificationEventAndClientCancel(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	hub := notification.NewHub(1)
+	shutdownCtx, cancelShutdown := context.WithCancel(context.Background())
+	defer cancelShutdown()
+
+	engine := gin.New()
+	Setup(engine.Group("/api"), hub, func(ctx *gin.Context) { ctx.Next() }, shutdownCtx)
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	server := &http.Server{Handler: engine}
+	go func() { _ = server.Serve(listener) }()
+	t.Cleanup(func() { _ = server.Close() })
+
+	requestCtx, cancelRequest := context.WithCancel(context.Background())
+	request, err := http.NewRequestWithContext(requestCtx, http.MethodGet, "http://"+listener.Addr().String()+"/api/notifications", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer response.Body.Close()
+	reader := bufio.NewReader(response.Body)
+	if line, err := reader.ReadString('\n'); err != nil || line != ": connected\n" {
+		t.Fatalf("connected line = %q, %v", line, err)
+	}
+	hub.Publish(notification.Event{ID: "evt-1", ServiceID: "quakesense", Message: "triggered", Level: notification.LevelWarning, OccurredAt: 10})
+	var payload string
+	deadline := time.Now().Add(time.Second)
+	for !strings.Contains(payload, "triggered") {
+		if time.Now().After(deadline) {
+			t.Fatalf("event was not delivered: %q", payload)
+		}
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			t.Fatal(err)
+		}
+		payload += line
+	}
+	cancelRequest()
+}
 
 func TestShutdownWithConnectedClient(t *testing.T) {
 	gin.SetMode(gin.TestMode)

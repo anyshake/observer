@@ -3,6 +3,7 @@ package seisevent
 import (
 	"bytes"
 	"encoding/json"
+	"net/http"
 	"strings"
 	"time"
 
@@ -22,6 +23,7 @@ type NCS struct {
 	travelTimeTable *travel.AK135
 	cache           cache.GenericCache[[]Event]
 	sf              singleflight.Group
+	transport       http.RoundTripper
 }
 
 func (c *NCS) GetProperty() DataSourceProperty {
@@ -47,10 +49,14 @@ func (c *NCS) GetEvents(latitude, longitude float64) ([]Event, error) {
 				return c.cache.Get(), nil
 			}
 
+			transport := c.transport
+			if transport == nil {
+				transport = createCustomTransport(c.resolvers, "ncs")
+			}
 			res, err := request.GET(
 				"https://riseq.seismo.gov.in/riseq/earthquake",
 				30*time.Second, time.Second, 3, false,
-				createCustomTransport(c.resolvers, "ncs"),
+				transport,
 				map[string]string{"User-Agent": uarand.GetRandom()},
 			)
 			if err != nil {

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"time"
 
 	"golang.org/x/sync/singleflight"
@@ -22,6 +23,7 @@ type CWA_SC struct {
 	travelTimeTable *travel.AK135
 	cache           cache.GenericCache[[]Event]
 	sf              singleflight.Group
+	transport       http.RoundTripper
 }
 
 func (c *CWA_SC) getRequestBody(limit int) string {
@@ -51,13 +53,17 @@ func (c *CWA_SC) GetEvents(latitude, longitude float64) ([]Event, error) {
 				return c.cache.Get(), nil
 			}
 
+			transport := c.transport
+			if transport == nil {
+				// Query CWA IP from custom encrypted DNS servers
+				transport = createCustomTransport(c.resolvers, "")
+			}
 			res, err := request.POST(
 				"https://scweb.cwa.gov.tw/zh-tw/earthquake/ajaxhandler",
 				c.getRequestBody(100),
 				"application/x-www-form-urlencoded",
 				10*time.Second, time.Second, 3, false,
-				// Query CWA IP from custom encrypted DNS servers
-				createCustomTransport(c.resolvers, ""),
+				transport,
 				map[string]string{"User-Agent": uarand.GetRandom()},
 			)
 			if err != nil {

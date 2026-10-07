@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -22,6 +23,7 @@ type BMKG struct {
 	travelTimeTable *travel.AK135
 	cache           cache.GenericCache[[]Event]
 	sf              singleflight.Group
+	transport       http.RoundTripper
 }
 
 func (c *BMKG) GetProperty() DataSourceProperty {
@@ -47,11 +49,15 @@ func (c *BMKG) GetEvents(latitude, longitude float64) ([]Event, error) {
 				return c.cache.Get(), nil
 			}
 
+			transport := c.transport
+			if transport == nil {
+				// Set custom frontend SNI (bmkg) to bypass GFW in China
+				transport = createCustomTransport(c.resolvers, "bmkg")
+			}
 			res, err := request.GET(
 				"https://bmkg-content-inatews.storage.googleapis.com/last30feltevent.xml",
 				30*time.Second, time.Second, 3, false,
-				// Set custom frontend SNI (bmkg) to bypass GFW in China
-				createCustomTransport(c.resolvers, "bmkg"),
+				transport,
 				map[string]string{"User-Agent": uarand.GetRandom()},
 			)
 			if err != nil {

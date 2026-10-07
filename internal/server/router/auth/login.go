@@ -11,8 +11,11 @@ import (
 	"github.com/dchest/captcha"
 )
 
+// verifyCaptchaString is the captcha check used by login. Tests replace it.
+var verifyCaptchaString = captcha.VerifyString
+
 var (
-	errInvalidLoginRequest = errors.New("invalid login request")
+	errInvalidLoginRequest  = errors.New("invalid login request")
 	errAuthenticationFailed = errors.New("authentication failed")
 )
 
@@ -52,7 +55,7 @@ func (h *auth) login(sessionId, secret, nonce, challengeId, challengeSolution, c
 	}
 
 	// 3. Verify captcha solution
-	if !captcha.VerifyString(captchaId, captchaVal) {
+	if !verifyCaptchaString(captchaId, captchaVal) {
 		return fail(http.StatusUnauthorized, errAuthenticationFailed, "login rejected: invalid captcha")
 	}
 
