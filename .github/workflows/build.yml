@@ -17,6 +17,8 @@ env:
 jobs:
   unit_tests:
     runs-on: ubuntu-latest
+    needs:
+      - build_web
 
     steps:
       - name: Checkout repository
