@@ -15,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -302,9 +303,9 @@ func TestFetchReleaseFromTestServer(t *testing.T) {
 	payload := []byte("observer-binary-v1")
 	archive := zipArchive(t, map[string][]byte{"dist/observer": payload, "README": []byte("notes")})
 	digest := checksumText(payload, true)
-	var hits int
+	var hits atomic.Int32
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		hits++
+		hits.Add(1)
 		switch {
 		case strings.HasSuffix(r.URL.Path, ".dgst"):
 			writeResponse(w, []byte(digest))
@@ -320,8 +321,8 @@ func TestFetchReleaseFromTestServer(t *testing.T) {
 	helper.SetReleaseFetchUrl(srv.URL + "/{{.Version}}/{{.ToolchainName}}.{{.Extension}}")
 	version := semver.New("9", "8", "7", "")
 	data, archiveURL, err := helper.FetchRelease(version, 5*time.Second)
-	if err != nil || !bytes.Equal(data, payload) || hits != 2 {
-		t.Fatalf("fetch = %q hits %d url %s err %v", data, hits, archiveURL, err)
+	if count := hits.Load(); err != nil || !bytes.Equal(data, payload) || count != 2 {
+		t.Fatalf("fetch = %q hits %d url %s err %v", data, count, archiveURL, err)
 	}
 	if !strings.Contains(archiveURL, "/v9.8.7/test-toolchain.zip") {
 		t.Fatalf("archive url = %s", archiveURL)

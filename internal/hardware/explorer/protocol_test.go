@@ -132,12 +132,16 @@ func TestProtocolChecksums(t *testing.T) {
 func TestV2TimestampCorrection(t *testing.T) {
 	t.Parallel()
 
-	protocol := &ExplorerProtoImplV2{timeDiff4NonGnssMode: 1500}
-	if got := protocol.getTimestamp(10000); got != 11500 {
-		t.Fatalf("non-GNSS timestamp = %d, want 11500", got)
+	stream := newV2TestStream(t)
+	first := stream.startNTP(100_000, 1)
+	second := stream.push(101_100, false, 1)
+	if first == nil || second == nil {
+		t.Fatal("NTP stream did not produce samples")
 	}
-	protocol.deviceConfig.SetGnssAvailability(true)
-	if got := protocol.getTimestamp(10000); got != 10000 {
-		t.Fatalf("GNSS timestamp = %d, want 10000", got)
+	if delta := time.Since(first.Timestamp); delta < -5*time.Second || delta > 5*time.Second {
+		t.Fatalf("MCU uptime was not mapped to wall time: %v", first.Timestamp)
+	}
+	if delta := second.Timestamp.Sub(first.Timestamp); delta != 100*time.Millisecond {
+		t.Fatalf("sample spacing = %v, want 100ms", delta)
 	}
 }

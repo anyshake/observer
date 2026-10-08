@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -16,9 +17,13 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func TestWebSocketStream(t *testing.T) {
+var setupSocketTests = sync.OnceFunc(func() {
 	gin.SetMode(gin.TestMode)
 	logger.Init()
+})
+
+func TestWebSocketStream(t *testing.T) {
+	setupSocketTests()
 	hardware := &fakeHardware{}
 	router := gin.New()
 	Setup(router.Group("/"), timesource.New(func() time.Time {
@@ -98,8 +103,7 @@ func TestWebSocketStream(t *testing.T) {
 }
 
 func TestWebSocketSubscribeFailure(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	logger.Init()
+	setupSocketTests()
 	router := gin.New()
 	Setup(router.Group("/"), timesource.New(time.Now), &fakeHardware{subscribeErr: context.Canceled}, func(ctx *gin.Context) {})
 	server := httptest.NewServer(router)

@@ -60,8 +60,12 @@ func TestTCPTransportReadsAndWrites(t *testing.T) {
 	if err != nil || timedOut || string(data) != "Z" || elapsed < 0 {
 		t.Fatalf("ReadUntil = %q timedOut=%v elapsed=%v err=%v", data, timedOut, elapsed, err)
 	}
-	if err := client.Flush(); err != nil || client.GetLatency(8) != 0 {
-		t.Fatal("flush or latency failed")
+	if err := client.Flush(); err != nil {
+		t.Fatalf("Flush() error = %v", err)
+	}
+	// Linux reports the measured TCP RTT; loopback is not necessarily zero.
+	if latency := client.GetLatency(8); latency < 0 {
+		t.Fatalf("GetLatency() = %v, want a non-negative duration", latency)
 	}
 	if err := client.Close(); err != nil {
 		t.Fatal(err)
