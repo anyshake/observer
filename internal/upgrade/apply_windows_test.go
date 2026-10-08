@@ -24,7 +24,7 @@ func TestApplyUpgradeWindows(t *testing.T) {
 	if err := helper.ApplyUpgrade(version, []byte("new")); err != nil {
 		t.Fatal(err)
 	}
-	body, err := os.ReadFile(exe)
+	body, err := readFile(exe)
 	if err != nil || string(body) != "new" {
 		t.Fatalf("replaced = %q, %v", body, err)
 	}

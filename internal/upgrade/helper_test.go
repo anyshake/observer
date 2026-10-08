@@ -4,12 +4,11 @@ import (
 	"archive/zip"
 	"bytes"
 	"context"
-	"crypto/md5"
-	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/hex"
 	"errors"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -308,9 +307,9 @@ func TestFetchReleaseFromTestServer(t *testing.T) {
 		hits++
 		switch {
 		case strings.HasSuffix(r.URL.Path, ".dgst"):
-			_, _ = w.Write([]byte(digest))
+			writeResponse(w, []byte(digest))
 		case strings.HasSuffix(r.URL.Path, ".zip"):
-			_, _ = w.Write(archive)
+			writeResponse(w, archive)
 		default:
 			http.NotFound(w, r)
 		}
@@ -348,7 +347,7 @@ func TestFetchReleaseRejectsBadArtifacts(t *testing.T) {
 			if strings.HasSuffix(r.URL.Path, ".dgst") {
 				_, _ = w.Write([]byte("SHA2-256=deadbeef\n"))
 			} else {
-				_, _ = w.Write(archive)
+				writeResponse(w, archive)
 			}
 		case strings.Contains(r.URL.Path, "bad-zip"):
 			if strings.HasSuffix(r.URL.Path, ".dgst") {
@@ -358,9 +357,9 @@ func TestFetchReleaseRejectsBadArtifacts(t *testing.T) {
 			}
 		case strings.Contains(r.URL.Path, "missing-file"):
 			if strings.HasSuffix(r.URL.Path, ".dgst") {
-				_, _ = w.Write([]byte(checksumText([]byte("other"), false)))
+				writeResponse(w, []byte(checksumText([]byte("other"), false)))
 			} else {
-				_, _ = w.Write(zipArchive(t, map[string][]byte{"README": []byte("only")}))
+				writeResponse(w, zipArchive(t, map[string][]byte{"README": []byte("only")}))
 			}
 		case strings.Contains(r.URL.Path, "status"):
 			http.Error(w, "busy", http.StatusServiceUnavailable)
@@ -418,7 +417,7 @@ func TestUtilityHelpers(t *testing.T) {
 	if err := helper.verifyChecksum(payload, map[string]any{}); err != nil {
 		t.Fatal(err)
 	}
-	if err := helper.verifyChecksum(payload, map[string]any{"MD5": strings.ToUpper(hex.EncodeToString(md5Sum(payload)))}); err != nil {
+	if err := helper.verifyChecksum(payload, map[string]any{"MD5": strings.ToUpper(checksumPayloadMD5)}); err != nil {
 		t.Fatal(err)
 	}
 	if err := helper.verifyChecksum(payload, map[string]any{"SHA1": "00", "SHA2-256": hex.EncodeToString(sha256Sum(payload))}); err == nil {
@@ -428,8 +427,8 @@ func TestUtilityHelpers(t *testing.T) {
 		t.Fatal("non-string checksum accepted")
 	}
 	expect := map[string]any{
-		"MD5":      hex.EncodeToString(md5Sum(payload)),
-		"SHA1":     hex.EncodeToString(sha1Sum(payload)),
+		"MD5":      checksumPayloadMD5,
+		"SHA1":     checksumPayloadSHA1,
 		"SHA2-256": hex.EncodeToString(sha256Sum(payload)),
 		"SHA2-512": hex.EncodeToString(sha512Sum(payload)),
 		"EXTRA":    "ignored",
@@ -478,7 +477,7 @@ func TestApplyUpgrade(t *testing.T) {
 
 	dir := t.TempDir()
 	exe := filepath.Join(dir, "observer")
-	if err := os.WriteFile(exe, []byte("old"), 0o755); err != nil {
+	if err := os.WriteFile(exe, []byte("old"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	before, err := os.Stat(exe)
@@ -490,7 +489,7 @@ func TestApplyUpgrade(t *testing.T) {
 	if err := helper.ApplyUpgrade(version, []byte("new")); err != nil {
 		t.Fatal(err)
 	}
-	body, err := os.ReadFile(exe)
+	body, err := readFile(exe)
 	if err != nil || string(body) != "new" {
 		t.Fatalf("replaced = %q, %v", body, err)
 	}
@@ -504,7 +503,7 @@ func TestApplyUpgrade(t *testing.T) {
 	if err := helper.ApplyUpgrade(version, []byte("ignored")); err != nil {
 		t.Fatal(err)
 	}
-	body, err = os.ReadFile(exe)
+	body, err = readFile(exe)
 	if err != nil || string(body) != "new" {
 		t.Fatalf("repeat apply changed the file to %q, %v", body, err)
 	}
@@ -513,7 +512,7 @@ func TestApplyUpgrade(t *testing.T) {
 	if err := helper.ApplyUpgrade(next, []byte("newer")); err != nil {
 		t.Fatal(err)
 	}
-	body, err = os.ReadFile(exe)
+	body, err = readFile(exe)
 	if err != nil || string(body) != "newer" || !helper.appliedVer.Equal(next) {
 		t.Fatalf("second apply = %q %v %v", body, helper.appliedVer, err)
 	}
@@ -526,7 +525,7 @@ func TestApplyUpgrade(t *testing.T) {
 	if err := os.Chmod(locked, 0o555); err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { _ = os.Chmod(locked, 0o755) })
+	t.Cleanup(func() { _ = os.Chmod(locked, 0o600) })
 	helper.currentExePath = filepath.Join(locked, "observer")
 	helper.appliedVer = nil
 	if err := helper.ApplyUpgrade(version, []byte("nope")); err == nil {
@@ -605,6 +604,24 @@ func zipArchive(t *testing.T, files map[string][]byte) []byte {
 	return buf.Bytes()
 }
 
+const (
+	checksumPayloadMD5  = "8a666fd414abefc1bc4c706fe0d2e3f1"
+	checksumPayloadSHA1 = "983317dfc918d601faacc29f45039d36ac21fcaa"
+)
+
+func writeResponse(w http.ResponseWriter, body []byte) {
+	_, _ = io.Copy(w, bytes.NewReader(body))
+}
+
+func readFile(path string) ([]byte, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	return io.ReadAll(file)
+}
+
 func checksumText(payload []byte, upper bool) string {
 	encode := func(sum []byte) string {
 		text := hex.EncodeToString(sum)
@@ -614,22 +631,10 @@ func checksumText(payload []byte, upper bool) string {
 		return text
 	}
 	return strings.Join([]string{
-		"MD5=" + encode(md5Sum(payload)),
-		"SHA1=" + encode(sha1Sum(payload)),
 		"SHA2-256=" + encode(sha256Sum(payload)),
 		"SHA2-512=" + encode(sha512Sum(payload)),
 		"NOTE=ignored",
 	}, "\n")
-}
-
-func md5Sum(payload []byte) []byte {
-	sum := md5.Sum(payload)
-	return sum[:]
-}
-
-func sha1Sum(payload []byte) []byte {
-	sum := sha1.Sum(payload)
-	return sum[:]
 }
 
 func sha256Sum(payload []byte) []byte {

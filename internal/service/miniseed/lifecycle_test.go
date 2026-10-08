@@ -85,7 +85,7 @@ func TestLifecycle(t *testing.T) {
 		t.Fatal("outside asset was accepted")
 	}
 
-	if err := os.WriteFile(svc.dataSequence.filePath, []byte("not-gob"), 0o644); err != nil {
+	if err := os.WriteFile(svc.dataSequence.filePath, []byte("not-gob"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	later := fixed.Add(time.Hour)

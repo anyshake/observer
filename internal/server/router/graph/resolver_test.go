@@ -646,10 +646,10 @@ func TestPurgeJobs(t *testing.T) {
 	miniDir := t.TempDir()
 	mini := env.prepareMiniSeedIn(t, miniDir)
 	env.resolver.ServiceMap[miniseed.ID] = mini
-	if err := os.MkdirAll(miniDir, 0o755); err != nil {
+	if err := os.MkdirAll(miniDir, 0o700); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(miniDir, "keep.mseed"), []byte("mseed"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(miniDir, "keep.mseed"), []byte("mseed"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := mut.PurgeMiniSeedFiles(admin); err != nil {
@@ -665,7 +665,7 @@ func TestPurgeJobs(t *testing.T) {
 	miniDir = t.TempDir()
 	dayDir := filepath.Join(miniDir, "2026-01-02")
 	otherDir := filepath.Join(miniDir, "2026-01-03")
-	if err := os.MkdirAll(dayDir, 0o755); err != nil || os.MkdirAll(otherDir, 0o755) != nil {
+	if err := os.MkdirAll(dayDir, 0o700); err != nil || os.MkdirAll(otherDir, 0o700) != nil {
 		t.Fatal(err)
 	}
 	mini = env.prepareMiniSeedIn(t, miniDir)
@@ -701,7 +701,7 @@ func TestPurgeJobs(t *testing.T) {
 	heliDir := t.TempDir()
 	heli := env.prepareHelicorderIn(t, heliDir)
 	env.resolver.ServiceMap[helicorder.ID] = heli
-	if err := os.WriteFile(filepath.Join(heliDir, "plot.png"), []byte("png"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(heliDir, "plot.png"), []byte("png"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := mut.PurgeHelicorderFiles(admin); err != nil {
@@ -716,7 +716,7 @@ func TestPurgeJobs(t *testing.T) {
 
 	heliDir = t.TempDir()
 	heliDay := filepath.Join(heliDir, "2026-02-02")
-	if err := os.MkdirAll(heliDay, 0o755); err != nil {
+	if err := os.MkdirAll(heliDay, 0o700); err != nil {
 		t.Fatal(err)
 	}
 	heli = env.prepareHelicorderIn(t, heliDir)

@@ -2,11 +2,10 @@ package logger
 
 import (
 	"bytes"
-	"os"
-	"os/exec"
 	"path/filepath"
 	"testing"
 
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -66,27 +65,27 @@ func TestLoggerLevelsBufferAndFile(t *testing.T) {
 }
 
 func TestFatalExits(t *testing.T) {
-	mode := os.Getenv("OBSERVER_LOGGER_FATAL")
-	if mode == "f" || mode == "ln" {
-		Init()
-		if mode == "f" {
-			GetLogger("fatal").Fatalf("stop %d", 1)
-		} else {
-			GetLogger("fatal").Fatalln("stop")
-		}
-		t.Fatal("logger fatal returned")
-	}
+	Init()
+	var buf bytes.Buffer
+	log.Logger = zerolog.New(&buf).With().Timestamp().Logger()
+	previous := zerolog.FatalExitFunc
+	t.Cleanup(func() { zerolog.FatalExitFunc = previous })
 
-	for _, mode := range []string{"f", "ln"} {
-		t.Run(mode, func(t *testing.T) {
-			cmd := exec.Command(os.Args[0], "-test.run=^TestFatalExits$", "-test.count=1")
-			cmd.Env = append(os.Environ(), "OBSERVER_LOGGER_FATAL="+mode)
-			var stderr bytes.Buffer
-			cmd.Stderr = &stderr
-			if err := cmd.Run(); err == nil {
-				t.Fatalf("fatal mode %s did not exit: %s", mode, stderr.String())
-			}
-		})
+	for _, call := range []func(){
+		func() { GetLogger("fatal").Fatalf("stop %d", 1) },
+		func() { GetLogger("fatal").Fatalln("stop") },
+	} {
+		exited := false
+		zerolog.FatalExitFunc = func() {
+			exited = true
+			panic("logger exit")
+		}
+		func() {
+			defer func() { _ = recover() }()
+			call()
+		}()
+		if !exited {
+			t.Fatal("fatal logger returned")
+		}
 	}
-	_ = log.Logger
 }

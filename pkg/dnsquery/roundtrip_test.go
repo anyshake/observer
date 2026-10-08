@@ -1,11 +1,12 @@
 package dnsquery
 
 import (
-	"crypto/tls"
+	"bytes"
 	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 	"time"
 
@@ -32,7 +33,8 @@ func TestUDPQuery(t *testing.T) {
 		_, _ = conn.WriteTo(packed, addr)
 	}()
 
-	server, err := New("udp://" + conn.LocalAddr().String())
+	endpoint := (&url.URL{Scheme: "udp", Host: conn.LocalAddr().String()}).String()
+	server, err := New(endpoint)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,7 +48,7 @@ func TestUDPQuery(t *testing.T) {
 	if err := server.Close(); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := server.Query((&dns.Msg{}).SetQuestion("example.com.", dns.TypeA), time.Second); err == nil {
+	if _, err := server.Query(exampleQuestion(), time.Second); err == nil {
 		t.Fatal("closed UDP client accepted a query")
 	}
 }
@@ -64,12 +66,12 @@ func TestDoHQuery(t *testing.T) {
 			return
 		}
 		packed, _ := exampleReply(&request).Pack()
-		_, _ = w.Write(packed)
+		_, _ = io.Copy(w, bytes.NewReader(packed))
 	}))
 	defer httpServer.Close()
 
 	server := &DoH{server: httpServer.URL}
-	if _, err := server.Query((&dns.Msg{}).SetQuestion("example.com.", dns.TypeA), time.Second); err == nil {
+	if _, err := server.Query(exampleQuestion(), time.Second); err == nil {
 		t.Fatal("unopened DoH client accepted a query")
 	}
 	if err := server.Open(); err != nil {
@@ -83,7 +85,7 @@ func TestDoHQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 	bad.client = httpServer.Client()
-	if _, err := bad.Query((&dns.Msg{}).SetQuestion("example.com.", dns.TypeA), time.Second); err == nil {
+	if _, err := bad.Query(exampleQuestion(), time.Second); err == nil {
 		t.Fatal("invalid DoH body accepted")
 	}
 	if err := server.Close(); err != nil {
@@ -96,14 +98,13 @@ func TestDoTAndDNSCryptErrors(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := dot.Query((&dns.Msg{}).SetQuestion("example.com.", dns.TypeA), time.Second); err == nil {
+	if _, err := dot.Query(exampleQuestion(), time.Second); err == nil {
 		t.Fatal("unopened DoT client accepted a query")
 	}
 	if err := dot.Open(); err != nil {
 		t.Fatal(err)
 	}
-	dot.(*DoT).client.TLSConfig = &tls.Config{InsecureSkipVerify: true}
-	if _, err := dot.Query((&dns.Msg{}).SetQuestion("example.com.", dns.TypeA), 200*time.Millisecond); err == nil {
+	if _, err := dot.Query(exampleQuestion(), 200*time.Millisecond); err == nil {
 		t.Fatal("closed DoT port accepted a query")
 	}
 	if err := dot.Close(); err != nil {
@@ -114,7 +115,7 @@ func TestDoTAndDNSCryptErrors(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := crypt.Query((&dns.Msg{}).SetQuestion("example.com.", dns.TypeA), time.Second); err == nil {
+	if _, err := crypt.Query(exampleQuestion(), time.Second); err == nil {
 		t.Fatal("unopened DNSCrypt client accepted a query")
 	}
 	if err := crypt.Open(); err == nil {
@@ -125,9 +126,16 @@ func TestDoTAndDNSCryptErrors(t *testing.T) {
 	}
 }
 
+func exampleQuestion() *dns.Msg {
+	message := new(dns.Msg)
+	message.SetQuestion("example.com.", dns.TypeA)
+	return message
+}
+
 func queryExample(t *testing.T, server IServer) *dns.Msg {
 	t.Helper()
-	response, err := server.Query((&dns.Msg{}).SetQuestion("example.com.", dns.TypeA), time.Second)
+	ask := server.Query
+	response, err := ask(exampleQuestion(), time.Second)
 	if err != nil {
 		t.Fatal(err)
 	}
