@@ -31,6 +31,16 @@ jobs:
           cache: true
           cache-dependency-path: go.sum
 
+      - name: Download web artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: web
+
+      - name: Extract web artifacts
+        working-directory: web
+        run: tar -zxf web_dist.tar.gz
+
       - name: Run unit tests
         run: go test -race ./... -count=1
 
