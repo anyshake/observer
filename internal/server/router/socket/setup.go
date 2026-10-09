@@ -10,6 +10,7 @@ import (
 	"github.com/anyshake/observer/internal/server/response"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/anyshake/observer/pkg/message"
+	"github.com/anyshake/observer/pkg/ringbuf"
 	"github.com/anyshake/observer/pkg/timesource"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -19,7 +20,7 @@ import (
 func Setup(routerGroup *gin.RouterGroup, timeSource *timesource.Source, hardware hardware.IHardware, jwtMiddleware gin.HandlerFunc) {
 	s := socket{
 		messageBus:     message.NewBus[explorer.Event](LOG_PREFIX),
-		historyBuffer:  make([]buffer, HISTORY_BUFFER_SIZE),
+		history:        ringbuf.New[buffer](HISTORY_BUFFER_SIZE),
 		tokenValidator: newTokenValidator(jwtMiddleware),
 	}
 	if err := hardware.Subscribe(LOG_PREFIX, func(event explorer.Event) {
@@ -59,35 +60,17 @@ func (s *socket) storeHistory(event explorer.Event) {
 		channelData[i].Data = append([]int32(nil), event.ChannelData[i].Data...)
 	}
 
-	s.historyMu.Lock()
-	s.historyBuffer[s.historyPos] = buffer{
+	s.history.Push(buffer{
 		Timestamp:   event.Timestamp.UnixMilli(),
 		SampleRate:  event.SampleRate,
 		ChannelData: channelData,
-	}
-	s.historyPos++
-	if s.historyPos == HISTORY_BUFFER_SIZE {
-		s.historyPos = 0
-	}
-	if s.historyLen < HISTORY_BUFFER_SIZE {
-		s.historyLen++
-	}
-	s.historyMu.Unlock()
-}
-
-func (s *socket) historyAt(index int) buffer {
-	start := 0
-	if s.historyLen == HISTORY_BUFFER_SIZE {
-		start = s.historyPos
-	}
-	return s.historyBuffer[(start+index)%HISTORY_BUFFER_SIZE]
+	})
 }
 
 func (s *socket) sendHistory(conn *websocket.Conn, writeMu *sync.Mutex, timeSource *timesource.Source) error {
-	s.historyMu.RLock()
-	historyMessages := make([]map[string]any, s.historyLen)
-	for i := range historyMessages {
-		history := s.historyAt(i)
+	historyValues := s.history.Values()
+	historyMessages := make([]map[string]any, len(historyValues))
+	for i, history := range historyValues {
 		historyMessages[i] = map[string]any{
 			"current_time": timeSource.Now().UnixMilli(),
 			"record_time":  history.Timestamp,
@@ -102,7 +85,6 @@ func (s *socket) sendHistory(conn *websocket.Conn, writeMu *sync.Mutex, timeSour
 			}),
 		}
 	}
-	s.historyMu.RUnlock()
 
 	for _, message := range historyMessages {
 		if err := writeWebSocketJSON(conn, writeMu, message); err != nil {

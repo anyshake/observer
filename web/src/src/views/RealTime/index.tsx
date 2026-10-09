@@ -9,25 +9,15 @@ import {
     mdiWaveform
 } from '@mdi/js';
 import Icon from '@mdi/react';
-import {
-    createRef,
-    memo,
-    RefObject,
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState
-} from 'react';
+import { createRef, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import type { ColorMapName } from 'spectrogram-js';
 import { FFTExecutor } from 'spectrogram-js';
 
-import { DequeChart, DequeChartHandle } from '../../components/chart/DequeChart';
-import { DequeSpectrogram, DequeSpectrogramHandle } from '../../components/chart/DequeSpectrogram';
+import { DequeChartHandle } from '../../components/chart/DequeChart';
+import { DequeSpectrogramHandle } from '../../components/chart/DequeSpectrogram';
 import { DEFAULT_SPECTROGRAM_COLOR_MAP } from '../../components/chart/spectrogramColorMaps';
-import { DraggableBox } from '../../components/ui/DraggableBox';
 import { Banner } from '../../components/widget/Banner';
 import { RealTimeConstraints } from '../../config/constraints';
 import { routerConfig } from '../../config/router';
@@ -36,126 +26,12 @@ import { sendUserConfirm } from '../../helpers/alert/sendUserConfirm';
 import { getSocketApiUrl } from '../../helpers/app/getSocketApiUrl';
 import { useSocket } from '../../helpers/request/useSocket';
 import { getTimeString } from '../../helpers/utils/getTimeString';
+import { sameStrings } from '../../helpers/utils/sameStrings';
 import { useThrottleFnTrailing } from '../../helpers/utils/useThrottleFnTrailing';
 import { useCredentialStore } from '../../stores/credential';
-import { useLayoutStore } from '../../stores/layout';
+import { type LayoutConfig, useLayoutStore } from '../../stores/layout';
 import { useRetentionStore } from '../../stores/retention';
-
-type RealtimeLayout = {
-    position: { x: number; y: number };
-    size: { width: number; height: number };
-    spectrogram: { maxDB: number; minDB: number; colorMap?: ColorMapName };
-};
-
-const sameStrings = (left: string[], right: string[]) => {
-    if (left.length !== right.length) {
-        return false;
-    }
-    for (let i = 0; i < left.length; i++) {
-        if (left[i] !== right[i]) {
-            return false;
-        }
-    }
-    return true;
-};
-
-const RealtimeChannel = memo(function RealtimeChannel({
-    channel,
-    channelId,
-    index,
-    layout,
-    locked,
-    waveformMode,
-    retention,
-    sampleRate,
-    fftExecutor,
-    waveformRef,
-    spectrogramRef,
-    onActive,
-    onDragStop,
-    onResizeStop,
-    onSpectrogram
-}: {
-    readonly channel: string;
-    readonly channelId: string;
-    readonly index: number;
-    readonly layout: RealtimeLayout;
-    readonly locked: boolean;
-    readonly waveformMode: boolean;
-    readonly retention: number;
-    readonly sampleRate: number;
-    readonly fftExecutor: FFTExecutor;
-    readonly waveformRef?: RefObject<DequeChartHandle>;
-    readonly spectrogramRef?: RefObject<DequeSpectrogramHandle>;
-    readonly onActive: (channel: string) => void;
-    readonly onDragStop: (channel: string, index: number, x: number, y: number) => void;
-    readonly onResizeStop: (channel: string, index: number, width: number, height: number) => void;
-    readonly onSpectrogram: (
-        channel: string,
-        index: number,
-        minDB: number,
-        maxDB: number,
-        colorMap: ColorMapName
-    ) => void;
-}) {
-    const handleDragStart = useCallback(() => onActive(channel), [channel, onActive]);
-    const handleDragStop = useCallback(
-        (x: number, y: number) => onDragStop(channelId, index, x, y),
-        [channelId, index, onDragStop]
-    );
-    const handleResizeStop = useCallback(
-        (width: number, height: number) => onResizeStop(channelId, index, width, height),
-        [channelId, index, onResizeStop]
-    );
-    const handleSpectrogram = useCallback(
-        (minDB: number, maxDB: number, colorMap: ColorMapName) =>
-            onSpectrogram(channelId, index, minDB, maxDB, colorMap),
-        [channelId, index, onSpectrogram]
-    );
-
-    return (
-        <DraggableBox
-            layout={layout}
-            locked={locked}
-            constraints={RealTimeConstraints}
-            onDragStart={handleDragStart}
-            onDragStop={handleDragStop}
-            onResizeStop={handleResizeStop}
-        >
-            <div className={waveformMode ? 'block h-full w-full' : 'hidden'}>
-                <DequeChart
-                    minSpanValue={RealTimeConstraints.minSpanValue}
-                    ref={waveformRef}
-                    lineColor={RealTimeConstraints.lineColor}
-                    maxDuration={retention}
-                    title={channel}
-                    height="100%"
-                    yPosition="right"
-                    zoom={true}
-                    animation={false}
-                    paused={!waveformMode}
-                />
-            </div>
-            <div className={waveformMode ? 'hidden' : 'block h-full w-full'}>
-                <DequeSpectrogram
-                    title={channel}
-                    duration={retention}
-                    overlap={RealTimeConstraints.overlap}
-                    freqRange={RealTimeConstraints.freqRange}
-                    windowSize={RealTimeConstraints.windowSize}
-                    maxDB={layout.spectrogram.maxDB}
-                    minDB={layout.spectrogram.minDB}
-                    colorMap={layout.spectrogram.colorMap}
-                    ref={spectrogramRef}
-                    fftExecutor={fftExecutor}
-                    sampleRate={sampleRate}
-                    paused={waveformMode}
-                    onSpectrogramUpdate={handleSpectrogram}
-                />
-            </div>
-        </DraggableBox>
-    );
-});
+import { RealtimeChannel } from './RealtimeChannel';
 
 const RealTime = () => {
     const { t } = useTranslation();
@@ -188,7 +64,7 @@ const RealTime = () => {
     const waveformRefs = useRef<{ [key: string]: RefObject<DequeChartHandle> }>({});
     const spectrogramRefs = useRef<{ [key: string]: RefObject<DequeSpectrogramHandle> }>({});
     const prevChannelsRef = useRef<string[]>([]);
-    const layoutCacheRef = useRef(new Map<string, RealtimeLayout>());
+    const layoutCacheRef = useRef(new Map<string, LayoutConfig>());
     const [activeChart, setActiveChart] = useState<string | null>(null); // Track the active chart
 
     const updateChannels = useCallback((channelData: Record<string, unknown>) => {
@@ -287,7 +163,7 @@ const RealTime = () => {
             x = Math.max(20, Math.min(x, 500));
             y = Math.max(50, Math.min(y, 500));
 
-            const layout: RealtimeLayout = {
+            const layout: LayoutConfig = {
                 position: { x, y },
                 size: {
                     width: wide ? RealTimeConstraints.minWidth * 2 : RealTimeConstraints.minWidth,

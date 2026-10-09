@@ -40,22 +40,11 @@ import { getRestfulApiUrl } from '../../helpers/app/getRestfulApiUrl';
 import { ApiClient } from '../../helpers/request/ApiClient';
 import { useUrlParams } from '../../helpers/request/useUrlParams';
 import { getTimeString } from '../../helpers/utils/getTimeString';
+import { sameStrings } from '../../helpers/utils/sameStrings';
 import { setClipboardText } from '../../helpers/utils/setClipboardText';
 import { useThrottleFnTrailing } from '../../helpers/utils/useThrottleFnTrailing';
 import { useLayoutStore } from '../../stores/layout';
 import { useRetentionStore } from '../../stores/retention';
-
-const sameStrings = (left: string[], right: string[]) => {
-    if (left.length !== right.length) {
-        return false;
-    }
-    for (let i = 0; i < left.length; i++) {
-        if (left[i] !== right[i]) {
-            return false;
-        }
-    }
-    return true;
-};
 
 const History = ({ currentLocale }: IRouterComponent) => {
     const { t } = useTranslation();

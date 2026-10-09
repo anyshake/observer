@@ -7,7 +7,7 @@ import { setLocalStorage } from '../helpers/storage/setLocalStorage';
 
 const layoutStoreKey = 'layout-store';
 
-type LayoutConfig = {
+export type LayoutConfig = {
     readonly position: { x: number; y: number };
     readonly size: { width: number; height: number };
     readonly spectrogram: { maxDB: number; minDB: number; colorMap?: ColorMapName };
