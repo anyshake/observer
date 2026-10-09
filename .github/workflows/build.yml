@@ -6,7 +6,7 @@ on:
     types: [opened, synchronize, reopened]
   push:
     branches:
-      - "*"
+      - "**"
     tags:
       - "v*"
 
@@ -15,6 +15,35 @@ env:
   CLOUDFLARE_RECORD_NAME: observer.updates.anyshake.org
 
 jobs:
+  unit_tests:
+    runs-on: ubuntu-latest
+    needs:
+      - build_web
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go toolchain
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Download web artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: web
+
+      - name: Extract web artifacts
+        working-directory: web
+        run: tar -zxf web_dist.tar.gz
+
+      - name: Run unit tests
+        run: go test -race ./... -count=1
+
   build_web:
     runs-on: ubuntu-latest
 
