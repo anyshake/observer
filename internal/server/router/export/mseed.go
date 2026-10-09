@@ -7,9 +7,7 @@ import (
 	"github.com/anyshake/observer/config"
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/dao/model"
-	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/bclswl0827/mseedio"
-	"github.com/samber/lo"
 )
 
 type seismicDataEncoderMseedImpl struct {
@@ -58,20 +56,27 @@ func (e *seismicDataEncoderMseedImpl) Encode(records seismicRecordIterator, chan
 		if err != nil {
 			return err
 		}
-		channelData, ok := lo.Find(channelDataArr, func(item explorer.ChannelData) bool { return item.ChannelCode == channelCode })
-		if !ok {
-			return nil
+		for _, channelData := range channelDataArr {
+			if channelCode != "*" && channelData.ChannelCode != channelCode {
+				continue
+			}
+			err := miniseed.Append(channelData.Data, &mseedio.AppendOptions{
+				SequenceNumber: fmt.Sprintf("%06d", sequence),
+				SampleRate:     float64(sampleRate),
+				StartTime:      tm.UTC(),
+				ChannelCode:    channelData.ChannelCode,
+				StationCode:    stationCodeStr,
+				NetworkCode:    networkCodeStr,
+				LocationCode:   locationCodeStr,
+			})
+			if err != nil {
+				return err
+			}
+			if channelCode != "*" {
+				break
+			}
 		}
-		err = miniseed.Append(channelData.Data, &mseedio.AppendOptions{
-			SequenceNumber: fmt.Sprintf("%06d", sequence),
-			SampleRate:     float64(sampleRate),
-			StartTime:      tm.UTC(),
-			ChannelCode:    channelCode,
-			StationCode:    stationCodeStr,
-			NetworkCode:    networkCodeStr,
-			LocationCode:   locationCodeStr,
-		})
-		return err
+		return nil
 	})
 	if err != nil {
 		return nil, err
@@ -105,6 +110,10 @@ func (e *seismicDataEncoderMseedImpl) GetFileName(startTime time.Time, channelCo
 	stationCodeStr := stationCode.(string)
 	locationCodeStr := locationCode.(string)
 	networkCodeStr := networkCode.(string)
+
+	if channelCode == "*" {
+		channelCode = "ALL"
+	}
 
 	filename := fmt.Sprintf("%s.%s.%s.%s.%s.%04d.%s.%s.%s.%s.D.mseed",
 		startTime.UTC().Format("2006"),

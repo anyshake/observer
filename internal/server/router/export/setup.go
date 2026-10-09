@@ -73,9 +73,10 @@ func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, hardware
 			dataFormatMap[k] = v.GetName()
 		}
 		hardwareConfig := hardware.GetConfig()
+		channelCodes := append([]string{"*"}, hardwareConfig.GetChannelCodes()...)
 		response.Data(ctx, http.StatusOK, "data formats", gin.H{
 			"data_format":  dataFormatMap,
-			"channel_code": hardwareConfig.GetChannelCodes(),
+			"channel_code": channelCodes,
 		})
 	})
 	routerGroup.POST("/export", jwtMiddleware, func(ctx *gin.Context) {
@@ -91,7 +92,7 @@ func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, hardware
 		}
 
 		hardwareConfig := hardware.GetConfig()
-		if !lo.Contains(hardwareConfig.GetChannelCodes(), requestModel.ChannelCode) {
+		if requestModel.ChannelCode != "*" && !lo.Contains(hardwareConfig.GetChannelCodes(), requestModel.ChannelCode) {
 			response.Error(ctx, http.StatusBadRequest, fmt.Sprintf("channel code %s was not found in hardware config", requestModel.ChannelCode))
 			return
 		}
@@ -100,6 +101,14 @@ func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, hardware
 		if !ok {
 			response.Error(ctx, http.StatusBadRequest, fmt.Sprintf("unknown data format type: %s", requestModel.DataFormat))
 			return
+		}
+
+		if requestModel.ChannelCode == "*" {
+			switch requestModel.DataFormat {
+			case "sac", "txt", "wav":
+				response.Error(ctx, http.StatusBadRequest, fmt.Sprintf("data format %s does not support exporting all channels", requestModel.DataFormat))
+				return
+			}
 		}
 
 		startTime, endTime := requestModel.StartTime, requestModel.EndTime
