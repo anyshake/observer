@@ -3,10 +3,12 @@ package export
 import (
 	"bytes"
 	"context"
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"testing"
 	"time"
 
@@ -18,6 +20,7 @@ import (
 	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/internal/testsupport"
 	"github.com/anyshake/observer/pkg/metadata"
+	"github.com/bclswl0827/mseedio"
 	"github.com/gin-gonic/gin"
 )
 
@@ -61,7 +64,7 @@ func TestSetupListsFormatsAndRejectsUnauthorizedCalls(t *testing.T) {
 			t.Fatalf("missing format %s in %#v", format, body.Data.DataFormat)
 		}
 	}
-	if len(body.Data.ChannelCode) != 2 || body.Data.ChannelCode[0] != "EHZ" {
+	if !slices.Equal(body.Data.ChannelCode, []string{"*", "EHZ", "EHE"}) {
 		t.Fatalf("channels = %#v", body.Data.ChannelCode)
 	}
 }
@@ -105,6 +108,77 @@ func TestSetupPostEncodesStoredRecords(t *testing.T) {
 	}
 }
 
+func TestSetupPostExportsAllChannels(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	db, handler := testsupport.OpenDAO(t)
+	initExportCodes(t, handler)
+	start := time.Date(2024, 3, 15, 13, 5, 9, 123000000, time.UTC)
+	channels := []explorer.ChannelData{
+		{ChannelCode: "EHZ", ChannelId: 1, ByteSize: 4, DataType: "int32", Data: []int32{1, -2, 3, -4}},
+		{ChannelCode: "EHE", ChannelId: 2, ByteSize: 4, DataType: "int32", Data: []int32{10, -20, 30, -40}},
+	}
+	insertRecords(t, db, syntheticRecords(start, 2, 4, channels))
+
+	engine := gin.New()
+	Setup(engine.Group("/api"), handler, hardwareWithChannels("EHZ", "EHE"), func(ctx *gin.Context) { ctx.Next() })
+
+	for _, format := range []string{"mseed_int32", "mseed_steim1", "mseed_steim2"} {
+		t.Run(format, func(t *testing.T) {
+			rec := postExport(engine, exportBody(start, "*", format))
+			if rec.Code != http.StatusOK {
+				t.Fatalf("status = %d body = %s", rec.Code, rec.Body.String())
+			}
+			if disposition := rec.Header().Get("Content-Disposition"); disposition != "attachment; filename=2024.075.13.05.09.0123.SHAKE.AS.00.ALL.D.mseed" {
+				t.Fatalf("disposition = %s", disposition)
+			}
+
+			var decoded mseedio.MiniSeedData
+			if err := decoded.ReadFromReader(bytes.NewReader(rec.Body.Bytes())); err != nil {
+				t.Fatal(err)
+			}
+			if len(decoded.Series) != 4 {
+				t.Fatalf("series count = %d, want 4", len(decoded.Series))
+			}
+			wantSamples := map[string][]int32{"EHZ": channels[0].Data, "EHE": channels[1].Data}
+			counts := make(map[string]int)
+			for _, series := range decoded.Series {
+				channel := series.FixedSection.ChannelCode
+				want, ok := wantSamples[channel]
+				if !ok {
+					t.Fatalf("unexpected channel = %s", channel)
+				}
+				wantTime := start.Add(time.Duration(counts[channel]) * time.Second)
+				if !series.FixedSection.StartTime.Truncate(time.Second).Equal(wantTime.Truncate(time.Second)) {
+					t.Fatalf("%s start time = %s, want %s", channel, series.FixedSection.StartTime, wantTime)
+				}
+				// mseedio v1.2.1 decodes BTIME fractions as nanoseconds instead of 100us units.
+				// Check the fractional field directly to preserve subsecond coverage.
+				header := rec.Body.Bytes()[series.FixedSection.ReaderOffset.Start:]
+				gotFraction := binary.BigEndian.Uint16(header[28:30])
+				wantFraction := uint16(wantTime.Nanosecond() / int(100*time.Microsecond))
+				if gotFraction != wantFraction {
+					t.Fatalf("%s BTIME fraction = %d, want %d (100us units)", channel, gotFraction, wantFraction)
+				}
+				got := series.DataSection.Decoded
+				if len(got) != len(want) {
+					t.Fatalf("%s samples = %v, want %v", channel, got, want)
+				}
+				for i, sample := range want {
+					if got[i] != sample {
+						t.Fatalf("%s sample %d = %v, want %d", channel, i, got[i], sample)
+					}
+				}
+				counts[channel]++
+			}
+			for channel := range wantSamples {
+				if counts[channel] != 2 {
+					t.Fatalf("%s record count = %d, want 2", channel, counts[channel])
+				}
+			}
+		})
+	}
+}
+
 func TestSetupPostRejectsBadRequests(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	db, handler := testsupport.OpenDAO(t)
@@ -132,7 +206,12 @@ func TestSetupPostRejectsBadRequests(t *testing.T) {
 		{name: "missing fields", body: map[string]any{"start_time": 1}, status: http.StatusBadRequest, text: "not valid"},
 		{name: "unknown channel", body: exportBody(start, "EHN", "txt"), status: http.StatusBadRequest, text: "was not found"},
 		{name: "unknown format", body: exportBody(start, "EHZ", "csv"), status: http.StatusBadRequest, text: "unknown data format"},
+		{name: "all channels unknown format", body: exportBody(start, "*", "csv"), status: http.StatusBadRequest, text: "unknown data format"},
+		{name: "all channels sac", body: exportBody(start.Add(time.Hour), "*", "sac"), status: http.StatusBadRequest, text: "data format sac does not support exporting all channels"},
+		{name: "all channels txt", body: exportBody(start.Add(time.Hour), "*", "txt"), status: http.StatusBadRequest, text: "data format txt does not support exporting all channels"},
+		{name: "all channels wav", body: exportBody(start.Add(time.Hour), "*", "wav"), status: http.StatusBadRequest, text: "data format wav does not support exporting all channels"},
 		{name: "empty range", body: exportBody(start.Add(time.Hour), "EHZ", "txt"), status: http.StatusNotFound, text: "no seis records"},
+		{name: "all channels empty range", body: exportBody(start.Add(time.Hour), "*", "mseed_int32"), status: http.StatusNotFound, text: "no seis records"},
 		{name: "reversed range", body: map[string]any{
 			"start_time": start.Add(time.Second).UnixMilli(), "end_time": start.UnixMilli(),
 			"channel_code": "EHZ", "data_format": "txt",
