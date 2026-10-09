@@ -8,7 +8,7 @@ REQUIRED_VERSION_PATCH = 0
 
 # Caution: software versioning mechanism depends on format of above lines in this file
 
-.PHONY: build digest clean run gen version
+.PHONY: build test digest clean run gen version
 
 GO ?= go
 
@@ -42,6 +42,10 @@ build:
 		$(GO) build -ldflags="$(BUILD_FLAGS)" $(BUILD_ARGS) -o $(DIST_DIR)/$(BINARY) $(SRC_DIR)
 	@cp -r $(ASSETS_DIR) $(DIST_DIR)
 	@echo "[Info] Build completed."
+
+test:
+	@echo "[Info] Running unit tests..."
+	$(GO) test -race ./... -count=1
 
 digest:
 ifneq ($(wildcard $(DIST_DIR)/$(BINARY)),)
