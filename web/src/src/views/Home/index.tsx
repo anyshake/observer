@@ -22,6 +22,7 @@ import { StatusCard } from '../../components/widget/StatusCard';
 import { StatusList } from '../../components/widget/StatusList';
 import { HomeConstraints } from '../../config/constraints';
 import { useGetHomeDataQuery, useGetUpgradeStatusLazyQuery } from '../../graphql';
+import { isOlderThanRelease } from '../../helpers/app/isOlderThanRelease';
 import { getTimeString } from '../../helpers/utils/getTimeString';
 import { useCredentialStore } from '../../stores/credential';
 
@@ -256,7 +257,7 @@ const Home = () => {
             if (applied) {
                 return t('views.Home.upgrade.restart_needed', { latest, current });
             }
-            if (current !== latest) {
+            if (isOlderThanRelease(current, latest) && isOlderThanRelease(current, required)) {
                 return t('views.Home.upgrade.manual_upgrade_needed', { latest, current, required });
             }
 
