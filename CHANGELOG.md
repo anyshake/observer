@@ -2,6 +2,28 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.7.0
+
+### Release Notes
+
+This release adds **all-channel MiniSEED export** and reduces work during live and historical waveform rendering. It also corrects spectrogram defaults for physical channel positions and expands automated test coverage.
+
+### New Features
+
+- Added a `*` channel option for MiniSEED exports, allowing all available channels to be included in one file. SAC, TXT, and WAV exports continue to require a single channel.
+
+### Improvements
+
+- Reduced repeated sorting, copying, and redraws in real-time waveform and spectrogram views, including when a display mode is inactive.
+- Reduced data preparation work for historical waveform and spectrogram views.
+- Replaced shifting WebSocket history storage with a bounded ring buffer while preserving replay order.
+- Expanded Go unit tests across hardware protocols, services, API routes, and utilities; added a race-enabled `make test` target and CI job.
+- Updated Go dependencies and source build instructions.
+
+### Bug Fixes
+
+- Fixed real-time and historical spectrogram default ranges using channel list positions instead of physical channel IDs, which could assign the wrong range when channels were reordered or disabled.
+
 ## v4.6.1
 
 ### Release Notes
