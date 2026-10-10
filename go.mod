@@ -13,7 +13,7 @@ require (
 	github.com/bclswl0827/mseedio v1.2.2
 	github.com/bclswl0827/obsgo v1.0.1
 	github.com/bclswl0827/sacio v1.0.6
-	github.com/bclswl0827/slgo v0.4.1
+	github.com/bclswl0827/slgo v0.4.2
 	github.com/bclswl0827/sqlite v1.11.1-0.20240613172512-9e6ac9861470
 	github.com/bclswl0827/travel v0.0.1
 	github.com/bclswl0827/winsgo v0.0.1
