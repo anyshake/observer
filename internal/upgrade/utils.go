@@ -86,6 +86,11 @@ func (h *Helper) fetchDataFromUrl(ctx context.Context, url string) ([]byte, erro
 }
 
 func (h *Helper) verifyChecksum(data []byte, expect map[string]any) error {
+	// mandatory verification algorithm: SHA-256
+	if _, ok := expect["SHA2-256"]; !ok {
+		return errors.New("SHA2-256 checksum missing")
+	}
+
 	algos := map[string]func([]byte) []byte{
 		"MD5": func(b []byte) []byte {
 			h := md5.Sum(b)

@@ -173,6 +173,7 @@
                 "error": "Terjadi error saat menghubungkan ke stasiun, silakan periksa koneksi Anda."
             },
             "upgrade": {
+                "check_failed": "Gagal memeriksa pembaruan.",
                 "update_available": "Versi baru {{latest}} tersedia. Anda dapat mengaktifkan pembaruan otomatis atau mengunduh dan memasangnya secara manual.",
                 "restart_needed": "Versi terbaru {{latest}} telah dipasang, namun {{current}} masih berjalan. Silakan mulai ulang perangkat lunak pada waktu yang sesuai untuk menerapkan pembaruan.",
                 "manual_upgrade_needed": "Versi baru {{latest}} terdeteksi, tetapi versi saat ini {{current}} berada di bawah versi minimum yang kompatibel {{required}}. Pembaruan manual diperlukan."

@@ -29,10 +29,13 @@ func GET(url string, timeout, retryInterval time.Duration, maxRetries int, trimS
 	for retries := 0; retries <= maxRetries; retries++ {
 		resp, err := client.Do(req)
 		if err != nil {
-			time.Sleep(retryInterval)
+			if retries < maxRetries {
+				time.Sleep(retryInterval)
+			}
 			continue
 		}
 		if resp.StatusCode != http.StatusOK {
+			resp.Body.Close()
 			return nil, fmt.Errorf("unexpected status: %s", resp.Status)
 		}
 

@@ -173,6 +173,24 @@ func TestCheckUpdateRejectsBadMetadata(t *testing.T) {
 		})
 	}
 
+	for _, tc := range []struct {
+		name     string
+		metadata string
+		want     string
+	}{
+		{"non-numeric", "latest_major=1;latest_minor=bad;latest_patch=0;required_major=1;required_minor=1;required_patch=0", "latest_minor"},
+		{"negative", "latest_major=-1;latest_minor=4;latest_patch=0;required_major=1;required_minor=1;required_patch=0", "latest_major"},
+		{"zero latest", "latest_major=0;latest_minor=0;latest_patch=0;required_major=0;required_minor=0;required_patch=0", "latest version is zero"},
+		{"required exceeds latest", "latest_major=1;latest_minor=4;latest_patch=0;required_major=1;required_minor=5;required_patch=0", "required version exceeds"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			helper := helperWithTXT(t, tc.metadata)
+			if _, _, _, _, err := helper.CheckUpdate(); err == nil || !strings.Contains(err.Error(), tc.want) {
+				t.Fatalf("error = %v", err)
+			}
+		})
+	}
+
 	t.Run("empty txt", func(t *testing.T) {
 		helper := helperWithTXT(t, "")
 		if _, _, _, _, err := helper.CheckUpdate(); err == nil {
@@ -350,6 +368,12 @@ func TestFetchReleaseRejectsBadArtifacts(t *testing.T) {
 			} else {
 				writeResponse(w, archive)
 			}
+		case strings.Contains(r.URL.Path, "missing-digest"):
+			if strings.HasSuffix(r.URL.Path, ".dgst") {
+				_, _ = w.Write([]byte("NOTE=ignored\n"))
+			} else {
+				writeResponse(w, archive)
+			}
 		case strings.Contains(r.URL.Path, "bad-zip"):
 			if strings.HasSuffix(r.URL.Path, ".dgst") {
 				_, _ = w.Write([]byte("NOTE=ignored\n"))
@@ -378,6 +402,7 @@ func TestFetchReleaseRejectsBadArtifacts(t *testing.T) {
 		text    string
 	}{
 		{name: "checksum", pattern: srv.URL + "/bad-digest/file.{{.Extension}}", timeout: time.Second, text: "integrity check"},
+		{name: "missing checksum", pattern: srv.URL + "/missing-digest/file.{{.Extension}}", timeout: time.Second, text: "checksum missing"},
 		{name: "zip", pattern: srv.URL + "/bad-zip/file.{{.Extension}}", timeout: time.Second, text: "zip"},
 		{name: "missing", pattern: srv.URL + "/missing-file/file.{{.Extension}}", timeout: time.Second, text: "not found"},
 		{name: "status", pattern: srv.URL + "/status/file.{{.Extension}}", timeout: time.Second, text: "status"},
@@ -415,16 +440,22 @@ func TestUtilityHelpers(t *testing.T) {
 	}
 
 	payload := []byte("checksum-me")
-	if err := helper.verifyChecksum(payload, map[string]any{}); err != nil {
-		t.Fatal(err)
+	if err := helper.verifyChecksum(payload, map[string]any{}); err == nil {
+		t.Fatal("missing checksum accepted")
 	}
-	if err := helper.verifyChecksum(payload, map[string]any{"MD5": strings.ToUpper(checksumPayloadMD5)}); err != nil {
+	if err := helper.verifyChecksum(payload, map[string]any{"MD5": strings.ToUpper(checksumPayloadMD5)}); err == nil {
+		t.Fatal("weak checksum without SHA2-256 accepted")
+	}
+	if err := helper.verifyChecksum(payload, map[string]any{"SHA2-256": hex.EncodeToString(sha256Sum(payload))}); err != nil {
 		t.Fatal(err)
 	}
 	if err := helper.verifyChecksum(payload, map[string]any{"SHA1": "00", "SHA2-256": hex.EncodeToString(sha256Sum(payload))}); err == nil {
 		t.Fatal("mismatched checksum accepted")
 	}
-	if err := helper.verifyChecksum(payload, map[string]any{"SHA2-512": 12}); err == nil {
+	if err := helper.verifyChecksum(payload, map[string]any{
+		"SHA2-256": hex.EncodeToString(sha256Sum(payload)),
+		"SHA2-512": 12,
+	}); err == nil {
 		t.Fatal("non-string checksum accepted")
 	}
 	expect := map[string]any{

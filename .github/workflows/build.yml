@@ -119,6 +119,7 @@ jobs:
 
     needs:
       - build_web
+      - unit_tests
 
     steps:
       - name: Checkout repository
@@ -300,6 +301,7 @@ jobs:
     needs:
       - build_web
       - build_core
+      - unit_tests
 
     steps:
       - name: Checkout repository

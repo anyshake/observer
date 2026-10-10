@@ -173,6 +173,7 @@
                 "error": "İstasyona bağlanırken hata oluştu, lütfen bağlantınızı kontrol edin."
             },
             "upgrade": {
+                "check_failed": "Güncellemeler denetlenemedi.",
                 "update_available": "Yeni bir sürüm {{latest}} kullanılabilir. Otomatik güncellemeleri etkinleştirebilir veya güncellemeyi manuel olarak indirip yükleyebilirsiniz.",
                 "restart_needed": "En son sürüm {{latest}} yüklendi, ancak şu anda {{current}} çalışıyor. Güncellemeyi uygulamak için uygun bir zamanda yazılımı yeniden başlatın.",
                 "manual_upgrade_needed": "Yeni bir sürüm {{latest}} algılandı, ancak mevcut sürüm {{current}}, minimum uyumlu sürüm {{required}}'ün altında. Manuel yükseltme gereklidir."

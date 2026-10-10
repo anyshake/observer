@@ -176,6 +176,7 @@
                 "title": "Ubicación de la estación"
             },
             "upgrade": {
+                "check_failed": "No se pudieron buscar actualizaciones.",
                 "update_available": "Hay una nueva versión disponible: {{latest}}. Puedes activar las actualizaciones automáticas o descargarla e instalarla manualmente.",
                 "restart_needed": "La última versión, {{latest}}, ya está instalada, pero sigue ejecutándose la versión {{current}}. Reinicia el software cuando sea conveniente para aplicar la actualización.",
                 "manual_upgrade_needed": "Hay una nueva versión disponible: {{latest}}, pero la versión actual, {{current}}, es inferior a la versión mínima compatible, {{required}}. Es necesario actualizar manualmente."

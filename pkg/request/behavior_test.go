@@ -105,6 +105,57 @@ func TestGETAndPOSTEdges(t *testing.T) {
 	}
 }
 
+func TestResponsesAreClosedOnError(t *testing.T) {
+	for _, method := range []string{http.MethodGet, http.MethodPost} {
+		t.Run(method, func(t *testing.T) {
+			body := &trackedBody{ReadCloser: io.NopCloser(strings.NewReader("error"))}
+			transport := roundTripperFunc(func(req *http.Request) (*http.Response, error) {
+				resp := textResponse(req, http.StatusTeapot, "")
+				resp.Body = body
+				return resp, nil
+			})
+			var err error
+			if method == http.MethodGet {
+				_, err = GET("https://example.invalid/status", time.Second, 0, 0, false, transport)
+			} else {
+				_, err = POST("https://example.invalid/status", "x", "text/plain", time.Second, 0, 0, false, transport)
+			}
+			if err == nil || !body.closed {
+				t.Fatalf("error = %v, body closed = %v", err, body.closed)
+			}
+		})
+	}
+}
+
+func TestPOSTRetryRestoresBody(t *testing.T) {
+	var bodies []string
+	transport := roundTripperFunc(func(req *http.Request) (*http.Response, error) {
+		body, err := io.ReadAll(req.Body)
+		if err != nil {
+			return nil, err
+		}
+		bodies = append(bodies, string(body))
+		if len(bodies) == 1 {
+			return nil, io.ErrUnexpectedEOF
+		}
+		return textResponse(req, http.StatusOK, "ok"), nil
+	})
+	response, err := POST("https://example.invalid/retry", "payload", "text/plain", time.Second, 0, 1, false, transport)
+	if err != nil || string(response) != "ok" || len(bodies) != 2 || bodies[0] != "payload" || bodies[1] != "payload" {
+		t.Fatalf("response = %q, bodies = %q, error = %v", response, bodies, err)
+	}
+}
+
+type trackedBody struct {
+	io.ReadCloser
+	closed bool
+}
+
+func (b *trackedBody) Close() error {
+	b.closed = true
+	return b.ReadCloser.Close()
+}
+
 func textResponse(req *http.Request, status int, body string) *http.Response {
 	return &http.Response{
 		StatusCode: status,

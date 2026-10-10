@@ -63,8 +63,8 @@ type ComplexityRoot struct {
 		RestoreStationConfig       func(childComplexity int) int
 		StartService               func(childComplexity int, serviceID string) int
 		StopService                func(childComplexity int, serviceID string) int
-		UpdateServiceConfig        func(childComplexity int, serviceID string, key string, val any) int
-		UpdateStationConfig        func(childComplexity int, key string, value any) int
+		UpdateServiceConfig        func(childComplexity int, serviceID string, key string, val interface{}) int
+		UpdateStationConfig        func(childComplexity int, key string, value interface{}) int
 		UpdateSysUser              func(childComplexity int, userID string, username string, password *string, admin bool) int
 	}
 
@@ -215,11 +215,12 @@ type ComplexityRoot struct {
 	}
 
 	UpgradeStatus struct {
-		Applied  func(childComplexity int) int
-		Current  func(childComplexity int) int
-		Eligible func(childComplexity int) int
-		Latest   func(childComplexity int) int
-		Required func(childComplexity int) int
+		Applied     func(childComplexity int) int
+		CheckFailed func(childComplexity int) int
+		Current     func(childComplexity int) int
+		Eligible    func(childComplexity int) int
+		Latest      func(childComplexity int) int
+		Required    func(childComplexity int) int
 	}
 }
 
@@ -233,7 +234,7 @@ type MutationResolver interface {
 	PurgeMiniSeedFilesByDate(ctx context.Context, startDate int64, endDate int64) (*graph_model.PurgeDataJob, error)
 	PurgeHelicorderFiles(ctx context.Context) (*graph_model.PurgeDataJob, error)
 	PurgeHelicorderFilesByDate(ctx context.Context, startDate int64, endDate int64) (*graph_model.PurgeDataJob, error)
-	UpdateStationConfig(ctx context.Context, key string, value any) (bool, error)
+	UpdateStationConfig(ctx context.Context, key string, value interface{}) (bool, error)
 	RestoreStationConfig(ctx context.Context) (bool, error)
 	ImportGlobalConfig(ctx context.Context, data string) (bool, error)
 	RestartApplication(ctx context.Context) (bool, error)
@@ -241,7 +242,7 @@ type MutationResolver interface {
 	StartService(ctx context.Context, serviceID string) (bool, error)
 	RestartService(ctx context.Context, serviceID string) (bool, error)
 	RestoreServiceConfig(ctx context.Context, serviceID *string) (bool, error)
-	UpdateServiceConfig(ctx context.Context, serviceID string, key string, val any) (bool, error)
+	UpdateServiceConfig(ctx context.Context, serviceID string, key string, val interface{}) (bool, error)
 }
 type QueryResolver interface {
 	GetSoftwareVersion(ctx context.Context) (string, error)
@@ -439,7 +440,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateServiceConfig(childComplexity, args["serviceId"].(string), args["key"].(string), args["val"].(any)), true
+		return e.complexity.Mutation.UpdateServiceConfig(childComplexity, args["serviceId"].(string), args["key"].(string), args["val"].(interface{})), true
 	case "Mutation.updateStationConfig":
 		if e.complexity.Mutation.UpdateStationConfig == nil {
 			break
@@ -450,7 +451,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateStationConfig(childComplexity, args["key"].(string), args["value"].(any)), true
+		return e.complexity.Mutation.UpdateStationConfig(childComplexity, args["key"].(string), args["value"].(interface{})), true
 	case "Mutation.updateSysUser":
 		if e.complexity.Mutation.UpdateSysUser == nil {
 			break
@@ -1105,6 +1106,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.UpgradeStatus.Applied(childComplexity), true
+	case "upgradeStatus.checkFailed":
+		if e.complexity.UpgradeStatus.CheckFailed == nil {
+			break
+		}
+
+		return e.complexity.UpgradeStatus.CheckFailed(childComplexity), true
 	case "upgradeStatus.current":
 		if e.complexity.UpgradeStatus.Current == nil {
 			break
@@ -3224,6 +3231,8 @@ func (ec *executionContext) fieldContext_Query_getUpgradeStatus(_ context.Contex
 				return ec.fieldContext_upgradeStatus_eligible(ctx, field)
 			case "applied":
 				return ec.fieldContext_upgradeStatus_applied(ctx, field)
+			case "checkFailed":
+				return ec.fieldContext_upgradeStatus_checkFailed(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type upgradeStatus", field.Name)
 		},
@@ -7228,6 +7237,35 @@ func (ec *executionContext) fieldContext_upgradeStatus_applied(_ context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _upgradeStatus_checkFailed(ctx context.Context, field graphql.CollectedField, obj *graph_model.UpgradeStatus) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_upgradeStatus_checkFailed,
+		func(ctx context.Context) (any, error) {
+			return obj.CheckFailed, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_upgradeStatus_checkFailed(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "upgradeStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 // endregion **************************** field.gotpl *****************************
 
 // region    **************************** input.gotpl *****************************
@@ -9178,6 +9216,11 @@ func (ec *executionContext) _upgradeStatus(ctx context.Context, sel ast.Selectio
 			}
 		case "applied":
 			out.Values[i] = ec._upgradeStatus_applied(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "checkFailed":
+			out.Values[i] = ec._upgradeStatus_checkFailed(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

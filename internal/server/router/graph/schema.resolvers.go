@@ -242,7 +242,7 @@ func (r *mutationResolver) PurgeHelicorderFilesByDate(ctx context.Context, start
 }
 
 // UpdateStationConfig is the resolver for the updateStationConfig field.
-func (r *mutationResolver) UpdateStationConfig(ctx context.Context, key string, value any) (bool, error) {
+func (r *mutationResolver) UpdateStationConfig(ctx context.Context, key string, value interface{}) (bool, error) {
 	if !r.checkIsAdmin(ctx) {
 		return false, errors.New("permission denied")
 	}
@@ -452,7 +452,7 @@ func (r *mutationResolver) RestoreServiceConfig(ctx context.Context, serviceID *
 }
 
 // UpdateServiceConfig is the resolver for the updateServiceConfig field.
-func (r *mutationResolver) UpdateServiceConfig(ctx context.Context, serviceID string, key string, val any) (bool, error) {
+func (r *mutationResolver) UpdateServiceConfig(ctx context.Context, serviceID string, key string, val interface{}) (bool, error) {
 	if !r.checkIsAdmin(ctx) {
 		return false, errors.New("permission denied")
 	}
@@ -1015,7 +1015,10 @@ func (r *queryResolver) GetUpgradeStatus(ctx context.Context) (*graph_model.Upgr
 
 	latest, required, eligible, applied, err := r.UpgradeHelper.CheckUpdate()
 	if err != nil {
-		return nil, err
+		return &graph_model.UpgradeStatus{
+			Current:     r.CurrentVersion.String(),
+			CheckFailed: true,
+		}, nil
 	}
 	return &graph_model.UpgradeStatus{
 		Current:  r.CurrentVersion.String(),

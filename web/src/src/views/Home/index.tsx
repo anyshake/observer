@@ -249,8 +249,12 @@ const Home = () => {
             latest: string,
             required: string,
             eligible: boolean,
-            applied: boolean
+            applied: boolean,
+            checkFailed: boolean
         ) => {
+            if (checkFailed) {
+                return t('views.Home.upgrade.check_failed');
+            }
             if (eligible) {
                 return t('views.Home.upgrade.update_available', { latest });
             }
@@ -268,14 +272,28 @@ const Home = () => {
 
     useEffect(() => {
         if (getHomeDataData?.getCurrentUser.admin) {
-            getUpgradeStatus().then(({ data }) => {
-                let msg = '';
-                if (data?.getUpgradeStatus) {
-                    const { current, latest, required, eligible, applied } = data.getUpgradeStatus;
-                    msg = generateUpgradeMessage(current, latest, required, eligible, applied);
-                }
-                setUpgradeMessage(msg);
-            });
+            getUpgradeStatus()
+                .then(({ data, error }) => {
+                    if (error) {
+                        setUpgradeMessage(t('views.Home.upgrade.check_failed'));
+                        return;
+                    }
+                    let msg = '';
+                    if (data?.getUpgradeStatus) {
+                        const { current, latest, required, eligible, applied, checkFailed } =
+                            data.getUpgradeStatus;
+                        msg = generateUpgradeMessage(
+                            current,
+                            latest,
+                            required,
+                            eligible,
+                            applied,
+                            checkFailed
+                        );
+                    }
+                    setUpgradeMessage(msg);
+                })
+                .catch(() => setUpgradeMessage(t('views.Home.upgrade.check_failed')));
         }
     }, [generateUpgradeMessage, getHomeDataData?.getCurrentUser.admin, getUpgradeStatus, t]);
 

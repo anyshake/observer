@@ -135,11 +135,12 @@ type SystemStatus struct {
 }
 
 type UpgradeStatus struct {
-	Required string `json:"required"`
-	Current  string `json:"current"`
-	Latest   string `json:"latest"`
-	Eligible bool   `json:"eligible"`
-	Applied  bool   `json:"applied"`
+	Required    string `json:"required"`
+	Current     string `json:"current"`
+	Latest      string `json:"latest"`
+	Eligible    bool   `json:"eligible"`
+	Applied     bool   `json:"applied"`
+	CheckFailed bool   `json:"checkFailed"`
 }
 
 type JobStatus string

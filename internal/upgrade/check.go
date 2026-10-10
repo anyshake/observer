@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -75,49 +76,32 @@ func (u *Helper) CheckUpdate() (latest, required *semver.Version, eligible bool,
 					return nil, nil, false, false, fmt.Errorf("metadata unmarshal failed: %w", err)
 				}
 
-				var (
-					latestMajor   string
-					latestMinor   string
-					latestPatch   string
-					requiredMajor string
-					requiredMinor string
-					requiredPatch string
-				)
-				if val, ok := metadataMap["latest_major"].(string); !ok {
-					return nil, nil, false, false, errors.New("latest_major missing or invalid")
-				} else {
-					latestMajor = val
+				keys := []string{
+					"latest_major", "latest_minor", "latest_patch",
+					"required_major", "required_minor", "required_patch",
 				}
-				if val, ok := metadataMap["latest_minor"].(string); !ok {
-					return nil, nil, false, false, errors.New("latest_minor missing or invalid")
-				} else {
-					latestMinor = val
-				}
-				if val, ok := metadataMap["latest_patch"].(string); !ok {
-					return nil, nil, false, false, errors.New("latest_patch missing or invalid")
-				} else {
-					latestPatch = val
-				}
-				if val, ok := metadataMap["required_major"].(string); !ok {
-					return nil, nil, false, false, errors.New("required_major missing or invalid")
-				} else {
-					requiredMajor = val
-				}
-				if val, ok := metadataMap["required_minor"].(string); !ok {
-					return nil, nil, false, false, errors.New("required_minor missing or invalid")
-				} else {
-					requiredMinor = val
-				}
-				if val, ok := metadataMap["required_patch"].(string); !ok {
-					return nil, nil, false, false, errors.New("required_patch missing or invalid")
-				} else {
-					requiredPatch = val
+				var parts [6]string
+				for i, key := range keys {
+					value, ok := metadataMap[key].(string)
+					if !ok {
+						return nil, nil, false, false, fmt.Errorf("%s missing or invalid", key)
+					}
+					number, err := strconv.ParseInt(value, 10, 64)
+					if err != nil || number < 0 {
+						return nil, nil, false, false, fmt.Errorf("%s missing or invalid", key)
+					}
+					parts[i] = value
 				}
 
-				latest := semver.New(latestMajor, latestMinor, latestPatch, "")
+				latest := semver.New(parts[0], parts[1], parts[2], "")
+				if latest.GetMajor() == 0 && latest.GetMinor() == 0 && latest.GetPatch() == 0 {
+					return nil, nil, false, false, errors.New("latest version is zero")
+				}
+				required := semver.New(parts[3], parts[4], parts[5], "")
+				if latest.LessThan(required) {
+					return nil, nil, false, false, errors.New("required version exceeds latest version")
+				}
 				u.latestVer.Set(latest)
-
-				required := semver.New(requiredMajor, requiredMinor, requiredPatch, "")
 				u.requiredVer.Set(required)
 
 				if u.appliedVer != nil {

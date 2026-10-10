@@ -119,6 +119,7 @@ type upgradeStatus {
   latest: String!
   eligible: Boolean!
   applied: Boolean!
+  checkFailed: Boolean!
 }
 
 enum jobStatus {

@@ -307,6 +307,7 @@ export type SystemStatus = {
 export type UpgradeStatus = {
   __typename?: 'upgradeStatus';
   applied: Scalars['Boolean']['output'];
+  checkFailed: Scalars['Boolean']['output'];
   current: Scalars['String']['output'];
   eligible: Scalars['Boolean']['output'];
   latest: Scalars['String']['output'];
@@ -356,7 +357,7 @@ export type GetHomeDataQuery = { __typename?: 'Query', getCurrentTime: number, g
 export type GetUpgradeStatusQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUpgradeStatusQuery = { __typename?: 'Query', getUpgradeStatus?: { __typename?: 'upgradeStatus', current: string, required: string, latest: string, eligible: boolean, applied: boolean } | null };
+export type GetUpgradeStatusQuery = { __typename?: 'Query', getUpgradeStatus?: { __typename?: 'upgradeStatus', current: string, required: string, latest: string, eligible: boolean, applied: boolean, checkFailed: boolean } | null };
 
 export type CreateUserMutationVariables = Exact<{
   username: Scalars['String']['input'];
@@ -874,6 +875,7 @@ export const GetUpgradeStatusDocument = gql`
     latest
     eligible
     applied
+    checkFailed
   }
 }
     `;

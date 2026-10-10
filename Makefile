@@ -71,13 +71,8 @@ clean:
 	@rm -rf $(DIST_DIR)/*
 
 gen:
-ifeq ($(shell command -v gqlgen 2> /dev/null),)
-	@echo "[Info] Installing gqlgen..."
-	@$(GO) get github.com/99designs/gqlgen
-	@$(GO) install github.com/99designs/gqlgen
-endif
 	@echo "[Info] Generating GraphQL code..."
-	@gqlgen generate
+	@$(GO) run ./cmd/graphqlgen
 
 version:
 	@echo -n 'latest_major=$(CURRENT_VERSION_MAJOR);'
