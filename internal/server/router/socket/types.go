@@ -1,10 +1,9 @@
 package socket
 
 import (
-	"sync"
-
 	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/pkg/message"
+	"github.com/anyshake/observer/pkg/ringbuf"
 )
 
 const LOG_PREFIX = "websocket_api_stream"
@@ -18,8 +17,7 @@ type buffer struct {
 }
 
 type socket struct {
-	historyMu      sync.RWMutex
 	messageBus     *message.Bus[explorer.Event]
 	tokenValidator func(string) bool
-	historyBuffer  []buffer
+	history        *ringbuf.Buffer[buffer]
 }

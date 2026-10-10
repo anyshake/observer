@@ -32,6 +32,7 @@ interface ISpectrogramDeque {
     readonly colorMap?: ColorMapName;
     readonly fftExecutor?: FFTExecutor;
     readonly renderFPS?: number;
+    readonly paused?: boolean;
     readonly onSpectrogramUpdate?: (minDB: number, maxDB: number, colorMap: ColorMapName) => void;
 }
 
@@ -50,6 +51,7 @@ export const DequeSpectrogram = memo(
                 colorMap = DEFAULT_SPECTROGRAM_COLOR_MAP,
                 fftExecutor,
                 renderFPS = 2,
+                paused = false,
                 onSpectrogramUpdate
             },
             ref
@@ -63,6 +65,8 @@ export const DequeSpectrogram = memo(
 
             const bufferRef = useRef<TimeSeriesBuffer>(new TimeSeriesBuffer(duration));
             const needsUpdateRef = useRef(true);
+            const pausedRef = useRef(paused);
+            pausedRef.current = paused;
             const [initializedSpectrogram, setInitializedSpectrogram] =
                 useState<SpectrogramCore | null>(null);
             const spectrogramRef = useRef<SpectrogramCore | null>(null);
@@ -160,6 +164,10 @@ export const DequeSpectrogram = memo(
             }, [freqRange, initializedSpectrogram]);
 
             const renderSpectrogram = useCallback(() => {
+                if (pausedRef.current) {
+                    return;
+                }
+
                 const canvas = canvasRef.current;
                 const sp = spectrogramRef.current;
                 const { width, height } = sizeRef.current;
@@ -172,9 +180,7 @@ export const DequeSpectrogram = memo(
 
                 if (needsUpdateRef.current) {
                     needsUpdateRef.current = false;
-                    const bufData = bufferRef.current
-                        .getData()
-                        .filter((v): v is [number, number] => v[1] !== null);
+                    const bufData = bufferRef.current.getSamples();
                     sp.setData(bufData);
                     if (bufData.length > 0) {
                         const end = sp.getDuration();
@@ -224,7 +230,11 @@ export const DequeSpectrogram = memo(
             );
 
             useEffect(() => {
-                if (!initializedSpectrogram) {
+                if (!initializedSpectrogram || paused) {
+                    if (pendingRenderRef.current !== null) {
+                        cancelAnimationFrame(pendingRenderRef.current);
+                        pendingRenderRef.current = null;
+                    }
                     return;
                 }
 
@@ -232,17 +242,21 @@ export const DequeSpectrogram = memo(
                 const intervalId = window.setInterval(requestSpectrogramRender, frameInterval);
                 requestSpectrogramRender();
                 return () => window.clearInterval(intervalId);
-            }, [initializedSpectrogram, renderFPS, requestSpectrogramRender]);
+            }, [initializedSpectrogram, paused, renderFPS, requestSpectrogramRender]);
 
             useEffect(() => {
-                if (!initializedSpectrogram || spectrogramRef.current !== initializedSpectrogram) {
+                if (
+                    paused ||
+                    !initializedSpectrogram ||
+                    spectrogramRef.current !== initializedSpectrogram
+                ) {
                     return;
                 }
 
                 initializedSpectrogram.setColormap(colormap);
                 needsBitmapFollowupRef.current = true;
                 requestSpectrogramRender();
-            }, [colormap, initializedSpectrogram, requestSpectrogramRender]);
+            }, [colormap, initializedSpectrogram, paused, requestSpectrogramRender]);
 
             const handlePreviewMinDB = useCallback((value: number) => {
                 setMinDBState(value);

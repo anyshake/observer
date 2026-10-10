@@ -33,6 +33,7 @@ interface IDequeChart {
     readonly yPosition?: 'left' | 'right';
     readonly minSpanValue?: number;
     readonly maxDuration?: number; // Buffer duration in seconds
+    readonly paused?: boolean;
 }
 
 export const DequeChart = memo(
@@ -50,7 +51,8 @@ export const DequeChart = memo(
                 yInterval,
                 yPosition = 'left',
                 maxDuration = 60,
-                minSpanValue
+                minSpanValue,
+                paused = false
             }: IDequeChart,
             ref
         ) => {
@@ -58,11 +60,53 @@ export const DequeChart = memo(
             const bufferRef = useRef(new TimeSeriesBuffer(maxDuration));
             const rafRef = useRef<number | null>(null);
             const needsUpdateRef = useRef(false);
+            const pausedRef = useRef(paused);
+            const maxDurationRef = useRef(maxDuration);
+            const resizeOnDrawRef = useRef(false);
+            const scheduleRef = useRef<() => void>(() => {});
+            pausedRef.current = paused;
+            maxDurationRef.current = maxDuration;
+
+            scheduleRef.current = () => {
+                if (rafRef.current !== null) {
+                    return;
+                }
+                rafRef.current = requestAnimationFrame(() => {
+                    rafRef.current = null;
+                    if (pausedRef.current || !needsUpdateRef.current) {
+                        return;
+                    }
+                    if (!chartRef.current) {
+                        scheduleRef.current();
+                        return;
+                    }
+
+                    needsUpdateRef.current = false;
+                    const instance = chartRef.current.getEchartsInstance();
+                    if (resizeOnDrawRef.current) {
+                        resizeOnDrawRef.current = false;
+                        instance.resize();
+                    }
+                    const data = bufferRef.current.getData();
+                    const endTime = bufferRef.current.getEndTime();
+                    const startTime = endTime - maxDurationRef.current * 1000;
+                    instance.setOption({
+                        series: [{ data }],
+                        xAxis: { min: startTime, max: endTime }
+                    });
+                    if (needsUpdateRef.current && !pausedRef.current) {
+                        scheduleRef.current();
+                    }
+                });
+            };
 
             const addData = useCallback(
                 (values: number[], recordTime: number, currentTime: number, sampleRate: number) => {
                     bufferRef.current.addData(values, recordTime, currentTime, sampleRate);
                     needsUpdateRef.current = true;
+                    if (!pausedRef.current) {
+                        scheduleRef.current();
+                    }
                 },
                 []
             );
@@ -71,29 +115,42 @@ export const DequeChart = memo(
                 addData
             }));
 
-            const updateChart = useCallback(() => {
-                if (needsUpdateRef.current && chartRef.current) {
-                    needsUpdateRef.current = false;
-                    const instance = chartRef.current.getEchartsInstance();
-                    const data = bufferRef.current.getData();
-                    const endTime = bufferRef.current.getEndTime();
-                    const startTime = endTime - maxDuration * 1000;
-                    instance.setOption({
-                        series: [{ data }],
-                        xAxis: { min: startTime, max: endTime }
-                    });
-                }
-                rafRef.current = requestAnimationFrame(updateChart);
-            }, [maxDuration]);
-
-            useEffect(() => {
-                rafRef.current = requestAnimationFrame(updateChart);
-                return () => {
-                    if (rafRef.current) {
+            const wasPausedRef = useRef(paused);
+            useEffect(
+                () => () => {
+                    if (rafRef.current !== null) {
                         cancelAnimationFrame(rafRef.current);
+                        rafRef.current = null;
+                    }
+                },
+                []
+            );
+            useEffect(() => {
+                if (paused) {
+                    wasPausedRef.current = true;
+                    if (rafRef.current !== null) {
+                        cancelAnimationFrame(rafRef.current);
+                        rafRef.current = null;
+                    }
+                    return;
+                }
+
+                const resumed = wasPausedRef.current;
+                wasPausedRef.current = false;
+                if (!resumed) {
+                    return;
+                }
+
+                resizeOnDrawRef.current = true;
+                needsUpdateRef.current = true;
+                scheduleRef.current();
+                return () => {
+                    if (rafRef.current !== null) {
+                        cancelAnimationFrame(rafRef.current);
+                        rafRef.current = null;
                     }
                 };
-            }, [updateChart]);
+            }, [paused]);
 
             const option = useMemo(
                 () => ({

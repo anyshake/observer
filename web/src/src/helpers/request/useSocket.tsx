@@ -8,6 +8,7 @@ export const useSocket = (options: ISocket, reconnect: boolean) => {
     const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const [readyState, setReadyState] = useState<WebSocket['readyState']>(WebSocket.CONNECTING);
+    optionsRef.current = options;
 
     const sendMessage = useCallback((message: unknown, json?: boolean) => {
         if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {

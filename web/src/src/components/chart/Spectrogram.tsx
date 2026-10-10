@@ -5,10 +5,7 @@ import { useTranslation } from 'react-i18next';
 import type { ColorMapName, FFTExecutor } from 'spectrogram-js';
 import { Spectrogram as SpectrogramCore } from 'spectrogram-js';
 
-import {
-    DEFAULT_SPECTROGRAM_COLOR_MAP,
-    SPECTROGRAM_COLOR_MAPS
-} from './spectrogramColorMaps';
+import { DEFAULT_SPECTROGRAM_COLOR_MAP, SPECTROGRAM_COLOR_MAPS } from './spectrogramColorMaps';
 
 interface ISpectrogram {
     readonly title?: string;
@@ -23,6 +20,7 @@ interface ISpectrogram {
     readonly colorMap?: ColorMapName;
     readonly fftExecutor?: FFTExecutor;
     readonly renderFPS?: number;
+    readonly paused?: boolean;
     readonly zoomStep?: number;
     readonly onSpectrogramUpdate?: (minDB: number, maxDB: number, colorMap: ColorMapName) => void;
 }
@@ -41,6 +39,7 @@ export const Spectrogram = memo(
         colorMap = DEFAULT_SPECTROGRAM_COLOR_MAP,
         fftExecutor,
         renderFPS = 2,
+        paused = false,
         zoomStep = 0.2,
         onSpectrogramUpdate
     }: ISpectrogram) => {
@@ -86,6 +85,10 @@ export const Spectrogram = memo(
         }, [colorMap]);
 
         const canvasRef = useRef<HTMLCanvasElement>(null);
+        const pausedRef = useRef(paused);
+        const appliedDataRef = useRef<ISpectrogram['data'] | null>(null);
+        const appliedCoreRef = useRef<SpectrogramCore | null>(null);
+        pausedRef.current = paused;
         const sizeRef = useRef({ width: 1, height: 1 });
         useEffect(() => {
             const canvas = canvasRef.current;
@@ -112,6 +115,10 @@ export const Spectrogram = memo(
         }, [data]);
 
         const renderSpectrogram = useCallback(() => {
+            if (pausedRef.current) {
+                return;
+            }
+
             const canvas = canvasRef.current;
             const sp = spectrogramRef.current;
             if (!canvas || !sp || initializedSpectrogram !== sp) {
@@ -159,7 +166,11 @@ export const Spectrogram = memo(
         );
 
         useEffect(() => {
-            if (!initializedSpectrogram) {
+            if (!initializedSpectrogram || paused) {
+                if (pendingRenderRef.current !== null) {
+                    cancelAnimationFrame(pendingRenderRef.current);
+                    pendingRenderRef.current = null;
+                }
                 return;
             }
 
@@ -167,25 +178,40 @@ export const Spectrogram = memo(
             const intervalId = window.setInterval(requestSpectrogramRender, frameInterval);
             requestSpectrogramRender();
             return () => window.clearInterval(intervalId);
-        }, [initializedSpectrogram, renderFPS, requestSpectrogramRender]);
+        }, [initializedSpectrogram, paused, renderFPS, requestSpectrogramRender]);
 
         useEffect(() => {
-            if (!initializedSpectrogram || spectrogramRef.current !== initializedSpectrogram) {
+            if (
+                paused ||
+                !initializedSpectrogram ||
+                spectrogramRef.current !== initializedSpectrogram
+            ) {
                 return;
             }
 
-            initializedSpectrogram.setData(data);
+            if (
+                appliedCoreRef.current !== initializedSpectrogram ||
+                appliedDataRef.current !== data
+            ) {
+                initializedSpectrogram.setData(data);
+                appliedCoreRef.current = initializedSpectrogram;
+                appliedDataRef.current = data;
+            }
             requestSpectrogramRender();
-        }, [data, initializedSpectrogram, requestSpectrogramRender]);
+        }, [data, initializedSpectrogram, paused, requestSpectrogramRender]);
 
         useEffect(() => {
-            if (!initializedSpectrogram || spectrogramRef.current !== initializedSpectrogram) {
+            if (
+                paused ||
+                !initializedSpectrogram ||
+                spectrogramRef.current !== initializedSpectrogram
+            ) {
                 return;
             }
 
             initializedSpectrogram.setColormap(colormap);
             requestSpectrogramRender();
-        }, [colormap, initializedSpectrogram, requestSpectrogramRender]);
+        }, [colormap, initializedSpectrogram, paused, requestSpectrogramRender]);
 
         const handlePreviewMinDB = useCallback((value: number) => {
             setMinDBState(value);
