@@ -347,24 +347,29 @@ const History = ({ currentLocale }: IRouterComponent) => {
                 const records = [...getSeisRecordsByTime].sort(
                     (a, b) => a!.timestamp - b!.timestamp
                 );
-                const currentChannels = new Set<string>();
+                const currentChannels = new Map<string, number>();
                 records.forEach((record) => {
                     record?.channelData.forEach((channel) => {
-                        currentChannels.add(channel.channelCode);
+                        // channelId is 1-based; keep the physical index when earlier channels are absent.
+                        currentChannels.set(channel.channelCode, channel.channelId - 1);
                     });
                 });
-                const channels = Array.from(currentChannels);
+                const channels = Array.from(currentChannels.keys());
+                const channelIndices = Array.from(currentChannels.values());
 
-                if (!sameStrings(channels, prevChannelsRef.current)) {
+                if (
+                    !sameStrings(channels, prevChannelsRef.current) ||
+                    channelIndices.some(
+                        (index, position) => index !== prevChannelIndicesRef.current[position]
+                    )
+                ) {
                     setActiveChannels((prevChannels) => {
                         const newChannels = { ...prevChannels };
-                        channels.forEach((channel, index) => {
-                            if (!newChannels[channel]) {
-                                newChannels[channel] = {
-                                    id: `${HistoryConstraints.id}_${channel}`,
-                                    index
-                                };
-                            }
+                        channels.forEach((channel, position) => {
+                            newChannels[channel] = {
+                                id: `${HistoryConstraints.id}_${channel}`,
+                                index: channelIndices[position]
+                            };
                         });
                         Object.keys(newChannels).forEach((channel) => {
                             if (!currentChannels.has(channel)) {
@@ -372,6 +377,7 @@ const History = ({ currentLocale }: IRouterComponent) => {
                             }
                         });
                         prevChannelsRef.current = channels;
+                        prevChannelIndicesRef.current = channelIndices;
                         return newChannels;
                     });
                 }
@@ -471,6 +477,7 @@ const History = ({ currentLocale }: IRouterComponent) => {
     const { config, locks, toggleLock, setLayoutConfig, resetLayoutConfig } = useLayoutStore();
     const { retention } = useRetentionStore();
     const prevChannelsRef = useRef<string[]>([]);
+    const prevChannelIndicesRef = useRef<number[]>([]);
     const [activeChart, setActiveChart] = useState<string | null>(null); // Track the active chart
 
     const getInitialLayout = useCallback(

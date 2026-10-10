@@ -64,28 +64,34 @@ const RealTime = () => {
     const waveformRefs = useRef<{ [key: string]: RefObject<DequeChartHandle> }>({});
     const spectrogramRefs = useRef<{ [key: string]: RefObject<DequeSpectrogramHandle> }>({});
     const prevChannelsRef = useRef<string[]>([]);
+    const prevChannelIndicesRef = useRef<number[]>([]);
     const layoutCacheRef = useRef(new Map<string, LayoutConfig>());
     const [activeChart, setActiveChart] = useState<string | null>(null); // Track the active chart
 
-    const updateChannels = useCallback((channelData: Record<string, unknown>) => {
+    const updateChannels = useCallback((channelData: Record<string, { channel_id: number }>) => {
         const currentChannels = Object.keys(channelData);
+        // Backend channel_id starts at 1; object key order does not reflect physical channel order.
+        const channelIndices = currentChannels.map((channel) => channelData[channel].channel_id - 1);
 
-        if (sameStrings(currentChannels, prevChannelsRef.current)) {
+        if (
+            sameStrings(currentChannels, prevChannelsRef.current) &&
+            channelIndices.every((index, position) => index === prevChannelIndicesRef.current[position])
+        ) {
             return;
         }
         setActiveChannels((prevChannels) => {
             const newChannels = { ...prevChannels };
-            currentChannels.forEach((channel, index) => {
+            currentChannels.forEach((channel, position) => {
                 if (!newChannels[channel]) {
-                    newChannels[channel] = {
-                        id: `${RealTimeConstraints.id}_${channel}`,
-                        index
-                    };
                     waveformRefs.current[channel] =
                         createRef<DequeChartHandle>() as RefObject<DequeChartHandle>;
                     spectrogramRefs.current[channel] =
                         createRef<DequeSpectrogramHandle>() as RefObject<DequeSpectrogramHandle>;
                 }
+                newChannels[channel] = {
+                    id: `${RealTimeConstraints.id}_${channel}`,
+                    index: channelIndices[position]
+                };
             });
             Object.keys(newChannels).forEach((channel) => {
                 if (!currentChannels.includes(channel)) {
@@ -95,6 +101,7 @@ const RealTime = () => {
                 }
             });
             prevChannelsRef.current = currentChannels;
+            prevChannelIndicesRef.current = channelIndices;
             return newChannels;
         });
     }, []);
