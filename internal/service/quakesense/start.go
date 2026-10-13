@@ -99,7 +99,10 @@ func (s *QuakeSenseServiceImpl) Start() error {
 		return fmt.Errorf("failed to connect to MQTT broker: %w", token.Error())
 	}
 
+	s.wg.Add(1)
 	go func() {
+		defer s.wg.Done()
+
 		s.status.SetStartedAt(s.timeSource.Now())
 		s.status.SetIsRunning(true)
 		defer func() {
@@ -346,9 +349,7 @@ func (s *QuakeSenseServiceImpl) Start() error {
 		}
 
 		<-s.ctx.Done()
-		s.wg.Done()
 	}()
-	s.wg.Add(1)
 
 	return nil
 }

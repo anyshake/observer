@@ -94,7 +94,7 @@ func (s *FrpClientServiceImpl) Start() error {
 			}
 		}()
 
-		if err := s.clientObj.Run(context.Background()); err != nil {
+		if err := s.clientObj.Run(s.ctx); err != nil {
 			logger.GetLogger(ID).Errorf("error running frpc: %v", err)
 		}
 		s.handleInterrupt()
