@@ -15,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -112,6 +113,47 @@ func TestCheckUpdateUsesCachedMetadata(t *testing.T) {
 	_, _, eligible, applied, err = helper.CheckUpdate()
 	if err != nil || eligible || applied {
 		t.Fatalf("newer applied version = eligible %v applied %v err %v", eligible, applied, err)
+	}
+}
+
+func TestCheckUpdateConcurrentWithApply(t *testing.T) {
+	helper := testHelper(t, semver.New("1", "2", "0", ""))
+	latest := semver.New("1", "3", "0", "")
+	helper.latestVer.Set(latest)
+	helper.requiredVer.Set(semver.New("1", "1", "0", ""))
+	if err := os.WriteFile(helper.currentExePath, []byte("old"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	done := make(chan struct{})
+	var readers sync.WaitGroup
+	for range 4 {
+		readers.Add(1)
+		go func() {
+			defer readers.Done()
+			for {
+				_, _, eligible, applied, err := helper.CheckUpdate()
+				if err != nil || eligible == applied {
+					t.Errorf("concurrent update = eligible %v applied %v err %v", eligible, applied, err)
+					return
+				}
+				select {
+				case <-done:
+					return
+				default:
+				}
+			}
+		}()
+	}
+	err := helper.ApplyUpgrade(latest, []byte("new"))
+	close(done)
+	readers.Wait()
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, _, eligible, applied, err := helper.CheckUpdate()
+	if err != nil || eligible || !applied {
+		t.Fatalf("after apply = eligible %v applied %v err %v", eligible, applied, err)
 	}
 }
 

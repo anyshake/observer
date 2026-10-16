@@ -13,6 +13,11 @@ import (
 )
 
 func (u *Helper) ApplyUpgrade(version *semver.Version, release []byte) error {
+	executableFilesMu.Lock()
+	defer executableFilesMu.Unlock()
+	u.mu.Lock()
+	defer u.mu.Unlock()
+
 	if version == nil {
 		return fmt.Errorf("version is nil")
 	}

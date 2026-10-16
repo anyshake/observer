@@ -56,6 +56,7 @@ type ComplexityRoot struct {
 		PurgeMiniSeedFilesByDate   func(childComplexity int, startDate int64, endDate int64) int
 		PurgeSeisRecords           func(childComplexity int) int
 		PurgeSeisRecordsByDate     func(childComplexity int, startDate int64, endDate int64) int
+		RemoveExecutableBackups    func(childComplexity int, names []string) int
 		RemoveSysUser              func(childComplexity int, userID string) int
 		RestartApplication         func(childComplexity int) int
 		RestartService             func(childComplexity int, serviceID string) int
@@ -80,6 +81,7 @@ type ComplexityRoot struct {
 		GetDeviceStatus            func(childComplexity int) int
 		GetEventSource             func(childComplexity int) int
 		GetEventsBySource          func(childComplexity int, code string) int
+		GetExecutableBackups       func(childComplexity int) int
 		GetHelicorderFiles         func(childComplexity int) int
 		GetMiniSeedFiles           func(childComplexity int) int
 		GetSeisRecordsByTime       func(childComplexity int, startTime int64, endTime int64) int
@@ -134,6 +136,18 @@ type ComplexityRoot struct {
 		Messages  func(childComplexity int) int
 		StartedAt func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
+	}
+
+	ExecutableBackup struct {
+		ModifiedAt func(childComplexity int) int
+		Name       func(childComplexity int) int
+		Size       func(childComplexity int) int
+	}
+
+	ExecutableBackupRemoval struct {
+		Error   func(childComplexity int) int
+		Name    func(childComplexity int) int
+		Removed func(childComplexity int) int
 	}
 
 	PurgeDataJob struct {
@@ -238,6 +252,7 @@ type MutationResolver interface {
 	RestoreStationConfig(ctx context.Context) (bool, error)
 	ImportGlobalConfig(ctx context.Context, data string) (bool, error)
 	RestartApplication(ctx context.Context) (bool, error)
+	RemoveExecutableBackups(ctx context.Context, names []string) ([]*graph_model.ExecutableBackupRemoval, error)
 	StopService(ctx context.Context, serviceID string) (bool, error)
 	StartService(ctx context.Context, serviceID string) (bool, error)
 	RestartService(ctx context.Context, serviceID string) (bool, error)
@@ -268,6 +283,7 @@ type QueryResolver interface {
 	GetApplicationLogs(ctx context.Context) ([]string, error)
 	ExportGlobalConfig(ctx context.Context) (string, error)
 	GetUpgradeStatus(ctx context.Context) (*graph_model.UpgradeStatus, error)
+	GetExecutableBackups(ctx context.Context) ([]*graph_model.ExecutableBackup, error)
 	GetCleanupStatus(ctx context.Context) (*graph_model.PurgeDataJob, error)
 }
 
@@ -363,6 +379,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.PurgeSeisRecordsByDate(childComplexity, args["startDate"].(int64), args["endDate"].(int64)), true
+	case "Mutation.removeExecutableBackups":
+		if e.complexity.Mutation.RemoveExecutableBackups == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_removeExecutableBackups_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RemoveExecutableBackups(childComplexity, args["names"].([]string)), true
 	case "Mutation.removeSysUser":
 		if e.complexity.Mutation.RemoveSysUser == nil {
 			break
@@ -535,6 +562,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.GetEventsBySource(childComplexity, args["code"].(string)), true
+	case "Query.getExecutableBackups":
+		if e.complexity.Query.GetExecutableBackups == nil {
+			break
+		}
+
+		return e.complexity.Query.GetExecutableBackups(childComplexity), true
 	case "Query.getHelicorderFiles":
 		if e.complexity.Query.GetHelicorderFiles == nil {
 			break
@@ -784,6 +817,44 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.DeviceStatus.UpdatedAt(childComplexity), true
+
+	case "executableBackup.modifiedAt":
+		if e.complexity.ExecutableBackup.ModifiedAt == nil {
+			break
+		}
+
+		return e.complexity.ExecutableBackup.ModifiedAt(childComplexity), true
+	case "executableBackup.name":
+		if e.complexity.ExecutableBackup.Name == nil {
+			break
+		}
+
+		return e.complexity.ExecutableBackup.Name(childComplexity), true
+	case "executableBackup.size":
+		if e.complexity.ExecutableBackup.Size == nil {
+			break
+		}
+
+		return e.complexity.ExecutableBackup.Size(childComplexity), true
+
+	case "executableBackupRemoval.error":
+		if e.complexity.ExecutableBackupRemoval.Error == nil {
+			break
+		}
+
+		return e.complexity.ExecutableBackupRemoval.Error(childComplexity), true
+	case "executableBackupRemoval.name":
+		if e.complexity.ExecutableBackupRemoval.Name == nil {
+			break
+		}
+
+		return e.complexity.ExecutableBackupRemoval.Name(childComplexity), true
+	case "executableBackupRemoval.removed":
+		if e.complexity.ExecutableBackupRemoval.Removed == nil {
+			break
+		}
+
+		return e.complexity.ExecutableBackupRemoval.Removed(childComplexity), true
 
 	case "purgeDataJob.error":
 		if e.complexity.PurgeDataJob.Error == nil {
@@ -1337,6 +1408,17 @@ func (ec *executionContext) field_Mutation_purgeSeisRecordsByDate_args(ctx conte
 		return nil, err
 	}
 	args["endDate"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_removeExecutableBackups_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "names", ec.unmarshalNString2ᚕstringᚄ)
+	if err != nil {
+		return nil, err
+	}
+	args["names"] = arg0
 	return args, nil
 }
 
@@ -2118,6 +2200,55 @@ func (ec *executionContext) fieldContext_Mutation_restartApplication(_ context.C
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_removeExecutableBackups(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_removeExecutableBackups,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().RemoveExecutableBackups(ctx, fc.Args["names"].([]string))
+		},
+		nil,
+		ec.marshalNexecutableBackupRemoval2ᚕᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐExecutableBackupRemovalᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_removeExecutableBackups(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "name":
+				return ec.fieldContext_executableBackupRemoval_name(ctx, field)
+			case "removed":
+				return ec.fieldContext_executableBackupRemoval_removed(ctx, field)
+			case "error":
+				return ec.fieldContext_executableBackupRemoval_error(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type executableBackupRemoval", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_removeExecutableBackups_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -3235,6 +3366,43 @@ func (ec *executionContext) fieldContext_Query_getUpgradeStatus(_ context.Contex
 				return ec.fieldContext_upgradeStatus_checkFailed(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type upgradeStatus", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getExecutableBackups(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_getExecutableBackups,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Query().GetExecutableBackups(ctx)
+		},
+		nil,
+		ec.marshalNexecutableBackup2ᚕᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐExecutableBackupᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_getExecutableBackups(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "name":
+				return ec.fieldContext_executableBackup_name(ctx, field)
+			case "size":
+				return ec.fieldContext_executableBackup_size(ctx, field)
+			case "modifiedAt":
+				return ec.fieldContext_executableBackup_modifiedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type executableBackup", field.Name)
 		},
 	}
 	return fc, nil
@@ -5587,6 +5755,180 @@ func (ec *executionContext) fieldContext_deviceStatus_messages(_ context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _executableBackup_name(ctx context.Context, field graphql.CollectedField, obj *graph_model.ExecutableBackup) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_executableBackup_name,
+		func(ctx context.Context) (any, error) {
+			return obj.Name, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_executableBackup_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "executableBackup",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _executableBackup_size(ctx context.Context, field graphql.CollectedField, obj *graph_model.ExecutableBackup) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_executableBackup_size,
+		func(ctx context.Context) (any, error) {
+			return obj.Size, nil
+		},
+		nil,
+		ec.marshalNInt642int64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_executableBackup_size(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "executableBackup",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _executableBackup_modifiedAt(ctx context.Context, field graphql.CollectedField, obj *graph_model.ExecutableBackup) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_executableBackup_modifiedAt,
+		func(ctx context.Context) (any, error) {
+			return obj.ModifiedAt, nil
+		},
+		nil,
+		ec.marshalNInt642int64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_executableBackup_modifiedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "executableBackup",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _executableBackupRemoval_name(ctx context.Context, field graphql.CollectedField, obj *graph_model.ExecutableBackupRemoval) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_executableBackupRemoval_name,
+		func(ctx context.Context) (any, error) {
+			return obj.Name, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_executableBackupRemoval_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "executableBackupRemoval",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _executableBackupRemoval_removed(ctx context.Context, field graphql.CollectedField, obj *graph_model.ExecutableBackupRemoval) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_executableBackupRemoval_removed,
+		func(ctx context.Context) (any, error) {
+			return obj.Removed, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_executableBackupRemoval_removed(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "executableBackupRemoval",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _executableBackupRemoval_error(ctx context.Context, field graphql.CollectedField, obj *graph_model.ExecutableBackupRemoval) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_executableBackupRemoval_error,
+		func(ctx context.Context) (any, error) {
+			return obj.Error, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_executableBackupRemoval_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "executableBackupRemoval",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _purgeDataJob_id(ctx context.Context, field graphql.CollectedField, obj *graph_model.PurgeDataJob) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -7388,6 +7730,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "removeExecutableBackups":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_removeExecutableBackups(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "stopService":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_stopService(ctx, field)
@@ -7953,6 +8302,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getUpgradeStatus(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getExecutableBackups":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getExecutableBackups(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
 				return res
 			}
 
@@ -8608,6 +8979,101 @@ func (ec *executionContext) _deviceStatus(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var executableBackupImplementors = []string{"executableBackup"}
+
+func (ec *executionContext) _executableBackup(ctx context.Context, sel ast.SelectionSet, obj *graph_model.ExecutableBackup) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, executableBackupImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("executableBackup")
+		case "name":
+			out.Values[i] = ec._executableBackup_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "size":
+			out.Values[i] = ec._executableBackup_size(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "modifiedAt":
+			out.Values[i] = ec._executableBackup_modifiedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var executableBackupRemovalImplementors = []string{"executableBackupRemoval"}
+
+func (ec *executionContext) _executableBackupRemoval(ctx context.Context, sel ast.SelectionSet, obj *graph_model.ExecutableBackupRemoval) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, executableBackupRemovalImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("executableBackupRemoval")
+		case "name":
+			out.Values[i] = ec._executableBackupRemoval_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "removed":
+			out.Values[i] = ec._executableBackupRemoval_removed(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "error":
+			out.Values[i] = ec._executableBackupRemoval_error(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9920,6 +10386,114 @@ func (ec *executionContext) marshalNdeviceStatus2ᚖgithubᚗcomᚋanyshakeᚋob
 		return graphql.Null
 	}
 	return ec._deviceStatus(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNexecutableBackup2ᚕᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐExecutableBackupᚄ(ctx context.Context, sel ast.SelectionSet, v []*graph_model.ExecutableBackup) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNexecutableBackup2ᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐExecutableBackup(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNexecutableBackup2ᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐExecutableBackup(ctx context.Context, sel ast.SelectionSet, v *graph_model.ExecutableBackup) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._executableBackup(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNexecutableBackupRemoval2ᚕᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐExecutableBackupRemovalᚄ(ctx context.Context, sel ast.SelectionSet, v []*graph_model.ExecutableBackupRemoval) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNexecutableBackupRemoval2ᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐExecutableBackupRemoval(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNexecutableBackupRemoval2ᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐExecutableBackupRemoval(ctx context.Context, sel ast.SelectionSet, v *graph_model.ExecutableBackupRemoval) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._executableBackupRemoval(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNjobStatus2githubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐJobStatus(ctx context.Context, v any) (graph_model.JobStatus, error) {

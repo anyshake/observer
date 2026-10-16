@@ -237,6 +237,24 @@
                 "title": "アプリケーションログ"
             },
             "Dangerous": {
+                "executable_backups": {
+                    "title": "旧バージョンのバックアップ",
+                    "description": "アプリケーションの更新時に作成されたバックアップです。完全に削除するファイルを選択してください。",
+                    "submit_button": "バックアップを整理",
+                    "refresh_button": "再検索",
+                    "delete_button": "選択した項目を削除（{{count}}）",
+                    "select_all": "すべて選択",
+                    "loading": "バックアップを検索中...",
+                    "empty": "旧バージョンのバックアップは見つかりませんでした。",
+                    "list_failed": "バックアップの検索に失敗しました：{{error}}",
+                    "confirm_title": "バックアップを削除",
+                    "confirm_message": "選択した {{count}} 件のバックアップを完全に削除しますか？",
+                    "cancel_button": "キャンセル",
+                    "removing": "バックアップを削除中...",
+                    "result_summary": "{{removed}} 件のバックアップを削除しました。{{failed}} 件は削除に失敗しました。",
+                    "empty_response": "バックアップの削除結果を受信できませんでした。",
+                    "remove_failed": "バックアップの削除に失敗しました：{{error}}"
+                },
                 "title": "危険ゾーン",
                 "restart_application": {
                     "title": "アプリケーション全体を再起動",

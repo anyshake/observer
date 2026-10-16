@@ -237,6 +237,24 @@
                 "title": "Log Aplikasi"
             },
             "Dangerous": {
+                "executable_backups": {
+                    "title": "Cadangan Versi Lama",
+                    "description": "Cadangan ini dibuat saat aplikasi diperbarui. Pilih berkas yang ingin dihapus secara permanen.",
+                    "submit_button": "Bersihkan Cadangan",
+                    "refresh_button": "Segarkan",
+                    "delete_button": "Hapus yang Dipilih ({{count}})",
+                    "select_all": "Pilih semua",
+                    "loading": "Mencari cadangan...",
+                    "empty": "Tidak ditemukan cadangan versi lama.",
+                    "list_failed": "Gagal mencari cadangan: {{error}}",
+                    "confirm_title": "Hapus Cadangan",
+                    "confirm_message": "Hapus {{count}} cadangan yang dipilih secara permanen?",
+                    "cancel_button": "Batal",
+                    "removing": "Menghapus cadangan...",
+                    "result_summary": "{{removed}} cadangan dihapus; {{failed}} gagal.",
+                    "empty_response": "Tidak ada hasil penghapusan cadangan yang diterima.",
+                    "remove_failed": "Gagal menghapus cadangan: {{error}}"
+                },
                 "title": "Zona Berbahaya",
                 "restart_application": {
                     "title": "Mulai Ulang Seluruh Aplikasi",

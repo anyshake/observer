@@ -1,11 +1,11 @@
 import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { CodeBlock } from '../../components/widget/CodeBlock';
-import { useExportGlobalConfigLazyQuery, useImportGlobalConfigMutation } from '../../graphql';
-import { sendPromiseAlert } from '../../helpers/alert/sendPromiseAlert';
-import { sendUserAlert } from '../../helpers/alert/sendUserAlert';
-import { sendUserConfirm } from '../../helpers/alert/sendUserConfirm';
+import { CodeBlock } from '../../../components/widget/CodeBlock';
+import { useExportGlobalConfigLazyQuery, useImportGlobalConfigMutation } from '../../../graphql';
+import { sendPromiseAlert } from '../../../helpers/alert/sendPromiseAlert';
+import { sendUserAlert } from '../../../helpers/alert/sendUserAlert';
+import { sendUserConfirm } from '../../../helpers/alert/sendUserConfirm';
 
 export const Backup = () => {
     const { t } = useTranslation();

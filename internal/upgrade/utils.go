@@ -153,18 +153,27 @@ func (h *Helper) extractExecutableFromZip(archive []byte, fileName string) ([]by
 }
 
 func (u *Helper) isEligibleForUpdate(latestVer, requiredVer *semver.Version) bool {
+	eligible, _ := u.updateStatus(latestVer, requiredVer)
+	return eligible
+}
+
+func (u *Helper) updateStatus(latestVer, requiredVer *semver.Version) (eligible, applied bool) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+
+	applied = u.appliedVer != nil && latestVer.Equal(u.appliedVer)
 	if !u.currentVer.IsCompatible(latestVer) {
-		return false
+		return false, applied
 	}
 	if u.currentVer.GreaterThanOrEqual(latestVer) || u.currentVer.LessThan(requiredVer) {
-		return false
+		return false, applied
 	}
 
 	if u.appliedVer != nil {
 		if u.appliedVer.GreaterThanOrEqual(latestVer) {
-			return false
+			return false, applied
 		}
 	}
 
-	return true
+	return true, applied
 }

@@ -1,6 +1,8 @@
 import ReactECharts from 'echarts-for-react';
 import { memo, useEffect, useMemo, useRef } from 'react';
 
+import { getLineSeries, type LineChartData } from './lineSeries';
+
 interface ILineChart {
     readonly hidden?: boolean;
     readonly title?: string;
@@ -9,7 +11,7 @@ interface ILineChart {
     readonly lineWidth?: number;
     readonly height?: number | string;
     readonly zoom?: boolean;
-    readonly data: [number, number | null][] | (number | null)[];
+    readonly data: LineChartData;
     readonly yMax?: number;
     readonly yMin?: number;
     readonly yInterval?: number;
@@ -73,19 +75,7 @@ export const LineChart = memo(
                     position: yPosition,
                     scale: true
                 },
-                series: [
-                    {
-                        type: 'line',
-                        sampling: 'lttb',
-                        showSymbol: false,
-                        lineStyle: {
-                            color: lineColor,
-                            width: lineWidth
-                        },
-                        connectNulls: false,
-                        data: Array.isArray(data) ? data : []
-                    }
-                ],
+                series: getLineSeries(Array.isArray(data) ? data : [], lineColor, lineWidth),
                 grid: { top: '5%', bottom: '3%', containLabel: true },
                 dataZoom: zoom
                     ? [

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 
-import { ErrorPage } from '../../components/ui/ErrorPage';
-import { CodeBlock } from '../../components/widget/CodeBlock';
-import { SettingsConstraints } from '../../config/constraints';
-import { useGetApplicationLogsQuery } from '../../graphql';
+import { ErrorPage } from '../../../components/ui/ErrorPage';
+import { CodeBlock } from '../../../components/widget/CodeBlock';
+import { SettingsConstraints } from '../../../config/constraints';
+import { useGetApplicationLogsQuery } from '../../../graphql';
 
-export const Logs = () => {
+export const AppLogs = () => {
     const {
         data: getApplicationLogsData,
         loading: getApplicationLogsLoading,

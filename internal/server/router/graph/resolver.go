@@ -29,6 +29,7 @@ type ContextKey string
 
 type Resolver struct {
 	RestartChan              chan struct{}
+	ExecutablePath           string
 	CurrentVersion           *semver.Version
 	CurrentBuild             *unibuild.UniBuild
 	UpgradeHelper            *upgrade.Helper

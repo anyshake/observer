@@ -119,6 +119,71 @@ func TestWebSocketSubscribeFailure(t *testing.T) {
 	time.Sleep(20 * time.Millisecond)
 }
 
+func TestWebSocketMessageLimits(t *testing.T) {
+	setupSocketTests()
+	router := gin.New()
+	Setup(router.Group("/"), timesource.New(time.Now), &fakeHardware{}, func(ctx *gin.Context) {
+		if ctx.GetHeader("Authorization") != "Bearer good" {
+			ctx.AbortWithStatus(http.StatusUnauthorized)
+		}
+	})
+	server := httptest.NewServer(router)
+	t.Cleanup(server.Close)
+	endpoint := "ws" + strings.TrimPrefix(server.URL, "http") + "/socket"
+
+	for _, tc := range []struct {
+		name          string
+		compressed    bool
+		authenticated bool
+		oversized     bool
+	}{
+		{"plain before authentication", false, false, true},
+		{"compressed before authentication", true, false, true},
+		{"plain after authentication", false, true, true},
+		{"compressed after authentication", true, true, true},
+		{"plain at limit", false, true, false},
+		{"compressed at limit", true, true, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			dialer := websocket.Dialer{EnableCompression: tc.compressed}
+			conn, response, err := dialer.Dial(endpoint, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer conn.Close()
+			if tc.compressed && !strings.Contains(response.Header.Get("Sec-WebSocket-Extensions"), "permessage-deflate") {
+				t.Fatal("compression was not negotiated")
+			}
+			_ = conn.SetReadDeadline(time.Now().Add(2 * time.Second))
+			if tc.authenticated {
+				if err := conn.WriteMessage(websocket.TextMessage, []byte("good")); err != nil {
+					t.Fatal(err)
+				}
+			}
+			size := maxClientMessageSize
+			if tc.oversized {
+				size++
+			}
+			if err := conn.WriteMessage(websocket.TextMessage, []byte(strings.Repeat("a", size))); err != nil {
+				t.Fatal(err)
+			}
+			if tc.oversized {
+				if _, _, err := conn.ReadMessage(); !websocket.IsCloseError(err, websocket.CloseMessageTooBig) {
+					t.Fatalf("oversized message close = %v", err)
+				}
+				return
+			}
+			if err := conn.WriteMessage(websocket.TextMessage, []byte("ping")); err != nil {
+				t.Fatal(err)
+			}
+			var reply string
+			if err := conn.ReadJSON(&reply); err != nil || reply != "pong" {
+				t.Fatalf("connection after limit-sized message = %q, %v", reply, err)
+			}
+		})
+	}
+}
+
 type fakeHardware struct {
 	handler      explorer.EventHandler
 	subscribeErr error

@@ -10,6 +10,7 @@ import {
 } from 'react';
 
 import TimeSeriesBuffer from '../../helpers/storage/TimeSeriesBuffer';
+import { getLineSeries } from './lineSeries';
 
 export interface DequeChartHandle {
     addData: (
@@ -90,10 +91,13 @@ export const DequeChart = memo(
                     const data = bufferRef.current.getData();
                     const endTime = bufferRef.current.getEndTime();
                     const startTime = endTime - maxDurationRef.current * 1000;
-                    instance.setOption({
-                        series: [{ data }],
-                        xAxis: { min: startTime, max: endTime }
-                    });
+                    instance.setOption(
+                        {
+                            series: getLineSeries(data, lineColor, lineWidth),
+                            xAxis: { min: startTime, max: endTime }
+                        },
+                        { replaceMerge: ['series'] }
+                    );
                     if (needsUpdateRef.current && !pausedRef.current) {
                         scheduleRef.current();
                     }
@@ -192,16 +196,7 @@ export const DequeChart = memo(
                         position: yPosition,
                         scale: true
                     },
-                    series: [
-                        {
-                            type: 'line',
-                            sampling: 'lttb',
-                            showSymbol: false,
-                            lineStyle: { color: lineColor, width: lineWidth },
-                            connectNulls: false,
-                            data: []
-                        }
-                    ],
+                    series: getLineSeries([], lineColor, lineWidth),
                     grid: { top: '5%', bottom: '3%', containLabel: true },
                     dataZoom: zoom
                         ? [

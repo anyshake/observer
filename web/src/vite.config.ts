@@ -13,7 +13,7 @@ export default defineConfig({
             injectRegister: 'auto',
             registerType: 'prompt',
             workbox: {
-                globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+                globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
                 navigateFallbackDenylist: [/^\/api/],
                 maximumFileSizeToCacheInBytes: 3000000
             },

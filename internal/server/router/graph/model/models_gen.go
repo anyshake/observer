@@ -56,6 +56,18 @@ type DeviceStatus struct {
 	Messages  int64 `json:"messages"`
 }
 
+type ExecutableBackup struct {
+	Name       string `json:"name"`
+	Size       int64  `json:"size"`
+	ModifiedAt int64  `json:"modifiedAt"`
+}
+
+type ExecutableBackupRemoval struct {
+	Name    string  `json:"name"`
+	Removed bool    `json:"removed"`
+	Error   *string `json:"error,omitempty"`
+}
+
 type PurgeDataJob struct {
 	ID         string    `json:"id"`
 	Kind       string    `json:"kind"`

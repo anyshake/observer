@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 
-import { ErrorPage } from '../../components/ui/ErrorPage';
-import { CodeBlock } from '../../components/widget/CodeBlock';
-import { useGetStationMetadataQuery } from '../../graphql';
+import { ErrorPage } from '../../../components/ui/ErrorPage';
+import { CodeBlock } from '../../../components/widget/CodeBlock';
+import { useGetStationMetadataQuery } from '../../../graphql';
 
 export const Metadata = () => {
     const availableFormats = useMemo(

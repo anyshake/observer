@@ -237,6 +237,24 @@
                 "title": "Logi Aplikacji"
             },
             "Dangerous": {
+                "executable_backups": {
+                    "title": "Kopie zapasowe starszych wersji",
+                    "description": "Te kopie zapasowe zostały utworzone podczas aktualizacji aplikacji. Wybierz pliki do trwałego usunięcia.",
+                    "submit_button": "Usuń stare kopie",
+                    "refresh_button": "Odśwież",
+                    "delete_button": "Usuń zaznaczone ({{count}})",
+                    "select_all": "Zaznacz wszystkie",
+                    "loading": "Wyszukiwanie kopii zapasowych...",
+                    "empty": "Nie znaleziono kopii zapasowych starszych wersji.",
+                    "list_failed": "Nie udało się wyszukać kopii zapasowych: {{error}}",
+                    "confirm_title": "Usuń kopie zapasowe",
+                    "confirm_message": "Czy trwale usunąć zaznaczone kopie zapasowe ({{count}})?",
+                    "cancel_button": "Anuluj",
+                    "removing": "Usuwanie kopii zapasowych...",
+                    "result_summary": "Usunięte kopie: {{removed}}. Niepowodzenia: {{failed}}.",
+                    "empty_response": "Nie otrzymano wyników usuwania kopii zapasowych.",
+                    "remove_failed": "Nie udało się usunąć kopii zapasowych: {{error}}"
+                },
                 "title": "Strefa Niebezpieczna",
                 "restart_application": {
                     "title": "Restart całej aplikacji",

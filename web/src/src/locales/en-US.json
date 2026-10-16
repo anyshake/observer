@@ -237,6 +237,24 @@
                 "title": "Application Logs"
             },
             "Dangerous": {
+                "executable_backups": {
+                    "title": "Old Executable Backups",
+                    "description": "Backups created when this application was upgraded. Select the files to delete permanently.",
+                    "submit_button": "Clean Up Backups",
+                    "refresh_button": "Refresh",
+                    "delete_button": "Delete Selected ({{count}})",
+                    "select_all": "Select all",
+                    "loading": "Scanning for backups...",
+                    "empty": "No old executable backups found.",
+                    "list_failed": "Failed to scan backups: {{error}}",
+                    "confirm_title": "Delete Backups",
+                    "confirm_message": "Permanently delete {{count}} selected backup(s)?",
+                    "cancel_button": "Cancel",
+                    "removing": "Deleting backups...",
+                    "result_summary": "Deleted {{removed}} backup(s); {{failed}} failed.",
+                    "empty_response": "No backup deletion results were returned.",
+                    "remove_failed": "Failed to delete backups: {{error}}"
+                },
                 "title": "Dangerous Zone",
                 "restart_application": {
                     "title": "Restart Entire Application",

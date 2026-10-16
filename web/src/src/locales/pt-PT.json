@@ -237,6 +237,24 @@
                 "title": "Registos da Aplicação"
             },
             "Dangerous": {
+                "executable_backups": {
+                    "title": "Cópias de segurança de versões anteriores",
+                    "description": "Estas cópias de segurança foram criadas durante as atualizações da aplicação. Selecione os ficheiros a eliminar permanentemente.",
+                    "submit_button": "Limpar cópias de segurança",
+                    "refresh_button": "Atualizar",
+                    "delete_button": "Eliminar selecionadas ({{count}})",
+                    "select_all": "Selecionar todas",
+                    "loading": "A procurar cópias de segurança...",
+                    "empty": "Não foram encontradas cópias de segurança de versões anteriores.",
+                    "list_failed": "Falha ao procurar cópias de segurança: {{error}}",
+                    "confirm_title": "Eliminar cópias de segurança",
+                    "confirm_message": "Eliminar permanentemente as {{count}} cópias de segurança selecionadas?",
+                    "cancel_button": "Cancelar",
+                    "removing": "A eliminar cópias de segurança...",
+                    "result_summary": "Cópias de segurança eliminadas: {{removed}}; falhas: {{failed}}.",
+                    "empty_response": "Não foram recebidos os resultados da eliminação das cópias de segurança.",
+                    "remove_failed": "Falha ao eliminar cópias de segurança: {{error}}"
+                },
                 "title": "Zona Perigosa",
                 "restart_application": {
                     "title": "Reiniciar toda a aplicação",

@@ -1,127 +1,20 @@
 import '@fancyapps/ui/dist/fancybox/fancybox.css';
 
-import { Fancybox } from '@fancyapps/ui';
 import { mdiArchive, mdiClose, mdiImageAlbum, mdiMagnify } from '@mdi/js';
 import Icon from '@mdi/react';
-import { GridColDef, GridValidRowModel } from '@mui/x-data-grid';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Card } from '../../components/widget/Card';
 import { TableList } from '../../components/widget/TableList';
-import { DownloadConstraints } from '../../config/constraints';
 import { IRouterComponent } from '../../config/router';
-import { useGetFileListDataQuery } from '../../graphql';
-import { sendPromiseAlert } from '../../helpers/alert/sendPromiseAlert';
-import { getRestfulApiUrl } from '../../helpers/app/getRestfulApiUrl';
-import { ApiClient } from '../../helpers/request/ApiClient';
-import { getTimeString } from '../../helpers/utils/getTimeString';
+import { useAssetActions } from './useAssetActions';
+import { useFileColumns } from './useFileColumns';
+import { useFileLists } from './useFileLists';
 
 const Download = ({ currentLocale }: IRouterComponent) => {
     const { t } = useTranslation();
-    const { loading: getFileListDataLoading, data: getFileListDataData } = useGetFileListDataQuery({
-        pollInterval: DownloadConstraints.pollInterval
-    });
-
-    const parseMseedFileName = (filename: string) => {
-        const match = filename.match(
-            /^([A-Z0-9]+)\.([A-Z0-9]+)\.([A-Z0-9]+)\.([A-Z0-9]+)\.D\.(\d{4})\.(\d{3})\.mseed$/i
-        );
-        if (!match) {
-            return null;
-        }
-        return {
-            channelCode: match[4],
-            year: parseInt(match[5]),
-            dayOfYear: parseInt(match[6])
-        };
-    };
-    const [miniSeedList, setMiniSeedList] = useState<
-        Array<{
-            id: number;
-            namespace: string;
-            filePath: string;
-            fileName: string;
-            size: number;
-            timestamp: number;
-        }>
-    >([]);
-    useEffect(() => {
-        if (getFileListDataData?.getMiniSeedFiles) {
-            const rawList = [...getFileListDataData.getMiniSeedFiles]
-                .sort((a, b) => {
-                    const fa = parseMseedFileName(a!.fileName);
-                    const fb = parseMseedFileName(b!.fileName);
-                    if (!fa || !fb) {
-                        return 0;
-                    }
-                    return (
-                        fb.year - fa.year ||
-                        fb.dayOfYear - fa.dayOfYear ||
-                        fa.channelCode.localeCompare(fb.channelCode)
-                    );
-                })
-                .map((file, index) => ({
-                    id: index + 1,
-                    namespace: file!.namespace,
-                    filePath: file!.filePath,
-                    fileName: file!.fileName,
-                    size: file!.size,
-                    timestamp: file!.modifiedAt
-                }));
-            setMiniSeedList(rawList);
-        }
-    }, [getFileListDataData]);
-
-    const parseHelicorderFilename = (filename: string) => {
-        const match = filename.match(
-            /^([A-Z0-9]+)\.([A-Z0-9]+)\.([A-Z0-9]+)\.([A-Z0-9]+)\.(\d{4})\.(\d{3})\.svg$/i
-        );
-        if (!match) {
-            return null;
-        }
-        return {
-            channelCode: match[4],
-            year: parseInt(match[5]),
-            dayOfYear: parseInt(match[6])
-        };
-    };
-    const [helicorderList, setHelicorderList] = useState<
-        Array<{
-            id: number;
-            namespace: string;
-            filePath: string;
-            fileName: string;
-            size: number;
-            timestamp: number;
-        }>
-    >([]);
-    useEffect(() => {
-        if (getFileListDataData?.getHelicorderFiles) {
-            const rawList = [...getFileListDataData.getHelicorderFiles]
-                .sort((a, b) => {
-                    const fa = parseHelicorderFilename(a!.fileName);
-                    const fb = parseHelicorderFilename(b!.fileName);
-                    if (!fa || !fb) {
-                        return 0;
-                    }
-                    return (
-                        fb.year - fa.year ||
-                        fb.dayOfYear - fa.dayOfYear ||
-                        fa.channelCode.localeCompare(fb.channelCode)
-                    );
-                })
-                .map((file, index) => ({
-                    id: index + 1,
-                    namespace: file!.namespace,
-                    filePath: file!.filePath,
-                    fileName: file!.fileName,
-                    size: file!.size,
-                    timestamp: file!.modifiedAt
-                }));
-            setHelicorderList(rawList);
-        }
-    }, [getFileListDataData]);
+    const { getFileListDataLoading, miniSeedList, helicorderList } = useFileLists();
 
     const [searchMiniSeed, setSearchMiniSeed] = useState('');
     const [searchHelicorder, setSearchHelicorder] = useState('');
@@ -132,136 +25,8 @@ const Download = ({ currentLocale }: IRouterComponent) => {
         item.fileName.toLowerCase().includes(searchHelicorder.toLowerCase())
     );
 
-    const getAssetFetchLink = useCallback(
-        (apiUrl: string, token: string, namespace: string, filePath: string) => {
-            const urlObj = new URL(apiUrl);
-            urlObj.searchParams.set('token', token);
-            urlObj.searchParams.set('namespace', namespace);
-            urlObj.searchParams.set('file_path', filePath);
-            return urlObj.toString();
-        },
-        []
-    );
-
-    const handleDownloadAsset = useCallback(
-        async (namespace: string, fileName: string, filePath: string) => {
-            const apiUrl = getRestfulApiUrl('/files');
-            await sendPromiseAlert(
-                ApiClient.request<string>({
-                    url: apiUrl,
-                    method: 'post',
-                    data: { file_path: filePath }
-                }),
-                t('views.Download.request_file.requesting', { fileName }),
-                (res) => {
-                    const fetchUrl = getAssetFetchLink(apiUrl, res!.data!, namespace, filePath);
-                    window.open(fetchUrl, '_blank');
-                    return t('views.Download.request_file.success', { fileName });
-                },
-                (error) => t('views.Download.request_file.error', { fileName, error })
-            );
-        },
-        [t, getAssetFetchLink]
-    );
-
-    const handlePreviewAsset = useCallback(
-        async (namespace: string, fileName: string, filePath: string) => {
-            const requestFn = async () => {
-                const apiUrl = getRestfulApiUrl('/files');
-                const res = await ApiClient.request<string>({
-                    url: apiUrl,
-                    method: 'post',
-                    data: { file_path: filePath }
-                });
-                const fetchUrl = getAssetFetchLink(apiUrl, res!.data!, namespace, filePath);
-                const blobObj = await ApiClient.getBlob({ url: fetchUrl });
-                const blobUrl = URL.createObjectURL(blobObj!);
-                Fancybox.show([{ src: blobUrl, type: 'image' }], {
-                    on: { close: () => URL.revokeObjectURL(blobUrl) }
-                });
-            };
-            await sendPromiseAlert(
-                requestFn(),
-                t('views.Download.preview_file.requesting', { fileName }),
-                t('views.Download.preview_file.success', { fileName }),
-                (error) => t('views.Download.preview_file.error', { fileName, error })
-            );
-        },
-        [t, getAssetFetchLink]
-    );
-    useEffect(
-        () => () => {
-            Fancybox.destroy();
-        },
-        []
-    );
-
-    const getColumns = useCallback(
-        (hasPreview: boolean): GridColDef<GridValidRowModel>[] => [
-            {
-                field: 'id',
-                headerName: t('views.Download.file_list_columns.id'),
-                hideable: false,
-                sortable: true,
-                minWidth: 150
-            },
-            {
-                field: 'fileName',
-                headerName: t('views.Download.file_list_columns.name'),
-                hideable: false,
-                sortable: true,
-                minWidth: 350
-            },
-            {
-                field: 'timestamp',
-                headerName: t('views.Download.file_list_columns.time'),
-                hideable: true,
-                sortable: true,
-                minWidth: 250,
-                renderCell: (cell: GridValidRowModel) => getTimeString(cell.value)
-            },
-            {
-                field: 'size',
-                headerName: t('views.Download.file_list_columns.size'),
-                hideable: true,
-                sortable: true,
-                minWidth: 200,
-                renderCell: (cell: GridValidRowModel) =>
-                    `${(cell.value / 1024 / 1024).toFixed(2)} MB`
-            },
-            {
-                field: 'actions',
-                headerName: t('views.Download.file_list_columns.actions'),
-                sortable: false,
-                minWidth: 220,
-                headerAlign: 'center',
-                align: 'center',
-                renderCell: ({ row: { fileName, namespace, filePath } }: GridValidRowModel) => (
-                    <div className="space-x-4">
-                        {hasPreview && (
-                            <button
-                                className="cursor-pointer text-blue-700 hover:opacity-50"
-                                onClick={() => {
-                                    handlePreviewAsset(namespace, fileName, filePath);
-                                }}
-                            >
-                                {t('views.Download.file_list_actions.preview')}
-                            </button>
-                        )}
-                        <button
-                            className="cursor-pointer text-blue-700 hover:opacity-50"
-                            onClick={() => {
-                                handleDownloadAsset(namespace, fileName, filePath);
-                            }}
-                        >
-                            {t('views.Download.file_list_actions.download')}
-                        </button>
-                    </div>
-                )
-            }
-        ],
-        [t, handlePreviewAsset, handleDownloadAsset]
-    );
+    const assetActions = useAssetActions();
+    const { getColumns } = useFileColumns(assetActions);
 
     return (
         <div className="container mx-auto space-y-6 p-4">

@@ -250,6 +250,7 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 
 	graphqlResolver := &graph_resolver.Resolver{
 		RestartChan:              restartChan,
+		ExecutablePath:           exePath,
 		CurrentVersion:           ver,
 		CurrentBuild:             build,
 		UpgradeHelper:            upgradeHelper,

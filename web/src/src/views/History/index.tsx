@@ -1,63 +1,31 @@
-import {
-    mdiBlurLinear,
-    mdiCalendarSearch,
-    mdiClock,
-    mdiLink,
-    mdiLock,
-    mdiLockOpen,
-    mdiLockReset,
-    mdiTarget,
-    mdiViewDashboard,
-    mdiWaveform
-} from '@mdi/js';
+import { mdiBlurLinear, mdiLink, mdiLock, mdiLockOpen, mdiLockReset, mdiWaveform } from '@mdi/js';
 import Icon from '@mdi/react';
-import { Buffer } from 'buffer';
-import * as _countryFlags from 'country-flag-icons/string/3x2';
-import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
-import type { ColorMapName } from 'spectrogram-js';
 import { FFTExecutor } from 'spectrogram-js';
 
 import { LineChart } from '../../components/chart/LineChart';
 import { Spectrogram } from '../../components/chart/Spectrogram';
-import { DialogModal } from '../../components/ui/DialogModal';
 import { DraggableBox } from '../../components/ui/DraggableBox';
-import { Card } from '../../components/widget/Card';
-import { List } from '../../components/widget/List';
-import { TimePicker } from '../../components/widget/TimePicker';
 import { HistoryConstraints } from '../../config/constraints';
 import { IRouterComponent } from '../../config/router';
-import {
-    useGetSeismicEventBySourceLazyQuery,
-    useGetSeismicEventSourceListQuery,
-    useGetSeismicRecordsLazyQuery
-} from '../../graphql';
-import { sendPromiseAlert } from '../../helpers/alert/sendPromiseAlert';
+import { useGetSeismicEventSourceListQuery } from '../../graphql';
 import { sendUserAlert } from '../../helpers/alert/sendUserAlert';
-import { sendUserConfirm } from '../../helpers/alert/sendUserConfirm';
-import { getRestfulApiUrl } from '../../helpers/app/getRestfulApiUrl';
-import { ApiClient } from '../../helpers/request/ApiClient';
 import { useUrlParams } from '../../helpers/request/useUrlParams';
-import { getTimeString } from '../../helpers/utils/getTimeString';
-import { sameStrings } from '../../helpers/utils/sameStrings';
 import { setClipboardText } from '../../helpers/utils/setClipboardText';
-import { useThrottleFnTrailing } from '../../helpers/utils/useThrottleFnTrailing';
-import { useLayoutStore } from '../../stores/layout';
 import { useRetentionStore } from '../../stores/retention';
+import { DataExport } from './DataExport';
+import { EventListModal } from './EventListModal';
+import { EventSearch } from './EventSearch';
+import { RecordSearch } from './RecordSearch';
+import { useDataExport } from './useDataExport';
+import { useHistoryLayout } from './useHistoryLayout';
+import { useSeismicEvents } from './useSeismicEvents';
+import { useSeismicRecords } from './useSeismicRecords';
 
 const History = ({ currentLocale }: IRouterComponent) => {
     const { t } = useTranslation();
-    const countryFlags = useMemo(
-        () =>
-            Object.fromEntries(
-                Object.entries(_countryFlags).map(([key, value]) => [
-                    key,
-                    `data:image/svg+xml;base64,${Buffer.from(value).toString('base64')}`
-                ])
-            ),
-        []
-    );
     const sharedFFTExecutor = useMemo(() => new FFTExecutor(HistoryConstraints.fftSize), []);
 
     const [displayMode, setDisplayMode] = useState<'waveform' | 'spectrogram'>('waveform');
@@ -86,446 +54,23 @@ const History = ({ currentLocale }: IRouterComponent) => {
         }
     }, [startTime, endTime, getSeismicEventSourceListData]);
 
-    const [getSeismicEventBySource] = useGetSeismicEventBySourceLazyQuery();
-    const [selectedSeismicEventSource, setSelectedSeismicEventSource] = useState<{
-        id: string;
-        countryFlag: string;
-        locales: Record<string, string>;
-        defaultLocale: string;
-    }>();
-    const [isSelectModalOpen, setIsSelectModalOpen] = useState(false);
-    const [seismicEventsData, setSeismicEventsData] = useState<
-        Record<
-            string,
-            {
-                id: string;
-                region: string;
-                timestamp: number;
-                estimation: number[];
-                primary: ReactNode | ReactNode[];
-                secondary: ReactNode | ReactNode[];
-            }
-        >
-    >({});
-    const handleSearchEvents = useCallback(async () => {
-        const requestFn = async () => {
-            setIsBusy(true);
-            const { data, error } = await getSeismicEventBySource({
-                variables: { sourceId: selectedSeismicEventSource?.id ?? '' }
-            });
-            setIsBusy(false);
-            if (error) {
-                throw error;
-            }
-            if (!data?.getEventsBySource.length) {
-                throw new Error(t('views.History.search_events.no_data'));
-            }
-            return data?.getEventsBySource;
-        };
-        await sendPromiseAlert(
-            requestFn(),
-            t('views.History.search_events.searching'),
-            (data) => {
-                setSeismicEventsData(
-                    (data ? [...data] : []).reduce(
-                        (
-                            acc,
-                            { eventId, region, timestamp, estimation, depth, distance, magnitude }
-                        ) => {
-                            acc[eventId] = {
-                                id: eventId,
-                                region,
-                                timestamp,
-                                estimation,
-                                primary: (
-                                    <div className="space-y-2">
-                                        <h3 className="font-semibold text-gray-700">{region}</h3>
-                                        <ul className="list-inside list-disc whitespace-nowrap text-gray-500">
-                                            <li>
-                                                {t('views.History.event_list_modal.earthquake_at', {
-                                                    time: getTimeString(timestamp)
-                                                })}
-                                            </li>
-                                            <li>
-                                                {t(
-                                                    'views.History.event_list_modal.p_wave_arrival',
-                                                    {
-                                                        time: getTimeString(
-                                                            timestamp + estimation[0] * 1000
-                                                        ),
-                                                        seconds: estimation[0].toFixed(1)
-                                                    }
-                                                )}
-                                            </li>
-                                            <li>
-                                                {t(
-                                                    'views.History.event_list_modal.s_wave_arrival',
-                                                    {
-                                                        time: getTimeString(
-                                                            timestamp + estimation[1] * 1000
-                                                        ),
-                                                        seconds: estimation[1].toFixed(1)
-                                                    }
-                                                )}
-                                            </li>
-                                            <li>
-                                                {t(
-                                                    'views.History.event_list_modal.epicenter_distance',
-                                                    { distance: distance.toFixed(1) }
-                                                )}
-                                            </li>
-                                            {depth !== -1 && (
-                                                <li>
-                                                    {t(
-                                                        'views.History.event_list_modal.earthquake_depth',
-                                                        { depth: depth.toFixed(1) }
-                                                    )}
-                                                </li>
-                                            )}
-                                        </ul>
-                                    </div>
-                                ),
-                                secondary: (
-                                    <div className="mx-4 flex flex-wrap font-medium">
-                                        {Object.keys(magnitude).map((key, index) => (
-                                            <div
-                                                key={`${index}-${key}`}
-                                                className="badge badge-soft badge-secondary whitespace-nowrap"
-                                            >
-                                                {`${key} ${magnitude[key].toFixed(1)}`}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )
-                            };
-                            return acc;
-                        },
-                        {} as Record<string, (typeof seismicEventsData)[string]>
-                    )
-                );
-                setIsSelectModalOpen(true);
-                return t('views.History.search_events.success', { count: data.length });
-            },
-            (error) => t('views.History.search_events.error', { error })
-        );
-    }, [t, getSeismicEventBySource, selectedSeismicEventSource]);
-    const handleChooseEvent = useCallback(
-        (eventId: string) => {
-            const selectedEvent = seismicEventsData[eventId];
-            if (selectedEvent) {
-                const { timestamp, estimation, region } = selectedEvent;
-                const [pWave, sWave] = estimation;
-                setStartTime(Math.floor(timestamp + pWave * 1000 - 1000 * 60 * 5));
-                setEndTime(Math.floor(timestamp + sWave * 1000 + 1000 * 60 * 5));
-                sendUserAlert(
-                    t('views.History.event_list_modal.selected_an_event', {
-                        region,
-                        time: getTimeString(timestamp)
-                    })
-                );
-                setIsSelectModalOpen(false);
-            }
-        },
-        [t, seismicEventsData]
-    );
+    const events = useSeismicEvents({ setIsBusy, setStartTime, setEndTime });
 
-    const [availableExports, setAvailableExports] = useState<{
-        channels: string[];
-        formats: Record<string, string>;
-    }>();
-    const [selectedExport, setSelectedExport] = useState<{ channel: string; format: string }>({
-        channel: '',
-        format: ''
-    });
-    useEffect(() => {
-        const requestFn = async () => {
-            setIsBusy(true);
-            const { data } = await ApiClient.request<{
-                channel_code: string[];
-                data_format: Record<string, string>;
-            }>({
-                url: getRestfulApiUrl('/export'),
-                method: 'get',
-                ignoreErrors: true
-            });
-            setIsBusy(false);
-            if (data) {
-                const { channel_code, data_format } = data;
-                setAvailableExports({ channels: channel_code, formats: data_format });
-            }
-        };
-        requestFn();
-    }, []);
-    const handleGetData = useCallback(async () => {
-        setIsBusy(true);
-        await sendPromiseAlert(
-            ApiClient.saveAs({
-                url: getRestfulApiUrl('/export'),
-                method: 'post',
-                data: {
-                    start_time: startTime,
-                    end_time: endTime,
-                    data_format: selectedExport.format,
-                    channel_code: selectedExport.channel
-                }
-            }),
-            t('views.History.data_export.exporting', {
-                channel: selectedExport.channel,
-                format: availableExports?.formats[selectedExport.format]
-            }),
-            t('views.History.data_export.success', {
-                channel: selectedExport.channel,
-                format: availableExports?.formats[selectedExport.format]
-            }),
-            (error) =>
-                t('views.History.data_export.error', {
-                    channel: selectedExport.channel,
-                    format: availableExports?.formats[selectedExport.format],
-                    error
-                })
-        );
-        setIsBusy(false);
-    }, [
-        startTime,
-        endTime,
-        selectedExport.format,
-        selectedExport.channel,
-        t,
-        availableExports?.formats
-    ]);
+    const dataExport = useDataExport({ startTime, endTime, setIsBusy });
 
-    const [sampleRate, setSampleRate] = useState(0);
-    const [chartData, setChartData] = useState<{ [key: string]: Array<[number, number | null]> }>(
-        {}
-    );
-    const spectrogramSeries = useMemo(() => {
-        const series: { [key: string]: Array<[number, number]> } = {};
-        for (const channel in chartData) {
-            const source = chartData[channel];
-            let count = 0;
-            for (let i = 0; i < source.length; i++) {
-                if (source[i][1] !== null) {
-                    count++;
-                }
-            }
-            const points = new Array<[number, number]>(count);
-            let offset = 0;
-            for (let i = 0; i < source.length; i++) {
-                const point = source[i];
-                if (point[1] !== null) {
-                    points[offset++] = [point[0], point[1]];
-                }
-            }
-            series[channel] = points;
-        }
-        return series;
-    }, [chartData]);
-    const [getSeismicRecords] = useGetSeismicRecordsLazyQuery();
-    const handleSearchRecords = useCallback(async () => {
-        if (startTime > endTime) {
-            sendUserAlert(t('views.History.search_records.invalid_time'), true);
-            return;
-        }
-        const requestFn = async () => {
-            setSampleRate(0);
-            setChartData({});
-            setIsBusy(true);
-            const { data, error } = await getSeismicRecords({ variables: { startTime, endTime } });
-            setIsBusy(false);
-            if (error) {
-                throw error;
-            }
-            if (!data?.getSeisRecordsByTime.length) {
-                throw new Error(t('views.History.search_records.no_data'));
-            }
-            return data;
-        };
-        await sendPromiseAlert(
-            requestFn(),
-            t('views.History.search_records.searching'),
-            ({ getSeisRecordsByTime }) => {
-                const records = [...getSeisRecordsByTime].sort(
-                    (a, b) => a!.timestamp - b!.timestamp
-                );
-                const currentChannels = new Map<string, number>();
-                records.forEach((record) => {
-                    record?.channelData.forEach((channel) => {
-                        // channelId is 1-based; keep the physical index when earlier channels are absent.
-                        currentChannels.set(channel.channelCode, channel.channelId - 1);
-                    });
-                });
-                const channels = Array.from(currentChannels.keys());
-                const channelIndices = Array.from(currentChannels.values());
-
-                if (
-                    !sameStrings(channels, prevChannelsRef.current) ||
-                    channelIndices.some(
-                        (index, position) => index !== prevChannelIndicesRef.current[position]
-                    )
-                ) {
-                    setActiveChannels((prevChannels) => {
-                        const newChannels = { ...prevChannels };
-                        channels.forEach((channel, position) => {
-                            newChannels[channel] = {
-                                id: `${HistoryConstraints.id}_${channel}`,
-                                index: channelIndices[position]
-                            };
-                        });
-                        Object.keys(newChannels).forEach((channel) => {
-                            if (!currentChannels.has(channel)) {
-                                delete newChannels[channel];
-                            }
-                        });
-                        prevChannelsRef.current = channels;
-                        prevChannelIndicesRef.current = channelIndices;
-                        return newChannels;
-                    });
-                }
-
-                const sampleCounts: Record<string, number> = {};
-                let gapCount = 0;
-                let previousTimestamp: number | null = null;
-                for (let recordIndex = 0; recordIndex < records.length; recordIndex++) {
-                    const record = records[recordIndex]!;
-                    if (previousTimestamp !== null && record.timestamp - previousTimestamp > 2000) {
-                        gapCount++;
-                    }
-                    previousTimestamp = record.timestamp;
-                    for (
-                        let channelIndex = 0;
-                        channelIndex < record.channelData.length;
-                        channelIndex++
-                    ) {
-                        const channel = record.channelData[channelIndex];
-                        sampleCounts[channel.channelCode] =
-                            (sampleCounts[channel.channelCode] ?? 0) + channel.data.length;
-                    }
-                }
-
-                setChartData((prevChartData) => {
-                    const newChartData: typeof prevChartData = {};
-                    const writeAt: Record<string, number> = {};
-
-                    for (let channelIndex = 0; channelIndex < channels.length; channelIndex++) {
-                        const channel = channels[channelIndex];
-                        const previous = prevChartData[channel];
-                        const base = previous?.length ?? 0;
-                        const total = base + (sampleCounts[channel] ?? 0) + gapCount;
-                        const dataArray = previous ?? new Array<[number, number | null]>(total);
-                        if (previous) {
-                            dataArray.length = total;
-                        }
-                        newChartData[channel] = dataArray;
-                        writeAt[channel] = base;
-                    }
-
-                    let lastTimestamp: number | null = null;
-                    for (let recordIndex = 0; recordIndex < records.length; recordIndex++) {
-                        const { timestamp, sampleRate, channelData } = records[recordIndex]!;
-                        const interval = 1000 / sampleRate;
-
-                        if (lastTimestamp !== null && timestamp - lastTimestamp > 2000) {
-                            for (
-                                let channelIndex = 0;
-                                channelIndex < channels.length;
-                                channelIndex++
-                            ) {
-                                const channel = channels[channelIndex];
-                                const offset = writeAt[channel];
-                                newChartData[channel][offset] = [lastTimestamp + 1, null];
-                                writeAt[channel] = offset + 1;
-                            }
-                        }
-
-                        for (
-                            let channelIndex = 0;
-                            channelIndex < channelData.length;
-                            channelIndex++
-                        ) {
-                            const channel = channelData[channelIndex];
-                            const dataArray = newChartData[channel.channelCode];
-                            if (!dataArray) {
-                                continue;
-                            }
-                            let offset = writeAt[channel.channelCode];
-                            const samples = channel.data;
-                            for (let sampleIndex = 0; sampleIndex < samples.length; sampleIndex++) {
-                                dataArray[offset++] = [
-                                    timestamp + sampleIndex * interval,
-                                    samples[sampleIndex]
-                                ];
-                            }
-                            writeAt[channel.channelCode] = offset;
-                        }
-
-                        lastTimestamp = timestamp;
-                    }
-                    setSampleRate(records.length > 0 ? records[0]!.sampleRate : 0);
-
-                    return newChartData;
-                });
-
-                return t('views.History.search_records.success', { count: records.length });
-            },
-            (error) => t('views.History.search_records.error', { error })
-        );
-    }, [t, startTime, endTime, getSeismicRecords]);
-
-    const [activeChannels, setActiveChannels] = useState<
-        Record<string, { id: string; index: number }>
-    >({});
-    const { config, locks, toggleLock, setLayoutConfig, resetLayoutConfig } = useLayoutStore();
+    const { sampleRate, chartData, spectrogramSeries, activeChannels, handleSearchRecords } =
+        useSeismicRecords({ startTime, endTime, setIsBusy });
+    const {
+        locks,
+        toggleLock,
+        getInitialLayout,
+        handleResetLayout,
+        handleDragStop,
+        handleResizeStop,
+        handleSpectrogramUpdate
+    } = useHistoryLayout(activeChannels);
     const { retention } = useRetentionStore();
-    const prevChannelsRef = useRef<string[]>([]);
-    const prevChannelIndicesRef = useRef<number[]>([]);
     const [activeChart, setActiveChart] = useState<string | null>(null); // Track the active chart
-
-    const getInitialLayout = useCallback(
-        (id: string, index: number) => {
-            if (config[id]?.position && config[id]?.size && config[id]?.spectrogram) {
-                return config[id];
-            }
-
-            let x = 20;
-            let y = 50;
-            for (let i = 0; i < id.length; i++) {
-                x = (x + id.charCodeAt(i) * (i + 1)) % 450;
-                y = (y + id.charCodeAt(i) * (i + 2)) % 450;
-            }
-            x = Math.max(20, Math.min(x, 500));
-            y = Math.max(50, Math.min(y, 500));
-
-            return {
-                position: { x, y },
-                size: {
-                    width:
-                        document.documentElement.clientWidth > 768
-                            ? HistoryConstraints.minWidth * 2
-                            : HistoryConstraints.minWidth,
-                    height:
-                        document.documentElement.clientWidth > 768
-                            ? HistoryConstraints.minWidth * 2
-                            : HistoryConstraints.minHeight
-                },
-                spectrogram: {
-                    ...HistoryConstraints.getDynamicDB(index),
-                    colorMap: 'jet' as const
-                }
-            };
-        },
-        [config]
-    );
-
-    const handleResetLayout = useCallback(() => {
-        sendUserConfirm(t('views.History.reset_layout.confirm_message'), {
-            title: t('views.History.reset_layout.confirm_title'),
-            cancelBtnText: t('views.History.reset_layout.cancel_button'),
-            confirmBtnText: t('views.History.reset_layout.confirm_button'),
-            onConfirmed: () => {
-                Object.values(activeChannels).forEach(({ id }) => resetLayoutConfig(id));
-            }
-        });
-    }, [t, activeChannels, resetLayoutConfig]);
 
     const handleShareLink = useCallback(() => {
         const params = new URLSearchParams(searchParams);
@@ -536,260 +81,28 @@ const History = ({ currentLocale }: IRouterComponent) => {
         sendUserAlert(t('views.History.share_link.link_copied'));
     }, [t, searchParams, startTime, endTime, setSearchParams]);
 
-    const handleDragStop = useCallback(
-        (channel: string, index: number, x: number, y: number) => {
-            setLayoutConfig(channel, { ...getInitialLayout(channel, index), position: { x, y } });
-        },
-        [getInitialLayout, setLayoutConfig]
-    );
-
-    const handleResizeStop = useCallback(
-        (channel: string, index: number, width: number, height: number) => {
-            setLayoutConfig(channel, {
-                ...getInitialLayout(channel, index),
-                size: { width, height }
-            });
-        },
-        [getInitialLayout, setLayoutConfig]
-    );
-
-    const handleSpectrogramUpdate = useThrottleFnTrailing(
-        useCallback(
-            (
-                channel: string,
-                index: number,
-                minDB: number,
-                maxDB: number,
-                colorMap: ColorMapName
-            ) => {
-                setLayoutConfig(channel, {
-                    ...getInitialLayout(channel, index),
-                    spectrogram: { maxDB, minDB, colorMap }
-                });
-            },
-            [getInitialLayout, setLayoutConfig]
-        ),
-        500
-    );
-
     return (
         <div className="container mx-auto space-y-6 p-4">
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-10">
-                <div className="lg:col-span-3">
-                    <Card
-                        className="flex h-56 flex-shrink-0 flex-col space-y-4"
-                        title={t('views.History.search_records.title')}
-                        iconPath={mdiClock}
-                    >
-                        <label className="font-medium whitespace-nowrap">
-                            {t('views.History.search_records.start_time')}
-                        </label>
-                        <TimePicker
-                            className="w-full rounded-md border border-gray-300 py-1 text-center shadow-sm transition-all hover:ring focus:outline-none disabled:bg-gray-100"
-                            currentLocale={currentLocale}
-                            defaultValue={startTime}
-                            onChange={(v) => setStartTime(v)}
-                        />
-                        <label className="font-medium whitespace-nowrap">
-                            {t('views.History.search_records.end_time')}
-                        </label>
-                        <TimePicker
-                            className="w-full rounded-md border border-gray-300 py-1 text-center shadow-sm transition-all hover:ring focus:outline-none disabled:bg-gray-100"
-                            currentLocale={currentLocale}
-                            defaultValue={endTime}
-                            onChange={(v) => setEndTime(v)}
-                        />
-                        <button
-                            disabled={isBusy}
-                            onClick={handleSearchRecords}
-                            className="btn btn-sm mt-auto w-full rounded-lg bg-purple-500 py-2 font-medium text-white shadow-lg transition-all hover:bg-purple-700"
-                        >
-                            {t('views.History.search_records.search_button')}
-                        </button>
-                    </Card>
-                </div>
+                <RecordSearch
+                    currentLocale={currentLocale}
+                    startTime={startTime}
+                    endTime={endTime}
+                    setStartTime={setStartTime}
+                    setEndTime={setEndTime}
+                    isBusy={isBusy}
+                    handleSearchRecords={handleSearchRecords}
+                />
 
-                <div className="lg:col-span-3">
-                    <Card
-                        className="flex h-56 flex-shrink-0 flex-col space-y-2"
-                        title={t('views.History.data_export.title')}
-                        iconPath={mdiViewDashboard}
-                    >
-                        <div className="flex h-42 w-full flex-row space-x-2">
-                            <div className="flex w-1/2 flex-col space-y-2">
-                                <label className="font-medium whitespace-nowrap">
-                                    {t('views.History.data_export.file_format')}
-                                </label>
-                                <div className="flex-grow space-y-1 overflow-y-auto rounded-md border border-gray-300 p-2">
-                                    {availableExports ? (
-                                        Object.keys(availableExports.formats)
-                                            .sort((a, b) =>
-                                                availableExports.formats[a].localeCompare(
-                                                    availableExports.formats[b]
-                                                )
-                                            )
-                                            .map((formatKey, index) => (
-                                                <div
-                                                    key={`${index}-${formatKey}`}
-                                                    onClick={() => {
-                                                        if (!isBusy) {
-                                                            setSelectedExport({
-                                                                ...selectedExport,
-                                                                format: formatKey
-                                                            });
-                                                        }
-                                                    }}
-                                                    className={`hover:bg-base-300 flex cursor-pointer items-center space-x-2 rounded-md px-3 py-2 text-sm transition-all ${
-                                                        formatKey === selectedExport?.format
-                                                            ? 'bg-base-300 font-medium text-gray-700'
-                                                            : ''
-                                                    }`}
-                                                >
-                                                    <span>
-                                                        {availableExports.formats[formatKey]}
-                                                    </span>
-                                                </div>
-                                            ))
-                                    ) : (
-                                        <div className="flex h-full items-center justify-center">
-                                            <span className="loading loading-dots loading-md text-gray-400" />
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            <div className="flex w-1/2 flex-col space-y-2">
-                                <label className="font-medium whitespace-nowrap">
-                                    {t('views.History.data_export.channel_code')}
-                                </label>
-                                <div className="flex-grow space-y-1 overflow-y-scroll rounded-md border border-gray-300 p-2">
-                                    {availableExports && availableExports.channels ? (
-                                        availableExports.channels
-                                            .sort((a, b) => a.localeCompare(b))
-                                            .map((channel, index) => (
-                                                <div
-                                                    key={`${index}-${channel}`}
-                                                    onClick={() => {
-                                                        if (!isBusy) {
-                                                            setSelectedExport({
-                                                                ...selectedExport,
-                                                                channel
-                                                            });
-                                                        }
-                                                    }}
-                                                    className={`hover:bg-base-300 flex cursor-pointer items-center space-x-2 rounded-md px-3 py-2 text-sm transition-all ${
-                                                        channel === selectedExport?.channel
-                                                            ? 'bg-base-300 font-medium text-gray-700'
-                                                            : ''
-                                                    }`}
-                                                >
-                                                    <span>{channel}</span>
-                                                </div>
-                                            ))
-                                    ) : (
-                                        <div className="flex h-full items-center justify-center">
-                                            <span className="loading loading-dots loading-md text-gray-400" />
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
+                <DataExport isBusy={isBusy} dataExport={dataExport} />
 
-                        <button
-                            disabled={
-                                isBusy ||
-                                !selectedExport.channel.length ||
-                                !selectedExport.format.length
-                            }
-                            onClick={handleGetData}
-                            className="btn btn-sm mt-4 w-full rounded-lg bg-purple-500 py-2 font-medium text-white shadow-lg transition-all hover:bg-purple-700"
-                        >
-                            {t('views.History.data_export.export_button')}
-                        </button>
-                    </Card>
-                </div>
-
-                <div className="lg:col-span-4">
-                    <Card
-                        className="flex h-56 flex-shrink-0 flex-col space-y-2"
-                        title={t('views.History.search_events.title')}
-                        iconPath={mdiCalendarSearch}
-                    >
-                        <label className="font-medium whitespace-nowrap">
-                            {t('views.History.search_events.data_agency')}
-                        </label>
-
-                        <div className="flex-grow space-y-1 overflow-y-scroll rounded-md border border-gray-300 p-2">
-                            {getSeismicEventSourceListLoading ? (
-                                <div className="flex h-full items-center justify-center">
-                                    <span className="loading loading-dots loading-md text-gray-400" />
-                                </div>
-                            ) : (
-                                (getSeismicEventSourceListData?.getEventSource
-                                    ? [...getSeismicEventSourceListData.getEventSource]
-                                    : []
-                                )
-                                    .sort((a, b) => {
-                                        const nameA =
-                                            a?.locales[currentLocale] ??
-                                            a?.locales[a!.defaultLocale] ??
-                                            a?.id ??
-                                            '';
-                                        const nameB =
-                                            b?.locales[currentLocale] ??
-                                            b?.locales[b!.defaultLocale] ??
-                                            b?.id ??
-                                            '';
-                                        return nameA.localeCompare(nameB);
-                                    })
-                                    .map((item, index) => {
-                                        const countryFlagImg = countryFlags[item!.country];
-                                        return (
-                                            <div
-                                                key={`${index}-${item?.id}`}
-                                                onClick={() => {
-                                                    if (!isBusy) {
-                                                        setSelectedSeismicEventSource({
-                                                            id: item!.id,
-                                                            locales: item!.locales,
-                                                            countryFlag: countryFlagImg,
-                                                            defaultLocale: item!.defaultLocale
-                                                        });
-                                                    }
-                                                }}
-                                                className={`hover:bg-base-300 flex cursor-pointer items-center space-x-2 rounded-md px-3 py-2 text-sm transition-all ${
-                                                    item?.id === selectedSeismicEventSource?.id
-                                                        ? 'bg-base-300 font-medium text-gray-700'
-                                                        : ''
-                                                }`}
-                                            >
-                                                <img
-                                                    src={countryFlagImg}
-                                                    alt={item?.country}
-                                                    className="size-4 flex-shrink-0 rounded-lg"
-                                                />
-                                                <span>
-                                                    {item?.locales[currentLocale] ??
-                                                        item?.locales[item.defaultLocale]}
-                                                </span>
-                                            </div>
-                                        );
-                                    })
-                            )}
-                        </div>
-
-                        <button
-                            disabled={
-                                isBusy ||
-                                !selectedSeismicEventSource ||
-                                getSeismicEventSourceListLoading
-                            }
-                            onClick={handleSearchEvents}
-                            className="btn btn-sm mt-4 w-full rounded-lg bg-purple-500 py-2 font-medium text-white shadow-lg transition-all hover:bg-purple-700"
-                        >
-                            {t('views.History.search_events.search_button')}
-                        </button>
-                    </Card>
-                </div>
+                <EventSearch
+                    currentLocale={currentLocale}
+                    isBusy={isBusy}
+                    getSeismicEventSourceListData={getSeismicEventSourceListData}
+                    getSeismicEventSourceListLoading={getSeismicEventSourceListLoading}
+                    events={events}
+                />
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
@@ -932,38 +245,7 @@ const History = ({ currentLocale }: IRouterComponent) => {
                     })}
             </div>
 
-            <DialogModal
-                heading={
-                    <div className="space-y-4 text-gray-800">
-                        <div className="flex items-center space-x-2 text-lg font-extrabold">
-                            <Icon path={mdiTarget} size={1.2} className="flex-shrink-0" />
-                            <h2>{t('views.History.event_list_modal.title')}</h2>
-                        </div>
-                        <div className="ml-0.5 flex items-center space-x-2 text-sm">
-                            <img
-                                src={selectedSeismicEventSource?.countryFlag}
-                                className="size-5 flex-shrink-0"
-                            />
-                            <span>
-                                {selectedSeismicEventSource?.locales[currentLocale] ??
-                                    selectedSeismicEventSource?.locales[
-                                        selectedSeismicEventSource?.defaultLocale
-                                    ]}
-                            </span>
-                        </div>
-                    </div>
-                }
-                open={isSelectModalOpen}
-                onClose={() => setIsSelectModalOpen(false)}
-            >
-                <List
-                    className="overflow-y-scroll"
-                    onClick={(id) => handleChooseEvent(id)}
-                    data={Object.values(seismicEventsData).sort(
-                        (a, b) => b.timestamp - a.timestamp
-                    )}
-                />
-            </DialogModal>
+            <EventListModal currentLocale={currentLocale} events={events} />
         </div>
     );
 };

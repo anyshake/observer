@@ -16,9 +16,9 @@ import { useSearchParams } from 'react-router-dom';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { IRouterComponent } from '../../config/router';
 import { useIsCurrentUserAdminQuery } from '../../graphql';
+import { AppLogs } from './applogs';
 import { Backup } from './backup';
 import { Dangerous } from './dangerous';
-import { Logs } from './logs';
 import { Metadata } from './metadata';
 import { Preference } from './preference';
 import { Service } from './service';
@@ -71,7 +71,7 @@ const Settings = ({ currentLocale }: IRouterComponent) => {
                 adminOnly: true,
                 icon: mdiTimelineText,
                 label: t('views.Settings.Logs.title'),
-                element: <Logs />
+                element: <AppLogs />
             },
             dangerous: {
                 adminOnly: true,

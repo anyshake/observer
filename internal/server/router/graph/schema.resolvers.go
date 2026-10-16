@@ -17,6 +17,7 @@ import (
 	"github.com/anyshake/observer/internal/service"
 	service_helicorder "github.com/anyshake/observer/internal/service/helicorder"
 	service_miniseed "github.com/anyshake/observer/internal/service/miniseed"
+	"github.com/anyshake/observer/internal/upgrade"
 	"github.com/anyshake/observer/pkg/seisevent"
 	"github.com/anyshake/observer/pkg/system"
 	"github.com/samber/lo"
@@ -359,6 +360,29 @@ func (r *mutationResolver) RestartApplication(ctx context.Context) (bool, error)
 
 	time.AfterFunc(3*time.Second, func() { r.RestartChan <- struct{}{} })
 	return true, nil
+}
+
+// RemoveExecutableBackups is the resolver for the removeExecutableBackups field.
+func (r *mutationResolver) RemoveExecutableBackups(ctx context.Context, names []string) ([]*graph_model.ExecutableBackupRemoval, error) {
+	if !r.checkIsAdmin(ctx) {
+		return nil, errors.New("permission denied")
+	}
+	results, err := upgrade.RemoveExecutableBackups(r.ExecutablePath, names)
+	if err != nil {
+		return nil, fmt.Errorf("failed to remove executable backups: %w", err)
+	}
+	response := make([]*graph_model.ExecutableBackupRemoval, 0, len(results))
+	for _, result := range results {
+		var errorMessage *string
+		if result.Error != "" {
+			message := result.Error
+			errorMessage = &message
+		}
+		response = append(response, &graph_model.ExecutableBackupRemoval{
+			Name: result.Name, Removed: result.Removed, Error: errorMessage,
+		})
+	}
+	return response, nil
 }
 
 // StopService is the resolver for the stopService field.
@@ -1027,6 +1051,24 @@ func (r *queryResolver) GetUpgradeStatus(ctx context.Context) (*graph_model.Upgr
 		Eligible: eligible,
 		Applied:  applied,
 	}, nil
+}
+
+// GetExecutableBackups is the resolver for the getExecutableBackups field.
+func (r *queryResolver) GetExecutableBackups(ctx context.Context) ([]*graph_model.ExecutableBackup, error) {
+	if !r.checkIsAdmin(ctx) {
+		return nil, errors.New("permission denied")
+	}
+	backups, err := upgrade.ListExecutableBackups(r.ExecutablePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list executable backups: %w", err)
+	}
+	result := make([]*graph_model.ExecutableBackup, 0, len(backups))
+	for _, backup := range backups {
+		result = append(result, &graph_model.ExecutableBackup{
+			Name: backup.Name, Size: backup.Size, ModifiedAt: backup.ModifiedAt,
+		})
+	}
+	return result, nil
 }
 
 // GetCleanupStatus is the resolver for the getCleanupStatus field.

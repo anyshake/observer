@@ -237,6 +237,24 @@
                 "title": "Registros de la aplicación"
             },
             "Dangerous": {
+                "executable_backups": {
+                    "title": "Respaldos de versiones anteriores",
+                    "description": "Estos respaldos se crearon al actualizar la aplicación. Selecciona los archivos que quieras eliminar permanentemente.",
+                    "submit_button": "Limpiar respaldos",
+                    "refresh_button": "Actualizar",
+                    "delete_button": "Eliminar seleccionados ({{count}})",
+                    "select_all": "Seleccionar todos",
+                    "loading": "Buscando respaldos...",
+                    "empty": "No se encontraron respaldos de versiones anteriores.",
+                    "list_failed": "No se pudieron buscar los respaldos: {{error}}",
+                    "confirm_title": "Eliminar respaldos",
+                    "confirm_message": "¿Quieres eliminar permanentemente los {{count}} respaldos seleccionados?",
+                    "cancel_button": "Cancelar",
+                    "removing": "Eliminando respaldos...",
+                    "result_summary": "Respaldos eliminados: {{removed}}; fallidos: {{failed}}.",
+                    "empty_response": "No se recibieron los resultados de la eliminación de respaldos.",
+                    "remove_failed": "No se pudieron eliminar los respaldos: {{error}}"
+                },
                 "title": "Zona de riesgo",
                 "restart_application": {
                     "title": "Reiniciar toda la aplicación",

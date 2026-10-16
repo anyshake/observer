@@ -237,6 +237,24 @@
                 "title": "Anwendungsprotokolle"
             },
             "Dangerous": {
+                "executable_backups": {
+                    "title": "Sicherungen alter Programmversionen",
+                    "description": "Diese Sicherungen wurden bei Programmaktualisierungen erstellt. Wählen Sie die Dateien aus, die dauerhaft gelöscht werden sollen.",
+                    "submit_button": "Sicherungen bereinigen",
+                    "refresh_button": "Aktualisieren",
+                    "delete_button": "Auswahl löschen ({{count}})",
+                    "select_all": "Alle auswählen",
+                    "loading": "Sicherungen werden gesucht...",
+                    "empty": "Keine Sicherungen alter Programmversionen gefunden.",
+                    "list_failed": "Sicherungen konnten nicht gesucht werden: {{error}}",
+                    "confirm_title": "Sicherungen löschen",
+                    "confirm_message": "Möchten Sie die {{count}} ausgewählten Sicherungen dauerhaft löschen?",
+                    "cancel_button": "Abbrechen",
+                    "removing": "Sicherungen werden gelöscht...",
+                    "result_summary": "{{removed}} Sicherungen gelöscht; {{failed}} fehlgeschlagen.",
+                    "empty_response": "Es wurden keine Ergebnisse zum Löschen der Sicherungen zurückgegeben.",
+                    "remove_failed": "Sicherungen konnten nicht gelöscht werden: {{error}}"
+                },
                 "title": "Gefahrenbereich",
                 "restart_application": {
                     "title": "Gesamte Anwendung neu starten",

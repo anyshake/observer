@@ -16,10 +16,8 @@ import (
 func (u *Helper) CheckUpdate() (latest, required *semver.Version, eligible bool, applied bool, err error) {
 	if u.latestVer.Valid() && u.requiredVer.Valid() {
 		latest, required := u.latestVer.Get(), u.requiredVer.Get()
-		if u.appliedVer != nil {
-			return latest, required, u.isEligibleForUpdate(latest, required), latest.Equal(u.appliedVer), nil
-		}
-		return latest, required, u.isEligibleForUpdate(latest, required), false, nil
+		eligible, applied := u.updateStatus(latest, required)
+		return latest, required, eligible, applied, nil
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -30,6 +28,7 @@ func (u *Helper) CheckUpdate() (latest, required *semver.Version, eligible bool,
 		err error
 	}
 	resultCh := make(chan result, len(u.resolvers))
+	versionCheckDomain := u.GetVersionCheckDomain()
 
 	for _, r := range u.resolvers {
 		resolver := r
@@ -45,7 +44,7 @@ func (u *Helper) CheckUpdate() (latest, required *semver.Version, eligible bool,
 			}
 			defer dq.Close()
 
-			msg := (&dns.Msg{}).SetQuestion(fmt.Sprintf("%s.", u.versionCheckDomain), dns.TypeTXT)
+			msg := (&dns.Msg{}).SetQuestion(fmt.Sprintf("%s.", versionCheckDomain), dns.TypeTXT)
 			res, err := dq.Query(msg, 5*time.Second)
 			if err != nil {
 				resultCh <- result{nil, fmt.Errorf("query failed: %w", err)}
@@ -104,10 +103,8 @@ func (u *Helper) CheckUpdate() (latest, required *semver.Version, eligible bool,
 				u.latestVer.Set(latest)
 				u.requiredVer.Set(required)
 
-				if u.appliedVer != nil {
-					return latest, required, u.isEligibleForUpdate(latest, required), latest.Equal(u.appliedVer), nil
-				}
-				return latest, required, u.isEligibleForUpdate(latest, required), false, nil
+				eligible, applied := u.updateStatus(latest, required)
+				return latest, required, eligible, applied, nil
 			}
 		case <-ctx.Done():
 			return nil, nil, false, false, ctx.Err()

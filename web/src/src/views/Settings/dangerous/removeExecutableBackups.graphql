@@ -1,0 +1,7 @@
+mutation removeExecutableBackups($names: [String!]!) {
+    removeExecutableBackups(names: $names) {
+        name
+        removed
+        error
+    }
+}

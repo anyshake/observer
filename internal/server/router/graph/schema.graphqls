@@ -122,6 +122,18 @@ type upgradeStatus {
   checkFailed: Boolean!
 }
 
+type executableBackup {
+  name: String!
+  size: Int64!
+  modifiedAt: Int64!
+}
+
+type executableBackupRemoval {
+  name: String!
+  removed: Boolean!
+  error: String
+}
+
 enum jobStatus {
   IDLE
   RUNNING
@@ -162,6 +174,7 @@ type Mutation {
   restoreStationConfig: Boolean!
   importGlobalConfig(data: String!): Boolean!
   restartApplication: Boolean!
+  removeExecutableBackups(names: [String!]!): [executableBackupRemoval!]!
 
   # service management - admin only
   stopService(serviceId: String!): Boolean!
@@ -200,5 +213,6 @@ type Query {
   getApplicationLogs: [String!] # admin only
   exportGlobalConfig: String! # admin only
   getUpgradeStatus: upgradeStatus # admin only
+  getExecutableBackups: [executableBackup!]! # admin only
   getCleanupStatus: purgeDataJob! # admin only
 }

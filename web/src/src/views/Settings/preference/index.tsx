@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { sendUserAlert } from '../../helpers/alert/sendUserAlert';
-import { sendUserConfirm } from '../../helpers/alert/sendUserConfirm';
-import { useLayoutStore } from '../../stores/layout';
+import { sendUserAlert } from '../../../helpers/alert/sendUserAlert';
+import { sendUserConfirm } from '../../../helpers/alert/sendUserConfirm';
+import { useLayoutStore } from '../../../stores/layout';
 
 export const Preference = () => {
     const { t } = useTranslation();

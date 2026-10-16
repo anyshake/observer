@@ -237,6 +237,24 @@
                 "title": "Uygulama Günlükleri"
             },
             "Dangerous": {
+                "executable_backups": {
+                    "title": "Eski Sürüm Yedekleri",
+                    "description": "Bu yedekler uygulama güncellenirken oluşturuldu. Kalıcı olarak silinecek dosyaları seçin.",
+                    "submit_button": "Yedekleri Temizle",
+                    "refresh_button": "Yenile",
+                    "delete_button": "Seçilenleri Sil ({{count}})",
+                    "select_all": "Tümünü seç",
+                    "loading": "Yedekler aranıyor...",
+                    "empty": "Eski sürüm yedeği bulunamadı.",
+                    "list_failed": "Yedekler aranamadı: {{error}}",
+                    "confirm_title": "Yedekleri Sil",
+                    "confirm_message": "Seçilen {{count}} yedek kalıcı olarak silinsin mi?",
+                    "cancel_button": "İptal",
+                    "removing": "Yedekler siliniyor...",
+                    "result_summary": "Silinen yedek: {{removed}}; başarısız: {{failed}}.",
+                    "empty_response": "Yedek silme sonuçları alınamadı.",
+                    "remove_failed": "Yedekler silinemedi: {{error}}"
+                },
                 "title": "Tehlikeli Bölge",
                 "restart_application": {
                     "title": "Tüm Uygulamayı Yeniden Başlat",

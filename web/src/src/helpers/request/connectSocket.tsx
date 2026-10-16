@@ -1,6 +1,12 @@
 export interface ISocket {
     readonly url: string;
     readonly protocols?: string[];
+    readonly heartbeat?: {
+        readonly message: string;
+        readonly response: string;
+        readonly interval?: number;
+        readonly timeout?: number;
+    };
     readonly onOpen?: (event: Event) => void;
     readonly onError?: (event: Event) => void;
     readonly onClose?: (event: CloseEvent) => void;

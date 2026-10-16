@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ErrorPage } from '../../components/ui/ErrorPage';
-import { InputType, TypedInput } from '../../components/ui/TypedInput';
-import { useGetStationConfigQuery, useUpdateStationConfigMutation } from '../../graphql';
-import { sendPromiseAlert } from '../../helpers/alert/sendPromiseAlert';
-import { sendUserAlert } from '../../helpers/alert/sendUserAlert';
+import { ErrorPage } from '../../../components/ui/ErrorPage';
+import { InputType, TypedInput } from '../../../components/ui/TypedInput';
+import { useGetStationConfigQuery, useUpdateStationConfigMutation } from '../../../graphql';
+import { sendPromiseAlert } from '../../../helpers/alert/sendPromiseAlert';
+import { sendUserAlert } from '../../../helpers/alert/sendUserAlert';
 
 export const Station = () => {
     const { t } = useTranslation();
@@ -50,7 +50,7 @@ export const Station = () => {
         async (key: string, val: unknown, isRequired: boolean) => {
             if (isRequired && !val && typeof val !== 'boolean') {
                 if (val !== 0 && typeof val === 'number') {
-                    sendUserAlert(t('views.Settings.Station.update_station.required'), true);
+                    sendUserAlert(t('views.Settings.Station.update_station.field_required'), true);
                     return;
                 }
             }

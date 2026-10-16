@@ -237,6 +237,24 @@
                 "title": "應用程式日誌"
             },
             "Dangerous": {
+                "executable_backups": {
+                    "title": "舊版程式備份",
+                    "description": "這些備份是在程式升級時建立的。選取要永久刪除的檔案。",
+                    "submit_button": "清理舊版程式",
+                    "refresh_button": "重新掃描",
+                    "delete_button": "刪除已選取（{{count}}）",
+                    "select_all": "全選",
+                    "loading": "正在掃描備份...",
+                    "empty": "找不到舊版程式備份。",
+                    "list_failed": "掃描備份失敗：{{error}}",
+                    "confirm_title": "刪除程式備份",
+                    "confirm_message": "確定要永久刪除已選取的 {{count}} 個備份嗎？",
+                    "cancel_button": "取消",
+                    "removing": "正在刪除備份...",
+                    "result_summary": "已刪除 {{removed}} 個備份，{{failed}} 個刪除失敗。",
+                    "empty_response": "未收到備份刪除結果。",
+                    "remove_failed": "刪除備份失敗：{{error}}"
+                },
                 "title": "危險區域",
                 "restart_application": {
                     "title": "重新啟動整個應用程式",

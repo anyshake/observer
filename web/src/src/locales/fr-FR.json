@@ -237,6 +237,24 @@
                 "title": "Journaux d’application"
             },
             "Dangerous": {
+                "executable_backups": {
+                    "title": "Sauvegardes des anciennes versions",
+                    "description": "Ces sauvegardes ont été créées lors des mises à jour de l’application. Sélectionnez les fichiers à supprimer définitivement.",
+                    "submit_button": "Nettoyer les sauvegardes",
+                    "refresh_button": "Actualiser",
+                    "delete_button": "Supprimer la sélection ({{count}})",
+                    "select_all": "Tout sélectionner",
+                    "loading": "Recherche des sauvegardes...",
+                    "empty": "Aucune sauvegarde d’une ancienne version trouvée.",
+                    "list_failed": "Échec de la recherche des sauvegardes : {{error}}",
+                    "confirm_title": "Supprimer les sauvegardes",
+                    "confirm_message": "Supprimer définitivement les {{count}} sauvegardes sélectionnées ?",
+                    "cancel_button": "Annuler",
+                    "removing": "Suppression des sauvegardes...",
+                    "result_summary": "Sauvegardes supprimées : {{removed}} ; échecs : {{failed}}.",
+                    "empty_response": "Aucun résultat de suppression des sauvegardes n’a été reçu.",
+                    "remove_failed": "Échec de la suppression des sauvegardes : {{error}}"
+                },
                 "title": "Zone dangereuse",
                 "restart_application": {
                     "title": "Redémarrer toute l’application",

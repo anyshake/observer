@@ -32,6 +32,7 @@ export type Mutation = {
   purgeMiniSeedFilesByDate: PurgeDataJob;
   purgeSeisRecords: PurgeDataJob;
   purgeSeisRecordsByDate: PurgeDataJob;
+  removeExecutableBackups: Array<ExecutableBackupRemoval>;
   removeSysUser: Scalars['Boolean']['output'];
   restartApplication: Scalars['Boolean']['output'];
   restartService: Scalars['Boolean']['output'];
@@ -72,6 +73,11 @@ export type MutationPurgeMiniSeedFilesByDateArgs = {
 export type MutationPurgeSeisRecordsByDateArgs = {
   endDate: Scalars['Int64']['input'];
   startDate: Scalars['Int64']['input'];
+};
+
+
+export type MutationRemoveExecutableBackupsArgs = {
+  names: Array<Scalars['String']['input']>;
 };
 
 
@@ -133,6 +139,7 @@ export type Query = {
   getDeviceStatus: DeviceStatus;
   getEventSource: Array<Maybe<SeisEventSource>>;
   getEventsBySource: Array<SeisEvent>;
+  getExecutableBackups: Array<ExecutableBackup>;
   getHelicorderFiles: Array<Maybe<ServiceAsset>>;
   getMiniSeedFiles: Array<Maybe<ServiceAsset>>;
   getSeisRecordsByTime: Array<Maybe<SeisRecord>>;
@@ -208,6 +215,20 @@ export type DeviceStatus = {
   messages: Scalars['Int64']['output'];
   startedAt: Scalars['Int64']['output'];
   updatedAt: Scalars['Int64']['output'];
+};
+
+export type ExecutableBackup = {
+  __typename?: 'executableBackup';
+  modifiedAt: Scalars['Int64']['output'];
+  name: Scalars['String']['output'];
+  size: Scalars['Int64']['output'];
+};
+
+export type ExecutableBackupRemoval = {
+  __typename?: 'executableBackupRemoval';
+  error?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  removed: Scalars['Boolean']['output'];
 };
 
 export enum JobStatus {
@@ -359,46 +380,15 @@ export type GetUpgradeStatusQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetUpgradeStatusQuery = { __typename?: 'Query', getUpgradeStatus?: { __typename?: 'upgradeStatus', current: string, required: string, latest: string, eligible: boolean, applied: boolean, checkFailed: boolean } | null };
 
-export type CreateUserMutationVariables = Exact<{
-  username: Scalars['String']['input'];
-  password: Scalars['String']['input'];
-  admin: Scalars['Boolean']['input'];
-}>;
-
-
-export type CreateUserMutation = { __typename?: 'Mutation', createSysUser: string };
-
-export type ExportGlobalConfigQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ExportGlobalConfigQuery = { __typename?: 'Query', exportGlobalConfig: string };
-
 export type GetApplicationLogsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetApplicationLogsQuery = { __typename?: 'Query', getApplicationLogs?: Array<string> | null };
 
-export type GetServiceDataQueryVariables = Exact<{ [key: string]: never; }>;
+export type ExportGlobalConfigQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetServiceDataQuery = { __typename?: 'Query', getServiceConfigConstraint: Array<{ __typename?: 'serviceConfigConstraint', serviceName: string, serviceId: string, constraints: Array<{ __typename?: 'configConstraint', key: string, name: string, description: string, configType: string, isRequired: boolean, currentValue: any, options?: any | null } | null> }>, getServiceStatus?: Array<{ __typename?: 'serviceStatus', description: string, serviceId: string, name: string, restarts: number, startedAt: number, stoppedAt: number, updatedAt: number, isRunning: boolean }> | null };
-
-export type GetStationConfigQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetStationConfigQuery = { __typename?: 'Query', getStationConfigConstraint: Array<{ __typename?: 'configConstraint', namespace: string, name: string, key: string, description: string, configType: string, isRequired: boolean, currentValue: any, options?: any | null }> };
-
-export type GetStationMetadataQueryVariables = Exact<{
-  format: Scalars['String']['input'];
-}>;
-
-
-export type GetStationMetadataQuery = { __typename?: 'Query', getStationMetadata: string };
-
-export type GetUserListQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetUserListQuery = { __typename?: 'Query', getSysUsers: Array<{ __typename?: 'sysUser', userId: string, username: string, createdAt: number, updatedAt: number, lastLogin: number, userIp: string, userAgent: string, admin: boolean }> };
+export type ExportGlobalConfigQuery = { __typename?: 'Query', exportGlobalConfig: string };
 
 export type ImportGlobalConfigMutationVariables = Exact<{
   data: Scalars['String']['input'];
@@ -407,10 +397,10 @@ export type ImportGlobalConfigMutationVariables = Exact<{
 
 export type ImportGlobalConfigMutation = { __typename?: 'Mutation', importGlobalConfig: boolean };
 
-export type IsCurrentUserAdminQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetExecutableBackupsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type IsCurrentUserAdminQuery = { __typename?: 'Query', getCurrentUser: { __typename?: 'sysUser', admin: boolean } };
+export type GetExecutableBackupsQuery = { __typename?: 'Query', getExecutableBackups: Array<{ __typename?: 'executableBackup', name: string, size: number, modifiedAt: number }> };
 
 export type PurgeSeisRecordsMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -468,17 +458,34 @@ export type RestoreServiceConfigMutationVariables = Exact<{
 
 export type RestoreServiceConfigMutation = { __typename?: 'Mutation', restoreServiceConfig: boolean };
 
-export type RemoveUserMutationVariables = Exact<{
-  userId: Scalars['String']['input'];
+export type RemoveExecutableBackupsMutationVariables = Exact<{
+  names: Array<Scalars['String']['input']> | Scalars['String']['input'];
 }>;
 
 
-export type RemoveUserMutation = { __typename?: 'Mutation', removeSysUser: boolean };
+export type RemoveExecutableBackupsMutation = { __typename?: 'Mutation', removeExecutableBackups: Array<{ __typename?: 'executableBackupRemoval', name: string, removed: boolean, error?: string | null }> };
 
 export type RestartApplicationMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type RestartApplicationMutation = { __typename?: 'Mutation', restartApplication: boolean };
+
+export type IsCurrentUserAdminQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type IsCurrentUserAdminQuery = { __typename?: 'Query', getCurrentUser: { __typename?: 'sysUser', admin: boolean } };
+
+export type GetStationMetadataQueryVariables = Exact<{
+  format: Scalars['String']['input'];
+}>;
+
+
+export type GetStationMetadataQuery = { __typename?: 'Query', getStationMetadata: string };
+
+export type GetServiceDataQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetServiceDataQuery = { __typename?: 'Query', getServiceConfigConstraint: Array<{ __typename?: 'serviceConfigConstraint', serviceName: string, serviceId: string, constraints: Array<{ __typename?: 'configConstraint', key: string, name: string, description: string, configType: string, isRequired: boolean, currentValue: any, options?: any | null } | null> }>, getServiceStatus?: Array<{ __typename?: 'serviceStatus', description: string, serviceId: string, name: string, restarts: number, startedAt: number, stoppedAt: number, updatedAt: number, isRunning: boolean }> | null };
 
 export type RestartServiceMutationVariables = Exact<{
   serviceId: Scalars['String']['input'];
@@ -510,6 +517,11 @@ export type UpdateServiceConfigMutationVariables = Exact<{
 
 export type UpdateServiceConfigMutation = { __typename?: 'Mutation', updateServiceConfig: boolean };
 
+export type GetStationConfigQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetStationConfigQuery = { __typename?: 'Query', getStationConfigConstraint: Array<{ __typename?: 'configConstraint', namespace: string, name: string, key: string, description: string, configType: string, isRequired: boolean, currentValue: any, options?: any | null }> };
+
 export type UpdateStationConfigMutationVariables = Exact<{
   key: Scalars['String']['input'];
   value: Scalars['Any']['input'];
@@ -517,6 +529,27 @@ export type UpdateStationConfigMutationVariables = Exact<{
 
 
 export type UpdateStationConfigMutation = { __typename?: 'Mutation', updateStationConfig: boolean };
+
+export type CreateUserMutationVariables = Exact<{
+  username: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  admin: Scalars['Boolean']['input'];
+}>;
+
+
+export type CreateUserMutation = { __typename?: 'Mutation', createSysUser: string };
+
+export type GetUserListQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUserListQuery = { __typename?: 'Query', getSysUsers: Array<{ __typename?: 'sysUser', userId: string, username: string, createdAt: number, updatedAt: number, lastLogin: number, userIp: string, userAgent: string, admin: boolean }> };
+
+export type RemoveUserMutationVariables = Exact<{
+  userId: Scalars['String']['input'];
+}>;
+
+
+export type RemoveUserMutation = { __typename?: 'Mutation', removeSysUser: boolean };
 
 export type UpdateUserMutationVariables = Exact<{
   userId: Scalars['String']['input'];
@@ -911,76 +944,6 @@ export type GetUpgradeStatusQueryHookResult = ReturnType<typeof useGetUpgradeSta
 export type GetUpgradeStatusLazyQueryHookResult = ReturnType<typeof useGetUpgradeStatusLazyQuery>;
 export type GetUpgradeStatusSuspenseQueryHookResult = ReturnType<typeof useGetUpgradeStatusSuspenseQuery>;
 export type GetUpgradeStatusQueryResult = ApolloReactCommon.QueryResult<GetUpgradeStatusQuery, GetUpgradeStatusQueryVariables>;
-export const CreateUserDocument = gql`
-    mutation createUser($username: String!, $password: String!, $admin: Boolean!) {
-  createSysUser(username: $username, password: $password, admin: $admin)
-}
-    `;
-export type CreateUserMutationFn = ApolloReactCommon.MutationFunction<CreateUserMutation, CreateUserMutationVariables>;
-
-/**
- * __useCreateUserMutation__
- *
- * To run a mutation, you first call `useCreateUserMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateUserMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createUserMutation, { data, loading, error }] = useCreateUserMutation({
- *   variables: {
- *      username: // value for 'username'
- *      password: // value for 'password'
- *      admin: // value for 'admin'
- *   },
- * });
- */
-export function useCreateUserMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateUserMutation, CreateUserMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useMutation<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument, options);
-      }
-export type CreateUserMutationHookResult = ReturnType<typeof useCreateUserMutation>;
-export type CreateUserMutationResult = ApolloReactCommon.MutationResult<CreateUserMutation>;
-export type CreateUserMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
-export const ExportGlobalConfigDocument = gql`
-    query exportGlobalConfig {
-  exportGlobalConfig
-}
-    `;
-
-/**
- * __useExportGlobalConfigQuery__
- *
- * To run a query within a React component, call `useExportGlobalConfigQuery` and pass it any options that fit your needs.
- * When your component renders, `useExportGlobalConfigQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useExportGlobalConfigQuery({
- *   variables: {
- *   },
- * });
- */
-export function useExportGlobalConfigQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>(ExportGlobalConfigDocument, options);
-      }
-export function useExportGlobalConfigLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>(ExportGlobalConfigDocument, options);
-        }
-export function useExportGlobalConfigSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>) {
-          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useSuspenseQuery<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>(ExportGlobalConfigDocument, options);
-        }
-export type ExportGlobalConfigQueryHookResult = ReturnType<typeof useExportGlobalConfigQuery>;
-export type ExportGlobalConfigLazyQueryHookResult = ReturnType<typeof useExportGlobalConfigLazyQuery>;
-export type ExportGlobalConfigSuspenseQueryHookResult = ReturnType<typeof useExportGlobalConfigSuspenseQuery>;
-export type ExportGlobalConfigQueryResult = ApolloReactCommon.QueryResult<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>;
 export const GetApplicationLogsDocument = gql`
     query getApplicationLogs {
   getApplicationLogs
@@ -1018,195 +981,43 @@ export type GetApplicationLogsQueryHookResult = ReturnType<typeof useGetApplicat
 export type GetApplicationLogsLazyQueryHookResult = ReturnType<typeof useGetApplicationLogsLazyQuery>;
 export type GetApplicationLogsSuspenseQueryHookResult = ReturnType<typeof useGetApplicationLogsSuspenseQuery>;
 export type GetApplicationLogsQueryResult = ApolloReactCommon.QueryResult<GetApplicationLogsQuery, GetApplicationLogsQueryVariables>;
-export const GetServiceDataDocument = gql`
-    query getServiceData {
-  getServiceConfigConstraint {
-    serviceName
-    serviceId
-    constraints {
-      key
-      name
-      description
-      configType
-      isRequired
-      currentValue
-      options
-    }
-  }
-  getServiceStatus {
-    description
-    serviceId
-    name
-    restarts
-    startedAt
-    stoppedAt
-    updatedAt
-    isRunning
-  }
+export const ExportGlobalConfigDocument = gql`
+    query exportGlobalConfig {
+  exportGlobalConfig
 }
     `;
 
 /**
- * __useGetServiceDataQuery__
+ * __useExportGlobalConfigQuery__
  *
- * To run a query within a React component, call `useGetServiceDataQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetServiceDataQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useExportGlobalConfigQuery` and pass it any options that fit your needs.
+ * When your component renders, `useExportGlobalConfigQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetServiceDataQuery({
+ * const { data, loading, error } = useExportGlobalConfigQuery({
  *   variables: {
  *   },
  * });
  */
-export function useGetServiceDataQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetServiceDataQuery, GetServiceDataQueryVariables>) {
+export function useExportGlobalConfigQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<GetServiceDataQuery, GetServiceDataQueryVariables>(GetServiceDataDocument, options);
+        return ApolloReactHooks.useQuery<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>(ExportGlobalConfigDocument, options);
       }
-export function useGetServiceDataLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetServiceDataQuery, GetServiceDataQueryVariables>) {
+export function useExportGlobalConfigLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<GetServiceDataQuery, GetServiceDataQueryVariables>(GetServiceDataDocument, options);
+          return ApolloReactHooks.useLazyQuery<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>(ExportGlobalConfigDocument, options);
         }
-export function useGetServiceDataSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetServiceDataQuery, GetServiceDataQueryVariables>) {
+export function useExportGlobalConfigSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>) {
           const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useSuspenseQuery<GetServiceDataQuery, GetServiceDataQueryVariables>(GetServiceDataDocument, options);
+          return ApolloReactHooks.useSuspenseQuery<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>(ExportGlobalConfigDocument, options);
         }
-export type GetServiceDataQueryHookResult = ReturnType<typeof useGetServiceDataQuery>;
-export type GetServiceDataLazyQueryHookResult = ReturnType<typeof useGetServiceDataLazyQuery>;
-export type GetServiceDataSuspenseQueryHookResult = ReturnType<typeof useGetServiceDataSuspenseQuery>;
-export type GetServiceDataQueryResult = ApolloReactCommon.QueryResult<GetServiceDataQuery, GetServiceDataQueryVariables>;
-export const GetStationConfigDocument = gql`
-    query getStationConfig {
-  getStationConfigConstraint {
-    namespace
-    name
-    key
-    description
-    configType
-    isRequired
-    currentValue
-    options
-  }
-}
-    `;
-
-/**
- * __useGetStationConfigQuery__
- *
- * To run a query within a React component, call `useGetStationConfigQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetStationConfigQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetStationConfigQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetStationConfigQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetStationConfigQuery, GetStationConfigQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<GetStationConfigQuery, GetStationConfigQueryVariables>(GetStationConfigDocument, options);
-      }
-export function useGetStationConfigLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetStationConfigQuery, GetStationConfigQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<GetStationConfigQuery, GetStationConfigQueryVariables>(GetStationConfigDocument, options);
-        }
-export function useGetStationConfigSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetStationConfigQuery, GetStationConfigQueryVariables>) {
-          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useSuspenseQuery<GetStationConfigQuery, GetStationConfigQueryVariables>(GetStationConfigDocument, options);
-        }
-export type GetStationConfigQueryHookResult = ReturnType<typeof useGetStationConfigQuery>;
-export type GetStationConfigLazyQueryHookResult = ReturnType<typeof useGetStationConfigLazyQuery>;
-export type GetStationConfigSuspenseQueryHookResult = ReturnType<typeof useGetStationConfigSuspenseQuery>;
-export type GetStationConfigQueryResult = ApolloReactCommon.QueryResult<GetStationConfigQuery, GetStationConfigQueryVariables>;
-export const GetStationMetadataDocument = gql`
-    query getStationMetadata($format: String!) {
-  getStationMetadata(format: $format)
-}
-    `;
-
-/**
- * __useGetStationMetadataQuery__
- *
- * To run a query within a React component, call `useGetStationMetadataQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetStationMetadataQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetStationMetadataQuery({
- *   variables: {
- *      format: // value for 'format'
- *   },
- * });
- */
-export function useGetStationMetadataQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetStationMetadataQuery, GetStationMetadataQueryVariables> & ({ variables: GetStationMetadataQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<GetStationMetadataQuery, GetStationMetadataQueryVariables>(GetStationMetadataDocument, options);
-      }
-export function useGetStationMetadataLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetStationMetadataQuery, GetStationMetadataQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<GetStationMetadataQuery, GetStationMetadataQueryVariables>(GetStationMetadataDocument, options);
-        }
-export function useGetStationMetadataSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetStationMetadataQuery, GetStationMetadataQueryVariables>) {
-          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useSuspenseQuery<GetStationMetadataQuery, GetStationMetadataQueryVariables>(GetStationMetadataDocument, options);
-        }
-export type GetStationMetadataQueryHookResult = ReturnType<typeof useGetStationMetadataQuery>;
-export type GetStationMetadataLazyQueryHookResult = ReturnType<typeof useGetStationMetadataLazyQuery>;
-export type GetStationMetadataSuspenseQueryHookResult = ReturnType<typeof useGetStationMetadataSuspenseQuery>;
-export type GetStationMetadataQueryResult = ApolloReactCommon.QueryResult<GetStationMetadataQuery, GetStationMetadataQueryVariables>;
-export const GetUserListDocument = gql`
-    query getUserList {
-  getSysUsers {
-    userId
-    username
-    createdAt
-    updatedAt
-    lastLogin
-    userIp
-    userAgent
-    admin
-  }
-}
-    `;
-
-/**
- * __useGetUserListQuery__
- *
- * To run a query within a React component, call `useGetUserListQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetUserListQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetUserListQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetUserListQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetUserListQuery, GetUserListQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<GetUserListQuery, GetUserListQueryVariables>(GetUserListDocument, options);
-      }
-export function useGetUserListLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetUserListQuery, GetUserListQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<GetUserListQuery, GetUserListQueryVariables>(GetUserListDocument, options);
-        }
-export function useGetUserListSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetUserListQuery, GetUserListQueryVariables>) {
-          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useSuspenseQuery<GetUserListQuery, GetUserListQueryVariables>(GetUserListDocument, options);
-        }
-export type GetUserListQueryHookResult = ReturnType<typeof useGetUserListQuery>;
-export type GetUserListLazyQueryHookResult = ReturnType<typeof useGetUserListLazyQuery>;
-export type GetUserListSuspenseQueryHookResult = ReturnType<typeof useGetUserListSuspenseQuery>;
-export type GetUserListQueryResult = ApolloReactCommon.QueryResult<GetUserListQuery, GetUserListQueryVariables>;
+export type ExportGlobalConfigQueryHookResult = ReturnType<typeof useExportGlobalConfigQuery>;
+export type ExportGlobalConfigLazyQueryHookResult = ReturnType<typeof useExportGlobalConfigLazyQuery>;
+export type ExportGlobalConfigSuspenseQueryHookResult = ReturnType<typeof useExportGlobalConfigSuspenseQuery>;
+export type ExportGlobalConfigQueryResult = ApolloReactCommon.QueryResult<ExportGlobalConfigQuery, ExportGlobalConfigQueryVariables>;
 export const ImportGlobalConfigDocument = gql`
     mutation importGlobalConfig($data: String!) {
   importGlobalConfig(data: $data)
@@ -1238,45 +1049,47 @@ export function useImportGlobalConfigMutation(baseOptions?: ApolloReactHooks.Mut
 export type ImportGlobalConfigMutationHookResult = ReturnType<typeof useImportGlobalConfigMutation>;
 export type ImportGlobalConfigMutationResult = ApolloReactCommon.MutationResult<ImportGlobalConfigMutation>;
 export type ImportGlobalConfigMutationOptions = ApolloReactCommon.BaseMutationOptions<ImportGlobalConfigMutation, ImportGlobalConfigMutationVariables>;
-export const IsCurrentUserAdminDocument = gql`
-    query isCurrentUserAdmin {
-  getCurrentUser {
-    admin
+export const GetExecutableBackupsDocument = gql`
+    query getExecutableBackups {
+  getExecutableBackups {
+    name
+    size
+    modifiedAt
   }
 }
     `;
 
 /**
- * __useIsCurrentUserAdminQuery__
+ * __useGetExecutableBackupsQuery__
  *
- * To run a query within a React component, call `useIsCurrentUserAdminQuery` and pass it any options that fit your needs.
- * When your component renders, `useIsCurrentUserAdminQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetExecutableBackupsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetExecutableBackupsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useIsCurrentUserAdminQuery({
+ * const { data, loading, error } = useGetExecutableBackupsQuery({
  *   variables: {
  *   },
  * });
  */
-export function useIsCurrentUserAdminQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<IsCurrentUserAdminQuery, IsCurrentUserAdminQueryVariables>) {
+export function useGetExecutableBackupsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetExecutableBackupsQuery, GetExecutableBackupsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<IsCurrentUserAdminQuery, IsCurrentUserAdminQueryVariables>(IsCurrentUserAdminDocument, options);
+        return ApolloReactHooks.useQuery<GetExecutableBackupsQuery, GetExecutableBackupsQueryVariables>(GetExecutableBackupsDocument, options);
       }
-export function useIsCurrentUserAdminLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<IsCurrentUserAdminQuery, IsCurrentUserAdminQueryVariables>) {
+export function useGetExecutableBackupsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetExecutableBackupsQuery, GetExecutableBackupsQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<IsCurrentUserAdminQuery, IsCurrentUserAdminQueryVariables>(IsCurrentUserAdminDocument, options);
+          return ApolloReactHooks.useLazyQuery<GetExecutableBackupsQuery, GetExecutableBackupsQueryVariables>(GetExecutableBackupsDocument, options);
         }
-export function useIsCurrentUserAdminSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<IsCurrentUserAdminQuery, IsCurrentUserAdminQueryVariables>) {
+export function useGetExecutableBackupsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetExecutableBackupsQuery, GetExecutableBackupsQueryVariables>) {
           const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useSuspenseQuery<IsCurrentUserAdminQuery, IsCurrentUserAdminQueryVariables>(IsCurrentUserAdminDocument, options);
+          return ApolloReactHooks.useSuspenseQuery<GetExecutableBackupsQuery, GetExecutableBackupsQueryVariables>(GetExecutableBackupsDocument, options);
         }
-export type IsCurrentUserAdminQueryHookResult = ReturnType<typeof useIsCurrentUserAdminQuery>;
-export type IsCurrentUserAdminLazyQueryHookResult = ReturnType<typeof useIsCurrentUserAdminLazyQuery>;
-export type IsCurrentUserAdminSuspenseQueryHookResult = ReturnType<typeof useIsCurrentUserAdminSuspenseQuery>;
-export type IsCurrentUserAdminQueryResult = ApolloReactCommon.QueryResult<IsCurrentUserAdminQuery, IsCurrentUserAdminQueryVariables>;
+export type GetExecutableBackupsQueryHookResult = ReturnType<typeof useGetExecutableBackupsQuery>;
+export type GetExecutableBackupsLazyQueryHookResult = ReturnType<typeof useGetExecutableBackupsLazyQuery>;
+export type GetExecutableBackupsSuspenseQueryHookResult = ReturnType<typeof useGetExecutableBackupsSuspenseQuery>;
+export type GetExecutableBackupsQueryResult = ApolloReactCommon.QueryResult<GetExecutableBackupsQuery, GetExecutableBackupsQueryVariables>;
 export const PurgeSeisRecordsDocument = gql`
     mutation purgeSeisRecords {
   purgeSeisRecords {
@@ -1610,37 +1423,41 @@ export function useRestoreServiceConfigMutation(baseOptions?: ApolloReactHooks.M
 export type RestoreServiceConfigMutationHookResult = ReturnType<typeof useRestoreServiceConfigMutation>;
 export type RestoreServiceConfigMutationResult = ApolloReactCommon.MutationResult<RestoreServiceConfigMutation>;
 export type RestoreServiceConfigMutationOptions = ApolloReactCommon.BaseMutationOptions<RestoreServiceConfigMutation, RestoreServiceConfigMutationVariables>;
-export const RemoveUserDocument = gql`
-    mutation removeUser($userId: String!) {
-  removeSysUser(userId: $userId)
+export const RemoveExecutableBackupsDocument = gql`
+    mutation removeExecutableBackups($names: [String!]!) {
+  removeExecutableBackups(names: $names) {
+    name
+    removed
+    error
+  }
 }
     `;
-export type RemoveUserMutationFn = ApolloReactCommon.MutationFunction<RemoveUserMutation, RemoveUserMutationVariables>;
+export type RemoveExecutableBackupsMutationFn = ApolloReactCommon.MutationFunction<RemoveExecutableBackupsMutation, RemoveExecutableBackupsMutationVariables>;
 
 /**
- * __useRemoveUserMutation__
+ * __useRemoveExecutableBackupsMutation__
  *
- * To run a mutation, you first call `useRemoveUserMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRemoveUserMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useRemoveExecutableBackupsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveExecutableBackupsMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [removeUserMutation, { data, loading, error }] = useRemoveUserMutation({
+ * const [removeExecutableBackupsMutation, { data, loading, error }] = useRemoveExecutableBackupsMutation({
  *   variables: {
- *      userId: // value for 'userId'
+ *      names: // value for 'names'
  *   },
  * });
  */
-export function useRemoveUserMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RemoveUserMutation, RemoveUserMutationVariables>) {
+export function useRemoveExecutableBackupsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RemoveExecutableBackupsMutation, RemoveExecutableBackupsMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useMutation<RemoveUserMutation, RemoveUserMutationVariables>(RemoveUserDocument, options);
+        return ApolloReactHooks.useMutation<RemoveExecutableBackupsMutation, RemoveExecutableBackupsMutationVariables>(RemoveExecutableBackupsDocument, options);
       }
-export type RemoveUserMutationHookResult = ReturnType<typeof useRemoveUserMutation>;
-export type RemoveUserMutationResult = ApolloReactCommon.MutationResult<RemoveUserMutation>;
-export type RemoveUserMutationOptions = ApolloReactCommon.BaseMutationOptions<RemoveUserMutation, RemoveUserMutationVariables>;
+export type RemoveExecutableBackupsMutationHookResult = ReturnType<typeof useRemoveExecutableBackupsMutation>;
+export type RemoveExecutableBackupsMutationResult = ApolloReactCommon.MutationResult<RemoveExecutableBackupsMutation>;
+export type RemoveExecutableBackupsMutationOptions = ApolloReactCommon.BaseMutationOptions<RemoveExecutableBackupsMutation, RemoveExecutableBackupsMutationVariables>;
 export const RestartApplicationDocument = gql`
     mutation restartApplication {
   restartApplication
@@ -1671,6 +1488,142 @@ export function useRestartApplicationMutation(baseOptions?: ApolloReactHooks.Mut
 export type RestartApplicationMutationHookResult = ReturnType<typeof useRestartApplicationMutation>;
 export type RestartApplicationMutationResult = ApolloReactCommon.MutationResult<RestartApplicationMutation>;
 export type RestartApplicationMutationOptions = ApolloReactCommon.BaseMutationOptions<RestartApplicationMutation, RestartApplicationMutationVariables>;
+export const IsCurrentUserAdminDocument = gql`
+    query isCurrentUserAdmin {
+  getCurrentUser {
+    admin
+  }
+}
+    `;
+
+/**
+ * __useIsCurrentUserAdminQuery__
+ *
+ * To run a query within a React component, call `useIsCurrentUserAdminQuery` and pass it any options that fit your needs.
+ * When your component renders, `useIsCurrentUserAdminQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useIsCurrentUserAdminQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useIsCurrentUserAdminQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<IsCurrentUserAdminQuery, IsCurrentUserAdminQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<IsCurrentUserAdminQuery, IsCurrentUserAdminQueryVariables>(IsCurrentUserAdminDocument, options);
+      }
+export function useIsCurrentUserAdminLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<IsCurrentUserAdminQuery, IsCurrentUserAdminQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<IsCurrentUserAdminQuery, IsCurrentUserAdminQueryVariables>(IsCurrentUserAdminDocument, options);
+        }
+export function useIsCurrentUserAdminSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<IsCurrentUserAdminQuery, IsCurrentUserAdminQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<IsCurrentUserAdminQuery, IsCurrentUserAdminQueryVariables>(IsCurrentUserAdminDocument, options);
+        }
+export type IsCurrentUserAdminQueryHookResult = ReturnType<typeof useIsCurrentUserAdminQuery>;
+export type IsCurrentUserAdminLazyQueryHookResult = ReturnType<typeof useIsCurrentUserAdminLazyQuery>;
+export type IsCurrentUserAdminSuspenseQueryHookResult = ReturnType<typeof useIsCurrentUserAdminSuspenseQuery>;
+export type IsCurrentUserAdminQueryResult = ApolloReactCommon.QueryResult<IsCurrentUserAdminQuery, IsCurrentUserAdminQueryVariables>;
+export const GetStationMetadataDocument = gql`
+    query getStationMetadata($format: String!) {
+  getStationMetadata(format: $format)
+}
+    `;
+
+/**
+ * __useGetStationMetadataQuery__
+ *
+ * To run a query within a React component, call `useGetStationMetadataQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetStationMetadataQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetStationMetadataQuery({
+ *   variables: {
+ *      format: // value for 'format'
+ *   },
+ * });
+ */
+export function useGetStationMetadataQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetStationMetadataQuery, GetStationMetadataQueryVariables> & ({ variables: GetStationMetadataQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetStationMetadataQuery, GetStationMetadataQueryVariables>(GetStationMetadataDocument, options);
+      }
+export function useGetStationMetadataLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetStationMetadataQuery, GetStationMetadataQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetStationMetadataQuery, GetStationMetadataQueryVariables>(GetStationMetadataDocument, options);
+        }
+export function useGetStationMetadataSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetStationMetadataQuery, GetStationMetadataQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetStationMetadataQuery, GetStationMetadataQueryVariables>(GetStationMetadataDocument, options);
+        }
+export type GetStationMetadataQueryHookResult = ReturnType<typeof useGetStationMetadataQuery>;
+export type GetStationMetadataLazyQueryHookResult = ReturnType<typeof useGetStationMetadataLazyQuery>;
+export type GetStationMetadataSuspenseQueryHookResult = ReturnType<typeof useGetStationMetadataSuspenseQuery>;
+export type GetStationMetadataQueryResult = ApolloReactCommon.QueryResult<GetStationMetadataQuery, GetStationMetadataQueryVariables>;
+export const GetServiceDataDocument = gql`
+    query getServiceData {
+  getServiceConfigConstraint {
+    serviceName
+    serviceId
+    constraints {
+      key
+      name
+      description
+      configType
+      isRequired
+      currentValue
+      options
+    }
+  }
+  getServiceStatus {
+    description
+    serviceId
+    name
+    restarts
+    startedAt
+    stoppedAt
+    updatedAt
+    isRunning
+  }
+}
+    `;
+
+/**
+ * __useGetServiceDataQuery__
+ *
+ * To run a query within a React component, call `useGetServiceDataQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetServiceDataQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetServiceDataQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetServiceDataQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetServiceDataQuery, GetServiceDataQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetServiceDataQuery, GetServiceDataQueryVariables>(GetServiceDataDocument, options);
+      }
+export function useGetServiceDataLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetServiceDataQuery, GetServiceDataQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetServiceDataQuery, GetServiceDataQueryVariables>(GetServiceDataDocument, options);
+        }
+export function useGetServiceDataSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetServiceDataQuery, GetServiceDataQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetServiceDataQuery, GetServiceDataQueryVariables>(GetServiceDataDocument, options);
+        }
+export type GetServiceDataQueryHookResult = ReturnType<typeof useGetServiceDataQuery>;
+export type GetServiceDataLazyQueryHookResult = ReturnType<typeof useGetServiceDataLazyQuery>;
+export type GetServiceDataSuspenseQueryHookResult = ReturnType<typeof useGetServiceDataSuspenseQuery>;
+export type GetServiceDataQueryResult = ApolloReactCommon.QueryResult<GetServiceDataQuery, GetServiceDataQueryVariables>;
 export const RestartServiceDocument = gql`
     mutation restartService($serviceId: String!) {
   restartService(serviceId: $serviceId)
@@ -1797,6 +1750,52 @@ export function useUpdateServiceConfigMutation(baseOptions?: ApolloReactHooks.Mu
 export type UpdateServiceConfigMutationHookResult = ReturnType<typeof useUpdateServiceConfigMutation>;
 export type UpdateServiceConfigMutationResult = ApolloReactCommon.MutationResult<UpdateServiceConfigMutation>;
 export type UpdateServiceConfigMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateServiceConfigMutation, UpdateServiceConfigMutationVariables>;
+export const GetStationConfigDocument = gql`
+    query getStationConfig {
+  getStationConfigConstraint {
+    namespace
+    name
+    key
+    description
+    configType
+    isRequired
+    currentValue
+    options
+  }
+}
+    `;
+
+/**
+ * __useGetStationConfigQuery__
+ *
+ * To run a query within a React component, call `useGetStationConfigQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetStationConfigQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetStationConfigQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetStationConfigQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetStationConfigQuery, GetStationConfigQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetStationConfigQuery, GetStationConfigQueryVariables>(GetStationConfigDocument, options);
+      }
+export function useGetStationConfigLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetStationConfigQuery, GetStationConfigQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetStationConfigQuery, GetStationConfigQueryVariables>(GetStationConfigDocument, options);
+        }
+export function useGetStationConfigSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetStationConfigQuery, GetStationConfigQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetStationConfigQuery, GetStationConfigQueryVariables>(GetStationConfigDocument, options);
+        }
+export type GetStationConfigQueryHookResult = ReturnType<typeof useGetStationConfigQuery>;
+export type GetStationConfigLazyQueryHookResult = ReturnType<typeof useGetStationConfigLazyQuery>;
+export type GetStationConfigSuspenseQueryHookResult = ReturnType<typeof useGetStationConfigSuspenseQuery>;
+export type GetStationConfigQueryResult = ApolloReactCommon.QueryResult<GetStationConfigQuery, GetStationConfigQueryVariables>;
 export const UpdateStationConfigDocument = gql`
     mutation updateStationConfig($key: String!, $value: Any!) {
   updateStationConfig(key: $key, value: $value)
@@ -1829,6 +1828,116 @@ export function useUpdateStationConfigMutation(baseOptions?: ApolloReactHooks.Mu
 export type UpdateStationConfigMutationHookResult = ReturnType<typeof useUpdateStationConfigMutation>;
 export type UpdateStationConfigMutationResult = ApolloReactCommon.MutationResult<UpdateStationConfigMutation>;
 export type UpdateStationConfigMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateStationConfigMutation, UpdateStationConfigMutationVariables>;
+export const CreateUserDocument = gql`
+    mutation createUser($username: String!, $password: String!, $admin: Boolean!) {
+  createSysUser(username: $username, password: $password, admin: $admin)
+}
+    `;
+export type CreateUserMutationFn = ApolloReactCommon.MutationFunction<CreateUserMutation, CreateUserMutationVariables>;
+
+/**
+ * __useCreateUserMutation__
+ *
+ * To run a mutation, you first call `useCreateUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createUserMutation, { data, loading, error }] = useCreateUserMutation({
+ *   variables: {
+ *      username: // value for 'username'
+ *      password: // value for 'password'
+ *      admin: // value for 'admin'
+ *   },
+ * });
+ */
+export function useCreateUserMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateUserMutation, CreateUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument, options);
+      }
+export type CreateUserMutationHookResult = ReturnType<typeof useCreateUserMutation>;
+export type CreateUserMutationResult = ApolloReactCommon.MutationResult<CreateUserMutation>;
+export type CreateUserMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
+export const GetUserListDocument = gql`
+    query getUserList {
+  getSysUsers {
+    userId
+    username
+    createdAt
+    updatedAt
+    lastLogin
+    userIp
+    userAgent
+    admin
+  }
+}
+    `;
+
+/**
+ * __useGetUserListQuery__
+ *
+ * To run a query within a React component, call `useGetUserListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserListQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetUserListQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetUserListQuery, GetUserListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetUserListQuery, GetUserListQueryVariables>(GetUserListDocument, options);
+      }
+export function useGetUserListLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetUserListQuery, GetUserListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetUserListQuery, GetUserListQueryVariables>(GetUserListDocument, options);
+        }
+export function useGetUserListSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetUserListQuery, GetUserListQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetUserListQuery, GetUserListQueryVariables>(GetUserListDocument, options);
+        }
+export type GetUserListQueryHookResult = ReturnType<typeof useGetUserListQuery>;
+export type GetUserListLazyQueryHookResult = ReturnType<typeof useGetUserListLazyQuery>;
+export type GetUserListSuspenseQueryHookResult = ReturnType<typeof useGetUserListSuspenseQuery>;
+export type GetUserListQueryResult = ApolloReactCommon.QueryResult<GetUserListQuery, GetUserListQueryVariables>;
+export const RemoveUserDocument = gql`
+    mutation removeUser($userId: String!) {
+  removeSysUser(userId: $userId)
+}
+    `;
+export type RemoveUserMutationFn = ApolloReactCommon.MutationFunction<RemoveUserMutation, RemoveUserMutationVariables>;
+
+/**
+ * __useRemoveUserMutation__
+ *
+ * To run a mutation, you first call `useRemoveUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeUserMutation, { data, loading, error }] = useRemoveUserMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useRemoveUserMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RemoveUserMutation, RemoveUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<RemoveUserMutation, RemoveUserMutationVariables>(RemoveUserDocument, options);
+      }
+export type RemoveUserMutationHookResult = ReturnType<typeof useRemoveUserMutation>;
+export type RemoveUserMutationResult = ApolloReactCommon.MutationResult<RemoveUserMutation>;
+export type RemoveUserMutationOptions = ApolloReactCommon.BaseMutationOptions<RemoveUserMutation, RemoveUserMutationVariables>;
 export const UpdateUserDocument = gql`
     mutation updateUser($userId: String!, $username: String!, $password: String, $admin: Boolean!) {
   updateSysUser(

@@ -166,6 +166,9 @@ func TestPermissionChecks(t *testing.T) {
 		if _, err := mut.RestartApplication(ctx); err == nil {
 			t.Fatal("restart allowed")
 		}
+		if _, err := mut.RemoveExecutableBackups(ctx, []string{"backup"}); err == nil {
+			t.Fatal("backup removal allowed")
+		}
 		if _, err := mut.StopService(ctx, serviceID); err == nil {
 			t.Fatal("stop allowed")
 		}
@@ -201,6 +204,9 @@ func TestPermissionChecks(t *testing.T) {
 		}
 		if _, err := query.GetUpgradeStatus(ctx); err == nil {
 			t.Fatal("upgrade status allowed")
+		}
+		if _, err := query.GetExecutableBackups(ctx); err == nil {
+			t.Fatal("backup listing allowed")
 		}
 		if _, err := query.GetCleanupStatus(ctx); err == nil {
 			t.Fatal("cleanup status allowed")

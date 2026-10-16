@@ -1,6 +1,7 @@
 package socket
 
 import (
+	"io"
 	"net/http"
 	"sync"
 	"time"
@@ -16,6 +17,9 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/samber/lo"
 )
+
+// Clients only send a JWT or short commands, including when compression is negotiated.
+const maxClientMessageSize = 8 * 1024
 
 func Setup(routerGroup *gin.RouterGroup, timeSource *timesource.Source, hardware hardware.IHardware, jwtMiddleware gin.HandlerFunc) {
 	s := socket{
@@ -109,12 +113,32 @@ func writeWebSocketJSON(conn *websocket.Conn, writeMu *sync.Mutex, data any) err
 	return nil
 }
 
+func readWebSocketMessage(conn *websocket.Conn) ([]byte, error) {
+	_, reader, err := conn.NextReader()
+	if err != nil {
+		return nil, err
+	}
+	// SetReadLimit bounds wire payloads; this also bounds decompressed messages.
+	data, err := io.ReadAll(io.LimitReader(reader, maxClientMessageSize+1))
+	if err != nil {
+		return nil, err
+	}
+	if len(data) > maxClientMessageSize {
+		_ = conn.WriteControl(websocket.CloseMessage,
+			websocket.FormatCloseMessage(websocket.CloseMessageTooBig, "message too large"),
+			time.Now().Add(time.Second))
+		return nil, websocket.ErrReadLimit
+	}
+	return data, nil
+}
+
 func (s *socket) handleWebSocket(_ *gin.Context, conn *websocket.Conn, timeSource *timesource.Source) {
 	clientID := conn.RemoteAddr().String()
 	logger.GetLogger(LOG_PREFIX).Infof("%s - client connected, waiting for authentication", clientID)
 
+	conn.SetReadLimit(maxClientMessageSize)
 	conn.SetReadDeadline(time.Now().Add(10 * time.Second))
-	_, tokenBytes, err := conn.ReadMessage()
+	tokenBytes, err := readWebSocketMessage(conn)
 	conn.SetReadDeadline(time.Time{})
 	if err != nil {
 		logger.GetLogger(LOG_PREFIX).Warnf("%s - authentication timeout or read error: %v", clientID, err)
@@ -162,9 +186,16 @@ func (s *socket) handleWebSocket(_ *gin.Context, conn *websocket.Conn, timeSourc
 	defer s.messageBus.Unsubscribe(clientID)
 
 	for {
-		_, dataBytes, err := conn.ReadMessage()
+		dataBytes, err := readWebSocketMessage(conn)
 		if err != nil {
 			break
+		}
+		if string(dataBytes) == "ping" {
+			if err := writeWebSocketJSON(conn, &writeMu, "pong"); err != nil {
+				logger.GetLogger(LOG_PREFIX).Warnf("%s - failed to write websocket heartbeat: %v", clientID, err)
+				break
+			}
+			continue
 		}
 		if string(dataBytes) == "client hello" {
 			if err := s.sendHistory(conn, &writeMu, timeSource); err != nil {
