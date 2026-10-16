@@ -15,6 +15,9 @@ func (s *DiscoveryServiceImpl) Stop() error {
 
 	done := make(chan struct{})
 	go func() {
+		// Wait until the scan loop has finished writing the registration
+		// pointers, then shut those servers down.
+		s.wg.Wait()
 		for _, reg := range []*mdnsRegistration{
 			s.httpReg, s.seedlinkReg, s.winstonReg, s.forwarderReg,
 		} {
@@ -22,7 +25,6 @@ func (s *DiscoveryServiceImpl) Stop() error {
 				reg.server.Shutdown()
 			}
 		}
-		s.wg.Wait()
 		close(done)
 	}()
 

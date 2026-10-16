@@ -15,8 +15,11 @@ func (s *FrpClientServiceImpl) Stop() error {
 
 	done := make(chan struct{})
 	go func() {
-		s.clientObj.Close()
+		// Run observes s.ctx and returns before Close reads the client.
 		s.wg.Wait()
+		if s.clientObj != nil {
+			s.clientObj.Close()
+		}
 		close(done)
 	}()
 
