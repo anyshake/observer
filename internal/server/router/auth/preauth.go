@@ -5,11 +5,20 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"image/color"
+	"image/png"
 	"net/http"
 	"time"
 
 	"github.com/dchest/captcha"
 )
+
+var captchaStore = captcha.NewMemoryStore(captcha.CollectNum, captcha.Expiration)
+
+func init() {
+	// Share the store with captcha.New and captcha.VerifyString.
+	captcha.SetCustomStore(captchaStore)
+}
 
 func (h *auth) cleanupExpiredAuthState() {
 	for key, pair := range h.keyPairDataPool.Iterator() {
@@ -65,8 +74,16 @@ func (h *auth) preAuth(ttl time.Duration) (code int, msg string, res any, err er
 
 	var buf bytes.Buffer
 	captchaId := captcha.New()
-	if err = captcha.WriteImage(&buf, captchaId, captcha.StdWidth, captcha.StdHeight); err != nil {
+	captchaDigits := captchaStore.Get(captchaId, false)
+	if captchaDigits == nil {
 		errText := "failed to create captcha"
+		return http.StatusInternalServerError, errText, nil, fmt.Errorf("%s: %w", errText, captcha.ErrNotFound)
+	}
+	captchaImage := captcha.NewImage(captchaId, captchaDigits, captcha.StdWidth, captcha.StdHeight)
+	// Palette index 0 is the background; make it opaque white before encoding.
+	captchaImage.Palette[0] = color.White
+	if err = png.Encode(&buf, captchaImage.Paletted); err != nil {
+		errText := "failed to encode captcha image"
 		return http.StatusInternalServerError, errText, nil, fmt.Errorf("%s: %w", errText, err)
 	}
 
