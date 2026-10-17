@@ -2,6 +2,21 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.7.2
+
+### Release Notes
+
+This maintenance release fixes SeedLink data gaps and refines web interface styling and theme support.
+
+### Improvements
+
+- Updated frontend dependencies and simplified shared utility classes.
+
+### Bug Fixes
+
+- Fixed SeedLink data gaps by upgrading `slgo` to v0.4.3.
+- Fixed map theme updates, status badge styling, and data grid border colors.
+
 ## v4.7.1
 
 ### Release Notes
