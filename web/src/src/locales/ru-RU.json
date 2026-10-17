@@ -14,6 +14,12 @@
         }
     },
     "components": {
+        "ThemeToggle": {
+            "label": "Тема",
+            "light": "Светлая",
+            "dark": "Тёмная",
+            "system": "Как в системе"
+        },
         "ErrorPage": {
             "something_went_wrong": "Ой! Что-то пошло не так.",
             "try_again_later": "Пожалуйста, попробуйте обновить страницу или вернитесь позже."
@@ -587,6 +593,7 @@
         },
         "captcha": {
             "label": "Введите капчу",
+            "countdown": "({{seconds}} сек)",
             "loading": "Загрузка капчи...",
             "error": "Не удалось загрузить капчу",
             "placeholder": "Код капчи",

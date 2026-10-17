@@ -38,51 +38,48 @@ export const Users = ({ currentLocale }: IUsers) => {
             debug={JSON.stringify(getUserListDataError)}
         />
     ) : getUserListDataLoading ? (
-        <div className="flex items-center justify-center">
-            <span className="loading loading-spinner text-primary mt-6" />
+        <div className="app-center">
+            <span className="loading loading-spinner app-loading-delayed" />
         </div>
     ) : (
         <>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="app-toolbar">
                 <button
-                    className="btn btn-sm flex items-center"
+                    className="btn btn-sm app-button-toolbar"
                     onClick={() => handleRefreshUserList()}
                 >
-                    <Icon className="flex-shrink-0" path={mdiRefresh} size={0.7} />
+                    <Icon className="app-icon" path={mdiRefresh} size={0.7} />
                     <span>{t('views.Settings.Users.refresh_list.submit_button')}</span>
                 </button>
                 <button
-                    className="btn btn-sm flex items-center"
+                    className="btn btn-sm app-button-toolbar"
                     onClick={() => setCreateUserModalOpen(true)}
                 >
-                    <Icon className="flex-shrink-0" path={mdiAccountPlus} size={0.7} />
+                    <Icon className="app-icon" path={mdiAccountPlus} size={0.7} />
                     <span>{t('views.Settings.Users.create_user.submit_button')}</span>
                 </button>
                 {selectedUsers.length > 1 && (
                     <button
-                        className="btn btn-sm flex items-center"
+                        className="btn btn-sm app-button-toolbar"
                         onClick={() => handleRemoveUsers()}
                     >
-                        <Icon className="flex-shrink-0" path={mdiAccountRemove} size={0.7} />
+                        <Icon className="app-icon" path={mdiAccountRemove} size={0.7} />
                         <span>{t('views.Settings.Users.remove_users.submit_button')}</span>
                     </button>
                 )}
             </div>
             <label className="input">
-                <Icon className="flex-shrink-0" path={mdiMagnify} size={0.8} />
+                <Icon className="app-icon" path={mdiMagnify} size={0.8} />
                 <input
                     type="search"
-                    className="grow"
+                    className="app-grow"
                     value={searchUser}
                     onChange={({ currentTarget }) => setSearchUser(currentTarget.value)}
                     placeholder={t('views.Settings.Users.search_users.placeholder')}
                 />
                 {searchUser.length > 0 && (
-                    <button
-                        className="cursor-pointer opacity-60 transition-all hover:opacity-100"
-                        onClick={() => setSearchUser('')}
-                    >
-                        <Icon className="flex-shrink-0" path={mdiClose} size={0.8} />
+                    <button className="app-icon-button" onClick={() => setSearchUser('')}>
+                        <Icon className="app-icon" path={mdiClose} size={0.8} />
                     </button>
                 )}
             </label>

@@ -14,7 +14,6 @@ export const SystemUsage = ({ data: getHomeDataData }: { data: GetHomeDataQuery 
     const lineChartConfig = useMemo(
         () => ({
             height: 250,
-            lineColor: '#8A3EED',
             lineWidth: 5,
             yMax: 100,
             yMin: 0,
@@ -76,10 +75,10 @@ export const SystemUsage = ({ data: getHomeDataData }: { data: GetHomeDataQuery 
     }, [getHomeDataData, processChartData]);
 
     return (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-19">
-            <div className="card bg-base-100 flex flex-col space-y-8 p-5 text-gray-700 shadow-md md:col-span-7">
-                <h2 className="flex items-center space-x-2 text-lg font-bold">
-                    <Icon className="flex-shrink-0" path={mdiChip} size={1} />
+        <div className="app-usage-grid">
+            <div className="card app-panel app-usage-line-card">
+                <h2 className="app-section-title">
+                    <Icon className="app-icon" path={mdiChip} size={1} />
                     <span>{t('views.Home.cpu_usage.title')}</span>
                 </h2>
                 {cpuData.length > 1 ? (
@@ -88,9 +87,9 @@ export const SystemUsage = ({ data: getHomeDataData }: { data: GetHomeDataQuery 
                     <Skeleton height={lineChartConfig.height} />
                 )}
             </div>
-            <div className="card bg-base-100 flex flex-col space-y-8 p-5 text-gray-700 shadow-md md:col-span-7">
-                <h2 className="flex items-center space-x-2 text-lg font-bold">
-                    <Icon className="flex-shrink-0" path={mdiMemory} size={1} />
+            <div className="card app-panel app-usage-line-card">
+                <h2 className="app-section-title">
+                    <Icon className="app-icon" path={mdiMemory} size={1} />
                     <span>{t('views.Home.memory_usage.title')}</span>
                 </h2>
                 {memoryData.length > 1 ? (
@@ -99,9 +98,9 @@ export const SystemUsage = ({ data: getHomeDataData }: { data: GetHomeDataQuery 
                     <Skeleton height={lineChartConfig.height} />
                 )}
             </div>
-            <div className="card bg-base-100 flex flex-col space-y-8 p-5 text-gray-700 shadow-md md:col-span-5">
-                <h2 className="flex items-center space-x-2 text-lg font-bold">
-                    <Icon className="flex-shrink-0" path={mdiHarddisk} size={1} />
+            <div className="card app-panel app-usage-gauge-card">
+                <h2 className="app-section-title">
+                    <Icon className="app-icon" path={mdiHarddisk} size={1} />
                     <span>{t('views.Home.disk_usage.title')}</span>
                 </h2>
                 <GaugeChart

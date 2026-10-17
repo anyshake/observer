@@ -40,8 +40,8 @@ const Home = () => {
     const { upgradeMessage } = useUpgradeMessage(getHomeDataData);
 
     return (
-        <div className="container mx-auto space-y-6 p-4">
-            <div className="space-y-3">
+        <div className="app-page">
+            <div className="app-stack-md">
                 {upgradeMessage.length > 0 && <Banner status="warning" message={upgradeMessage} />}
                 <Banner
                     status={getHomeDataLoading ? 'warning' : getHomeDataError ? 'error' : 'ok'}
@@ -62,7 +62,7 @@ const Home = () => {
                 />
             </div>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+            <div className="app-status-grid">
                 <StatusCard
                     iconPath={mdiDesktopTower}
                     title={t('views.Home.station_info.title')}
@@ -85,10 +85,10 @@ const Home = () => {
                 />
             </div>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-16">
-                <div className="card bg-base-100 flex flex-col space-y-4 p-5 text-gray-700 shadow-md md:col-span-7">
-                    <h2 className="flex items-center space-x-2 text-lg font-bold">
-                        <Icon className="flex-shrink-0" path={mdiMapMarkerRadius} size={1} />
+            <div className="app-station-grid">
+                <div className="card app-panel app-location-card">
+                    <h2 className="app-section-title">
+                        <Icon className="app-icon" path={mdiMapMarkerRadius} size={1} />
                         <span>{t('views.Home.station_location.title')}</span>
                     </h2>
                     <MapContainer
@@ -106,9 +106,9 @@ const Home = () => {
                     />
                 </div>
 
-                <div className="card bg-base-100 flex flex-col space-y-4 p-5 text-gray-700 shadow-md md:col-span-9">
-                    <h2 className="flex items-center space-x-2 text-lg font-bold">
-                        <Icon className="flex-shrink-0" path={mdiTooltipText} size={1} />
+                <div className="card app-panel app-services-card">
+                    <h2 className="app-section-title">
+                        <Icon className="app-icon" path={mdiTooltipText} size={1} />
                         <span>{t('views.Home.service_status.title')}</span>
                     </h2>
                     <StatusList data={getServiceStatus} />

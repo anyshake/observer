@@ -13,20 +13,20 @@ export const Skeleton = ({ height }: ISkeleton) => {
     }, [height]);
 
     return (
-        <div className="my-auto w-full animate-pulse space-y-6 overflow-x-hidden p-8">
+        <div className="app-skeleton">
             {[...new Array(skeletonRows)].map((_, index) => (
-                <div key={index} className="space-y-4">
-                    <div className="bg-base-300 h-4 w-48 rounded-full"></div>
+                <div key={index} className="app-stack">
+                    <div className="app-skeleton-title"></div>
 
-                    <div className="flex flex-col space-y-3">
-                        <div className="bg-base-300 h-3 w-full rounded-full"></div>
-                        <div className="bg-base-300 h-3 w-11/12 rounded-full"></div>
-                        <div className="bg-base-300 h-3 w-10/12 rounded-full"></div>
-                        <div className="bg-base-300 h-3 w-9/12 rounded-full"></div>
-                        <div className="bg-base-300 h-3 w-8/12 rounded-full"></div>
+                    <div className="app-skeleton-lines">
+                        <div className="app-skeleton-line-full"></div>
+                        <div className="app-skeleton-line-long"></div>
+                        <div className="app-skeleton-line-medium"></div>
+                        <div className="app-skeleton-line-short"></div>
+                        <div className="app-skeleton-line-shortest"></div>
                     </div>
 
-                    {index < skeletonRows - 1 && <div className="divider my-2 opacity-20"></div>}
+                    {index < skeletonRows - 1 && <div className="app-skeleton-divider"></div>}
                 </div>
             ))}
         </div>

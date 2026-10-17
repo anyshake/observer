@@ -22,20 +22,17 @@ export const Preference = () => {
     }, [t, resetLayoutConfig]);
 
     return (
-        <div className="mx-auto max-w-3xl space-y-4 p-6">
-            <div className="flex flex-col justify-between gap-4 border-b border-gray-300 p-4 sm:flex-row sm:items-center">
-                <div className="space-y-2">
-                    <h3 className="text-lg font-semibold text-gray-800">
+        <div className="app-settings-content-padded">
+            <div className="app-settings-action-bordered">
+                <div className="app-stack-sm">
+                    <h3 className="app-subheading">
                         {t('views.Settings.Preference.reset_layout_preference.title')}
                     </h3>
-                    <p className="text-sm text-gray-500">
+                    <p className="app-description">
                         {t('views.Settings.Preference.reset_layout_preference.description')}
                     </p>
                 </div>
-                <button
-                    className="btn w-full rounded-lg bg-red-500 px-4 py-2 font-medium text-white shadow-lg transition-all hover:bg-red-700 sm:w-auto"
-                    onClick={handleClearPreference}
-                >
+                <button className="btn app-preference-reset" onClick={handleClearPreference}>
                     {t('views.Settings.Preference.reset_layout_preference.submit_button')}
                 </button>
             </div>

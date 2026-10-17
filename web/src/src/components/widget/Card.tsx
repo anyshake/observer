@@ -10,12 +10,12 @@ interface ICard {
 
 export const Card = ({ title, className, iconPath, children }: ICard) => {
     return (
-        <div className="card bg-base-100 p-5 text-gray-700 shadow-md h-full">
-            <h2 className="flex items-center space-x-2 text-lg font-bold">
-                <Icon className="flex-shrink-0" path={iconPath} size={1} />
+        <div className="card app-panel app-card">
+            <h2 className="app-section-title">
+                <Icon className="app-icon" path={iconPath} size={1} />
                 <span>{title}</span>
             </h2>
-            <hr className="my-4 text-gray-200" />
+            <hr className="app-card-divider" />
             <div className={className}>{children}</div>
         </div>
     );

@@ -1,0 +1,72 @@
+/* MUI uses unlayered styles. Keep these scoped overrides unlayered as well. */
+.app-data-grid.MuiDataGrid-root {
+    min-height: 300px;
+    min-width: 10px;
+    --app-grid-cell-padding: 0px;
+    --app-grid-header-padding: 0px;
+}
+
+.app-data-grid.app-data-grid-unselectable {
+    --app-grid-cell-padding: 32px;
+    --app-grid-header-padding: 24px;
+}
+
+.app-data-grid.MuiDataGrid-root .MuiDataGrid-cell {
+    padding-left: var(--app-grid-cell-padding);
+}
+
+.app-data-grid.MuiDataGrid-root .MuiDataGrid-columnHeaderDraggableContainer {
+    padding-left: var(--app-grid-header-padding);
+}
+
+.app-time-picker-paper.MuiPaper-root {
+    padding: 12px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.app-toast.app-toast {
+    background: var(--app-surface);
+    color: var(--app-text);
+    border: 1px solid var(--app-border);
+}
+
+.app-map .maplibregl-ctrl-group {
+    background: var(--app-surface);
+    box-shadow: 0 0 0 1px var(--app-border);
+}
+
+.app-map .maplibregl-ctrl-group button + button {
+    border-color: var(--app-border);
+}
+
+.app-map .maplibregl-ctrl-group button:hover {
+    background-color: var(--app-hover);
+}
+
+[data-theme='dark'] .app-map .maplibregl-ctrl-icon {
+    filter: invert(85%) sepia(16%) saturate(500%) hue-rotate(220deg);
+}
+
+/* Keep the vendor handle's hit area and rotation; draw its icon with theme colors. */
+.app-draggable .react-resizable-handle {
+    background-image: none;
+}
+
+.app-draggable .react-resizable-handle::after {
+    content: '';
+    position: absolute;
+    right: 3px;
+    bottom: 3px;
+    width: 6px;
+    height: 6px;
+    border-right: 2px solid var(--app-muted);
+    border-bottom: 2px solid var(--app-muted);
+    pointer-events: none;
+}
+
+.menu li > a:active,
+.menu li > a:hover,
+.menu li > a:focus {
+    background-color: transparent !important;
+}

@@ -32,20 +32,16 @@ export const ServiceConfigModal = ({
                 <DialogModal
                     fullScreen
                     heading={
-                        <div className="text-gray-800">
-                            <h2 className="flex items-center space-x-2 py-4 text-lg font-extrabold">
-                                <Icon
-                                    className="flex-shrink-0"
-                                    path={mdiSquareEditOutline}
-                                    size={1}
-                                />
+                        <div className="app-text-heading">
+                            <h2 className="app-service-config-heading">
+                                <Icon className="app-icon" path={mdiSquareEditOutline} size={1} />
                                 <span>
                                     {t('views.Settings.Service.edit_service_modal.title', {
                                         name: serviceConfig[selectedServiceId].serviceName
                                     })}
                                 </span>
                             </h2>
-                            <p className="text-sm">
+                            <p className="app-text-small">
                                 {serviceStatus[selectedServiceId].description}
                             </p>
                         </div>
@@ -57,32 +53,32 @@ export const ServiceConfigModal = ({
                     }}
                 >
                     {configureModalStatus.status === 'updating' && (
-                        <div className="my-2 flex items-center space-x-2 text-sm text-gray-500">
+                        <div className="app-form-status-muted">
                             <span className="loading loading-spinner loading-xs" />
                             <span>{configureModalStatus.message}</span>
                         </div>
                     )}
                     {configureModalStatus.status === 'error' && (
-                        <div className="my-2 flex items-center space-x-2 text-sm text-red-500">
-                            <Icon className="flex-shrink-0" path={mdiAlertCircle} size={0.8} />
+                        <div className="app-form-status-error">
+                            <Icon className="app-icon" path={mdiAlertCircle} size={0.8} />
                             <span>{configureModalStatus.message}</span>
                         </div>
                     )}
                     {configureModalStatus.status === 'success' && (
-                        <div className="my-2 flex items-center space-x-2 text-sm text-green-500">
-                            <Icon className="flex-shrink-0" path={mdiCheckCircle} size={0.8} />
+                        <div className="app-form-status-success">
+                            <Icon className="app-icon" path={mdiCheckCircle} size={0.8} />
                             <span>{configureModalStatus.message}</span>
                         </div>
                     )}
-                    <div className="flex flex-wrap justify-center gap-4 lg:justify-start">
+                    <div className="app-field-grid">
                         {serviceConfig[selectedServiceId].constraints.map((item, index) => (
                             <fieldset
-                                className="fieldset w-md"
+                                className="fieldset app-fieldset"
                                 key={`${selectedServiceId}-${item.key}-${index}`}
                             >
                                 <legend className="fieldset-legend">
-                                    <span className="font-bold text-gray-700">{item.name}</span>
-                                    {item.isRequired && <span className="text-red-500">*</span>}
+                                    <span className="app-field-name">{item.name}</span>
+                                    {item.isRequired && <span className="app-text-error">*</span>}
                                 </legend>
                                 <TypedInput
                                     key={`${item.key}-${item.currentValue}`}
@@ -100,7 +96,7 @@ export const ServiceConfigModal = ({
                                     fieldName={item.name}
                                     options={item.options}
                                 />
-                                <p className="w-[80%] text-xs text-gray-500">{item.description}</p>
+                                <p className="app-field-help">{item.description}</p>
                             </fieldset>
                         ))}
                     </div>

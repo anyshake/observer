@@ -68,9 +68,9 @@ export const useSeismicEvents = ({
                                 timestamp,
                                 estimation,
                                 primary: (
-                                    <div className="space-y-2">
-                                        <h3 className="font-semibold text-gray-700">{region}</h3>
-                                        <ul className="list-inside list-disc whitespace-nowrap text-gray-500">
+                                    <div className="app-stack-sm">
+                                        <h3 className="app-event-region">{region}</h3>
+                                        <ul className="app-event-details">
                                             <li>
                                                 {t('views.History.event_list_modal.earthquake_at', {
                                                     time: getTimeString(timestamp)
@@ -116,11 +116,11 @@ export const useSeismicEvents = ({
                                     </div>
                                 ),
                                 secondary: (
-                                    <div className="mx-4 flex flex-wrap font-medium">
+                                    <div className="app-event-tags">
                                         {Object.keys(magnitude).map((key, index) => (
                                             <div
                                                 key={`${index}-${key}`}
-                                                className="badge badge-soft badge-secondary whitespace-nowrap"
+                                                className="badge badge-soft badge-secondary app-nowrap"
                                             >
                                                 {`${key} ${magnitude[key].toFixed(1)}`}
                                             </div>

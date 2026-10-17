@@ -26,12 +26,10 @@ export const Scroller = ({ threshold }: IScroller) => {
 
     return (
         <button
-            className={`right-3 bottom-16 flex size-10 items-center justify-center rounded-full bg-purple-500 text-white duration-300 hover:cursor-pointer hover:bg-purple-600 ${
-                showButton ? 'animate-fade-left animate-duration-300 fixed' : 'hidden'
-            }`}
+            className={`app-scroller ${showButton ? 'app-scroller-visible' : 'app-hidden'}`}
             onClick={scrollToTop}
         >
-            <Icon className="flex-shrink-0" path={mdiArrowUp} size={1} />
+            <Icon className="app-icon" path={mdiArrowUp} size={1} />
         </button>
     );
 };

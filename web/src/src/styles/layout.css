@@ -1,0 +1,153 @@
+@layer utilities {
+    .app-content {
+        @apply ml-10 flex min-h-screen flex-col space-y-4 p-20 px-4;
+    }
+
+    .app-announcement {
+        @apply border-app-border-strong h-[350px] overflow-y-scroll rounded-lg border border-dashed p-4;
+    }
+
+    .app-header {
+        @apply bg-base-200 fixed z-10 px-4 shadow-md;
+    }
+
+    .app-header-brand {
+        @apply flex-1 pl-16;
+    }
+
+    .app-header-title {
+        @apply text-app-heading text-xl font-bold select-none;
+    }
+
+    .app-header-actions {
+        @apply flex space-x-1;
+    }
+
+    .app-header-button {
+        @apply text-app-muted;
+    }
+
+    .app-header-locales {
+        @apply bg-base-100 w-36 p-2 shadow;
+    }
+
+    .app-sidebar {
+        @apply bg-app-sidebar fixed z-20 flex min-h-screen w-[235px] text-white transition-all duration-700;
+    }
+
+    .app-sidebar-open {
+        @apply left-0;
+    }
+
+    .app-sidebar-collapsed {
+        @apply -left-48;
+    }
+
+    .app-sidebar-brand {
+        @apply absolute top-2 -right-6 rounded-full border-4 border-white duration-300 ease-in;
+    }
+
+    .app-sidebar-brand-visible {
+        @apply translate-x-0;
+    }
+
+    .app-sidebar-brand-hidden {
+        @apply translate-x-24 scale-x-0;
+    }
+
+    .app-sidebar-brand-surface {
+        @apply rounded-full bg-gradient-to-tl from-purple-500 to-indigo-500 py-3 pr-14;
+    }
+
+    .app-sidebar-title {
+        @apply ml-6 text-center font-bold duration-100 select-none;
+    }
+
+    .app-sidebar-toggle {
+        @apply hover:bg-app-button absolute top-2.5 -right-6 cursor-pointer rounded-full border-4 border-white p-3 duration-500 hover:rotate-45;
+    }
+
+    .app-sidebar-toggle-open {
+        @apply bg-app-button rotate-45;
+    }
+
+    .app-sidebar-toggle-collapsed {
+        @apply bg-app-sidebar;
+    }
+
+    .app-sidebar-menu {
+        @apply mt-20 flex h-full w-full flex-col space-y-2;
+    }
+
+    .app-sidebar-link {
+        @apply bg-app-sidebar flex w-full cursor-pointer items-center rounded-full p-3 pl-6 duration-300;
+    }
+
+    .app-sidebar-link-active {
+        @apply ml-2 font-bold;
+    }
+
+    .app-sidebar-link-idle {
+        @apply hover:ml-2 hover:font-bold;
+    }
+
+    .app-sidebar-label {
+        @apply ml-4;
+    }
+
+    .app-sidebar-icon-link {
+        @apply bg-app-sidebar flex w-full cursor-pointer justify-end rounded-full p-3 duration-300;
+    }
+
+    .app-sidebar-icon-active {
+        @apply ml-2;
+    }
+
+    .app-sidebar-icon-idle {
+        @apply hover:ml-2;
+    }
+
+    .app-breadcrumb {
+        @apply bg-base-100 rounded-lg px-5 py-3 shadow-md;
+    }
+
+    .app-breadcrumb-list {
+        @apply text-app-text flex space-x-2 text-sm font-medium;
+    }
+
+    .app-breadcrumb-home {
+        @apply hover:text-app-heading cursor-pointer;
+    }
+
+    .app-breadcrumb-icon {
+        @apply mr-2 flex-shrink-0 self-center;
+    }
+
+    .app-breadcrumb-separator {
+        @apply my-2;
+    }
+
+    .app-breadcrumb-link {
+        @apply hover:text-app-heading my-2 cursor-pointer;
+    }
+
+    .app-footer {
+        @apply bg-base-300 text-app-muted flex w-full flex-col justify-between px-8 py-2 sm:flex-row;
+    }
+
+    .app-footer-text {
+        @apply self-center text-center text-xs italic sm:ml-12;
+    }
+
+    .app-footer-links {
+        @apply flex items-center justify-center text-center;
+    }
+
+    .app-footer-copyright {
+        @apply self-center text-sm hover:underline;
+    }
+
+    .app-footer-icon {
+        @apply mx-2 flex-shrink-0 self-center hover:opacity-80;
+    }
+}

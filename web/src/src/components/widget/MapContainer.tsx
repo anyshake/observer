@@ -4,6 +4,9 @@ import { mdiMapMarker } from '@mdi/js';
 import maplibregl from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
+import { applyMapTheme } from '../../styles/mapTheme';
+import { useThemeColors } from '../../styles/useThemeColors';
+
 export interface IMapContainer {
     readonly height: number;
     readonly minZoom: number;
@@ -40,10 +43,10 @@ const createMapStyle = (
 
 const createMarkerElement = (): HTMLDivElement => {
     const el = document.createElement('div');
-    el.innerHTML = `<svg viewBox="0 0 24 24" style="width: 32px; height: 32px; fill: #364153; filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.5));">
-        <path d="${mdiMapMarker}" stroke="white" stroke-width="0.7" />
+    el.className = 'app-map-marker';
+    el.innerHTML = `<svg viewBox="0 0 24 24">
+        <path d="${mdiMapMarker}" />
     </svg>`;
-    el.style.cursor = 'pointer';
     return el;
 };
 
@@ -177,6 +180,7 @@ export const MapContainer = ({
     dragging,
     onClick
 }: IMapContainer) => {
+    const colors = useThemeColors();
     const containerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<maplibregl.Map | null>(null);
     const markerRef = useRef<maplibregl.Marker | null>(null);
@@ -285,6 +289,36 @@ export const MapContainer = ({
 
     useEffect(() => {
         const map = mapRef.current;
+        if (!map) {
+            return;
+        }
+
+        const applyColors = () => applyMapTheme(map, colors.map);
+        if (map.isStyleLoaded()) {
+            applyColors();
+        } else {
+            map.once('style.load', applyColors);
+        }
+
+        return () => {
+            map.off('style.load', applyColors);
+        };
+    }, [
+        colors.map,
+        dragging,
+        layers,
+        maxZoom,
+        minZoom,
+        scrollWheelZoom,
+        tileUrl,
+        showMarkerAt,
+        zoom,
+        zoomControl,
+        tileToken
+    ]);
+
+    useEffect(() => {
+        const map = mapRef.current;
         if (!map || !isMapLoadedRef.current) {
             return;
         }
@@ -320,11 +354,5 @@ export const MapContainer = ({
         };
     }, [handleClick]);
 
-    return (
-        <div
-            ref={containerRef}
-            className="z-0"
-            style={{ cursor: 'default', borderRadius, height, overflow: 'hidden' }}
-        />
-    );
+    return <div ref={containerRef} className="app-map" style={{ borderRadius, height }} />;
 };

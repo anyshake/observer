@@ -1,0 +1,105 @@
+@layer utilities {
+    .app-settings-action {
+        @apply flex flex-col justify-between gap-4 p-4 sm:flex-row sm:items-center;
+    }
+
+    .app-settings-action-bordered {
+        @apply border-app-border-strong flex flex-col justify-between gap-4 border-b p-4 sm:flex-row sm:items-center;
+    }
+
+    .app-backup-import {
+        @apply flex flex-col gap-4 p-4;
+    }
+
+    .app-backup-import-controls {
+        @apply flex flex-col gap-4 sm:flex-row sm:items-center md:justify-between;
+    }
+
+    .app-file-input {
+        @apply border-app-border-strong hover:border-app-border-strong w-auto transition-all hover:shadow-md focus:outline-none md:w-md;
+    }
+
+    .app-cleanup-mode {
+        @apply flex flex-col items-start space-y-2;
+    }
+
+    .app-cleanup-range {
+        @apply grid gap-3 sm:grid-cols-2;
+    }
+
+    .app-cleanup-date-label {
+        @apply text-app-muted text-xs font-medium;
+    }
+
+    .app-dangerous-action {
+        @apply border-app-border-strong flex flex-col justify-between gap-4 border-b p-4 transition-colors sm:flex-row sm:items-center;
+    }
+
+    .app-dangerous-action-active {
+        @apply bg-app-warning-soft;
+    }
+
+    .app-action-description {
+        @apply min-w-0 space-y-2;
+    }
+
+    .app-action-status {
+        @apply bg-app-warning-soft text-app-warning rounded-full px-2 py-0.5 text-xs font-medium;
+    }
+
+    .app-backup-toolbar {
+        @apply flex flex-wrap items-center justify-between gap-3;
+    }
+
+    .app-backup-select-all {
+        @apply text-app-text flex items-center gap-3 text-sm font-medium;
+    }
+
+    .app-backup-error {
+        @apply text-app-danger text-sm;
+    }
+
+    .app-backup-removal-status {
+        @apply space-y-2 text-sm;
+    }
+
+    .app-backup-removal-list {
+        @apply max-h-40 space-y-1 overflow-y-auto;
+    }
+
+    .app-backup-list {
+        @apply max-h-72 space-y-2 overflow-y-auto;
+    }
+
+    .app-backup-item {
+        @apply border-app-border flex items-start gap-3 rounded-lg border p-3 text-sm;
+    }
+
+    .app-backup-item-content {
+        @apply min-w-0 space-y-1;
+    }
+
+    .app-backup-name {
+        @apply block font-mono break-all;
+    }
+
+    .app-backup-date {
+        @apply text-app-muted block text-xs;
+    }
+
+    .app-settings-tab {
+        @apply space-x-1;
+    }
+
+    .app-service-config-heading {
+        @apply flex items-center space-x-2 py-4 text-lg font-extrabold;
+    }
+
+    .app-service-grid {
+        @apply grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3;
+    }
+
+    .app-service-actions {
+        @apply my-1 flex justify-center;
+    }
+}

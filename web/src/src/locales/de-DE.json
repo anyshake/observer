@@ -14,6 +14,12 @@
         }
     },
     "components": {
+        "ThemeToggle": {
+            "label": "Design",
+            "light": "Hell",
+            "dark": "Dunkel",
+            "system": "System"
+        },
         "ErrorPage": {
             "something_went_wrong": "Hoppla! Etwas ist schiefgelaufen.",
             "try_again_later": "Bitte versuchen Sie, die Seite neu zu laden oder kommen Sie später wieder."
@@ -587,6 +593,7 @@
         },
         "captcha": {
             "label": "Captcha eingeben",
+            "countdown": "({{seconds}} sek)",
             "loading": "Captcha wird geladen...",
             "error": "Fehler beim Laden des Captchas",
             "placeholder": "Captcha-Code",

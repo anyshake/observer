@@ -1,0 +1,91 @@
+@layer utilities {
+    .app-login {
+        @apply bg-base-200 animate-fade animate-duration-500 animate-delay-300 text-app-text flex min-h-screen flex-col;
+    }
+
+    .app-login-main {
+        @apply flex flex-1 items-center justify-center px-4 py-10 sm:px-6 lg:py-14;
+    }
+
+    .app-login-panel {
+        @apply bg-base-100 grid w-full max-w-4xl overflow-hidden rounded-xl shadow-xl lg:grid-cols-[0.9fr_1.1fr];
+    }
+
+    .app-login-artwork {
+        @apply bg-app-sidebar relative hidden min-h-[590px] overflow-hidden lg:block;
+    }
+
+    .app-login-background {
+        @apply absolute -inset-3 h-[calc(100%+1.5rem)] w-[calc(100%+1.5rem)] scale-105 object-cover brightness-50;
+    }
+
+    .app-login-content {
+        @apply p-7 sm:p-10 lg:p-12;
+    }
+
+    .app-login-heading {
+        @apply mb-8;
+    }
+
+    .app-login-brand-row {
+        @apply flex items-center justify-between gap-4;
+    }
+
+    .app-login-logo {
+        @apply flex size-18 items-center gap-4;
+    }
+
+    .app-login-actions {
+        @apply flex items-center gap-1;
+    }
+
+    .app-login-locale-button {
+        @apply text-app-muted gap-2;
+    }
+
+    .app-login-locales {
+        @apply bg-base-100 z-20 mt-2 w-52 p-2 shadow-md;
+    }
+
+    .app-login-divider {
+        @apply text-app-border mt-6;
+    }
+
+    .app-login-label {
+        @apply text-app-text flex items-center text-sm font-medium;
+    }
+
+    .app-login-captcha-countdown {
+        @apply ml-1 tabular-nums;
+    }
+
+    .app-login-input {
+        @apply mt-2 w-full;
+    }
+
+    .app-login-captcha {
+        @apply mt-2 flex items-stretch justify-between space-x-2;
+    }
+
+    .app-login-captcha-input {
+        @apply min-w-0 flex-1;
+    }
+
+    .app-login-captcha-button {
+        @apply border-app-border-strong w-28 flex-shrink-0 overflow-hidden border p-0 shadow-sm transition-all hover:ring sm:w-32;
+    }
+
+    .app-login-captcha-image {
+        @apply block h-full w-full object-fill;
+        /* Transparent CAPTCHA images contain dark text in both themes. */
+        background-color: var(--app-captcha-surface);
+    }
+
+    .app-login-captcha-error {
+        @apply text-app-error size-6 flex-shrink-0;
+    }
+
+    .app-login-captcha-loading {
+        @apply bg-app-subtle size-6;
+    }
+}

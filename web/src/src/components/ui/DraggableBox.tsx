@@ -68,7 +68,7 @@ export const DraggableBox = ({
             nodeRef={dragRef as RefObject<HTMLElement>}
             disabled={locked}
             cancel=".react-resizable-handle"
-            defaultClassNameDragging="border-2 border-dashed border-gray-300"
+            defaultClassNameDragging="app-draggable-dragging"
             bounds="parent"
             grid={[1, 1]}
             position={position}
@@ -82,7 +82,7 @@ export const DraggableBox = ({
         >
             <div
                 ref={dragRef}
-                className={`absolute m-2 overflow-hidden rounded-lg bg-white p-2 shadow-lg ${!locked ? 'cursor-move' : ''}`}
+                className={`app-draggable ${!locked ? 'app-draggable-unlocked' : ''}`}
             >
                 <ResizableBox
                     axis="both"

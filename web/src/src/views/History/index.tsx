@@ -82,8 +82,8 @@ const History = ({ currentLocale }: IRouterComponent) => {
     }, [t, searchParams, startTime, endTime, setSearchParams]);
 
     return (
-        <div className="container mx-auto space-y-6 p-4">
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-10">
+        <div className="app-page">
+            <div className="app-history-search-grid">
                 <RecordSearch
                     currentLocale={currentLocale}
                     startTime={startTime}
@@ -105,34 +105,34 @@ const History = ({ currentLocale }: IRouterComponent) => {
                 />
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="app-toolbar">
                 <button
-                    className="btn btn-sm flex items-center"
+                    className="btn btn-sm app-button-toolbar"
                     onClick={() => toggleLock(HistoryConstraints.id)}
                 >
                     {locks[HistoryConstraints.id] ? (
                         <>
-                            <Icon className="flex-shrink-0" path={mdiLock} size={0.7} />
+                            <Icon className="app-icon" path={mdiLock} size={0.7} />
                             <span>{t('views.History.layout_locker.unlock_button')}</span>
                         </>
                     ) : (
                         <>
-                            <Icon className="flex-shrink-0" path={mdiLockOpen} size={0.7} />
+                            <Icon className="app-icon" path={mdiLockOpen} size={0.7} />
                             <span>{t('views.History.layout_locker.lock_button')}</span>
                         </>
                     )}
                 </button>
-                <button className="btn btn-sm flex items-center" onClick={handleResetLayout}>
-                    <Icon className="flex-shrink-0" path={mdiLockReset} size={0.7} />
+                <button className="btn btn-sm app-button-toolbar" onClick={handleResetLayout}>
+                    <Icon className="app-icon" path={mdiLockReset} size={0.7} />
                     <span>{t('views.History.reset_layout.reset_button')}</span>
                 </button>
                 {sampleRate >= HistoryConstraints.freqRange[1] * 2 && (
                     <button
-                        className="btn btn-sm flex items-center"
+                        className="btn btn-sm app-button-toolbar"
                         onClick={handleToggleDisplayMode}
                     >
                         <Icon
-                            className="flex-shrink-0"
+                            className="app-icon"
                             path={displayMode === 'waveform' ? mdiBlurLinear : mdiWaveform}
                             size={0.7}
                         />
@@ -144,12 +144,12 @@ const History = ({ currentLocale }: IRouterComponent) => {
                     </button>
                 )}
                 <button className="btn btn-sm" onClick={handleShareLink}>
-                    <Icon className="flex-shrink-0" path={mdiLink} size={0.7} />
+                    <Icon className="app-icon" path={mdiLink} size={0.7} />
                     <span>{t('views.History.share_link.share_button')}</span>
                 </button>
             </div>
 
-            <div className="bg-base-300 relative h-[2000px] w-full overflow-scroll rounded-lg md:h-[1000px] lg:h-[800px] xl:h-screen">
+            <div className="app-chart-workspace">
                 {Object.keys(activeChannels)
                     .sort((a, b) => {
                         // Move active chart to the end
@@ -194,13 +194,12 @@ const History = ({ currentLocale }: IRouterComponent) => {
                                 <div
                                     className={
                                         displayMode === 'waveform'
-                                            ? 'block h-full w-full'
-                                            : 'hidden'
+                                            ? 'app-chart-visible'
+                                            : 'app-hidden'
                                     }
                                 >
                                     <LineChart
                                         minSpanValue={HistoryConstraints.minSpanValue}
-                                        lineColor={HistoryConstraints.lineColor}
                                         height={'100%'}
                                         yPosition="right"
                                         title={channel}
@@ -212,8 +211,8 @@ const History = ({ currentLocale }: IRouterComponent) => {
                                 <div
                                     className={
                                         displayMode === 'spectrogram'
-                                            ? 'block h-full w-full'
-                                            : 'hidden'
+                                            ? 'app-chart-visible'
+                                            : 'app-hidden'
                                     }
                                 >
                                     <Spectrogram

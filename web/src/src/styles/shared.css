@@ -1,0 +1,293 @@
+@layer utilities {
+    .app-enter {
+        @apply animate-fade animate-duration-500 animate-delay-300;
+    }
+
+    .app-icon {
+        @apply flex-shrink-0;
+    }
+
+    .app-theme-toggle {
+        @apply text-app-muted;
+    }
+
+    .app-theme-options {
+        @apply bg-base-100 text-app-text z-30 mt-2 w-max max-w-[calc(100vw-2rem)] min-w-40 p-2 shadow-md;
+    }
+
+    .app-theme-options button[aria-pressed='true'] {
+        @apply text-app-primary font-semibold;
+    }
+
+    .app-icon-leading {
+        @apply mr-2 flex-shrink-0;
+    }
+
+    .app-text-small {
+        @apply text-sm;
+    }
+
+    .app-text-body {
+        @apply text-app-text;
+    }
+
+    .app-text-heading {
+        @apply text-app-heading;
+    }
+
+    .app-text-muted {
+        @apply text-app-muted;
+    }
+
+    .app-text-error {
+        @apply text-app-error;
+    }
+
+    .app-text-danger {
+        @apply text-app-danger;
+    }
+
+    .app-text-inverse {
+        @apply text-white;
+    }
+
+    .app-text-bold {
+        @apply font-bold;
+    }
+
+    .app-text-medium {
+        @apply font-medium;
+    }
+
+    .app-text-mono {
+        @apply font-mono;
+    }
+
+    .app-break-all {
+        @apply break-all;
+    }
+
+    .app-block {
+        @apply block;
+    }
+
+    .app-flex {
+        @apply flex;
+    }
+
+    .app-full-width {
+        @apply w-full;
+    }
+
+    .app-fit-width {
+        @apply w-fit;
+    }
+
+    .app-max-width {
+        @apply max-w-full;
+    }
+
+    .app-grow {
+        @apply grow;
+    }
+
+    .app-pointer {
+        @apply cursor-pointer;
+    }
+
+    .app-pulse {
+        @apply animate-pulse;
+    }
+
+    .app-bounce {
+        @apply animate-bounce;
+    }
+
+    .app-stack-xs {
+        @apply space-y-1;
+    }
+
+    .app-stack-sm {
+        @apply space-y-2;
+    }
+
+    .app-stack-md {
+        @apply space-y-3;
+    }
+
+    .app-stack {
+        @apply space-y-4;
+    }
+
+    .app-stack-lg {
+        @apply space-y-5;
+    }
+
+    .app-row {
+        @apply flex items-center space-x-2;
+    }
+
+    .app-row-tight {
+        @apply flex items-center space-x-1;
+    }
+
+    .app-field-label {
+        @apply font-medium whitespace-nowrap;
+    }
+
+    .app-form-label {
+        @apply text-app-text text-sm font-medium;
+    }
+
+    .app-description {
+        @apply text-app-muted text-sm;
+    }
+
+    .app-help-text {
+        @apply text-app-muted text-sm leading-6;
+    }
+
+    .app-subheading {
+        @apply text-app-heading text-lg font-semibold;
+    }
+
+    .app-section-title {
+        @apply flex items-center space-x-2 text-lg font-bold;
+    }
+
+    .app-dialog-title {
+        @apply text-app-heading text-lg font-extrabold;
+    }
+
+    .app-dialog-heading {
+        @apply flex items-center space-x-2 text-lg font-extrabold;
+    }
+
+    .app-dialog-heading-colored {
+        @apply text-app-heading flex items-center space-x-2 text-lg font-extrabold;
+    }
+
+    .app-dialog-intro {
+        @apply text-app-heading space-y-4;
+    }
+
+    .app-center {
+        @apply flex items-center justify-center;
+    }
+
+    .app-center-fill {
+        @apply flex h-full items-center justify-center;
+    }
+
+    .app-toolbar {
+        @apply flex flex-wrap items-center gap-2;
+    }
+
+    .app-options {
+        @apply flex flex-wrap gap-4;
+    }
+
+    .app-option {
+        @apply flex items-center gap-2;
+    }
+
+    .app-action-icons {
+        @apply space-x-4;
+    }
+
+    .app-icon-button {
+        @apply cursor-pointer opacity-60 transition-all hover:opacity-100;
+    }
+
+    .app-icon-action {
+        @apply text-app-muted hover:text-app-text cursor-pointer disabled:cursor-not-allowed disabled:text-gray-300;
+    }
+
+    .app-icon-action-enabled {
+        @apply text-app-muted hover:text-app-text cursor-pointer;
+    }
+
+    .app-link-action {
+        @apply text-app-primary cursor-pointer hover:opacity-50;
+    }
+
+    .app-delete-action {
+        @apply text-app-danger cursor-pointer hover:opacity-50;
+    }
+
+    .app-scroll-y {
+        @apply overflow-y-scroll;
+    }
+
+    .app-section-footer {
+        @apply mt-4;
+    }
+
+    .app-column {
+        @apply flex w-full flex-col space-y-2;
+    }
+
+    .app-field-grid {
+        @apply flex flex-wrap justify-center gap-4 lg:justify-start;
+    }
+
+    .app-fieldset {
+        @apply w-md;
+    }
+
+    .app-field-name {
+        @apply text-app-text font-bold;
+    }
+
+    .app-field-help {
+        @apply text-app-muted w-[80%] text-xs;
+    }
+
+    .app-form-legend {
+        @apply text-app-text text-sm font-bold;
+    }
+
+    .app-checkbox-label {
+        @apply text-app-text text-sm;
+    }
+
+    .app-form-status {
+        @apply text-app-text my-2 flex items-center space-x-2 text-sm;
+    }
+
+    .app-form-status-muted {
+        @apply text-app-muted my-2 flex items-center space-x-2 text-sm;
+    }
+
+    .app-form-status-error {
+        @apply text-app-error my-2 flex items-center space-x-2 text-sm;
+    }
+
+    .app-form-status-success {
+        @apply text-app-success my-2 flex items-center space-x-2 text-sm;
+    }
+
+    .app-page {
+        @apply container mx-auto space-y-6 p-4;
+    }
+
+    .app-settings-content {
+        @apply mx-auto max-w-3xl space-y-4;
+    }
+
+    .app-settings-content-padded {
+        @apply mx-auto max-w-3xl space-y-4 p-6;
+    }
+
+    .app-no-shrink {
+        @apply shrink-0;
+    }
+
+    .app-nowrap {
+        @apply whitespace-nowrap;
+    }
+
+    .app-not-found {
+        @apply p-8;
+    }
+}

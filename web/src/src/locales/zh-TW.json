@@ -14,6 +14,12 @@
         }
     },
     "components": {
+        "ThemeToggle": {
+            "label": "主題",
+            "light": "亮色",
+            "dark": "暗色",
+            "system": "依系統"
+        },
         "ErrorPage": {
             "something_went_wrong": "哎呀！ 出錯了。",
             "try_again_later": "請嘗試重新整理頁面或稍後再回來。"
@@ -587,6 +593,7 @@
         },
         "captcha": {
             "label": "輸入驗證碼",
+            "countdown": "({{seconds}} 秒)",
             "loading": "正在加載驗證碼...",
             "error": "加載驗證碼失敗",
             "placeholder": "驗證碼",

@@ -14,6 +14,12 @@
         }
     },
     "components": {
+        "ThemeToggle": {
+            "label": "Thème",
+            "light": "Clair",
+            "dark": "Sombre",
+            "system": "Système"
+        },
         "ErrorPage": {
             "something_went_wrong": "Oups ! Quelque chose s'est mal passé.",
             "try_again_later": "Veuillez essayer d'actualiser la page ou de revenir plus tard."
@@ -587,6 +593,7 @@
         },
         "captcha": {
             "label": "Saisir le Captcha",
+            "countdown": "({{seconds}} sec)",
             "loading": "Chargement du captcha en cours...",
             "error": "Échec du chargement du captcha",
             "placeholder": "Code Captcha",

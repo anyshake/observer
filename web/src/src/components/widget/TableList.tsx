@@ -48,16 +48,7 @@ export const TableList = ({
             }
             columns={columns}
             rows={data}
-            sx={{
-                minHeight: 300,
-                minWidth: 10,
-                '& .MuiDataGrid-cell': {
-                    paddingLeft: !onSelect ? 4 : 0
-                },
-                '& .MuiDataGrid-columnHeaderDraggableContainer': {
-                    paddingLeft: !onSelect ? 3 : 0
-                }
-            }}
+            className={`app-data-grid ${!onSelect ? 'app-data-grid-unselectable' : ''}`}
             initialState={{
                 pagination: { paginationModel: { page: 0, pageSize: 6 } },
                 sorting: { sortModel: [{ field: sortField, sort: sortDirection ?? 'asc' }] }

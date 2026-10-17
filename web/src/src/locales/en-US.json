@@ -14,6 +14,12 @@
         }
     },
     "components": {
+        "ThemeToggle": {
+            "label": "Theme",
+            "light": "Light",
+            "dark": "Dark",
+            "system": "System"
+        },
         "ErrorPage": {
             "something_went_wrong": "Oops! Something went wrong.",
             "try_again_later": "Please try to refresh the page or come back later."
@@ -587,9 +593,10 @@
         },
         "captcha": {
             "label": "Enter Captcha",
+            "countdown": "({{seconds}}s)",
             "loading": "Loading captcha...",
             "error": "Failed to load captcha",
-            "placeholder": "Captcha code",
+            "placeholder": "Captcha Code",
             "refreshing": "Refreshing captcha.",
             "refresh_success": "Refreshed captcha successfully.",
             "refresh_error": "Failed to refresh captcha."

@@ -3,7 +3,6 @@ import Icon from '@mdi/react';
 import { saveAs } from 'file-saver';
 import { useCallback, useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import theme from 'react-syntax-highlighter/dist/esm/styles/prism/atom-dark';
 
 import { setClipboardText } from '../../helpers/utils/setClipboardText';
 
@@ -35,39 +34,40 @@ export const CodeBlock = ({ fileName, language, children, showLineNumbers }: ICo
     );
 
     return (
-        <div className="rounded-lg bg-gray-700 p-2">
-            <div className="flex items-center justify-between px-3">
-                <span className="font-mono text-sm text-gray-300">{fileName ?? 'Code'}</span>
-                <div className="flex space-x-3">
+        <div className="app-code-block">
+            <div className="app-code-toolbar">
+                <span className="app-code-filename">{fileName ?? 'Code'}</span>
+                <div className="app-code-actions">
                     <div
-                        className="cursor-pointer opacity-60 transition-all hover:opacity-100"
+                        className="app-icon-button"
                         onClick={() => {
                             handleCopy(children);
                         }}
                     >
                         <Icon
-                            className="flex-shrink-0 text-gray-300"
+                            className="app-code-icon"
                             path={isCopied ? mdiCheckAll : mdiContentCopy}
                             size={0.8}
                         />
                     </div>
                     {fileName?.length && (
                         <div
-                            className="cursor-pointer opacity-60 transition-all hover:opacity-100"
+                            className="app-icon-button"
                             onClick={() => {
                                 handleDownload(children);
                             }}
                         >
-                            <Icon
-                                className="flex-shrink-0 text-gray-300"
-                                path={mdiContentSaveAll}
-                                size={0.8}
-                            />
+                            <Icon className="app-code-icon" path={mdiContentSaveAll} size={0.8} />
                         </div>
                     )}
                 </div>
             </div>
-            <SyntaxHighlighter language={language} style={theme} showLineNumbers={showLineNumbers}>
+            <SyntaxHighlighter
+                language={language}
+                useInlineStyles={false}
+                codeTagProps={{ className: language ? `language-${language}` : undefined }}
+                showLineNumbers={showLineNumbers}
+            >
                 {children}
             </SyntaxHighlighter>
         </div>

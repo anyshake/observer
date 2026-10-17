@@ -158,7 +158,6 @@ export const RealTimeConstraints = {
     maxHeight: 600,
     // waveform default options
     minSpanValue: 100,
-    lineColor: '#8A3EED',
     // spectrogram default options
     fftSize: 1024,
     windowSize: 512,
@@ -180,7 +179,6 @@ export const HistoryConstraints = {
     maxHeight: 600,
     // waveform default options
     minSpanValue: 100,
-    lineColor: '#8A3EED',
     // spectrogram default options
     fftSize: 1024,
     windowSize: 512,

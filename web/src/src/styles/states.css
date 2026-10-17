@@ -1,0 +1,6 @@
+/* Visibility must win over component display rules in the same cascade layer. */
+@layer utilities {
+    .app-hidden {
+        display: none;
+    }
+}

@@ -1,10 +1,12 @@
 import './index.css';
+import './theme';
 
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import { createRoot } from 'react-dom/client';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import App from './App.tsx';
+import { AppThemeProvider } from './components/ui/AppThemeProvider';
 import { ErrorPage } from './components/ui/ErrorPage.tsx';
 import { RouterWrapper } from './components/ui/RouterWrapper.tsx';
 import { routerConfig } from './config/router';
@@ -21,11 +23,13 @@ const graphQlClient = new ApolloClient({
 });
 
 createRoot(document.getElementById('root')!).render(
-    <ErrorBoundary fallback={<ErrorPage />}>
-        <ApolloProvider client={graphQlClient}>
-            <RouterWrapper mode={routerConfig.mode} basename={routerConfig.basename}>
-                <App />
-            </RouterWrapper>
-        </ApolloProvider>
-    </ErrorBoundary>
+    <AppThemeProvider>
+        <ErrorBoundary fallback={<ErrorPage />}>
+            <ApolloProvider client={graphQlClient}>
+                <RouterWrapper mode={routerConfig.mode} basename={routerConfig.basename}>
+                    <App />
+                </RouterWrapper>
+            </ApolloProvider>
+        </ErrorBoundary>
+    </AppThemeProvider>
 );

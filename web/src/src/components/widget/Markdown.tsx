@@ -27,12 +27,12 @@ export const Markdown = ({ className, children }: IMarkdown) => {
     return (
         <div className={className}>
             <ReactMarkdown
-                className="prose-sm max-w-[100%] break-words"
+                className="prose-sm app-markdown"
                 children={children}
                 components={{
                     a: ({ ...props }) => (
                         <a
-                            className="text-purple-600 hover:underline"
+                            className="app-markdown-link"
                             href={props.href}
                             target="_blank"
                             {...props}
@@ -42,16 +42,16 @@ export const Markdown = ({ className, children }: IMarkdown) => {
                     ),
                     img: ({ ...props }) => (
                         <a
-                            className="flex flex-col items-center"
+                            className="app-markdown-figure"
                             href={props.src}
                             data-viewer
                             data-caption={props.alt}
                         >
-                            <img className="rounded-lg shadow-lg" {...props} alt={props.alt} />
-                            <span className="-mt-6 text-sm">{props.alt}</span>
+                            <img className="app-markdown-image" {...props} alt={props.alt} />
+                            <span className="app-markdown-caption">{props.alt}</span>
                         </a>
                     ),
-                    pre: ({ ...props }) => <pre className="bg-transparent p-2" {...props} />,
+                    pre: ({ ...props }) => <pre className="app-markdown-pre" {...props} />,
                     code: ({ className, children }) => {
                         const match = /language-(\w+)/.exec(className ?? '');
                         const lang = match !== null ? match[1] : '';
@@ -61,14 +61,12 @@ export const Markdown = ({ className, children }: IMarkdown) => {
                                 {code}
                             </CodeBlock>
                         ) : (
-                            <code className="overflow-scroll rounded-sm bg-gray-200 px-2 py-0.5 font-mono text-gray-700">
+                            <code className="app-markdown-inline-code">
                                 {code.replace(/\n$/, '')}
                             </code>
                         );
                     },
-                    table: ({ ...props }) => (
-                        <table className="block overflow-x-auto whitespace-nowrap" {...props} />
-                    )
+                    table: ({ ...props }) => <table className="app-markdown-table" {...props} />
                 }}
                 urlTransform={(url) => url}
                 rehypePlugins={[rehypeKatex, rehypeRaw]}

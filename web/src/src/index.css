@@ -1,14 +1,55 @@
 @import 'tailwindcss';
 @import 'tailwindcss-animated';
 @import 'tailwind-scrollbar-hide/v4';
+@import './styles/tokens.css';
+@import './styles/shared.css';
+@import './styles/controls.css';
+@import './styles/layout.css';
+@import './styles/components.css';
+@import './styles/markdown.css';
+@import './styles/syntax.css';
+@import './styles/charts.css';
+@import './styles/notifications.css';
+@import './styles/pages/login.css';
+@import './styles/pages/home.css';
+@import './styles/pages/history.css';
+@import './styles/pages/realtime.css';
+@import './styles/pages/settings.css';
+@import './styles/states.css';
+@import './styles/vendor.css';
 
 @plugin "@tailwindcss/typography";
 @plugin "daisyui" {
-    themes: light --default;
+    themes:
+        light --default,
+        dark;
+    /* Use app-skeleton-divider; the vendor divider emits invalid nested CSS. */
+    exclude: divider;
 }
 
-.menu li > a:active,
-.menu li > a:hover,
-.menu li > a:focus {
-    background-color: transparent !important;
+@theme inline {
+    --color-app-text: var(--app-text);
+    --color-app-heading: var(--app-heading);
+    --color-app-muted: var(--app-muted);
+    --color-app-subtle: var(--app-subtle);
+    --color-app-surface: var(--app-surface);
+    --color-app-hover: var(--app-hover);
+    --color-app-border: var(--app-border);
+    --color-app-border-strong: var(--app-border-strong);
+    --color-app-primary: var(--app-primary);
+    --color-app-button: var(--app-button);
+    --color-app-button-hover: var(--app-button-hover);
+    --color-app-disabled: var(--app-disabled);
+    --color-app-sidebar: var(--app-sidebar);
+    --color-app-code: var(--app-code);
+    --color-app-error: var(--app-error);
+    --color-app-danger: var(--app-danger);
+    --color-app-success: var(--app-success);
+    --color-app-warning: var(--app-warning);
+    --color-app-info-soft: var(--app-info-soft);
+    --color-app-success-soft: var(--app-success-soft);
+    --color-app-warning-soft: var(--app-warning-soft);
+    --color-app-danger-soft: var(--app-danger-soft);
+    --color-app-danger-button: var(--app-danger-button);
+    --color-app-danger-button-hover: var(--app-danger-button-hover);
 }

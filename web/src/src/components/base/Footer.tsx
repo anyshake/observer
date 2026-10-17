@@ -16,20 +16,16 @@ export const Footer = ({ text, homepage, copyright, repository }: IFooter) => {
     const currentYear = useMemo(() => new Date().getFullYear(), []);
 
     return (
-        <footer className="bg-base-300 flex w-full flex-col justify-between px-8 py-2 text-gray-500 sm:flex-row">
-            <span className="self-center text-center text-xs italic sm:ml-12">{t(text)}</span>
-            <div className="flex items-center justify-center text-center">
+        <footer className="app-footer">
+            <span className="app-footer-text">{t(text)}</span>
+            <div className="app-footer-links">
                 <Link
-                    className="self-center text-sm hover:underline"
+                    className="app-footer-copyright"
                     to={homepage}
                     target="_blank"
                 >{`© ${currentYear} ${copyright}`}</Link>
                 <Link to={repository} target="_blank">
-                    <Icon
-                        className="mx-2 flex-shrink-0 self-center hover:opacity-80"
-                        path={mdiGithub}
-                        size={1}
-                    />
+                    <Icon className="app-footer-icon" path={mdiGithub} size={1} />
                 </Link>
             </div>
         </footer>

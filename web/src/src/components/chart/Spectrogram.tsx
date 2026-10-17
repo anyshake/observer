@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next';
 import type { ColorMapName, FFTExecutor } from 'spectrogram-js';
 import { Spectrogram as SpectrogramCore } from 'spectrogram-js';
 
+import { getSpectrogramAxis } from '../../styles/spectrogramTheme';
+import { useThemeColors } from '../../styles/useThemeColors';
 import { DEFAULT_SPECTROGRAM_COLOR_MAP, SPECTROGRAM_COLOR_MAPS } from './spectrogramColorMaps';
 
 interface ISpectrogram {
@@ -44,6 +46,8 @@ export const Spectrogram = memo(
         onSpectrogramUpdate
     }: ISpectrogram) => {
         const { t } = useTranslation();
+        const colors = useThemeColors();
+        const axis = useMemo(() => getSpectrogramAxis(colors), [colors]);
 
         const [showSettings, setShowSettings] = useState(false);
         const [minDBState, setMinDBState] = useState(minDB);
@@ -114,35 +118,44 @@ export const Spectrogram = memo(
             return (data[data.length - 1][0] - data[0][0]) / 1000;
         }, [data]);
 
-        const renderSpectrogram = useCallback(() => {
-            if (pausedRef.current) {
-                return;
-            }
+        const renderSpectrogram = useCallback(
+            (force = false) => {
+                if (pausedRef.current && !force) {
+                    return;
+                }
 
-            const canvas = canvasRef.current;
-            const sp = spectrogramRef.current;
-            if (!canvas || !sp || initializedSpectrogram !== sp) {
-                return;
-            }
+                const canvas = canvasRef.current;
+                const sp = spectrogramRef.current;
+                if (!canvas || !sp || initializedSpectrogram !== sp) {
+                    return;
+                }
 
-            const { width, height } = sizeRef.current;
-            if (width <= 0 || height <= 0) {
-                return;
-            }
+                const { width, height } = sizeRef.current;
+                if (width <= 0 || height <= 0) {
+                    return;
+                }
 
-            const total = dataDuration ?? 0;
-            const window = zoomDuration;
-            const maxStart = Math.max(0, total - window);
-            const start = maxStart * timePercent;
-            const end = start + window;
-            sp.render({
-                canvas,
-                width,
-                height,
-                timeRange: [start, end],
-                freqRange
-            });
-        }, [dataDuration, freqRange, initializedSpectrogram, timePercent, zoomDuration]);
+                const total = dataDuration ?? 0;
+                const window = zoomDuration;
+                const maxStart = Math.max(0, total - window);
+                const start = maxStart * timePercent;
+                const end = start + window;
+                sp.render({
+                    canvas,
+                    width,
+                    height,
+                    timeRange: [start, end],
+                    freqRange,
+                    xAxis: axis,
+                    yAxis: axis
+                });
+            },
+            [axis, dataDuration, freqRange, initializedSpectrogram, timePercent, zoomDuration]
+        );
+
+        useEffect(() => {
+            renderSpectrogram(true);
+        }, [renderSpectrogram]);
 
         const pendingRenderRef = useRef<number | null>(null);
         const requestSpectrogramRender = useCallback(() => {
@@ -272,45 +285,32 @@ export const Spectrogram = memo(
         }, [dataDuration, zoomStep]);
 
         return (
-            <div className="relative flex h-full w-full flex-col">
-                <canvas className="block" ref={canvasRef} />
+            <div className="app-spectrogram">
+                <canvas className="app-block" ref={canvasRef} />
 
-                <div className="absolute top-5 left-15 mr-15 flex flex-wrap items-center gap-1">
-                    {title && (
-                        <div className="flex h-6 items-center rounded bg-black/50 px-3 text-sm font-bold text-white select-none">
-                            {title}
-                        </div>
-                    )}
+                <div className="app-spectrogram-toolbar">
+                    {title && <div className="app-spectrogram-title">{title}</div>}
 
                     <button
-                        className="flex size-6 flex-shrink-0 cursor-pointer items-center justify-center rounded bg-black/50 text-white opacity-50 transition-all hover:opacity-100"
+                        className="app-spectrogram-button"
                         onClick={() => setShowSettings((v) => !v)}
                     >
                         <Icon path={mdiCog} size={0.7} />
                     </button>
 
-                    <button
-                        className="flex h-6 min-w-12 flex-shrink-0 cursor-pointer items-center justify-center rounded bg-black/50 px-2 text-xs font-semibold text-white opacity-50 transition-all hover:opacity-100"
-                        onClick={handleToggleColormap}
-                    >
+                    <button className="app-spectrogram-mode" onClick={handleToggleColormap}>
                         {colormap}
                     </button>
 
-                    <button
-                        className="flex size-6 flex-shrink-0 cursor-pointer items-center justify-center rounded bg-black/50 text-white opacity-50 transition-all hover:opacity-100"
-                        onClick={handleZoomIn}
-                    >
+                    <button className="app-spectrogram-button" onClick={handleZoomIn}>
                         <Icon path={mdiMagnifyPlus} size={0.7} />
                     </button>
 
-                    <button
-                        className="flex size-6 flex-shrink-0 cursor-pointer items-center justify-center rounded bg-black/50 text-white opacity-50 transition-all hover:opacity-100"
-                        onClick={handleZoomOut}
-                    >
+                    <button className="app-spectrogram-button" onClick={handleZoomOut}>
                         <Icon path={mdiMagnifyMinus} size={0.7} />
                     </button>
 
-                    <div className="flex h-6 max-w-36 items-center rounded bg-black/50 opacity-50 transition-all hover:opacity-100">
+                    <div className="app-spectrogram-speed">
                         <input
                             type="range"
                             min={0}
@@ -320,9 +320,9 @@ export const Spectrogram = memo(
                             onChange={({ target }) => setTimePercent(Number(target.value))}
                             onMouseDown={(e) => e.stopPropagation()}
                             onTouchStart={(e) => e.stopPropagation()}
-                            className="range range-xs rounded py-3 pl-2 text-gray-300 [--range-bg:#fff] [--range-fill:0]"
+                            className="range range-xs app-spectrogram-speed-range"
                         />
-                        <span className="px-2 font-mono text-xs text-white select-none">
+                        <span className="app-spectrogram-speed-value">
                             {(timePercent * 100).toFixed(0)}%
                         </span>
                     </div>
@@ -330,15 +330,15 @@ export const Spectrogram = memo(
 
                 {showSettings && (
                     <div
-                        className="absolute inset-0 z-10 flex cursor-default items-center justify-center rounded-md bg-black/50"
+                        className="app-spectrogram-settings-overlay"
                         onClick={() => setShowSettings(false)}
                     >
-                        <div className="max-h-full w-full overflow-y-auto px-4 py-2">
+                        <div className="app-spectrogram-settings-scroll">
                             <div
-                                className="mx-auto w-64 space-y-4 rounded bg-black/90 p-4 text-xs text-white"
+                                className="app-spectrogram-settings"
                                 onClick={(e) => e.stopPropagation()}
                             >
-                                <div className="flex justify-between text-sm font-bold">
+                                <div className="app-spectrogram-settings-title">
                                     <span>{t('components.Spectrogram.settings.title')}</span>
                                     <button onClick={() => setShowSettings(false)}>
                                         <Icon path={mdiClose} size={0.6} />
@@ -346,7 +346,7 @@ export const Spectrogram = memo(
                                 </div>
 
                                 <>
-                                    <div className="mb-1 flex justify-between">
+                                    <div className="app-spectrogram-setting-label">
                                         <span>{t('components.Spectrogram.settings.min_db')}</span>
                                         <span>{minDBState}</span>
                                     </div>
@@ -356,7 +356,7 @@ export const Spectrogram = memo(
                                         max={250}
                                         step={2}
                                         value={minDBState}
-                                        className="range range-info range-sm w-full"
+                                        className="range range-info range-sm app-full-width"
                                         onChange={({ target }) =>
                                             handlePreviewMinDB(Number(target.value))
                                         }
@@ -380,7 +380,7 @@ export const Spectrogram = memo(
                                 </>
 
                                 <>
-                                    <div className="mb-1 flex justify-between">
+                                    <div className="app-spectrogram-setting-label">
                                         <span>{t('components.Spectrogram.settings.max_db')}</span>
                                         <span>{maxDBState}</span>
                                     </div>
@@ -390,7 +390,7 @@ export const Spectrogram = memo(
                                         max={250}
                                         step={2}
                                         value={maxDBState}
-                                        className="range range-info range-sm w-full"
+                                        className="range range-info range-sm app-full-width"
                                         onChange={({ target }) =>
                                             handlePreviewMaxDB(Number(target.value))
                                         }

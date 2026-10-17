@@ -181,7 +181,7 @@ export const Entry = ({ currentLocale, locales, onSwitchLocale }: IEntry) => {
     }, [isGenuineProductData, isGenuineProductError, isGenuineProductLoading]);
 
     return (
-        <div className="animate-fade animate-duration-500 animate-delay-300">
+        <div className="app-enter">
             <Header
                 title={t(globalConfig.name)}
                 onLogout={handleLogoutSubmit}
@@ -191,7 +191,7 @@ export const Entry = ({ currentLocale, locales, onSwitchLocale }: IEntry) => {
             />
             <AsideMenu title={t(globalConfig.name)} menu={menuConfig} />
 
-            <div className="ml-10 flex min-h-screen flex-col space-y-4 p-20 px-4">
+            <div className="app-content">
                 <BreadCrumb
                     pathname={pathname}
                     basename={routerConfig.basename}
@@ -216,16 +216,12 @@ export const Entry = ({ currentLocale, locales, onSwitchLocale }: IEntry) => {
             {ctaMessage && (
                 <DialogModal
                     heading={
-                        <div className="space-y-4 text-gray-800">
-                            <h2 className="flex items-center space-x-2 text-lg font-extrabold">
-                                <Icon
-                                    className="flex-shrink-0"
-                                    path={mdiEmailNewsletter}
-                                    size={1}
-                                />
+                        <div className="app-dialog-intro">
+                            <h2 className="app-dialog-heading">
+                                <Icon className="app-icon" path={mdiEmailNewsletter} size={1} />
                                 <span>{ctaMessage.title}</span>
                             </h2>
-                            <p className="text-sm">{ctaMessage.subject}</p>
+                            <p className="app-text-small">{ctaMessage.subject}</p>
                         </div>
                     }
                     open={ctaModalShouldOpen}
@@ -234,9 +230,7 @@ export const Entry = ({ currentLocale, locales, onSwitchLocale }: IEntry) => {
                         setCtaModalShouldOpen(false);
                     }}
                 >
-                    <Markdown className="h-[350px] overflow-y-scroll rounded-lg border border-dashed border-gray-300 p-4">
-                        {ctaMessage.content}
-                    </Markdown>
+                    <Markdown className="app-announcement">{ctaMessage.content}</Markdown>
                 </DialogModal>
             )}
         </div>

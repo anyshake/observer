@@ -1,0 +1,119 @@
+/* Theme-aware syntax colors on a dark code surface. */
+@layer utilities {
+    .app-code-block .prismjs,
+    .app-code-block .prismjs > code {
+        color: var(--app-code-text);
+        text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+        font-family: Inconsolata, Monaco, Consolas, 'Courier New', Courier, monospace;
+        direction: ltr;
+        text-align: left;
+        white-space: pre;
+        word-spacing: normal;
+        word-break: normal;
+        line-height: 1.5;
+        tab-size: 4;
+        hyphens: none;
+    }
+
+    .app-code-block .prismjs {
+        padding: 1em;
+        margin: 0.5em 0;
+        overflow: auto;
+        border-radius: 0.3em;
+        background: var(--app-code-surface);
+    }
+
+    .app-code-block .token.comment,
+    .app-code-block .token.prolog,
+    .app-code-block .token.doctype,
+    .app-code-block .token.cdata {
+        color: var(--app-code-comment);
+    }
+
+    .app-code-block .token.punctuation {
+        color: var(--app-code-text);
+    }
+
+    .app-code-block .namespace {
+        opacity: 0.7;
+    }
+
+    .app-code-block .token.property,
+    .app-code-block .token.keyword,
+    .app-code-block .token.tag,
+    .app-code-block .token.url {
+        color: var(--app-code-keyword);
+    }
+
+    .app-code-block .token.class-name {
+        color: var(--app-code-function);
+        text-decoration: underline;
+    }
+
+    .app-code-block .token.boolean,
+    .app-code-block .token.constant {
+        color: var(--app-code-number);
+    }
+
+    .app-code-block .token.symbol,
+    .app-code-block .token.deleted {
+        color: var(--app-code-symbol);
+    }
+
+    .app-code-block .token.number {
+        color: var(--app-code-number);
+    }
+
+    .app-code-block .token.selector,
+    .app-code-block .token.attr-name,
+    .app-code-block .token.string,
+    .app-code-block .token.char,
+    .app-code-block .token.builtin,
+    .app-code-block .token.inserted {
+        color: var(--app-code-string);
+    }
+
+    .app-code-block .token.variable {
+        color: var(--app-code-keyword);
+    }
+
+    .app-code-block .token.operator {
+        color: var(--app-code-text);
+    }
+
+    .app-code-block .token.entity {
+        color: var(--app-code-function);
+        cursor: help;
+    }
+
+    .app-code-block .language-css .token.string,
+    .app-code-block .style .token.string {
+        color: var(--app-code-string);
+    }
+
+    .app-code-block .token.atrule,
+    .app-code-block .token.attr-value {
+        color: var(--app-code-keyword);
+    }
+
+    .app-code-block .token.function {
+        color: var(--app-code-function);
+    }
+
+    .app-code-block .token.regex {
+        color: var(--app-code-string);
+    }
+
+    .app-code-block .token.important {
+        color: var(--app-code-symbol);
+        font-weight: bold;
+    }
+
+    .app-code-block .token.bold {
+        font-weight: bold;
+    }
+
+    .app-code-block .token.italic {
+        font-style: italic;
+    }
+}

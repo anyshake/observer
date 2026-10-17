@@ -15,26 +15,22 @@ export const sendUserConfirm = (
 ) =>
     toast.custom(
         ({ visible, id }) => (
-            <div
-                className={`animate-fade animate-duration-300 flex w-full max-w-md rounded-lg bg-white shadow-xl ${
-                    visible ? 'block' : 'hidden'
-                }`}
-            >
-                <div className="flex-1 p-4">
-                    <div className="flex items-start">
-                        <div className="ml-3 flex-1">
-                            <p className="text-sm font-medium text-gray-900">{title}</p>
-                            <p className="mt-1 text-sm text-gray-500">{message}</p>
+            <div className={`app-confirm ${visible ? 'app-block' : 'app-hidden'}`}>
+                <div className="app-confirm-content">
+                    <div className="app-confirm-row">
+                        <div className="app-confirm-text">
+                            <p className="app-confirm-title">{title}</p>
+                            <p className="app-confirm-message">{message}</p>
                         </div>
                     </div>
                 </div>
-                <div className="m-6 flex items-center justify-center gap-2">
+                <div className="app-confirm-actions">
                     <button
                         onClick={() => {
                             toast.dismiss(id);
                             onConfirmed();
                         }}
-                        className="btn btn-md rounded-lg bg-red-500 px-3 py-2 font-medium text-white transition-all hover:bg-red-700"
+                        className="btn btn-md app-confirm-danger"
                     >
                         {confirmBtnText}
                     </button>
@@ -43,7 +39,7 @@ export const sendUserConfirm = (
                             toast.dismiss(id);
                             onCancelled?.();
                         }}
-                        className="btn btn-md rounded-lg px-3 py-2 font-medium transition-all hover:bg-gray-300"
+                        className="btn btn-md app-confirm-cancel"
                     >
                         {cancelBtnText}
                     </button>

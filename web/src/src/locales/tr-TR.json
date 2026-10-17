@@ -14,6 +14,12 @@
         }
     },
     "components": {
+        "ThemeToggle": {
+            "label": "Tema",
+            "light": "Açık",
+            "dark": "Koyu",
+            "system": "Sistem"
+        },
         "ErrorPage": {
             "something_went_wrong": "Hoppa! Bir şeyler ters gitti.",
             "try_again_later": "Lütfen sayfayı yenilemeyi deneyin veya daha sonra tekrar gelin."
@@ -587,6 +593,7 @@
         },
         "captcha": {
             "label": "Captcha'yı Girin",
+            "countdown": "({{seconds}} sn)",
             "loading": "Captcha yükleniyor...",
             "error": "Captcha yüklenemedi",
             "placeholder": "Captcha kodu",

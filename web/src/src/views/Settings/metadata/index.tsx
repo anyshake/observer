@@ -35,12 +35,12 @@ export const Metadata = () => {
             debug={JSON.stringify(getStationMetadataError)}
         />
     ) : (
-        <div className="mx-auto max-w-3xl space-y-4">
-            <div className="flex flex-wrap gap-4">
+        <div className="app-settings-content">
+            <div className="app-options">
                 {availableFormats.map(({ value, label }, index) => {
                     const inputId = `format-radio-${value}`;
                     return (
-                        <div key={`${index}-${value}`} className="flex items-center gap-2">
+                        <div key={`${index}-${value}`} className="app-option">
                             <input
                                 id={inputId}
                                 type="radio"
@@ -49,7 +49,7 @@ export const Metadata = () => {
                                 onChange={() => setFormatIndex(index)}
                                 className="radio radio-primary radio-xs"
                             />
-                            <label htmlFor={inputId} className="label cursor-pointer">
+                            <label htmlFor={inputId} className="label app-pointer">
                                 {label}
                             </label>
                         </div>
@@ -58,7 +58,7 @@ export const Metadata = () => {
             </div>
 
             {getStationMetadataLoading ? (
-                <span className="loading loading-spinner text-primary" />
+                <span className="loading loading-spinner app-loading-primary" />
             ) : (
                 <CodeBlock
                     fileName={availableFormats[formatIndex].fileName}

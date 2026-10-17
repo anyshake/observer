@@ -1,6 +1,8 @@
 import ReactECharts from 'echarts-for-react';
 import { memo, useEffect, useMemo, useRef } from 'react';
 
+import { getChartAxis, getChartTitle } from '../../styles/chartTheme';
+import { useThemeColors } from '../../styles/useThemeColors';
 import { getLineSeries, type LineChartData } from './lineSeries';
 
 interface ILineChart {
@@ -24,7 +26,7 @@ export const LineChart = memo(
         hidden,
         title,
         animation = true,
-        lineColor = '#7e59ff',
+        lineColor,
         lineWidth = 2,
         height = 250,
         zoom = false,
@@ -36,27 +38,21 @@ export const LineChart = memo(
         yPosition = 'left'
     }: ILineChart) => {
         const chartRef = useRef<ReactECharts>(null);
+        const colors = useThemeColors();
+        const seriesColor = lineColor ?? colors.line;
+        const axis = useMemo(() => getChartAxis(colors), [colors]);
 
         const option = useMemo(
             () => ({
                 animation,
-                title: title
-                    ? {
-                          text: title,
-                          left: 'left',
-                          textStyle: {
-                              color: '#4A4A4A',
-                              fontSize: 13,
-                              fontWeight: 'bold'
-                          },
-                          backgroundColor: '#f0f0f0',
-                          padding: [6, 12],
-                          borderRadius: 3
-                      }
-                    : {},
+                backgroundColor: 'transparent',
+                textStyle: { color: colors.label },
+                title: getChartTitle(title, colors),
                 xAxis: {
+                    ...axis,
                     type: 'time',
                     axisLabel: {
+                        ...axis.axisLabel,
                         hideOverlap: true,
                         formatter: (value: number) => {
                             const date = new Date(value);
@@ -68,6 +64,7 @@ export const LineChart = memo(
                     }
                 },
                 yAxis: {
+                    ...axis,
                     type: 'value',
                     max: yMax,
                     min: yMin,
@@ -75,7 +72,7 @@ export const LineChart = memo(
                     position: yPosition,
                     scale: true
                 },
-                series: getLineSeries(Array.isArray(data) ? data : [], lineColor, lineWidth),
+                series: getLineSeries(Array.isArray(data) ? data : [], seriesColor, lineWidth),
                 grid: { top: '5%', bottom: '3%', containLabel: true },
                 dataZoom: zoom
                     ? [
@@ -96,7 +93,9 @@ export const LineChart = memo(
                 yMin,
                 yInterval,
                 yPosition,
-                lineColor,
+                colors,
+                axis,
+                seriesColor,
                 lineWidth,
                 data,
                 zoom,
@@ -115,15 +114,8 @@ export const LineChart = memo(
             <ReactECharts
                 ref={chartRef}
                 option={option}
-                style={
-                    hidden
-                        ? { display: 'none' }
-                        : {
-                              height: typeof height === 'number' ? `${height}px` : height,
-                              width: '100%',
-                              display: 'block'
-                          }
-                }
+                className={`app-line-chart ${hidden ? 'app-hidden' : ''}`}
+                style={hidden ? undefined : { height }}
                 opts={{ renderer: 'canvas' }}
                 notMerge={true}
                 lazyUpdate={true}

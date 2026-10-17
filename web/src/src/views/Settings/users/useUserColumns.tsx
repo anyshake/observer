@@ -98,9 +98,9 @@ export const useUserColumns = (
                 headerAlign: 'center',
                 align: 'center',
                 renderCell: ({ row: { userId, username, admin } }: GridValidRowModel) => (
-                    <div className="space-x-4">
+                    <div className="app-action-icons">
                         <button
-                            className="cursor-pointer text-blue-700 hover:opacity-50"
+                            className="app-link-action"
                             onClick={() => {
                                 setTargetUserInEditModal({ userId, username, admin });
                                 setEditUserModalOpen(true);
@@ -109,7 +109,7 @@ export const useUserColumns = (
                             {t('views.Settings.Users.edit_user.submit_button')}
                         </button>
                         <button
-                            className="cursor-pointer text-red-700 hover:opacity-50"
+                            className="app-delete-action"
                             onClick={() => handleRemoveUser(userId, username)}
                         >
                             {t('views.Settings.Users.remove_user.submit_button')}

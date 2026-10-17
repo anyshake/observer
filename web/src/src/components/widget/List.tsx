@@ -12,17 +12,15 @@ interface IList {
 
 export const List = ({ data, onClick, className }: IList) => {
     return (
-        <ul
-            className={`list bg-base-100 rounded-box overflow-y-scroll border border-dashed border-gray-300 ${className}`}
-        >
+        <ul className={`list rounded-box app-list ${className}`}>
             {data.map(({ primary, secondary, id }, index) => (
                 <li
                     key={`${index}-${id}`}
                     onClick={() => onClick?.(id)}
-                    className={`border-base-200 border-b last:border-b-0 ${onClick ? 'cursor-pointer' : ''}`}
+                    className={`app-list-item ${onClick ? 'app-pointer' : ''}`}
                 >
-                    <div className="hover:bg-base-200 flex items-center justify-between px-4 py-3">
-                        <div className="flex items-center pr-6">{primary}</div>
+                    <div className="app-list-row">
+                        <div className="app-list-primary">{primary}</div>
                         <div>{secondary}</div>
                     </div>
                 </li>

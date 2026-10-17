@@ -37,21 +37,17 @@ export const CleanupModal = ({
                     nativeModal={false}
                     onClose={handleCleanupModalClose}
                     heading={
-                        <h2 className="text-lg font-extrabold text-gray-800">
-                            {cleanupModalTarget.confirmTitle}
-                        </h2>
+                        <h2 className="app-dialog-title">{cleanupModalTarget.confirmTitle}</h2>
                     }
                 >
-                    <div className="space-y-5">
-                        <p className="text-sm leading-6 text-gray-500">
-                            {cleanupModalTarget.description}
-                        </p>
+                    <div className="app-stack-lg">
+                        <p className="app-help-text">{cleanupModalTarget.description}</p>
 
-                        <div className="flex flex-col items-start space-y-2">
-                            <span className="text-sm font-medium text-gray-700">
+                        <div className="app-cleanup-mode">
+                            <span className="app-form-label">
                                 {t('views.Settings.Dangerous.purge_data.mode_label')}
                             </span>
-                            <div className="join w-fit">
+                            <div className="join app-fit-width">
                                 <button
                                     className={`btn join-item btn-sm ${
                                         cleanupModalMode === 'all' ? 'btn-active' : ''
@@ -72,9 +68,9 @@ export const CleanupModal = ({
                         </div>
 
                         {cleanupModalMode === 'range' && (
-                            <div className="grid gap-3 sm:grid-cols-2">
-                                <label className="space-y-1">
-                                    <span className="text-xs font-medium text-gray-600">
+                            <div className="app-cleanup-range">
+                                <label className="app-stack-xs">
+                                    <span className="app-cleanup-date-label">
                                         {t('views.Settings.Dangerous.purge_data.start_date')}
                                     </span>
                                     <TimePicker
@@ -84,13 +80,13 @@ export const CleanupModal = ({
                                         placeholder={t(
                                             'views.Settings.Dangerous.purge_data.start_date'
                                         )}
-                                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-center text-sm shadow-sm transition-all hover:ring focus:outline-none disabled:bg-gray-100"
+                                        className="app-time-input-padded"
                                         onChange={handleCleanupStartDateChange}
                                     />
                                 </label>
 
-                                <label className="space-y-1">
-                                    <span className="text-xs font-medium text-gray-600">
+                                <label className="app-stack-xs">
+                                    <span className="app-cleanup-date-label">
                                         {t('views.Settings.Dangerous.purge_data.end_date')}
                                     </span>
                                     <TimePicker
@@ -100,39 +96,39 @@ export const CleanupModal = ({
                                         placeholder={t(
                                             'views.Settings.Dangerous.purge_data.end_date'
                                         )}
-                                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-center text-sm shadow-sm transition-all hover:ring focus:outline-none disabled:bg-gray-100"
+                                        className="app-time-input-padded"
                                         onChange={handleCleanupEndDateChange}
                                     />
                                 </label>
                             </div>
                         )}
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">
+                        <div className="app-stack-sm">
+                            <label className="app-form-label">
                                 {t('views.Settings.Dangerous.purge_data.verification_label')}
                             </label>
-                            <p className="text-sm leading-6 text-gray-500">
+                            <p className="app-help-text">
                                 {t('views.Settings.Dangerous.purge_data.verification_help', {
                                     verificationText: cleanupVerificationText
                                 })}
                             </p>
                             <input
-                                className="input w-full border border-gray-300 shadow-sm transition-all hover:ring focus:outline-none"
+                                className="input app-input app-full-width"
                                 value={cleanupVerificationInput}
                                 placeholder={cleanupVerificationText}
                                 onChange={handleCleanupVerificationInputChange}
                             />
                         </div>
 
-                        <div className="flex flex-col-reverse justify-end gap-2 pt-2 sm:flex-row">
+                        <div className="app-modal-actions">
                             <button
-                                className="btn rounded-lg px-4 py-2 font-medium transition-all hover:bg-gray-300"
+                                className="btn app-button-cancel"
                                 onClick={handleCleanupModalClose}
                             >
                                 {cleanupModalTarget.cancelBtnText}
                             </button>
                             <button
-                                className="btn rounded-lg bg-red-500 px-4 py-2 font-medium text-white transition-all hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-400"
+                                className="btn app-button-danger"
                                 disabled={!cleanupVerificationPassed}
                                 onClick={handleCleanupSubmit}
                             >

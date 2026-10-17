@@ -6,6 +6,7 @@ import {
     useCallback,
     useEffect,
     useImperativeHandle,
+    useMemo,
     useRef,
     useState
 } from 'react';
@@ -14,6 +15,8 @@ import type { ColorMapName, FFTExecutor } from 'spectrogram-js';
 import { Spectrogram as SpectrogramCore } from 'spectrogram-js';
 
 import TimeSeriesBuffer from '../../helpers/storage/TimeSeriesBuffer';
+import { getSpectrogramAxis } from '../../styles/spectrogramTheme';
+import { useThemeColors } from '../../styles/useThemeColors';
 import { DEFAULT_SPECTROGRAM_COLOR_MAP, SPECTROGRAM_COLOR_MAPS } from './spectrogramColorMaps';
 
 export interface DequeSpectrogramHandle {
@@ -57,6 +60,8 @@ export const DequeSpectrogram = memo(
             ref
         ) => {
             const { t } = useTranslation();
+            const colors = useThemeColors();
+            const axis = useMemo(() => getSpectrogramAxis(colors), [colors]);
 
             const [showSettings, setShowSettings] = useState(false);
             const [minDBState, setMinDBState] = useState(minDB);
@@ -159,9 +164,15 @@ export const DequeSpectrogram = memo(
                     canvas,
                     width,
                     height,
-                    freqRange
+                    freqRange,
+                    xAxis: axis,
+                    yAxis: axis
                 });
-            }, [freqRange, initializedSpectrogram]);
+            }, [axis, freqRange, initializedSpectrogram]);
+
+            useEffect(() => {
+                drawSpectrogram();
+            }, [drawSpectrogram]);
 
             const renderSpectrogram = useCallback(() => {
                 if (pausedRef.current) {
@@ -299,42 +310,35 @@ export const DequeSpectrogram = memo(
             }, [colormap, maxDBState, minDBState, onSpectrogramUpdate]);
 
             return (
-                <div className="relative h-full w-full">
-                    <canvas ref={canvasRef} className="block h-full w-full" />
+                <div className="app-chart-frame">
+                    <canvas ref={canvasRef} className="app-chart-visible" />
 
-                    <div className="absolute top-5 left-15 flex items-center gap-1">
-                        {title && (
-                            <div className="flex h-6 items-center rounded bg-black/50 px-3 text-sm font-bold text-white select-none">
-                                {title}
-                            </div>
-                        )}
+                    <div className="app-spectrogram-toolbar-live">
+                        {title && <div className="app-spectrogram-title">{title}</div>}
 
                         <button
-                            className="flex size-6 flex-shrink-0 cursor-pointer items-center justify-center rounded bg-black/50 text-white opacity-50 transition-all hover:opacity-100"
+                            className="app-spectrogram-button"
                             onClick={() => setShowSettings((v) => !v)}
                         >
                             <Icon path={mdiCog} size={0.7} />
                         </button>
 
-                        <button
-                            className="flex h-6 min-w-12 flex-shrink-0 cursor-pointer items-center justify-center rounded bg-black/50 px-2 text-xs font-semibold text-white opacity-50 transition-all hover:opacity-100"
-                            onClick={handleToggleColormap}
-                        >
+                        <button className="app-spectrogram-mode" onClick={handleToggleColormap}>
                             {colormap}
                         </button>
                     </div>
 
                     {showSettings && (
                         <div
-                            className="absolute inset-0 z-10 flex cursor-default items-center justify-center rounded-md bg-black/50"
+                            className="app-spectrogram-settings-overlay"
                             onClick={() => setShowSettings(false)}
                         >
-                            <div className="max-h-full w-full overflow-y-auto px-4 py-2">
+                            <div className="app-spectrogram-settings-scroll">
                                 <div
-                                    className="mx-auto w-64 space-y-4 rounded bg-black/90 p-4 text-xs text-white"
+                                    className="app-spectrogram-settings"
                                     onClick={(e) => e.stopPropagation()}
                                 >
-                                    <div className="flex justify-between text-sm font-bold">
+                                    <div className="app-spectrogram-settings-title">
                                         <span>
                                             {t('components.DequeSpectrogram.settings.title')}
                                         </span>
@@ -344,7 +348,7 @@ export const DequeSpectrogram = memo(
                                     </div>
 
                                     <>
-                                        <div className="mb-1 flex justify-between">
+                                        <div className="app-spectrogram-setting-label">
                                             <span>
                                                 {t('components.DequeSpectrogram.settings.min_db')}
                                             </span>
@@ -356,7 +360,7 @@ export const DequeSpectrogram = memo(
                                             max={250}
                                             step={2}
                                             value={minDBState}
-                                            className="range range-info range-sm w-full"
+                                            className="range range-info range-sm app-full-width"
                                             onChange={({ target }) =>
                                                 handlePreviewMinDB(Number(target.value))
                                             }
@@ -380,7 +384,7 @@ export const DequeSpectrogram = memo(
                                     </>
 
                                     <>
-                                        <div className="mb-1 flex justify-between">
+                                        <div className="app-spectrogram-setting-label">
                                             <span>
                                                 {t('components.DequeSpectrogram.settings.max_db')}
                                             </span>
@@ -392,7 +396,7 @@ export const DequeSpectrogram = memo(
                                             max={250}
                                             step={2}
                                             value={maxDBState}
-                                            className="range range-info range-sm w-full"
+                                            className="range range-info range-sm app-full-width"
                                             onChange={({ target }) =>
                                                 handlePreviewMaxDB(Number(target.value))
                                             }

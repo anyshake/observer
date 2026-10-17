@@ -1,0 +1,68 @@
+@layer utilities {
+    .app-code-block {
+        @apply bg-app-code rounded-lg p-2;
+    }
+
+    .app-code-toolbar {
+        @apply flex items-center justify-between px-3;
+    }
+
+    .app-code-filename {
+        @apply font-mono text-sm text-gray-300;
+    }
+
+    .app-code-actions {
+        @apply flex space-x-3;
+    }
+
+    .app-code-icon {
+        @apply flex-shrink-0 text-gray-300;
+    }
+
+    .app-markdown {
+        @apply max-w-[100%] break-words;
+        color: var(--app-text);
+        --tw-prose-body: var(--app-text);
+        --tw-prose-headings: var(--app-heading);
+        --tw-prose-lead: var(--app-muted);
+        --tw-prose-links: var(--app-primary);
+        --tw-prose-bold: var(--app-heading);
+        --tw-prose-counters: var(--app-muted);
+        --tw-prose-bullets: var(--app-subtle);
+        --tw-prose-hr: var(--app-border);
+        --tw-prose-quotes: var(--app-text);
+        --tw-prose-quote-borders: var(--app-border-strong);
+        --tw-prose-captions: var(--app-muted);
+        --tw-prose-code: var(--app-text);
+        --tw-prose-th-borders: var(--app-border-strong);
+        --tw-prose-td-borders: var(--app-border);
+    }
+
+    .app-markdown-link {
+        @apply text-app-primary hover:underline;
+    }
+
+    .app-markdown-figure {
+        @apply flex flex-col items-center;
+    }
+
+    .app-markdown-image {
+        @apply rounded-lg shadow-lg;
+    }
+
+    .app-markdown-caption {
+        @apply -mt-6 text-sm;
+    }
+
+    .app-markdown-pre {
+        @apply bg-transparent p-2;
+    }
+
+    .app-markdown-inline-code {
+        @apply bg-base-300 text-app-text overflow-scroll rounded-sm px-2 py-0.5 font-mono;
+    }
+
+    .app-markdown-table {
+        @apply block overflow-x-auto whitespace-nowrap;
+    }
+}

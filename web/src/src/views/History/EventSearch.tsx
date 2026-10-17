@@ -36,20 +36,20 @@ export const EventSearch = ({
         events;
 
     return (
-        <div className="lg:col-span-4">
+        <div className="app-history-wide">
             <Card
-                className="flex h-56 flex-shrink-0 flex-col space-y-2"
+                className="app-history-search"
                 title={t('views.History.search_events.title')}
                 iconPath={mdiCalendarSearch}
             >
-                <label className="font-medium whitespace-nowrap">
+                <label className="app-field-label">
                     {t('views.History.search_events.data_agency')}
                 </label>
 
-                <div className="flex-grow space-y-1 overflow-y-scroll rounded-md border border-gray-300 p-2">
+                <div className="app-search-options">
                     {getSeismicEventSourceListLoading ? (
-                        <div className="flex h-full items-center justify-center">
-                            <span className="loading loading-dots loading-md text-gray-400" />
+                        <div className="app-center-fill">
+                            <span className="loading loading-dots loading-md app-loading-muted" />
                         </div>
                     ) : (
                         (getSeismicEventSourceListData?.getEventSource
@@ -84,16 +84,16 @@ export const EventSearch = ({
                                                 });
                                             }
                                         }}
-                                        className={`hover:bg-base-300 flex cursor-pointer items-center space-x-2 rounded-md px-3 py-2 text-sm transition-all ${
+                                        className={`app-search-option ${
                                             item?.id === selectedSeismicEventSource?.id
-                                                ? 'bg-base-300 font-medium text-gray-700'
+                                                ? 'app-search-option-selected'
                                                 : ''
                                         }`}
                                     >
                                         <img
                                             src={countryFlagImg}
                                             alt={item?.country}
-                                            className="size-4 flex-shrink-0 rounded-lg"
+                                            className="app-event-source-flag"
                                         />
                                         <span>
                                             {item?.locales[currentLocale] ??
@@ -110,7 +110,7 @@ export const EventSearch = ({
                         isBusy || !selectedSeismicEventSource || getSeismicEventSourceListLoading
                     }
                     onClick={handleSearchEvents}
-                    className="btn btn-sm mt-4 w-full rounded-lg bg-purple-500 py-2 font-medium text-white shadow-lg transition-all hover:bg-purple-700"
+                    className="btn btn-sm app-button-primary app-button-search"
                 >
                     {t('views.History.search_events.search_button')}
                 </button>

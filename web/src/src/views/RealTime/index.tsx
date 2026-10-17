@@ -69,7 +69,7 @@ const RealTime = () => {
     }, []);
 
     return (
-        <div className="container mx-auto space-y-6 p-4">
+        <div className="app-page">
             <Banner
                 status={readyState === 1 ? 'ok' : 'warning'}
                 message={
@@ -80,34 +80,34 @@ const RealTime = () => {
                         : t('views.RealTime.connectivity.connecting')
                 }
             />
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="app-toolbar">
                 <button
-                    className="btn btn-sm flex items-center"
+                    className="btn btn-sm app-button-toolbar"
                     onClick={() => toggleLock(RealTimeConstraints.id)}
                 >
                     {locks[RealTimeConstraints.id] ? (
                         <>
-                            <Icon className="flex-shrink-0" path={mdiLock} size={0.7} />
+                            <Icon className="app-icon" path={mdiLock} size={0.7} />
                             <span>{t('views.RealTime.layout_locker.unlock_button')}</span>
                         </>
                     ) : (
                         <>
-                            <Icon className="flex-shrink-0" path={mdiLockOpen} size={0.7} />
+                            <Icon className="app-icon" path={mdiLockOpen} size={0.7} />
                             <span>{t('views.RealTime.layout_locker.lock_button')}</span>
                         </>
                     )}
                 </button>
-                <button className="btn btn-sm flex items-center" onClick={handleResetLayout}>
-                    <Icon className="flex-shrink-0" path={mdiLockReset} size={0.7} />
+                <button className="btn btn-sm app-button-toolbar" onClick={handleResetLayout}>
+                    <Icon className="app-icon" path={mdiLockReset} size={0.7} />
                     <span>{t('views.RealTime.reset_layout.reset_button')}</span>
                 </button>
                 {sampleRate >= RealTimeConstraints.freqRange[1] * 2 && (
                     <button
-                        className="btn btn-sm flex items-center"
+                        className="btn btn-sm app-button-toolbar"
                         onClick={handleToggleDisplayMode}
                     >
                         <Icon
-                            className="flex-shrink-0"
+                            className="app-icon"
                             path={displayMode === 'waveform' ? mdiBlurLinear : mdiWaveform}
                             size={0.7}
                         />
@@ -119,59 +119,59 @@ const RealTime = () => {
                     </button>
                 )}
                 <button
-                    className={`btn btn-sm flex items-center ${recordingState.isRecording ? 'text-pink-800' : ''}`}
+                    className={`btn btn-sm app-button-toolbar ${recordingState.isRecording ? 'app-recording' : ''}`}
                     onClick={handleToggleRecording}
                 >
                     <Icon
-                        className="flex-shrink-0"
+                        className="app-icon"
                         path={recordingState.isRecording ? mdiRecordRec : mdiRecordCircle}
                         size={0.7}
                     />
-                    <span className={recordingState.isRecording ? 'animate-pulse' : ''}>
+                    <span className={recordingState.isRecording ? 'app-pulse' : ''}>
                         {recordingState.isRecording
                             ? t('views.RealTime.record_data.stop_button')
                             : t('views.RealTime.record_data.start_button')}
                     </span>
                 </button>
-                <div className="flex flex-wrap gap-2">
-                    <div className="badge badge-soft badge-primary font-medium">
+                <div className="app-recordings-status">
+                    <div className="badge badge-soft badge-primary app-text-medium">
                         {t('views.RealTime.stream_status.sample_rate', { value: sampleRate })}
                     </div>
-                    <div className="badge badge-soft badge-secondary font-medium">
+                    <div className="badge badge-soft badge-secondary app-text-medium">
                         {t('views.RealTime.stream_status.channels', {
                             num: Object.keys(activeChannels).length
                         })}
                     </div>
-                    <div className="badge badge-soft badge-info font-medium">
+                    <div className="badge badge-soft badge-info app-text-medium">
                         {t('views.RealTime.stream_status.retention', { retention })}
                     </div>
                 </div>
             </div>
 
             {recordList.length > 0 && (
-                <div className="flex w-fit flex-col rounded-lg border border-dashed border-gray-300 p-4">
+                <div className="app-recording-files">
                     {recordList.map(([startTime, endTime, search], index) => (
-                        <li className="flex flex-row items-center space-x-2">
+                        <li className="app-recording-file">
                             <Link
                                 key={index}
-                                className="link link-primary text-sm font-medium"
+                                className="link link-primary app-recording-link"
                                 target="_blank"
                                 to={{ search, pathname: routerConfig.routes.history.uri }}
                             >
                                 {`${getTimeString(startTime)} - ${getTimeString(endTime)}`}
                             </Link>
                             <button
-                                className="cursor-pointer text-gray-500 hover:text-gray-700 disabled:cursor-not-allowed disabled:text-gray-300"
+                                className="app-icon-action"
                                 onClick={() => handleRemoveRecord(index)}
                             >
-                                <Icon className="flex-shrink-0" path={mdiClose} size={0.7} />
+                                <Icon className="app-icon" path={mdiClose} size={0.7} />
                             </button>
                         </li>
                     ))}
                 </div>
             )}
 
-            <div className="bg-base-300 relative h-[2000px] w-full overflow-scroll rounded-lg md:h-[1000px] lg:h-[800px] xl:h-screen">
+            <div className="app-chart-workspace">
                 {Object.keys(activeChannels)
                     .sort((a, b) => {
                         // Move active chart to the end

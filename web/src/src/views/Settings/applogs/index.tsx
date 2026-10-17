@@ -33,9 +33,9 @@ export const AppLogs = () => {
             debug={JSON.stringify(getApplicationLogsError)}
         />
     ) : (
-        <div className="mx-auto max-w-3xl space-y-4">
+        <div className="app-settings-content">
             {getApplicationLogsLoading || !applicationLogs.length ? (
-                <span className="loading loading-spinner text-primary" />
+                <span className="loading loading-spinner app-loading-primary" />
             ) : (
                 <CodeBlock fileName="logs.txt" language="go" showLineNumbers>
                     {applicationLogs}

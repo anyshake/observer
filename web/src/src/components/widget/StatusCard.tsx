@@ -13,16 +13,14 @@ export const StatusCard = ({ title, iconPath, fields, children }: IStatusCard) =
     return (
         <Card title={title} iconPath={iconPath}>
             {fields.map(({ label, value }, index) => (
-                <div className="mt-2 flex justify-between" key={`${index}-${label}`}>
-                    <span className="pr-4 font-medium whitespace-nowrap">{label}</span>
-                    <div className="scrollbar-hide max-w-[180px] overflow-x-scroll">
-                        <span className="bg-base-200 rounded px-2 font-mono text-sm whitespace-nowrap text-[#9221ed]">
-                            {value}
-                        </span>
+                <div className="app-status-row" key={`${index}-${label}`}>
+                    <span className="app-status-label">{label}</span>
+                    <div className="app-status-value-scroll">
+                        <span className="app-status-value">{value}</span>
                     </div>
                 </div>
             ))}
-            {children && <div className="mt-4">{children}</div>}
+            {children && <div className="app-section-footer">{children}</div>}
         </Card>
     );
 };

@@ -29,20 +29,20 @@ const Download = ({ currentLocale }: IRouterComponent) => {
     const { getColumns } = useFileColumns(assetActions);
 
     return (
-        <div className="container mx-auto space-y-6 p-4">
-            <div className="flex w-full flex-col space-y-2">
+        <div className="app-page">
+            <div className="app-column">
                 <Card title={t('views.Download.miniseed_list.title')} iconPath={mdiArchive}>
                     {getFileListDataLoading ? (
-                        <div className="flex items-center justify-center">
-                            <span className="loading loading-spinner loading-lg text-gray-400" />
+                        <div className="app-center">
+                            <span className="loading loading-spinner loading-lg app-loading-muted" />
                         </div>
                     ) : (
-                        <div className="space-y-4">
+                        <div className="app-stack">
                             <label className="input">
-                                <Icon className="flex-shrink-0" path={mdiMagnify} size={0.8} />
+                                <Icon className="app-icon" path={mdiMagnify} size={0.8} />
                                 <input
                                     type="search"
-                                    className="grow"
+                                    className="app-grow"
                                     value={searchMiniSeed}
                                     onChange={({ currentTarget }) =>
                                         setSearchMiniSeed(currentTarget.value)
@@ -51,14 +51,10 @@ const Download = ({ currentLocale }: IRouterComponent) => {
                                 />
                                 {searchMiniSeed.length > 0 && (
                                     <button
-                                        className="cursor-pointer opacity-60 transition-all hover:opacity-100"
+                                        className="app-icon-button"
                                         onClick={() => setSearchMiniSeed('')}
                                     >
-                                        <Icon
-                                            className="flex-shrink-0"
-                                            path={mdiClose}
-                                            size={0.8}
-                                        />
+                                        <Icon className="app-icon" path={mdiClose} size={0.8} />
                                     </button>
                                 )}
                             </label>
@@ -74,16 +70,16 @@ const Download = ({ currentLocale }: IRouterComponent) => {
                 </Card>
                 <Card title={t('views.Download.helicorder_list.title')} iconPath={mdiImageAlbum}>
                     {getFileListDataLoading ? (
-                        <div className="flex items-center justify-center">
-                            <span className="loading loading-spinner loading-lg text-gray-400" />
+                        <div className="app-center">
+                            <span className="loading loading-spinner loading-lg app-loading-muted" />
                         </div>
                     ) : (
-                        <div className="space-y-4">
+                        <div className="app-stack">
                             <label className="input">
-                                <Icon className="flex-shrink-0" path={mdiMagnify} size={0.8} />
+                                <Icon className="app-icon" path={mdiMagnify} size={0.8} />
                                 <input
                                     type="search"
-                                    className="grow"
+                                    className="app-grow"
                                     value={searchHelicorder}
                                     onChange={({ currentTarget }) =>
                                         setSearchHelicorder(currentTarget.value)
@@ -92,14 +88,10 @@ const Download = ({ currentLocale }: IRouterComponent) => {
                                 />
                                 {searchHelicorder.length > 0 && (
                                     <button
-                                        className="cursor-pointer opacity-60 transition-all hover:opacity-100"
+                                        className="app-icon-button"
                                         onClick={() => setSearchHelicorder('')}
                                     >
-                                        <Icon
-                                            className="flex-shrink-0"
-                                            path={mdiClose}
-                                            size={0.8}
-                                        />
+                                        <Icon className="app-icon" path={mdiClose} size={0.8} />
                                     </button>
                                 )}
                             </label>

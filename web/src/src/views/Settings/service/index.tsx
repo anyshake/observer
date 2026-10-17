@@ -66,11 +66,11 @@ export const Service = () => {
             debug={JSON.stringify(getServiceDataError)}
         />
     ) : getServiceDataLoading ? (
-        <div className="flex items-center justify-center">
-            <span className="loading loading-spinner text-primary mt-6" />
+        <div className="app-center">
+            <span className="loading loading-spinner app-loading-delayed" />
         </div>
     ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="app-service-grid">
             {Object.keys(serviceConfig)
                 .sort((a, b) =>
                     serviceConfig[a].serviceName.localeCompare(serviceConfig[b].serviceName)
@@ -85,17 +85,13 @@ export const Service = () => {
                             iconPath={mdiApplicationCogOutline}
                             fields={getStatusCardFields(status)}
                         >
-                            <div className="join my-1 flex justify-center">
+                            <div className="join app-service-actions">
                                 {status?.isRunning && (
                                     <button
-                                        className="join-item btn btn-sm flex items-center"
+                                        className="join-item btn btn-sm app-button-toolbar"
                                         onClick={() => handleRestartService(serviceId)}
                                     >
-                                        <Icon
-                                            className="flex-shrink-0"
-                                            path={mdiRestart}
-                                            size={0.7}
-                                        />
+                                        <Icon className="app-icon" path={mdiRestart} size={0.7} />
                                         <span>
                                             {t(
                                                 'views.Settings.Service.restart_service.submit_button'
@@ -104,7 +100,7 @@ export const Service = () => {
                                     </button>
                                 )}
                                 <button
-                                    className="join-item btn btn-sm flex items-center"
+                                    className="join-item btn btn-sm app-button-toolbar"
                                     onClick={() =>
                                         handleStartStopService(
                                             serviceId,
@@ -114,11 +110,7 @@ export const Service = () => {
                                 >
                                     {status?.isRunning ? (
                                         <>
-                                            <Icon
-                                                className="flex-shrink-0"
-                                                path={mdiStop}
-                                                size={0.7}
-                                            />
+                                            <Icon className="app-icon" path={mdiStop} size={0.7} />
                                             <span>
                                                 {t(
                                                     'views.Settings.Service.stop_service.submit_button'
@@ -127,11 +119,7 @@ export const Service = () => {
                                         </>
                                     ) : (
                                         <>
-                                            <Icon
-                                                className="flex-shrink-0"
-                                                path={mdiPlay}
-                                                size={0.7}
-                                            />
+                                            <Icon className="app-icon" path={mdiPlay} size={0.7} />
                                             <span>
                                                 {t(
                                                     'views.Settings.Service.start_service.submit_button'
@@ -141,17 +129,17 @@ export const Service = () => {
                                     )}
                                 </button>
                             </div>
-                            <div className="join my-1 flex justify-center">
+                            <div className="join app-service-actions">
                                 {config.constraints.length > 0 && (
                                     <button
-                                        className="join-item btn btn-sm flex items-center"
+                                        className="join-item btn btn-sm app-button-toolbar"
                                         onClick={() => {
                                             setSelectedServiceId(serviceId);
                                             setIsConfigureModalOpen(true);
                                         }}
                                     >
                                         <Icon
-                                            className="flex-shrink-0"
+                                            className="app-icon"
                                             path={mdiSquareEditOutline}
                                             size={0.7}
                                         />
@@ -161,14 +149,10 @@ export const Service = () => {
                                     </button>
                                 )}
                                 <button
-                                    className="join-item btn btn-sm flex items-center"
+                                    className="join-item btn btn-sm app-button-toolbar"
                                     onClick={() => handleResetServiceConfig(serviceId)}
                                 >
-                                    <Icon
-                                        className="flex-shrink-0"
-                                        path={mdiBackupRestore}
-                                        size={0.7}
-                                    />
+                                    <Icon className="app-icon" path={mdiBackupRestore} size={0.7} />
                                     <span>
                                         {t('views.Settings.Service.reset_service.submit_button')}
                                     </span>

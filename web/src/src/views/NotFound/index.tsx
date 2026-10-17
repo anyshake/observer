@@ -11,7 +11,7 @@ const NotFound = () => {
     }, []);
 
     return (
-        <div className="p-8">
+        <div className="app-not-found">
             <ErrorPage
                 code={404}
                 heading={t('views.NotFound.page_not_found')}

@@ -28,35 +28,32 @@ export const ErrorPage = ({ code, heading, content, action, debug }: IErrorPage)
     }, []);
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center space-y-4 p-5">
-            <h1 className="text-6xl font-bold tracking-tight text-gray-800">{code ?? ':-('}</h1>
-            <p className="text-lg font-medium text-gray-600">
+        <div className="app-error-page">
+            <h1 className="app-error-code">{code ?? ':-('}</h1>
+            <p className="app-error-title">
                 {heading ?? t('components.ErrorPage.something_went_wrong')}
             </p>
-            <p className="text-gray-500">{content ?? t('components.ErrorPage.try_again_later')}</p>
+            <p className="app-text-muted">{content ?? t('components.ErrorPage.try_again_later')}</p>
 
             {action && (
-                <button
-                    onClick={action.onClick}
-                    className="btn btn-md rounded-md bg-gray-500 px-4 py-2 text-gray-200 transition-all hover:bg-gray-600"
-                >
+                <button onClick={action.onClick} className="btn btn-md app-error-back">
                     {action.label}
                 </button>
             )}
 
             {debug && (
                 <button
-                    className="cursor-pointer rounded-full bg-gray-100 p-2 transition-all hover:scale-110"
+                    className="app-error-details-button"
                     onClick={() => {
                         setIsDebug(!isDebug);
                     }}
                 >
-                    <Icon className="flex-shrink-0 text-gray-400" path={mdiBugPause} size={1} />
+                    <Icon className="app-error-icon" path={mdiBugPause} size={1} />
                 </button>
             )}
 
             {debug && isDebug && (
-                <div className="container w-[350px] md:w-[600px]">
+                <div className="app-error-details">
                     <CodeBlock language="javascript" fileName={`error_stack_${currentTime}.log`}>
                         {debug}
                     </CodeBlock>

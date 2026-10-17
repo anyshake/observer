@@ -14,6 +14,12 @@
         }
     },
     "components": {
+        "ThemeToggle": {
+            "label": "Tema",
+            "light": "Terang",
+            "dark": "Gelap",
+            "system": "Ikuti sistem"
+        },
         "ErrorPage": {
             "something_went_wrong": "Ups! Terjadi kesalahan.",
             "try_again_later": "Silakan coba muat ulang halaman atau kembali lagi nanti."
@@ -587,6 +593,7 @@
         },
         "captcha": {
             "label": "Masukkan Captcha",
+            "countdown": "({{seconds}} detik)",
             "loading": "Memuat captcha...",
             "error": "Gagal memuat captcha",
             "placeholder": "Kode Captcha",

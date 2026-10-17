@@ -82,7 +82,7 @@ export const DialogModal = ({
 
         return (
             <div
-                className="fixed inset-0 z-40 flex h-dvh items-center justify-center bg-black/40 p-4"
+                className="app-dialog-overlay"
                 role="dialog"
                 aria-modal="true"
                 onMouseDown={({ currentTarget, target }) => {
@@ -92,33 +92,33 @@ export const DialogModal = ({
                 }}
             >
                 <div
-                    className={`relative min-h-0 overflow-y-auto rounded-lg bg-white p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-2xl ${fullScreen ? 'h-full max-h-full w-full max-w-none' : 'max-h-[90dvh] w-[90%] max-w-2xl sm:w-[80%] md:w-[60%]'}`}
+                    className={`app-dialog-panel ${fullScreen ? 'app-dialog-fullscreen' : 'app-dialog-window'}`}
                 >
                     <button
-                        className="btn btn-sm btn-circle btn-ghost absolute top-2 right-2"
+                        className="btn btn-sm btn-circle btn-ghost app-dialog-close"
                         onClick={onClose}
                     >
-                        <Icon className="flex-shrink-0" path={mdiClose} size={0.8} />
+                        <Icon className="app-icon" path={mdiClose} size={0.8} />
                     </button>
                     {heading}
-                    <div className="pt-4">{children}</div>
+                    <div className="app-dialog-body">{children}</div>
                 </div>
             </div>
         );
     }
 
     return (
-        <dialog ref={dialogRef} className="modal h-dvh">
+        <dialog ref={dialogRef} className="modal app-native-dialog">
             <div
-                className={`modal-box min-h-0 overflow-y-auto pb-[calc(1.5rem+env(safe-area-inset-bottom))] ${fullScreen ? 'h-full max-h-full w-full max-w-none' : 'max-h-[90dvh] w-[90%] max-w-2xl sm:w-[80%] md:w-[60%]'}`}
+                className={`modal-box app-native-dialog-panel ${fullScreen ? 'app-dialog-fullscreen' : 'app-dialog-window'}`}
             >
                 <form method="dialog">
-                    <button className="btn btn-sm btn-circle btn-ghost absolute top-2 right-2">
-                        <Icon className="flex-shrink-0" path={mdiClose} size={0.8} />
+                    <button className="btn btn-sm btn-circle btn-ghost app-dialog-close">
+                        <Icon className="app-icon" path={mdiClose} size={0.8} />
                     </button>
                 </form>
                 {heading}
-                <div className="pt-4">{children}</div>
+                <div className="app-dialog-body">{children}</div>
             </div>
         </dialog>
     );

@@ -2,6 +2,7 @@ import { mdiEarth, mdiExitToApp } from '@mdi/js';
 import Icon from '@mdi/react';
 
 import { localeConfig } from '../../config/locale';
+import { ThemeToggle } from '../ui/ThemeToggle';
 
 interface IHeader {
     readonly title: string;
@@ -13,22 +14,23 @@ interface IHeader {
 
 export const Header = ({ title, onLogout, locales, currentLocale, onSwitchLocale }: IHeader) => {
     return (
-        <div className="navbar bg-base-200 fixed z-10 px-4 shadow-md">
-            <div className="flex-1 pl-16">
-                <span className="text-xl font-bold text-gray-800 select-none">{title}</span>
+        <div className="navbar app-header">
+            <div className="app-header-brand">
+                <span className="app-header-title">{title}</span>
             </div>
-            <div className="flex space-x-1">
+            <div className="app-header-actions">
+                <ThemeToggle />
                 <div className="dropdown dropdown-end">
-                    <button tabIndex={0} className="btn btn-sm btn-ghost text-gray-500">
-                        <Icon className="flex-shrink-0" path={mdiEarth} size={0.8} />
+                    <button tabIndex={0} className="btn btn-sm btn-ghost app-header-button">
+                        <Icon className="app-icon" path={mdiEarth} size={0.8} />
                     </button>
                     <ul
                         tabIndex={0}
-                        className="dropdown-content menu bg-base-100 rounded-box w-36 p-2 shadow"
+                        className="dropdown-content menu rounded-box app-header-locales"
                     >
                         {Object.entries(locales).map(([key, value]) => (
                             <li
-                                className={`text-gray-700 ${key === currentLocale ? 'font-bold' : ''}`}
+                                className={`app-text-body ${key === currentLocale ? 'app-text-bold' : ''}`}
                                 key={key}
                             >
                                 <a onClick={() => onSwitchLocale(key)}>{value}</a>
@@ -36,8 +38,8 @@ export const Header = ({ title, onLogout, locales, currentLocale, onSwitchLocale
                         ))}
                     </ul>
                 </div>
-                <button className="btn btn-sm btn-ghost text-gray-500" onClick={onLogout}>
-                    <Icon className="flex-shrink-0" path={mdiExitToApp} size={0.8} />
+                <button className="btn btn-sm btn-ghost app-header-button" onClick={onLogout}>
+                    <Icon className="app-icon" path={mdiExitToApp} size={0.8} />
                 </button>
             </div>
         </div>

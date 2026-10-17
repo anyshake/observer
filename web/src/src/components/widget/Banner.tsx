@@ -28,9 +28,9 @@ export const Banner = ({ status, message, fullWidth = false }: IBanner) => {
     return (
         <div
             role="alert"
-            className={`alert ${statusConfig[status].alertClass} alert-outline flex ${fullWidth ? 'w-full' : 'w-fit'} max-w-full`}
+            className={`alert ${statusConfig[status].alertClass} alert-outline app-banner ${fullWidth ? 'app-full-width' : 'app-fit-width'} app-max-width`}
         >
-            <div className={`status ${statusConfig[status].statusClass} animate-bounce`} />
+            <div className={`status ${statusConfig[status].statusClass} app-bounce`} />
             <span>{message}</span>
         </div>
     );

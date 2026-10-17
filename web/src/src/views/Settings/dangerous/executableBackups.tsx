@@ -106,18 +106,18 @@ export const ExecutableBackups = ({ currentLocale }: { currentLocale: string }) 
                     nativeModal={false}
                     onClose={handleClose}
                     heading={
-                        <h2 className="text-lg font-extrabold text-gray-800">
+                        <h2 className="app-dialog-title">
                             {t('views.Settings.Dangerous.executable_backups.confirm_title')}
                         </h2>
                     }
                 >
-                    <div className="space-y-5">
-                        <p className="text-sm leading-6 text-gray-500">
+                    <div className="app-stack-lg">
+                        <p className="app-help-text">
                             {t('views.Settings.Dangerous.executable_backups.description')}
                         </p>
 
-                        <div className="flex flex-wrap items-center justify-between gap-3">
-                            <label className="flex items-center gap-3 text-sm font-medium text-gray-700">
+                        <div className="app-backup-toolbar">
+                            <label className="app-backup-select-all">
                                 <input
                                     type="checkbox"
                                     className="checkbox checkbox-sm"
@@ -125,7 +125,9 @@ export const ExecutableBackups = ({ currentLocale }: { currentLocale: string }) 
                                         backups.length > 0 &&
                                         selectedNames.length === backups.length
                                     }
-                                    disabled={loading || removing || !!error || backups.length === 0}
+                                    disabled={
+                                        loading || removing || !!error || backups.length === 0
+                                    }
                                     onChange={({ currentTarget }) =>
                                         setSelectedNames(
                                             currentTarget.checked
@@ -147,28 +149,29 @@ export const ExecutableBackups = ({ currentLocale }: { currentLocale: string }) 
                         </div>
 
                         {error && (
-                            <p className="text-sm text-red-600" role="alert">
+                            <p className="app-backup-error" role="alert">
                                 {t('views.Settings.Dangerous.executable_backups.list_failed', {
                                     error: error.message
                                 })}
                             </p>
                         )}
                         {loading && (
-                            <p className="text-sm text-gray-500" role="status">
+                            <p className="app-description" role="status">
                                 {t('views.Settings.Dangerous.executable_backups.loading')}
                             </p>
                         )}
                         {removalResults && (
                             <div
-                                className={`space-y-2 text-sm ${failedRemovals.length > 0 ? 'text-red-600' : 'text-gray-700'}`}
+                                className={`app-backup-removal-status ${failedRemovals.length > 0 ? 'app-text-danger' : 'app-text-body'}`}
                                 role="status"
                             >
                                 <p>{removalSummary}</p>
                                 {failedRemovals.length > 0 && (
-                                    <ul className="max-h-40 space-y-1 overflow-y-auto">
+                                    <ul className="app-backup-removal-list">
                                         {failedRemovals.map(({ name, error }) => (
-                                            <li key={name} className="break-all">
-                                                <span className="font-mono">{name}</span>: {error}
+                                            <li key={name} className="app-break-all">
+                                                <span className="app-text-mono">{name}</span>:{' '}
+                                                {error}
                                             </li>
                                         ))}
                                     </ul>
@@ -176,20 +179,17 @@ export const ExecutableBackups = ({ currentLocale }: { currentLocale: string }) 
                             </div>
                         )}
                         {!loading && !error && backups.length === 0 && (
-                            <p className="text-sm text-gray-500">
+                            <p className="app-description">
                                 {t('views.Settings.Dangerous.executable_backups.empty')}
                             </p>
                         )}
                         {!loading && !error && backups.length > 0 && (
-                            <div className="max-h-72 space-y-2 overflow-y-auto">
+                            <div className="app-backup-list">
                                 {backups.map(({ name, size, modifiedAt }) => (
-                                    <label
-                                        key={name}
-                                        className="flex items-start gap-3 rounded-lg border border-gray-200 p-3 text-sm"
-                                    >
+                                    <label key={name} className="app-backup-item">
                                         <input
                                             type="checkbox"
-                                            className="checkbox checkbox-sm shrink-0"
+                                            className="checkbox checkbox-sm app-no-shrink"
                                             checked={selectedNames.includes(name)}
                                             disabled={removing}
                                             onChange={({ currentTarget }) =>
@@ -202,11 +202,11 @@ export const ExecutableBackups = ({ currentLocale }: { currentLocale: string }) 
                                                 )
                                             }
                                         />
-                                        <span className="min-w-0 space-y-1">
-                                            <span className="block break-all font-mono">{name}</span>
-                                            <span className="block text-xs text-gray-500">
-                                                {new Intl.NumberFormat(currentLocale).format(size)} B
-                                                {' · '}
+                                        <span className="app-backup-item-content">
+                                            <span className="app-backup-name">{name}</span>
+                                            <span className="app-backup-date">
+                                                {new Intl.NumberFormat(currentLocale).format(size)}{' '}
+                                                B{' · '}
                                                 {new Date(modifiedAt).toLocaleString(currentLocale)}
                                             </span>
                                         </span>
@@ -216,16 +216,16 @@ export const ExecutableBackups = ({ currentLocale }: { currentLocale: string }) 
                         )}
 
                         {selectedNames.length > 0 && (
-                            <p className="text-sm leading-6 text-gray-500">
+                            <p className="app-help-text">
                                 {t('views.Settings.Dangerous.executable_backups.confirm_message', {
                                     count: selectedNames.length
                                 })}
                             </p>
                         )}
-                        <div className="flex flex-col-reverse justify-end gap-2 pt-2 sm:flex-row">
+                        <div className="app-modal-actions">
                             <button
                                 type="button"
-                                className="btn rounded-lg px-4 py-2 font-medium transition-all hover:bg-gray-300"
+                                className="btn app-button-cancel"
                                 disabled={removing}
                                 onClick={handleClose}
                             >
@@ -233,13 +233,15 @@ export const ExecutableBackups = ({ currentLocale }: { currentLocale: string }) 
                             </button>
                             <button
                                 type="button"
-                                className="btn rounded-lg bg-red-500 px-4 py-2 font-medium text-white transition-all hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-400"
+                                className="btn app-button-danger"
                                 disabled={
                                     selectedNames.length === 0 || loading || removing || !!error
                                 }
                                 onClick={() => void handleDelete()}
                             >
-                                {removing && <span className="loading loading-spinner loading-xs" />}
+                                {removing && (
+                                    <span className="loading loading-spinner loading-xs" />
+                                )}
                                 {t('views.Settings.Dangerous.executable_backups.delete_button', {
                                     count: selectedNames.length
                                 })}

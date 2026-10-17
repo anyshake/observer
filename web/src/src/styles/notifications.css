@@ -1,0 +1,101 @@
+@layer utilities {
+    .app-notification {
+        @apply border-app-border bg-app-surface flex w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-lg border shadow-xl transition-all duration-200;
+    }
+
+    .app-notification-visible {
+        @apply translate-y-0 opacity-100;
+    }
+
+    .app-notification-hidden {
+        @apply -translate-y-2 opacity-0;
+    }
+
+    .app-notification-accent {
+        @apply w-1.5 shrink-0;
+    }
+
+    .app-notification-content {
+        @apply flex min-w-0 flex-1 items-start gap-3 p-4;
+    }
+
+    .app-notification-icon {
+        @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-full;
+    }
+
+    .app-notification[data-level='info'] .app-notification-accent {
+        @apply bg-app-button;
+    }
+
+    .app-notification[data-level='info'] .app-notification-icon {
+        @apply bg-app-info-soft text-app-primary;
+    }
+
+    .app-notification[data-level='success'] .app-notification-accent {
+        @apply bg-emerald-500;
+    }
+
+    .app-notification[data-level='success'] .app-notification-icon {
+        @apply bg-app-success-soft text-app-success;
+    }
+
+    .app-notification[data-level='warning'] .app-notification-accent {
+        @apply bg-amber-500;
+    }
+
+    .app-notification[data-level='warning'] .app-notification-icon {
+        @apply bg-app-warning-soft text-app-warning;
+    }
+
+    .app-notification[data-level='error'] .app-notification-accent {
+        @apply bg-red-500;
+    }
+
+    .app-notification[data-level='error'] .app-notification-icon {
+        @apply bg-app-danger-soft text-app-danger;
+    }
+
+    .app-notification-text {
+        @apply min-w-0 flex-1;
+    }
+
+    .app-notification-source {
+        @apply text-app-muted truncate text-xs font-semibold tracking-wide uppercase;
+    }
+
+    .app-notification-message {
+        @apply text-app-heading mt-1 text-sm leading-5 break-words;
+    }
+
+    .app-notification-close {
+        @apply text-app-subtle hover:bg-base-200 hover:text-app-text shrink-0 rounded-md p-1 transition-colors;
+    }
+
+    .app-confirm {
+        @apply animate-fade animate-duration-300 bg-app-surface flex w-full max-w-md rounded-lg shadow-xl;
+    }
+
+    .app-confirm-content {
+        @apply flex-1 p-4;
+    }
+
+    .app-confirm-row {
+        @apply flex items-start;
+    }
+
+    .app-confirm-text {
+        @apply ml-3 flex-1;
+    }
+
+    .app-confirm-title {
+        @apply text-app-heading text-sm font-medium;
+    }
+
+    .app-confirm-message {
+        @apply text-app-muted mt-1 text-sm;
+    }
+
+    .app-confirm-actions {
+        @apply m-6 flex items-center justify-center gap-2;
+    }
+}

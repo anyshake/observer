@@ -74,16 +74,19 @@ export const Station = () => {
             debug={JSON.stringify(getStationConfigError)}
         />
     ) : getStationConfigLoading ? (
-        <div className="flex items-center justify-center">
-            <span className="loading loading-spinner text-primary mt-6" />
+        <div className="app-center">
+            <span className="loading loading-spinner app-loading-delayed" />
         </div>
     ) : (
-        <div className="flex flex-wrap justify-center gap-4 lg:justify-start">
+        <div className="app-field-grid">
             {stationConfig?.map((item, index) => (
-                <fieldset className="fieldset w-md" key={`${item.namespace}-${item.key}-${index}`}>
+                <fieldset
+                    className="fieldset app-fieldset"
+                    key={`${item.namespace}-${item.key}-${index}`}
+                >
                     <legend className="fieldset-legend">
-                        <span className="font-bold text-gray-700">{item.name}</span>
-                        {item.isRequired && <span className="text-red-500">*</span>}
+                        <span className="app-field-name">{item.name}</span>
+                        {item.isRequired && <span className="app-text-error">*</span>}
                     </legend>
                     <TypedInput
                         dataType={item.configType}
@@ -95,7 +98,7 @@ export const Station = () => {
                         fieldName={item.name}
                         options={item.options}
                     />
-                    <p className="w-[80%] text-xs text-gray-500">{item.description}</p>
+                    <p className="app-field-help">{item.description}</p>
                 </fieldset>
             ))}
         </div>

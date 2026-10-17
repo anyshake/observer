@@ -25,15 +25,15 @@ export const EventListModal = ({
     return (
         <DialogModal
             heading={
-                <div className="space-y-4 text-gray-800">
-                    <div className="flex items-center space-x-2 text-lg font-extrabold">
-                        <Icon path={mdiTarget} size={1.2} className="flex-shrink-0" />
+                <div className="app-dialog-intro">
+                    <div className="app-dialog-heading">
+                        <Icon path={mdiTarget} size={1.2} className="app-icon" />
                         <h2>{t('views.History.event_list_modal.title')}</h2>
                     </div>
-                    <div className="ml-0.5 flex items-center space-x-2 text-sm">
+                    <div className="app-event-subtitle">
                         <img
                             src={selectedSeismicEventSource?.countryFlag}
-                            className="size-5 flex-shrink-0"
+                            className="app-event-flag"
                         />
                         <span>
                             {selectedSeismicEventSource?.locales[currentLocale] ??
@@ -48,7 +48,7 @@ export const EventListModal = ({
             onClose={() => setIsSelectModalOpen(false)}
         >
             <List
-                className="overflow-y-scroll"
+                className="app-scroll-y"
                 onClick={(id) => handleChooseEvent(id)}
                 data={Object.values(seismicEventsData).sort((a, b) => b.timestamp - a.timestamp)}
             />

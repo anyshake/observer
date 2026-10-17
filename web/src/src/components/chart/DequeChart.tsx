@@ -10,6 +10,8 @@ import {
 } from 'react';
 
 import TimeSeriesBuffer from '../../helpers/storage/TimeSeriesBuffer';
+import { getChartAxis, getChartTitle } from '../../styles/chartTheme';
+import { useThemeColors } from '../../styles/useThemeColors';
 import { getLineSeries } from './lineSeries';
 
 export interface DequeChartHandle {
@@ -43,7 +45,7 @@ export const DequeChart = memo(
             {
                 title,
                 animation = true,
-                lineColor = '#7e59ff',
+                lineColor,
                 lineWidth = 2,
                 height = 250,
                 zoom = false,
@@ -58,6 +60,11 @@ export const DequeChart = memo(
             ref
         ) => {
             const chartRef = useRef<ReactECharts>(null);
+            const colors = useThemeColors();
+            const seriesColor = lineColor ?? colors.line;
+            const axis = useMemo(() => getChartAxis(colors), [colors]);
+            const seriesStyleRef = useRef({ color: seriesColor, width: lineWidth });
+            seriesStyleRef.current = { color: seriesColor, width: lineWidth };
             const bufferRef = useRef(new TimeSeriesBuffer(maxDuration));
             const rafRef = useRef<number | null>(null);
             const needsUpdateRef = useRef(false);
@@ -93,7 +100,11 @@ export const DequeChart = memo(
                     const startTime = endTime - maxDurationRef.current * 1000;
                     instance.setOption(
                         {
-                            series: getLineSeries(data, lineColor, lineWidth),
+                            series: getLineSeries(
+                                data,
+                                seriesStyleRef.current.color,
+                                seriesStyleRef.current.width
+                            ),
                             xAxis: { min: startTime, max: endTime }
                         },
                         { replaceMerge: ['series'] }
@@ -156,28 +167,22 @@ export const DequeChart = memo(
                 };
             }, [paused]);
 
-            const option = useMemo(
-                () => ({
+            const option = useMemo(() => {
+                // Theme changes repaint buffered samples without resetting the live stream.
+                const data = bufferRef.current.getData();
+                const endTime = data.length ? bufferRef.current.getEndTime() : Date.now() + 1000;
+                return {
                     animation,
-                    title: title
-                        ? {
-                              text: title,
-                              left: 'left',
-                              textStyle: {
-                                  color: '#4A4A4A',
-                                  fontSize: 13,
-                                  fontWeight: 'bold'
-                              },
-                              backgroundColor: '#f0f0f0',
-                              padding: [6, 12],
-                              borderRadius: 3
-                          }
-                        : {},
+                    backgroundColor: 'transparent',
+                    textStyle: { color: colors.label },
+                    title: getChartTitle(title, colors),
                     xAxis: {
+                        ...axis,
                         type: 'time',
-                        min: Date.now(),
-                        max: Date.now() + 1000,
+                        min: data.length ? endTime - maxDurationRef.current * 1000 : endTime - 1000,
+                        max: endTime,
                         axisLabel: {
+                            ...axis.axisLabel,
                             hideOverlap: true,
                             formatter: (value: number) => {
                                 const date = new Date(value);
@@ -189,6 +194,7 @@ export const DequeChart = memo(
                         }
                     },
                     yAxis: {
+                        ...axis,
                         type: 'value',
                         max: yMax,
                         min: yMin,
@@ -196,7 +202,7 @@ export const DequeChart = memo(
                         position: yPosition,
                         scale: true
                     },
-                    series: getLineSeries([], lineColor, lineWidth),
+                    series: getLineSeries(data, seriesColor, lineWidth),
                     grid: { top: '5%', bottom: '3%', containLabel: true },
                     dataZoom: zoom
                         ? [
@@ -209,30 +215,28 @@ export const DequeChart = memo(
                               }
                           ]
                         : []
-                }),
-                [
-                    animation,
-                    title,
-                    yMax,
-                    yMin,
-                    yInterval,
-                    yPosition,
-                    lineColor,
-                    lineWidth,
-                    zoom,
-                    minSpanValue
-                ]
-            );
+                };
+            }, [
+                animation,
+                title,
+                yMax,
+                yMin,
+                yInterval,
+                yPosition,
+                colors,
+                axis,
+                seriesColor,
+                lineWidth,
+                zoom,
+                minSpanValue
+            ]);
 
             return (
                 <ReactECharts
                     ref={chartRef}
                     option={option}
-                    style={{
-                        height: typeof height === 'number' ? `${height}px` : height,
-                        width: '100%',
-                        display: 'block'
-                    }}
+                    className="app-line-chart"
+                    style={{ height }}
                     opts={{ renderer: 'canvas' }}
                     notMerge={true}
                     lazyUpdate={true}

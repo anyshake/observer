@@ -24,7 +24,7 @@ export const Dangerous = ({ currentLocale }: IDangerous) => {
     const { otherActions, handleOtherActionClick } = useDangerousActions();
 
     return (
-        <div className="mx-auto max-w-3xl space-y-4 p-6">
+        <div className="app-settings-content-padded">
             <Banner
                 fullWidth={true}
                 status={cleanupStatusMeta.status}

@@ -71,9 +71,9 @@ export const Backup = () => {
     }, [handleConfirmedImportGlobalConfig, t]);
 
     return (
-        <div className="mx-auto max-w-3xl space-y-4">
-            <div className="flex flex-wrap gap-4">
-                <div className="flex items-center gap-2">
+        <div className="app-settings-content">
+            <div className="app-options">
+                <div className="app-option">
                     <input
                         id="mode-radio-backup"
                         type="radio"
@@ -81,11 +81,11 @@ export const Backup = () => {
                         onChange={handleSelectBackupMode}
                         className="radio radio-primary radio-xs"
                     />
-                    <label htmlFor="mode-radio-backup" className="label cursor-pointer">
+                    <label htmlFor="mode-radio-backup" className="label app-pointer">
                         {t('views.Settings.Backup.select_mode.backup')}
                     </label>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="app-option">
                     <input
                         id="mode-radio-restore"
                         type="radio"
@@ -93,25 +93,25 @@ export const Backup = () => {
                         onChange={handleSelectRestoreMode}
                         className="radio radio-primary radio-xs"
                     />
-                    <label htmlFor="mode-radio-restore" className="label cursor-pointer">
+                    <label htmlFor="mode-radio-restore" className="label app-pointer">
                         {t('views.Settings.Backup.select_mode.restore')}
                     </label>
                 </div>
             </div>
 
             {mode === 'backup' && (
-                <div className="space-y-4">
-                    <div className="flex flex-col justify-between gap-4 p-4 sm:flex-row sm:items-center">
-                        <div className="space-y-2">
-                            <h3 className="text-lg font-semibold text-gray-800">
+                <div className="app-stack">
+                    <div className="app-settings-action">
+                        <div className="app-stack-sm">
+                            <h3 className="app-subheading">
                                 {t('views.Settings.Backup.backup_config.title')}
                             </h3>
-                            <p className="text-sm text-gray-500">
+                            <p className="app-description">
                                 {t('views.Settings.Backup.backup_config.description')}
                             </p>
                         </div>
                         <button
-                            className="btn w-full rounded-lg bg-purple-500 px-4 py-2 font-medium text-white shadow-lg transition-all hover:bg-purple-700 sm:w-auto"
+                            className="btn app-button-primary app-button-responsive"
                             onClick={handleExportGlobalConfig}
                         >
                             {t('views.Settings.Backup.backup_config.submit_button')}
@@ -134,24 +134,24 @@ export const Backup = () => {
             )}
 
             {mode === 'restore' && (
-                <div className="flex flex-col gap-4 p-4">
-                    <div className="space-y-2">
-                        <h3 className="text-lg font-semibold text-gray-800">
+                <div className="app-backup-import">
+                    <div className="app-stack-sm">
+                        <h3 className="app-subheading">
                             {t('views.Settings.Backup.restore_config.title')}
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="app-description">
                             {t('views.Settings.Backup.restore_config.description')}
                         </p>
                     </div>
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center md:justify-between">
+                    <div className="app-backup-import-controls">
                         <input
                             ref={fileInputRef}
                             type="file"
                             accept=".json"
-                            className="file-input w-auto border-gray-300 transition-all hover:border-gray-400 hover:shadow-md focus:outline-none md:w-md"
+                            className="file-input app-file-input"
                         />
                         <button
-                            className="btn w-auto rounded-lg bg-purple-500 px-4 py-2 font-medium text-white shadow-lg transition-all hover:bg-purple-700"
+                            className="btn app-button-primary app-button-auto"
                             onClick={handleImportGlobalConfig}
                         >
                             {t('views.Settings.Backup.restore_config.submit_button')}

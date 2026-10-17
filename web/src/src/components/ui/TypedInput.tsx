@@ -119,7 +119,7 @@ export const TypedInput = ({
         if (options) {
             return (
                 <select
-                    className="select join-item border border-gray-300 shadow-sm focus:outline-none"
+                    className="select join-item app-select"
                     value={value}
                     onChange={({ currentTarget }) =>
                         setValue(parseValue(currentTarget.value, dataType))
@@ -137,7 +137,7 @@ export const TypedInput = ({
         if (isArrayType) {
             return (
                 <input
-                    className="input join-item cursor-pointer border border-gray-300 shadow-sm transition-all hover:ring focus:outline-none"
+                    className="input join-item app-input app-pointer"
                     readOnly
                     placeholder={placeholder}
                     value={value.join(', ')}
@@ -149,7 +149,7 @@ export const TypedInput = ({
         if (dataType === 'bool') {
             return (
                 <select
-                    className="select join-item border border-gray-300 shadow-sm focus:outline-none"
+                    className="select join-item app-select"
                     value={value}
                     onChange={({ currentTarget }) => setValue(currentTarget.value === 'true')}
                 >
@@ -161,7 +161,7 @@ export const TypedInput = ({
 
         return (
             <input
-                className="input join-item border border-gray-300 shadow-sm transition-all hover:ring focus:outline-none"
+                className="input join-item app-input"
                 placeholder={placeholder}
                 type={inputTypeMap[dataType]}
                 value={inputTypeMap[dataType] === 'number' ? (isNaN(value) ? 0 : value) : value}
@@ -177,11 +177,11 @@ export const TypedInput = ({
             <div className="join">
                 {renderInput()}
                 <button
-                    className="btn join-item text-base-200 bg-purple-500 hover:bg-purple-600 disabled:bg-gray-300 disabled:text-gray-500"
+                    className="btn join-item app-button-apply"
                     onClick={() => onSubmit?.(value)}
                     disabled={!hasChanged}
                 >
-                    <Icon className="flex-shrink-0" path={mdiCheck} size={0.9} />
+                    <Icon className="app-icon" path={mdiCheck} size={0.9} />
                 </button>
             </div>
 
@@ -190,82 +190,78 @@ export const TypedInput = ({
                     open={isInputModalOpen}
                     onClose={() => setIsInputModalOpen(false)}
                     heading={
-                        <h2 className="flex items-center space-x-2 text-lg font-extrabold text-gray-800">
-                            <Icon className="flex-shrink-0" path={mdiTableEdit} size={1} />
+                        <h2 className="app-dialog-heading-colored">
+                            <Icon className="app-icon" path={mdiTableEdit} size={1} />
                             <span>{t('components.TypedInput.editing_list', { fieldName })}</span>
                         </h2>
                     }
                 >
-                    <div className="join w-full">
+                    <div className="join app-full-width">
                         <input
-                            className="join-item input w-full border border-gray-300 shadow-sm transition-all hover:ring focus:outline-none"
+                            className="join-item input app-input app-full-width"
                             placeholder={t('components.TypedInput.add_new_item')}
                             value={tempArrayValue}
                             type={inputTypeMap[dataType as keyof typeof inputTypeMap]}
                             onChange={({ currentTarget }) => setTempArrayValue(currentTarget.value)}
                         />
                         <button className="btn join-item" onClick={handleAddArrayItem}>
-                            <Icon className="flex-shrink-0" path={mdiPlus} size={0.9} />
+                            <Icon className="app-icon" path={mdiPlus} size={0.9} />
                         </button>
                     </div>
-                    <div className="mt-6 overflow-x-auto rounded border border-gray-200">
-                        <table className="w-full text-sm">
-                            <thead className="bg-gray-50">
+                    <div className="app-array-table-container">
+                        <table className="app-array-table">
+                            <thead className="app-array-table-head">
                                 <tr>
-                                    <th className="w-10 px-3 py-2 text-left text-xs font-medium tracking-wide text-gray-500 uppercase">
-                                        #
-                                    </th>
-                                    <th className="px-3 py-2 text-left text-xs font-medium tracking-wide text-gray-500 uppercase">
+                                    <th className="app-array-table-index-heading">#</th>
+                                    <th className="app-array-table-heading">
                                         {t('components.TypedInput.table_value')}
                                     </th>
-                                    <th className="px-3 py-2 text-right text-xs font-medium tracking-wide text-gray-500 uppercase">
+                                    <th className="app-array-table-actions-heading">
                                         {t('components.TypedInput.table_actions')}
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100 font-mono text-xs">
+                            <tbody className="app-array-table-body">
                                 {value.map((item: unknown, idx: number) => (
-                                    <tr key={idx} className="hover:bg-gray-50">
-                                        <td className="px-3 py-2 align-middle text-gray-400 tabular-nums">
-                                            {idx + 1}
-                                        </td>
-                                        <td className="w-full max-w-0 px-3 py-2 align-middle">
-                                            <span className="block break-words select-none">
+                                    <tr key={idx} className="app-array-table-row">
+                                        <td className="app-array-table-index">{idx + 1}</td>
+                                        <td className="app-array-table-value">
+                                            <span className="app-array-table-text">
                                                 {String(item)}
                                             </span>
                                         </td>
-                                        <td className="px-3 py-2 align-middle">
-                                            <div className="flex justify-end gap-1">
+                                        <td className="app-array-table-cell">
+                                            <div className="app-array-table-actions">
                                                 <button
-                                                    className="cursor-pointer text-gray-500 hover:text-gray-700 disabled:cursor-not-allowed disabled:text-gray-300"
+                                                    className="app-icon-action"
                                                     onClick={() => handleUpdateArrayItem(idx, 'up')}
                                                     disabled={idx === 0}
                                                 >
                                                     <Icon
-                                                        className="flex-shrink-0"
+                                                        className="app-icon"
                                                         path={mdiMenuUp}
                                                         size={0.9}
                                                     />
                                                 </button>
                                                 <button
-                                                    className="cursor-pointer text-gray-500 hover:text-gray-700 disabled:cursor-not-allowed disabled:text-gray-300"
+                                                    className="app-icon-action"
                                                     onClick={() =>
                                                         handleUpdateArrayItem(idx, 'down')
                                                     }
                                                     disabled={idx === value.length - 1}
                                                 >
                                                     <Icon
-                                                        className="flex-shrink-0"
+                                                        className="app-icon"
                                                         path={mdiMenuDown}
                                                         size={0.9}
                                                     />
                                                 </button>
                                                 <button
-                                                    className="cursor-pointer text-gray-500 hover:text-gray-700"
+                                                    className="app-icon-action-enabled"
                                                     onClick={() => handleRemoveArrayItem(idx)}
                                                 >
                                                     <Icon
-                                                        className="flex-shrink-0"
+                                                        className="app-icon"
                                                         path={mdiDelete}
                                                         size={0.9}
                                                     />

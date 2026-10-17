@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 
 import loginBackground from '/login_bg.webp?url';
 
+import { ThemeToggle } from './components/ui/ThemeToggle';
 import { globalConfig } from './config/global';
 import { localeConfig } from './config/locale';
 import { sendPromiseAlert } from './helpers/alert/sendPromiseAlert';
@@ -39,7 +40,8 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
     }, [currentLocale, t]);
 
     // State for pre-authentication data (captcha, encrypt key, etc.)
-    const [preAuthTTL, setPreAuthTTL] = useState(0);
+    const [preAuthExpiresAt, setPreAuthExpiresAt] = useState(0);
+    const [captchaSecondsRemaining, setCaptchaSecondsRemaining] = useState(0);
     const [preAuthData, setPreAuthData] = useState({
         public_key: '',
         captcha_id: '',
@@ -50,6 +52,8 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
     });
     const getPreAuthData = useCallback(
         async (notify: boolean) => {
+            setPreAuthExpiresAt(0);
+            setCaptchaSecondsRemaining(0);
             setPreAuthData({
                 public_key: '',
                 captcha_id: '',
@@ -101,21 +105,38 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                     challenge_seed,
                     captcha_img: `data:image/png;base64,${captcha_img}`
                 });
-                setPreAuthTTL(ttl);
+                setPreAuthExpiresAt(Date.now() + ttl);
+                setCaptchaSecondsRemaining(Math.ceil(ttl / 1000));
             }
         },
         [t]
     );
     useEffect(() => {
-        // Refresh captcha and encrypt key after TTL
-        if (preAuthTTL) {
-            const interval = setInterval(() => {
-                getPreAuthData(true);
-            }, preAuthTTL);
-            return () => clearInterval(interval);
-        }
         getPreAuthData(false);
-    }, [preAuthTTL, getPreAuthData]);
+    }, [getPreAuthData]);
+
+    useEffect(() => {
+        if (!preAuthExpiresAt) {
+            return;
+        }
+
+        const updateCountdown = () => {
+            setCaptchaSecondsRemaining(
+                Math.max(0, Math.ceil((preAuthExpiresAt - Date.now()) / 1000))
+            );
+        };
+        updateCountdown();
+        const interval = window.setInterval(updateCountdown, 1000);
+        // Each new captcha gets its own deadline, including manual refreshes.
+        const timeout = window.setTimeout(
+            () => getPreAuthData(true),
+            Math.max(0, preAuthExpiresAt - Date.now())
+        );
+        return () => {
+            window.clearInterval(interval);
+            window.clearTimeout(timeout);
+        };
+    }, [preAuthExpiresAt, getPreAuthData]);
 
     const { setCredential, credential } = useCredentialStore();
     const handleLoginSubmit = async (username: string, password: string, captcha: string) => {
@@ -180,60 +201,53 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
     };
 
     return (
-        <div className="bg-base-200 animate-fade animate-duration-500 animate-delay-300 flex min-h-screen flex-col text-gray-700">
-            <main className="flex flex-1 items-center justify-center px-4 py-10 sm:px-6 lg:py-14">
-                <div className="bg-base-100 grid w-full max-w-4xl overflow-hidden rounded-xl shadow-xl lg:grid-cols-[0.9fr_1.1fr]">
-                    <section className="relative hidden min-h-[590px] overflow-hidden bg-gray-800 lg:block">
-                        <img
-                            src={loginBackground}
-                            alt=""
-                            className="absolute -inset-3 h-[calc(100%+1.5rem)] w-[calc(100%+1.5rem)] scale-105 object-cover brightness-50"
-                        />
+        <div className="app-login">
+            <main className="app-login-main">
+                <div className="app-login-panel">
+                    <section className="app-login-artwork">
+                        <img src={loginBackground} alt="" className="app-login-background" />
                     </section>
 
-                    <section className="p-7 sm:p-10 lg:p-12">
-                        <div className="mb-8">
-                            <div className="flex items-center justify-between gap-4">
-                                <img
-                                    src={globalConfig.logo}
-                                    alt=""
-                                    className="flex size-18 items-center gap-4"
-                                />
+                    <section className="app-login-content">
+                        <div className="app-login-heading">
+                            <div className="app-login-brand-row">
+                                <img src={globalConfig.logo} alt="" className="app-login-logo" />
 
-                                <div className="dropdown dropdown-end">
-                                    <button
-                                        type="button"
-                                        tabIndex={0}
-                                        className="btn btn-sm btn-ghost gap-2 text-gray-500"
-                                    >
-                                        <Icon
-                                            className="flex-shrink-0"
-                                            path={mdiEarth}
-                                            size={0.8}
-                                        />
-                                        <span>{locales[currentLocale]}</span>
-                                        <Icon
-                                            className="flex-shrink-0"
-                                            path={mdiChevronDown}
-                                            size={0.6}
-                                        />
-                                    </button>
-                                    <ul
-                                        tabIndex={0}
-                                        className="menu dropdown-content bg-base-100 rounded-box z-20 mt-2 w-52 p-2 shadow-md"
-                                    >
-                                        {Object.entries(locales).map(([key, value]) => (
-                                            <li
-                                                className={`text-gray-700 ${key === currentLocale ? 'font-bold' : ''}`}
-                                                key={key}
-                                            >
-                                                <a onClick={() => onSwitchLocale(key)}>{value}</a>
-                                            </li>
-                                        ))}
-                                    </ul>
+                                <div className="app-login-actions">
+                                    <ThemeToggle />
+                                    <div className="dropdown dropdown-end">
+                                        <button
+                                            type="button"
+                                            tabIndex={0}
+                                            className="btn btn-sm btn-ghost app-login-locale-button"
+                                        >
+                                            <Icon className="app-icon" path={mdiEarth} size={0.8} />
+                                            <span>{locales[currentLocale]}</span>
+                                            <Icon
+                                                className="app-icon"
+                                                path={mdiChevronDown}
+                                                size={0.6}
+                                            />
+                                        </button>
+                                        <ul
+                                            tabIndex={0}
+                                            className="menu dropdown-content rounded-box app-login-locales"
+                                        >
+                                            {Object.entries(locales).map(([key, value]) => (
+                                                <li
+                                                    className={`app-text-body ${key === currentLocale ? 'app-text-bold' : ''}`}
+                                                    key={key}
+                                                >
+                                                    <a onClick={() => onSwitchLocale(key)}>
+                                                        {value}
+                                                    </a>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                            <hr className="mt-6 text-gray-200" />
+                            <hr className="app-login-divider" />
                         </div>
 
                         <Formik
@@ -260,14 +274,11 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                             }}
                         >
                             {({ isSubmitting }) => (
-                                <Form className="space-y-5">
+                                <Form className="app-stack-lg">
                                     <div>
-                                        <label
-                                            htmlFor="username"
-                                            className="flex items-center text-sm font-medium text-gray-700"
-                                        >
+                                        <label htmlFor="username" className="app-login-label">
                                             <Icon
-                                                className="mr-2 flex-shrink-0"
+                                                className="app-icon-leading"
                                                 path={mdiAccount}
                                                 size={0.8}
                                             />
@@ -277,7 +288,7 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                                             required
                                             id="username"
                                             autoComplete="username"
-                                            className="input mt-2 w-full border border-gray-300 shadow-sm transition-all hover:ring focus:outline-none"
+                                            className="input app-input app-login-input"
                                             type="text"
                                             name="username"
                                             placeholder={t('Login.username.placeholder')}
@@ -285,12 +296,9 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                                     </div>
 
                                     <div>
-                                        <label
-                                            htmlFor="password"
-                                            className="flex items-center text-sm font-medium text-gray-700"
-                                        >
+                                        <label htmlFor="password" className="app-login-label">
                                             <Icon
-                                                className="mr-2 flex-shrink-0"
+                                                className="app-icon-leading"
                                                 path={mdiKey}
                                                 size={0.8}
                                             />
@@ -300,7 +308,7 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                                             required
                                             id="password"
                                             autoComplete="current-password"
-                                            className="input mt-2 w-full border border-gray-300 shadow-sm transition-all hover:ring focus:outline-none"
+                                            className="input app-input app-login-input"
                                             type="password"
                                             name="password"
                                             placeholder={t('Login.password.placeholder')}
@@ -308,23 +316,28 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                                     </div>
 
                                     <div>
-                                        <label
-                                            htmlFor="captcha"
-                                            className="flex items-center text-sm font-medium text-gray-700"
-                                        >
+                                        <label htmlFor="captcha" className="app-login-label">
                                             <Icon
-                                                className="mr-2 flex-shrink-0"
+                                                className="app-icon-leading"
                                                 path={mdiShieldCheck}
                                                 size={0.8}
                                             />
                                             {t('Login.captcha.label')}
+                                            {preAuthData.captcha_img.length > 0 &&
+                                                captchaSecondsRemaining > 0 && (
+                                                    <span className="app-login-captcha-countdown">
+                                                        {t('Login.captcha.countdown', {
+                                                            seconds: captchaSecondsRemaining
+                                                        })}
+                                                    </span>
+                                                )}
                                         </label>
-                                        <div className="mt-2 flex items-stretch justify-between space-x-2">
+                                        <div className="app-login-captcha">
                                             <Field
                                                 required
                                                 autoComplete="off"
                                                 id="captcha"
-                                                className="input min-w-0 flex-1 border border-gray-300 shadow-sm transition-all hover:ring focus:outline-none"
+                                                className="input app-input app-login-captcha-input"
                                                 type="text"
                                                 name="captcha"
                                                 disabled={!preAuthData.captcha_img.length}
@@ -338,7 +351,7 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                                             />
                                             <button
                                                 type="button"
-                                                className="btn w-28 flex-shrink-0 border border-gray-300 shadow-sm transition-all hover:ring sm:w-32"
+                                                className="btn app-login-captcha-button"
                                                 disabled={
                                                     !preAuthData.captcha_img.length &&
                                                     !preAuthData.error
@@ -354,24 +367,24 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                                             >
                                                 {preAuthData.captcha_img.length ? (
                                                     <img
-                                                        className="h-6"
+                                                        className="app-login-captcha-image"
                                                         src={preAuthData.captcha_img}
                                                         alt={t('Login.captcha.label')}
                                                     />
                                                 ) : preAuthData.error ? (
                                                     <Icon
-                                                        className="size-6 flex-shrink-0 text-red-400"
+                                                        className="app-login-captcha-error"
                                                         path={mdiRefreshCircle}
                                                     />
                                                 ) : (
-                                                    <span className="loading loading-dots loading-sm size-6 bg-gray-500" />
+                                                    <span className="loading loading-dots loading-sm app-login-captcha-loading" />
                                                 )}
                                             </button>
                                         </div>
                                     </div>
 
                                     <button
-                                        className="btn mt-3 w-full rounded-lg bg-purple-500 py-2 font-medium text-white shadow-lg transition-all hover:bg-purple-700"
+                                        className="btn app-button-primary app-button-login"
                                         type="submit"
                                         disabled={
                                             isSubmitting ||

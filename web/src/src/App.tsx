@@ -122,7 +122,23 @@ const App = () => {
                     onSwitchLocale={handleSwitchLocale}
                 />
             )}
-            <Toaster />
+            <Toaster
+                toastOptions={{
+                    className: 'app-toast',
+                    success: {
+                        iconTheme: {
+                            primary: 'var(--app-success)',
+                            secondary: 'var(--app-surface)'
+                        }
+                    },
+                    error: {
+                        iconTheme: { primary: 'var(--app-error)', secondary: 'var(--app-surface)' }
+                    },
+                    loading: {
+                        iconTheme: { primary: 'var(--app-primary)', secondary: 'var(--app-border)' }
+                    }
+                }}
+            />
         </>
     );
 };

@@ -51,10 +51,10 @@ export const useFileColumns = ({
                 headerAlign: 'center',
                 align: 'center',
                 renderCell: ({ row: { fileName, namespace, filePath } }: GridValidRowModel) => (
-                    <div className="space-x-4">
+                    <div className="app-action-icons">
                         {hasPreview && (
                             <button
-                                className="cursor-pointer text-blue-700 hover:opacity-50"
+                                className="app-link-action"
                                 onClick={() => {
                                     handlePreviewAsset(namespace, fileName, filePath);
                                 }}
@@ -63,7 +63,7 @@ export const useFileColumns = ({
                             </button>
                         )}
                         <button
-                            className="cursor-pointer text-blue-700 hover:opacity-50"
+                            className="app-link-action"
                             onClick={() => {
                                 handleDownloadAsset(namespace, fileName, filePath);
                             }}

@@ -107,7 +107,7 @@ const Settings = ({ currentLocale }: IRouterComponent) => {
     }, [isCurrentUserAdminData]);
 
     return (
-        <div className="container mx-auto space-y-6 p-4">
+        <div className="app-page">
             {isCurrentUserAdminLoading ? (
                 <Skeleton />
             ) : (
@@ -121,7 +121,7 @@ const Settings = ({ currentLocale }: IRouterComponent) => {
                                 <div
                                     key={`${index}_${tabKey}`}
                                     role="tab"
-                                    className={`tab space-x-1 ${activeTab === tabKey ? 'tab-active text-gray-700' : 'text-gray-500'}`}
+                                    className={`tab app-settings-tab ${activeTab === tabKey ? 'tab-active app-text-body' : 'app-text-muted'}`}
                                     onClick={() => setActiveTab(tabKey)}
                                 >
                                     <Icon

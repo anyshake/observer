@@ -1,0 +1,73 @@
+@layer utilities {
+    .app-line-chart {
+        @apply block w-full;
+    }
+
+    .app-chart-frame {
+        @apply relative h-full w-full;
+    }
+
+    .app-chart-visible {
+        @apply block h-full w-full;
+    }
+
+    .app-spectrogram {
+        @apply relative flex h-full w-full flex-col;
+    }
+
+    .app-spectrogram-toolbar-live {
+        @apply absolute top-5 left-15 flex items-center gap-1;
+    }
+
+    .app-spectrogram-toolbar {
+        @apply absolute top-5 left-15 mr-15 flex flex-wrap items-center gap-1;
+    }
+
+    .app-spectrogram-title {
+        @apply flex h-6 items-center rounded bg-black/50 px-3 text-sm font-bold text-white select-none;
+    }
+
+    .app-spectrogram-button {
+        @apply flex size-6 flex-shrink-0 cursor-pointer items-center justify-center rounded bg-black/50 text-white opacity-50 transition-all hover:opacity-100;
+    }
+
+    .app-spectrogram-mode {
+        @apply flex h-6 min-w-12 flex-shrink-0 cursor-pointer items-center justify-center rounded bg-black/50 px-2 text-xs font-semibold text-white opacity-50 transition-all hover:opacity-100;
+    }
+
+    .app-spectrogram-settings-overlay {
+        @apply absolute inset-0 z-10 flex cursor-default items-center justify-center rounded-md bg-black/50;
+    }
+
+    .app-spectrogram-settings-scroll {
+        @apply max-h-full w-full overflow-y-auto px-4 py-2;
+    }
+
+    .app-spectrogram-settings {
+        @apply mx-auto w-64 space-y-4 rounded bg-black/90 p-4 text-xs text-white;
+    }
+
+    .app-spectrogram-settings-title {
+        @apply flex justify-between text-sm font-bold;
+    }
+
+    .app-spectrogram-setting-label {
+        @apply mb-1 flex justify-between;
+    }
+
+    .app-spectrogram-speed {
+        @apply flex h-6 max-w-36 items-center rounded bg-black/50 opacity-50 transition-all hover:opacity-100;
+    }
+
+    .app-spectrogram-speed-range {
+        @apply rounded py-3 pl-2 text-gray-300 [--range-bg:#fff] [--range-fill:0];
+    }
+
+    .app-spectrogram-speed-value {
+        @apply px-2 font-mono text-xs text-white select-none;
+    }
+
+    .app-chart-workspace {
+        @apply bg-base-300 relative h-[2000px] w-full overflow-scroll rounded-lg md:h-[1000px] lg:h-[800px] xl:h-screen;
+    }
+}

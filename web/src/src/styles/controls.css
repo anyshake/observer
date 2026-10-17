@@ -1,0 +1,123 @@
+@layer utilities {
+    .app-input,
+    .app-select,
+    .app-time-input,
+    .app-time-input-padded {
+        @apply border-app-border-strong border shadow-sm focus:outline-none;
+    }
+
+    .app-input,
+    .app-time-input,
+    .app-time-input-padded {
+        @apply transition-all hover:ring;
+    }
+
+    .app-button-primary,
+    .app-button-danger,
+    .app-button-cancel,
+    .app-dangerous-action-button,
+    .app-preference-reset,
+    .app-confirm-danger,
+    .app-confirm-cancel {
+        @apply rounded-lg py-2 font-medium transition-all;
+    }
+
+    .app-button-primary {
+        @apply bg-app-button hover:bg-app-button-hover text-white shadow-lg;
+    }
+
+    .app-button-danger,
+    .app-dangerous-action-button,
+    .app-preference-reset,
+    .app-confirm-danger {
+        @apply bg-app-danger-button hover:bg-app-danger-button-hover text-white;
+    }
+
+    .app-button-danger,
+    .app-dangerous-action-button {
+        @apply disabled:bg-app-disabled disabled:cursor-not-allowed;
+    }
+
+    .app-button-danger,
+    .app-button-cancel,
+    .app-dangerous-action-button,
+    .app-preference-reset {
+        @apply px-4;
+    }
+
+    .app-button-cancel,
+    .app-confirm-cancel {
+        @apply hover:bg-app-hover;
+    }
+
+    .app-dangerous-action-button,
+    .app-preference-reset {
+        @apply w-full shadow-lg sm:w-auto;
+    }
+
+    .app-dangerous-action-button {
+        @apply shrink-0;
+    }
+
+    .app-confirm-danger,
+    .app-confirm-cancel {
+        @apply px-3;
+    }
+
+    .app-button-responsive {
+        @apply w-full px-4 sm:w-auto;
+    }
+
+    .app-button-auto {
+        @apply w-auto px-4;
+    }
+
+    .app-button-search {
+        @apply mt-4 w-full;
+    }
+
+    .app-button-search-bottom {
+        @apply mt-auto w-full;
+    }
+
+    .app-button-login {
+        @apply mt-3 w-full;
+    }
+
+    .app-button-toolbar {
+        @apply flex items-center;
+    }
+
+    .app-button-apply {
+        @apply bg-app-button hover:bg-app-button-hover disabled:bg-app-disabled disabled:text-app-muted text-white;
+    }
+
+    .app-time-input,
+    .app-time-input-padded {
+        @apply disabled:bg-base-200 w-full rounded-md text-center;
+    }
+
+    .app-time-input {
+        @apply py-1;
+    }
+
+    .app-time-input-padded {
+        @apply px-3 py-2 text-sm;
+    }
+
+    .app-modal-actions {
+        @apply flex flex-col-reverse justify-end gap-2 pt-2 sm:flex-row;
+    }
+
+    .app-loading-muted {
+        @apply text-app-subtle;
+    }
+
+    .app-loading-delayed {
+        @apply text-primary mt-6;
+    }
+
+    .app-loading-primary {
+        @apply text-primary;
+    }
+}

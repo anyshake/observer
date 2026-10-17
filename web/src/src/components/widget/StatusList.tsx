@@ -14,26 +14,22 @@ interface IStatusList {
 export const StatusList = ({ data }: IStatusList) => {
     return (
         <List
-            className="max-h-[300px]"
+            className="app-status-list"
             data={data.map(({ description, title, running }) => ({
                 id: title,
                 primary: (
                     <div>
-                        <div className="font-medium">{title}</div>
-                        <div className="flex items-center space-x-1">
-                            <Icon
-                                path={mdiToolboxOutline}
-                                size={0.6}
-                                className="flex-shrink-0 opacity-50"
-                            />
-                            <span className="text-xs opacity-50">{description}</span>
+                        <div className="app-text-medium">{title}</div>
+                        <div className="app-row-tight">
+                            <Icon path={mdiToolboxOutline} size={0.6} className="app-status-icon" />
+                            <span className="app-status-description">{description}</span>
                         </div>
                     </div>
                 ),
                 secondary: (
                     <div className={`badge ${running ? 'badge-success' : 'badge-error'}`}>
                         <Icon
-                            className="text-white"
+                            className="app-text-inverse"
                             path={running ? mdiCheckCircle : mdiCloseCircle}
                             size={0.6}
                         />

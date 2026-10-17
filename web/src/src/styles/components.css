@@ -1,0 +1,264 @@
+@layer utilities {
+    .app-panel {
+        @apply bg-base-100 text-app-text p-5 shadow-md;
+    }
+
+    .app-card {
+        @apply h-full;
+    }
+
+    .app-card-divider {
+        @apply text-app-border my-4;
+    }
+
+    .app-list {
+        @apply bg-base-100 border-app-border-strong overflow-y-scroll border border-dashed;
+    }
+
+    .app-list-item {
+        @apply border-base-200 border-b last:border-b-0;
+    }
+
+    .app-list-row {
+        @apply hover:bg-base-200 flex items-center justify-between px-4 py-3;
+    }
+
+    .app-list-primary {
+        @apply flex items-center pr-6;
+    }
+
+    .app-status-row {
+        @apply mt-2 flex justify-between;
+    }
+
+    .app-status-label {
+        @apply pr-4 font-medium whitespace-nowrap;
+    }
+
+    .app-status-value-scroll {
+        @apply scrollbar-hide max-w-[180px] overflow-x-scroll;
+    }
+
+    .app-status-value {
+        @apply bg-base-200 text-app-primary rounded px-2 font-mono text-sm whitespace-nowrap;
+    }
+
+    .app-status-list {
+        @apply max-h-[300px];
+    }
+
+    .app-status-icon {
+        @apply flex-shrink-0 opacity-50;
+    }
+
+    .app-status-description {
+        @apply text-xs opacity-50;
+    }
+
+    .app-banner {
+        @apply flex;
+    }
+
+    .app-scroller {
+        @apply bg-app-button hover:bg-app-button-hover right-3 bottom-16 flex size-10 items-center justify-center rounded-full text-white duration-300 hover:cursor-pointer;
+    }
+
+    .app-scroller-visible {
+        @apply animate-fade-left animate-duration-300 fixed;
+    }
+
+    .app-dialog-overlay {
+        @apply fixed inset-0 z-40 flex h-dvh items-center justify-center bg-black/40 p-4;
+    }
+
+    .app-dialog-panel {
+        @apply bg-app-surface relative min-h-0 overflow-y-auto rounded-lg p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-2xl;
+    }
+
+    .app-dialog-fullscreen {
+        @apply h-full max-h-full w-full max-w-none;
+    }
+
+    .app-dialog-window {
+        @apply max-h-[90dvh] w-[90%] max-w-2xl sm:w-[80%] md:w-[60%];
+    }
+
+    .app-dialog-close {
+        @apply absolute top-2 right-2;
+    }
+
+    .app-dialog-body {
+        @apply pt-4;
+    }
+
+    .app-native-dialog {
+        @apply h-dvh;
+    }
+
+    .app-native-dialog-panel {
+        @apply min-h-0 overflow-y-auto pb-[calc(1.5rem+env(safe-area-inset-bottom))];
+    }
+
+    .app-draggable-dragging {
+        @apply border-app-border-strong border-2 border-dashed;
+    }
+
+    .app-draggable {
+        @apply bg-app-surface absolute m-2 overflow-hidden rounded-lg p-2 shadow-lg;
+    }
+
+    .app-draggable-unlocked {
+        @apply cursor-move;
+    }
+
+    .app-error-page {
+        @apply flex min-h-screen flex-col items-center justify-center space-y-4 p-5;
+    }
+
+    .app-error-code {
+        @apply text-app-heading text-6xl font-bold tracking-tight;
+    }
+
+    .app-error-title {
+        @apply text-app-muted text-lg font-medium;
+    }
+
+    .app-error-back {
+        @apply bg-app-button hover:bg-app-button-hover rounded-md px-4 py-2 text-white transition-all;
+    }
+
+    .app-error-details-button {
+        @apply bg-base-200 cursor-pointer rounded-full p-2 transition-all hover:scale-110;
+    }
+
+    .app-error-icon {
+        @apply text-app-subtle flex-shrink-0;
+    }
+
+    .app-error-details {
+        @apply container w-[350px] md:w-[600px];
+    }
+
+    .app-skeleton {
+        @apply my-auto w-full animate-pulse space-y-6 overflow-x-hidden p-8;
+    }
+
+    .app-skeleton-title {
+        @apply bg-base-300 h-4 w-48 rounded-full;
+    }
+
+    .app-skeleton-lines {
+        @apply flex flex-col space-y-3;
+    }
+
+    .app-skeleton-line-full {
+        @apply bg-base-300 h-3 w-full rounded-full;
+    }
+
+    .app-skeleton-line-long {
+        @apply bg-base-300 h-3 w-11/12 rounded-full;
+    }
+
+    .app-skeleton-line-medium {
+        @apply bg-base-300 h-3 w-10/12 rounded-full;
+    }
+
+    .app-skeleton-line-short {
+        @apply bg-base-300 h-3 w-9/12 rounded-full;
+    }
+
+    .app-skeleton-line-shortest {
+        @apply bg-base-300 h-3 w-8/12 rounded-full;
+    }
+
+    .app-skeleton-divider {
+        @apply my-2 flex h-4 items-center opacity-20;
+    }
+
+    .app-skeleton-divider::before {
+        content: '';
+        width: 100%;
+        height: 0.125rem;
+        background-color: var(--app-border-strong);
+    }
+
+    .app-array-table-container {
+        @apply border-app-border mt-6 overflow-x-auto rounded border;
+    }
+
+    .app-array-table {
+        @apply w-full text-sm;
+    }
+
+    .app-array-table-head {
+        @apply bg-base-200;
+    }
+
+    .app-array-table-index-heading {
+        @apply text-app-muted w-10 px-3 py-2 text-left text-xs font-medium tracking-wide uppercase;
+    }
+
+    .app-array-table-heading {
+        @apply text-app-muted px-3 py-2 text-left text-xs font-medium tracking-wide uppercase;
+    }
+
+    .app-array-table-actions-heading {
+        @apply text-app-muted px-3 py-2 text-right text-xs font-medium tracking-wide uppercase;
+    }
+
+    .app-array-table-body {
+        @apply divide-app-border divide-y font-mono text-xs;
+    }
+
+    .app-array-table-row {
+        @apply hover:bg-base-200;
+    }
+
+    .app-array-table-index {
+        @apply text-app-subtle px-3 py-2 align-middle tabular-nums;
+    }
+
+    .app-array-table-value {
+        @apply w-full max-w-0 px-3 py-2 align-middle;
+    }
+
+    .app-array-table-text {
+        @apply block break-words select-none;
+    }
+
+    .app-array-table-cell {
+        @apply px-3 py-2 align-middle;
+    }
+
+    .app-array-table-actions {
+        @apply flex justify-end gap-1;
+    }
+
+    .app-time-picker {
+        @apply relative;
+    }
+
+    .app-time-picker-anchor {
+        @apply absolute h-0 w-0 overflow-hidden;
+    }
+
+    .app-map {
+        @apply z-0 cursor-default overflow-hidden;
+    }
+
+    .app-map-marker {
+        cursor: pointer;
+    }
+
+    .app-map-marker svg {
+        width: 32px;
+        height: 32px;
+        fill: var(--app-map-marker);
+        filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.5));
+    }
+
+    .app-map-marker path {
+        stroke: var(--app-map-marker-stroke);
+        stroke-width: 0.7;
+    }
+}

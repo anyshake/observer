@@ -73,11 +73,10 @@ export const RealtimeChannel = memo(function RealtimeChannel({
             onDragStop={handleDragStop}
             onResizeStop={handleResizeStop}
         >
-            <div className={waveformMode ? 'block h-full w-full' : 'hidden'}>
+            <div className={waveformMode ? 'app-chart-visible' : 'app-hidden'}>
                 <DequeChart
                     minSpanValue={RealTimeConstraints.minSpanValue}
                     ref={waveformRef}
-                    lineColor={RealTimeConstraints.lineColor}
                     maxDuration={retention}
                     title={channel}
                     height="100%"
@@ -87,7 +86,7 @@ export const RealtimeChannel = memo(function RealtimeChannel({
                     paused={!waveformMode}
                 />
             </div>
-            <div className={waveformMode ? 'hidden' : 'block h-full w-full'}>
+            <div className={waveformMode ? 'app-hidden' : 'app-chart-visible'}>
                 <DequeSpectrogram
                     title={channel}
                     duration={retention}

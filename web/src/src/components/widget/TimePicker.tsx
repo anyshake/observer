@@ -1,4 +1,4 @@
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import {
     LocalizationProvider,
     MobileDatePicker,
@@ -11,6 +11,8 @@ import * as DateFnsLang from 'date-fns/locale';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { getTimeString } from '../../helpers/utils/getTimeString';
+import { selectThemeMode, useThemeStore } from '../../stores/theme';
+import { createAppTheme } from '../../styles/timePickerTheme';
 
 const getDateString = (ts: number) => {
     const date = new Date(ts);
@@ -40,6 +42,7 @@ export const TimePicker = ({
     dateOnly = false
 }: TimePickerProps) => {
     const [open, setOpen] = useState(false);
+    const mode = useThemeStore(selectThemeMode);
     const safeCurrentLocale = currentLocale || 'en-US';
 
     const themeRecords = useMemo(
@@ -92,27 +95,17 @@ export const TimePicker = ({
     );
 
     const theme = useMemo(
-        () =>
-            createTheme(
-                {
-                    palette: {
-                        primary: { main: '#8b3dff' },
-                        secondary: { main: '#7B1FA2' },
-                        background: { default: '#F3E5F5' }
-                    }
-                },
-                themeRecords[locale4Component]
-            ),
-        [locale4Component, themeRecords]
+        () => createAppTheme(mode, themeRecords[locale4Component]),
+        [mode, locale4Component, themeRecords]
     );
 
     return (
-        <div className="relative">
+        <div className="app-time-picker">
             <input
                 readOnly
                 type="text"
                 placeholder={placeholder}
-                className={`cursor-pointer ${className}`}
+                className={`app-pointer ${className}`}
                 onClick={() => setOpen(true)}
                 onFocus={({ currentTarget }) => currentTarget.blur()}
                 value={
@@ -124,7 +117,7 @@ export const TimePicker = ({
                 }
             />
 
-            <div className="absolute h-0 w-0 overflow-hidden">
+            <div className="app-time-picker-anchor">
                 <ThemeProvider theme={theme}>
                     <LocalizationProvider
                         dateAdapter={AdapterDateFns}
@@ -136,17 +129,13 @@ export const TimePicker = ({
                                 onClose={() => setOpen(false)}
                                 onChange={handleDateChange}
                                 format="yyyy-MM-dd"
-                                className="w-full"
+                                className="app-full-width"
                                 timezone="system"
                                 views={['year', 'month', 'day']}
                                 slotProps={{
                                     field: { clearable: true },
                                     mobilePaper: {
-                                        sx: {
-                                            padding: '12px',
-                                            borderRadius: '12px',
-                                            overflow: 'hidden'
-                                        }
+                                        className: 'app-time-picker-paper'
                                     }
                                 }}
                                 defaultValue={
@@ -166,7 +155,7 @@ export const TimePicker = ({
                                 onClose={() => setOpen(false)}
                                 onChange={handleDateChange}
                                 format="yyyy-MM-dd HH:mm:ss"
-                                className="w-full"
+                                className="app-full-width"
                                 timezone="system"
                                 views={['year', 'month', 'day', 'hours', 'minutes', 'seconds']}
                                 viewRenderers={{
@@ -177,11 +166,7 @@ export const TimePicker = ({
                                 slotProps={{
                                     field: { clearable: true },
                                     mobilePaper: {
-                                        sx: {
-                                            padding: '12px',
-                                            borderRadius: '12px',
-                                            overflow: 'hidden'
-                                        }
+                                        className: 'app-time-picker-paper'
                                     }
                                 }}
                                 defaultValue={new Date(defaultValue ?? 0)}
