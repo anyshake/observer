@@ -2,6 +2,34 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.7.1
+
+### Release Notes
+
+This release adds **light, dark, and system themes** and **executable backup management** in the web interface. It also improves encrypted DNS resolution, live connection recovery, and upgrade verification, with fixes for waveform gaps, update notifications, and service shutdown.
+
+### New Features
+
+- Added selectable **light, dark, and system themes** with a remembered browser preference. System mode follows operating system theme changes, with consistent colors across charts, spectrograms, maps, and other interface elements.
+- Added administrator controls to list executable backups left by upgrades and selectively remove them from the settings page, including file sizes, modification times, and removal results.
+
+### Improvements
+
+- Reworked **DNS resolution** for update checks and seismic data sources with reusable resolver pools, bounded discovery concurrency, preferred healthy endpoints, failure backoff, and context-aware cancellation.
+- Expanded the built-in **DNSCrypt, DNS-over-HTTPS, and DNS-over-TLS** resolver catalog and removed automatic plaintext UDP fallback.
+- Strengthened DNS response validation, DNSCrypt certificate validation and refresh, and DNS-over-HTTPS response and redirect checks.
+- Improved **WebSocket connection recovery** with heartbeat monitoring, connection timeouts, exponential reconnect backoff, and handling of browser connectivity and tab visibility changes. Incoming message sizes are now bounded, including decompressed payloads.
+- Required **SHA-256 checksums** when verifying downloaded upgrades and synchronized upgrade status updates and executable replacement operations.
+- Consolidated shared frontend styles and components, expanded lifecycle and network regression test coverage, and updated the `slgo` and `spectrogram-js` dependencies.
+
+### Bug Fixes
+
+- Fixed update check failures lacking a dedicated status, rejected invalid version metadata, and corrected manual-upgrade notices to compare versions numerically and account for the minimum required release.
+- Fixed HTTP POST retries reusing consumed request bodies and ignoring the configured retry interval, closed response bodies on unsuccessful requests, and removed unnecessary delays after the final failed attempt.
+- Fixed waveform downsampling drawing lines across missing or non-finite data intervals.
+- Fixed startup and shutdown synchronization in discovery, FRP, and QuakeSense services to wait for active loops and avoid goroutine tracking races.
+- Fixed CAPTCHA images using a transparent background, preserving readability against dark interface backgrounds.
+
 ## v4.7.0
 
 ### Release Notes
