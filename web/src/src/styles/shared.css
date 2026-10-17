@@ -4,7 +4,7 @@
     }
 
     .app-icon {
-        @apply flex-shrink-0;
+        @apply shrink-0;
     }
 
     .app-theme-toggle {
@@ -20,7 +20,7 @@
     }
 
     .app-icon-leading {
-        @apply mr-2 flex-shrink-0;
+        @apply mr-2 shrink-0;
     }
 
     .app-text-small {

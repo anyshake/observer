@@ -4,7 +4,7 @@
     }
 
     .app-announcement {
-        @apply border-app-border-strong h-[350px] overflow-y-scroll rounded-lg border border-dashed p-4;
+        @apply border-app-border-strong h-87.5 overflow-y-scroll rounded-lg border border-dashed p-4;
     }
 
     .app-header {
@@ -32,7 +32,7 @@
     }
 
     .app-sidebar {
-        @apply bg-app-sidebar fixed z-20 flex min-h-screen w-[235px] text-white transition-all duration-700;
+        @apply bg-app-sidebar fixed z-20 flex min-h-screen w-58.75 text-white transition-all duration-700;
     }
 
     .app-sidebar-open {
@@ -44,7 +44,7 @@
     }
 
     .app-sidebar-brand {
-        @apply absolute top-2 -right-6 rounded-full border-4 border-white duration-300 ease-in;
+        @apply absolute top-2 -right-6 rounded-full border-3 border-white duration-300 ease-in;
     }
 
     .app-sidebar-brand-visible {
@@ -56,7 +56,7 @@
     }
 
     .app-sidebar-brand-surface {
-        @apply rounded-full bg-gradient-to-tl from-purple-500 to-indigo-500 py-3 pr-14;
+        @apply rounded-full bg-linear-to-tl from-purple-500 to-indigo-500 py-3 pr-14;
     }
 
     .app-sidebar-title {
@@ -64,7 +64,7 @@
     }
 
     .app-sidebar-toggle {
-        @apply hover:bg-app-button absolute top-2.5 -right-6 cursor-pointer rounded-full border-4 border-white p-3 duration-500 hover:rotate-45;
+        @apply hover:bg-app-button absolute top-2.5 -right-6 cursor-pointer rounded-full border-3 border-white p-3 duration-500 hover:rotate-45;
     }
 
     .app-sidebar-toggle-open {
@@ -120,7 +120,7 @@
     }
 
     .app-breadcrumb-icon {
-        @apply mr-2 flex-shrink-0 self-center;
+        @apply mr-2 shrink-0 self-center;
     }
 
     .app-breadcrumb-separator {
@@ -148,6 +148,6 @@
     }
 
     .app-footer-icon {
-        @apply mx-2 flex-shrink-0 self-center hover:opacity-80;
+        @apply mx-2 shrink-0 self-center hover:opacity-80;
     }
 }

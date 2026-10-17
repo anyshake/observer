@@ -16,11 +16,11 @@
     }
 
     .app-code-icon {
-        @apply flex-shrink-0 text-gray-300;
+        @apply shrink-0 text-gray-300;
     }
 
     .app-markdown {
-        @apply max-w-[100%] break-words;
+        @apply max-w-full wrap-break-word;
         color: var(--app-text);
         --tw-prose-body: var(--app-text);
         --tw-prose-headings: var(--app-heading);

@@ -28,11 +28,11 @@
     }
 
     .app-spectrogram-button {
-        @apply flex size-6 flex-shrink-0 cursor-pointer items-center justify-center rounded bg-black/50 text-white opacity-50 transition-all hover:opacity-100;
+        @apply flex size-6 shrink-0 cursor-pointer items-center justify-center rounded bg-black/50 text-white opacity-50 transition-all hover:opacity-100;
     }
 
     .app-spectrogram-mode {
-        @apply flex h-6 min-w-12 flex-shrink-0 cursor-pointer items-center justify-center rounded bg-black/50 px-2 text-xs font-semibold text-white opacity-50 transition-all hover:opacity-100;
+        @apply flex h-6 min-w-12 shrink-0 cursor-pointer items-center justify-center rounded bg-black/50 px-2 text-xs font-semibold text-white opacity-50 transition-all hover:opacity-100;
     }
 
     .app-spectrogram-settings-overlay {
@@ -68,6 +68,6 @@
     }
 
     .app-chart-workspace {
-        @apply bg-base-300 relative h-[2000px] w-full overflow-scroll rounded-lg md:h-[1000px] lg:h-[800px] xl:h-screen;
+        @apply bg-base-300 relative h-[2000px] w-full overflow-scroll rounded-lg md:h-250 lg:h-200 xl:h-screen;
     }
 }

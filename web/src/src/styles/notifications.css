@@ -64,7 +64,7 @@
     }
 
     .app-notification-message {
-        @apply text-app-heading mt-1 text-sm leading-5 break-words;
+        @apply text-app-heading mt-1 text-sm leading-5 wrap-break-word;
     }
 
     .app-notification-close {

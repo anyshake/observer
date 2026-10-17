@@ -12,7 +12,7 @@
     }
 
     .app-login-artwork {
-        @apply bg-app-sidebar relative hidden min-h-[590px] overflow-hidden lg:block;
+        @apply bg-app-sidebar relative hidden min-h-147.5 overflow-hidden lg:block;
     }
 
     .app-login-background {
@@ -72,7 +72,7 @@
     }
 
     .app-login-captcha-button {
-        @apply border-app-border-strong w-28 flex-shrink-0 overflow-hidden border p-0 shadow-sm transition-all hover:ring sm:w-32;
+        @apply border-app-border-strong w-28 shrink-0 overflow-hidden border p-0 shadow-sm transition-all hover:ring sm:w-32;
     }
 
     .app-login-captcha-image {
@@ -82,7 +82,7 @@
     }
 
     .app-login-captcha-error {
-        @apply text-app-error size-6 flex-shrink-0;
+        @apply text-app-error size-6 shrink-0;
     }
 
     .app-login-captcha-loading {

@@ -36,7 +36,7 @@
     }
 
     .app-status-value-scroll {
-        @apply scrollbar-hide max-w-[180px] overflow-x-scroll;
+        @apply scrollbar-hide max-w-45 overflow-x-scroll;
     }
 
     .app-status-value {
@@ -44,7 +44,7 @@
     }
 
     .app-status-list {
-        @apply max-h-[300px];
+        @apply max-h-75;
     }
 
     [data-theme='dark'] .app-status-badge.badge-success {
@@ -56,7 +56,7 @@
     }
 
     .app-status-icon {
-        @apply flex-shrink-0 opacity-50;
+        @apply shrink-0 opacity-50;
     }
 
     .app-status-description {
@@ -140,11 +140,11 @@
     }
 
     .app-error-icon {
-        @apply text-app-subtle flex-shrink-0;
+        @apply text-app-subtle shrink-0;
     }
 
     .app-error-details {
-        @apply container w-[350px] md:w-[600px];
+        @apply container w-87.5 md:w-150;
     }
 
     .app-skeleton {
@@ -231,7 +231,7 @@
     }
 
     .app-array-table-text {
-        @apply block break-words select-none;
+        @apply block wrap-break-word select-none;
     }
 
     .app-array-table-cell {
