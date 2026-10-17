@@ -1,12 +1,13 @@
 package dnsquery
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"net"
 	"time"
 
 	"github.com/ameshkov/dnscrypt/v2"
-	"github.com/jedisct1/go-dnsstamps"
 	"github.com/miekg/dns"
 )
 
@@ -17,29 +18,55 @@ type DNSCrypt struct {
 }
 
 func (d *DNSCrypt) Open() error {
-	d.client = &dnscrypt.Client{Net: "tcp"}
+	return d.OpenContext(context.Background(), 5*time.Second)
+}
 
-	stamp, err := dnsstamps.NewServerStampFromString(d.server)
-	if err != nil {
-		return fmt.Errorf("failed to create stamp from provider information: %w", err)
+func (d *DNSCrypt) OpenContext(ctx context.Context, timeout time.Duration) error {
+	ctx, cancel := queryContext(ctx, timeout)
+	defer cancel()
+	if err := ctx.Err(); err != nil {
+		return err
 	}
-
-	ro, err := d.client.Dial(stamp.String())
+	if d.resolver != nil && d.resolver.ResolverCert.VerifyDate() {
+		return nil
+	}
+	resolver, err := dialDNSCrypt(ctx, d.server, timeout)
 	if err != nil {
 		return fmt.Errorf("failed to dial DNSCrypt server: %w", err)
 	}
-
-	d.resolver = ro
+	d.client = &dnscrypt.Client{Net: "tcp"}
+	d.resolver = resolver
 	return nil
 }
 
 func (d *DNSCrypt) Query(msg *dns.Msg, timeout time.Duration) (*dns.Msg, error) {
-	if d.client == nil {
+	return d.QueryContext(context.Background(), msg, timeout)
+}
+
+func (d *DNSCrypt) QueryContext(ctx context.Context, msg *dns.Msg, timeout time.Duration) (*dns.Msg, error) {
+	if d.client == nil || d.resolver == nil {
 		return nil, errors.New("DNSCrypt client is not initialized")
 	}
 
-	d.client.Timeout = timeout
-	return d.client.Exchange(msg, d.resolver)
+	ctx, cancel := queryContext(ctx, timeout)
+	defer cancel()
+	if err := d.OpenContext(ctx, timeout); err != nil {
+		return nil, err
+	}
+	conn, err := (&net.Dialer{}).DialContext(ctx, "tcp", d.resolver.ServerAddress)
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	stop := closeOnCancel(ctx, func() { _ = conn.Close() })
+	defer stop()
+	client := *d.client
+	client.Timeout = timeout
+	response, err := client.ExchangeConn(conn, msg, d.resolver)
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
+	}
+	return response, err
 }
 
 func (d *DNSCrypt) Close() error {

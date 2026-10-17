@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 	"time"
 
@@ -66,6 +67,7 @@ func TestDoHQuery(t *testing.T) {
 			return
 		}
 		packed, _ := exampleReply(&request).Pack()
+		w.Header().Set("Content-Type", "application/dns-message")
 		_, _ = io.Copy(w, bytes.NewReader(packed))
 	}))
 	defer httpServer.Close()
@@ -123,6 +125,32 @@ func TestDoTAndDNSCryptErrors(t *testing.T) {
 	}
 	if err := crypt.Close(); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestDoHRejectsInvalidHTTPResponses(t *testing.T) {
+	for _, tc := range []struct {
+		name        string
+		status      int
+		contentType string
+		body        string
+	}{
+		{"status", http.StatusBadGateway, "application/dns-message", ""},
+		{"media type", http.StatusOK, "text/html", "unexpected"},
+		{"size", http.StatusOK, "application/dns-message", strings.Repeat("x", dns.MaxMsgSize+1)},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+				w.Header().Set("Content-Type", tc.contentType)
+				w.WriteHeader(tc.status)
+				_, _ = io.WriteString(w, tc.body)
+			}))
+			defer server.Close()
+			backend := &DoH{server: server.URL, client: server.Client()}
+			if _, err := backend.Query(exampleQuestion(), time.Second); err == nil {
+				t.Fatal("invalid HTTP response accepted")
+			}
+		})
 	}
 }
 

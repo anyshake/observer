@@ -19,7 +19,7 @@ import (
 const BMKG_ID = "bmkg"
 
 type BMKG struct {
-	resolvers       dnsquery.Resolvers
+	dnsClient       *dnsquery.Client
 	travelTimeTable *travel.AK135
 	cache           cache.GenericCache[[]Event]
 	sf              singleflight.Group
@@ -52,7 +52,7 @@ func (c *BMKG) GetEvents(latitude, longitude float64) ([]Event, error) {
 			transport := c.transport
 			if transport == nil {
 				// Set custom frontend SNI (bmkg) to bypass GFW in China
-				transport = createCustomTransport(c.resolvers, "bmkg")
+				transport = createCustomTransport(c.dnsClient, "bmkg")
 			}
 			res, err := request.GET(
 				"https://bmkg-content-inatews.storage.googleapis.com/last30feltevent.xml",

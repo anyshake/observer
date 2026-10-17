@@ -19,7 +19,14 @@ func New(timeSrc *timesource.Source, cacheTTL time.Duration) (map[string]IDataSo
 		return nil, err
 	}
 
-	builtinResolvers := dnsquery.NewResolvers()
+	builtinResolvers, err := dnsquery.NewResolvers()
+	if err != nil {
+		return nil, err
+	}
+	dnsClient, err := dnsquery.NewClient(builtinResolvers, len(builtinResolvers), 5*time.Second)
+	if err != nil {
+		return nil, err
+	}
 
 	return map[string]IDataSource{
 		AFAD_ID: &AFAD{
@@ -36,7 +43,7 @@ func New(timeSrc *timesource.Source, cacheTTL time.Duration) (map[string]IDataSo
 			travelTimeTable: travelTimeTable,
 		},
 		BMKG_ID: &BMKG{
-			resolvers:       builtinResolvers,
+			dnsClient:       dnsClient,
 			cache:           cache.NewGeneric[[]Event](cacheTTL),
 			travelTimeTable: travelTimeTable,
 		},
@@ -58,7 +65,7 @@ func New(timeSrc *timesource.Source, cacheTTL time.Duration) (map[string]IDataSo
 			travelTimeTable: travelTimeTable,
 		},
 		CWA_SC_ID: &CWA_SC{
-			resolvers:       builtinResolvers,
+			dnsClient:       dnsClient,
 			cache:           cache.NewGeneric[[]Event](cacheTTL),
 			travelTimeTable: travelTimeTable,
 		},
@@ -127,7 +134,7 @@ func New(timeSrc *timesource.Source, cacheTTL time.Duration) (map[string]IDataSo
 			travelTimeTable: travelTimeTable,
 		},
 		NCS_ID: &NCS{
-			resolvers:       builtinResolvers,
+			dnsClient:       dnsClient,
 			cache:           cache.NewGeneric[[]Event](cacheTTL),
 			travelTimeTable: travelTimeTable,
 		},

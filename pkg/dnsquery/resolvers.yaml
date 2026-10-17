@@ -1,11 +1,65 @@
-# This resolver list is derived from the DNSCrypt public-resolvers catalog.
-# Entries are taken from the upstream maintained list and converted into
-# YAML format for use in client configurations.
+# Encrypted, non-filtering resolvers using DNSCrypt, DNS-over-HTTPS and DNS-over-TLS.
+# DNSCrypt stamps come from the upstream public-resolvers catalog; DoH and DoT
+# endpoints follow the providers' published configuration.
 #
 # Try to choose ones that have been running long-term and are not blocked in China.
 # Since one of the purposes of the built‑in DNS resolver is to bypass such restrictions.
 #
 # See: https://raw.githubusercontent.com/DNSCrypt/dnscrypt-resolvers/master/v3/public-resolvers.md
+# See: https://developers.cloudflare.com/1.1.1.1/encryption/
+# See: https://developers.google.com/speed/public-dns/docs/secure-transports
+# See: https://quad9.net/service/service-addresses-and-features/
+# See: https://adguard-dns.io/en/public-dns.html
+# See: https://dns.sb/doh/
+# See: https://dns.sb/dot/
+# See: https://controld.com/free-dns
+
+# The first discovery batch spans protocols and operators
+
+- name: "cloudflare-doh"
+  server: "https://cloudflare-dns.com/dns-query"
+
+- name: "adguard-unfiltered-dot"
+  server: "tls://unfiltered.adguard-dns.com"
+
+- name: "quad9-unfiltered-dnscrypt-primary"
+  server: "sdns://AQcAAAAAAAAADTkuOS45LjEwOjg0NDMgZ8hHuMh1jNEgJFVDvnVnRt803x2EwAuMRwNo34Idhj4ZMi5kbnNjcnlwdC1jZXJ0LnF1YWQ5Lm5ldA"
+
+- name: "google-doh"
+  server: "https://dns.google/dns-query"
+
+# Additional DNS-over-HTTPS (DoH)
+
+- name: "quad9-unfiltered-doh"
+  server: "https://dns10.quad9.net/dns-query"
+
+- name: "adguard-unfiltered-doh"
+  server: "https://unfiltered.adguard-dns.com/dns-query"
+
+- name: "dns-sb-doh"
+  server: "https://doh.dns.sb/dns-query"
+
+- name: "controld-unfiltered-doh"
+  server: "https://freedns.controld.com/p0"
+
+# Additional DNS-over-TLS (DoT)
+
+- name: "cloudflare-dot"
+  server: "tls://one.one.one.one"
+
+- name: "google-dot"
+  server: "tls://dns.google"
+
+- name: "quad9-unfiltered-dot"
+  server: "tls://dns10.quad9.net"
+
+- name: "dns-sb-dot"
+  server: "tls://dot.sb"
+
+- name: "controld-unfiltered-dot"
+  server: "tls://p0.freedns.controld.com"
+
+# Additional DNSCrypt endpoints
 
 - name: "cs-tokyo"
   server: "sdns://AQcAAAAAAAAADDE0Ni43MC4zMS40MyAxM3KtWVYywkFrhy8Jj4Ub3bllKExsvppPGQlkMNupWh4yLmRuc2NyeXB0LWNlcnQuY3J5cHRvc3Rvcm0uaXM"
@@ -48,3 +102,18 @@
 
 - name: "dnscry.pt-singapore-ipv4"
   server: "sdns://AQcAAAAAAAAADjE1Ny4yMC4xMDUuMTE1IF-A7YB2q_Cn7QZ946XHFuDvAUNlRXLcIcLv6zH5glrGGTIuZG5zY3J5cHQtY2VydC5kbnNjcnkucHQ"
+
+- name: "quad9-unfiltered-dnscrypt-secondary"
+  server: "sdns://AQcAAAAAAAAAEzE0OS4xMTIuMTEyLjEwOjg0NDMgZ8hHuMh1jNEgJFVDvnVnRt803x2EwAuMRwNo34Idhj4ZMi5kbnNjcnlwdC1jZXJ0LnF1YWQ5Lm5ldA"
+
+- name: "adguard-unfiltered-dnscrypt-primary"
+  server: "sdns://AQcAAAAAAAAAEjk0LjE0MC4xNC4xNDA6NTQ0MyC16ETWuDo-PhJo62gfvqcN48X6aNvWiBQdvy7AZrLa-iUyLmRuc2NyeXB0LnVuZmlsdGVyZWQubnMxLmFkZ3VhcmQuY29t"
+
+- name: "adguard-unfiltered-dnscrypt-secondary"
+  server: "sdns://AQcAAAAAAAAAEjk0LjE0MC4xNC4xNDE6NTQ0MyC16ETWuDo-PhJo62gfvqcN48X6aNvWiBQdvy7AZrLa-iUyLmRuc2NyeXB0LnVuZmlsdGVyZWQubnMxLmFkZ3VhcmQuY29t"
+
+- name: "scaleway-ams"
+  server: "sdns://AQcAAAAAAAAADTUxLjE1LjEyMi4yNTAg6Q3ZfapcbHgiHKLF7QFoli0Ty1Vsz3RXs1RUbxUrwZAcMi5kbnNjcnlwdC1jZXJ0LnNjYWxld2F5LWFtcw"
+
+- name: "scaleway-fr"
+  server: "sdns://AQcAAAAAAAAADjIxMi40Ny4yMjguMTM2IOgBuE6mBr-wusDOQ0RbsV66ZLAvo8SqMa4QY2oHkDJNHzIuZG5zY3J5cHQtY2VydC5mci5kbnNjcnlwdC5vcmc"

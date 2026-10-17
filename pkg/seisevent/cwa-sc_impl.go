@@ -19,7 +19,7 @@ import (
 const CWA_SC_ID = "cwa_sc"
 
 type CWA_SC struct {
-	resolvers       dnsquery.Resolvers
+	dnsClient       *dnsquery.Client
 	travelTimeTable *travel.AK135
 	cache           cache.GenericCache[[]Event]
 	sf              singleflight.Group
@@ -56,7 +56,7 @@ func (c *CWA_SC) GetEvents(latitude, longitude float64) ([]Event, error) {
 			transport := c.transport
 			if transport == nil {
 				// Query CWA IP from custom encrypted DNS servers
-				transport = createCustomTransport(c.resolvers, "")
+				transport = createCustomTransport(c.dnsClient, "")
 			}
 			res, err := request.POST(
 				"https://scweb.cwa.gov.tw/zh-tw/earthquake/ajaxhandler",

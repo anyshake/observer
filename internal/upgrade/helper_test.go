@@ -172,7 +172,7 @@ func TestCheckUpdateFromLocalDNS(t *testing.T) {
 		}
 		_ = w.WriteMsg(reply)
 	}))
-	helper.resolvers = dnsquery.Resolvers{{Name: "bad", Server: "tcp://nope"}, {Name: "local", Server: address}}
+	helper.resolvers = dnsquery.Resolvers{{Name: "bad", Server: "tls://127.0.0.1:1"}, {Name: "local", Server: address}}
 
 	latest, required, eligible, applied, err := helper.CheckUpdate()
 	if err != nil || latest.String() != "v1.4.0" || required.String() != "v1.1.0" || !eligible || applied {
@@ -294,6 +294,7 @@ func TestCheckUpdateResolverFailures(t *testing.T) {
 	}
 
 	helper.resolvers = dnsquery.Resolvers{{Server: "sdns://not-a-stamp"}}
+	helper.dnsClient = nil
 	if _, _, _, _, err := helper.CheckUpdate(); err == nil || !strings.Contains(err.Error(), "all resolvers failed") {
 		t.Fatalf("open failure error = %v", err)
 	}
@@ -304,6 +305,7 @@ func TestCheckUpdateResolverFailures(t *testing.T) {
 	}
 	t.Cleanup(func() { _ = packet.Close() })
 	helper.resolvers = dnsquery.Resolvers{{Server: "udp://" + packet.LocalAddr().String()}}
+	helper.dnsClient = nil
 	_, _, _, _, err = helper.CheckUpdate()
 	if err == nil || (!errors.Is(err, context.DeadlineExceeded) && !strings.Contains(err.Error(), "all resolvers failed")) {
 		t.Fatalf("silent resolver error = %v", err)

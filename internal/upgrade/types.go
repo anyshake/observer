@@ -14,6 +14,8 @@ type Helper struct {
 	versionCheckDomain string
 	releaseFetchUrl    string
 	resolvers          dnsquery.Resolvers
+	resolverErr        error
+	dnsClient          *dnsquery.Client
 
 	currentExePath string
 	currentBuild   *unibuild.UniBuild

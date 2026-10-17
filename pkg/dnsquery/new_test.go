@@ -77,7 +77,10 @@ func TestResolverLifecycle(t *testing.T) {
 
 func TestResolverCatalogAndPickRandom(t *testing.T) {
 	t.Parallel()
-	resolvers := NewResolvers()
+	resolvers, err := NewResolvers()
+	if err != nil {
+		t.Fatal(err)
+	}
 	if len(resolvers) == 0 {
 		t.Fatal("resolver catalog is empty")
 	}

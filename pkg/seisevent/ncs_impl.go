@@ -19,7 +19,7 @@ import (
 const NCS_ID = "ncs"
 
 type NCS struct {
-	resolvers       dnsquery.Resolvers
+	dnsClient       *dnsquery.Client
 	travelTimeTable *travel.AK135
 	cache           cache.GenericCache[[]Event]
 	sf              singleflight.Group
@@ -51,7 +51,7 @@ func (c *NCS) GetEvents(latitude, longitude float64) ([]Event, error) {
 
 			transport := c.transport
 			if transport == nil {
-				transport = createCustomTransport(c.resolvers, "ncs")
+				transport = createCustomTransport(c.dnsClient, "ncs")
 			}
 			res, err := request.GET(
 				"https://riseq.seismo.gov.in/riseq/earthquake",
