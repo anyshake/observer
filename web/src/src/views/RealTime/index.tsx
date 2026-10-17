@@ -137,12 +137,12 @@ const RealTime = () => {
                     <div className="badge badge-soft badge-primary app-text-medium">
                         {t('views.RealTime.stream_status.sample_rate', { value: sampleRate })}
                     </div>
-                    <div className="badge badge-soft badge-secondary app-text-medium">
+                    <div className="badge badge-soft badge-primary app-text-medium">
                         {t('views.RealTime.stream_status.channels', {
                             num: Object.keys(activeChannels).length
                         })}
                     </div>
-                    <div className="badge badge-soft badge-info app-text-medium">
+                    <div className="badge badge-soft badge-primary app-text-medium">
                         {t('views.RealTime.stream_status.retention', { retention })}
                     </div>
                 </div>

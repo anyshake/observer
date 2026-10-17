@@ -27,9 +27,11 @@ export const StatusList = ({ data }: IStatusList) => {
                     </div>
                 ),
                 secondary: (
-                    <div className={`badge ${running ? 'badge-success' : 'badge-error'}`}>
+                    <div
+                        className={`badge app-status-badge ${running ? 'badge-success' : 'badge-error'}`}
+                    >
                         <Icon
-                            className="app-text-inverse"
+                            className="app-icon"
                             path={running ? mdiCheckCircle : mdiCloseCircle}
                             size={0.6}
                         />

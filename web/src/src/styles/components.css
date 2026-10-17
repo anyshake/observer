@@ -47,6 +47,14 @@
         @apply max-h-[300px];
     }
 
+    [data-theme='dark'] .app-status-badge.badge-success {
+        @apply border-app-success/30 bg-app-success-soft text-app-success;
+    }
+
+    [data-theme='dark'] .app-status-badge.badge-error {
+        @apply border-app-error/30 bg-app-danger-soft text-app-error;
+    }
+
     .app-status-icon {
         @apply flex-shrink-0 opacity-50;
     }

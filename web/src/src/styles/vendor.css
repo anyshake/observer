@@ -4,6 +4,9 @@
     min-width: 10px;
     --app-grid-cell-padding: 0px;
     --app-grid-header-padding: 0px;
+    /* DataGrid lightens/darkens palette.divider; use the theme border directly. */
+    --DataGrid-rowBorderColor: var(--app-border-strong);
+    border-color: var(--DataGrid-rowBorderColor);
 }
 
 .app-data-grid.app-data-grid-unselectable {
@@ -17,6 +20,14 @@
 
 .app-data-grid.MuiDataGrid-root .MuiDataGrid-columnHeaderDraggableContainer {
     padding-left: var(--app-grid-header-padding);
+}
+
+.app-data-grid.MuiDataGrid-root .MuiDataGrid-withBorderColor {
+    border-color: var(--DataGrid-rowBorderColor);
+}
+
+.app-data-grid.MuiDataGrid-root .MuiDataGrid-columnSeparator {
+    color: var(--DataGrid-rowBorderColor);
 }
 
 .app-time-picker-paper.MuiPaper-root {

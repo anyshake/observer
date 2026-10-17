@@ -294,11 +294,9 @@ export const MapContainer = ({
         }
 
         const applyColors = () => applyMapTheme(map, colors.map);
-        if (map.isStyleLoaded()) {
-            applyColors();
-        } else {
-            map.once('style.load', applyColors);
-        }
+        // isStyleLoaded() also waits for tiles, which finish without another style.load.
+        map.on('style.load', applyColors);
+        applyColors();
 
         return () => {
             map.off('style.load', applyColors);
