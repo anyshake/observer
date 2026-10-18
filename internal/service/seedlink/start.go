@@ -7,17 +7,21 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/internal/dao/action"
-	"github.com/anyshake/observer/internal/dao/model"
 	"github.com/anyshake/observer/internal/hardware"
 	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/anyshake/observer/pkg/message"
+	"github.com/anyshake/observer/pkg/ringbuf"
 	"github.com/anyshake/observer/pkg/timesource"
 	"github.com/bclswl0827/slgo"
 	"github.com/bclswl0827/slgo/handlers"
 )
 
 const seedLinkWriteTimeout = 5 * time.Second
+
+// Hardware publishes one event per second; keep enough to bridge batched
+// archiver writes and preserve the recent tail while history is queried.
+const seedLinkHistoryBufferSize = 120
 
 func (s *SeedLinkServiceImpl) Start() error {
 	s.mu.Lock()
@@ -28,6 +32,7 @@ func (s *SeedLinkServiceImpl) Start() error {
 	}
 
 	seedlinkMessageBus := message.NewBus[explorer.Event](ID)
+	recentBuffer := ringbuf.New[explorer.Event](seedLinkHistoryBufferSize)
 	clients := newSeedLinkClientRegistry()
 	server := slgo.New(
 		&provider{
@@ -35,6 +40,7 @@ func (s *SeedLinkServiceImpl) Start() error {
 			hardwareDev:   s.hardwareDev,
 			timeSource:    s.timeSource,
 			actionHandler: s.actionHandler,
+			recentBuffer:  recentBuffer,
 			startTime:     s.timeSource.Now(),
 			stationCode:   s.stationCode,
 			networkCode:   s.networkCode,
@@ -62,6 +68,9 @@ func (s *SeedLinkServiceImpl) Start() error {
 		}()
 
 		err := s.hardwareDev.Subscribe(ID, func(event explorer.Event) {
+			// Cache before publishing so a history query can always see events
+			// emitted before the client's live subscription was installed.
+			recentBuffer.Push(event)
 			seedlinkMessageBus.Publish(event)
 		})
 		if err != nil {
@@ -98,6 +107,7 @@ type provider struct {
 	hardwareDev   hardware.IHardware
 	timeSource    *timesource.Source
 	actionHandler *action.Handler
+	recentBuffer  *ringbuf.Buffer[explorer.Event]
 	startTime     time.Time
 	stationCode   string
 	networkCode   string
@@ -145,44 +155,6 @@ func (p *provider) GetStreams() []handlers.SeedLinkStream {
 
 	return streams
 }
-func (p *provider) QueryHistory(startTime, endTime time.Time, channels []handlers.SeedLinkChannel) ([]handlers.SeedLinkDataPacket, error) {
-	if endTime.IsZero() {
-		endTime = p.timeSource.Now()
-	}
-
-	channelSet := make(map[string]struct{}, len(channels))
-	for _, ch := range channels {
-		channelSet[ch.ChannelName] = struct{}{}
-	}
-	if len(channelSet) == 0 {
-		return nil, nil
-	}
-
-	var dataPackets []handlers.SeedLinkDataPacket
-	err := p.actionHandler.SeisRecordsQueryEachContext(p.ctx, startTime, endTime, func(record model.SeisRecord) error {
-		_, sampleRate, channelData, err := record.Decode()
-		if err != nil {
-			return err
-		}
-
-		for _, data := range channelData {
-			if _, exists := channelSet[data.ChannelCode]; exists {
-				dataPackets = append(dataPackets, handlers.SeedLinkDataPacket{
-					Timestamp:  record.RecordTime,
-					SampleRate: sampleRate,
-					Channel:    data.ChannelCode,
-					DataArr:    data.Data,
-				})
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return dataPackets, nil
-}
 
 type consumer struct {
 	messageBus *message.Bus[explorer.Event]
@@ -196,16 +168,11 @@ func (c *consumer) Subscribe(clientId string, channels []handlers.SeedLinkChanne
 	}
 
 	handler := func(event explorer.Event) {
-		client, ok := c.clients.Get(clientId)
-		if !ok {
+		if _, ok := c.clients.Get(clientId); !ok {
 			return
 		}
 		for _, data := range event.ChannelData {
 			if _, exists := channelSet[data.ChannelCode]; exists {
-				if err := client.SetWriteDeadline(time.Now().Add(seedLinkWriteTimeout)); err != nil {
-					_ = client.Close()
-					return
-				}
 				eventHandler(handlers.SeedLinkDataPacket{
 					Timestamp:  event.Timestamp.UnixMilli(),
 					SampleRate: event.SampleRate,
@@ -266,10 +233,9 @@ type hooks struct {
 	clients *seedLinkClientRegistry
 }
 
-func (h *hooks) OnData(client *handlers.SeedLinkClient, _ []byte) {
-	_ = client.SetWriteDeadline(time.Now().Add(seedLinkWriteTimeout))
-}
+func (h *hooks) OnData(_ *handlers.SeedLinkClient, _ []byte) {}
 func (h *hooks) OnConnection(client *handlers.SeedLinkClient) {
+	client.Conn = &seedLinkConn{Conn: client.Conn}
 	h.clients.Add(client)
 	logger.GetLogger(ID).Infof("%s - client connected to SeedLink service", client.RemoteAddr().String())
 }
@@ -278,6 +244,5 @@ func (h *hooks) OnClose(client *handlers.SeedLinkClient) {
 	logger.GetLogger(ID).Infof("%s - client disconnected from SeedLink service", client.RemoteAddr().String())
 }
 func (h *hooks) OnCommand(client *handlers.SeedLinkClient, command []string) {
-	_ = client.SetWriteDeadline(time.Now().Add(seedLinkWriteTimeout))
 	logger.GetLogger(ID).Infof("%s - client sent command to SeedLink service: %s", client.RemoteAddr().String(), command)
 }
