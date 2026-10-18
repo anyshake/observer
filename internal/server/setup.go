@@ -18,6 +18,7 @@ import (
 	"github.com/anyshake/observer/internal/server/response"
 	"github.com/anyshake/observer/internal/server/router/auth"
 	"github.com/anyshake/observer/internal/server/router/export"
+	"github.com/anyshake/observer/internal/server/router/fdsnws"
 	"github.com/anyshake/observer/internal/server/router/files"
 	graph_resolver "github.com/anyshake/observer/internal/server/router/graph"
 	"github.com/anyshake/observer/internal/server/router/notifications"
@@ -66,9 +67,13 @@ func (s *HttpServer) Setup(listen string) error {
 		response.Error(ctx, http.StatusNotFound, msg)
 	})
 
+	if err := fdsnws.Setup(s.engine, s.resolver.ActionHandler, s.resolver.HardwareDev, s.resolver.TimeSource.Now); err != nil {
+		return fmt.Errorf("failed to setup FDSN router: %w", err)
+	}
+
 	jwtHandler, err := auth_jwt.New(s.resolver.TimeSource, s.resolver.ActionHandler, AUTH_TIMEOUT)
 	if err != nil {
-		return fmt.Errorf("failed to create jwt handler: %w", err)
+		return fmt.Errorf("failed to create JWT handler: %w", err)
 	}
 	jwtMiddlewareFn := jwtHandler.MiddlewareFunc()
 

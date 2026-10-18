@@ -32,6 +32,11 @@ type ConfigConstraint struct {
 	Options      any    `json:"options,omitempty"`
 }
 
+type CreatedFDSNAccessKey struct {
+	AccessKey *FdsnAccessKey `json:"accessKey"`
+	Key       string         `json:"key"`
+}
+
 type DeviceConfig struct {
 	PacketInterval int64    `json:"packetInterval"`
 	SampleRate     int      `json:"sampleRate"`
@@ -66,6 +71,18 @@ type ExecutableBackupRemoval struct {
 	Name    string  `json:"name"`
 	Removed bool    `json:"removed"`
 	Error   *string `json:"error,omitempty"`
+}
+
+type FdsnAccessKey struct {
+	KeyID           string `json:"keyId"`
+	KeyPrefix       string `json:"keyPrefix"`
+	Remark          string `json:"remark"`
+	CreatedAt       int64  `json:"createdAt"`
+	ExpiresAt       *int64 `json:"expiresAt,omitempty"`
+	RevokedAt       *int64 `json:"revokedAt,omitempty"`
+	LastRequestedAt *int64 `json:"lastRequestedAt,omitempty"`
+	UserIP          string `json:"userIp"`
+	UserAgent       string `json:"userAgent"`
 }
 
 type PurgeDataJob struct {

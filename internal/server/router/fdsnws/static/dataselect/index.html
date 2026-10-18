@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" type="image/svg+xml" href="/anyshake.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+            name="description"
+            content="FDSN Web Services: station metadata, instrument responses, and waveform data."
+        />
+        <title>DataSelect URL Builder</title>
+
+        <link rel="stylesheet" href="/fdsnws/assets/app.css" />
+        <script src="/fdsnws/assets/app.js"></script>
+        <script defer src="/fdsnws/assets/tailwindcss-4.3.3.js"></script>
+        <script defer src="/fdsnws/assets/alpine-csp-3.15.8.min.js"></script>
+    </head>
+    <body class="min-h-screen">
+        <a class="sr-only focus:not-sr-only" href="#main">Skip to content</a>
+        <header
+            class="border-(--app-border) mx-auto max-w-6xl border-b px-4 py-3"
+            x-data="fdsnHeader"
+            @keydown.escape.prevent.stop="closeMenu"
+            @resize.window="resetMenu"
+        >
+            <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+                <a class="app-brand" href="/fdsnws/">
+                    <img
+                        src="/anyshake.svg"
+                        alt=""
+                        width="40"
+                        height="40"
+                        class="size-10 shrink-0"
+                    />
+                    <span>AnyShake Observer</span>
+                </a>
+                <button
+                    class="app-button app-menu-toggle"
+                    type="button"
+                    x-ref="menuToggle"
+                    aria-label="Open navigation menu"
+                    :aria-label="menuLabel"
+                    aria-controls="fdsn-navigation"
+                    aria-expanded="false"
+                    :aria-expanded="menuOpen"
+                    @click="toggleMenu"
+                >
+                    <svg
+                        class="size-5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        aria-hidden="true"
+                    >
+                        <path d="M4 6h16M4 12h16M4 18h16" :d="menuIcon" />
+                    </svg>
+                </button>
+                <nav
+                    class="app-navigation text-sm"
+                    id="fdsn-navigation"
+                    :class="navigationClass"
+                    aria-label="FDSN services"
+                    @click="resetMenu"
+                >
+                    <a href="/fdsnws/">Overview</a>
+                    <a href="/fdsnws/station/">Station URL Builder</a>
+                    <a href="/fdsnws/dataselect/" aria-current="page">DataSelect URL Builder</a>
+                </nav>
+            </div>
+        </header>
+        <main class="mx-auto max-w-6xl space-y-8 px-4 py-6" id="main">
+            <div x-data="dataselectBuilder" class="app-stack">
+                <div class="app-stack-xs">
+                    <h1 class="text-2xl font-semibold">
+                        <span>DataSelect URL Builder</span>
+                    </h1>
+                    <p class="app-description">
+                        Build a request to download recorded waveform data in MiniSEED format.
+                    </p>
+                </div>
+                <noscript
+                    ><p class="app-form-status-error">
+                        Enable JavaScript to use the URL Builder. The
+                        <a class="app-link-action" href="/fdsnws/dataselect/1/">API reference</a> is
+                        also available.
+                    </p></noscript
+                >
+                <div class="grid items-start gap-6 lg:grid-cols-2">
+                    <form
+                        class="app-stack border-(--app-border) border p-4"
+                        @submit.prevent="sendRequest"
+                        @input="clearFeedback"
+                        novalidate
+                    >
+                        <h2 class="text-(--app-heading) text-lg font-semibold">Query parameters</h2>
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="network">Network</label>
+                                <input
+                                    class="app-input app-full-width"
+                                    id="network"
+                                    name="network"
+                                    type="text"
+                                    placeholder="*"
+                                    x-model="network"
+                                    autocomplete="off"
+                                    spellcheck="false"
+                                />
+                            </div>
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="station">Station</label>
+                                <input
+                                    class="app-input app-full-width"
+                                    id="station"
+                                    name="station"
+                                    type="text"
+                                    placeholder="*"
+                                    x-model="station"
+                                    autocomplete="off"
+                                    spellcheck="false"
+                                />
+                            </div>
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="location">Location</label>
+                                <input
+                                    class="app-input app-full-width"
+                                    id="location"
+                                    name="location"
+                                    type="text"
+                                    placeholder="*"
+                                    x-model="location"
+                                    autocomplete="off"
+                                    spellcheck="false"
+                                />
+                            </div>
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="channel">Channel</label>
+                                <input
+                                    class="app-input app-full-width"
+                                    id="channel"
+                                    name="channel"
+                                    type="text"
+                                    placeholder="*"
+                                    x-model="channel"
+                                    autocomplete="off"
+                                    spellcheck="false"
+                                />
+                            </div>
+                        </div>
+                        <p class="app-help-text">
+                            Use <code>*</code> for any value, <code>?</code> for one character, and
+                            commas for multiple selectors. Use <code>--</code> for an empty location
+                            code.
+                        </p>
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="starttime"
+                                    >Start time (UTC)</label
+                                >
+                                <input
+                                    class="app-input app-full-width"
+                                    id="starttime"
+                                    name="starttime"
+                                    type="datetime-local"
+                                    placeholder=""
+                                    x-model="starttime"
+                                    step="1"
+                                />
+                            </div>
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="endtime">End time (UTC)</label>
+                                <input
+                                    class="app-input app-full-width"
+                                    id="endtime"
+                                    name="endtime"
+                                    type="datetime-local"
+                                    placeholder=""
+                                    x-model="endtime"
+                                    step="1"
+                                />
+                            </div>
+                        </div>
+                        <p class="app-help-text">
+                            Start and end times are required and use UTC. The default window is the
+                            last minute. The server applies its configured query duration limit.
+                        </p>
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="quality">Data quality</label>
+                                <select
+                                    class="app-select app-full-width"
+                                    id="quality"
+                                    x-model="quality"
+                                >
+                                    <option value="B">Best available (B)</option>
+                                    <option value="D">Raw data (D)</option>
+                                </select>
+                            </div>
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="minimumlength"
+                                    >Minimum length (seconds)</label
+                                >
+                                <input
+                                    class="app-input app-full-width"
+                                    id="minimumlength"
+                                    name="minimumlength"
+                                    type="number"
+                                    placeholder="No minimum"
+                                    x-model="minimumlength"
+                                    min="0"
+                                    step="any"
+                                />
+                            </div>
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="nodata"
+                                    >When no data matches</label
+                                >
+                                <select
+                                    class="app-select app-full-width"
+                                    id="nodata"
+                                    x-model="nodata"
+                                >
+                                    <option value="204">204 · No Content</option>
+                                    <option value="404">404 · Not Found</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="app-row">
+                            <input id="longestonly" type="checkbox" x-model="longestonly" />
+                            <label class="app-checkbox-label whitespace-normal" for="longestonly"
+                                >Return only the longest continuous segment</label
+                            >
+                        </div>
+                        <button
+                            class="app-button"
+                            type="button"
+                            @click="reset"
+                            :disabled="requesting"
+                        >
+                            <span>Reset parameters</span>
+                        </button>
+                    </form>
+                    <aside class="app-stack min-w-0" aria-label="Request and response">
+                        <section class="app-stack border-(--app-border) border p-4">
+                            <h2 class="text-(--app-heading) text-lg font-semibold">Test request</h2>
+                            <form
+                                class="app-stack"
+                                @submit.prevent="sendRequest"
+                                :aria-busy="requesting"
+                                autocomplete="off"
+                                novalidate
+                                x-cloak
+                            >
+                                <div class="app-stack-xs">
+                                    <label class="app-form-legend" for="access-key"
+                                        >Access key</label
+                                    >
+                                    <input
+                                        class="app-input app-full-width"
+                                        id="access-key"
+                                        type="password"
+                                        x-model="accessKey"
+                                        placeholder="Enter your access key"
+                                        autocomplete="off"
+                                        spellcheck="false"
+                                        aria-describedby="access-key-help"
+                                        required
+                                    />
+                                    <p class="app-help-text" id="access-key-help">
+                                        The key stays on this page and is sent in the Authorization
+                                        header.
+                                    </p>
+                                </div>
+                                <p
+                                    class="app-form-status-error"
+                                    role="alert"
+                                    x-show="validationError"
+                                    x-text="validationError"
+                                    x-cloak
+                                ></p>
+                                <div class="flex flex-wrap gap-2">
+                                    <button
+                                        class="app-button app-button-primary"
+                                        type="submit"
+                                        :disabled="requestDisabled"
+                                        x-text="requestLabel"
+                                    >
+                                        Send request
+                                    </button>
+                                    <button
+                                        class="app-button"
+                                        type="button"
+                                        @click="cancelRequest"
+                                        x-show="requesting"
+                                        x-cloak
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                                <p
+                                    class="app-form-status-error"
+                                    role="alert"
+                                    x-show="requestError"
+                                    x-text="requestError"
+                                    x-cloak
+                                ></p>
+                            </form>
+                        </section>
+                        <section
+                            class="app-stack border-(--app-border) border p-4"
+                            x-show="responseStatus"
+                            x-cloak
+                        >
+                            <h2 class="text-(--app-heading) text-lg font-semibold">
+                                Last response
+                            </h2>
+                            <p
+                                class="font-mono"
+                                :class="responseStatusClass"
+                                role="status"
+                                x-text="responseStatus"
+                            ></p>
+                            <p class="app-help-text wrap-anywhere" x-text="responseURL"></p>
+                            <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+                                <dt>Content type</dt>
+                                <dd class="wrap-anywhere min-w-0" x-text="responseType"></dd>
+                                <dt>Size</dt>
+                                <dd x-text="responseSize"></dd>
+                            </dl>
+                            <p
+                                class="app-help-text"
+                                x-show="responseMessage"
+                                x-text="responseMessage"
+                            ></p>
+                            <p x-show="downloadURL">
+                                <a
+                                    class="app-link-action"
+                                    :href="downloadURL"
+                                    :download="downloadName"
+                                    >Download <span x-text="downloadName"></span
+                                ></a>
+                            </p>
+                            <div class="app-code-block app-response-preview" x-show="responseText">
+                                <div class="app-code-toolbar"><span>Response body</span></div>
+                                <pre><code x-text="responseText"></code></pre>
+                            </div>
+                            <p class="app-help-text" x-show="responseTruncated">
+                                The preview shows the first 64 KiB.
+                            </p>
+                        </section>
+                        <details class="app-stack border-(--app-border) border p-4">
+                            <summary class="cursor-pointer font-semibold">URL and cURL</summary>
+                            <div class="app-code-block">
+                                <div class="app-code-toolbar"><span>GET · Request URL</span></div>
+                                <pre><code x-text="url"></code></pre>
+                            </div>
+                            <div class="app-code-block">
+                                <div class="app-code-toolbar"><span>cURL · Download</span></div>
+                                <pre><code x-text="curl"></code></pre>
+                            </div>
+                            <p class="app-help-text">
+                                To use cURL, set the FDSN_ACCESS_KEY environment variable to your
+                                access key. Opening the URL alone does not send the required header.
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <button
+                                    class="app-button"
+                                    type="button"
+                                    :disabled="validationError !== ''"
+                                    @click="copyURL"
+                                >
+                                    Copy URL
+                                </button>
+                                <button
+                                    class="app-button"
+                                    type="button"
+                                    :disabled="validationError !== ''"
+                                    @click="copyCurl"
+                                >
+                                    Copy cURL
+                                </button>
+                            </div>
+                            <p
+                                class="app-form-status-success"
+                                role="status"
+                                x-show="copyMessage"
+                                x-text="copyMessage"
+                                x-cloak
+                            ></p>
+                            <p
+                                class="app-form-status-error"
+                                role="alert"
+                                x-show="copyError"
+                                x-text="copyError"
+                                x-cloak
+                            ></p>
+                        </details>
+                        <p class="text-sm">
+                            <a class="app-link-action" href="/fdsnws/dataselect/1/"
+                                >API reference</a
+                            >
+                        </p>
+                    </aside>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

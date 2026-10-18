@@ -14,7 +14,7 @@ export default defineConfig({
             registerType: 'prompt',
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
-                navigateFallbackDenylist: [/^\/api/],
+                navigateFallbackDenylist: [/^\/api/, /^\/fdsnws(?:\/|\?|$)/],
                 maximumFileSizeToCacheInBytes: 3000000
             },
             manifest: {

@@ -48,6 +48,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
+		CreateFDSNAccessKey        func(childComplexity int, remark string, expiresAt *int64) int
 		CreateSysUser              func(childComplexity int, username string, password string, admin bool) int
 		ImportGlobalConfig         func(childComplexity int, data string) int
 		PurgeHelicorderFiles       func(childComplexity int) int
@@ -62,6 +63,7 @@ type ComplexityRoot struct {
 		RestartService             func(childComplexity int, serviceID string) int
 		RestoreServiceConfig       func(childComplexity int, serviceID *string) int
 		RestoreStationConfig       func(childComplexity int) int
+		RevokeFDSNAccessKeys       func(childComplexity int, keyIds []string) int
 		StartService               func(childComplexity int, serviceID string) int
 		StopService                func(childComplexity int, serviceID string) int
 		UpdateServiceConfig        func(childComplexity int, serviceID string, key string, val interface{}) int
@@ -82,6 +84,7 @@ type ComplexityRoot struct {
 		GetEventSource             func(childComplexity int) int
 		GetEventsBySource          func(childComplexity int, code string) int
 		GetExecutableBackups       func(childComplexity int) int
+		GetFDSNAccessKeys          func(childComplexity int) int
 		GetHelicorderFiles         func(childComplexity int) int
 		GetMiniSeedFiles           func(childComplexity int) int
 		GetSeisRecordsByTime       func(childComplexity int, startTime int64, endTime int64) int
@@ -112,6 +115,11 @@ type ComplexityRoot struct {
 		Name         func(childComplexity int) int
 		Namespace    func(childComplexity int) int
 		Options      func(childComplexity int) int
+	}
+
+	CreatedFDSNAccessKey struct {
+		AccessKey func(childComplexity int) int
+		Key       func(childComplexity int) int
 	}
 
 	DeviceConfig struct {
@@ -148,6 +156,18 @@ type ComplexityRoot struct {
 		Error   func(childComplexity int) int
 		Name    func(childComplexity int) int
 		Removed func(childComplexity int) int
+	}
+
+	FdsnAccessKey struct {
+		CreatedAt       func(childComplexity int) int
+		ExpiresAt       func(childComplexity int) int
+		KeyID           func(childComplexity int) int
+		KeyPrefix       func(childComplexity int) int
+		LastRequestedAt func(childComplexity int) int
+		Remark          func(childComplexity int) int
+		RevokedAt       func(childComplexity int) int
+		UserAgent       func(childComplexity int) int
+		UserIP          func(childComplexity int) int
 	}
 
 	PurgeDataJob struct {
@@ -239,6 +259,8 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
+	CreateFDSNAccessKey(ctx context.Context, remark string, expiresAt *int64) (*graph_model.CreatedFDSNAccessKey, error)
+	RevokeFDSNAccessKeys(ctx context.Context, keyIds []string) (bool, error)
 	CreateSysUser(ctx context.Context, username string, password string, admin bool) (string, error)
 	RemoveSysUser(ctx context.Context, userID string) (bool, error)
 	UpdateSysUser(ctx context.Context, userID string, username string, password *string, admin bool) (bool, error)
@@ -271,6 +293,7 @@ type QueryResolver interface {
 	GetStationMetadata(ctx context.Context, format string) (string, error)
 	GetServiceConfigConstraint(ctx context.Context) ([]*graph_model.ServiceConfigConstraint, error)
 	GetStationConfigConstraint(ctx context.Context) ([]*graph_model.ConfigConstraint, error)
+	GetFDSNAccessKeys(ctx context.Context) ([]*graph_model.FdsnAccessKey, error)
 	GetServiceStatus(ctx context.Context) ([]*graph_model.ServiceStatus, error)
 	GetEventSource(ctx context.Context) ([]*graph_model.SeisEventSource, error)
 	GetEventsBySource(ctx context.Context, code string) ([]*graph_model.SeisEvent, error)
@@ -306,6 +329,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	_ = ec
 	switch typeName + "." + field {
 
+	case "Mutation.createFDSNAccessKey":
+		if e.complexity.Mutation.CreateFDSNAccessKey == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createFDSNAccessKey_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateFDSNAccessKey(childComplexity, args["remark"].(string), args["expiresAt"].(*int64)), true
 	case "Mutation.createSysUser":
 		if e.complexity.Mutation.CreateSysUser == nil {
 			break
@@ -435,6 +469,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.RestoreStationConfig(childComplexity), true
+	case "Mutation.revokeFDSNAccessKeys":
+		if e.complexity.Mutation.RevokeFDSNAccessKeys == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_revokeFDSNAccessKeys_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RevokeFDSNAccessKeys(childComplexity, args["keyIds"].([]string)), true
 	case "Mutation.startService":
 		if e.complexity.Mutation.StartService == nil {
 			break
@@ -568,6 +613,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.GetExecutableBackups(childComplexity), true
+	case "Query.getFDSNAccessKeys":
+		if e.complexity.Query.GetFDSNAccessKeys == nil {
+			break
+		}
+
+		return e.complexity.Query.GetFDSNAccessKeys(childComplexity), true
 	case "Query.getHelicorderFiles":
 		if e.complexity.Query.GetHelicorderFiles == nil {
 			break
@@ -725,6 +776,19 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.ConfigConstraint.Options(childComplexity), true
 
+	case "createdFDSNAccessKey.accessKey":
+		if e.complexity.CreatedFDSNAccessKey.AccessKey == nil {
+			break
+		}
+
+		return e.complexity.CreatedFDSNAccessKey.AccessKey(childComplexity), true
+	case "createdFDSNAccessKey.key":
+		if e.complexity.CreatedFDSNAccessKey.Key == nil {
+			break
+		}
+
+		return e.complexity.CreatedFDSNAccessKey.Key(childComplexity), true
+
 	case "deviceConfig.channelCodes":
 		if e.complexity.DeviceConfig.ChannelCodes == nil {
 			break
@@ -855,6 +919,61 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.ExecutableBackupRemoval.Removed(childComplexity), true
+
+	case "fdsnAccessKey.createdAt":
+		if e.complexity.FdsnAccessKey.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.FdsnAccessKey.CreatedAt(childComplexity), true
+	case "fdsnAccessKey.expiresAt":
+		if e.complexity.FdsnAccessKey.ExpiresAt == nil {
+			break
+		}
+
+		return e.complexity.FdsnAccessKey.ExpiresAt(childComplexity), true
+	case "fdsnAccessKey.keyId":
+		if e.complexity.FdsnAccessKey.KeyID == nil {
+			break
+		}
+
+		return e.complexity.FdsnAccessKey.KeyID(childComplexity), true
+	case "fdsnAccessKey.keyPrefix":
+		if e.complexity.FdsnAccessKey.KeyPrefix == nil {
+			break
+		}
+
+		return e.complexity.FdsnAccessKey.KeyPrefix(childComplexity), true
+	case "fdsnAccessKey.lastRequestedAt":
+		if e.complexity.FdsnAccessKey.LastRequestedAt == nil {
+			break
+		}
+
+		return e.complexity.FdsnAccessKey.LastRequestedAt(childComplexity), true
+	case "fdsnAccessKey.remark":
+		if e.complexity.FdsnAccessKey.Remark == nil {
+			break
+		}
+
+		return e.complexity.FdsnAccessKey.Remark(childComplexity), true
+	case "fdsnAccessKey.revokedAt":
+		if e.complexity.FdsnAccessKey.RevokedAt == nil {
+			break
+		}
+
+		return e.complexity.FdsnAccessKey.RevokedAt(childComplexity), true
+	case "fdsnAccessKey.userAgent":
+		if e.complexity.FdsnAccessKey.UserAgent == nil {
+			break
+		}
+
+		return e.complexity.FdsnAccessKey.UserAgent(childComplexity), true
+	case "fdsnAccessKey.userIp":
+		if e.complexity.FdsnAccessKey.UserIP == nil {
+			break
+		}
+
+		return e.complexity.FdsnAccessKey.UserIP(childComplexity), true
 
 	case "purgeDataJob.error":
 		if e.complexity.PurgeDataJob.Error == nil {
@@ -1331,6 +1450,22 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) field_Mutation_createFDSNAccessKey_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "remark", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["remark"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "expiresAt", ec.unmarshalOInt642ᚖint64)
+	if err != nil {
+		return nil, err
+	}
+	args["expiresAt"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createSysUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1452,6 +1587,17 @@ func (ec *executionContext) field_Mutation_restoreServiceConfig_args(ctx context
 		return nil, err
 	}
 	args["serviceId"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_revokeFDSNAccessKeys_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "keyIds", ec.unmarshalNString2ᚕstringᚄ)
+	if err != nil {
+		return nil, err
+	}
+	args["keyIds"] = arg0
 	return args, nil
 }
 
@@ -1640,6 +1786,94 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Mutation_createFDSNAccessKey(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createFDSNAccessKey,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().CreateFDSNAccessKey(ctx, fc.Args["remark"].(string), fc.Args["expiresAt"].(*int64))
+		},
+		nil,
+		ec.marshalNcreatedFDSNAccessKey2ᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐCreatedFDSNAccessKey,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createFDSNAccessKey(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "accessKey":
+				return ec.fieldContext_createdFDSNAccessKey_accessKey(ctx, field)
+			case "key":
+				return ec.fieldContext_createdFDSNAccessKey_key(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type createdFDSNAccessKey", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createFDSNAccessKey_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_revokeFDSNAccessKeys(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_revokeFDSNAccessKeys,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().RevokeFDSNAccessKeys(ctx, fc.Args["keyIds"].([]string))
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_revokeFDSNAccessKeys(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_revokeFDSNAccessKeys_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _Mutation_createSysUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
@@ -2862,6 +3096,55 @@ func (ec *executionContext) fieldContext_Query_getStationConfigConstraint(_ cont
 				return ec.fieldContext_configConstraint_options(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type configConstraint", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getFDSNAccessKeys(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_getFDSNAccessKeys,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Query().GetFDSNAccessKeys(ctx)
+		},
+		nil,
+		ec.marshalNfdsnAccessKey2ᚕᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐFdsnAccessKeyᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_getFDSNAccessKeys(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "keyId":
+				return ec.fieldContext_fdsnAccessKey_keyId(ctx, field)
+			case "keyPrefix":
+				return ec.fieldContext_fdsnAccessKey_keyPrefix(ctx, field)
+			case "remark":
+				return ec.fieldContext_fdsnAccessKey_remark(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_fdsnAccessKey_createdAt(ctx, field)
+			case "expiresAt":
+				return ec.fieldContext_fdsnAccessKey_expiresAt(ctx, field)
+			case "revokedAt":
+				return ec.fieldContext_fdsnAccessKey_revokedAt(ctx, field)
+			case "lastRequestedAt":
+				return ec.fieldContext_fdsnAccessKey_lastRequestedAt(ctx, field)
+			case "userIp":
+				return ec.fieldContext_fdsnAccessKey_userIp(ctx, field)
+			case "userAgent":
+				return ec.fieldContext_fdsnAccessKey_userAgent(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type fdsnAccessKey", field.Name)
 		},
 	}
 	return fc, nil
@@ -5320,6 +5603,84 @@ func (ec *executionContext) fieldContext_configConstraint_options(_ context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _createdFDSNAccessKey_accessKey(ctx context.Context, field graphql.CollectedField, obj *graph_model.CreatedFDSNAccessKey) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_createdFDSNAccessKey_accessKey,
+		func(ctx context.Context) (any, error) {
+			return obj.AccessKey, nil
+		},
+		nil,
+		ec.marshalNfdsnAccessKey2ᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐFdsnAccessKey,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_createdFDSNAccessKey_accessKey(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "createdFDSNAccessKey",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "keyId":
+				return ec.fieldContext_fdsnAccessKey_keyId(ctx, field)
+			case "keyPrefix":
+				return ec.fieldContext_fdsnAccessKey_keyPrefix(ctx, field)
+			case "remark":
+				return ec.fieldContext_fdsnAccessKey_remark(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_fdsnAccessKey_createdAt(ctx, field)
+			case "expiresAt":
+				return ec.fieldContext_fdsnAccessKey_expiresAt(ctx, field)
+			case "revokedAt":
+				return ec.fieldContext_fdsnAccessKey_revokedAt(ctx, field)
+			case "lastRequestedAt":
+				return ec.fieldContext_fdsnAccessKey_lastRequestedAt(ctx, field)
+			case "userIp":
+				return ec.fieldContext_fdsnAccessKey_userIp(ctx, field)
+			case "userAgent":
+				return ec.fieldContext_fdsnAccessKey_userAgent(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type fdsnAccessKey", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _createdFDSNAccessKey_key(ctx context.Context, field graphql.CollectedField, obj *graph_model.CreatedFDSNAccessKey) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_createdFDSNAccessKey_key,
+		func(ctx context.Context) (any, error) {
+			return obj.Key, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_createdFDSNAccessKey_key(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "createdFDSNAccessKey",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _deviceConfig_packetInterval(ctx context.Context, field graphql.CollectedField, obj *graph_model.DeviceConfig) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -5919,6 +6280,267 @@ func (ec *executionContext) _executableBackupRemoval_error(ctx context.Context, 
 func (ec *executionContext) fieldContext_executableBackupRemoval_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "executableBackupRemoval",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _fdsnAccessKey_keyId(ctx context.Context, field graphql.CollectedField, obj *graph_model.FdsnAccessKey) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_fdsnAccessKey_keyId,
+		func(ctx context.Context) (any, error) {
+			return obj.KeyID, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_fdsnAccessKey_keyId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "fdsnAccessKey",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _fdsnAccessKey_keyPrefix(ctx context.Context, field graphql.CollectedField, obj *graph_model.FdsnAccessKey) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_fdsnAccessKey_keyPrefix,
+		func(ctx context.Context) (any, error) {
+			return obj.KeyPrefix, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_fdsnAccessKey_keyPrefix(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "fdsnAccessKey",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _fdsnAccessKey_remark(ctx context.Context, field graphql.CollectedField, obj *graph_model.FdsnAccessKey) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_fdsnAccessKey_remark,
+		func(ctx context.Context) (any, error) {
+			return obj.Remark, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_fdsnAccessKey_remark(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "fdsnAccessKey",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _fdsnAccessKey_createdAt(ctx context.Context, field graphql.CollectedField, obj *graph_model.FdsnAccessKey) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_fdsnAccessKey_createdAt,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalNInt642int64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_fdsnAccessKey_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "fdsnAccessKey",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _fdsnAccessKey_expiresAt(ctx context.Context, field graphql.CollectedField, obj *graph_model.FdsnAccessKey) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_fdsnAccessKey_expiresAt,
+		func(ctx context.Context) (any, error) {
+			return obj.ExpiresAt, nil
+		},
+		nil,
+		ec.marshalOInt642ᚖint64,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_fdsnAccessKey_expiresAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "fdsnAccessKey",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _fdsnAccessKey_revokedAt(ctx context.Context, field graphql.CollectedField, obj *graph_model.FdsnAccessKey) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_fdsnAccessKey_revokedAt,
+		func(ctx context.Context) (any, error) {
+			return obj.RevokedAt, nil
+		},
+		nil,
+		ec.marshalOInt642ᚖint64,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_fdsnAccessKey_revokedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "fdsnAccessKey",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _fdsnAccessKey_lastRequestedAt(ctx context.Context, field graphql.CollectedField, obj *graph_model.FdsnAccessKey) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_fdsnAccessKey_lastRequestedAt,
+		func(ctx context.Context) (any, error) {
+			return obj.LastRequestedAt, nil
+		},
+		nil,
+		ec.marshalOInt642ᚖint64,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_fdsnAccessKey_lastRequestedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "fdsnAccessKey",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _fdsnAccessKey_userIp(ctx context.Context, field graphql.CollectedField, obj *graph_model.FdsnAccessKey) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_fdsnAccessKey_userIp,
+		func(ctx context.Context) (any, error) {
+			return obj.UserIP, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_fdsnAccessKey_userIp(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "fdsnAccessKey",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _fdsnAccessKey_userAgent(ctx context.Context, field graphql.CollectedField, obj *graph_model.FdsnAccessKey) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_fdsnAccessKey_userAgent,
+		func(ctx context.Context) (any, error) {
+			return obj.UserAgent, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_fdsnAccessKey_userAgent(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "fdsnAccessKey",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -7639,6 +8261,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
+		case "createFDSNAccessKey":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createFDSNAccessKey(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "revokeFDSNAccessKeys":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_revokeFDSNAccessKeys(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createSysUser":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createSysUser(ctx, field)
@@ -8044,6 +8680,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getStationConfigConstraint(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getFDSNAccessKeys":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getFDSNAccessKeys(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -8837,6 +9495,50 @@ func (ec *executionContext) _configConstraint(ctx context.Context, sel ast.Selec
 	return out
 }
 
+var createdFDSNAccessKeyImplementors = []string{"createdFDSNAccessKey"}
+
+func (ec *executionContext) _createdFDSNAccessKey(ctx context.Context, sel ast.SelectionSet, obj *graph_model.CreatedFDSNAccessKey) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createdFDSNAccessKeyImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("createdFDSNAccessKey")
+		case "accessKey":
+			out.Values[i] = ec._createdFDSNAccessKey_accessKey(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "key":
+			out.Values[i] = ec._createdFDSNAccessKey_key(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var deviceConfigImplementors = []string{"deviceConfig"}
 
 func (ec *executionContext) _deviceConfig(ctx context.Context, sel ast.SelectionSet, obj *graph_model.DeviceConfig) graphql.Marshaler {
@@ -9074,6 +9776,76 @@ func (ec *executionContext) _executableBackupRemoval(ctx context.Context, sel as
 			}
 		case "error":
 			out.Values[i] = ec._executableBackupRemoval_error(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var fdsnAccessKeyImplementors = []string{"fdsnAccessKey"}
+
+func (ec *executionContext) _fdsnAccessKey(ctx context.Context, sel ast.SelectionSet, obj *graph_model.FdsnAccessKey) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, fdsnAccessKeyImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("fdsnAccessKey")
+		case "keyId":
+			out.Values[i] = ec._fdsnAccessKey_keyId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "keyPrefix":
+			out.Values[i] = ec._fdsnAccessKey_keyPrefix(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "remark":
+			out.Values[i] = ec._fdsnAccessKey_remark(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._fdsnAccessKey_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "expiresAt":
+			out.Values[i] = ec._fdsnAccessKey_expiresAt(ctx, field, obj)
+		case "revokedAt":
+			out.Values[i] = ec._fdsnAccessKey_revokedAt(ctx, field, obj)
+		case "lastRequestedAt":
+			out.Values[i] = ec._fdsnAccessKey_lastRequestedAt(ctx, field, obj)
+		case "userIp":
+			out.Values[i] = ec._fdsnAccessKey_userIp(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "userAgent":
+			out.Values[i] = ec._fdsnAccessKey_userAgent(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10346,6 +11118,20 @@ func (ec *executionContext) marshalNconfigConstraint2ᚖgithubᚗcomᚋanyshake�
 	return ec._configConstraint(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNcreatedFDSNAccessKey2githubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐCreatedFDSNAccessKey(ctx context.Context, sel ast.SelectionSet, v graph_model.CreatedFDSNAccessKey) graphql.Marshaler {
+	return ec._createdFDSNAccessKey(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNcreatedFDSNAccessKey2ᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐCreatedFDSNAccessKey(ctx context.Context, sel ast.SelectionSet, v *graph_model.CreatedFDSNAccessKey) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._createdFDSNAccessKey(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNdeviceConfig2githubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐDeviceConfig(ctx context.Context, sel ast.SelectionSet, v graph_model.DeviceConfig) graphql.Marshaler {
 	return ec._deviceConfig(ctx, sel, &v)
 }
@@ -10494,6 +11280,60 @@ func (ec *executionContext) marshalNexecutableBackupRemoval2ᚖgithubᚗcomᚋan
 		return graphql.Null
 	}
 	return ec._executableBackupRemoval(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNfdsnAccessKey2ᚕᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐFdsnAccessKeyᚄ(ctx context.Context, sel ast.SelectionSet, v []*graph_model.FdsnAccessKey) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNfdsnAccessKey2ᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐFdsnAccessKey(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNfdsnAccessKey2ᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐFdsnAccessKey(ctx context.Context, sel ast.SelectionSet, v *graph_model.FdsnAccessKey) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._fdsnAccessKey(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNjobStatus2githubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐJobStatus(ctx context.Context, v any) (graph_model.JobStatus, error) {

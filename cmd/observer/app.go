@@ -123,6 +123,7 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		&model.SchemaVersion{},
 		&model.SeisRecord{},
 		&model.SysUser{},
+		&model.FDSNAccessKey{},
 		&model.UserSettings{},
 	); err != nil {
 		logger.GetLogger(main).Fatalln(err)

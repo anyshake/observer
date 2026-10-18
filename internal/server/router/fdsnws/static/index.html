@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" type="image/svg+xml" href="/anyshake.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+            name="description"
+            content="FDSN Web Services: station metadata, instrument responses, and waveform data."
+        />
+        <title>FDSN Web Services</title>
+
+        <link rel="stylesheet" href="/fdsnws/assets/app.css" />
+
+        <script src="/fdsnws/assets/app.js"></script>
+        <script defer src="/fdsnws/assets/tailwindcss-4.3.3.js"></script>
+        <script defer src="/fdsnws/assets/alpine-csp-3.15.8.min.js"></script>
+    </head>
+    <body class="min-h-screen">
+        <a class="sr-only focus:not-sr-only" href="#main">Skip to content</a>
+        <header
+            class="border-(--app-border) mx-auto max-w-6xl border-b px-4 py-3"
+            x-data="fdsnHeader"
+            @keydown.escape.prevent.stop="closeMenu"
+            @resize.window="resetMenu"
+        >
+            <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+                <a class="app-brand" href="/fdsnws/">
+                    <img
+                        src="/anyshake.svg"
+                        alt=""
+                        width="40"
+                        height="40"
+                        class="size-10 shrink-0"
+                    />
+                    <span>AnyShake Observer</span>
+                </a>
+                <button
+                    class="app-button app-menu-toggle"
+                    type="button"
+                    x-ref="menuToggle"
+                    aria-label="Open navigation menu"
+                    :aria-label="menuLabel"
+                    aria-controls="fdsn-navigation"
+                    aria-expanded="false"
+                    :aria-expanded="menuOpen"
+                    @click="toggleMenu"
+                >
+                    <svg
+                        class="size-5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        aria-hidden="true"
+                    >
+                        <path d="M4 6h16M4 12h16M4 18h16" :d="menuIcon" />
+                    </svg>
+                </button>
+                <nav
+                    class="app-navigation text-sm"
+                    id="fdsn-navigation"
+                    :class="navigationClass"
+                    aria-label="FDSN services"
+                    @click="resetMenu"
+                >
+                    <a href="/fdsnws/" aria-current="page">Overview</a>
+                    <a href="/fdsnws/station/">Station URL Builder</a>
+                    <a href="/fdsnws/dataselect/">DataSelect URL Builder</a>
+                </nav>
+            </div>
+        </header>
+        <main class="mx-auto max-w-6xl space-y-8 px-4 py-6" id="main">
+            <div class="app-stack-xs">
+                <h1 class="text-2xl font-semibold">FDSN Web Services</h1>
+                <p class="app-description">
+                    Station metadata, instrument responses, and waveform data.
+                </p>
+            </div>
+            <div class="grid gap-6 md:grid-cols-2">
+                <section class="app-stack">
+                    <h2 class="text-lg font-semibold">Station</h2>
+                    <p class="app-help-text">
+                        Discover this station's network, channels, coordinates, and sample rates.
+                        Request StationXML with instrument sensitivity and response stages when
+                        available.
+                    </p>
+                    <div class="flex flex-wrap gap-4 text-sm">
+                        <a class="app-link-action" href="/fdsnws/station/">URL Builder</a
+                        ><a class="app-link-action" href="/fdsnws/station/1/">API reference</a>
+                    </div>
+                </section>
+                <section class="app-stack">
+                    <h2 class="text-lg font-semibold">DataSelect</h2>
+                    <p class="app-help-text">
+                        Download archived waveform samples for a channel and time range as MiniSEED.
+                        Use them with FDSN-compatible seismic analysis tools.
+                    </p>
+                    <div class="flex flex-wrap gap-4 text-sm">
+                        <a class="app-link-action" href="/fdsnws/dataselect/">URL Builder</a
+                        ><a class="app-link-action" href="/fdsnws/dataselect/1/">API reference</a>
+                    </div>
+                </section>
+            </div>
+            <section class="app-stack">
+                <h2 class="text-lg font-semibold">Access and authentication</h2>
+                <ol class="list-decimal space-y-3 pl-5 text-sm leading-6">
+                    <li>Ask the station administrator for an access key.</li>
+                    <li>
+                        Choose a service above and use its URL Builder to select channels, times,
+                        and output options.
+                    </li>
+                    <li>
+                        Enter your access key in the URL Builder and click Send request to test it
+                        in your browser. To use cURL, set the key in your shell and copy the
+                        generated command.
+                    </li>
+                </ol>
+                <div class="app-code-block">
+                    <div class="app-code-toolbar"><span>Shell · Access key</span></div>
+                    <pre><code>export FDSN_ACCESS_KEY=&#x27;&lt;access key&gt;&#x27;</code></pre>
+                </div>
+                <p class="app-help-text">
+                    Send <code>Authorization: Bearer &lt;access key&gt;</code> with each query
+                    request. Keys are managed by an administrator and may expire or be revoked. Keep
+                    the key out of query URLs.
+                </p>
+                <p class="app-help-text">
+                    Documentation, URL Builders, version endpoints, and WADL files are public while
+                    the service is enabled. Authentication is required only for station and
+                    dataselect query endpoints.
+                </p>
+            </section>
+            <section class="app-stack">
+                <h2 class="text-(--app-heading) text-lg font-semibold">Response codes</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <caption class="sr-only">
+                            HTTP response codes
+                        </caption>
+                        <thead>
+                            <tr class="border-(--app-border-strong) border-b">
+                                <th class="p-3">Status</th>
+                                <th class="p-3">Meaning</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-(--app-border) divide-y">
+                            <tr>
+                                <td class="p-3 font-mono">200</td>
+                                <td class="p-3">The request succeeded.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-mono">204 / 404</td>
+                                <td class="p-3">
+                                    No matching data; controlled by the nodata parameter.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-mono">400</td>
+                                <td class="p-3">
+                                    A parameter, time range, or request body is invalid.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-mono">401</td>
+                                <td class="p-3">
+                                    The access key is missing, invalid, expired, or revoked.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-mono">404</td>
+                                <td class="p-3">The endpoint does not exist.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-mono">501</td>
+                                <td class="p-3">The FDSN service is disabled.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-mono">503</td>
+                                <td class="p-3">The service is temporarily unavailable.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </body>
+</html>

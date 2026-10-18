@@ -1,0 +1,245 @@
+:root {
+    color-scheme: light;
+    --app-heading: #1e2939;
+    --app-muted: #52525b;
+    --app-border: #e4e4e7;
+    --app-border-strong: #d4d4d8;
+    --app-primary: #8b3dff;
+    --app-button: #ad46ff;
+    --app-button-hover: #8200db;
+}
+
+body {
+    margin: 0;
+    background: #fff;
+    color: #27272a;
+    font-family: system-ui, sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+[x-cloak] {
+    display: none !important;
+}
+
+a {
+    color: var(--app-primary);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+}
+
+nav a {
+    text-decoration: none;
+}
+
+nav a[aria-current='page'] {
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+:where(a, button, input, select, summary):focus-visible {
+    outline: 2px solid var(--app-primary);
+    outline-offset: 2px;
+}
+
+.app-stack > :where(:not(:last-child)) {
+    margin-block: 0 1rem;
+}
+
+.app-stack-xs > :where(:not(:last-child)) {
+    margin-block: 0 0.25rem;
+}
+
+.app-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.app-description,
+.app-help-text {
+    color: var(--app-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.app-form-legend {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.app-checkbox-label {
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+summary {
+    color: var(--app-primary);
+}
+
+.app-input,
+.app-select {
+    min-width: 0;
+    min-height: 2.375rem;
+    border: 1px solid var(--app-border-strong);
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.625rem;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+}
+
+.app-input::placeholder {
+    color: #71717a;
+    opacity: 1;
+}
+
+input[type='checkbox'] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--app-primary);
+}
+
+.app-full-width {
+    width: 100%;
+}
+
+.app-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--app-primary);
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    background: #fff;
+    color: var(--app-primary);
+    font: inherit;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.app-button-primary {
+    border-color: var(--app-button);
+    background: var(--app-button);
+    color: #fff;
+}
+
+.app-button-primary:hover:not(:disabled) {
+    border-color: var(--app-button-hover);
+    background: var(--app-button-hover);
+}
+
+.app-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.app-brand {
+    display: inline-flex;
+    flex: 1;
+    align-items: center;
+    min-width: 0;
+    gap: 0.5rem;
+    color: var(--app-heading);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.app-brand span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.app-menu-toggle {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    padding: 0.25rem;
+}
+
+.app-navigation {
+    display: none;
+    flex-basis: 100%;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.app-navigation-open {
+    display: flex;
+}
+
+.app-navigation a {
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+}
+
+@media (min-width: 48rem) {
+    .app-menu-toggle {
+        display: none;
+    }
+
+    .app-navigation {
+        display: flex;
+        flex-basis: auto;
+        flex-direction: row;
+        gap: 1.5rem;
+    }
+}
+
+.app-form-status-error,
+.app-form-status-success {
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.app-form-status-error {
+    color: #b91c1c;
+}
+
+.app-form-status-success {
+    color: #166534;
+}
+
+.app-code-block {
+    min-width: 0;
+    border: 1px solid var(--app-border);
+    border-radius: 0.25rem;
+    background: #fafafa;
+}
+
+.app-code-toolbar {
+    padding: 0.5rem 0.75rem 0;
+    color: var(--app-muted);
+    font-size: 0.75rem;
+}
+
+.app-code-block pre {
+    margin: 0;
+    padding: 0.75rem;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-family: ui-monospace, monospace;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+}
+
+.app-code-block code {
+    font: inherit;
+}
+
+.app-response-preview pre {
+    max-height: 24rem;
+}
+
+.fdsn-copy-input {
+    position: fixed;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}

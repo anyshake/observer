@@ -260,11 +260,11 @@
     }
 
     .app-form-status-error {
-        @apply text-app-error my-2 flex items-center space-x-2 text-sm;
+        @apply text-app-error mt-2 mb-4 flex items-center space-x-2 text-sm;
     }
 
     .app-form-status-success {
-        @apply text-app-success my-2 flex items-center space-x-2 text-sm;
+        @apply text-app-success mt-2 mb-4 flex items-center space-x-2 text-sm;
     }
 
     .app-page {

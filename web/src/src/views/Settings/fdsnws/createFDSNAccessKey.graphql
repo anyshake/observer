@@ -1,0 +1,8 @@
+mutation createFDSNAccessKey($remark: String!, $expiresAt: Int64) {
+    createFDSNAccessKey(remark: $remark, expiresAt: $expiresAt) {
+        key
+        accessKey {
+            keyId
+        }
+    }
+}

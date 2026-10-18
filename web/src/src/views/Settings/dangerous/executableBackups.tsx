@@ -8,9 +8,10 @@ import {
     useRemoveExecutableBackupsMutation
 } from '../../../graphql';
 import { sendUserAlert } from '../../../helpers/alert/sendUserAlert';
+import { getTimeString } from '../../../helpers/utils/getTimeString';
 import { DangerousAction } from './action';
 
-export const ExecutableBackups = ({ currentLocale }: { currentLocale: string }) => {
+export const ExecutableBackups = () => {
     const { t } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedNames, setSelectedNames] = useState<string[]>([]);
@@ -205,9 +206,7 @@ export const ExecutableBackups = ({ currentLocale }: { currentLocale: string }) 
                                         <span className="app-backup-item-content">
                                             <span className="app-backup-name">{name}</span>
                                             <span className="app-backup-date">
-                                                {new Intl.NumberFormat(currentLocale).format(size)}{' '}
-                                                B{' · '}
-                                                {new Date(modifiedAt).toLocaleString(currentLocale)}
+                                                {`${(size / 1024 / 1024).toFixed(2)} MB · ${getTimeString(modifiedAt)}`}
                                             </span>
                                         </span>
                                     </label>

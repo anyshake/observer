@@ -1,4 +1,10 @@
-import { DataGrid, GridColDef, GridValidRowModel } from '@mui/x-data-grid';
+import {
+    DataGrid,
+    GridColDef,
+    GridRowParams,
+    GridRowSelectionModel,
+    GridValidRowModel
+} from '@mui/x-data-grid';
 import * as dataGridLocales from '@mui/x-data-grid/locales';
 import { Localization } from '@mui/x-data-grid/utils/getGridLocalization';
 import { useEffect, useMemo, useState } from 'react';
@@ -10,6 +16,8 @@ interface TableListProps {
     readonly columns: GridColDef<GridValidRowModel>[];
     readonly data: GridValidRowModel[];
     readonly onSelect?: (rows: GridValidRowModel[]) => void;
+    readonly rowSelectionModel?: GridRowSelectionModel;
+    readonly isRowSelectable?: (params: GridRowParams) => boolean;
     readonly sortDirection?: 'asc' | 'desc';
     readonly sortField?: string;
 }
@@ -18,7 +26,9 @@ export const TableList = ({
     currentLocale,
     columns,
     data,
-    onSelect = () => {},
+    onSelect,
+    rowSelectionModel,
+    isRowSelectable,
     sortField = 'id',
     sortDirection
 }: TableListProps) => {
@@ -61,13 +71,15 @@ export const TableList = ({
             onRowSelectionModelChange={(idx) => {
                 const rows: GridValidRowModel[] = [];
                 idx.forEach((id) => {
-                    const row = data.find((v) => String(v[sortField]) === String(id));
+                    const row = data.find((v) => v.id === id);
                     if (row) {
                         rows.push(row);
                     }
                 });
-                onSelect(rows);
+                onSelect?.(rows);
             }}
+            rowSelectionModel={rowSelectionModel}
+            isRowSelectable={isRowSelectable}
             pageSizeOptions={[6, 12, 18, 24]}
             checkboxSelection={!!onSelect}
         />

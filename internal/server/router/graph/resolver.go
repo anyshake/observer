@@ -6,6 +6,7 @@ import (
 
 	"github.com/anyshake/observer/config"
 	"github.com/anyshake/observer/internal/dao/action"
+	"github.com/anyshake/observer/internal/dao/model"
 	"github.com/anyshake/observer/internal/hardware"
 	"github.com/anyshake/observer/internal/server/middleware/auth_jwt"
 	graph_model "github.com/anyshake/observer/internal/server/router/graph/model"
@@ -107,6 +108,21 @@ func (r *Resolver) getHelicorderService() (*service_helicorder.HelicorderService
 	}
 
 	return typedServiceObj, nil
+}
+
+func (r *Resolver) toFDSNAccessKey(record model.FDSNAccessKey) *graph_model.FdsnAccessKey {
+	optionalTime := func(value int64) *int64 {
+		if value == 0 {
+			return nil
+		}
+		return &value
+	}
+	return &graph_model.FdsnAccessKey{
+		KeyID: record.KeyId, KeyPrefix: record.KeyPrefix, Remark: record.Remark,
+		CreatedAt: record.CreatedAt, ExpiresAt: optionalTime(record.ExpiresAt),
+		RevokedAt: optionalTime(record.RevokedAt), LastRequestedAt: optionalTime(record.LastRequestedAt),
+		UserIP: record.UserIp, UserAgent: record.UserAgent,
+	}
 }
 
 func (r *Resolver) toPurgeDataJobResponse(jobStatus *jobtracker.Job) *graph_model.PurgeDataJob {

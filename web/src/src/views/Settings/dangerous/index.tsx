@@ -32,7 +32,7 @@ export const Dangerous = ({ currentLocale }: IDangerous) => {
             />
 
             <div>
-                <ExecutableBackups currentLocale={currentLocale} />
+                <ExecutableBackups />
                 {cleanupTargets.map(({ id, title, description, buttonText }) => {
                     const isActiveTarget = isCleanupRunning && runningTarget === id;
 

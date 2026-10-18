@@ -8,21 +8,15 @@ import {
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import * as XDatePickers from '@mui/x-date-pickers/locales';
 import * as DateFnsLang from 'date-fns/locale';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { getDateString } from '../../helpers/utils/getDateString';
 import { getTimeString } from '../../helpers/utils/getTimeString';
 import { selectThemeMode, useThemeStore } from '../../stores/theme';
 import { createAppTheme } from '../../styles/timePickerTheme';
 
-const getDateString = (ts: number) => {
-    const date = new Date(ts);
-    const year = date.getFullYear();
-    const month = `${date.getMonth() + 1}`.padStart(2, '0');
-    const day = `${date.getDate()}`.padStart(2, '0');
-    return `${year}-${month}-${day}`;
-};
-
 export interface TimePickerProps {
+    readonly id?: string;
     readonly value?: number;
     readonly defaultValue?: number;
     readonly placeholder?: string;
@@ -33,6 +27,7 @@ export interface TimePickerProps {
 }
 
 export const TimePicker = ({
+    id,
     onChange,
     value,
     placeholder,
@@ -41,6 +36,7 @@ export const TimePicker = ({
     className,
     dateOnly = false
 }: TimePickerProps) => {
+    const pickerRef = useRef<HTMLDivElement>(null);
     const [open, setOpen] = useState(false);
     const mode = useThemeStore(selectThemeMode);
     const safeCurrentLocale = currentLocale || 'en-US';
@@ -98,10 +94,15 @@ export const TimePicker = ({
         () => createAppTheme(mode, themeRecords[locale4Component]),
         [mode, locale4Component, themeRecords]
     );
+    const getDialogContainer = useCallback(
+        () => pickerRef.current?.closest('dialog') ?? document.body,
+        []
+    );
 
     return (
-        <div className="app-time-picker">
+        <div className="app-time-picker" ref={pickerRef}>
             <input
+                id={id}
                 readOnly
                 type="text"
                 placeholder={placeholder}
@@ -133,6 +134,7 @@ export const TimePicker = ({
                                 timezone="system"
                                 views={['year', 'month', 'day']}
                                 slotProps={{
+                                    dialog: { container: getDialogContainer },
                                     field: { clearable: true },
                                     mobilePaper: {
                                         className: 'app-time-picker-paper'
@@ -164,13 +166,14 @@ export const TimePicker = ({
                                     seconds: renderTimeViewClock
                                 }}
                                 slotProps={{
+                                    dialog: { container: getDialogContainer },
                                     field: { clearable: true },
                                     mobilePaper: {
                                         className: 'app-time-picker-paper'
                                     }
                                 }}
-                                defaultValue={new Date(defaultValue ?? 0)}
-                                value={new Date(internalValue ?? 0)}
+                                defaultValue={defaultValue ? new Date(defaultValue) : null}
+                                value={internalValue ? new Date(internalValue) : null}
                                 ampm={false}
                             />
                         )}

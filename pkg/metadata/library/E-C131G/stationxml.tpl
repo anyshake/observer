@@ -496,7 +496,7 @@
               <CfTransferFunctionType>DIGITAL</CfTransferFunctionType>
             </Coefficients>
             <Decimation>
-              <InputSampleRate unit="HERTZ">250.0</InputSampleRate>
+              <InputSampleRate unit="HERTZ">{{.SampleRate}}</InputSampleRate>
               <Factor>1</Factor>
               <Offset>0</Offset>
               <Delay>0.0</Delay>

@@ -1,0 +1,3 @@
+mutation revokeFDSNAccessKeys($keyIds: [String!]!) {
+    revokeFDSNAccessKeys(keyIds: $keyIds)
+}

@@ -1,0 +1,14 @@
+query getFDSNAccessKeys {
+    getStationConfig
+    getFDSNAccessKeys {
+        keyId
+        keyPrefix
+        remark
+        createdAt
+        expiresAt
+        revokedAt
+        lastRequestedAt
+        userIp
+        userAgent
+    }
+}

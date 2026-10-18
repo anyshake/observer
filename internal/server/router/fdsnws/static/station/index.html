@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" type="image/svg+xml" href="/anyshake.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+            name="description"
+            content="FDSN Web Services: station metadata, instrument responses, and waveform data."
+        />
+        <title>Station URL Builder</title>
+
+        <link rel="stylesheet" href="/fdsnws/assets/app.css" />
+        <script src="/fdsnws/assets/app.js"></script>
+        <script defer src="/fdsnws/assets/tailwindcss-4.3.3.js"></script>
+        <script defer src="/fdsnws/assets/alpine-csp-3.15.8.min.js"></script>
+    </head>
+    <body class="min-h-screen">
+        <a class="sr-only focus:not-sr-only" href="#main">Skip to content</a>
+        <header
+            class="border-(--app-border) mx-auto max-w-6xl border-b px-4 py-3"
+            x-data="fdsnHeader"
+            @keydown.escape.prevent.stop="closeMenu"
+            @resize.window="resetMenu"
+        >
+            <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+                <a class="app-brand" href="/fdsnws/">
+                    <img
+                        src="/anyshake.svg"
+                        alt=""
+                        width="40"
+                        height="40"
+                        class="size-10 shrink-0"
+                    />
+                    <span>AnyShake Observer</span>
+                </a>
+                <button
+                    class="app-button app-menu-toggle"
+                    type="button"
+                    x-ref="menuToggle"
+                    aria-label="Open navigation menu"
+                    :aria-label="menuLabel"
+                    aria-controls="fdsn-navigation"
+                    aria-expanded="false"
+                    :aria-expanded="menuOpen"
+                    @click="toggleMenu"
+                >
+                    <svg
+                        class="size-5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        aria-hidden="true"
+                    >
+                        <path d="M4 6h16M4 12h16M4 18h16" :d="menuIcon" />
+                    </svg>
+                </button>
+                <nav
+                    class="app-navigation text-sm"
+                    id="fdsn-navigation"
+                    :class="navigationClass"
+                    aria-label="FDSN services"
+                    @click="resetMenu"
+                >
+                    <a href="/fdsnws/">Overview</a>
+                    <a href="/fdsnws/station/" aria-current="page">Station URL Builder</a>
+                    <a href="/fdsnws/dataselect/">DataSelect URL Builder</a>
+                </nav>
+            </div>
+        </header>
+        <main class="mx-auto max-w-6xl space-y-8 px-4 py-6" id="main">
+            <div x-data="stationBuilder" class="app-stack">
+                <div class="app-stack-xs">
+                    <h1 class="text-2xl font-semibold">
+                        <span>Station URL Builder</span>
+                    </h1>
+                    <p class="app-description">
+                        Build a request for station metadata and available instrument responses.
+                    </p>
+                </div>
+                <noscript
+                    ><p class="app-form-status-error">
+                        Enable JavaScript to use the URL Builder. The
+                        <a class="app-link-action" href="/fdsnws/station/1/">API reference</a> is
+                        also available.
+                    </p></noscript
+                >
+                <div class="grid items-start gap-6 lg:grid-cols-2">
+                    <form
+                        class="app-stack border-(--app-border) border p-4"
+                        @submit.prevent="sendRequest"
+                        @input="clearFeedback"
+                        novalidate
+                    >
+                        <h2 class="text-(--app-heading) text-lg font-semibold">Query parameters</h2>
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="network">Network</label>
+                                <input
+                                    class="app-input app-full-width"
+                                    id="network"
+                                    name="network"
+                                    type="text"
+                                    placeholder="*"
+                                    x-model="network"
+                                    autocomplete="off"
+                                    spellcheck="false"
+                                />
+                            </div>
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="station">Station</label>
+                                <input
+                                    class="app-input app-full-width"
+                                    id="station"
+                                    name="station"
+                                    type="text"
+                                    placeholder="*"
+                                    x-model="station"
+                                    autocomplete="off"
+                                    spellcheck="false"
+                                />
+                            </div>
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="location">Location</label>
+                                <input
+                                    class="app-input app-full-width"
+                                    id="location"
+                                    name="location"
+                                    type="text"
+                                    placeholder="*"
+                                    x-model="location"
+                                    autocomplete="off"
+                                    spellcheck="false"
+                                />
+                            </div>
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="channel">Channel</label>
+                                <input
+                                    class="app-input app-full-width"
+                                    id="channel"
+                                    name="channel"
+                                    type="text"
+                                    placeholder="*"
+                                    x-model="channel"
+                                    autocomplete="off"
+                                    spellcheck="false"
+                                />
+                            </div>
+                        </div>
+                        <p class="app-help-text">
+                            Use <code>*</code> for any value, <code>?</code> for one character, and
+                            commas for multiple selectors. Use <code>--</code> for an empty location
+                            code.
+                        </p>
+                        <div class="app-stack-xs">
+                            <label class="app-form-legend" for="time-mode">Time filter</label>
+                            <select
+                                class="app-select app-full-width"
+                                id="time-mode"
+                                x-model="timeMode"
+                            >
+                                <option value="range">Time range</option>
+                                <option value="epoch">Epoch constraints</option>
+                            </select>
+                        </div>
+                        <div class="grid gap-4 sm:grid-cols-2" x-show="timeMode === 'range'">
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="starttime"
+                                    >Start time (UTC)</label
+                                >
+                                <input
+                                    class="app-input app-full-width"
+                                    id="starttime"
+                                    name="starttime"
+                                    type="datetime-local"
+                                    placeholder=""
+                                    x-model="starttime"
+                                    step="1"
+                                />
+                            </div>
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="endtime">End time (UTC)</label>
+                                <input
+                                    class="app-input app-full-width"
+                                    id="endtime"
+                                    name="endtime"
+                                    type="datetime-local"
+                                    placeholder=""
+                                    x-model="endtime"
+                                    step="1"
+                                />
+                            </div>
+                        </div>
+                        <div
+                            class="grid gap-4 sm:grid-cols-2"
+                            x-show="timeMode === 'epoch'"
+                            x-cloak
+                        >
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="startbefore"
+                                    >Started before (UTC)</label
+                                >
+                                <input
+                                    class="app-input app-full-width"
+                                    id="startbefore"
+                                    name="startbefore"
+                                    type="datetime-local"
+                                    placeholder=""
+                                    x-model="startbefore"
+                                    step="1"
+                                />
+                            </div>
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="startafter"
+                                    >Started after (UTC)</label
+                                >
+                                <input
+                                    class="app-input app-full-width"
+                                    id="startafter"
+                                    name="startafter"
+                                    type="datetime-local"
+                                    placeholder=""
+                                    x-model="startafter"
+                                    step="1"
+                                />
+                            </div>
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="endbefore"
+                                    >Ended before (UTC)</label
+                                >
+                                <input
+                                    class="app-input app-full-width"
+                                    id="endbefore"
+                                    name="endbefore"
+                                    type="datetime-local"
+                                    placeholder=""
+                                    x-model="endbefore"
+                                    step="1"
+                                />
+                            </div>
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="endafter"
+                                    >Ended after (UTC)</label
+                                >
+                                <input
+                                    class="app-input app-full-width"
+                                    id="endafter"
+                                    name="endafter"
+                                    type="datetime-local"
+                                    placeholder=""
+                                    x-model="endafter"
+                                    step="1"
+                                />
+                            </div>
+                        </div>
+                        <p class="app-help-text">
+                            All times are UTC. Leave time fields empty to omit the filter. Time
+                            range and epoch constraints are alternatives.
+                        </p>
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="level">Metadata level</label>
+                                <select
+                                    class="app-select app-full-width"
+                                    id="level"
+                                    x-model="level"
+                                    @change="syncFormat"
+                                >
+                                    <option value="network">Network</option>
+                                    <option value="station">Station</option>
+                                    <option value="channel">Channel</option>
+                                    <option value="response">Response</option>
+                                </select>
+                            </div>
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="format">Format</label>
+                                <select
+                                    class="app-select app-full-width"
+                                    id="format"
+                                    x-model="format"
+                                >
+                                    <option value="xml">StationXML</option>
+                                    <option value="text" :disabled="level === 'response'">
+                                        Text
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="nodata"
+                                    >When no data matches</label
+                                >
+                                <select
+                                    class="app-select app-full-width"
+                                    id="nodata"
+                                    x-model="nodata"
+                                >
+                                    <option value="204">204 · No Content</option>
+                                    <option value="404">404 · Not Found</option>
+                                </select>
+                            </div>
+                        </div>
+                        <details class="app-stack">
+                            <summary class="cursor-pointer text-sm font-semibold">
+                                Geographic filters
+                            </summary>
+                            <div class="app-stack-xs">
+                                <label class="app-form-legend" for="geographic-mode"
+                                    >Search area</label
+                                >
+                                <select
+                                    class="app-select app-full-width"
+                                    id="geographic-mode"
+                                    x-model="geographicMode"
+                                >
+                                    <option value="none">No geographic filter</option>
+                                    <option value="rectangle">Bounding box</option>
+                                    <option value="circle">Radius search</option>
+                                </select>
+                            </div>
+                            <div
+                                class="grid gap-4 sm:grid-cols-2"
+                                x-show="geographicMode === 'rectangle'"
+                                x-cloak
+                            >
+                                <div class="app-stack-xs">
+                                    <label class="app-form-legend" for="minlatitude"
+                                        >Minimum latitude</label
+                                    >
+                                    <input
+                                        class="app-input app-full-width"
+                                        id="minlatitude"
+                                        name="minlatitude"
+                                        type="number"
+                                        placeholder=""
+                                        x-model="minlatitude"
+                                        min="-90"
+                                        max="90"
+                                        step="any"
+                                    />
+                                </div>
+                                <div class="app-stack-xs">
+                                    <label class="app-form-legend" for="maxlatitude"
+                                        >Maximum latitude</label
+                                    >
+                                    <input
+                                        class="app-input app-full-width"
+                                        id="maxlatitude"
+                                        name="maxlatitude"
+                                        type="number"
+                                        placeholder=""
+                                        x-model="maxlatitude"
+                                        min="-90"
+                                        max="90"
+                                        step="any"
+                                    />
+                                </div>
+                                <div class="app-stack-xs">
+                                    <label class="app-form-legend" for="minlongitude"
+                                        >Minimum longitude</label
+                                    >
+                                    <input
+                                        class="app-input app-full-width"
+                                        id="minlongitude"
+                                        name="minlongitude"
+                                        type="number"
+                                        placeholder=""
+                                        x-model="minlongitude"
+                                        min="-180"
+                                        max="180"
+                                        step="any"
+                                    />
+                                </div>
+                                <div class="app-stack-xs">
+                                    <label class="app-form-legend" for="maxlongitude"
+                                        >Maximum longitude</label
+                                    >
+                                    <input
+                                        class="app-input app-full-width"
+                                        id="maxlongitude"
+                                        name="maxlongitude"
+                                        type="number"
+                                        placeholder=""
+                                        x-model="maxlongitude"
+                                        min="-180"
+                                        max="180"
+                                        step="any"
+                                    />
+                                </div>
+                            </div>
+                            <div
+                                class="grid gap-4 sm:grid-cols-2"
+                                x-show="geographicMode === 'circle'"
+                                x-cloak
+                            >
+                                <div class="app-stack-xs">
+                                    <label class="app-form-legend" for="latitude">Latitude</label>
+                                    <input
+                                        class="app-input app-full-width"
+                                        id="latitude"
+                                        name="latitude"
+                                        type="number"
+                                        placeholder=""
+                                        x-model="latitude"
+                                        min="-90"
+                                        max="90"
+                                        step="any"
+                                    />
+                                </div>
+                                <div class="app-stack-xs">
+                                    <label class="app-form-legend" for="longitude">Longitude</label>
+                                    <input
+                                        class="app-input app-full-width"
+                                        id="longitude"
+                                        name="longitude"
+                                        type="number"
+                                        placeholder=""
+                                        x-model="longitude"
+                                        min="-180"
+                                        max="180"
+                                        step="any"
+                                    />
+                                </div>
+                                <div class="app-stack-xs">
+                                    <label class="app-form-legend" for="minradius"
+                                        >Minimum radius (degrees)</label
+                                    >
+                                    <input
+                                        class="app-input app-full-width"
+                                        id="minradius"
+                                        name="minradius"
+                                        type="number"
+                                        placeholder=""
+                                        x-model="minradius"
+                                        min="0"
+                                        max="180"
+                                        step="any"
+                                    />
+                                </div>
+                                <div class="app-stack-xs">
+                                    <label class="app-form-legend" for="maxradius"
+                                        >Maximum radius (degrees)</label
+                                    >
+                                    <input
+                                        class="app-input app-full-width"
+                                        id="maxradius"
+                                        name="maxradius"
+                                        type="number"
+                                        placeholder=""
+                                        x-model="maxradius"
+                                        min="0"
+                                        max="180"
+                                        step="any"
+                                    />
+                                </div>
+                            </div>
+                            <p class="app-help-text">
+                                Coordinates are in degrees. Radius searches require both latitude
+                                and longitude.
+                            </p>
+                        </details>
+                        <div class="app-row">
+                            <input
+                                id="includerestricted"
+                                type="checkbox"
+                                x-model="includerestricted"
+                            />
+                            <label class="app-checkbox-label" for="includerestricted"
+                                >Include restricted metadata</label
+                            >
+                        </div>
+                        <button
+                            class="app-button"
+                            type="button"
+                            @click="reset"
+                            :disabled="requesting"
+                        >
+                            <span>Reset parameters</span>
+                        </button>
+                    </form>
+                    <aside class="app-stack min-w-0" aria-label="Request and response">
+                        <section class="app-stack border-(--app-border) border p-4">
+                            <h2 class="text-(--app-heading) text-lg font-semibold">Test request</h2>
+                            <form
+                                class="app-stack"
+                                @submit.prevent="sendRequest"
+                                :aria-busy="requesting"
+                                autocomplete="off"
+                                novalidate
+                                x-cloak
+                            >
+                                <div class="app-stack-xs">
+                                    <label class="app-form-legend" for="access-key"
+                                        >Access key</label
+                                    >
+                                    <input
+                                        class="app-input app-full-width"
+                                        id="access-key"
+                                        type="password"
+                                        x-model="accessKey"
+                                        placeholder="Enter your access key"
+                                        autocomplete="off"
+                                        spellcheck="false"
+                                        aria-describedby="access-key-help"
+                                        required
+                                    />
+                                    <p class="app-help-text" id="access-key-help">
+                                        The key stays on this page and is sent in the Authorization
+                                        header.
+                                    </p>
+                                </div>
+                                <p
+                                    class="app-form-status-error"
+                                    role="alert"
+                                    x-show="validationError"
+                                    x-text="validationError"
+                                    x-cloak
+                                ></p>
+                                <div class="flex flex-wrap gap-2">
+                                    <button
+                                        class="app-button app-button-primary"
+                                        type="submit"
+                                        :disabled="requestDisabled"
+                                        x-text="requestLabel"
+                                    >
+                                        Send request
+                                    </button>
+                                    <button
+                                        class="app-button"
+                                        type="button"
+                                        @click="cancelRequest"
+                                        x-show="requesting"
+                                        x-cloak
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                                <p
+                                    class="app-form-status-error"
+                                    role="alert"
+                                    x-show="requestError"
+                                    x-text="requestError"
+                                    x-cloak
+                                ></p>
+                            </form>
+                        </section>
+                        <section
+                            class="app-stack border-(--app-border) border p-4"
+                            x-show="responseStatus"
+                            x-cloak
+                        >
+                            <h2 class="text-(--app-heading) text-lg font-semibold">
+                                Last response
+                            </h2>
+                            <p
+                                class="font-mono"
+                                :class="responseStatusClass"
+                                role="status"
+                                x-text="responseStatus"
+                            ></p>
+                            <p class="app-help-text wrap-anywhere" x-text="responseURL"></p>
+                            <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+                                <dt>Content type</dt>
+                                <dd class="wrap-anywhere min-w-0" x-text="responseType"></dd>
+                                <dt>Size</dt>
+                                <dd x-text="responseSize"></dd>
+                            </dl>
+                            <p
+                                class="app-help-text"
+                                x-show="responseMessage"
+                                x-text="responseMessage"
+                            ></p>
+                            <p x-show="downloadURL">
+                                <a
+                                    class="app-link-action"
+                                    :href="downloadURL"
+                                    :download="downloadName"
+                                    >Download <span x-text="downloadName"></span
+                                ></a>
+                            </p>
+                            <div class="app-code-block app-response-preview" x-show="responseText">
+                                <div class="app-code-toolbar"><span>Response body</span></div>
+                                <pre><code x-text="responseText"></code></pre>
+                            </div>
+                            <p class="app-help-text" x-show="responseTruncated">
+                                The preview shows the first 64 KiB.
+                            </p>
+                        </section>
+                        <details class="app-stack border-(--app-border) border p-4">
+                            <summary class="cursor-pointer font-semibold">URL and cURL</summary>
+                            <div class="app-code-block">
+                                <div class="app-code-toolbar"><span>GET · Request URL</span></div>
+                                <pre><code x-text="url"></code></pre>
+                            </div>
+                            <div class="app-code-block">
+                                <div class="app-code-toolbar"><span>cURL · Download</span></div>
+                                <pre><code x-text="curl"></code></pre>
+                            </div>
+                            <p class="app-help-text">
+                                To use cURL, set the FDSN_ACCESS_KEY environment variable to your
+                                access key. Opening the URL alone does not send the required header.
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <button
+                                    class="app-button"
+                                    type="button"
+                                    :disabled="validationError !== ''"
+                                    @click="copyURL"
+                                >
+                                    Copy URL
+                                </button>
+                                <button
+                                    class="app-button"
+                                    type="button"
+                                    :disabled="validationError !== ''"
+                                    @click="copyCurl"
+                                >
+                                    Copy cURL
+                                </button>
+                            </div>
+                            <p
+                                class="app-form-status-success"
+                                role="status"
+                                x-show="copyMessage"
+                                x-text="copyMessage"
+                                x-cloak
+                            ></p>
+                            <p
+                                class="app-form-status-error"
+                                role="alert"
+                                x-show="copyError"
+                                x-text="copyError"
+                                x-cloak
+                            ></p>
+                        </details>
+                        <p class="text-sm">
+                            <a class="app-link-action" href="/fdsnws/station/1/">API reference</a>
+                        </p>
+                    </aside>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

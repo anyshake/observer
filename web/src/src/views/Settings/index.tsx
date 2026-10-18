@@ -5,6 +5,7 @@ import {
     mdiCube,
     mdiHeart,
     mdiHomeEdit,
+    mdiKey,
     mdiPowerPlug,
     mdiTimelineText
 } from '@mdi/js';
@@ -19,6 +20,7 @@ import { useIsCurrentUserAdminQuery } from '../../graphql';
 import { AppLogs } from './applogs';
 import { Backup } from './backup';
 import { Dangerous } from './dangerous';
+import { FDSN } from './fdsnws';
 import { Metadata } from './metadata';
 import { Preference } from './preference';
 import { Service } from './service';
@@ -60,6 +62,12 @@ const Settings = ({ currentLocale }: IRouterComponent) => {
                 icon: mdiAccount,
                 label: t('views.Settings.Users.title'),
                 element: <Users currentLocale={currentLocale} />
+            },
+            fdsn: {
+                adminOnly: true,
+                icon: mdiKey,
+                label: t('views.Settings.FDSN.title'),
+                element: <FDSN currentLocale={currentLocale} />
             },
             backup: {
                 adminOnly: true,

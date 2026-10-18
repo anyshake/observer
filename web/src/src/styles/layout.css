@@ -12,15 +12,15 @@
     }
 
     .app-header-brand {
-        @apply flex-1 pl-16;
+        @apply min-w-0 flex-1 pl-16;
     }
 
     .app-header-title {
-        @apply text-app-heading text-xl font-bold select-none;
+        @apply text-app-heading block truncate text-xl font-bold select-none;
     }
 
     .app-header-actions {
-        @apply flex space-x-1;
+        @apply flex shrink-0 space-x-1;
     }
 
     .app-header-button {

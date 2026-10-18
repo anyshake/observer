@@ -475,6 +475,50 @@ func (s *StationChannelCodesConfigConstraintImpl) Restore(handler *action.Handle
 	return nil
 }
 
+type StationFDSNServiceEnabledConfigConstraintImpl struct{}
+
+func (s *StationFDSNServiceEnabledConfigConstraintImpl) GetName() string { return "FDSN Web Service" }
+func (s *StationFDSNServiceEnabledConfigConstraintImpl) GetNamespace() string {
+	return STATION_NAMESPACE
+}
+func (s *StationFDSNServiceEnabledConfigConstraintImpl) GetKey() string {
+	return "fdsn_service_enabled"
+}
+func (s *StationFDSNServiceEnabledConfigConstraintImpl) GetType() action.SettingType {
+	return action.Bool
+}
+func (s *StationFDSNServiceEnabledConfigConstraintImpl) IsRequired() bool           { return true }
+func (s *StationFDSNServiceEnabledConfigConstraintImpl) GetVersion() int            { return 0 }
+func (s *StationFDSNServiceEnabledConfigConstraintImpl) GetOptions() map[string]any { return nil }
+func (s *StationFDSNServiceEnabledConfigConstraintImpl) GetDefaultValue() any       { return false }
+func (s *StationFDSNServiceEnabledConfigConstraintImpl) GetDescription() string {
+	return "Enable authenticated FDSN Station and DataSelect web services. Changes take effect immediately."
+}
+func (s *StationFDSNServiceEnabledConfigConstraintImpl) Init(handler *action.Handler) error {
+	_, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+	return err
+}
+func (s *StationFDSNServiceEnabledConfigConstraintImpl) Set(handler *action.Handler, newVal any) error {
+	enabled, err := GetConfigValBool(newVal)
+	if err != nil {
+		return err
+	}
+	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled)
+}
+func (s *StationFDSNServiceEnabledConfigConstraintImpl) Get(handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+	if err != nil {
+		return nil, fmt.Errorf("failed to get FDSN service status: %w", err)
+	}
+	if _, ok := val.(bool); !ok {
+		return nil, errors.New("boolean expected")
+	}
+	return val, nil
+}
+func (s *StationFDSNServiceEnabledConfigConstraintImpl) Restore(handler *action.Handler) error {
+	return s.Set(handler, s.GetDefaultValue())
+}
+
 func NewStationConstraints() []IConstraint {
 	return []IConstraint{
 		&StationNameConfigConstraintImpl{},
@@ -486,5 +530,6 @@ func NewStationConstraints() []IConstraint {
 		&StationNetworkCodeConfigConstraintImpl{},
 		&StationLocationCodeConfigConstraintImpl{},
 		&StationChannelCodesConfigConstraintImpl{},
+		&StationFDSNServiceEnabledConfigConstraintImpl{},
 	}
 }

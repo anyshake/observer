@@ -24,6 +24,7 @@ export type Scalars = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createFDSNAccessKey: CreatedFdsnAccessKey;
   createSysUser: Scalars['String']['output'];
   importGlobalConfig: Scalars['Boolean']['output'];
   purgeHelicorderFiles: PurgeDataJob;
@@ -38,11 +39,18 @@ export type Mutation = {
   restartService: Scalars['Boolean']['output'];
   restoreServiceConfig: Scalars['Boolean']['output'];
   restoreStationConfig: Scalars['Boolean']['output'];
+  revokeFDSNAccessKeys: Scalars['Boolean']['output'];
   startService: Scalars['Boolean']['output'];
   stopService: Scalars['Boolean']['output'];
   updateServiceConfig: Scalars['Boolean']['output'];
   updateStationConfig: Scalars['Boolean']['output'];
   updateSysUser: Scalars['Boolean']['output'];
+};
+
+
+export type MutationCreateFdsnAccessKeyArgs = {
+  expiresAt?: InputMaybe<Scalars['Int64']['input']>;
+  remark: Scalars['String']['input'];
 };
 
 
@@ -96,6 +104,11 @@ export type MutationRestoreServiceConfigArgs = {
 };
 
 
+export type MutationRevokeFdsnAccessKeysArgs = {
+  keyIds: Array<Scalars['String']['input']>;
+};
+
+
 export type MutationStartServiceArgs = {
   serviceId: Scalars['String']['input'];
 };
@@ -140,6 +153,7 @@ export type Query = {
   getEventSource: Array<Maybe<SeisEventSource>>;
   getEventsBySource: Array<SeisEvent>;
   getExecutableBackups: Array<ExecutableBackup>;
+  getFDSNAccessKeys: Array<FdsnAccessKey>;
   getHelicorderFiles: Array<Maybe<ServiceAsset>>;
   getMiniSeedFiles: Array<Maybe<ServiceAsset>>;
   getSeisRecordsByTime: Array<Maybe<SeisRecord>>;
@@ -190,6 +204,12 @@ export type ConfigConstraint = {
   options?: Maybe<Scalars['Any']['output']>;
 };
 
+export type CreatedFdsnAccessKey = {
+  __typename?: 'createdFDSNAccessKey';
+  accessKey: FdsnAccessKey;
+  key: Scalars['String']['output'];
+};
+
 export type DeviceConfig = {
   __typename?: 'deviceConfig';
   channelCodes: Array<Scalars['String']['output']>;
@@ -229,6 +249,19 @@ export type ExecutableBackupRemoval = {
   error?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   removed: Scalars['Boolean']['output'];
+};
+
+export type FdsnAccessKey = {
+  __typename?: 'fdsnAccessKey';
+  createdAt: Scalars['Int64']['output'];
+  expiresAt?: Maybe<Scalars['Int64']['output']>;
+  keyId: Scalars['String']['output'];
+  keyPrefix: Scalars['String']['output'];
+  lastRequestedAt?: Maybe<Scalars['Int64']['output']>;
+  remark: Scalars['String']['output'];
+  revokedAt?: Maybe<Scalars['Int64']['output']>;
+  userAgent: Scalars['String']['output'];
+  userIp: Scalars['String']['output'];
 };
 
 export enum JobStatus {
@@ -469,6 +502,26 @@ export type RestartApplicationMutationVariables = Exact<{ [key: string]: never; 
 
 
 export type RestartApplicationMutation = { __typename?: 'Mutation', restartApplication: boolean };
+
+export type CreateFdsnAccessKeyMutationVariables = Exact<{
+  remark: Scalars['String']['input'];
+  expiresAt?: InputMaybe<Scalars['Int64']['input']>;
+}>;
+
+
+export type CreateFdsnAccessKeyMutation = { __typename?: 'Mutation', createFDSNAccessKey: { __typename?: 'createdFDSNAccessKey', key: string, accessKey: { __typename?: 'fdsnAccessKey', keyId: string } } };
+
+export type GetFdsnAccessKeysQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetFdsnAccessKeysQuery = { __typename?: 'Query', getStationConfig: any, getFDSNAccessKeys: Array<{ __typename?: 'fdsnAccessKey', keyId: string, keyPrefix: string, remark: string, createdAt: number, expiresAt?: number | null, revokedAt?: number | null, lastRequestedAt?: number | null, userIp: string, userAgent: string }> };
+
+export type RevokeFdsnAccessKeysMutationVariables = Exact<{
+  keyIds: Array<Scalars['String']['input']> | Scalars['String']['input'];
+}>;
+
+
+export type RevokeFdsnAccessKeysMutation = { __typename?: 'Mutation', revokeFDSNAccessKeys: boolean };
 
 export type IsCurrentUserAdminQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1488,6 +1541,122 @@ export function useRestartApplicationMutation(baseOptions?: ApolloReactHooks.Mut
 export type RestartApplicationMutationHookResult = ReturnType<typeof useRestartApplicationMutation>;
 export type RestartApplicationMutationResult = ApolloReactCommon.MutationResult<RestartApplicationMutation>;
 export type RestartApplicationMutationOptions = ApolloReactCommon.BaseMutationOptions<RestartApplicationMutation, RestartApplicationMutationVariables>;
+export const CreateFdsnAccessKeyDocument = gql`
+    mutation createFDSNAccessKey($remark: String!, $expiresAt: Int64) {
+  createFDSNAccessKey(remark: $remark, expiresAt: $expiresAt) {
+    key
+    accessKey {
+      keyId
+    }
+  }
+}
+    `;
+export type CreateFdsnAccessKeyMutationFn = ApolloReactCommon.MutationFunction<CreateFdsnAccessKeyMutation, CreateFdsnAccessKeyMutationVariables>;
+
+/**
+ * __useCreateFdsnAccessKeyMutation__
+ *
+ * To run a mutation, you first call `useCreateFdsnAccessKeyMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateFdsnAccessKeyMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createFdsnAccessKeyMutation, { data, loading, error }] = useCreateFdsnAccessKeyMutation({
+ *   variables: {
+ *      remark: // value for 'remark'
+ *      expiresAt: // value for 'expiresAt'
+ *   },
+ * });
+ */
+export function useCreateFdsnAccessKeyMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateFdsnAccessKeyMutation, CreateFdsnAccessKeyMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<CreateFdsnAccessKeyMutation, CreateFdsnAccessKeyMutationVariables>(CreateFdsnAccessKeyDocument, options);
+      }
+export type CreateFdsnAccessKeyMutationHookResult = ReturnType<typeof useCreateFdsnAccessKeyMutation>;
+export type CreateFdsnAccessKeyMutationResult = ApolloReactCommon.MutationResult<CreateFdsnAccessKeyMutation>;
+export type CreateFdsnAccessKeyMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateFdsnAccessKeyMutation, CreateFdsnAccessKeyMutationVariables>;
+export const GetFdsnAccessKeysDocument = gql`
+    query getFDSNAccessKeys {
+  getStationConfig
+  getFDSNAccessKeys {
+    keyId
+    keyPrefix
+    remark
+    createdAt
+    expiresAt
+    revokedAt
+    lastRequestedAt
+    userIp
+    userAgent
+  }
+}
+    `;
+
+/**
+ * __useGetFdsnAccessKeysQuery__
+ *
+ * To run a query within a React component, call `useGetFdsnAccessKeysQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFdsnAccessKeysQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFdsnAccessKeysQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetFdsnAccessKeysQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetFdsnAccessKeysQuery, GetFdsnAccessKeysQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetFdsnAccessKeysQuery, GetFdsnAccessKeysQueryVariables>(GetFdsnAccessKeysDocument, options);
+      }
+export function useGetFdsnAccessKeysLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetFdsnAccessKeysQuery, GetFdsnAccessKeysQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetFdsnAccessKeysQuery, GetFdsnAccessKeysQueryVariables>(GetFdsnAccessKeysDocument, options);
+        }
+export function useGetFdsnAccessKeysSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetFdsnAccessKeysQuery, GetFdsnAccessKeysQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetFdsnAccessKeysQuery, GetFdsnAccessKeysQueryVariables>(GetFdsnAccessKeysDocument, options);
+        }
+export type GetFdsnAccessKeysQueryHookResult = ReturnType<typeof useGetFdsnAccessKeysQuery>;
+export type GetFdsnAccessKeysLazyQueryHookResult = ReturnType<typeof useGetFdsnAccessKeysLazyQuery>;
+export type GetFdsnAccessKeysSuspenseQueryHookResult = ReturnType<typeof useGetFdsnAccessKeysSuspenseQuery>;
+export type GetFdsnAccessKeysQueryResult = ApolloReactCommon.QueryResult<GetFdsnAccessKeysQuery, GetFdsnAccessKeysQueryVariables>;
+export const RevokeFdsnAccessKeysDocument = gql`
+    mutation revokeFDSNAccessKeys($keyIds: [String!]!) {
+  revokeFDSNAccessKeys(keyIds: $keyIds)
+}
+    `;
+export type RevokeFdsnAccessKeysMutationFn = ApolloReactCommon.MutationFunction<RevokeFdsnAccessKeysMutation, RevokeFdsnAccessKeysMutationVariables>;
+
+/**
+ * __useRevokeFdsnAccessKeysMutation__
+ *
+ * To run a mutation, you first call `useRevokeFdsnAccessKeysMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRevokeFdsnAccessKeysMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [revokeFdsnAccessKeysMutation, { data, loading, error }] = useRevokeFdsnAccessKeysMutation({
+ *   variables: {
+ *      keyIds: // value for 'keyIds'
+ *   },
+ * });
+ */
+export function useRevokeFdsnAccessKeysMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RevokeFdsnAccessKeysMutation, RevokeFdsnAccessKeysMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<RevokeFdsnAccessKeysMutation, RevokeFdsnAccessKeysMutationVariables>(RevokeFdsnAccessKeysDocument, options);
+      }
+export type RevokeFdsnAccessKeysMutationHookResult = ReturnType<typeof useRevokeFdsnAccessKeysMutation>;
+export type RevokeFdsnAccessKeysMutationResult = ApolloReactCommon.MutationResult<RevokeFdsnAccessKeysMutation>;
+export type RevokeFdsnAccessKeysMutationOptions = ApolloReactCommon.BaseMutationOptions<RevokeFdsnAccessKeysMutation, RevokeFdsnAccessKeysMutationVariables>;
 export const IsCurrentUserAdminDocument = gql`
     query isCurrentUserAdmin {
   getCurrentUser {

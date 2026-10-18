@@ -113,6 +113,23 @@ type sysUser {
   updatedAt: Int64!
 }
 
+type fdsnAccessKey {
+  keyId: String!
+  keyPrefix: String!
+  remark: String!
+  createdAt: Int64!
+  expiresAt: Int64
+  revokedAt: Int64
+  lastRequestedAt: Int64
+  userIp: String!
+  userAgent: String!
+}
+
+type createdFDSNAccessKey {
+  accessKey: fdsnAccessKey!
+  key: String! # Returned only once; the database stores a SHA-256 hash.
+}
+
 type upgradeStatus {
   required: String!
   current: String!
@@ -151,6 +168,9 @@ type purgeDataJob {
 }
 
 type Mutation {
+  # FDSN access management - admin only; timestamps are Unix milliseconds
+  createFDSNAccessKey(remark: String!, expiresAt: Int64): createdFDSNAccessKey!
+  revokeFDSNAccessKeys(keyIds: [String!]!): Boolean!
   # user management - admin only
   createSysUser(username: String!, password: String!, admin: Boolean!): String!
   removeSysUser(userId: String!): Boolean!
@@ -198,6 +218,7 @@ type Query {
 
   getServiceConfigConstraint: [serviceConfigConstraint!]! # admin only
   getStationConfigConstraint: [configConstraint!]! # admin only
+  getFDSNAccessKeys: [fdsnAccessKey!]! # admin only
   getServiceStatus: [serviceStatus!]
 
   getEventSource: [seisEventSource]!

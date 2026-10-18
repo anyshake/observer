@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" type="image/svg+xml" href="/anyshake.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+            name="description"
+            content="FDSN Web Services: station metadata, instrument responses, and waveform data."
+        />
+        <title>DataSelect v1 API reference</title>
+
+        <link rel="stylesheet" href="/fdsnws/assets/app.css" />
+
+        <script src="/fdsnws/assets/app.js"></script>
+        <script defer src="/fdsnws/assets/tailwindcss-4.3.3.js"></script>
+        <script defer src="/fdsnws/assets/alpine-csp-3.15.8.min.js"></script>
+    </head>
+    <body class="min-h-screen">
+        <a class="sr-only focus:not-sr-only" href="#main">Skip to content</a>
+        <header
+            class="border-(--app-border) mx-auto max-w-6xl border-b px-4 py-3"
+            x-data="fdsnHeader"
+            @keydown.escape.prevent.stop="closeMenu"
+            @resize.window="resetMenu"
+        >
+            <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+                <a class="app-brand" href="/fdsnws/">
+                    <img
+                        src="/anyshake.svg"
+                        alt=""
+                        width="40"
+                        height="40"
+                        class="size-10 shrink-0"
+                    />
+                    <span>AnyShake Observer</span>
+                </a>
+                <button
+                    class="app-button app-menu-toggle"
+                    type="button"
+                    x-ref="menuToggle"
+                    aria-label="Open navigation menu"
+                    :aria-label="menuLabel"
+                    aria-controls="fdsn-navigation"
+                    aria-expanded="false"
+                    :aria-expanded="menuOpen"
+                    @click="toggleMenu"
+                >
+                    <svg
+                        class="size-5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        aria-hidden="true"
+                    >
+                        <path d="M4 6h16M4 12h16M4 18h16" :d="menuIcon" />
+                    </svg>
+                </button>
+                <nav
+                    class="app-navigation text-sm"
+                    id="fdsn-navigation"
+                    :class="navigationClass"
+                    aria-label="FDSN services"
+                    @click="resetMenu"
+                >
+                    <a href="/fdsnws/">Overview</a>
+                    <a href="/fdsnws/station/">Station URL Builder</a>
+                    <a href="/fdsnws/dataselect/">DataSelect URL Builder</a>
+                </nav>
+            </div>
+        </header>
+        <main class="mx-auto max-w-6xl space-y-8 px-4 py-6" id="main" x-data="dataselectReference">
+            <div class="app-stack-xs">
+                <h1 class="text-2xl font-semibold">DataSelect v1 API reference</h1>
+                <p class="app-description">Recorded waveform samples in MiniSEED format.</p>
+            </div>
+            <div class="flex flex-wrap gap-4 text-sm">
+                <a class="app-link-action" href="/fdsnws/dataselect/">Open URL Builder</a>
+                <a class="app-link-action" href="/fdsnws/dataselect/1/version">Service version</a>
+                <a class="app-link-action" href="/fdsnws/dataselect/1/application.wadl"
+                    >Application WADL</a
+                >
+            </div>
+            <section class="app-stack">
+                <h2 class="text-(--app-heading) text-lg font-semibold">Endpoints</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <caption class="sr-only">
+                            dataselect v1 endpoints
+                        </caption>
+                        <thead>
+                            <tr class="border-(--app-border-strong) border-b">
+                                <th class="p-3">Path</th>
+                                <th class="p-3">Methods</th>
+                                <th class="p-3">Access key</th>
+                                <th class="p-3">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-(--app-border) divide-y">
+                            <tr>
+                                <td class="p-3 font-mono">/fdsnws/dataselect/1/query</td>
+                                <td class="p-3">GET, POST</td>
+                                <td class="p-3">Required</td>
+                                <td class="p-3">Recorded waveform samples in MiniSEED format.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-mono">/fdsnws/dataselect/1/version</td>
+                                <td class="p-3">GET</td>
+                                <td class="p-3">Public</td>
+                                <td class="p-3">Service version</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-mono">/fdsnws/dataselect/1/application.wadl</td>
+                                <td class="p-3">GET</td>
+                                <td class="p-3">Public</td>
+                                <td class="p-3">Machine-readable service description</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="app-help-text">
+                    Query requests require <code>Authorization: Bearer &lt;access key&gt;</code>.
+                    See the
+                    <a class="app-link-action" href="/fdsnws/"
+                        >authentication guide and response codes</a
+                    >.
+                </p>
+            </section>
+            <section class="app-stack">
+                <h2 class="text-(--app-heading) text-lg font-semibold">Query parameters</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <caption class="sr-only">
+                            dataselect query parameters
+                        </caption>
+                        <thead>
+                            <tr class="border-(--app-border-strong) border-b">
+                                <th class="p-3">Parameter</th>
+                                <th class="p-3">Values and behavior</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-(--app-border) divide-y">
+                            <tr>
+                                <th
+                                    scope="row"
+                                    class="wrap-anywhere p-3 align-top font-mono font-normal"
+                                >
+                                    network, station, location, channel
+                                </th>
+                                <td class="p-3 align-top">
+                                    Channel selectors. Use *, ?, and comma-separated values. Use --
+                                    for an empty location code.
+                                </td>
+                            </tr>
+                            <tr>
+                                <th
+                                    scope="row"
+                                    class="wrap-anywhere p-3 align-top font-mono font-normal"
+                                >
+                                    starttime, endtime
+                                </th>
+                                <td class="p-3 align-top">
+                                    ISO 8601 UTC times. Both are required. The total requested
+                                    duration must fit the server query limit.
+                                </td>
+                            </tr>
+                            <tr>
+                                <th
+                                    scope="row"
+                                    class="wrap-anywhere p-3 align-top font-mono font-normal"
+                                >
+                                    format
+                                </th>
+                                <td class="p-3 align-top">
+                                    miniseed. This is the only output format.
+                                </td>
+                            </tr>
+                            <tr>
+                                <th
+                                    scope="row"
+                                    class="wrap-anywhere p-3 align-top font-mono font-normal"
+                                >
+                                    quality
+                                </th>
+                                <td class="p-3 align-top">
+                                    B (best available, default) or D (raw). Both return raw D data
+                                    from this station. R, Q, and M have no matching data.
+                                </td>
+                            </tr>
+                            <tr>
+                                <th
+                                    scope="row"
+                                    class="wrap-anywhere p-3 align-top font-mono font-normal"
+                                >
+                                    minimumlength
+                                </th>
+                                <td class="p-3 align-top">
+                                    Minimum duration of a continuous segment, in seconds. Must be
+                                    nonnegative.
+                                </td>
+                            </tr>
+                            <tr>
+                                <th
+                                    scope="row"
+                                    class="wrap-anywhere p-3 align-top font-mono font-normal"
+                                >
+                                    longestonly
+                                </th>
+                                <td class="p-3 align-top">
+                                    true to return only the longest continuous segment per channel;
+                                    false by default.
+                                </td>
+                            </tr>
+                            <tr>
+                                <th
+                                    scope="row"
+                                    class="wrap-anywhere p-3 align-top font-mono font-normal"
+                                >
+                                    nodata
+                                </th>
+                                <td class="p-3 align-top">
+                                    204 (default) or 404 when no data matches.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="app-help-text">
+                    Short aliases <code>net</code>, <code>sta</code>, <code>loc</code>,
+                    <code>cha</code>, <code>start</code>, and <code>end</code> are also accepted.
+                </p>
+            </section>
+            <section class="app-stack">
+                <h2 class="text-(--app-heading) text-lg font-semibold">Data availability</h2>
+                <p class="app-help-text">
+                    Requests return archived observations that match the selectors and time range.
+                    Samples are trimmed to the requested interval. Requests outside the archive
+                    return the selected no-data status.
+                </p>
+                <p class="app-help-text">
+                    Bulk requests allow at most 100 selections. The combined duration of all
+                    selections must fit the server's configured query window.
+                </p>
+            </section>
+            <section class="app-stack">
+                <h2 class="text-(--app-heading) text-lg font-semibold">Bulk POST requests</h2>
+                <p class="app-help-text">
+                    Send plain text with optional <code>name=value</code> lines followed by stream
+                    selections in the order <code>NET STA LOC CHA STARTTIME ENDTIME</code>. Each
+                    selection occupies one line. Replace the example times with an available
+                    interval.
+                </p>
+                <div class="app-code-block">
+                    <div class="app-code-toolbar"><span>selections.txt</span></div>
+                    <pre><code>quality=B
+* * * * 2026-01-01T00:00:00Z 2026-01-01T00:01:00Z</code></pre>
+                </div>
+                <div class="app-code-block">
+                    <div class="app-code-toolbar"><span>cURL · Bulk request</span></div>
+                    <pre x-cloak><code x-text="curl"></code></pre>
+                    <noscript>Enable JavaScript to show the command for this server.</noscript>
+                </div>
+                <p class="app-help-text">POST bodies are limited to 1 MiB.</p>
+            </section>
+        </main>
+    </body>
+</html>

@@ -23,6 +23,36 @@ import (
 	"github.com/samber/lo"
 )
 
+// CreateFDSNAccessKey is the resolver for the createFDSNAccessKey field.
+func (r *mutationResolver) CreateFDSNAccessKey(ctx context.Context, remark string, expiresAt *int64) (*graph_model.CreatedFDSNAccessKey, error) {
+	if !r.checkIsAdmin(ctx) {
+		return nil, errors.New("permission denied")
+	}
+	enabled, err := (&config.StationFDSNServiceEnabledConfigConstraintImpl{}).Get(r.ActionHandler)
+	if err != nil {
+		return nil, err
+	}
+	if !enabled.(bool) {
+		return nil, errors.New("FDSN service is disabled")
+	}
+	record, key, err := r.ActionHandler.FDSNAccessKeyCreate(ctx, remark, expiresAt, r.TimeSource.Now())
+	if err != nil {
+		return nil, err
+	}
+	return &graph_model.CreatedFDSNAccessKey{AccessKey: r.toFDSNAccessKey(record), Key: key}, nil
+}
+
+// RevokeFDSNAccessKeys is the resolver for the revokeFDSNAccessKeys field.
+func (r *mutationResolver) RevokeFDSNAccessKeys(ctx context.Context, keyIds []string) (bool, error) {
+	if !r.checkIsAdmin(ctx) {
+		return false, errors.New("permission denied")
+	}
+	if err := r.ActionHandler.FDSNAccessKeyRevoke(ctx, keyIds, r.TimeSource.Now()); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 // CreateSysUser is the resolver for the createSysUser field.
 func (r *mutationResolver) CreateSysUser(ctx context.Context, username string, password string, admin bool) (string, error) {
 	if !r.checkIsAdmin(ctx) {
@@ -737,6 +767,22 @@ func (r *queryResolver) GetStationConfigConstraint(ctx context.Context) ([]*grap
 	}
 
 	return constraint, nil
+}
+
+// GetFDSNAccessKeys is the resolver for the getFDSNAccessKeys field.
+func (r *queryResolver) GetFDSNAccessKeys(ctx context.Context) ([]*graph_model.FdsnAccessKey, error) {
+	if !r.checkIsAdmin(ctx) {
+		return nil, errors.New("permission denied")
+	}
+	records, err := r.ActionHandler.FDSNAccessKeyList(ctx)
+	if err != nil {
+		return nil, err
+	}
+	keys := make([]*graph_model.FdsnAccessKey, 0, len(records))
+	for _, record := range records {
+		keys = append(keys, r.toFDSNAccessKey(record))
+	}
+	return keys, nil
 }
 
 // GetServiceStatus is the resolver for the getServiceStatus field.
