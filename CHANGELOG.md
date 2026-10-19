@@ -2,6 +2,30 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.8.0
+
+### Release Notes
+
+This release adds **FDSN Station and DataSelect web services** with access key management. It also unifies the service lifecycle with context-aware cancellation, which makes startup interruption and shutdown more reliable.
+
+### New Features
+
+- Added authenticated **FDSN Station and DataSelect web services** under `/fdsnws`, including built-in query pages. The services are disabled by default and can be enabled in station settings without a restart.
+- Added administrator management of **FDSN access keys** with optional expiration, revocation, and last request tracking. Keys are shown only once and stored as SHA-256 hashes.
+
+### Improvements
+
+- Unified service start, stop, and restart handling with context-aware cancellation, panic recovery, and consistent running status.
+- Made database operations, HTTP requests, seismic event queries, data exports, and purge jobs cancellable during shutdown.
+- Updated Go dependencies including `gin` and `frp`, and expanded lifecycle, transport, and race regression tests.
+
+### Bug Fixes
+
+- Fixed interrupting startup during hardware initialization or time synchronization leaving database connections and other resources unreleased.
+- Fixed data races and goroutine leaks in serial and TCP transports, the forwarder, the Tailscale proxy, and WebSocket connections.
+- Fixed the pprof server and DNS clients not being closed on shutdown, and service management requests restarting modules after shutdown began.
+- Fixed StationXML metadata reporting a fixed 250 Hz input sample rate instead of the configured sample rate.
+
 ## v4.7.2
 
 ### Release Notes
