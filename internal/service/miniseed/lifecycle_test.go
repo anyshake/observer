@@ -24,37 +24,37 @@ func TestLifecycle(t *testing.T) {
 		t.Fatal(err)
 	}
 	fixed := time.Date(2026, time.October, 8, 1, 2, 3, 0, time.UTC)
-	svc := New(hw, handler, timesource.New(func() time.Time { return fixed }))
+	svc := New(t.Context(), hw, handler, timesource.New(func() time.Time { return fixed }))
 
 	if svc.GetName() != "MiniSEED Service" || svc.GetDescription() == "" || svc.GetStatus() == nil {
 		t.Fatal("service metadata is incomplete")
 	}
-	if svc.IsEnabled() {
+	if svc.IsEnabled(t.Context()) {
 		t.Fatal("enabled before settings exist")
 	}
 	if _, err := svc.GetAssetData("missing.mseed"); err == nil {
 		t.Fatal("asset data succeeded before start")
 	}
-	if err := svc.Init(); err != nil {
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	if err := setConstraint(t, handler, svc, "file_path", dir); err != nil {
 		t.Fatal(err)
 	}
-	if err := svc.Init(); err != nil {
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	if err := setConstraint(t, handler, svc, "enabled", true); err != nil {
 		t.Fatal(err)
 	}
-	if !svc.IsEnabled() {
+	if !svc.IsEnabled(t.Context()) {
 		t.Fatal("service stayed disabled")
 	}
 
-	if err := svc.Start(); err != nil {
+	if err := svc.Start(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { _ = svc.Stop() })
+	t.Cleanup(func() { testsupport.StopService(t, svc) })
 	hw.WaitSubscribed(t)
 	waitRunning(t, svc, true)
 
@@ -102,21 +102,21 @@ func TestLifecycle(t *testing.T) {
 		})
 	}
 
-	if err := svc.PurgeMiniSeedFilesByDate(fixed.Add(48*time.Hour), fixed); err == nil {
+	if err := svc.PurgeMiniSeedFilesByDate(t.Context(), fixed.Add(48*time.Hour), fixed); err == nil {
 		t.Fatal("reversed purge range was accepted")
 	}
-	if err := svc.PurgeMiniSeedFilesByDate(fixed, fixed); err != nil {
+	if err := svc.PurgeMiniSeedFilesByDate(t.Context(), fixed, fixed); err != nil {
 		t.Fatal(err)
 	}
 	assets, err = svc.GetAssetList()
 	if err != nil || len(assets) != 0 {
 		t.Fatalf("assets after purge = %#v, %v", assets, err)
 	}
-	if err := svc.PurgeMiniSeedFiles(); err != nil {
+	if err := svc.PurgeMiniSeedFiles(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 
-	if err := svc.Restart(); err != nil {
+	if err := svc.Restart(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	hw.WaitSubscribed(t)
@@ -124,7 +124,7 @@ func TestLifecycle(t *testing.T) {
 	if svc.GetStatus().GetRestarts() != 1 {
 		t.Fatalf("restarts = %d", svc.GetStatus().GetRestarts())
 	}
-	if err := svc.Stop(); err != nil {
+	if err := svc.Stop(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	waitRunning(t, svc, false)
@@ -132,8 +132,8 @@ func TestLifecycle(t *testing.T) {
 
 func TestInitRequiresStationSettings(t *testing.T) {
 	_, handler := testsupport.OpenDAO(t)
-	svc := New(testsupport.NewHardware(), handler, timesource.New(time.Now))
-	if err := svc.Init(); err == nil {
+	svc := New(t.Context(), testsupport.NewHardware(), handler, timesource.New(time.Now))
+	if err := svc.Init(t.Context()); err == nil {
 		t.Fatal("Init succeeded without station settings")
 	}
 }
@@ -144,7 +144,7 @@ func setConstraint(t *testing.T, handler *action.Handler, svc *MiniSeedServiceIm
 		if constraint.GetKey() != key {
 			continue
 		}
-		return constraint.Set(handler, value)
+		return constraint.Set(t.Context(), handler, value)
 	}
 	t.Fatalf("constraint %s was not found", key)
 	return nil

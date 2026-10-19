@@ -2,6 +2,7 @@ package action
 
 import (
 	"bytes"
+	"context"
 	"encoding/gob"
 	"errors"
 	"fmt"
@@ -24,13 +25,13 @@ const (
 	FloatArray  SettingType = "float[]"
 )
 
-func (h *Handler) SettingsGet(namespace, key string) (any, SettingType, int, error) {
+func (h *Handler) SettingsGet(ctx context.Context, namespace, key string) (any, SettingType, int, error) {
 	if h.daoObj == nil {
 		return nil, "", 0, errors.New("database is not opened")
 	}
 
 	var settings model.UserSettings
-	err := h.daoObj.Database.
+	err := h.daoObj.Database.WithContext(ctx).
 		Model(settings).
 		Where("namespace = ? AND config_key = ?", namespace, key).
 		First(&settings).
@@ -79,7 +80,7 @@ func (h *Handler) SettingsGet(namespace, key string) (any, SettingType, int, err
 	return nil, "", 0, fmt.Errorf("unknown data type for namespace %s, key %s", namespace, key)
 }
 
-func (h *Handler) SettingsSet(namespace, key string, valueType SettingType, version int, value any) error {
+func (h *Handler) SettingsSet(ctx context.Context, namespace, key string, valueType SettingType, version int, value any) error {
 	if h.daoObj == nil {
 		return errors.New("database is not opened")
 	}
@@ -124,7 +125,7 @@ func (h *Handler) SettingsSet(namespace, key string, valueType SettingType, vers
 		Version:     version,
 		ConfigType:  string(valueType),
 	}
-	err := h.daoObj.Database.
+	err := h.daoObj.Database.WithContext(ctx).
 		Model(settings).
 		Where("namespace = ? AND config_key = ?", namespace, key).
 		Assign(settings).
@@ -137,12 +138,12 @@ func (h *Handler) SettingsSet(namespace, key string, valueType SettingType, vers
 	return nil
 }
 
-func (h *Handler) SettingsInit(namespace, key string, valueType SettingType, version int, value any) (bool, error) {
+func (h *Handler) SettingsInit(ctx context.Context, namespace, key string, valueType SettingType, version int, value any) (bool, error) {
 	if h.daoObj == nil {
 		return false, errors.New("database is not opened")
 	}
 
-	settingsVal, readValueType, versionDB, err := h.SettingsGet(namespace, key)
+	settingsVal, readValueType, versionDB, err := h.SettingsGet(ctx, namespace, key)
 	if err == nil {
 		if settingsVal != nil && valueType == readValueType {
 			return false, nil
@@ -155,7 +156,7 @@ func (h *Handler) SettingsInit(namespace, key string, valueType SettingType, ver
 		return false, err
 	}
 
-	err = h.SettingsSet(namespace, key, valueType, version, value)
+	err = h.SettingsSet(ctx, namespace, key, valueType, version, value)
 	if err != nil {
 		return false, fmt.Errorf("failed to initialize settings for namespace %s, key %s: %w", namespace, key, err)
 	}

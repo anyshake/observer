@@ -1,6 +1,7 @@
 package mdns_discovery
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -22,24 +23,24 @@ func (s *discoveryConfigEnabledImpl) GetDefaultValue() any        { return true 
 func (s *discoveryConfigEnabledImpl) GetDescription() string {
 	return "Enable mDNS discovery service to make AnyShake Observer discoverable on the local network."
 }
-func (s *discoveryConfigEnabledImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *discoveryConfigEnabledImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default mDNS discovery service availability: %w", err)
 	}
 	return nil
 }
-func (s *discoveryConfigEnabledImpl) Set(handler *action.Handler, newVal any) error {
+func (s *discoveryConfigEnabledImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	enabled, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
 		return fmt.Errorf("failed to set mDNS discovery service availability: %w", err)
 	}
 	return nil
 }
-func (s *discoveryConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *discoveryConfigEnabledImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get mDNS discovery service availability: %w", err)
 	}
@@ -49,8 +50,8 @@ func (s *discoveryConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
 	}
 	return enabled, nil
 }
-func (s *discoveryConfigEnabledImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *discoveryConfigEnabledImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset mDNS discovery service availability: %w", err)
 	}
 	return nil
@@ -72,24 +73,24 @@ func (s *discoveryConfigInstanceNameImpl) GetDefaultValue() any {
 func (s *discoveryConfigInstanceNameImpl) GetDescription() string {
 	return "An unique name to identify this AnyShake Observer instance on the local network."
 }
-func (s *discoveryConfigInstanceNameImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *discoveryConfigInstanceNameImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default mDNS discovery service instance name: %w", err)
 	}
 	return nil
 }
-func (s *discoveryConfigInstanceNameImpl) Set(handler *action.Handler, newVal any) error {
+func (s *discoveryConfigInstanceNameImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	host, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), host); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), host); err != nil {
 		return fmt.Errorf("failed to set mDNS discovery service instance name: %w", err)
 	}
 	return nil
 }
-func (s *discoveryConfigInstanceNameImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *discoveryConfigInstanceNameImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get mDNS discovery service instance name: %w", err)
 	}
@@ -99,8 +100,8 @@ func (s *discoveryConfigInstanceNameImpl) Get(handler *action.Handler) (any, err
 	}
 	return host, nil
 }
-func (s *discoveryConfigInstanceNameImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *discoveryConfigInstanceNameImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset mDNS discovery service instance name: %w", err)
 	}
 	return nil
@@ -119,24 +120,24 @@ func (s *discoveryConfigRegisterSeedLinkImpl) GetDefaultValue() any        { ret
 func (s *discoveryConfigRegisterSeedLinkImpl) GetDescription() string {
 	return "Broadcast the SeedLink service port via mDNS so clients on the local network can discover and connect to it."
 }
-func (s *discoveryConfigRegisterSeedLinkImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *discoveryConfigRegisterSeedLinkImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default SeedLink service flag: %w", err)
 	}
 	return nil
 }
-func (s *discoveryConfigRegisterSeedLinkImpl) Set(handler *action.Handler, newVal any) error {
+func (s *discoveryConfigRegisterSeedLinkImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	enabled, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
 		return fmt.Errorf("failed to set SeedLink service flag: %w", err)
 	}
 	return nil
 }
-func (s *discoveryConfigRegisterSeedLinkImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *discoveryConfigRegisterSeedLinkImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get SeedLink service flag: %w", err)
 	}
@@ -146,8 +147,8 @@ func (s *discoveryConfigRegisterSeedLinkImpl) Get(handler *action.Handler) (any,
 	}
 	return enabled, nil
 }
-func (s *discoveryConfigRegisterSeedLinkImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *discoveryConfigRegisterSeedLinkImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset SeedLink service flag: %w", err)
 	}
 	return nil
@@ -166,24 +167,24 @@ func (s *discoveryConfigRegisterWinstonImpl) GetDefaultValue() any        { retu
 func (s *discoveryConfigRegisterWinstonImpl) GetDescription() string {
 	return "Broadcast the Winston Wave Server port via mDNS so clients on the local network can discover and connect to it."
 }
-func (s *discoveryConfigRegisterWinstonImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *discoveryConfigRegisterWinstonImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default Winston service flag: %w", err)
 	}
 	return nil
 }
-func (s *discoveryConfigRegisterWinstonImpl) Set(handler *action.Handler, newVal any) error {
+func (s *discoveryConfigRegisterWinstonImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	enabled, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
 		return fmt.Errorf("failed to set Winston service flag: %w", err)
 	}
 	return nil
 }
-func (s *discoveryConfigRegisterWinstonImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *discoveryConfigRegisterWinstonImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Winston service flag: %w", err)
 	}
@@ -193,8 +194,8 @@ func (s *discoveryConfigRegisterWinstonImpl) Get(handler *action.Handler) (any, 
 	}
 	return enabled, nil
 }
-func (s *discoveryConfigRegisterWinstonImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *discoveryConfigRegisterWinstonImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset Winston service flag: %w", err)
 	}
 	return nil
@@ -213,24 +214,24 @@ func (s *discoveryConfigRegisterForwarderImpl) GetDefaultValue() any        { re
 func (s *discoveryConfigRegisterForwarderImpl) GetDescription() string {
 	return "Broadcast the TCP forwarder port via mDNS so clients on the local network can discover and connect to it."
 }
-func (s *discoveryConfigRegisterForwarderImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *discoveryConfigRegisterForwarderImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default TCP forwarder service flag: %w", err)
 	}
 	return nil
 }
-func (s *discoveryConfigRegisterForwarderImpl) Set(handler *action.Handler, newVal any) error {
+func (s *discoveryConfigRegisterForwarderImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	enabled, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
 		return fmt.Errorf("failed to set TCP forwarder service flag: %w", err)
 	}
 	return nil
 }
-func (s *discoveryConfigRegisterForwarderImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *discoveryConfigRegisterForwarderImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get TCP forwarder service flag: %w", err)
 	}
@@ -240,8 +241,8 @@ func (s *discoveryConfigRegisterForwarderImpl) Get(handler *action.Handler) (any
 	}
 	return enabled, nil
 }
-func (s *discoveryConfigRegisterForwarderImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *discoveryConfigRegisterForwarderImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset TCP forwarder service flag: %w", err)
 	}
 	return nil

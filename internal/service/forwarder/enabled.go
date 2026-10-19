@@ -1,7 +1,9 @@
 package forwarder
 
-func (s *ForwarderServiceImpl) IsEnabled() bool {
-	enable, err := (&forwarderConfigEnabledImpl{}).Get(s.actionHandler)
+import "context"
+
+func (s *ForwarderServiceImpl) IsEnabled(ctx context.Context) bool {
+	enable, err := (&forwarderConfigEnabledImpl{}).Get(ctx, s.actionHandler)
 	if err != nil {
 		return false
 	}

@@ -15,7 +15,7 @@ func TestLifecycle(t *testing.T) {
 	testsupport.InitStation(t, handler)
 	hw := testsupport.NewHardware()
 	fixed := time.Date(2026, time.October, 8, 1, 2, 3, 0, time.UTC)
-	svc := New(hw, handler, timesource.New(func() time.Time { return fixed }))
+	svc := New(t.Context(), hw, handler, timesource.New(func() time.Time { return fixed }))
 
 	if svc.GetName() != "Archiver Service" {
 		t.Fatalf("name = %q", svc.GetName())
@@ -26,7 +26,7 @@ func TestLifecycle(t *testing.T) {
 	if svc.GetStatus() == nil {
 		t.Fatal("status is nil")
 	}
-	if svc.IsEnabled() {
+	if svc.IsEnabled(t.Context()) {
 		t.Fatal("enabled before settings exist")
 	}
 	if _, err := svc.GetAssetList(); err == nil {
@@ -36,28 +36,26 @@ func TestLifecycle(t *testing.T) {
 		t.Fatal("asset data succeeded")
 	}
 
-	if err := svc.Init(); err != nil {
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatalf("Init() error = %v", err)
 	}
-	if !svc.IsEnabled() {
+	if !svc.IsEnabled(t.Context()) {
 		t.Fatal("archiver is disabled after Init")
 	}
-	if err := handler.SettingsSet(ID, "enabled", action.Bool, 0, false); err != nil {
+	if err := handler.SettingsSet(t.Context(), ID, "enabled", action.Bool, 0, false); err != nil {
 		t.Fatalf("disable archiver: %v", err)
 	}
-	if svc.IsEnabled() {
+	if svc.IsEnabled(t.Context()) {
 		t.Fatal("archiver stayed enabled")
 	}
-	if err := handler.SettingsSet(ID, "enabled", action.Bool, 0, true); err != nil {
+	if err := handler.SettingsSet(t.Context(), ID, "enabled", action.Bool, 0, true); err != nil {
 		t.Fatalf("enable archiver: %v", err)
 	}
 
-	if err := svc.Start(); err != nil {
+	if err := svc.Start(t.Context()); err != nil {
 		t.Fatalf("Start() error = %v", err)
 	}
-	t.Cleanup(func() {
-		_ = svc.Stop()
-	})
+	t.Cleanup(func() { testsupport.StopService(t, svc) })
 	hw.WaitSubscribed(t)
 	waitRunning(t, svc, true)
 
@@ -73,7 +71,7 @@ func TestLifecycle(t *testing.T) {
 			}},
 		})
 	}
-	records, err := handler.SeisRecordsQuery(fixed.Add(-time.Second), fixed.Add(time.Minute))
+	records, err := handler.SeisRecordsQuery(t.Context(), fixed.Add(-time.Second), fixed.Add(time.Minute))
 	if err != nil {
 		t.Fatalf("query records: %v", err)
 	}
@@ -81,7 +79,7 @@ func TestLifecycle(t *testing.T) {
 		t.Fatalf("inserted records = %d, want %d", len(records), RECORDS_INSERT_INTERVAL)
 	}
 
-	if err := svc.Restart(); err != nil {
+	if err := svc.Restart(t.Context()); err != nil {
 		t.Fatalf("Restart() error = %v", err)
 	}
 	hw.WaitSubscribed(t)
@@ -90,7 +88,7 @@ func TestLifecycle(t *testing.T) {
 		t.Fatalf("restarts = %d, want 1", svc.GetStatus().GetRestarts())
 	}
 
-	if err := svc.Stop(); err != nil {
+	if err := svc.Stop(t.Context()); err != nil {
 		t.Fatalf("Stop() error = %v", err)
 	}
 	waitRunning(t, svc, false)
@@ -98,8 +96,8 @@ func TestLifecycle(t *testing.T) {
 
 func TestInitRequiresStationSettings(t *testing.T) {
 	_, handler := testsupport.OpenDAO(t)
-	svc := New(testsupport.NewHardware(), handler, timesource.New(nil))
-	if err := svc.Init(); err == nil {
+	svc := New(t.Context(), testsupport.NewHardware(), handler, timesource.New(nil))
+	if err := svc.Init(t.Context()); err == nil {
 		t.Fatal("Init() succeeded without station settings")
 	}
 	if _, err := svc.GetAssetList(); err == nil {

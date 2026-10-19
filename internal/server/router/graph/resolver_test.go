@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"github.com/anyshake/observer/config"
@@ -259,7 +260,7 @@ func TestSysUsers(t *testing.T) {
 	if _, err := mut.UpdateSysUser(admin, userID, "renamed_user", &next, true); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := env.handler.SysUserLogin("renamed_user", next, "agent", "127.0.0.1"); err != nil {
+	if _, err := env.handler.SysUserLogin(t.Context(), "renamed_user", next, "agent", "127.0.0.1"); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := mut.UpdateSysUser(admin, userID, "renamed_user", nil, true); err != nil {
@@ -833,7 +834,7 @@ func TestDeviceQueries(t *testing.T) {
 		if _, err := bare.query().GetStationMetadata(admin, "seiscomp_xml"); err == nil {
 			t.Fatalf("metadata succeeded before %s was initialized", constraint.GetKey())
 		}
-		if err := constraint.Init(bareHandler); err != nil {
+		if err := constraint.Init(t.Context(), bareHandler); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -941,6 +942,25 @@ func TestRestartApplication(t *testing.T) {
 	}
 }
 
+func TestRepeatedRestartRequestsDoNotBlock(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		resolver := &Resolver{RestartChan: make(chan struct{}, 1)}
+		mutation := &mutationResolver{resolver}
+		for range 3 {
+			if ok, err := mutation.RestartApplication(adminContext("admin")); err != nil || !ok {
+				t.Fatal(err)
+			}
+		}
+		time.Sleep(4 * time.Second)
+		synctest.Wait()
+		select {
+		case <-resolver.RestartChan:
+		default:
+			t.Fatal("restart signal was not sent")
+		}
+	})
+}
+
 type graphEnv struct {
 	t        *testing.T
 	db       *dao.DAO
@@ -960,7 +980,7 @@ func newEnv(t *testing.T) *graphEnv {
 	}
 	sqlDB.SetMaxOpenConns(1)
 	for _, constraint := range config.NewStationConstraints() {
-		if err := constraint.Init(handler); err != nil {
+		if err := constraint.Init(t.Context(), handler); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -1005,11 +1025,11 @@ func (e *graphEnv) prepareMiniSeed(t *testing.T) *miniseed.MiniSeedServiceImpl {
 
 func (e *graphEnv) prepareMiniSeedIn(t *testing.T, dir string) *miniseed.MiniSeedServiceImpl {
 	t.Helper()
-	if err := e.handler.SettingsSet(miniseed.ID, "file_path", action.String, 0, dir); err != nil {
+	if err := e.handler.SettingsSet(t.Context(), miniseed.ID, "file_path", action.String, 0, dir); err != nil {
 		t.Fatal(err)
 	}
-	svc := miniseed.New(e.hardware, e.handler, e.resolver.TimeSource)
-	if err := svc.Init(); err != nil {
+	svc := miniseed.New(t.Context(), e.hardware, e.handler, e.resolver.TimeSource)
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	return svc
@@ -1022,14 +1042,14 @@ func (e *graphEnv) prepareHelicorder(t *testing.T) *helicorder.HelicorderService
 
 func (e *graphEnv) prepareHelicorderIn(t *testing.T, dir string) *helicorder.HelicorderServiceImpl {
 	t.Helper()
-	if err := e.handler.SettingsSet(helicorder.ID, "file_path", action.String, 0, dir); err != nil {
+	if err := e.handler.SettingsSet(t.Context(), helicorder.ID, "file_path", action.String, 0, dir); err != nil {
 		t.Fatal(err)
 	}
-	if err := e.handler.SettingsSet(helicorder.ID, "cache_storage", action.String, 0, helicorder.CACHE_STORAGE_DISABLED); err != nil {
+	if err := e.handler.SettingsSet(t.Context(), helicorder.ID, "cache_storage", action.String, 0, helicorder.CACHE_STORAGE_DISABLED); err != nil {
 		t.Fatal(err)
 	}
-	svc := helicorder.New(e.hardware, e.handler, e.resolver.TimeSource)
-	if err := svc.Init(); err != nil {
+	svc := helicorder.New(t.Context(), e.hardware, e.handler, e.resolver.TimeSource)
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	return svc
@@ -1087,7 +1107,7 @@ func insertSeis(t *testing.T, db *dao.DAO, records []model.SeisRecord) {
 		}
 		seen[table] = struct{}{}
 	}
-	if err := action.NewHandler(db).SeisRecordsCreate(records...); err != nil {
+	if err := action.NewHandler(db).SeisRecordsCreate(t.Context(), records...); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -1127,8 +1147,8 @@ func (fakeHardware) SubscribeRealtime(string, explorer.EventHandler) error {
 	return nil
 }
 func (fakeHardware) UnsubscribeRealtime(string) error { return nil }
-func (f *fakeHardware) GetConfig() explorer.DeviceConfig {
-	cfg := explorer.DeviceConfig{}
+func (f *fakeHardware) GetConfig() *explorer.DeviceConfig {
+	cfg := &explorer.DeviceConfig{}
 	cfg.SetPacketInterval(f.interval)
 	cfg.SetSampleRate(f.sampleRate)
 	cfg.SetChannelCodes(append([]string(nil), f.channels...))
@@ -1137,8 +1157,8 @@ func (f *fakeHardware) GetConfig() explorer.DeviceConfig {
 	cfg.SetProtocol(f.protocol)
 	return cfg
 }
-func (f *fakeHardware) GetStatus() explorer.DeviceStatus {
-	status := explorer.DeviceStatus{}
+func (f *fakeHardware) GetStatus() *explorer.DeviceStatus {
+	status := &explorer.DeviceStatus{}
 	status.SetStartedAt(f.started)
 	status.SetUpdatedAt(f.updated)
 	for i := int64(0); i < f.frames; i++ {
@@ -1192,25 +1212,25 @@ func (f *fakeService) GetStatus() *service.Status {
 	status.SetStoppedAt(f.stopped)
 	return status
 }
-func (f *fakeService) GetName() string        { return f.name }
-func (f *fakeService) GetDescription() string { return f.description }
-func (f *fakeService) Init() error            { return f.initErr }
-func (f *fakeService) IsEnabled() bool        { return true }
-func (f *fakeService) Start() error {
+func (f *fakeService) GetName() string                { return f.name }
+func (f *fakeService) GetDescription() string         { return f.description }
+func (f *fakeService) Init(context.Context) error     { return f.initErr }
+func (f *fakeService) IsEnabled(context.Context) bool { return true }
+func (f *fakeService) Start(context.Context) error {
 	if f.startErr != nil {
 		return f.startErr
 	}
 	f.running = true
 	return nil
 }
-func (f *fakeService) Stop() error {
+func (f *fakeService) Stop(context.Context) error {
 	if f.stopErr != nil {
 		return f.stopErr
 	}
 	f.running = false
 	return nil
 }
-func (f *fakeService) Restart() error {
+func (f *fakeService) Restart(context.Context) error {
 	if f.restartErr != nil {
 		return f.restartErr
 	}
@@ -1233,7 +1253,7 @@ type fakeSource struct {
 }
 
 func (f *fakeSource) GetProperty() seisevent.DataSourceProperty { return f.property }
-func (f *fakeSource) GetEvents(float64, float64) ([]seisevent.Event, error) {
+func (f *fakeSource) GetEvents(context.Context, float64, float64) ([]seisevent.Event, error) {
 	if f.err != nil {
 		return nil, f.err
 	}
@@ -1250,30 +1270,30 @@ type fakeConstraint struct {
 	getErr, setErr, restoreErr, initErr error
 }
 
-func (f *fakeConstraint) IsRequired() bool            { return f.required }
-func (f *fakeConstraint) GetDefaultValue() any        { return f.value }
-func (f *fakeConstraint) GetNamespace() string        { return f.namespace }
-func (f *fakeConstraint) GetDescription() string      { return f.description }
-func (f *fakeConstraint) GetName() string             { return f.name }
-func (f *fakeConstraint) GetType() action.SettingType { return f.typ }
-func (f *fakeConstraint) GetKey() string              { return f.key }
-func (f *fakeConstraint) GetVersion() int             { return f.version }
-func (f *fakeConstraint) GetOptions() map[string]any  { return f.options }
-func (f *fakeConstraint) Init(*action.Handler) error  { return f.initErr }
-func (f *fakeConstraint) Set(_ *action.Handler, newVal any) error {
+func (f *fakeConstraint) IsRequired() bool                            { return f.required }
+func (f *fakeConstraint) GetDefaultValue() any                        { return f.value }
+func (f *fakeConstraint) GetNamespace() string                        { return f.namespace }
+func (f *fakeConstraint) GetDescription() string                      { return f.description }
+func (f *fakeConstraint) GetName() string                             { return f.name }
+func (f *fakeConstraint) GetType() action.SettingType                 { return f.typ }
+func (f *fakeConstraint) GetKey() string                              { return f.key }
+func (f *fakeConstraint) GetVersion() int                             { return f.version }
+func (f *fakeConstraint) GetOptions() map[string]any                  { return f.options }
+func (f *fakeConstraint) Init(context.Context, *action.Handler) error { return f.initErr }
+func (f *fakeConstraint) Set(_ context.Context, _ *action.Handler, newVal any) error {
 	if f.setErr != nil {
 		return f.setErr
 	}
 	f.value = newVal
 	return nil
 }
-func (f *fakeConstraint) Get(*action.Handler) (any, error) {
+func (f *fakeConstraint) Get(context.Context, *action.Handler) (any, error) {
 	if f.getErr != nil {
 		return nil, f.getErr
 	}
 	return f.value, nil
 }
-func (f *fakeConstraint) Restore(*action.Handler) error { return f.restoreErr }
+func (f *fakeConstraint) Restore(context.Context, *action.Handler) error { return f.restoreErr }
 
 var (
 	_ hardware.IHardware    = (*fakeHardware)(nil)

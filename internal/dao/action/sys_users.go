@@ -1,6 +1,7 @@
 package action
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"regexp"
@@ -8,15 +9,16 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/internal/dao/model"
+	"gorm.io/gorm"
 )
 
-func (h *Handler) SysUserHasAdmin() (bool, error) {
+func (h *Handler) SysUserHasAdmin(ctx context.Context) (bool, error) {
 	if h.daoObj == nil {
 		return false, errors.New("database is not opened")
 	}
 
 	var adminUsers int64
-	err := h.daoObj.Database.
+	err := h.daoObj.Database.WithContext(ctx).
 		Table((&model.SysUser{}).GetName(h.daoObj.GetPrefix())).
 		Where("is_admin = ?", model.ADMIN).
 		Count(&adminUsers).
@@ -28,13 +30,13 @@ func (h *Handler) SysUserHasAdmin() (bool, error) {
 	return adminUsers > 0, nil
 }
 
-func (h *Handler) SysUserList() ([]model.SysUser, error) {
+func (h *Handler) SysUserList(ctx context.Context) ([]model.SysUser, error) {
 	if h.daoObj == nil {
 		return nil, errors.New("database is not opened")
 	}
 
 	var users []model.SysUser
-	err := h.daoObj.Database.
+	err := h.daoObj.Database.WithContext(ctx).
 		Table((&model.SysUser{}).GetName(h.daoObj.GetPrefix())).
 		Find(&users).
 		Error
@@ -45,13 +47,13 @@ func (h *Handler) SysUserList() ([]model.SysUser, error) {
 	return users, nil
 }
 
-func (h *Handler) SysUserGetByUsername(username string) (model.SysUser, error) {
+func (h *Handler) SysUserGetByUsername(ctx context.Context, username string) (model.SysUser, error) {
 	if h.daoObj == nil {
 		return model.SysUser{}, errors.New("database is not opened")
 	}
 
 	var user model.SysUser
-	err := h.daoObj.Database.
+	err := h.daoObj.Database.WithContext(ctx).
 		Table(user.GetName(h.daoObj.GetPrefix())).
 		Where("username = ?", username).
 		First(&user).
@@ -63,13 +65,13 @@ func (h *Handler) SysUserGetByUsername(username string) (model.SysUser, error) {
 	return user, nil
 }
 
-func (h *Handler) SysUserGetByUserId(userId string) (model.SysUser, error) {
+func (h *Handler) SysUserGetByUserId(ctx context.Context, userId string) (model.SysUser, error) {
 	if h.daoObj == nil {
 		return model.SysUser{}, errors.New("database is not opened")
 	}
 
 	var user model.SysUser
-	err := h.daoObj.Database.
+	err := h.daoObj.Database.WithContext(ctx).
 		Table(user.GetName(h.daoObj.GetPrefix())).
 		Where("user_id = ?", userId).
 		First(&user).
@@ -81,7 +83,7 @@ func (h *Handler) SysUserGetByUserId(userId string) (model.SysUser, error) {
 	return user, nil
 }
 
-func (h *Handler) SysUserCreate(username, password string, isAdmin bool) (string, error) {
+func (h *Handler) SysUserCreate(ctx context.Context, username, password string, isAdmin bool) (string, error) {
 	if h.daoObj == nil {
 		return "", errors.New("database is not opened")
 	}
@@ -89,8 +91,10 @@ func (h *Handler) SysUserCreate(username, password string, isAdmin bool) (string
 	if err := h.SysUserCheckUsername(username); err != nil {
 		return "", err
 	}
-	if _, err := h.SysUserGetByUsername(username); err == nil {
+	if _, err := h.SysUserGetByUsername(ctx, username); err == nil {
 		return "", fmt.Errorf("user %s already exists", username)
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return "", err
 	}
 
 	user := model.SysUser{
@@ -104,7 +108,7 @@ func (h *Handler) SysUserCreate(username, password string, isAdmin bool) (string
 	user.HashedPassword = hashedPassword
 	user.UserId = user.NewUserId()
 
-	if err = h.daoObj.Database.
+	if err = h.daoObj.Database.WithContext(ctx).
 		Table(user.GetName(h.daoObj.GetPrefix())).
 		Save(&user).
 		Error; err != nil {
@@ -114,12 +118,12 @@ func (h *Handler) SysUserCreate(username, password string, isAdmin bool) (string
 	return user.UserId, nil
 }
 
-func (h *Handler) SysUserLogin(username, password, userAgent, userIp string) (userId string, err error) {
+func (h *Handler) SysUserLogin(ctx context.Context, username, password, userAgent, userIp string) (userId string, err error) {
 	if h.daoObj == nil {
 		return "", errors.New("database is not opened")
 	}
 
-	user, err := h.SysUserGetByUsername(username)
+	user, err := h.SysUserGetByUsername(ctx, username)
 	if err != nil {
 		return "", err
 	}
@@ -132,7 +136,7 @@ func (h *Handler) SysUserLogin(username, password, userAgent, userIp string) (us
 		user.LastLogin = time.Now().UnixMilli()
 		user.UserAgent = userAgent
 		user.UserIp = userIp
-		err = h.SysUserUpdate(user.UserId, user)
+		err = h.SysUserUpdate(ctx, user.UserId, user)
 		if err != nil {
 			return "", fmt.Errorf("failed to update login status: %w", err)
 		}
@@ -141,12 +145,12 @@ func (h *Handler) SysUserLogin(username, password, userAgent, userIp string) (us
 	return user.UserId, nil
 }
 
-func (h *Handler) SysUserUpdate(userId string, user model.SysUser) error {
+func (h *Handler) SysUserUpdate(ctx context.Context, userId string, user model.SysUser) error {
 	if h.daoObj == nil {
 		return errors.New("database is not opened")
 	}
 
-	currentUser, err := h.SysUserGetByUserId(userId)
+	currentUser, err := h.SysUserGetByUserId(ctx, userId)
 	if err != nil {
 		return err
 	}
@@ -165,7 +169,7 @@ func (h *Handler) SysUserUpdate(userId string, user model.SysUser) error {
 	currentUser.Username = user.Username
 	currentUser.UpdatedAt = time.Now().UnixMilli()
 
-	err = h.daoObj.Database.
+	err = h.daoObj.Database.WithContext(ctx).
 		Table(currentUser.GetName(h.daoObj.GetPrefix())).
 		Where("user_id = ?", currentUser.UserId).
 		Updates(&currentUser).
@@ -177,13 +181,13 @@ func (h *Handler) SysUserUpdate(userId string, user model.SysUser) error {
 	return nil
 }
 
-func (h *Handler) SysUserRemove(userId string) error {
+func (h *Handler) SysUserRemove(ctx context.Context, userId string) error {
 	if h.daoObj == nil {
 		return errors.New("database is not opened")
 	}
 
 	var user model.SysUser
-	err := h.daoObj.Database.
+	err := h.daoObj.Database.WithContext(ctx).
 		Table(user.GetName(h.daoObj.GetPrefix())).
 		Where("user_id = ?", userId).
 		Delete(user.GetModel()).

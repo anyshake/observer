@@ -2,6 +2,8 @@ package socket
 
 import (
 	"context"
+	"errors"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -32,7 +34,7 @@ func TestWebSocketStream(t *testing.T) {
 		if ctx.GetHeader("Authorization") != "Bearer good" {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 		}
-	})
+	}, t.Context())
 
 	server := httptest.NewServer(router)
 	t.Cleanup(server.Close)
@@ -105,7 +107,7 @@ func TestWebSocketStream(t *testing.T) {
 func TestWebSocketSubscribeFailure(t *testing.T) {
 	setupSocketTests()
 	router := gin.New()
-	Setup(router.Group("/"), timesource.New(time.Now), &fakeHardware{subscribeErr: context.Canceled}, func(ctx *gin.Context) {})
+	Setup(router.Group("/"), timesource.New(time.Now), &fakeHardware{subscribeErr: context.Canceled}, func(ctx *gin.Context) {}, t.Context())
 	server := httptest.NewServer(router)
 	t.Cleanup(server.Close)
 	conn, _, err := websocket.DefaultDialer.Dial("ws"+strings.TrimPrefix(server.URL, "http")+"/socket", nil)
@@ -119,6 +121,98 @@ func TestWebSocketSubscribeFailure(t *testing.T) {
 	time.Sleep(20 * time.Millisecond)
 }
 
+func TestWebSocketClosesOnShutdown(t *testing.T) {
+	setupSocketTests()
+	shutdownCtx, shutdown := context.WithCancel(t.Context())
+	defer shutdown()
+	router := gin.New()
+	Setup(router.Group("/"), timesource.New(time.Now), &fakeHardware{}, func(ctx *gin.Context) {
+		if ctx.GetHeader("Authorization") != "Bearer good" {
+			ctx.AbortWithStatus(http.StatusUnauthorized)
+		}
+	}, shutdownCtx)
+	server := httptest.NewServer(router)
+	t.Cleanup(server.Close)
+	conn, _, err := websocket.DefaultDialer.Dial("ws"+strings.TrimPrefix(server.URL, "http")+"/socket", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+	if err := conn.WriteMessage(websocket.TextMessage, []byte("good")); err != nil {
+		t.Fatal(err)
+	}
+
+	shutdown()
+	_ = conn.SetReadDeadline(time.Now().Add(2 * time.Second))
+	for {
+		_, _, err := conn.ReadMessage()
+		if err == nil {
+			continue
+		}
+		var netErr net.Error
+		if errors.As(err, &netErr) && netErr.Timeout() {
+			t.Fatal("websocket stayed open after server shutdown")
+		}
+		return
+	}
+}
+
+func TestCloseUnsubscribesAndWaitsForHandlers(t *testing.T) {
+	setupSocketTests()
+	shutdownCtx, shutdown := context.WithCancel(t.Context())
+	defer shutdown()
+	hardware := &fakeHardware{unsubscribed: make(chan struct{})}
+	validating := make(chan struct{})
+	release := make(chan struct{})
+	router := gin.New()
+	closeSocket := Setup(router.Group("/"), timesource.New(time.Now), hardware, func(*gin.Context) {
+		close(validating)
+		<-release
+	}, shutdownCtx)
+	server := httptest.NewServer(router)
+	t.Cleanup(server.Close)
+	endpoint := "ws" + strings.TrimPrefix(server.URL, "http") + "/socket"
+	conn, _, err := websocket.DefaultDialer.Dial(endpoint, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+	if err := conn.WriteMessage(websocket.TextMessage, []byte("good")); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-validating:
+	case <-time.After(2 * time.Second):
+		t.Fatal("websocket handler did not start authentication")
+	}
+	select {
+	case <-hardware.unsubscribed:
+		t.Fatal("hardware unsubscribed before Close")
+	default:
+	}
+
+	shutdown()
+	ctx, cancel := context.WithTimeout(t.Context(), 100*time.Millisecond)
+	defer cancel()
+	if err := closeSocket(ctx); !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("Close with an active handler = %v", err)
+	}
+	select {
+	case <-hardware.unsubscribed:
+	default:
+		t.Fatal("hardware subscription stayed active after Close")
+	}
+	if rejected, _, err := websocket.DefaultDialer.Dial(endpoint, nil); err == nil {
+		_ = rejected.Close()
+		t.Fatal("websocket accepted after Close")
+	}
+
+	close(release)
+	if err := closeSocket(t.Context()); err != nil {
+		t.Fatalf("Close() error = %v", err)
+	}
+}
+
 func TestWebSocketMessageLimits(t *testing.T) {
 	setupSocketTests()
 	router := gin.New()
@@ -126,7 +220,7 @@ func TestWebSocketMessageLimits(t *testing.T) {
 		if ctx.GetHeader("Authorization") != "Bearer good" {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 		}
-	})
+	}, t.Context())
 	server := httptest.NewServer(router)
 	t.Cleanup(server.Close)
 	endpoint := "ws" + strings.TrimPrefix(server.URL, "http") + "/socket"
@@ -187,6 +281,7 @@ func TestWebSocketMessageLimits(t *testing.T) {
 type fakeHardware struct {
 	handler      explorer.EventHandler
 	subscribeErr error
+	unsubscribed chan struct{}
 }
 
 func (f *fakeHardware) Open(context.Context) (context.Context, context.CancelFunc, error) {
@@ -201,13 +296,18 @@ func (f *fakeHardware) Subscribe(_ string, handler explorer.EventHandler) error 
 	f.handler = handler
 	return nil
 }
-func (fakeHardware) Unsubscribe(string) error { return nil }
+func (f *fakeHardware) Unsubscribe(string) error {
+	if f.unsubscribed != nil {
+		close(f.unsubscribed)
+	}
+	return nil
+}
 func (fakeHardware) SubscribeRealtime(string, explorer.EventHandler) error {
 	return nil
 }
-func (fakeHardware) UnsubscribeRealtime(string) error { return nil }
-func (fakeHardware) GetConfig() explorer.DeviceConfig { return explorer.DeviceConfig{} }
-func (fakeHardware) GetStatus() explorer.DeviceStatus { return explorer.DeviceStatus{} }
+func (fakeHardware) UnsubscribeRealtime(string) error  { return nil }
+func (fakeHardware) GetConfig() *explorer.DeviceConfig { return &explorer.DeviceConfig{} }
+func (fakeHardware) GetStatus() *explorer.DeviceStatus { return &explorer.DeviceStatus{} }
 func (fakeHardware) GetCoordinates(bool) (float64, float64, float64, error) {
 	return 0, 0, 0, nil
 }

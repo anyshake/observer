@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/sha512"
 	"encoding/base64"
@@ -26,7 +27,7 @@ func TestLoginFlow(t *testing.T) {
 	t.Cleanup(func() { verifyCaptchaString = previous })
 
 	_, handler := testsupport.OpenDAO(t)
-	if _, err := handler.SysUserCreate("alice", "GoodPass1!", true); err != nil {
+	if _, err := handler.SysUserCreate(t.Context(), "alice", "GoodPass1!", true); err != nil {
 		t.Fatal(err)
 	}
 	session := newLoginSession(t, handler)
@@ -82,7 +83,7 @@ func TestLoginFlow(t *testing.T) {
 
 	_, nonce, payload = session.material(mustCredential(t, "alice", "GoodPass1!"))
 	session.rotateChallenge()
-	code, _, err = session.auth.login("missing-session", secret, nonce, session.challengeID, session.solution, "captcha", "000000", payload, "", "")
+	code, _, err = session.auth.login(t.Context(), "missing-session", secret, nonce, session.challengeID, session.solution, "captcha", "000000", payload, "", "")
 	if err == nil || code != http.StatusUnauthorized {
 		t.Fatalf("unknown session = %d %v", code, err)
 	}
@@ -92,7 +93,7 @@ func TestLoginFlow(t *testing.T) {
 		t.Fatalf("captcha = %d %v", code, err)
 	}
 	session.rotateChallenge()
-	code, _, err = session.auth.login(session.id, "c2VjcmV0", uniqueNonce(), session.challengeID, "1:"+strings.Repeat("00", sha512.Size), "captcha", "000000", "e30=", "", "")
+	code, _, err = session.auth.login(t.Context(), session.id, "c2VjcmV0", uniqueNonce(), session.challengeID, "1:"+strings.Repeat("00", sha512.Size), "captcha", "000000", "e30=", "", "")
 	if err == nil || code != http.StatusUnauthorized {
 		t.Fatalf("bad proof = %d %v", code, err)
 	}
@@ -100,7 +101,7 @@ func TestLoginFlow(t *testing.T) {
 	expired := newLoginSession(t, handler)
 	expired.challenge.createdAt = time.Now().Add(-time.Hour)
 	secret, nonce, payload = expired.material(mustCredential(t, "alice", "GoodPass1!"))
-	code, _, err = expired.auth.login(expired.id, secret, nonce, expired.challengeID, expired.solution, "captcha", "000000", payload, "", "")
+	code, _, err = expired.auth.login(t.Context(), expired.id, secret, nonce, expired.challengeID, expired.solution, "captcha", "000000", payload, "", "")
 	if err == nil || code != http.StatusUnauthorized {
 		t.Fatalf("expired challenge = %d %v", code, err)
 	}
@@ -221,12 +222,12 @@ func (s *loginSession) rotateChallenge() {
 func (s *loginSession) login(credential []byte, captcha, agent, ip string) (int, string, error) {
 	s.rotateChallenge()
 	secret, nonce, payload := s.material(credential)
-	return s.auth.login(s.id, secret, nonce, s.challengeID, s.solution, "captcha", captcha, payload, agent, ip)
+	return s.auth.login(context.Background(), s.id, secret, nonce, s.challengeID, s.solution, "captcha", captcha, payload, agent, ip)
 }
 
 func (s *loginSession) attempt(secret, nonce, payload, captcha string) (int, string, error) {
 	s.rotateChallenge()
-	return s.auth.login(s.id, secret, nonce, s.challengeID, s.solution, "captcha", captcha, payload, "", "")
+	return s.auth.login(context.Background(), s.id, secret, nonce, s.challengeID, s.solution, "captcha", captcha, payload, "", "")
 }
 
 func (s *loginSession) material(credential []byte) (string, string, string) {

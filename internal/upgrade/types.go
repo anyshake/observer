@@ -16,6 +16,7 @@ type Helper struct {
 	resolvers          dnsquery.Resolvers
 	resolverErr        error
 	dnsClient          *dnsquery.Client
+	closed             bool
 
 	currentExePath string
 	currentBuild   *unibuild.UniBuild

@@ -9,10 +9,11 @@ import (
 	"github.com/anyshake/observer/pkg/timesource"
 )
 
-func New(hardwareDev hardware.IHardware, actionHandler *action.Handler, timeSource *timesource.Source) *WinstonServiceImpl {
-	ctx, cancelFn := context.WithCancel(context.Background())
+func New(parentCtx context.Context, hardwareDev hardware.IHardware, actionHandler *action.Handler, timeSource *timesource.Source) *WinstonServiceImpl {
+	ctx, cancelFn := context.WithCancel(parentCtx)
 	obj := &WinstonServiceImpl{
 		hardwareDev:   hardwareDev,
+		parentCtx:     parentCtx,
 		ctx:           ctx,
 		cancelFn:      cancelFn,
 		timeSource:    timeSource,

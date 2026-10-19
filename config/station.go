@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -23,13 +24,13 @@ func (s *StationNameConfigConstraintImpl) GetDefaultValue() any        { return 
 func (s *StationNameConfigConstraintImpl) GetDescription() string {
 	return "Custom name for the station, should less than 20 characters."
 }
-func (s *StationNameConfigConstraintImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *StationNameConfigConstraintImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default station name: %w", err)
 	}
 	return nil
 }
-func (s *StationNameConfigConstraintImpl) Set(handler *action.Handler, newVal any) error {
+func (s *StationNameConfigConstraintImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	str, err := GetConfigValString(newVal)
 	if err != nil {
 		return err
@@ -37,13 +38,13 @@ func (s *StationNameConfigConstraintImpl) Set(handler *action.Handler, newVal an
 	if len(str) > 20 {
 		return errors.New("station name must be less than 20 characters")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), newVal); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), newVal); err != nil {
 		return fmt.Errorf("failed to set station name: %w", err)
 	}
 	return nil
 }
-func (s *StationNameConfigConstraintImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *StationNameConfigConstraintImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get station name: %w", err)
 	}
@@ -52,8 +53,8 @@ func (s *StationNameConfigConstraintImpl) Get(handler *action.Handler) (any, err
 	}
 	return val, nil
 }
-func (s *StationNameConfigConstraintImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *StationNameConfigConstraintImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset station name: %w", err)
 	}
 	return nil
@@ -74,13 +75,13 @@ func (s *StationDescriptionConfigConstraintImpl) GetDefaultValue() any {
 func (s *StationDescriptionConfigConstraintImpl) GetDescription() string {
 	return "Brief description for the station, should less than 100 characters."
 }
-func (s *StationDescriptionConfigConstraintImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *StationDescriptionConfigConstraintImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default station description: %w", err)
 	}
 	return nil
 }
-func (s *StationDescriptionConfigConstraintImpl) Set(handler *action.Handler, newVal any) error {
+func (s *StationDescriptionConfigConstraintImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	str, err := GetConfigValString(newVal)
 	if err != nil {
 		return err
@@ -88,13 +89,13 @@ func (s *StationDescriptionConfigConstraintImpl) Set(handler *action.Handler, ne
 	if len(str) > 100 {
 		return errors.New("station description must be less than 20 characters")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), newVal); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), newVal); err != nil {
 		return fmt.Errorf("failed to set station description: %w", err)
 	}
 	return nil
 }
-func (s *StationDescriptionConfigConstraintImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *StationDescriptionConfigConstraintImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get station description: %w", err)
 	}
@@ -103,8 +104,8 @@ func (s *StationDescriptionConfigConstraintImpl) Get(handler *action.Handler) (a
 	}
 	return val, nil
 }
-func (s *StationDescriptionConfigConstraintImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *StationDescriptionConfigConstraintImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset station description: %w", err)
 	}
 	return nil
@@ -123,13 +124,13 @@ func (s *StationCountryConfigConstraintImpl) GetDefaultValue() any        { retu
 func (s *StationCountryConfigConstraintImpl) GetDescription() string {
 	return "Country where the station is located, should less than 20 characters, e.g. United States."
 }
-func (s *StationCountryConfigConstraintImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *StationCountryConfigConstraintImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default station country: %w", err)
 	}
 	return nil
 }
-func (s *StationCountryConfigConstraintImpl) Set(handler *action.Handler, newVal any) error {
+func (s *StationCountryConfigConstraintImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	str, err := GetConfigValString(newVal)
 	if err != nil {
 		return err
@@ -137,13 +138,13 @@ func (s *StationCountryConfigConstraintImpl) Set(handler *action.Handler, newVal
 	if len(str) > 20 {
 		return errors.New("station country should be less than 20 characters")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), strings.ToUpper(str)); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), strings.ToUpper(str)); err != nil {
 		return fmt.Errorf("failed to set station country: %w", err)
 	}
 	return nil
 }
-func (s *StationCountryConfigConstraintImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *StationCountryConfigConstraintImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get station country: %w", err)
 	}
@@ -152,8 +153,8 @@ func (s *StationCountryConfigConstraintImpl) Get(handler *action.Handler) (any, 
 	}
 	return strings.ToUpper(val.(string)), nil
 }
-func (s *StationCountryConfigConstraintImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *StationCountryConfigConstraintImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset station country: %w", err)
 	}
 	return nil
@@ -172,13 +173,13 @@ func (s *StationPlaceConfigConstraintImpl) GetDefaultValue() any        { return
 func (s *StationPlaceConfigConstraintImpl) GetDescription() string {
 	return "Describe the location of the station, should include the city and less than 20 characters, e.g. New York, NY."
 }
-func (s *StationPlaceConfigConstraintImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *StationPlaceConfigConstraintImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default station place: %w", err)
 	}
 	return nil
 }
-func (s *StationPlaceConfigConstraintImpl) Set(handler *action.Handler, newVal any) error {
+func (s *StationPlaceConfigConstraintImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	str, err := GetConfigValString(newVal)
 	if err != nil {
 		return err
@@ -186,13 +187,13 @@ func (s *StationPlaceConfigConstraintImpl) Set(handler *action.Handler, newVal a
 	if len(str) > 20 {
 		return errors.New("station place should be less than 20 characters")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), str); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), str); err != nil {
 		return fmt.Errorf("failed to set station place: %w", err)
 	}
 	return nil
 }
-func (s *StationPlaceConfigConstraintImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *StationPlaceConfigConstraintImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get station place: %w", err)
 	}
@@ -203,8 +204,8 @@ func (s *StationPlaceConfigConstraintImpl) Get(handler *action.Handler) (any, er
 	return val, nil
 }
 
-func (s *StationPlaceConfigConstraintImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *StationPlaceConfigConstraintImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset station place: %w", err)
 	}
 	return nil
@@ -223,13 +224,13 @@ func (s *StationAffiliationConfigConstraintImpl) GetDefaultValue() any        { 
 func (s *StationAffiliationConfigConstraintImpl) GetDescription() string {
 	return "Who is the station affiliated with, should less than 50 characters, e.g. MIT Earth Resources Lab."
 }
-func (s *StationAffiliationConfigConstraintImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *StationAffiliationConfigConstraintImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default station affiliation: %w", err)
 	}
 	return nil
 }
-func (s *StationAffiliationConfigConstraintImpl) Set(handler *action.Handler, newVal any) error {
+func (s *StationAffiliationConfigConstraintImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	str, err := GetConfigValString(newVal)
 	if err != nil {
 		return err
@@ -240,13 +241,13 @@ func (s *StationAffiliationConfigConstraintImpl) Set(handler *action.Handler, ne
 	if len(str) > 50 {
 		return errors.New("station affiliation should be less than 50 characters")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), str); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), str); err != nil {
 		return fmt.Errorf("failed to set station affiliation: %w", err)
 	}
 	return nil
 }
-func (s *StationAffiliationConfigConstraintImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *StationAffiliationConfigConstraintImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get station affiliation: %w", err)
 	}
@@ -255,8 +256,8 @@ func (s *StationAffiliationConfigConstraintImpl) Get(handler *action.Handler) (a
 	}
 	return val, nil
 }
-func (s *StationAffiliationConfigConstraintImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *StationAffiliationConfigConstraintImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset station affiliation: %w", err)
 	}
 	return nil
@@ -275,13 +276,13 @@ func (s *StationStationCodeConfigConstraintImpl) GetDefaultValue() any        { 
 func (s *StationStationCodeConfigConstraintImpl) GetDescription() string {
 	return "An unique 5-letter uppercase station code, used for services such as MiniSEED, Helicorder, SeedLink, etc."
 }
-func (s *StationStationCodeConfigConstraintImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *StationStationCodeConfigConstraintImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default station code: %w", err)
 	}
 	return nil
 }
-func (s *StationStationCodeConfigConstraintImpl) Set(handler *action.Handler, newVal any) error {
+func (s *StationStationCodeConfigConstraintImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	str, err := GetConfigValString(newVal)
 	if err != nil {
 		return err
@@ -292,13 +293,13 @@ func (s *StationStationCodeConfigConstraintImpl) Set(handler *action.Handler, ne
 	if len(str) > 5 {
 		return errors.New("station code should be less than 5 characters")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), strings.ToUpper(str)); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), strings.ToUpper(str)); err != nil {
 		return fmt.Errorf("failed to set station code: %w", err)
 	}
 	return nil
 }
-func (s *StationStationCodeConfigConstraintImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *StationStationCodeConfigConstraintImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get station code: %w", err)
 	}
@@ -307,8 +308,8 @@ func (s *StationStationCodeConfigConstraintImpl) Get(handler *action.Handler) (a
 	}
 	return val, nil
 }
-func (s *StationStationCodeConfigConstraintImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *StationStationCodeConfigConstraintImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset station code: %w", err)
 	}
 	return nil
@@ -327,13 +328,13 @@ func (s *StationNetworkCodeConfigConstraintImpl) GetDefaultValue() any        { 
 func (s *StationNetworkCodeConfigConstraintImpl) GetDescription() string {
 	return "A unique 2-letter uppercase network code, used for services such as MiniSEED, Helicorder, SeedLink, etc."
 }
-func (s *StationNetworkCodeConfigConstraintImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *StationNetworkCodeConfigConstraintImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default network code: %w", err)
 	}
 	return nil
 }
-func (s *StationNetworkCodeConfigConstraintImpl) Set(handler *action.Handler, newVal any) error {
+func (s *StationNetworkCodeConfigConstraintImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	str, err := GetConfigValString(newVal)
 	if err != nil {
 		return err
@@ -341,13 +342,13 @@ func (s *StationNetworkCodeConfigConstraintImpl) Set(handler *action.Handler, ne
 	if len(str) != 2 {
 		return errors.New("network code should be 2 characters")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), strings.ToUpper(str)); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), strings.ToUpper(str)); err != nil {
 		return fmt.Errorf("failed to set network code: %w", err)
 	}
 	return nil
 }
-func (s *StationNetworkCodeConfigConstraintImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *StationNetworkCodeConfigConstraintImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get network code: %w", err)
 	}
@@ -356,8 +357,8 @@ func (s *StationNetworkCodeConfigConstraintImpl) Get(handler *action.Handler) (a
 	}
 	return val, nil
 }
-func (s *StationNetworkCodeConfigConstraintImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *StationNetworkCodeConfigConstraintImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset network code: %w", err)
 	}
 	return nil
@@ -376,13 +377,13 @@ func (s *StationLocationCodeConfigConstraintImpl) GetDefaultValue() any        {
 func (s *StationLocationCodeConfigConstraintImpl) GetDescription() string {
 	return "A unique 2-letter uppercase location code, used for services such as MiniSEED, Helicorder, SeedLink, etc."
 }
-func (s *StationLocationCodeConfigConstraintImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *StationLocationCodeConfigConstraintImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default location code: %w", err)
 	}
 	return nil
 }
-func (s *StationLocationCodeConfigConstraintImpl) Set(handler *action.Handler, newVal any) error {
+func (s *StationLocationCodeConfigConstraintImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	str, err := GetConfigValString(newVal)
 	if err != nil {
 		return err
@@ -390,13 +391,13 @@ func (s *StationLocationCodeConfigConstraintImpl) Set(handler *action.Handler, n
 	if len(str) != 2 {
 		return errors.New("location code should be 2 characters")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), strings.ToUpper(str)); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), strings.ToUpper(str)); err != nil {
 		return fmt.Errorf("failed to set location code: %w", err)
 	}
 	return nil
 }
-func (s *StationLocationCodeConfigConstraintImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *StationLocationCodeConfigConstraintImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get location code: %w", err)
 	}
@@ -405,8 +406,8 @@ func (s *StationLocationCodeConfigConstraintImpl) Get(handler *action.Handler) (
 	}
 	return val, nil
 }
-func (s *StationLocationCodeConfigConstraintImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *StationLocationCodeConfigConstraintImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset location code: %w", err)
 	}
 	return nil
@@ -429,17 +430,17 @@ func (s *StationChannelCodesConfigConstraintImpl) GetDefaultValue() any {
 func (s *StationChannelCodesConfigConstraintImpl) GetDescription() string {
 	return "Code for each channel in uppercase, by default, the first three channels are set to \"EH*\", followed by three \"EN*\" sensors, software restart needed when channel codes are updated."
 }
-func (s *StationChannelCodesConfigConstraintImpl) Init(handler *action.Handler) error {
+func (s *StationChannelCodesConfigConstraintImpl) Init(ctx context.Context, handler *action.Handler) error {
 	channelCodes, ok := s.GetDefaultValue().([]string)
 	if !ok {
 		return errors.New("failed to assert channel codes")
 	}
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), channelCodes); err != nil {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), channelCodes); err != nil {
 		return fmt.Errorf("failed to set default channel codes: %w", err)
 	}
 	return nil
 }
-func (s *StationChannelCodesConfigConstraintImpl) Set(handler *action.Handler, newVal any) error {
+func (s *StationChannelCodesConfigConstraintImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	channelCodes, err := GetConfigValStringArray(newVal)
 	if err != nil {
 		return err
@@ -453,13 +454,13 @@ func (s *StationChannelCodesConfigConstraintImpl) Set(handler *action.Handler, n
 		}
 		channelCodeStrArr = append(channelCodeStrArr, channelCode)
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), channelCodeStrArr); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), channelCodeStrArr); err != nil {
 		return fmt.Errorf("failed to set channel codes: %w", err)
 	}
 	return nil
 }
-func (s *StationChannelCodesConfigConstraintImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *StationChannelCodesConfigConstraintImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get channel codes: %w", err)
 	}
@@ -468,8 +469,8 @@ func (s *StationChannelCodesConfigConstraintImpl) Get(handler *action.Handler) (
 	}
 	return val, nil
 }
-func (s *StationChannelCodesConfigConstraintImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *StationChannelCodesConfigConstraintImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset channel codes: %w", err)
 	}
 	return nil
@@ -494,19 +495,19 @@ func (s *StationFDSNServiceEnabledConfigConstraintImpl) GetDefaultValue() any   
 func (s *StationFDSNServiceEnabledConfigConstraintImpl) GetDescription() string {
 	return "Enable authenticated FDSN Station and DataSelect web services. Changes take effect immediately."
 }
-func (s *StationFDSNServiceEnabledConfigConstraintImpl) Init(handler *action.Handler) error {
-	_, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *StationFDSNServiceEnabledConfigConstraintImpl) Init(ctx context.Context, handler *action.Handler) error {
+	_, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 	return err
 }
-func (s *StationFDSNServiceEnabledConfigConstraintImpl) Set(handler *action.Handler, newVal any) error {
+func (s *StationFDSNServiceEnabledConfigConstraintImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	enabled, err := GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled)
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled)
 }
-func (s *StationFDSNServiceEnabledConfigConstraintImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *StationFDSNServiceEnabledConfigConstraintImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get FDSN service status: %w", err)
 	}
@@ -515,8 +516,8 @@ func (s *StationFDSNServiceEnabledConfigConstraintImpl) Get(handler *action.Hand
 	}
 	return val, nil
 }
-func (s *StationFDSNServiceEnabledConfigConstraintImpl) Restore(handler *action.Handler) error {
-	return s.Set(handler, s.GetDefaultValue())
+func (s *StationFDSNServiceEnabledConfigConstraintImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	return s.Set(ctx, handler, s.GetDefaultValue())
 }
 
 func NewStationConstraints() []IConstraint {

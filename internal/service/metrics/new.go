@@ -11,11 +11,12 @@ import (
 	"github.com/anyshake/observer/pkg/unibuild"
 )
 
-func New(hardwareDev hardware.IHardware, actionHandler *action.Handler, timeSource *timesource.Source, version *semver.Version, build *unibuild.UniBuild) *MetricsServiceImpl {
-	ctx, cancelFn := context.WithCancel(context.Background())
+func New(parentCtx context.Context, hardwareDev hardware.IHardware, actionHandler *action.Handler, timeSource *timesource.Source, version *semver.Version, build *unibuild.UniBuild) *MetricsServiceImpl {
+	ctx, cancelFn := context.WithCancel(parentCtx)
 	obj := &MetricsServiceImpl{
-		ctx:      ctx,
-		cancelFn: cancelFn,
+		parentCtx: parentCtx,
+		ctx:       ctx,
+		cancelFn:  cancelFn,
 
 		actionHandler: actionHandler,
 		timeSource:    timeSource,

@@ -1,10 +1,12 @@
 package seisevent
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
+	"slices"
 	"time"
 
 	"github.com/anyshake/observer/pkg/cache"
@@ -39,13 +41,13 @@ func (c *PALERT) GetProperty() DataSourceProperty {
 	}
 }
 
-func (c *PALERT) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (c *PALERT) GetEvents(ctx context.Context, latitude, longitude float64) ([]Event, error) {
 	var baseEvents []Event
 
 	if c.cache.Valid() {
 		baseEvents = c.cache.Get()
 	} else {
-		v, err, _ := c.sf.Do(PALERT_ID, func() (any, error) {
+		v, err := fetchEvents(ctx, &c.sf, PALERT_ID, func(ctx context.Context) ([]Event, error) {
 			if c.cache.Valid() {
 				return c.cache.Get(), nil
 			}
@@ -62,7 +64,7 @@ func (c *PALERT) GetEvents(latitude, longitude float64) ([]Event, error) {
 
 			currentTime := c.timeSource.Now()
 			res, err := request.POST(
-				"https://palert.earth.sinica.edu.tw/graphql/",
+				ctx, "https://palert.earth.sinica.edu.tw/graphql/",
 				fmt.Sprintf(
 					`{"query":"query ($date: [Date!], $depth: [Float!], $ml: [Float!], $dateTime: DateTime, $needHaspga: Boolean!) {\n  eventList(\n    QueryEvent: {depth: $depth, date: $date, ml: $ml, dateTime: $dateTime}\n    needHaspga: $needHaspga\n  ) {\n    DateUTC\n    Depth\n    Latitude\n    Longitude\n    ML\n    hasPGA @include(if: $needHaspga)\n  }\n}","variables":{"date":["%s","%s"],"ml":[0,10],"depth":[0,1000],"needHaspga":false}}`,
 					currentTime.AddDate(-1, 0, 0).Format("2006-01-02"),
@@ -132,9 +134,10 @@ func (c *PALERT) GetEvents(latitude, longitude float64) ([]Event, error) {
 			return nil, err
 		}
 
-		baseEvents = v.([]Event)
+		baseEvents = v
 	}
 
+	baseEvents = slices.Clone(baseEvents)
 	for i := range baseEvents {
 		baseEvents[i].Distance = getDistance(latitude, baseEvents[i].Latitude, longitude, baseEvents[i].Longitude)
 		baseEvents[i].Estimation = getSeismicEstimation(

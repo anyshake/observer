@@ -1,9 +1,11 @@
 package seisevent
 
 import (
+	"context"
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -34,19 +36,19 @@ func (c *BGS) GetProperty() DataSourceProperty {
 	}
 }
 
-func (c *BGS) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (c *BGS) GetEvents(ctx context.Context, latitude, longitude float64) ([]Event, error) {
 	var baseEvents []Event
 
 	if c.cache.Valid() {
 		baseEvents = c.cache.Get()
 	} else {
-		v, err, _ := c.sf.Do(BGS_ID, func() (any, error) {
+		v, err := fetchEvents(ctx, &c.sf, BGS_ID, func(ctx context.Context) ([]Event, error) {
 			if c.cache.Valid() {
 				return c.cache.Get(), nil
 			}
 
 			worldEventRes, err := request.GET(
-				"https://quakes.bgs.ac.uk/feeds/WorldSeismology.xml",
+				ctx, "https://quakes.bgs.ac.uk/feeds/WorldSeismology.xml",
 				10*time.Second, time.Second, 3, false, nil,
 				map[string]string{"User-Agent": uarand.GetRandom()},
 			)
@@ -54,7 +56,7 @@ func (c *BGS) GetEvents(latitude, longitude float64) ([]Event, error) {
 				return nil, fmt.Errorf("failed to get WorldSeismology.xml: %w", err)
 			}
 			ukEventRes, err := request.GET(
-				"https://quakes.bgs.ac.uk/feeds/MhSeismology.xml",
+				ctx, "https://quakes.bgs.ac.uk/feeds/MhSeismology.xml",
 				10*time.Second, time.Second, 3, false, nil,
 				map[string]string{"User-Agent": uarand.GetRandom()},
 			)
@@ -79,9 +81,10 @@ func (c *BGS) GetEvents(latitude, longitude float64) ([]Event, error) {
 			return nil, err
 		}
 
-		baseEvents = v.([]Event)
+		baseEvents = v
 	}
 
+	baseEvents = slices.Clone(baseEvents)
 	for i := range baseEvents {
 		baseEvents[i].Distance = getDistance(latitude, baseEvents[i].Latitude, longitude, baseEvents[i].Longitude)
 		baseEvents[i].Estimation = getSeismicEstimation(

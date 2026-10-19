@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"net"
 
 	"github.com/anyshake/observer/internal/notification"
 	graph_resolver "github.com/anyshake/observer/internal/server/router/graph"
@@ -13,9 +14,9 @@ func init() {
 	gin.SetMode(gin.ReleaseMode)
 }
 
-func New(debug, cors bool, resolver *graph_resolver.Resolver, notificationHub *notification.Hub, logger *logger.Adapter) *HttpServer {
-	shutdownCtx, shutdownCancel := context.WithCancel(context.Background())
-	return &HttpServer{
+func New(parentCtx context.Context, debug, cors bool, resolver *graph_resolver.Resolver, notificationHub *notification.Hub, logger *logger.Adapter) *HttpServer {
+	shutdownCtx, shutdownCancel := context.WithCancel(parentCtx)
+	obj := &HttpServer{
 		debug:           debug,
 		cors:            cors,
 		log:             logger,
@@ -24,4 +25,6 @@ func New(debug, cors bool, resolver *graph_resolver.Resolver, notificationHub *n
 		shutdownCtx:     shutdownCtx,
 		shutdownCancel:  shutdownCancel,
 	}
+	obj.server.BaseContext = func(net.Listener) context.Context { return shutdownCtx }
+	return obj
 }

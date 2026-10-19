@@ -1,6 +1,7 @@
 package socket
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"sync"
@@ -9,6 +10,7 @@ import (
 	"github.com/anyshake/observer/internal/hardware"
 	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/internal/server/response"
+	"github.com/anyshake/observer/pkg/ctxutil"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/anyshake/observer/pkg/message"
 	"github.com/anyshake/observer/pkg/ringbuf"
@@ -21,20 +23,31 @@ import (
 // Clients only send a JWT or short commands, including when compression is negotiated.
 const maxClientMessageSize = 8 * 1024
 
-func Setup(routerGroup *gin.RouterGroup, timeSource *timesource.Source, hardware hardware.IHardware, jwtMiddleware gin.HandlerFunc) {
+func Setup(routerGroup *gin.RouterGroup, timeSource *timesource.Source, hardware hardware.IHardware, jwtMiddleware gin.HandlerFunc, shutdownCtx context.Context) func(context.Context) error {
 	s := socket{
 		messageBus:     message.NewBus[explorer.Event](LOG_PREFIX),
 		history:        ringbuf.New[buffer](HISTORY_BUFFER_SIZE),
 		tokenValidator: newTokenValidator(jwtMiddleware),
 	}
-	if err := hardware.Subscribe(LOG_PREFIX, func(event explorer.Event) {
+	subscribeErr := hardware.Subscribe(LOG_PREFIX, func(event explorer.Event) {
 		s.messageBus.Publish(event)
 		s.storeHistory(event)
-	}); err != nil {
-		logger.GetLogger(LOG_PREFIX).Errorf("failed to subscribe to hardware message bus: %v", err)
+	})
+	if subscribeErr != nil {
+		logger.GetLogger(LOG_PREFIX).Errorf("failed to subscribe to hardware message bus: %v", subscribeErr)
 	}
 
 	routerGroup.GET("/socket", func(ctx *gin.Context) {
+		s.mu.Lock()
+		if s.closed {
+			s.mu.Unlock()
+			response.Error(ctx, http.StatusServiceUnavailable, "server is shutting down")
+			return
+		}
+		s.handlers.Add(1)
+		s.mu.Unlock()
+		defer s.handlers.Done()
+
 		upgrader := websocket.Upgrader{
 			ReadBufferSize:    1024,
 			WriteBufferSize:   1024,
@@ -52,9 +65,33 @@ func Setup(routerGroup *gin.RouterGroup, timeSource *timesource.Source, hardware
 			return
 		}
 		defer conn.Close()
+		stopClose := ctxutil.AfterFunc(shutdownCtx, func() { _ = conn.Close() })
+		defer stopClose()
 
 		s.handleWebSocket(ctx, conn, timeSource)
 	})
+
+	return func(ctx context.Context) error {
+		s.mu.Lock()
+		wasClosed := s.closed
+		s.closed = true
+		s.mu.Unlock()
+		if subscribeErr == nil && !wasClosed {
+			_ = hardware.Unsubscribe(LOG_PREFIX)
+		}
+
+		finished := make(chan struct{})
+		go func() {
+			s.handlers.Wait()
+			close(finished)
+		}()
+		select {
+		case <-finished:
+			return nil
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
 }
 
 func (s *socket) storeHistory(event explorer.Event) {

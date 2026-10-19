@@ -48,9 +48,9 @@ func TestRequestsDoNotModifyDefaultTransport(t *testing.T) {
 				var body []byte
 				var err error
 				if method == http.MethodGet {
-					body, err = GET(server.URL, 5*time.Second, 0, 0, false, tc.transport)
+					body, err = GET(t.Context(), server.URL, 5*time.Second, 0, 0, false, tc.transport)
 				} else {
-					body, err = POST(server.URL, "", "application/json", 5*time.Second, 0, 0, false, tc.transport)
+					body, err = POST(t.Context(), server.URL, "", "application/json", 5*time.Second, 0, 0, false, tc.transport)
 				}
 				if err != nil {
 					t.Fatalf("%s request failed: %v", method, err)

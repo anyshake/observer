@@ -1,6 +1,7 @@
 package jobtracker
 
 import (
+	"context"
 	"sync"
 	"time"
 )
@@ -16,12 +17,15 @@ type Job struct {
 }
 
 type Tracker struct {
-	mu  sync.Mutex
-	job Job
+	mu   sync.Mutex
+	ctx  context.Context
+	done chan struct{}
+	job  Job
 }
 
-func New(kind string) *Tracker {
+func New(ctx context.Context, kind string) *Tracker {
 	return &Tracker{
+		ctx: ctx,
 		job: Job{
 			ID:     "",
 			Kind:   kind,

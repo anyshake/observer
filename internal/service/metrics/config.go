@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -21,24 +22,24 @@ func (s *metricsConfigEnabledImpl) GetDefaultValue() any        { return true }
 func (s *metricsConfigEnabledImpl) GetDescription() string {
 	return "The metrics service helps us improve the user experience by collecting anonymous usage data and performance metrics. This data allows us to identify issues, optimize performance, and enhance future updates. While you have the option to disable this service, keeping it enabled allows us to provide you with a better and more reliable experience."
 }
-func (s *metricsConfigEnabledImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *metricsConfigEnabledImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default metrics service availability: %w", err)
 	}
 	return nil
 }
-func (s *metricsConfigEnabledImpl) Set(handler *action.Handler, newVal any) error {
+func (s *metricsConfigEnabledImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	enabled, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
 		return fmt.Errorf("failed to set SeedLink service availability: %w", err)
 	}
 	return nil
 }
-func (s *metricsConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *metricsConfigEnabledImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get SeedLink service availability: %w", err)
 	}
@@ -48,8 +49,8 @@ func (s *metricsConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
 	}
 	return enabled, nil
 }
-func (s *metricsConfigEnabledImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *metricsConfigEnabledImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset SeedLink service availability: %w", err)
 	}
 	return nil

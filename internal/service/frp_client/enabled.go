@@ -1,7 +1,9 @@
 package frp_client
 
-func (s *FrpClientServiceImpl) IsEnabled() bool {
-	enable, err := (&frpClientConfigEnabledImpl{}).Get(s.actionHandler)
+import "context"
+
+func (s *FrpClientServiceImpl) IsEnabled(ctx context.Context) bool {
+	enable, err := (&frpClientConfigEnabledImpl{}).Get(ctx, s.actionHandler)
 	if err != nil {
 		return false
 	}

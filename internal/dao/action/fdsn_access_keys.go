@@ -114,37 +114,60 @@ func (h *Handler) FDSNAccessKeyAuthenticate(ctx context.Context, key, userIp, us
 		return record.KeyId, nil
 	}
 
-	_, err, _ = h.fdsnAccessGroup.Do(record.KeyId, func() (any, error) {
-		// A request may reach a new flight with a snapshot from before the previous update.
-		var latest model.FDSNAccessKey
-		err := h.daoObj.Database.WithContext(ctx).Table(latest.GetName(h.daoObj.GetPrefix())).
-			Where("key_id = ? AND revoked_at = 0 AND (expires_at = 0 OR expires_at > ?)", record.KeyId, now.UnixMilli()).
-			First(&latest).Error
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, ErrInvalidFDSNAccessKey
+	for {
+		if err := ctx.Err(); err != nil {
+			return "", err
 		}
-		if err != nil {
-			return nil, fmt.Errorf("failed to authenticate FDSN access key: %w", err)
+		result := h.fdsnAccessGroup.DoChan(record.KeyId, func() (any, error) {
+			err := h.recordFDSNAccessRequest(ctx, record.KeyId, userIp, userAgent, now)
+			return ctx.Err(), err
+		})
+		select {
+		case <-ctx.Done():
+			return "", ctx.Err()
+		case update := <-result:
+			if err := ctx.Err(); err != nil {
+				return "", err
+			}
+			// A canceled leader must not fail requests whose own contexts are
+			// still valid. Retry in a new flight using a surviving request.
+			if update.Val != nil && (errors.Is(update.Err, context.Canceled) || errors.Is(update.Err, context.DeadlineExceeded)) {
+				continue
+			}
+			if update.Err != nil {
+				return "", update.Err
+			}
+			return record.KeyId, nil
 		}
-		if latest.LastRequestedAt != 0 && now.UnixMilli()-latest.LastRequestedAt < time.Minute.Milliseconds() {
-			return nil, nil
-		}
-		// The conditional update also limits writes when multiple server instances share a database.
-		err = h.daoObj.Database.WithContext(ctx).Table(latest.GetName(h.daoObj.GetPrefix())).
-			Where("key_id = ? AND revoked_at = 0 AND (expires_at = 0 OR expires_at > ?)", record.KeyId, now.UnixMilli()).
-			Where("last_requested_at = 0 OR last_requested_at <= ?", now.Add(-time.Minute).UnixMilli()).
-			Updates(map[string]any{
-				"last_requested_at": now.UnixMilli(),
-				"user_ip":           userIp,
-				"user_agent":        string([]rune(userAgent)[:min(utf8.RuneCountInString(userAgent), 1024)]),
-			}).Error
-		if err != nil {
-			return nil, fmt.Errorf("failed to record FDSN access: %w", err)
-		}
-		return nil, nil
-	})
-	if err != nil {
-		return "", err
 	}
-	return record.KeyId, nil
+}
+
+func (h *Handler) recordFDSNAccessRequest(ctx context.Context, keyId, userIp, userAgent string, now time.Time) error {
+	// A request may reach a new flight with a snapshot from before the previous update.
+	var latest model.FDSNAccessKey
+	err := h.daoObj.Database.WithContext(ctx).Table(latest.GetName(h.daoObj.GetPrefix())).
+		Where("key_id = ? AND revoked_at = 0 AND (expires_at = 0 OR expires_at > ?)", keyId, now.UnixMilli()).
+		First(&latest).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return ErrInvalidFDSNAccessKey
+	}
+	if err != nil {
+		return fmt.Errorf("failed to authenticate FDSN access key: %w", err)
+	}
+	if latest.LastRequestedAt != 0 && now.UnixMilli()-latest.LastRequestedAt < time.Minute.Milliseconds() {
+		return nil
+	}
+	// The conditional update also limits writes when multiple server instances share a database.
+	err = h.daoObj.Database.WithContext(ctx).Table(latest.GetName(h.daoObj.GetPrefix())).
+		Where("key_id = ? AND revoked_at = 0 AND (expires_at = 0 OR expires_at > ?)", keyId, now.UnixMilli()).
+		Where("last_requested_at = 0 OR last_requested_at <= ?", now.Add(-time.Minute).UnixMilli()).
+		Updates(map[string]any{
+			"last_requested_at": now.UnixMilli(),
+			"user_ip":           userIp,
+			"user_agent":        string([]rune(userAgent)[:min(utf8.RuneCountInString(userAgent), 1024)]),
+		}).Error
+	if err != nil {
+		return fmt.Errorf("failed to record FDSN access: %w", err)
+	}
+	return nil
 }

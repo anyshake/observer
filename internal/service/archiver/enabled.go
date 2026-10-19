@@ -1,7 +1,9 @@
 package archiver
 
-func (s *ArchiverServiceImpl) IsEnabled() bool {
-	enable, err := (&archiverConfigEnabledImpl{}).Get(s.actionHandler)
+import "context"
+
+func (s *ArchiverServiceImpl) IsEnabled(ctx context.Context) bool {
+	enable, err := (&archiverConfigEnabledImpl{}).Get(ctx, s.actionHandler)
 	if err != nil {
 		return false
 	}

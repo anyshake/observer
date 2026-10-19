@@ -29,6 +29,8 @@ import (
 type ContextKey string
 
 type Resolver struct {
+	AppContext               context.Context
+	serviceControl           serviceControl
 	RestartChan              chan struct{}
 	ExecutablePath           string
 	CurrentVersion           *semver.Version
@@ -174,7 +176,11 @@ func LoadOrCreatePurgeDataJob(resolver *Resolver) *jobtracker.Tracker {
 		return nil
 	}
 	if resolver.DataPurgeJob == nil {
-		resolver.DataPurgeJob = jobtracker.New("data_purge_job")
+		ctx := resolver.AppContext
+		if ctx == nil {
+			ctx = context.Background()
+		}
+		resolver.DataPurgeJob = jobtracker.New(ctx, "data_purge_job")
 	}
 
 	return resolver.DataPurgeJob

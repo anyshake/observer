@@ -2,8 +2,10 @@ package seisevent
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
+	"slices"
 	"strings"
 	"time"
 
@@ -38,13 +40,13 @@ func (c *NCS) GetProperty() DataSourceProperty {
 	}
 }
 
-func (c *NCS) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (c *NCS) GetEvents(ctx context.Context, latitude, longitude float64) ([]Event, error) {
 	var baseEvents []Event
 
 	if c.cache.Valid() {
 		baseEvents = c.cache.Get()
 	} else {
-		v, err, _ := c.sf.Do(NCS_ID, func() (any, error) {
+		v, err := fetchEvents(ctx, &c.sf, NCS_ID, func(ctx context.Context) ([]Event, error) {
 			if c.cache.Valid() {
 				return c.cache.Get(), nil
 			}
@@ -54,7 +56,7 @@ func (c *NCS) GetEvents(latitude, longitude float64) ([]Event, error) {
 				transport = createCustomTransport(c.dnsClient, "ncs")
 			}
 			res, err := request.GET(
-				"https://riseq.seismo.gov.in/riseq/earthquake",
+				ctx, "https://riseq.seismo.gov.in/riseq/earthquake",
 				30*time.Second, time.Second, 3, false,
 				transport,
 				map[string]string{"User-Agent": uarand.GetRandom()},
@@ -129,9 +131,10 @@ func (c *NCS) GetEvents(latitude, longitude float64) ([]Event, error) {
 			return nil, err
 		}
 
-		baseEvents = v.([]Event)
+		baseEvents = v
 	}
 
+	baseEvents = slices.Clone(baseEvents)
 	for i := range baseEvents {
 		baseEvents[i].Distance = getDistance(latitude, baseEvents[i].Latitude, longitude, baseEvents[i].Longitude)
 		baseEvents[i].Estimation = getSeismicEstimation(

@@ -1,6 +1,8 @@
 package watchcat
 
 import (
+	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -10,7 +12,7 @@ import (
 
 func TestLifecycle(t *testing.T) {
 	hw := testsupport.NewHardware()
-	svc := New(hw, timesource.New(func() time.Time {
+	svc := New(t.Context(), hw, timesource.New(func() time.Time {
 		return time.Date(2026, time.October, 8, 1, 2, 3, 0, time.UTC)
 	}))
 
@@ -23,7 +25,7 @@ func TestLifecycle(t *testing.T) {
 	if svc.GetStatus() == nil {
 		t.Fatal("status is nil")
 	}
-	if !svc.IsEnabled() {
+	if !svc.IsEnabled(t.Context()) {
 		t.Fatal("watchcat is always enabled")
 	}
 	if _, err := svc.GetAssetList(); err == nil {
@@ -32,24 +34,20 @@ func TestLifecycle(t *testing.T) {
 	if _, err := svc.GetAssetData("missing"); err == nil {
 		t.Fatal("asset data succeeded")
 	}
-	if err := svc.Init(); err != nil {
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatalf("Init() error = %v", err)
 	}
 	if svc.GetStatus().GetIsRunning() {
 		t.Fatal("service is running before Start")
 	}
 
-	if err := svc.Start(); err != nil {
+	if err := svc.Start(t.Context()); err != nil {
 		t.Fatalf("Start() error = %v", err)
 	}
-	t.Cleanup(func() {
-		if err := svc.Stop(); err != nil {
-			t.Errorf("cleanup Stop() error = %v", err)
-		}
-	})
+	t.Cleanup(func() { testsupport.StopService(t, svc) })
 	waitRunning(t, svc, true)
 
-	if err := svc.Restart(); err != nil {
+	if err := svc.Restart(t.Context()); err != nil {
 		t.Fatalf("Restart() error = %v", err)
 	}
 	waitRunning(t, svc, true)
@@ -57,7 +55,7 @@ func TestLifecycle(t *testing.T) {
 		t.Fatalf("restarts = %d, want 1", svc.GetStatus().GetRestarts())
 	}
 
-	if err := svc.Stop(); err != nil {
+	if err := svc.Stop(t.Context()); err != nil {
 		t.Fatalf("Stop() error = %v", err)
 	}
 	waitRunning(t, svc, false)
@@ -67,12 +65,43 @@ func TestLifecycle(t *testing.T) {
 }
 
 func TestStopBeforeStart(t *testing.T) {
-	svc := New(testsupport.NewHardware(), timesource.New(nil))
-	if err := svc.Stop(); err != nil {
+	svc := New(t.Context(), testsupport.NewHardware(), timesource.New(nil))
+	if err := svc.Stop(t.Context()); err != nil {
 		t.Fatalf("Stop() error = %v", err)
 	}
 	if svc.GetStatus().GetIsRunning() {
 		t.Fatal("service is running after Stop")
+	}
+}
+
+func TestStartFollowsApplicationContext(t *testing.T) {
+	appCtx, cancelApp := context.WithCancel(t.Context())
+	defer cancelApp()
+	svc := New(appCtx, testsupport.NewHardware(), timesource.New(nil))
+	canceled, cancel := context.WithCancel(t.Context())
+	cancel()
+	if err := svc.Start(canceled); !errors.Is(err, context.Canceled) {
+		t.Fatalf("Start with canceled caller context = %v", err)
+	}
+	if err := svc.Start(t.Context()); err != nil {
+		t.Fatalf("Start() error = %v", err)
+	}
+	t.Cleanup(func() { testsupport.StopService(t, svc) })
+	waitRunning(t, svc, true)
+
+	cancelApp()
+	exited := make(chan struct{})
+	go func() {
+		svc.wg.Wait()
+		close(exited)
+	}()
+	select {
+	case <-exited:
+	case <-time.After(2 * time.Second):
+		t.Fatal("worker kept running after the application context was canceled")
+	}
+	if err := svc.Start(t.Context()); !errors.Is(err, context.Canceled) {
+		t.Fatalf("Start after application shutdown = %v", err)
 	}
 }
 

@@ -1,5 +1,7 @@
 package seisevent
 
+import "context"
+
 type MagnitudeType string
 
 type Magnitude struct {
@@ -34,5 +36,5 @@ type DataSourceProperty struct {
 
 type IDataSource interface {
 	GetProperty() DataSourceProperty
-	GetEvents(latitude, longitude float64) ([]Event, error)
+	GetEvents(ctx context.Context, latitude, longitude float64) ([]Event, error)
 }

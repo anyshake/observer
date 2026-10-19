@@ -77,7 +77,7 @@ func (p *provider) QueryHistory(startTime, endTime time.Time, channels []handler
 		if queryEnd.Sub(queryStart) > queryWindow {
 			queryEnd = queryStart.Add(queryWindow)
 		}
-		if err := p.actionHandler.SeisRecordsQueryEachContext(p.ctx, queryStart, queryEnd, collect); err != nil {
+		if err := p.actionHandler.SeisRecordsQueryEach(p.ctx, queryStart, queryEnd, collect); err != nil {
 			return nil, err
 		}
 		queryStart = queryEnd

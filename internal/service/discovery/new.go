@@ -9,9 +9,10 @@ import (
 	"github.com/anyshake/observer/pkg/timesource"
 )
 
-func New(webServerAddr string, serviceMap map[string]service.IService, actionHandler *action.Handler, timeSource *timesource.Source) *DiscoveryServiceImpl {
-	ctx, cancelFn := context.WithCancel(context.Background())
+func New(parentCtx context.Context, webServerAddr string, serviceMap map[string]service.IService, actionHandler *action.Handler, timeSource *timesource.Source) *DiscoveryServiceImpl {
+	ctx, cancelFn := context.WithCancel(parentCtx)
 	obj := &DiscoveryServiceImpl{
+		parentCtx:     parentCtx,
 		ctx:           ctx,
 		cancelFn:      cancelFn,
 		timeSource:    timeSource,

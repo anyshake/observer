@@ -19,7 +19,7 @@ func TestRoundTripperOverride(t *testing.T) {
 	restoreNil := SetRoundTripperOverrideForTest(nil)
 	restoreNil()
 
-	body, err := GET("https://example.invalid/override", time.Second, 0, 0, false, nil)
+	body, err := GET(t.Context(), "https://example.invalid/override", time.Second, 0, 0, false, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -27,7 +27,7 @@ func TestRoundTripperOverride(t *testing.T) {
 		t.Fatalf("override body = %q, calls = %d", body, calls)
 	}
 
-	body, err = GET("https://example.invalid/explicit", time.Second, 0, 0, false, roundTripperFunc(func(req *http.Request) (*http.Response, error) {
+	body, err = GET(t.Context(), "https://example.invalid/explicit", time.Second, 0, 0, false, roundTripperFunc(func(req *http.Request) (*http.Response, error) {
 		return textResponse(req, http.StatusOK, "explicit"), nil
 	}))
 	if err != nil {
@@ -39,10 +39,10 @@ func TestRoundTripperOverride(t *testing.T) {
 }
 
 func TestGETAndPOSTEdges(t *testing.T) {
-	if _, err := GET("://bad", time.Second, 0, 0, false, nil); err == nil {
+	if _, err := GET(t.Context(), "://bad", time.Second, 0, 0, false, nil); err == nil {
 		t.Fatal("invalid GET URL accepted")
 	}
-	if _, err := POST("://bad", "", "text/plain", time.Second, 0, 0, false, nil); err == nil {
+	if _, err := POST(t.Context(), "://bad", "", "text/plain", time.Second, 0, 0, false, nil); err == nil {
 		t.Fatal("invalid POST URL accepted")
 	}
 
@@ -54,7 +54,7 @@ func TestGETAndPOSTEdges(t *testing.T) {
 		}
 		return textResponse(req, http.StatusOK, "a b"), nil
 	})
-	body, err := GET("https://example.invalid/retry", time.Second, 0, 1, true, flaky)
+	body, err := GET(t.Context(), "https://example.invalid/retry", time.Second, 0, 1, true, flaky)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -65,7 +65,7 @@ func TestGETAndPOSTEdges(t *testing.T) {
 	statusTransport := roundTripperFunc(func(req *http.Request) (*http.Response, error) {
 		return textResponse(req, http.StatusTeapot, "nope"), nil
 	})
-	if _, err := GET("https://example.invalid/status", time.Second, 0, 2, false, statusTransport); err == nil || !strings.Contains(err.Error(), "teapot") {
+	if _, err := GET(t.Context(), "https://example.invalid/status", time.Second, 0, 2, false, statusTransport); err == nil || !strings.Contains(err.Error(), "teapot") {
 		t.Fatalf("status error = %v", err)
 	}
 
@@ -76,6 +76,7 @@ func TestGETAndPOSTEdges(t *testing.T) {
 		return textResponse(req, http.StatusOK, string(payload)), nil
 	})
 	body, err = POST(
+		t.Context(),
 		"https://example.invalid/post",
 		"hello",
 		"text/plain",
@@ -93,12 +94,12 @@ func TestGETAndPOSTEdges(t *testing.T) {
 		t.Fatalf("POST body = %q host = %q", body, hostSeen)
 	}
 
-	if _, err := GET("https://example.invalid/give-up", time.Second, 0, 0, false, roundTripperFunc(func(*http.Request) (*http.Response, error) {
+	if _, err := GET(t.Context(), "https://example.invalid/give-up", time.Second, 0, 0, false, roundTripperFunc(func(*http.Request) (*http.Response, error) {
 		return nil, io.ErrClosedPipe
 	})); err == nil || !strings.Contains(err.Error(), "failed after 0 retries") {
 		t.Fatalf("exhausted GET error = %v", err)
 	}
-	if _, err := POST("https://example.invalid/give-up", "x", "text/plain", time.Second, 0, 0, false, roundTripperFunc(func(*http.Request) (*http.Response, error) {
+	if _, err := POST(t.Context(), "https://example.invalid/give-up", "x", "text/plain", time.Second, 0, 0, false, roundTripperFunc(func(*http.Request) (*http.Response, error) {
 		return nil, io.ErrClosedPipe
 	})); err == nil || !strings.Contains(err.Error(), "failed after 0 retries") {
 		t.Fatalf("exhausted POST error = %v", err)
@@ -116,9 +117,9 @@ func TestResponsesAreClosedOnError(t *testing.T) {
 			})
 			var err error
 			if method == http.MethodGet {
-				_, err = GET("https://example.invalid/status", time.Second, 0, 0, false, transport)
+				_, err = GET(t.Context(), "https://example.invalid/status", time.Second, 0, 0, false, transport)
 			} else {
-				_, err = POST("https://example.invalid/status", "x", "text/plain", time.Second, 0, 0, false, transport)
+				_, err = POST(t.Context(), "https://example.invalid/status", "x", "text/plain", time.Second, 0, 0, false, transport)
 			}
 			if err == nil || !body.closed {
 				t.Fatalf("error = %v, body closed = %v", err, body.closed)
@@ -140,7 +141,7 @@ func TestPOSTRetryRestoresBody(t *testing.T) {
 		}
 		return textResponse(req, http.StatusOK, "ok"), nil
 	})
-	response, err := POST("https://example.invalid/retry", "payload", "text/plain", time.Second, 0, 1, false, transport)
+	response, err := POST(t.Context(), "https://example.invalid/retry", "payload", "text/plain", time.Second, 0, 1, false, transport)
 	if err != nil || string(response) != "ok" || len(bodies) != 2 || bodies[0] != "payload" || bodies[1] != "payload" {
 		t.Fatalf("response = %q, bodies = %q, error = %v", response, bodies, err)
 	}

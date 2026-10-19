@@ -36,7 +36,7 @@ func TestDatabasePersistsState(t *testing.T) {
 	}
 	handler := action.NewHandler(&dao.DAO{Database: db})
 
-	stateStore, err := New(handler, testNamespace)
+	stateStore, err := New(t.Context(), handler, testNamespace)
 	if err != nil {
 		t.Fatalf("failed to create state store: %v", err)
 	}
@@ -52,7 +52,7 @@ func TestDatabasePersistsState(t *testing.T) {
 	}
 	value[0] = 'x'
 
-	reloadedStore, err := New(handler, testNamespace)
+	reloadedStore, err := New(t.Context(), handler, testNamespace)
 	if err != nil {
 		t.Fatalf("failed to recreate state store: %v", err)
 	}
@@ -64,7 +64,7 @@ func TestDatabasePersistsState(t *testing.T) {
 		t.Fatal("state store did not preserve the written value")
 	}
 
-	encodedState, valueType, _, err := handler.SettingsGet(testNamespace, stateKey)
+	encodedState, valueType, _, err := handler.SettingsGet(t.Context(), testNamespace, stateKey)
 	if err != nil {
 		t.Fatalf("failed to read serialized state: %v", err)
 	}
@@ -91,7 +91,7 @@ func TestDatabasePersistsState(t *testing.T) {
 	if err := reloadedStore.WriteState(key, nil); err != nil {
 		t.Fatalf("failed to delete state: %v", err)
 	}
-	afterDeleteStore, err := New(handler, testNamespace)
+	afterDeleteStore, err := New(t.Context(), handler, testNamespace)
 	if err != nil {
 		t.Fatalf("failed to reload state after deletion: %v", err)
 	}

@@ -2,7 +2,9 @@ package seisevent
 
 import (
 	"bytes"
+	"context"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -35,19 +37,19 @@ func (c *CEA) GetProperty() DataSourceProperty {
 	}
 }
 
-func (c *CEA) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (c *CEA) GetEvents(ctx context.Context, latitude, longitude float64) ([]Event, error) {
 	var baseEvents []Event
 
 	if c.cache.Valid() {
 		baseEvents = c.cache.Get()
 	} else {
-		v, err, _ := c.sf.Do(CEA_ID, func() (any, error) {
+		v, err := fetchEvents(ctx, &c.sf, CEA_ID, func(ctx context.Context) ([]Event, error) {
 			if c.cache.Valid() {
 				return c.cache.Get(), nil
 			}
 
 			res, err := request.GET(
-				"https://www-dase.cea.fr/evenement/derniers_evenements.php",
+				ctx, "https://www-dase.cea.fr/evenement/derniers_evenements.php",
 				10*time.Second, time.Second, 3, false, nil,
 				map[string]string{"User-Agent": uarand.GetRandom()},
 			)
@@ -99,9 +101,10 @@ func (c *CEA) GetEvents(latitude, longitude float64) ([]Event, error) {
 			return nil, err
 		}
 
-		baseEvents = v.([]Event)
+		baseEvents = v
 	}
 
+	baseEvents = slices.Clone(baseEvents)
 	for i := range baseEvents {
 		baseEvents[i].Distance = getDistance(latitude, baseEvents[i].Latitude, longitude, baseEvents[i].Longitude)
 		baseEvents[i].Estimation = getSeismicEstimation(

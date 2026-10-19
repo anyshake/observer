@@ -71,46 +71,46 @@ func TestCheckUpdateUsesCachedMetadata(t *testing.T) {
 	helper.latestVer.Set(latest)
 	helper.requiredVer.Set(required)
 
-	gotLatest, gotRequired, eligible, applied, err := helper.CheckUpdate()
+	gotLatest, gotRequired, eligible, applied, err := helper.CheckUpdate(t.Context())
 	if err != nil || !gotLatest.Equal(latest) || !gotRequired.Equal(required) || !eligible || applied {
 		t.Fatalf("cached update = %v %v %v %v %v", gotLatest, gotRequired, eligible, applied, err)
 	}
 
 	helper.appliedVer = latest
-	_, _, eligible, applied, err = helper.CheckUpdate()
+	_, _, eligible, applied, err = helper.CheckUpdate(t.Context())
 	if err != nil || eligible || !applied {
 		t.Fatalf("applied latest = eligible %v applied %v err %v", eligible, applied, err)
 	}
 
 	helper.currentVer = semver.New("1", "4", "0", "")
 	helper.appliedVer = nil
-	_, _, eligible, applied, err = helper.CheckUpdate()
+	_, _, eligible, applied, err = helper.CheckUpdate(t.Context())
 	if err != nil || eligible || applied {
 		t.Fatalf("current is latest = eligible %v applied %v err %v", eligible, applied, err)
 	}
 
 	helper.currentVer = semver.New("1", "0", "0", "")
 	helper.appliedVer = semver.New("1", "2", "0", "")
-	_, _, eligible, _, err = helper.CheckUpdate()
+	_, _, eligible, _, err = helper.CheckUpdate(t.Context())
 	if err != nil || eligible {
 		t.Fatalf("below required minimum was eligible, err = %v", err)
 	}
 
 	helper.currentVer = semver.New("1", "2", "0", "rc.1")
-	_, _, eligible, _, err = helper.CheckUpdate()
+	_, _, eligible, _, err = helper.CheckUpdate(t.Context())
 	if err != nil || eligible {
 		t.Fatalf("prerelease was eligible, err = %v", err)
 	}
 
 	helper.currentVer = semver.New("0", "0", "0", "")
-	_, _, eligible, _, err = helper.CheckUpdate()
+	_, _, eligible, _, err = helper.CheckUpdate(t.Context())
 	if err != nil || eligible {
 		t.Fatalf("custom version was eligible, err = %v", err)
 	}
 
 	helper.currentVer = current
 	helper.appliedVer = semver.New("1", "4", "1", "")
-	_, _, eligible, applied, err = helper.CheckUpdate()
+	_, _, eligible, applied, err = helper.CheckUpdate(t.Context())
 	if err != nil || eligible || applied {
 		t.Fatalf("newer applied version = eligible %v applied %v err %v", eligible, applied, err)
 	}
@@ -132,7 +132,7 @@ func TestCheckUpdateConcurrentWithApply(t *testing.T) {
 		go func() {
 			defer readers.Done()
 			for {
-				_, _, eligible, applied, err := helper.CheckUpdate()
+				_, _, eligible, applied, err := helper.CheckUpdate(t.Context())
 				if err != nil || eligible == applied {
 					t.Errorf("concurrent update = eligible %v applied %v err %v", eligible, applied, err)
 					return
@@ -151,7 +151,7 @@ func TestCheckUpdateConcurrentWithApply(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, eligible, applied, err := helper.CheckUpdate()
+	_, _, eligible, applied, err := helper.CheckUpdate(t.Context())
 	if err != nil || eligible || !applied {
 		t.Fatalf("after apply = eligible %v applied %v err %v", eligible, applied, err)
 	}
@@ -174,20 +174,20 @@ func TestCheckUpdateFromLocalDNS(t *testing.T) {
 	}))
 	helper.resolvers = dnsquery.Resolvers{{Name: "bad", Server: "tls://127.0.0.1:1"}, {Name: "local", Server: address}}
 
-	latest, required, eligible, applied, err := helper.CheckUpdate()
+	latest, required, eligible, applied, err := helper.CheckUpdate(t.Context())
 	if err != nil || latest.String() != "v1.4.0" || required.String() != "v1.1.0" || !eligible || applied {
 		t.Fatalf("dns update = %v %v %v %v %v", latest, required, eligible, applied, err)
 	}
 
 	appliedHelper := helperWithTXT(t, txt)
 	appliedHelper.appliedVer = semver.New("1", "4", "0", "")
-	latest, required, eligible, applied, err = appliedHelper.CheckUpdate()
+	latest, required, eligible, applied, err = appliedHelper.CheckUpdate(t.Context())
 	if err != nil || latest.String() != "v1.4.0" || required.String() != "v1.1.0" || eligible || !applied {
 		t.Fatalf("applied dns update = %v %v %v %v %v", latest, required, eligible, applied, err)
 	}
 
 	helper.resolvers = nil
-	latest, required, eligible, applied, err = helper.CheckUpdate()
+	latest, required, eligible, applied, err = helper.CheckUpdate(t.Context())
 	if err != nil || latest.String() != "v1.4.0" || !eligible || applied {
 		t.Fatalf("cached after dns = %v %v %v %v %v", latest, required, eligible, applied, err)
 	}
@@ -209,7 +209,7 @@ func TestCheckUpdateRejectsBadMetadata(t *testing.T) {
 				pairs = append(pairs, key+"="+value)
 			}
 			helper := helperWithTXT(t, strings.Join(pairs, ";"))
-			if _, _, _, _, err := helper.CheckUpdate(); err == nil || !strings.Contains(err.Error(), missing) {
+			if _, _, _, _, err := helper.CheckUpdate(t.Context()); err == nil || !strings.Contains(err.Error(), missing) {
 				t.Fatalf("error = %v", err)
 			}
 		})
@@ -227,7 +227,7 @@ func TestCheckUpdateRejectsBadMetadata(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			helper := helperWithTXT(t, tc.metadata)
-			if _, _, _, _, err := helper.CheckUpdate(); err == nil || !strings.Contains(err.Error(), tc.want) {
+			if _, _, _, _, err := helper.CheckUpdate(t.Context()); err == nil || !strings.Contains(err.Error(), tc.want) {
 				t.Fatalf("error = %v", err)
 			}
 		})
@@ -235,7 +235,7 @@ func TestCheckUpdateRejectsBadMetadata(t *testing.T) {
 
 	t.Run("empty txt", func(t *testing.T) {
 		helper := helperWithTXT(t, "")
-		if _, _, _, _, err := helper.CheckUpdate(); err == nil {
+		if _, _, _, _, err := helper.CheckUpdate(t.Context()); err == nil {
 			t.Fatal("empty txt accepted")
 		}
 	})
@@ -246,7 +246,7 @@ func TestCheckUpdateRejectsBadMetadata(t *testing.T) {
 			reply.SetReply(r)
 			_ = w.WriteMsg(reply)
 		}))}}
-		if _, _, _, _, err := helper.CheckUpdate(); err == nil || !strings.Contains(err.Error(), "all resolvers failed") {
+		if _, _, _, _, err := helper.CheckUpdate(t.Context()); err == nil || !strings.Contains(err.Error(), "all resolvers failed") {
 			t.Fatalf("error = %v", err)
 		}
 	})
@@ -263,7 +263,7 @@ func TestCheckUpdateRejectsBadMetadata(t *testing.T) {
 			}
 			_ = w.WriteMsg(reply)
 		}))}}
-		if _, _, _, _, err := helper.CheckUpdate(); err == nil || !strings.Contains(err.Error(), "all resolvers failed") {
+		if _, _, _, _, err := helper.CheckUpdate(t.Context()); err == nil || !strings.Contains(err.Error(), "all resolvers failed") {
 			t.Fatalf("error = %v", err)
 		}
 	})
@@ -280,7 +280,7 @@ func TestCheckUpdateRejectsBadMetadata(t *testing.T) {
 			}
 			_ = w.WriteMsg(reply)
 		}))}}
-		if _, _, _, _, err := helper.CheckUpdate(); err == nil || !strings.Contains(err.Error(), "all resolvers failed") {
+		if _, _, _, _, err := helper.CheckUpdate(t.Context()); err == nil || !strings.Contains(err.Error(), "all resolvers failed") {
 			t.Fatalf("error = %v", err)
 		}
 	})
@@ -289,13 +289,13 @@ func TestCheckUpdateRejectsBadMetadata(t *testing.T) {
 func TestCheckUpdateResolverFailures(t *testing.T) {
 	helper := testHelper(t, semver.New("1", "2", "0", ""))
 	helper.resolvers = dnsquery.Resolvers{{Server: "tcp://nope"}, {Server: ""}}
-	if _, _, _, _, err := helper.CheckUpdate(); err == nil || !strings.Contains(err.Error(), "all resolvers failed") {
+	if _, _, _, _, err := helper.CheckUpdate(t.Context()); err == nil || !strings.Contains(err.Error(), "all resolvers failed") {
 		t.Fatalf("init failures error = %v", err)
 	}
 
 	helper.resolvers = dnsquery.Resolvers{{Server: "sdns://not-a-stamp"}}
 	helper.dnsClient = nil
-	if _, _, _, _, err := helper.CheckUpdate(); err == nil || !strings.Contains(err.Error(), "all resolvers failed") {
+	if _, _, _, _, err := helper.CheckUpdate(t.Context()); err == nil || !strings.Contains(err.Error(), "all resolvers failed") {
 		t.Fatalf("open failure error = %v", err)
 	}
 
@@ -306,9 +306,31 @@ func TestCheckUpdateResolverFailures(t *testing.T) {
 	t.Cleanup(func() { _ = packet.Close() })
 	helper.resolvers = dnsquery.Resolvers{{Server: "udp://" + packet.LocalAddr().String()}}
 	helper.dnsClient = nil
-	_, _, _, _, err = helper.CheckUpdate()
+	_, _, _, _, err = helper.CheckUpdate(t.Context())
 	if err == nil || (!errors.Is(err, context.DeadlineExceeded) && !strings.Contains(err.Error(), "all resolvers failed")) {
 		t.Fatalf("silent resolver error = %v", err)
+	}
+}
+
+func TestCloseReleasesDNSClient(t *testing.T) {
+	helper := testHelper(t, semver.New("1", "2", "0", ""))
+	helper.resolvers = dnsquery.Resolvers{{Name: "local", Server: "udp://127.0.0.1:53"}}
+	client, err := helper.getDNSClient()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := helper.Close(); err != nil {
+		t.Fatal(err)
+	}
+	query := new(dns.Msg).SetQuestion(dns.Fqdn(helper.GetVersionCheckDomain()), dns.TypeTXT)
+	if _, err := client.QueryContext(t.Context(), query); !errors.Is(err, dnsquery.ErrClosed) {
+		t.Fatalf("query after Close = %v, want %v", err, dnsquery.ErrClosed)
+	}
+	if _, _, _, _, err := helper.CheckUpdate(t.Context()); !errors.Is(err, dnsquery.ErrClosed) {
+		t.Fatalf("CheckUpdate after Close = %v, want %v", err, dnsquery.ErrClosed)
+	}
+	if err := helper.Close(); err != nil {
+		t.Fatalf("second Close = %v", err)
 	}
 }
 
@@ -382,7 +404,7 @@ func TestFetchReleaseFromTestServer(t *testing.T) {
 	helper := testHelper(t, semver.New("1", "2", "3", "rc.1"))
 	helper.SetReleaseFetchUrl(srv.URL + "/{{.Version}}/{{.ToolchainName}}.{{.Extension}}")
 	version := semver.New("9", "8", "7", "")
-	data, archiveURL, err := helper.FetchRelease(version, 5*time.Second)
+	data, archiveURL, err := helper.FetchRelease(t.Context(), version, 5*time.Second)
 	if count := hits.Load(); err != nil || !bytes.Equal(data, payload) || count != 2 {
 		t.Fatalf("fetch = %q hits %d url %s err %v", data, count, archiveURL, err)
 	}
@@ -391,12 +413,12 @@ func TestFetchReleaseFromTestServer(t *testing.T) {
 	}
 
 	helper.SetReleaseFetchUrl("{{")
-	if _, url, err := helper.FetchRelease(version, time.Second); err == nil || url != "" {
+	if _, url, err := helper.FetchRelease(t.Context(), version, time.Second); err == nil || url != "" {
 		t.Fatalf("bad template = %s, %v", url, err)
 	}
 
 	helper.SetReleaseFetchUrl(srv.URL + "/nope")
-	if _, url, err := helper.FetchRelease(version, time.Second); err == nil || !strings.Contains(url, "/nope") {
+	if _, url, err := helper.FetchRelease(t.Context(), version, time.Second); err == nil || !strings.Contains(url, "/nope") {
 		t.Fatalf("missing release = %s, %v", url, err)
 	}
 }
@@ -455,11 +477,28 @@ func TestFetchReleaseRejectsBadArtifacts(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			helper := testHelper(t, version)
 			helper.SetReleaseFetchUrl(tc.pattern)
-			_, archiveURL, err := helper.FetchRelease(version, tc.timeout)
+			_, archiveURL, err := helper.FetchRelease(t.Context(), version, tc.timeout)
 			if err == nil || !strings.Contains(strings.ToLower(err.Error()), tc.text) || archiveURL == "" {
 				t.Fatalf("url %s error %v", archiveURL, err)
 			}
 		})
+	}
+}
+
+func TestFetchReleaseHonorsCallerContext(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		<-r.Context().Done()
+	}))
+	t.Cleanup(srv.Close)
+	version := semver.New("1", "0", "0", "")
+	helper := testHelper(t, version)
+	helper.SetReleaseFetchUrl(srv.URL + "/hang/file.{{.Extension}}")
+	ctx, cancel := context.WithCancel(t.Context())
+	time.AfterFunc(20*time.Millisecond, cancel)
+	started := time.Now()
+	_, _, err := helper.FetchRelease(ctx, version, time.Minute)
+	if !errors.Is(err, context.Canceled) || time.Since(started) > 5*time.Second {
+		t.Fatalf("canceled fetch returned after %s: %v", time.Since(started), err)
 	}
 }
 

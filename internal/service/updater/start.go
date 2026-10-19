@@ -3,6 +3,7 @@ package updater
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -39,45 +40,56 @@ func (s *UpdaterServiceImpl) checkReadWritePermission() error {
 	return nil
 }
 
-func (s *UpdaterServiceImpl) handleInterrupt(ticker *time.Ticker) {
-	ticker.Stop()
-	s.wg.Done()
-}
+func (s *UpdaterServiceImpl) Start(ctx context.Context) error {
+	if err := s.lifecycle.Lock(ctx); err != nil {
+		return err
+	}
+	defer s.lifecycle.Unlock()
 
-func (s *UpdaterServiceImpl) Start() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if s.status.GetIsRunning() {
+		return errors.New("updater service is already running")
+	}
+	if err := s.parentCtx.Err(); err != nil {
+		return err
+	}
 	if s.ctx.Err() != nil {
-		s.ctx, s.cancelFn = context.WithCancel(context.Background())
+		s.ctx, s.cancelFn = context.WithCancel(s.parentCtx)
 	}
 
 	if err := s.checkReadWritePermission(); err != nil {
 		return fmt.Errorf("insufficient file system permissions for updater service: %w", err)
 	}
 
+	runCtx, runCancel := s.ctx, s.cancelFn
+	s.status.SetStartedAt(s.timeSource.Now())
+	s.status.SetIsRunning(true)
+	s.wg.Add(1)
 	go func() {
+		defer s.wg.Done()
 		ticker := time.NewTicker(UPDATE_CHECK_INTERVAL)
-
-		s.status.SetStartedAt(s.timeSource.Now())
-		s.status.SetIsRunning(true)
 		defer func() {
+			ticker.Stop()
+			runCancel()
+			s.status.SetStoppedAt(s.timeSource.Now())
+			s.status.SetIsRunning(false)
 			if r := recover(); r != nil {
-				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
-				s.handleInterrupt(ticker)
-				_ = s.Stop()
+				logger.GetLogger(ID).Errorf("service unexpectedly crashed, recovered from panic: %v\n%s", r, debug.Stack())
 			}
 		}()
 
 		for {
 			select {
-			case <-s.ctx.Done():
-				s.handleInterrupt(ticker)
+			case <-runCtx.Done():
 				return
 			case <-ticker.C:
-				latestVer, _, needUpdate, isApplied, err := s.upgradeHelper.CheckUpdate()
+				latestVer, _, needUpdate, isApplied, err := s.upgradeHelper.CheckUpdate(runCtx)
 				if err != nil {
-					logger.GetLogger(ID).Errorf("failed to check update: %v", err)
+					if runCtx.Err() == nil {
+						logger.GetLogger(ID).Errorf("failed to check update: %v", err)
+					}
 					continue
 				}
 
@@ -85,9 +97,11 @@ func (s *UpdaterServiceImpl) Start() error {
 
 				if needUpdate && !isApplied {
 					logger.GetLogger(ID).Infof("found new version %s, upgrading process will start now", latestVer.String())
-					release, url, err := s.upgradeHelper.FetchRelease(latestVer, UPDATE_FETCH_TIMEOUT)
+					release, url, err := s.upgradeHelper.FetchRelease(runCtx, latestVer, UPDATE_FETCH_TIMEOUT)
 					if err != nil {
-						logger.GetLogger(ID).Errorf("failed to fetch release package: %v", err)
+						if runCtx.Err() == nil {
+							logger.GetLogger(ID).Errorf("failed to fetch release package: %v", err)
+						}
 						continue
 					}
 					logger.GetLogger(ID).Infof("received %d bytes from URL: %s", len(release), url)
@@ -111,12 +125,18 @@ func (s *UpdaterServiceImpl) Start() error {
 
 				if needRestart {
 					logger.GetLogger(ID).Infoln("restarting application in 3 second...")
-					time.AfterFunc(3*time.Second, func() { s.restartChan <- struct{}{} })
+					time.AfterFunc(3*time.Second, s.requestRestart)
 				}
 			}
 		}
 	}()
 
-	s.wg.Add(1)
 	return nil
+}
+
+func (s *UpdaterServiceImpl) requestRestart() {
+	select {
+	case s.restartChan <- struct{}{}:
+	default:
+	}
 }

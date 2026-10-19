@@ -1,7 +1,9 @@
 package mdns_discovery
 
-func (s *DiscoveryServiceImpl) IsEnabled() bool {
-	enable, err := (&discoveryConfigEnabledImpl{}).Get(s.actionHandler)
+import "context"
+
+func (s *DiscoveryServiceImpl) IsEnabled(ctx context.Context) bool {
+	enable, err := (&discoveryConfigEnabledImpl{}).Get(ctx, s.actionHandler)
 	if err != nil {
 		return false
 	}

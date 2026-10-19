@@ -120,9 +120,9 @@ func (h *Hardware) UnsubscribeRealtime(string) error {
 	return nil
 }
 
-func (h *Hardware) GetConfig() explorer.DeviceConfig { return h.Config }
+func (h *Hardware) GetConfig() *explorer.DeviceConfig { return h.Config.Snapshot() }
 
-func (h *Hardware) GetStatus() explorer.DeviceStatus { return h.Status }
+func (h *Hardware) GetStatus() *explorer.DeviceStatus { return h.Status.Snapshot() }
 
 func (h *Hardware) GetCoordinates(bool) (float64, float64, float64, error) {
 	if h.CoordErr != nil {

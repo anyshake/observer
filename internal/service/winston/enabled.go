@@ -1,7 +1,9 @@
 package winston
 
-func (s *WinstonServiceImpl) IsEnabled() bool {
-	enable, err := (&winstonConfigEnabledImpl{}).Get(s.actionHandler)
+import "context"
+
+func (s *WinstonServiceImpl) IsEnabled(ctx context.Context) bool {
+	enable, err := (&winstonConfigEnabledImpl{}).Get(ctx, s.actionHandler)
 	if err != nil {
 		return false
 	}

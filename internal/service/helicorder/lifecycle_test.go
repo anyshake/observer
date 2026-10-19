@@ -20,7 +20,7 @@ func TestFilesAndPlotData(t *testing.T) {
 	database, handler := testsupport.OpenDAO(t)
 	testsupport.InitStation(t, handler)
 	fixed := time.Date(2026, time.October, 8, 1, 2, 3, 0, time.UTC)
-	svc := New(testsupport.NewHardware(), handler, timesource.New(func() time.Time { return fixed }))
+	svc := New(t.Context(), testsupport.NewHardware(), handler, timesource.New(func() time.Time { return fixed }))
 	dir, err := filepath.EvalSymlinks(t.TempDir())
 	if err != nil {
 		t.Fatal(err)
@@ -34,7 +34,7 @@ func TestFilesAndPlotData(t *testing.T) {
 	if err := setConstraint(t, handler, svc, "cache_path", dir); err != nil {
 		t.Fatal(err)
 	}
-	if err := svc.Init(); err != nil {
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	if svc.GetName() == "" || svc.GetDescription() == "" || svc.GetStatus() == nil {
@@ -92,16 +92,16 @@ func TestFilesAndPlotData(t *testing.T) {
 	if _, err := svc.GetAssetData(filepath.Join(t.TempDir(), "plot.png")); err == nil {
 		t.Fatal("outside asset was accepted")
 	}
-	if err := svc.PurgeHelicorderFilesByDate(day, day); err != nil {
+	if err := svc.PurgeHelicorderFilesByDate(t.Context(), day, day); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := os.Stat(filepath.Join(dir, day.Format("2006-01-02"))); !os.IsNotExist(err) {
 		t.Fatalf("purged directory still exists: %v", err)
 	}
-	if err := svc.cleanupHelicorderFiles(other); err != nil {
+	if err := svc.cleanupHelicorderFiles(t.Context(), other); err != nil {
 		t.Fatal(err)
 	}
-	if err := svc.PurgeHelicorderFiles(); err != nil {
+	if err := svc.PurgeHelicorderFiles(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 
@@ -116,7 +116,7 @@ func TestFilesAndPlotData(t *testing.T) {
 	if err := record.Encode(fixed, 2, []explorer.ChannelData{{ChannelCode: "EHZ", Data: []int32{3, 4}}}); err != nil {
 		t.Fatal(err)
 	}
-	if err := handler.SeisRecordsCreate(record); err != nil {
+	if err := handler.SeisRecordsCreate(t.Context(), record); err != nil {
 		t.Fatal(err)
 	}
 	plotted, err := svc.dataProvider.GetPlotData(fixed, fixed.Add(time.Second))
@@ -141,7 +141,7 @@ func TestLifecycle(t *testing.T) {
 	_, handler := testsupport.OpenDAO(t)
 	testsupport.InitStation(t, handler)
 	fixed := time.Date(2026, time.October, 8, 1, 2, 3, 0, time.UTC)
-	svc := New(testsupport.NewHardware(), handler, timesource.New(func() time.Time { return fixed }))
+	svc := New(t.Context(), testsupport.NewHardware(), handler, timesource.New(func() time.Time { return fixed }))
 	dir, err := filepath.EvalSymlinks(t.TempDir())
 	if err != nil {
 		t.Fatal(err)
@@ -155,25 +155,25 @@ func TestLifecycle(t *testing.T) {
 	if err := setConstraint(t, handler, svc, "cache_path", dir); err != nil {
 		t.Fatal(err)
 	}
-	if err := svc.Init(); err != nil {
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	if !svc.IsEnabled() && svc.GetStatus().GetIsRunning() {
+	if !svc.IsEnabled(t.Context()) && svc.GetStatus().GetIsRunning() {
 		t.Fatal("unexpected running state")
 	}
-	if err := svc.Start(); err != nil {
+	if err := svc.Start(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { _ = svc.Stop() })
+	t.Cleanup(func() { testsupport.StopService(t, svc) })
 	waitRunning(t, svc, true)
-	if err := svc.Restart(); err != nil {
+	if err := svc.Restart(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	waitRunning(t, svc, true)
 	if svc.GetStatus().GetRestarts() != 1 {
 		t.Fatalf("restarts = %d", svc.GetStatus().GetRestarts())
 	}
-	if err := svc.Stop(); err != nil {
+	if err := svc.Stop(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	waitRunning(t, svc, false)
@@ -183,7 +183,7 @@ func setConstraint(t *testing.T, handler *action.Handler, svc *HelicorderService
 	t.Helper()
 	for _, constraint := range svc.GetConfigConstraint() {
 		if constraint.GetKey() == key {
-			return constraint.Set(handler, value)
+			return constraint.Set(t.Context(), handler, value)
 		}
 	}
 	t.Fatalf("constraint %s was not found", key)

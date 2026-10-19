@@ -3,7 +3,6 @@ package tailscale
 import (
 	"context"
 	"sync"
-	"time"
 
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/service"
@@ -13,24 +12,22 @@ import (
 
 const ID = "service_tailscale"
 
-const shutdownTimeout = 10 * time.Second
-
 type serviceLogger interface {
 	Infof(format string, args ...any)
 	Errorf(format string, args ...any)
 }
 
-type stateStoreFactory func(*action.Handler) (ipn.StateStore, error)
+type stateStoreFactory func(context.Context, *action.Handler) (ipn.StateStore, error)
 
 type TailscaleServiceImpl struct {
-	mu       sync.Mutex
-	errMu    sync.Mutex
-	status   service.Status
-	runError error
+	lifecycle service.Lifecycle
+	mu        sync.Mutex
+	status    service.Status
 
-	ctx      context.Context
-	cancelFn context.CancelFunc
-	wg       sync.WaitGroup
+	parentCtx context.Context
+	ctx       context.Context
+	cancelFn  context.CancelFunc
+	wg        sync.WaitGroup
 
 	timeSource    *timesource.Source
 	actionHandler *action.Handler

@@ -17,7 +17,7 @@ func TestAuthRoutes(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	logger.Init()
 	_, handler := testsupport.OpenDAO(t)
-	userID, err := handler.SysUserCreate("admin_user", "Anyshake@12#$", true)
+	userID, err := handler.SysUserCreate(t.Context(), "admin_user", "Anyshake@12#$", true)
 	if err != nil {
 		t.Fatal(err)
 	}

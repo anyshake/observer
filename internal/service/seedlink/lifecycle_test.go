@@ -52,7 +52,7 @@ func TestProviderAndConsumer(t *testing.T) {
 	if err := record.Encode(fixed, 100, []explorer.ChannelData{{ChannelCode: "EHZ", Data: []int32{1, 2, 3}}}); err != nil {
 		t.Fatal(err)
 	}
-	if err := handler.SeisRecordsCreate(record); err != nil {
+	if err := handler.SeisRecordsCreate(t.Context(), record); err != nil {
 		t.Fatal(err)
 	}
 	packets, err := source.QueryHistory(fixed.Add(-time.Second), fixed.Add(time.Second), []handlers.SeedLinkChannel{{ChannelName: "EHZ"}, {ChannelName: "EHN"}})
@@ -121,7 +121,7 @@ func TestLifecycle(t *testing.T) {
 	testsupport.InitStation(t, handler)
 	hw := testsupport.NewHardware()
 	fixed := time.Date(2026, time.October, 8, 1, 2, 3, 0, time.UTC)
-	svc := New(hw, handler, timesource.New(func() time.Time { return fixed }))
+	svc := New(t.Context(), hw, handler, timesource.New(func() time.Time { return fixed }))
 	if svc.GetName() != "SeedLink Service" || svc.GetDescription() == "" || svc.GetStatus() == nil {
 		t.Fatal("service metadata is incomplete")
 	}
@@ -131,7 +131,7 @@ func TestLifecycle(t *testing.T) {
 	if _, err := svc.GetAssetData("missing"); err == nil {
 		t.Fatal("asset data succeeded")
 	}
-	if err := svc.Init(); err != nil {
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	if err := setConstraint(t, handler, svc, "listen_host", "127.0.0.1"); err != nil {
@@ -146,30 +146,30 @@ func TestLifecycle(t *testing.T) {
 	if err := setConstraint(t, handler, svc, "compress_scheme", COMPRESS_SCHEME_STEIM_2); err != nil {
 		t.Fatal(err)
 	}
-	if err := svc.Init(); err != nil {
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	if svc.GetListenPort() == 0 || !svc.IsEnabled() {
+	if svc.GetListenPort() == 0 || !svc.IsEnabled(t.Context()) {
 		t.Fatal("service was not configured")
 	}
-	if err := svc.Start(); err != nil {
+	if err := svc.Start(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { _ = svc.Stop() })
+	t.Cleanup(func() { testsupport.StopService(t, svc) })
 	hw.WaitSubscribed(t)
 	hw.Emit(explorer.Event{Timestamp: fixed, SampleRate: 100, ChannelData: []explorer.ChannelData{{ChannelCode: "EHZ", Data: []int32{1}}}})
 	conn, err := net.DialTimeout("tcp", net.JoinHostPort(svc.listenHost, strconv.Itoa(svc.listenPort)), time.Second)
 	if err == nil {
 		_ = conn.Close()
 	}
-	if err := svc.Restart(); err != nil {
+	if err := svc.Restart(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	hw.WaitSubscribed(t)
 	if svc.GetStatus().GetRestarts() != 1 {
 		t.Fatalf("restarts = %d", svc.GetStatus().GetRestarts())
 	}
-	if err := svc.Stop(); err != nil {
+	if err := svc.Stop(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -178,7 +178,7 @@ func setConstraint(t *testing.T, handler *action.Handler, svc *SeedLinkServiceIm
 	t.Helper()
 	for _, constraint := range svc.GetConfigConstraint() {
 		if constraint.GetKey() == key {
-			return constraint.Set(handler, value)
+			return constraint.Set(t.Context(), handler, value)
 		}
 	}
 	t.Fatalf("constraint %s was not found", key)

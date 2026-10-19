@@ -48,11 +48,15 @@ func TestStationResponseFromMetadata(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			server, err := fdsnwsgo.NewFDSNWS(&provider{
+			dataProvider := &provider{
 				handler: handler,
 				device:  metadataHardware{Hardware: testsupport.NewHardware(), render: render},
 				now:     func() time.Time { return now },
-			}, fdsnwsgo.WithModules(fdsnwsgo.ModuleStation))
+			}
+			server, err := fdsnwsgo.NewFDSNWS(dataProvider,
+				fdsnwsgo.WithModules(fdsnwsgo.ModuleStation),
+				fdsnwsgo.WithService(newStationService(dataProvider)),
+			)
 			if err != nil {
 				t.Fatal(err)
 			}

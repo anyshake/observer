@@ -1,7 +1,9 @@
 package quakesense
 
-func (s *QuakeSenseServiceImpl) IsEnabled() bool {
-	enable, err := (&quakeSenseConfigEnabledImpl{}).Get(s.actionHandler)
+import "context"
+
+func (s *QuakeSenseServiceImpl) IsEnabled(ctx context.Context) bool {
+	enable, err := (&quakeSenseConfigEnabledImpl{}).Get(ctx, s.actionHandler)
 	if err != nil {
 		return false
 	}

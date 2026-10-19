@@ -22,11 +22,11 @@ func TestLifecycle(t *testing.T) {
 	dir := t.TempDir()
 	exe := filepath.Join(dir, "observer")
 	helper := upgrade.NewHelper(exe, semver.New("1", "0", "0", ""), unibuild.New("test", "stable", "abc", "1"))
-	svc := New(handler, timesource.New(func() time.Time { return fixed }), helper, exe, make(chan struct{}, 1))
+	svc := New(t.Context(), handler, timesource.New(func() time.Time { return fixed }), helper, exe, make(chan struct{}, 1))
 	if svc.GetName() != "Updater Service" || svc.GetDescription() == "" || svc.GetStatus() == nil {
 		t.Fatal("service metadata is incomplete")
 	}
-	if svc.IsEnabled() {
+	if svc.IsEnabled(t.Context()) {
 		t.Fatal("enabled before initialization")
 	}
 	if _, err := svc.GetAssetList(); err == nil {
@@ -35,34 +35,54 @@ func TestLifecycle(t *testing.T) {
 	if _, err := svc.GetAssetData("missing"); err == nil {
 		t.Fatal("asset data succeeded")
 	}
-	if err := svc.Init(); err != nil {
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	if err := setConstraint(t, handler, svc, "enabled", true); err != nil {
 		t.Fatal(err)
 	}
-	if err := svc.Init(); err != nil {
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	if !svc.IsEnabled() {
+	if !svc.IsEnabled(t.Context()) {
 		t.Fatal("service stayed disabled")
 	}
-	if err := svc.Start(); err != nil {
+	if err := svc.Start(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { _ = svc.Stop() })
+	t.Cleanup(func() { testsupport.StopService(t, svc) })
 	waitRunning(t, svc, true)
-	if err := svc.Restart(); err != nil {
+	if err := svc.Restart(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	waitRunning(t, svc, true)
 	if svc.GetStatus().GetRestarts() != 1 {
 		t.Fatalf("restarts = %d", svc.GetStatus().GetRestarts())
 	}
-	if err := svc.Stop(); err != nil {
+	if err := svc.Stop(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	waitRunning(t, svc, false)
+}
+
+func TestRepeatedRestartRequestsDoNotBlock(t *testing.T) {
+	restartChan := make(chan struct{}, 1)
+	svc := &UpdaterServiceImpl{restartChan: restartChan}
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for range 3 {
+			svc.requestRestart()
+		}
+	}()
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("repeated restart requests blocked")
+	}
+	if len(restartChan) != 1 {
+		t.Fatalf("pending restart requests = %d, want 1", len(restartChan))
+	}
 }
 
 func TestStartRejectsReadOnlyDirectory(t *testing.T) {
@@ -75,11 +95,11 @@ func TestStartRejectsReadOnlyDirectory(t *testing.T) {
 	}
 	exe := filepath.Join(locked, "observer")
 	helper := upgrade.NewHelper(exe, semver.New("1", "0", "0", ""), unibuild.New("test", "stable", "abc", "1"))
-	svc := New(handler, timesource.New(nil), helper, exe, make(chan struct{}, 1))
-	if err := svc.Init(); err != nil {
+	svc := New(t.Context(), handler, timesource.New(nil), helper, exe, make(chan struct{}, 1))
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	if err := svc.Start(); err == nil {
+	if err := svc.Start(t.Context()); err == nil {
 		t.Fatal("read-only directory was accepted")
 	}
 }
@@ -88,7 +108,7 @@ func setConstraint(t *testing.T, handler *action.Handler, svc *UpdaterServiceImp
 	t.Helper()
 	for _, constraint := range svc.GetConfigConstraint() {
 		if constraint.GetKey() == key {
-			return constraint.Set(handler, value)
+			return constraint.Set(t.Context(), handler, value)
 		}
 	}
 	t.Fatalf("constraint %s was not found", key)

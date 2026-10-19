@@ -28,7 +28,7 @@ func (r *mutationResolver) CreateFDSNAccessKey(ctx context.Context, remark strin
 	if !r.checkIsAdmin(ctx) {
 		return nil, errors.New("permission denied")
 	}
-	enabled, err := (&config.StationFDSNServiceEnabledConfigConstraintImpl{}).Get(r.ActionHandler)
+	enabled, err := (&config.StationFDSNServiceEnabledConfigConstraintImpl{}).Get(ctx, r.ActionHandler)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (r *mutationResolver) CreateSysUser(ctx context.Context, username string, p
 		return "", err
 	}
 
-	userId, err := r.ActionHandler.SysUserCreate(username, password, admin)
+	userId, err := r.ActionHandler.SysUserCreate(ctx, username, password, admin)
 	if err != nil {
 		return "", fmt.Errorf("failed to create user: %w", err)
 	}
@@ -82,7 +82,7 @@ func (r *mutationResolver) RemoveSysUser(ctx context.Context, userID string) (bo
 		return false, fmt.Errorf("current user cannot be removed, user ID: %s", userID)
 	}
 
-	if err := r.ActionHandler.SysUserRemove(userID); err != nil {
+	if err := r.ActionHandler.SysUserRemove(ctx, userID); err != nil {
 		return false, fmt.Errorf("failed to remove user: %w", err)
 	}
 
@@ -119,7 +119,7 @@ func (r *mutationResolver) UpdateSysUser(ctx context.Context, userID string, use
 	}
 	user.IsAdmin = lo.Ternary(admin, model.ADMIN, model.NON_ADMIN)
 
-	if err := r.ActionHandler.SysUserUpdate(userID, user); err != nil {
+	if err := r.ActionHandler.SysUserUpdate(ctx, userID, user); err != nil {
 		return false, fmt.Errorf("failed to update user: %w", err)
 	}
 
@@ -155,7 +155,7 @@ func (r *mutationResolver) PurgeSeisRecordsByDate(ctx context.Context, startDate
 		return nil, errors.New("failed to create job tracker")
 	}
 
-	jobCreateResponse := jobTracker.Start(r.TimeSource.Now(), "seis_records_by_date", func() error {
+	jobCreateResponse := jobTracker.Start(r.TimeSource.Now(), "seis_records_by_date", func(jobCtx context.Context) error {
 		truncatedStartTime := time.Date(
 			_startDate.UTC().Year(),
 			_startDate.UTC().Month(),
@@ -182,7 +182,7 @@ func (r *mutationResolver) PurgeSeisRecordsByDate(ctx context.Context, startDate
 			return errors.New("start date is after end date")
 		}
 
-		return r.ActionHandler.SeisRecordsPurge(truncatedStartTime, truncatedEndTime)
+		return r.ActionHandler.SeisRecordsPurge(jobCtx, truncatedStartTime, truncatedEndTime)
 
 	})
 	return r.toPurgeDataJobResponse(jobCreateResponse), nil
@@ -224,8 +224,8 @@ func (r *mutationResolver) PurgeMiniSeedFilesByDate(ctx context.Context, startDa
 		return nil, errors.New("failed to create job tracker")
 	}
 
-	jobCreateResponse := jobTracker.Start(r.TimeSource.Now(), "miniseed_by_date", func() error {
-		return serviceObj.PurgeMiniSeedFilesByDate(time.UnixMilli(startDate), time.UnixMilli(endDate))
+	jobCreateResponse := jobTracker.Start(r.TimeSource.Now(), "miniseed_by_date", func(jobCtx context.Context) error {
+		return serviceObj.PurgeMiniSeedFilesByDate(jobCtx, time.UnixMilli(startDate), time.UnixMilli(endDate))
 	})
 	return r.toPurgeDataJobResponse(jobCreateResponse), nil
 }
@@ -266,8 +266,8 @@ func (r *mutationResolver) PurgeHelicorderFilesByDate(ctx context.Context, start
 		return nil, errors.New("failed to create job tracker")
 	}
 
-	jobCreateResponse := jobTracker.Start(r.TimeSource.Now(), "helicorder_by_date", func() error {
-		return serviceObj.PurgeHelicorderFilesByDate(time.UnixMilli(startDate), time.UnixMilli(endDate))
+	jobCreateResponse := jobTracker.Start(r.TimeSource.Now(), "helicorder_by_date", func(jobCtx context.Context) error {
+		return serviceObj.PurgeHelicorderFilesByDate(jobCtx, time.UnixMilli(startDate), time.UnixMilli(endDate))
 	})
 	return r.toPurgeDataJobResponse(jobCreateResponse), nil
 }
@@ -282,7 +282,7 @@ func (r *mutationResolver) UpdateStationConfig(ctx context.Context, key string, 
 		return constraint.GetKey() == key
 	})
 	if ok {
-		if err := constraint.Set(r.ActionHandler, value); err != nil {
+		if err := constraint.Set(ctx, r.ActionHandler, value); err != nil {
 			return false, fmt.Errorf("failed to update station config, namespace %s, key %s: %w", constraint.GetNamespace(), constraint.GetKey(), err)
 		}
 		return true, nil
@@ -298,7 +298,7 @@ func (r *mutationResolver) RestoreStationConfig(ctx context.Context) (bool, erro
 	}
 
 	for _, obj := range r.StationConfigConstraints {
-		if err := obj.Restore(r.ActionHandler); err != nil {
+		if err := obj.Restore(ctx, r.ActionHandler); err != nil {
 			return false, fmt.Errorf("failed to restore station config, key %s: %w", obj.GetKey(), err)
 		}
 	}
@@ -343,7 +343,7 @@ func (r *mutationResolver) ImportGlobalConfig(ctx context.Context, data string) 
 			continue
 		}
 
-		if err := constraint.Set(r.ActionHandler, value); err != nil {
+		if err := constraint.Set(ctx, r.ActionHandler, value); err != nil {
 			return false, fmt.Errorf("failed to import station config, key %s: %w", constraint.GetKey(), err)
 		}
 	}
@@ -373,7 +373,7 @@ func (r *mutationResolver) ImportGlobalConfig(ctx context.Context, data string) 
 				continue
 			}
 
-			if err := constraint.Set(r.ActionHandler, value); err != nil {
+			if err := constraint.Set(ctx, r.ActionHandler, value); err != nil {
 				return false, fmt.Errorf("failed to import service config, namespace %s, key %s: %w", namespace, constraint.GetKey(), err)
 			}
 		}
@@ -388,7 +388,12 @@ func (r *mutationResolver) RestartApplication(ctx context.Context) (bool, error)
 		return false, errors.New("permission denied")
 	}
 
-	time.AfterFunc(3*time.Second, func() { r.RestartChan <- struct{}{} })
+	time.AfterFunc(3*time.Second, func() {
+		select {
+		case r.RestartChan <- struct{}{}:
+		default:
+		}
+	})
 	return true, nil
 }
 
@@ -421,6 +426,12 @@ func (r *mutationResolver) StopService(ctx context.Context, serviceID string) (b
 		return false, errors.New("permission denied")
 	}
 
+	ctx, release, err := r.beginServiceOperation(ctx)
+	if err != nil {
+		return false, err
+	}
+	defer release()
+
 	ser, ok := r.ServiceMap[serviceID]
 	if !ok {
 		return false, fmt.Errorf("service ID %s not found", serviceID)
@@ -428,7 +439,7 @@ func (r *mutationResolver) StopService(ctx context.Context, serviceID string) (b
 	if !ser.GetStatus().GetIsRunning() {
 		return false, fmt.Errorf("service ID %s is not running", serviceID)
 	}
-	if err := ser.Stop(); err != nil {
+	if err := ser.Stop(ctx); err != nil {
 		return false, fmt.Errorf("failed to stop service ID %s: %w", serviceID, err)
 	}
 
@@ -441,6 +452,12 @@ func (r *mutationResolver) StartService(ctx context.Context, serviceID string) (
 		return false, errors.New("permission denied")
 	}
 
+	ctx, release, err := r.beginServiceOperation(ctx)
+	if err != nil {
+		return false, err
+	}
+	defer release()
+
 	ser, ok := r.ServiceMap[serviceID]
 	if !ok {
 		return false, fmt.Errorf("service ID %s not found", serviceID)
@@ -448,10 +465,13 @@ func (r *mutationResolver) StartService(ctx context.Context, serviceID string) (
 	if ser.GetStatus().GetIsRunning() {
 		return false, fmt.Errorf("service ID %s is already running", serviceID)
 	}
-	if err := ser.Init(); err != nil {
+	if err := ser.Init(ctx); err != nil {
 		return false, fmt.Errorf("failed to initialize service ID %s: %w", serviceID, err)
 	}
-	if err := ser.Start(); err != nil {
+	if err := ctx.Err(); err != nil {
+		return false, err
+	}
+	if err := ser.Start(ctx); err != nil {
 		return false, fmt.Errorf("failed to start service ID %s: %w", serviceID, err)
 	}
 
@@ -464,11 +484,17 @@ func (r *mutationResolver) RestartService(ctx context.Context, serviceID string)
 		return false, errors.New("permission denied")
 	}
 
+	ctx, release, err := r.beginServiceOperation(ctx)
+	if err != nil {
+		return false, err
+	}
+	defer release()
+
 	ser, ok := r.ServiceMap[serviceID]
 	if !ok {
 		return false, fmt.Errorf("service ID %s not found", serviceID)
 	}
-	if err := ser.Restart(); err != nil {
+	if err := ser.Restart(ctx); err != nil {
 		return false, fmt.Errorf("failed to restart service ID %s: %w", serviceID, err)
 	}
 
@@ -488,14 +514,14 @@ func (r *mutationResolver) RestoreServiceConfig(ctx context.Context, serviceID *
 		}
 
 		for _, cfg := range serviceObj.GetConfigConstraint() {
-			if err := cfg.Restore(r.ActionHandler); err != nil {
+			if err := cfg.Restore(ctx, r.ActionHandler); err != nil {
 				return false, fmt.Errorf("failed to restore service config, service ID %s, namespace %s, key %s: %w", *serviceID, cfg.GetNamespace(), cfg.GetKey(), err)
 			}
 		}
 	} else {
 		for serviceId, serviceObj := range r.ServiceMap {
 			for _, cfg := range serviceObj.GetConfigConstraint() {
-				if err := cfg.Restore(r.ActionHandler); err != nil {
+				if err := cfg.Restore(ctx, r.ActionHandler); err != nil {
 					return false, fmt.Errorf("failed to restore service config, service ID %s, namespace %s, key %s: %w", serviceId, cfg.GetNamespace(), cfg.GetKey(), err)
 				}
 			}
@@ -520,7 +546,7 @@ func (r *mutationResolver) UpdateServiceConfig(ctx context.Context, serviceID st
 		return constraint.GetKey() == key
 	})
 	if ok {
-		if err := constraint.Set(r.ActionHandler, val); err != nil {
+		if err := constraint.Set(ctx, r.ActionHandler, val); err != nil {
 			return false, fmt.Errorf("failed to update service config, service ID %s, namespace %s, key %s: %w", serviceID, constraint.GetNamespace(), key, err)
 		}
 		return true, nil
@@ -554,7 +580,7 @@ func (r *queryResolver) GetStationConfig(ctx context.Context) (map[string]any, e
 	for _, constraint := range r.StationConfigConstraints {
 		namespace := constraint.GetNamespace()
 		key := constraint.GetKey()
-		val, err := constraint.Get(r.ActionHandler)
+		val, err := constraint.Get(ctx, r.ActionHandler)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get station config, namespace %s, key %s: %w", namespace, key, err)
 		}
@@ -645,43 +671,43 @@ func (r *queryResolver) GetDeviceInfo(ctx context.Context) (*graph_model.DeviceI
 // GetStationMetadata is the resolver for the getStationMetadata field.
 func (r *queryResolver) GetStationMetadata(ctx context.Context, format string) (string, error) {
 	stationAffiliationConfig := &config.StationAffiliationConfigConstraintImpl{}
-	stationAffiliation, err := stationAffiliationConfig.Get(r.ActionHandler)
+	stationAffiliation, err := stationAffiliationConfig.Get(ctx, r.ActionHandler)
 	if err != nil {
 		return "", err
 	}
 
 	stationDescriptionConfig := &config.StationDescriptionConfigConstraintImpl{}
-	stationDescription, err := stationDescriptionConfig.Get(r.ActionHandler)
+	stationDescription, err := stationDescriptionConfig.Get(ctx, r.ActionHandler)
 	if err != nil {
 		return "", err
 	}
 
 	stationCountryConfig := &config.StationCountryConfigConstraintImpl{}
-	stationCountry, err := stationCountryConfig.Get(r.ActionHandler)
+	stationCountry, err := stationCountryConfig.Get(ctx, r.ActionHandler)
 	if err != nil {
 		return "", err
 	}
 
 	stationPlaceConfig := &config.StationPlaceConfigConstraintImpl{}
-	stationPlace, err := stationPlaceConfig.Get(r.ActionHandler)
+	stationPlace, err := stationPlaceConfig.Get(ctx, r.ActionHandler)
 	if err != nil {
 		return "", err
 	}
 
 	stationCodeConfig := &config.StationStationCodeConfigConstraintImpl{}
-	stationCode, err := stationCodeConfig.Get(r.ActionHandler)
+	stationCode, err := stationCodeConfig.Get(ctx, r.ActionHandler)
 	if err != nil {
 		return "", err
 	}
 
 	networkCodeConfig := &config.StationNetworkCodeConfigConstraintImpl{}
-	networkCode, err := networkCodeConfig.Get(r.ActionHandler)
+	networkCode, err := networkCodeConfig.Get(ctx, r.ActionHandler)
 	if err != nil {
 		return "", err
 	}
 
 	locationCodeConfig := &config.StationLocationCodeConfigConstraintImpl{}
-	locationCode, err := locationCodeConfig.Get(r.ActionHandler)
+	locationCode, err := locationCodeConfig.Get(ctx, r.ActionHandler)
 	if err != nil {
 		return "", err
 	}
@@ -719,7 +745,7 @@ func (r *queryResolver) GetServiceConfigConstraint(ctx context.Context) ([]*grap
 		item := &graph_model.ServiceConfigConstraint{ServiceName: serviceName, ServiceID: serviceId}
 		for _, con := range constraintObj {
 			namespace, key := con.GetNamespace(), con.GetKey()
-			currentVal, err := con.Get(r.ActionHandler)
+			currentVal, err := con.Get(ctx, r.ActionHandler)
 			if err != nil {
 				return nil, fmt.Errorf("failed to read current value for service namespace %s, key %s: %w", namespace, key, err)
 			}
@@ -750,7 +776,7 @@ func (r *queryResolver) GetStationConfigConstraint(ctx context.Context) ([]*grap
 	var constraint []*graph_model.ConfigConstraint
 	for _, con := range r.StationConfigConstraints {
 		namespace, key := con.GetNamespace(), con.GetKey()
-		currentVal, err := con.Get(r.ActionHandler)
+		currentVal, err := con.Get(ctx, r.ActionHandler)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read current value for namespace %s, key %s: %w", namespace, key, err)
 		}
@@ -832,7 +858,7 @@ func (r *queryResolver) GetEventsBySource(ctx context.Context, code string) ([]*
 		return nil, fmt.Errorf("failed to get current coordinates of device: %w", err)
 	}
 
-	events, err := source.GetEvents(lat, lon)
+	events, err := source.GetEvents(ctx, lat, lon)
 	if err != nil {
 		return nil, err
 	}
@@ -866,7 +892,7 @@ func (r *queryResolver) GetEventsBySource(ctx context.Context, code string) ([]*
 // GetSeisRecordsByTime is the resolver for the getSeisRecordsByTime field.
 func (r *queryResolver) GetSeisRecordsByTime(ctx context.Context, startTime int64, endTime int64) ([]*graph_model.SeisRecord, error) {
 	var respRecords []*graph_model.SeisRecord
-	err := r.ActionHandler.SeisRecordsQueryEachContext(ctx, time.UnixMilli(startTime), time.UnixMilli(endTime), func(record model.SeisRecord) error {
+	err := r.ActionHandler.SeisRecordsQueryEach(ctx, time.UnixMilli(startTime), time.UnixMilli(endTime), func(record model.SeisRecord) error {
 		_, sampleRate, channelData, err := record.Decode()
 		if err != nil {
 			return fmt.Errorf("failed to decode seismic waveform record: %w", err)
@@ -944,7 +970,7 @@ func (r *queryResolver) GetHelicorderFiles(ctx context.Context) ([]*graph_model.
 // GetCurrentUser is the resolver for the getCurrentUser field.
 func (r *queryResolver) GetCurrentUser(ctx context.Context) (*graph_model.SysUser, error) {
 	currentUserId := r.getCurrentUserId(ctx)
-	sysUser, err := r.ActionHandler.SysUserGetByUserId(currentUserId)
+	sysUser, err := r.ActionHandler.SysUserGetByUserId(ctx, currentUserId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get current user info: %w", err)
 	}
@@ -966,7 +992,7 @@ func (r *queryResolver) GetSysUsers(ctx context.Context) ([]*graph_model.SysUser
 		return nil, errors.New("permission denied")
 	}
 
-	users, err := r.ActionHandler.SysUserList()
+	users, err := r.ActionHandler.SysUserList(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get system users: %w", err)
 	}
@@ -1034,7 +1060,7 @@ func (r *queryResolver) ExportGlobalConfig(ctx context.Context) (string, error) 
 
 	for _, constraint := range r.StationConfigConstraints {
 		namespace := constraint.GetNamespace()
-		val, err := constraint.Get(r.ActionHandler)
+		val, err := constraint.Get(ctx, r.ActionHandler)
 		if err != nil {
 			return "", err
 		}
@@ -1051,7 +1077,7 @@ func (r *queryResolver) ExportGlobalConfig(ctx context.Context) (string, error) 
 	for _, serviceObj := range r.ServiceMap {
 		for _, constraint := range serviceObj.GetConfigConstraint() {
 			namespace := constraint.GetNamespace()
-			val, err := constraint.Get(r.ActionHandler)
+			val, err := constraint.Get(ctx, r.ActionHandler)
 			if err != nil {
 				return "", err
 			}
@@ -1083,7 +1109,7 @@ func (r *queryResolver) GetUpgradeStatus(ctx context.Context) (*graph_model.Upgr
 		return nil, nil
 	}
 
-	latest, required, eligible, applied, err := r.UpgradeHelper.CheckUpdate()
+	latest, required, eligible, applied, err := r.UpgradeHelper.CheckUpdate(ctx)
 	if err != nil {
 		return &graph_model.UpgradeStatus{
 			Current:     r.CurrentVersion.String(),

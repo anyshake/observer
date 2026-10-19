@@ -11,13 +11,14 @@ import (
 	"tailscale.com/ipn"
 )
 
-func newDatabaseStateStore(actionHandler *action.Handler) (ipn.StateStore, error) {
-	return tailscale_store.New(actionHandler, ID)
+func newDatabaseStateStore(ctx context.Context, actionHandler *action.Handler) (ipn.StateStore, error) {
+	return tailscale_store.New(ctx, actionHandler, ID)
 }
 
-func New(webServerAddr string, actionHandler *action.Handler, timeSource *timesource.Source) *TailscaleServiceImpl {
-	ctx, cancelFn := context.WithCancel(context.Background())
+func New(parentCtx context.Context, webServerAddr string, actionHandler *action.Handler, timeSource *timesource.Source) *TailscaleServiceImpl {
+	ctx, cancelFn := context.WithCancel(parentCtx)
 	obj := &TailscaleServiceImpl{
+		parentCtx:     parentCtx,
 		ctx:           ctx,
 		cancelFn:      cancelFn,
 		actionHandler: actionHandler,

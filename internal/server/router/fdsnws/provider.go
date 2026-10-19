@@ -1,6 +1,7 @@
 package fdsnws
 
 import (
+	"context"
 	"path"
 	"strings"
 	"time"
@@ -20,7 +21,7 @@ type provider struct {
 
 func (p *provider) Now() time.Time { return p.now().UTC() }
 
-func (p *provider) stationCodes() (network, station, location string, err error) {
+func (p *provider) stationCodes(ctx context.Context) (network, station, location string, err error) {
 	constraints := []config.IConstraint{
 		&config.StationNetworkCodeConfigConstraintImpl{},
 		&config.StationStationCodeConfigConstraintImpl{},
@@ -28,7 +29,7 @@ func (p *provider) stationCodes() (network, station, location string, err error)
 	}
 	values := make([]string, len(constraints))
 	for i, constraint := range constraints {
-		value, getErr := constraint.Get(p.handler)
+		value, getErr := constraint.Get(ctx, p.handler)
 		if getErr != nil {
 			return "", "", "", getErr
 		}

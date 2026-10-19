@@ -1,6 +1,7 @@
 package quakesense
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"time"
@@ -25,24 +26,24 @@ func (s *quakeSenseConfigEnabledImpl) GetDefaultValue() any        { return fals
 func (s *quakeSenseConfigEnabledImpl) GetDescription() string {
 	return "Enable QuakeSense service to detect realtime earthquakes, allows sending P-wave alerts via MQTT protocol"
 }
-func (s *quakeSenseConfigEnabledImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigEnabledImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default QuakeSense service availability: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigEnabledImpl) Set(handler *action.Handler, newVal any) error {
+func (s *quakeSenseConfigEnabledImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	enabled, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
 		return fmt.Errorf("failed to set QuakeSense service availability: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *quakeSenseConfigEnabledImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get QuakeSense service availability: %w", err)
 	}
@@ -52,8 +53,8 @@ func (s *quakeSenseConfigEnabledImpl) Get(handler *action.Handler) (any, error) 
 	}
 	return enabled, nil
 }
-func (s *quakeSenseConfigEnabledImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigEnabledImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset QuakeSense service availability: %w", err)
 	}
 	return nil
@@ -80,24 +81,24 @@ func (s *quakeSenseConfigWebNotificationEnabledImpl) GetDefaultValue() any { ret
 func (s *quakeSenseConfigWebNotificationEnabledImpl) GetDescription() string {
 	return "Send earthquake detection notifications to connected web dashboards."
 }
-func (s *quakeSenseConfigWebNotificationEnabledImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigWebNotificationEnabledImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default QuakeSense web notification availability: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigWebNotificationEnabledImpl) Set(handler *action.Handler, newVal any) error {
+func (s *quakeSenseConfigWebNotificationEnabledImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	enabled, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
 		return fmt.Errorf("failed to set QuakeSense web notification availability: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigWebNotificationEnabledImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *quakeSenseConfigWebNotificationEnabledImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get QuakeSense web notification availability: %w", err)
 	}
@@ -107,8 +108,8 @@ func (s *quakeSenseConfigWebNotificationEnabledImpl) Get(handler *action.Handler
 	}
 	return enabled, nil
 }
-func (s *quakeSenseConfigWebNotificationEnabledImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigWebNotificationEnabledImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset QuakeSense web notification availability: %w", err)
 	}
 	return nil
@@ -127,24 +128,24 @@ func (s *quakeSenseConfigMqttBrokerImpl) GetDefaultValue() any        { return "
 func (s *quakeSenseConfigMqttBrokerImpl) GetDescription() string {
 	return "Address used for connecting to MQTT broker, by default, the host is tcp://broker.emqx.io:1883"
 }
-func (s *quakeSenseConfigMqttBrokerImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigMqttBrokerImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default MQTT broker: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigMqttBrokerImpl) Set(handler *action.Handler, newVal any) error {
+func (s *quakeSenseConfigMqttBrokerImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	broker, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), broker); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), broker); err != nil {
 		return fmt.Errorf("failed to set MQTT broker: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigMqttBrokerImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *quakeSenseConfigMqttBrokerImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get MQTT broker: %w", err)
 	}
@@ -154,8 +155,8 @@ func (s *quakeSenseConfigMqttBrokerImpl) Get(handler *action.Handler) (any, erro
 	}
 	return broker, nil
 }
-func (s *quakeSenseConfigMqttBrokerImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigMqttBrokerImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset MQTT broker: %w", err)
 	}
 	return nil
@@ -180,24 +181,24 @@ func (s *quakeSenseConfigMqttTopicImpl) GetDefaultValue() any {
 func (s *quakeSenseConfigMqttTopicImpl) GetDescription() string {
 	return "Topic used for publishing MQTT messages, by default, the topic is anyshake/quakesense/<random string>"
 }
-func (s *quakeSenseConfigMqttTopicImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigMqttTopicImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default MQTT topic: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigMqttTopicImpl) Set(handler *action.Handler, newVal any) error {
+func (s *quakeSenseConfigMqttTopicImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	topic, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), topic); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), topic); err != nil {
 		return fmt.Errorf("failed to set MQTT topic: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigMqttTopicImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *quakeSenseConfigMqttTopicImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get MQTT topic: %w", err)
 	}
@@ -207,8 +208,8 @@ func (s *quakeSenseConfigMqttTopicImpl) Get(handler *action.Handler) (any, error
 	}
 	return topic, nil
 }
-func (s *quakeSenseConfigMqttTopicImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigMqttTopicImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset MQTT topic: %w", err)
 	}
 	return nil
@@ -227,24 +228,24 @@ func (s *quakeSenseConfigMqttUsernameImpl) GetDefaultValue() any        { return
 func (s *quakeSenseConfigMqttUsernameImpl) GetDescription() string {
 	return "MQTT Username used for connecting to MQTT broker, by default, the username is empty"
 }
-func (s *quakeSenseConfigMqttUsernameImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigMqttUsernameImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default MQTT username: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigMqttUsernameImpl) Set(handler *action.Handler, newVal any) error {
+func (s *quakeSenseConfigMqttUsernameImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	username, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), username); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), username); err != nil {
 		return fmt.Errorf("failed to set MQTT username: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigMqttUsernameImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *quakeSenseConfigMqttUsernameImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get MQTT username: %w", err)
 	}
@@ -254,8 +255,8 @@ func (s *quakeSenseConfigMqttUsernameImpl) Get(handler *action.Handler) (any, er
 	}
 	return username, nil
 }
-func (s *quakeSenseConfigMqttUsernameImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigMqttUsernameImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset MQTT username: %w", err)
 	}
 	return nil
@@ -274,24 +275,24 @@ func (s *quakeSenseConfigMqttPasswordImpl) GetDefaultValue() any        { return
 func (s *quakeSenseConfigMqttPasswordImpl) GetDescription() string {
 	return "MQTT Password used for connecting to MQTT broker, by default, the password is empty"
 }
-func (s *quakeSenseConfigMqttPasswordImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigMqttPasswordImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default MQTT password: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigMqttPasswordImpl) Set(handler *action.Handler, newVal any) error {
+func (s *quakeSenseConfigMqttPasswordImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	password, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), password); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), password); err != nil {
 		return fmt.Errorf("failed to set MQTT password: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigMqttPasswordImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *quakeSenseConfigMqttPasswordImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get MQTT password: %w", err)
 	}
@@ -301,8 +302,8 @@ func (s *quakeSenseConfigMqttPasswordImpl) Get(handler *action.Handler) (any, er
 	}
 	return password, nil
 }
-func (s *quakeSenseConfigMqttPasswordImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigMqttPasswordImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset MQTT password: %w", err)
 	}
 	return nil
@@ -327,24 +328,24 @@ func (s *quakeSenseConfigMqttClientIdImpl) GetDefaultValue() any {
 func (s *quakeSenseConfigMqttClientIdImpl) GetDescription() string {
 	return "MQTT Client ID uniquely identifies a client when connecting to the broker. By default, it is anyshake-observer-<random string>."
 }
-func (s *quakeSenseConfigMqttClientIdImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigMqttClientIdImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default MQTT client ID: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigMqttClientIdImpl) Set(handler *action.Handler, newVal any) error {
+func (s *quakeSenseConfigMqttClientIdImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	topic, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), topic); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), topic); err != nil {
 		return fmt.Errorf("failed to set MQTT client ID: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigMqttClientIdImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *quakeSenseConfigMqttClientIdImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get MQTT client ID: %w", err)
 	}
@@ -354,8 +355,8 @@ func (s *quakeSenseConfigMqttClientIdImpl) Get(handler *action.Handler) (any, er
 	}
 	return id, nil
 }
-func (s *quakeSenseConfigMqttClientIdImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigMqttClientIdImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset MQTT client ID: %w", err)
 	}
 	return nil
@@ -374,24 +375,24 @@ func (s *quakeSenseConfigMonitorChannelImpl) GetDefaultValue() any        { retu
 func (s *quakeSenseConfigMonitorChannelImpl) GetDescription() string {
 	return "Specify which channel to monitor, by default, the channel is EHZ, it should be the same as the channel codes in station config"
 }
-func (s *quakeSenseConfigMonitorChannelImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigMonitorChannelImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default monitor channel: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigMonitorChannelImpl) Set(handler *action.Handler, newVal any) error {
+func (s *quakeSenseConfigMonitorChannelImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	channel, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), channel); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), channel); err != nil {
 		return fmt.Errorf("failed to set monitor channel: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigMonitorChannelImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *quakeSenseConfigMonitorChannelImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get monitor channel: %w", err)
 	}
@@ -401,8 +402,8 @@ func (s *quakeSenseConfigMonitorChannelImpl) Get(handler *action.Handler) (any, 
 	}
 	return channel, nil
 }
-func (s *quakeSenseConfigMonitorChannelImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigMonitorChannelImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset monitor channel: %w", err)
 	}
 	return nil
@@ -428,13 +429,13 @@ func (s *quakeSenseConfigFilterTypeImpl) GetDefaultValue() any { return BAND_PAS
 func (s *quakeSenseConfigFilterTypeImpl) GetDescription() string {
 	return "Specify which filter type to use, by default, the filter type is Band-pass filter."
 }
-func (s *quakeSenseConfigFilterTypeImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigFilterTypeImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default filter type: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigFilterTypeImpl) Set(handler *action.Handler, newVal any) error {
+func (s *quakeSenseConfigFilterTypeImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	filterType, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
@@ -447,13 +448,13 @@ func (s *quakeSenseConfigFilterTypeImpl) Set(handler *action.Handler, newVal any
 	}, filterType) {
 		return fmt.Errorf("invalid filter type: %s", filterType)
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), filterType); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), filterType); err != nil {
 		return fmt.Errorf("failed to set filter type: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigFilterTypeImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *quakeSenseConfigFilterTypeImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get filter type: %w", err)
 	}
@@ -463,8 +464,8 @@ func (s *quakeSenseConfigFilterTypeImpl) Get(handler *action.Handler) (any, erro
 	}
 	return filterType, nil
 }
-func (s *quakeSenseConfigFilterTypeImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigFilterTypeImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset filter type: %w", err)
 	}
 	return nil
@@ -483,13 +484,13 @@ func (s *quakeSenseConfigMinFreqImpl) GetDefaultValue() any        { return 0.5 
 func (s *quakeSenseConfigMinFreqImpl) GetDescription() string {
 	return "Specify the minimum frequency to filter, by default, the minimum frequency is 0.5 Hz."
 }
-func (s *quakeSenseConfigMinFreqImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigMinFreqImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default minimum frequency: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigMinFreqImpl) Set(handler *action.Handler, newVal any) error {
+func (s *quakeSenseConfigMinFreqImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	minFreq, err := config.GetConfigValFloat64(newVal)
 	if err != nil {
 		return err
@@ -497,13 +498,13 @@ func (s *quakeSenseConfigMinFreqImpl) Set(handler *action.Handler, newVal any) e
 	if minFreq < 0 {
 		return errors.New("minimum frequency cannot be negative")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), minFreq); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), minFreq); err != nil {
 		return fmt.Errorf("failed to set minimum frequency: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigMinFreqImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *quakeSenseConfigMinFreqImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get minimum frequency: %w", err)
 	}
@@ -513,8 +514,8 @@ func (s *quakeSenseConfigMinFreqImpl) Get(handler *action.Handler) (any, error) 
 	}
 	return minFreq, nil
 }
-func (s *quakeSenseConfigMinFreqImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigMinFreqImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset minimum frequency: %w", err)
 	}
 	return nil
@@ -533,13 +534,13 @@ func (s *quakeSenseConfigMaxFreqImpl) GetDefaultValue() any        { return 10.0
 func (s *quakeSenseConfigMaxFreqImpl) GetDescription() string {
 	return "Specify the maximum frequency to filter, by default, the maximum frequency is 10 Hz."
 }
-func (s *quakeSenseConfigMaxFreqImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigMaxFreqImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default maximum frequency: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigMaxFreqImpl) Set(handler *action.Handler, newVal any) error {
+func (s *quakeSenseConfigMaxFreqImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	maxFreq, err := config.GetConfigValFloat64(newVal)
 	if err != nil {
 		return err
@@ -547,13 +548,13 @@ func (s *quakeSenseConfigMaxFreqImpl) Set(handler *action.Handler, newVal any) e
 	if maxFreq < 0 {
 		return errors.New("maximum frequency cannot be negative")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), maxFreq); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), maxFreq); err != nil {
 		return fmt.Errorf("failed to set maximum frequency: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigMaxFreqImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *quakeSenseConfigMaxFreqImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get maximum frequency: %w", err)
 	}
@@ -563,8 +564,8 @@ func (s *quakeSenseConfigMaxFreqImpl) Get(handler *action.Handler) (any, error) 
 	}
 	return maxFreq, nil
 }
-func (s *quakeSenseConfigMaxFreqImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigMaxFreqImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset maximum frequency: %w", err)
 	}
 	return nil
@@ -590,13 +591,13 @@ func (s *quakeSenseConfigTriggerMethodImpl) GetDefaultValue() any { return CLASS
 func (s *quakeSenseConfigTriggerMethodImpl) GetDescription() string {
 	return "Specify the method to use for triggering, by default, the trigger method is Classic STA/LTA	."
 }
-func (s *quakeSenseConfigTriggerMethodImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigTriggerMethodImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default trigger method: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigTriggerMethodImpl) Set(handler *action.Handler, newVal any) error {
+func (s *quakeSenseConfigTriggerMethodImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	triggerMethod, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
@@ -609,13 +610,13 @@ func (s *quakeSenseConfigTriggerMethodImpl) Set(handler *action.Handler, newVal 
 	}, triggerMethod) {
 		return fmt.Errorf("invalid trigger method: %s", triggerMethod)
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), triggerMethod); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), triggerMethod); err != nil {
 		return fmt.Errorf("failed to set trigger method: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigTriggerMethodImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *quakeSenseConfigTriggerMethodImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get trigger method: %w", err)
 	}
@@ -625,8 +626,8 @@ func (s *quakeSenseConfigTriggerMethodImpl) Get(handler *action.Handler) (any, e
 	}
 	return method, nil
 }
-func (s *quakeSenseConfigTriggerMethodImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigTriggerMethodImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset trigger method: %w", err)
 	}
 	return nil
@@ -645,13 +646,13 @@ func (s *quakeSenseConfigStaWindowImpl) GetDefaultValue() any        { return 4.
 func (s *quakeSenseConfigStaWindowImpl) GetDescription() string {
 	return "Specify the STA window, by default, the STA window is 4."
 }
-func (s *quakeSenseConfigStaWindowImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigStaWindowImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default STA window: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigStaWindowImpl) Set(handler *action.Handler, newVal any) error {
+func (s *quakeSenseConfigStaWindowImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	staWindow, err := config.GetConfigValFloat64(newVal)
 	if err != nil {
 		return err
@@ -662,13 +663,13 @@ func (s *quakeSenseConfigStaWindowImpl) Set(handler *action.Handler, newVal any)
 	if staWindow > 300 {
 		return errors.New("STA window cannot be greater than 300")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), staWindow); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), staWindow); err != nil {
 		return fmt.Errorf("failed to set STA window: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigStaWindowImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *quakeSenseConfigStaWindowImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get STA window: %w", err)
 	}
@@ -678,8 +679,8 @@ func (s *quakeSenseConfigStaWindowImpl) Get(handler *action.Handler) (any, error
 	}
 	return staWindow, nil
 }
-func (s *quakeSenseConfigStaWindowImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigStaWindowImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset STA window: %w", err)
 	}
 	return nil
@@ -698,13 +699,13 @@ func (s *quakeSenseConfigLtaWindowImpl) GetDefaultValue() any        { return 30
 func (s *quakeSenseConfigLtaWindowImpl) GetDescription() string {
 	return "Specify the LTA window, by default, the LTA window is 30."
 }
-func (s *quakeSenseConfigLtaWindowImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigLtaWindowImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default LTA window: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigLtaWindowImpl) Set(handler *action.Handler, newVal any) error {
+func (s *quakeSenseConfigLtaWindowImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	ltaWindow, err := config.GetConfigValFloat64(newVal)
 	if err != nil {
 		return err
@@ -715,13 +716,13 @@ func (s *quakeSenseConfigLtaWindowImpl) Set(handler *action.Handler, newVal any)
 	if ltaWindow > 300 {
 		return errors.New("LTA window cannot be greater than 300")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), ltaWindow); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), ltaWindow); err != nil {
 		return fmt.Errorf("failed to set LTA window: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigLtaWindowImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *quakeSenseConfigLtaWindowImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get LTA window: %w", err)
 	}
@@ -731,8 +732,8 @@ func (s *quakeSenseConfigLtaWindowImpl) Get(handler *action.Handler) (any, error
 	}
 	return ltaWindow, nil
 }
-func (s *quakeSenseConfigLtaWindowImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigLtaWindowImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset LTA window: %w", err)
 	}
 	return nil
@@ -751,13 +752,13 @@ func (s *quakeSenseConfigTrigOnImpl) GetDefaultValue() any        { return 1.0 }
 func (s *quakeSenseConfigTrigOnImpl) GetDescription() string {
 	return "Specify the STA/LTA ratio to turn the trigger on, by default, the trigger on value is 1."
 }
-func (s *quakeSenseConfigTrigOnImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigTrigOnImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default trigger on value: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigTrigOnImpl) Set(handler *action.Handler, newVal any) error {
+func (s *quakeSenseConfigTrigOnImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	trigOn, err := config.GetConfigValFloat64(newVal)
 	if err != nil {
 		return err
@@ -765,13 +766,13 @@ func (s *quakeSenseConfigTrigOnImpl) Set(handler *action.Handler, newVal any) er
 	if trigOn <= 0 {
 		return errors.New("trigger on value cannot be zero or negative")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), trigOn); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), trigOn); err != nil {
 		return fmt.Errorf("failed to set trigger on value: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigTrigOnImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *quakeSenseConfigTrigOnImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get trigger on value: %w", err)
 	}
@@ -781,8 +782,8 @@ func (s *quakeSenseConfigTrigOnImpl) Get(handler *action.Handler) (any, error) {
 	}
 	return trigOn, nil
 }
-func (s *quakeSenseConfigTrigOnImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigTrigOnImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset trigger on value: %w", err)
 	}
 	return nil
@@ -801,13 +802,13 @@ func (s *quakeSenseConfigTrigOffImpl) GetDefaultValue() any        { return 0.4 
 func (s *quakeSenseConfigTrigOffImpl) GetDescription() string {
 	return "Specify the STA/LTA ratio to turn the trigger off, by default, the trigger off value is 0.4."
 }
-func (s *quakeSenseConfigTrigOffImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigTrigOffImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default trigger off value: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigTrigOffImpl) Set(handler *action.Handler, newVal any) error {
+func (s *quakeSenseConfigTrigOffImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	trigOff, err := config.GetConfigValFloat64(newVal)
 	if err != nil {
 		return err
@@ -815,13 +816,13 @@ func (s *quakeSenseConfigTrigOffImpl) Set(handler *action.Handler, newVal any) e
 	if trigOff <= 0 {
 		return errors.New("trigger off value cannot be zero or negative")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), trigOff); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), trigOff); err != nil {
 		return fmt.Errorf("failed to set trigger off value: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigTrigOffImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *quakeSenseConfigTrigOffImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get trigger off value: %w", err)
 	}
@@ -831,8 +832,8 @@ func (s *quakeSenseConfigTrigOffImpl) Get(handler *action.Handler) (any, error) 
 	}
 	return trigOff, nil
 }
-func (s *quakeSenseConfigTrigOffImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigTrigOffImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset trigger off value: %w", err)
 	}
 	return nil
@@ -851,13 +852,13 @@ func (s *quakeSenseConfigThrottleImpl) GetDefaultValue() any        { return 10 
 func (s *quakeSenseConfigThrottleImpl) GetDescription() string {
 	return "Specify the throttle interval in seconds, to disable throttling, set this field to 0, by default, the throttle interval is 10 seconds."
 }
-func (s *quakeSenseConfigThrottleImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigThrottleImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default throttle interval value: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigThrottleImpl) Set(handler *action.Handler, newVal any) error {
+func (s *quakeSenseConfigThrottleImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	throttle, err := config.GetConfigValInt64(newVal)
 	if err != nil {
 		return err
@@ -865,13 +866,13 @@ func (s *quakeSenseConfigThrottleImpl) Set(handler *action.Handler, newVal any) 
 	if throttle < 0 {
 		return errors.New("throttle interval cannot be negative")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), throttle); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), throttle); err != nil {
 		return fmt.Errorf("failed to set throttle interval value: %w", err)
 	}
 	return nil
 }
-func (s *quakeSenseConfigThrottleImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *quakeSenseConfigThrottleImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get throttle interval value: %w", err)
 	}
@@ -881,8 +882,8 @@ func (s *quakeSenseConfigThrottleImpl) Get(handler *action.Handler) (any, error)
 	}
 	return throttle, nil
 }
-func (s *quakeSenseConfigThrottleImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *quakeSenseConfigThrottleImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset throttle interval value: %w", err)
 	}
 	return nil

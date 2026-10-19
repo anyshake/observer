@@ -2,8 +2,11 @@ package tailscale
 
 import (
 	"context"
+	"io"
 	"net"
+	"runtime"
 	"slices"
+	"strings"
 	"testing"
 	"time"
 )
@@ -134,4 +137,60 @@ func TestServeUDPProxyForwardsRequestsAndResponses(t *testing.T) {
 		t.Fatalf("UDP proxy returned an error during shutdown: %v", err)
 	}
 	<-echoDone
+}
+
+func TestServeTCPProxyWaitsForConnectionGoroutines(t *testing.T) {
+	target, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("failed to create TCP target: %v", err)
+	}
+	defer target.Close()
+	go func() {
+		conn, acceptErr := target.Accept()
+		if acceptErr != nil {
+			return
+		}
+		defer conn.Close()
+		_, _ = io.Copy(conn, conn)
+	}()
+
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("failed to create TCP proxy listener: %v", err)
+	}
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	proxyDone := make(chan error, 1)
+	go func() {
+		proxyDone <- serveTCPProxy(ctx, listener, target.Addr().String(), &testLogger{})
+	}()
+
+	client, err := net.Dial("tcp", listener.Addr().String())
+	if err != nil {
+		t.Fatalf("failed to connect to TCP proxy: %v", err)
+	}
+	defer client.Close()
+	if err := client.SetDeadline(time.Now().Add(time.Second)); err != nil {
+		t.Fatalf("failed to set TCP client deadline: %v", err)
+	}
+	payload := []byte("tcp forwarding test")
+	if _, err := client.Write(payload); err != nil {
+		t.Fatalf("failed to send TCP request: %v", err)
+	}
+	response := make([]byte, len(payload))
+	if _, err := io.ReadFull(client, response); err != nil || string(response) != string(payload) {
+		t.Fatalf("unexpected TCP response: %q, %v", response, err)
+	}
+
+	cancel()
+	if err := <-proxyDone; err != nil {
+		t.Fatalf("serveTCPProxy() error = %v", err)
+	}
+	stacks := make([]byte, 1<<20)
+	stacks = stacks[:runtime.Stack(stacks, true)]
+	for _, name := range []string{"tailscale.proxyTCPConnection", "tailscale.serveTCPProxy"} {
+		if strings.Contains(string(stacks), name) {
+			t.Fatalf("%s goroutine kept running after serveTCPProxy returned\n%s", name, stacks)
+		}
+	}
 }

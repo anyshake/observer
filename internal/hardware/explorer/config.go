@@ -2,6 +2,21 @@ package explorer
 
 import "time"
 
+// Snapshot returns an independent copy of the configuration with a fresh mutex.
+func (c *DeviceConfig) Snapshot() *DeviceConfig {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	return &DeviceConfig{
+		packetInterval: c.packetInterval,
+		channelCodes:   append([]string(nil), c.channelCodes...),
+		sampleRate:     c.sampleRate,
+		gnssEnabled:    c.gnssEnabled,
+		model:          c.model,
+		protocol:       c.protocol,
+	}
+}
+
 func (c *DeviceConfig) SetPacketInterval(packetInterval time.Duration) {
 	c.mu.Lock()
 	defer c.mu.Unlock()

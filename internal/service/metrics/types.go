@@ -12,7 +12,6 @@ import (
 	"github.com/anyshake/observer/pkg/timesource"
 	"github.com/anyshake/observer/pkg/unibuild"
 	"github.com/shirou/gopsutil/v4/host"
-	"go.opentelemetry.io/otel/sdk/trace"
 )
 
 const ID = "service_metrics"
@@ -28,20 +27,18 @@ const (
 )
 
 type MetricsServiceImpl struct {
-	mu     sync.Mutex
-	status service.Status
+	lifecycle service.Lifecycle
+	mu        sync.Mutex
+	status    service.Status
 
-	wg       sync.WaitGroup
-	ctx      context.Context
-	cancelFn context.CancelFunc
+	wg        sync.WaitGroup
+	parentCtx context.Context
+	ctx       context.Context
+	cancelFn  context.CancelFunc
 
 	hardwareDev   hardware.IHardware
 	timeSource    *timesource.Source
 	actionHandler *action.Handler
-
-	oltpCtx            context.Context
-	oltpCtxCancelFn    context.CancelFunc
-	oltpTracerProvider *trace.TracerProvider
 
 	startTime time.Time
 	hostInfo  *host.InfoStat

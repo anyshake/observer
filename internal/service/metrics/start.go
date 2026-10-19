@@ -52,29 +52,36 @@ func (s *MetricsServiceImpl) getBuildInfo() []attribute.KeyValue {
 	return values
 }
 
-func (s *MetricsServiceImpl) handleInterrupt(ticker *time.Ticker) {
-	ticker.Stop()
-	s.wg.Done()
-}
+func (s *MetricsServiceImpl) Start(ctx context.Context) error {
+	if err := s.lifecycle.Lock(ctx); err != nil {
+		return err
+	}
+	defer s.lifecycle.Unlock()
 
-func (s *MetricsServiceImpl) Start() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if s.status.GetIsRunning() {
+		return errors.New("metrics service is already running")
+	}
+	if err := s.parentCtx.Err(); err != nil {
+		return err
+	}
 	if s.ctx.Err() != nil {
-		s.ctx, s.cancelFn = context.WithCancel(context.Background())
+		s.ctx, s.cancelFn = context.WithCancel(s.parentCtx)
 	}
 
 	otel.SetLogger(logr.Discard())
 
-	s.oltpCtx, s.oltpCtxCancelFn = context.WithCancel(context.Background())
+	oltpCtx, oltpCancel := context.WithCancel(s.parentCtx)
 	exporter, err := otlptracehttp.New(
-		s.oltpCtx,
+		oltpCtx,
 		otlptracehttp.WithEndpoint(OTLP_EXPORTER_ENDPOINT),
 		otlptracehttp.WithTimeout(METRICS_REPORT_TIMEOUT),
 		otlptracehttp.WithRetry(otlptracehttp.RetryConfig{Enabled: false, MaxElapsedTime: 0}),
 	)
 	if err != nil {
+		oltpCancel()
 		return fmt.Errorf("failed to create OTLP exporter: %w", err)
 	}
 
@@ -93,46 +100,58 @@ func (s *MetricsServiceImpl) Start() error {
 	}
 	resources = append(resources, s.getBuildInfo()...)
 
-	s.oltpTracerProvider = trace.NewTracerProvider(
+	tracerProvider := trace.NewTracerProvider(
 		trace.WithBatcher(exporter),
 		trace.WithResource(resource.NewSchemaless(resources...)),
 	)
-	otel.SetTracerProvider(s.oltpTracerProvider)
+	otel.SetTracerProvider(tracerProvider)
 
+	runCtx, runCancel := s.ctx, s.cancelFn
+	s.status.SetStartedAt(s.timeSource.Now())
+	s.status.SetIsRunning(true)
+	s.wg.Add(1)
 	go func() {
+		defer s.wg.Done()
 		ticker := time.NewTicker(METRICS_REPORT_INTERVAL)
 		tracer := otel.Tracer(OTLP_TRACER_NAME)
-
-		s.status.SetStartedAt(s.timeSource.Now())
-		s.status.SetIsRunning(true)
 		defer func() {
+			ticker.Stop()
+			runCancel()
+			shutdownCtx, cancel := context.WithTimeout(context.WithoutCancel(runCtx), METRICS_REPORT_TIMEOUT)
+			if err := tracerProvider.Shutdown(shutdownCtx); err != nil {
+				logger.GetLogger(ID).Errorf("failed to shutdown OTLP tracer provider: %v", err)
+			}
+			cancel()
+			oltpCancel()
+			s.status.SetStoppedAt(s.timeSource.Now())
+			s.status.SetIsRunning(false)
 			if r := recover(); r != nil {
-				logger.GetLogger(ID).Errorf("service unexpectly crashed, recovered from panic: %v\n%s", r, debug.Stack())
-				s.handleInterrupt(ticker)
-				_ = s.Stop()
+				logger.GetLogger(ID).Errorf("service unexpectedly crashed, recovered from panic: %v\n%s", r, debug.Stack())
 			}
 		}()
 
 		for {
 			select {
-			case <-s.ctx.Done():
-				s.handleInterrupt(ticker)
+			case <-runCtx.Done():
 				return
 			case <-ticker.C:
-				if err := s.checkConnectivity(); err == nil {
-					s.reportCurrentStatus(tracer)
+				if err := s.checkConnectivity(runCtx); err == nil {
+					s.reportCurrentStatus(runCtx, tracer)
 				}
 			}
 		}
 	}()
 
-	s.wg.Add(1)
 	return nil
 }
 
-func (s *MetricsServiceImpl) checkConnectivity() error {
+func (s *MetricsServiceImpl) checkConnectivity(ctx context.Context) error {
 	client := &http.Client{Timeout: 5 * time.Second, Transport: &http.Transport{TLSClientConfig: &tls.Config{MinVersion: tls.VersionTLS12}}}
-	resp, err := client.Get(CONNECTIVITY_CHECK_URL)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, CONNECTIVITY_CHECK_URL, nil)
+	if err != nil {
+		return fmt.Errorf("pre-check failed: %w", err)
+	}
+	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("pre-check failed: %w", err)
 	}
@@ -145,11 +164,11 @@ func (s *MetricsServiceImpl) checkConnectivity() error {
 	return nil
 }
 
-func (s *MetricsServiceImpl) reportCurrentStatus(tracer _trace.Tracer) {
+func (s *MetricsServiceImpl) reportCurrentStatus(ctx context.Context, tracer _trace.Tracer) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	ctx, cancel := context.WithTimeout(context.Background(), METRICS_REPORT_TIMEOUT)
+	ctx, cancel := context.WithTimeout(ctx, METRICS_REPORT_TIMEOUT)
 	defer cancel()
 
 	currentTime := s.timeSource.Now()

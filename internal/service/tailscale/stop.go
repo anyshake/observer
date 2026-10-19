@@ -1,30 +1,23 @@
 package tailscale
 
 import (
-	"errors"
-	"time"
+	"context"
 )
 
-func (s *TailscaleServiceImpl) Stop() error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+func (s *TailscaleServiceImpl) Stop(ctx context.Context) error {
+	return s.lifecycle.Stop(ctx, func() error {
+		s.mu.Lock()
+		if s.cancelFn != nil {
+			s.cancelFn()
+		}
+		s.status.SetIsRunning(false)
+		s.mu.Unlock()
+		defer func() {
+			s.status.SetStoppedAt(s.timeSource.Now())
+			s.status.SetIsRunning(false)
+		}()
 
-	if s.cancelFn != nil {
-		s.cancelFn()
-	}
-	done := make(chan struct{})
-	go func() {
 		s.wg.Wait()
-		close(done)
-	}()
-
-	timer := time.NewTimer(shutdownTimeout)
-	defer timer.Stop()
-
-	select {
-	case <-done:
-		return s.getRunError()
-	case <-timer.C:
-		return errors.New("timeout waiting for embedded tailscale node to stop")
-	}
+		return nil
+	})
 }

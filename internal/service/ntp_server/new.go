@@ -8,9 +8,10 @@ import (
 	"github.com/anyshake/observer/pkg/timesource"
 )
 
-func New(actionHandler *action.Handler, timeSource *timesource.Source) *NtpServerServiceImpl {
-	ctx, cancelFn := context.WithCancel(context.Background())
+func New(parentCtx context.Context, actionHandler *action.Handler, timeSource *timesource.Source) *NtpServerServiceImpl {
+	ctx, cancelFn := context.WithCancel(parentCtx)
 	obj := &NtpServerServiceImpl{
+		parentCtx:     parentCtx,
 		ctx:           ctx,
 		cancelFn:      cancelFn,
 		timeSource:    timeSource,

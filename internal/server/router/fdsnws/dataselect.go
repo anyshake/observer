@@ -33,7 +33,7 @@ func (p *dataSelectProvider) DataSelect(query fdsnwsgo.DataSelectQuery) (fdsnwsg
 		}
 		total += duration
 	}
-	network, station, location, err := p.stationCodes()
+	network, station, location, err := p.stationCodes(p.ctx)
 	if err != nil {
 		return result, fdsnwsgo.ProviderErrorServer, err
 	}
@@ -54,7 +54,7 @@ func (p *dataSelectProvider) DataSelect(query fdsnwsgo.DataSelectQuery) (fdsnwsg
 			if chunkEnd.After(end) {
 				chunkEnd = end
 			}
-			err := p.handler.SeisRecordsQueryEachContext(p.ctx, start, chunkEnd, func(record model.SeisRecord) error {
+			err := p.handler.SeisRecordsQueryEach(p.ctx, start, chunkEnd, func(record model.SeisRecord) error {
 				timestamp, rate, channels, err := record.Decode()
 				if err != nil {
 					return err

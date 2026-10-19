@@ -22,8 +22,8 @@ func TestLifecycle(t *testing.T) {
 	_, handler := testsupport.OpenDAO(t)
 	hw := testsupport.NewHardware()
 	fixed := time.Date(2026, time.October, 8, 1, 2, 3, 0, time.UTC)
-	svc := New(hw, handler, timesource.New(func() time.Time { return fixed }))
-	if err := svc.Start(); err == nil {
+	svc := New(t.Context(), hw, handler, timesource.New(func() time.Time { return fixed }))
+	if err := svc.Start(t.Context()); err == nil {
 		t.Fatal("start succeeded before initialization")
 	}
 	if svc.GetName() != "Winston Service" || svc.GetDescription() == "" {
@@ -35,12 +35,12 @@ func TestLifecycle(t *testing.T) {
 	if _, err := svc.GetAssetData("missing"); err == nil {
 		t.Fatal("asset data succeeded")
 	}
-	if err := svc.Init(); err == nil {
+	if err := svc.Init(t.Context()); err == nil {
 		t.Fatal("Init succeeded without station settings")
 	}
 
 	testsupport.InitStation(t, handler)
-	if err := svc.Init(); err != nil {
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	if err := setConstraint(t, handler, svc, "listen_host", "127.0.0.1"); err != nil {
@@ -52,22 +52,22 @@ func TestLifecycle(t *testing.T) {
 	if err := setConstraint(t, handler, svc, "enabled", true); err != nil {
 		t.Fatal(err)
 	}
-	if err := svc.Init(); err != nil {
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	if !svc.IsEnabled() || svc.GetListenPort() == 0 {
+	if !svc.IsEnabled(t.Context()) || svc.GetListenPort() == 0 {
 		t.Fatal("service was not configured")
 	}
 
 	hw.SubscribeErr = errors.New("subscribe failed")
-	if err := svc.Start(); err == nil {
+	if err := svc.Start(t.Context()); err == nil {
 		t.Fatal("subscribe failure was ignored")
 	}
 	hw.SubscribeErr = nil
-	if err := svc.Start(); err != nil {
+	if err := svc.Start(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { _ = svc.Stop() })
+	t.Cleanup(func() { testsupport.StopService(t, svc) })
 	hw.WaitSubscribed(t)
 	hw.Emit(explorer.Event{
 		Timestamp:  fixed,
@@ -77,17 +77,17 @@ func TestLifecycle(t *testing.T) {
 			Data:        []int32{1, 2, 3, 4},
 		}},
 	})
-	if err := svc.Start(); err == nil {
+	if err := svc.Start(t.Context()); err == nil {
 		t.Fatal("second start was accepted")
 	}
-	if err := svc.Restart(); err != nil {
+	if err := svc.Restart(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	hw.WaitSubscribed(t)
 	if svc.GetStatus().GetRestarts() != 1 {
 		t.Fatalf("restarts = %d", svc.GetStatus().GetRestarts())
 	}
-	if err := svc.Stop(); err != nil {
+	if err := svc.Stop(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -98,8 +98,8 @@ func TestWaveformQueries(t *testing.T) {
 	testsupport.InitStation(t, handler)
 	hw := testsupport.NewHardware()
 	fixed := time.Date(2026, time.October, 8, 1, 2, 3, 0, time.UTC)
-	svc := New(hw, handler, timesource.New(func() time.Time { return fixed }))
-	if err := svc.Init(); err != nil {
+	svc := New(t.Context(), hw, handler, timesource.New(func() time.Time { return fixed }))
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	provider := &provider{
@@ -170,7 +170,7 @@ func TestWaveformQueries(t *testing.T) {
 	if err := record.Encode(fixed, 100, []explorer.ChannelData{{ChannelCode: "EHZ", Data: samples}}); err != nil {
 		t.Fatal(err)
 	}
-	if err := handler.SeisRecordsCreate(record); err != nil {
+	if err := handler.SeisRecordsCreate(t.Context(), record); err != nil {
 		t.Fatal(err)
 	}
 	if err := empty.Consume(context.Background(), request, func(winsgo.Waveform) error { return nil }); err != nil {
@@ -182,7 +182,7 @@ func setConstraint(t *testing.T, handler *action.Handler, svc *WinstonServiceImp
 	t.Helper()
 	for _, constraint := range svc.GetConfigConstraint() {
 		if constraint.GetKey() == key {
-			return constraint.Set(handler, value)
+			return constraint.Set(t.Context(), handler, value)
 		}
 	}
 	t.Fatalf("constraint %s was not found", key)

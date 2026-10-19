@@ -27,13 +27,13 @@ func TestStartupAndCleanerHooks(t *testing.T) {
 	if admin.GetName() == "" {
 		t.Fatal("empty admin hook name")
 	}
-	if err := admin.Execute(); err != nil {
+	if err := admin.Execute(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	if err := admin.Execute(); err != nil {
+	if err := admin.Execute(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	user, err := handler.SysUserGetByUsername(model.DEFAULT_USERNAME)
+	user, err := handler.SysUserGetByUsername(t.Context(), model.DEFAULT_USERNAME)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -41,13 +41,13 @@ func TestStartupAndCleanerHooks(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := handler.SysUserUpdate(user.UserId, user); err != nil {
+	if err := handler.SysUserUpdate(t.Context(), user.UserId, user); err != nil {
 		t.Fatal(err)
 	}
-	if err := admin.Execute(); err != nil {
+	if err := admin.Execute(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	if err := (&setup_admin.SetupAdminStartupImpl{ActionHandler: action.NewHandler(nil)}).Execute(); err == nil {
+	if err := (&setup_admin.SetupAdminStartupImpl{ActionHandler: action.NewHandler(nil)}).Execute(t.Context()); err == nil {
 		t.Fatal("admin hook without a database succeeded")
 	}
 
@@ -58,13 +58,13 @@ func TestStartupAndCleanerHooks(t *testing.T) {
 	if station.GetName() == "" {
 		t.Fatal("empty station hook name")
 	}
-	if err := station.Execute(); err != nil {
+	if err := station.Execute(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	if err := (&setup_station.SetupStationStartupImpl{
 		ActionHandler:            action.NewHandler(nil),
 		StationConfigConstraints: config.NewStationConstraints(),
-	}).Execute(); err == nil {
+	}).Execute(t.Context()); err == nil {
 		t.Fatal("station hook without a database succeeded")
 	}
 
@@ -72,10 +72,10 @@ func TestStartupAndCleanerHooks(t *testing.T) {
 	if migration.GetName() == "" {
 		t.Fatal("empty migration hook name")
 	}
-	if err := migration.Execute(); err != nil {
+	if err := migration.Execute(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	if err := migration.Execute(); err != nil {
+	if err := migration.Execute(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 
@@ -83,11 +83,11 @@ func TestStartupAndCleanerHooks(t *testing.T) {
 	if databaseCleaner.GetName() == "" {
 		t.Fatal("empty database cleaner name")
 	}
-	if err := databaseCleaner.Execute(); err != nil {
+	if err := databaseCleaner.Execute(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	databaseCleaner.DAO = obj
-	if err := databaseCleaner.Execute(); err != nil {
+	if err := databaseCleaner.Execute(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 
@@ -95,15 +95,15 @@ func TestStartupAndCleanerHooks(t *testing.T) {
 	if explorerCleaner.GetName() == "" {
 		t.Fatal("empty explorer cleaner name")
 	}
-	if err := explorerCleaner.Execute(); err != nil {
+	if err := explorerCleaner.Execute(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	explorerCleaner.HardwareDev = fakeHardware{}
-	if err := explorerCleaner.Execute(); err != nil {
+	if err := explorerCleaner.Execute(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	explorerCleaner.HardwareDev = fakeHardware{closeErr: errors.New("busy")}
-	if err := explorerCleaner.Execute(); err == nil {
+	if err := explorerCleaner.Execute(t.Context()); err == nil {
 		t.Fatal("hardware close error was ignored")
 	}
 }
@@ -124,9 +124,9 @@ func (fakeHardware) Unsubscribe(string) error { return nil }
 func (fakeHardware) SubscribeRealtime(string, explorer.EventHandler) error {
 	return nil
 }
-func (fakeHardware) UnsubscribeRealtime(string) error { return nil }
-func (fakeHardware) GetConfig() explorer.DeviceConfig { return explorer.DeviceConfig{} }
-func (fakeHardware) GetStatus() explorer.DeviceStatus { return explorer.DeviceStatus{} }
+func (fakeHardware) UnsubscribeRealtime(string) error  { return nil }
+func (fakeHardware) GetConfig() *explorer.DeviceConfig { return &explorer.DeviceConfig{} }
+func (fakeHardware) GetStatus() *explorer.DeviceStatus { return &explorer.DeviceStatus{} }
 func (fakeHardware) GetCoordinates(bool) (float64, float64, float64, error) {
 	return 0, 0, 0, nil
 }

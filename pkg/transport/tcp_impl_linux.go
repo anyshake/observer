@@ -20,6 +20,12 @@ type TcpTransportImpl struct {
 }
 
 func (t *TcpTransportImpl) Open() error {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
+	if t.conn != nil {
+		return errors.New("connection is already opened")
+	}
 	if t.timeout == 0 {
 		t.timeout = 5 * time.Second
 	}
@@ -29,10 +35,7 @@ func (t *TcpTransportImpl) Open() error {
 		return fmt.Errorf("failed to open TCP connection to %s: %w", t.host, err)
 	}
 
-	t.mutex.Lock()
 	t.conn = conn
-	t.mutex.Unlock()
-
 	return nil
 }
 
@@ -84,6 +87,9 @@ func (t *TcpTransportImpl) Flush() error {
 }
 
 func (t *TcpTransportImpl) GetLatency(packetSize int) time.Duration {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
 	if t.conn == nil {
 		return 0
 	}
@@ -118,10 +124,6 @@ func (t *TcpTransportImpl) SetTimeout(timeout time.Duration) error {
 }
 
 func (t *TcpTransportImpl) ReadUntil(ctx context.Context, maxBytes int, doneFunc func(buf *[]byte, updatedAt *time.Time) bool, timeout time.Duration) ([]byte, bool, time.Duration, error) {
-	if t.conn == nil {
-		return nil, false, 0, errors.New("connection is not opened")
-	}
-
 	if doneFunc == nil {
 		return nil, false, 0, errors.New("doneFunc cannot be nil")
 	}
@@ -145,6 +147,10 @@ func (t *TcpTransportImpl) ReadUntil(ctx context.Context, maxBytes int, doneFunc
 		}
 
 		t.mutex.Lock()
+		if t.conn == nil {
+			t.mutex.Unlock()
+			return nil, false, 0, errors.New("connection is not opened")
+		}
 		_ = t.conn.SetReadDeadline(time.Now().Add(t.timeout))
 		n, err := t.conn.Read(temp)
 		currentTime := time.Now()

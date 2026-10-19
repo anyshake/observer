@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -19,7 +20,7 @@ var (
 	errAuthenticationFailed = errors.New("authentication failed")
 )
 
-func (h *auth) login(sessionId, secret, nonce, challengeId, challengeSolution, captchaId, captchaVal, payload, userAgent, userIp string) (code int, userId string, err error) {
+func (h *auth) login(ctx context.Context, sessionId, secret, nonce, challengeId, challengeSolution, captchaId, captchaVal, payload, userAgent, userIp string) (code int, userId string, err error) {
 	fail := func(status int, public error, internal string, args ...any) (int, string, error) {
 		if internal != "" {
 			logger.GetLogger(LOG_PREFIX).Errorf(internal, args...)
@@ -110,7 +111,7 @@ func (h *auth) login(sessionId, secret, nonce, challengeId, challengeSolution, c
 		return fail(http.StatusUnauthorized, errAuthenticationFailed, "login rejected: credential format invalid")
 	}
 
-	userId, err = h.actionHandler.SysUserLogin(username, password, userAgent, userIp)
+	userId, err = h.actionHandler.SysUserLogin(ctx, username, password, userAgent, userIp)
 	if err != nil {
 		return fail(http.StatusUnauthorized, errAuthenticationFailed, "login rejected: user auth failed for %s: %v", username, err)
 	}

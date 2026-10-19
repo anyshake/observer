@@ -34,7 +34,7 @@ func TestQueryHistoryIncludesUncommittedTail(t *testing.T) {
 			if err := record.Encode(event.Timestamp, event.SampleRate, event.ChannelData); err != nil {
 				t.Fatal(err)
 			}
-			if err := handler.SeisRecordsCreate(record); err != nil {
+			if err := handler.SeisRecordsCreate(t.Context(), record); err != nil {
 				t.Fatal(err)
 			}
 		}
@@ -79,7 +79,7 @@ func TestQueryHistoryIncludesRecordCrossingStart(t *testing.T) {
 	if err := record.Encode(recordTime, 4, []explorer.ChannelData{{ChannelCode: "EHZ", Data: []int32{1, 2, 3, 4}}}); err != nil {
 		t.Fatal(err)
 	}
-	if err := handler.SeisRecordsCreate(record); err != nil {
+	if err := handler.SeisRecordsCreate(t.Context(), record); err != nil {
 		t.Fatal(err)
 	}
 	source := &provider{ctx: context.Background(), actionHandler: handler}

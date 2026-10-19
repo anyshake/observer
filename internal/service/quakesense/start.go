@@ -3,6 +3,7 @@ package quakesense
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"runtime/debug"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/internal/notification"
+	"github.com/anyshake/observer/internal/service"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/anyshake/observer/pkg/ringbuf"
 	"github.com/bclswl0827/obsgo/signal"
@@ -19,6 +21,7 @@ import (
 
 const (
 	quakeSenseAnalysisInterval = 250 * time.Millisecond
+	quakeSenseConnectTimeout   = 10 * time.Second
 	quakeSensePublishTimeout   = 2 * time.Second
 	quakeSenseWarningInterval  = 10 * time.Second
 )
@@ -29,6 +32,19 @@ func quakeSenseNotificationMessage(eventTime time.Time, eventCount int) string {
 		eventTime.UTC().Format("2006-01-02 15:04:05"),
 		eventCount,
 	)
+}
+
+func waitMQTTToken(ctx context.Context, token mqtt.Token, timeout time.Duration) bool {
+	timer := time.NewTimer(timeout)
+	defer timer.Stop()
+	select {
+	case <-token.Done():
+		return true
+	case <-ctx.Done():
+		return false
+	case <-timer.C:
+		return false
+	}
 }
 
 func (s *QuakeSenseServiceImpl) filterBufferSize(sampleRate int) int {
@@ -62,20 +78,32 @@ func (s *QuakeSenseServiceImpl) newFilter(sampleRate int) (*signal.IIRFilter, er
 	}
 }
 
-func (s *QuakeSenseServiceImpl) Start() error {
+func (s *QuakeSenseServiceImpl) Start(ctx context.Context) error {
+	if err := s.lifecycle.Lock(ctx); err != nil {
+		return err
+	}
+	defer s.lifecycle.Unlock()
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if s.status.GetIsRunning() {
+		return errors.New("QuakeSense service is already running")
+	}
+	if err := s.parentCtx.Err(); err != nil {
+		return err
+	}
 	if s.ctx.Err() != nil {
-		s.ctx, s.cancelFn = context.WithCancel(context.Background())
+		s.ctx, s.cancelFn = context.WithCancel(s.parentCtx)
 	}
 
+	mqttBroker := s.mqttBroker
 	mqttClientOptions := mqtt.NewClientOptions()
-	mqttClientOptions.AddBroker(s.mqttBroker)
+	mqttClientOptions.AddBroker(mqttBroker)
 	mqttClientOptions.SetAutoReconnect(true)
 	mqttClientOptions.SetKeepAlive(30 * time.Second)
 	mqttClientOptions.SetClientID(s.mqttClientId)
-	mqttClientOptions.SetConnectTimeout(10 * time.Second)
+	mqttClientOptions.SetConnectTimeout(quakeSenseConnectTimeout)
 	mqttClientOptions.SetWriteTimeout(quakeSensePublishTimeout)
 	if s.mqttUsername != "" {
 		mqttClientOptions.SetUsername(s.mqttUsername)
@@ -84,40 +112,52 @@ func (s *QuakeSenseServiceImpl) Start() error {
 		mqttClientOptions.SetPassword(s.mqttPassword)
 	}
 	mqttClientOptions.OnReconnecting = func(c mqtt.Client, options *mqtt.ClientOptions) {
-		logger.GetLogger(ID).Warnf("reconnecting to MQTT broker: %s", s.mqttBroker)
+		logger.GetLogger(ID).Warnf("reconnecting to MQTT broker: %s", mqttBroker)
 	}
 	mqttClientOptions.OnConnect = func(c mqtt.Client) {
-		logger.GetLogger(ID).Infof("connected to MQTT broker: %s", s.mqttBroker)
+		logger.GetLogger(ID).Infof("connected to MQTT broker: %s", mqttBroker)
 	}
 	mqttClientOptions.OnConnectionLost = func(c mqtt.Client, err error) {
 		logger.GetLogger(ID).Warnf("connection to MQTT broker lost: %v", err)
 	}
 
-	s.mqttClient = mqtt.NewClient(mqttClientOptions)
-	if token := s.mqttClient.Connect(); token.Wait() && token.Error() != nil {
-		s.mqttClient = nil
-		return fmt.Errorf("failed to connect to MQTT broker: %w", token.Error())
+	mqttClient := mqtt.NewClient(mqttClientOptions)
+	token := mqttClient.Connect()
+	if !waitMQTTToken(ctx, token, quakeSenseConnectTimeout) {
+		mqttClient.Disconnect(0)
+		if err := ctx.Err(); err != nil {
+			return fmt.Errorf("failed to connect to MQTT broker: %w", err)
+		}
+		return fmt.Errorf("failed to connect to MQTT broker: timed out after %s", quakeSenseConnectTimeout)
+	}
+	if err := token.Error(); err != nil {
+		mqttClient.Disconnect(0)
+		return fmt.Errorf("failed to connect to MQTT broker: %w", err)
 	}
 
+	runCtx, runCancel := s.ctx, s.cancelFn
+	s.status.SetStartedAt(s.timeSource.Now())
+	s.status.SetIsRunning(true)
 	s.wg.Add(1)
 	go func() {
 		defer s.wg.Done()
-
-		s.status.SetStartedAt(s.timeSource.Now())
-		s.status.SetIsRunning(true)
 		defer func() {
+			runCancel()
+			_ = s.hardwareDev.UnsubscribeRealtime(ID)
+			mqttClient.Disconnect(100)
+			s.mu.Lock()
+			s.prevSamplerate = 0
+			s.filterKernel = nil
+			if s.channelBuffer != nil {
+				s.channelBuffer.Reset()
+			}
+			s.mu.Unlock()
+			s.status.SetStoppedAt(s.timeSource.Now())
+			s.status.SetIsRunning(false)
 			if r := recover(); r != nil {
 				logger.GetLogger(ID).Errorf("service unexpectedly crashed, recovered from panic: %v\n%s", r, debug.Stack())
 			}
-			s.status.SetIsRunning(false)
-			_ = s.hardwareDev.UnsubscribeRealtime(ID)
-			if s.mqttClient != nil {
-				s.mqttClient.Disconnect(100)
-			}
 		}()
-
-		s.status.SetStartedAt(s.timeSource.Now())
-		s.status.SetIsRunning(true)
 
 		var lastTriggeredAt time.Time
 		var lastTriggerTime time.Time
@@ -133,11 +173,17 @@ func (s *QuakeSenseServiceImpl) Start() error {
 			lastStreamWarning = now
 			logger.GetLogger(ID).Warnf(format, args...)
 		}
-		handler := func(sensorEvent explorer.Event) {
+		type detection struct {
+			triggerTimes []time.Time
+			topic        string
+			payload      map[string]any
+			notify       bool
+		}
+		detect := func(sensorEvent explorer.Event) *detection {
 			s.mu.Lock()
 			defer s.mu.Unlock()
-			if s.ctx.Err() != nil {
-				return
+			if runCtx.Err() != nil {
+				return nil
 			}
 
 			var targetChannel *explorer.ChannelData
@@ -149,16 +195,16 @@ func (s *QuakeSenseServiceImpl) Start() error {
 			}
 			if targetChannel == nil {
 				logStreamWarning("target monitoring channel %s not found", s.monitorChannel)
-				return
+				return nil
 			}
 			if len(targetChannel.Data) == 0 {
-				return
+				return nil
 			}
 
 			currentSampleRate := sensorEvent.SampleRate
 			if currentSampleRate <= 0 {
 				logStreamWarning("invalid device sample rate: %d", currentSampleRate)
-				return
+				return nil
 			}
 
 			bufferSize := s.filterBufferSize(currentSampleRate)
@@ -167,7 +213,7 @@ func (s *QuakeSenseServiceImpl) Start() error {
 				if err != nil {
 					s.prevSamplerate = 0
 					logger.GetLogger(ID).Warnf("failed to create %s filter for sample rate %d: %v", s.filterType, currentSampleRate, err)
-					return
+					return nil
 				}
 				s.prevSamplerate = currentSampleRate
 				s.filterKernel = filterKernel
@@ -206,7 +252,7 @@ func (s *QuakeSenseServiceImpl) Start() error {
 
 			analysisSamples := max(1, int(math.Ceil(quakeSenseAnalysisInterval.Seconds()*float64(currentSampleRate))))
 			if len(pendingSamples) < analysisSamples {
-				return
+				return nil
 			}
 
 			batchStart := pendingStart
@@ -224,12 +270,12 @@ func (s *QuakeSenseServiceImpl) Start() error {
 				filtered, err = signal.ApplyFilter(s.filterKernel, channelData, 1/float64(currentSampleRate))
 				if err != nil {
 					logger.GetLogger(ID).Warnf("failed to apply %s filter: %v", s.filterType, err)
-					return
+					return nil
 				}
 			}
 			s.channelBuffer.Push(filtered...)
 			if s.channelBuffer.Len() < bufferSize {
-				return
+				return nil
 			}
 
 			values := s.channelBuffer.Values()
@@ -247,19 +293,16 @@ func (s *QuakeSenseServiceImpl) Start() error {
 				staLta = trigger.ZDetect(values, staSamples)
 			default:
 				logger.GetLogger(ID).Warnf("unknown trigger method specified: %s", s.triggerMethod)
-				return
+				return nil
 			}
 
 			onsets := trigger.TriggerOnset(staLta, s.trigOn, s.trigOff, math.MaxInt32, false)
 			if len(onsets) == 0 {
-				return
+				return nil
 			}
 
 			bufferStart := batchStart.Add(time.Duration(batchSampleCount-len(values)) * time.Second / time.Duration(currentSampleRate))
-			type event struct {
-				time time.Time
-			}
-			events := make([]event, 0, len(onsets))
+			triggerTimes := make([]time.Time, 0, len(onsets))
 			for _, onset := range onsets {
 				if len(onset) == 0 || onset[0] < 0 || onset[0] >= len(values) {
 					continue
@@ -268,35 +311,25 @@ func (s *QuakeSenseServiceImpl) Start() error {
 				if !lastTriggerTime.IsZero() && !triggerTime.After(lastTriggerTime) {
 					continue
 				}
-				events = append(events, event{time: triggerTime})
+				triggerTimes = append(triggerTimes, triggerTime)
 			}
-			if len(events) == 0 {
-				return
+			if len(triggerTimes) == 0 {
+				return nil
 			}
-			if s.throttleSeconds > 0 && !lastTriggeredAt.IsZero() && events[0].time.Sub(lastTriggeredAt) < time.Duration(s.throttleSeconds)*time.Second {
-				return
-			}
-
-			latitude, longitude, elevation, err := s.hardwareDev.GetCoordinates(true)
-			if err != nil {
-				logger.GetLogger(ID).Warnf("failed to get coordinates: %v", err)
-				return
+			if s.throttleSeconds > 0 && !lastTriggeredAt.IsZero() && triggerTimes[0].Sub(lastTriggeredAt) < time.Duration(s.throttleSeconds)*time.Second {
+				return nil
 			}
 
-			publishedEvents := 0
-			var lastPublishedAt time.Time
-			for index := range events {
-				payload, err := json.Marshal(map[string]any{
+			return &detection{
+				triggerTimes: triggerTimes,
+				topic:        s.mqttTopic,
+				payload: map[string]any{
 					"trigger_method":      s.triggerMethod,
-					"trigger_time":        events[index].time.UnixMilli(),
 					"station_name":        s.stationName,
 					"station_description": s.stationDescription,
 					"station_country":     s.stationCountry,
 					"station_place":       s.stationPlace,
 					"station_affiliation": s.stationAffiliation,
-					"latitude":            latitude,
-					"longitude":           longitude,
-					"elevation":           elevation,
 					"station_code":        s.stationCode,
 					"network_code":        s.networkCode,
 					"location_code":       s.locationCode,
@@ -310,13 +343,40 @@ func (s *QuakeSenseServiceImpl) Start() error {
 					"filter_order":        FILTER_ORDER,
 					"sample_rate":         currentSampleRate,
 					"channel_code":        s.monitorChannel,
-				})
+				},
+				notify: s.webNotificationEnabled && s.notifications != nil,
+			}
+		}
+		handler := func(sensorEvent explorer.Event) {
+			defer service.RecoverCallback(ID, runCancel)
+			detected := detect(sensorEvent)
+			if detected == nil {
+				return
+			}
+
+			latitude, longitude, elevation, err := s.hardwareDev.GetCoordinates(true)
+			if err != nil {
+				logger.GetLogger(ID).Warnf("failed to get coordinates: %v", err)
+				return
+			}
+			detected.payload["latitude"] = latitude
+			detected.payload["longitude"] = longitude
+			detected.payload["elevation"] = elevation
+
+			publishedEvents := 0
+			var lastPublishedAt time.Time
+			for _, triggerTime := range detected.triggerTimes {
+				detected.payload["trigger_time"] = triggerTime.UnixMilli()
+				payload, err := json.Marshal(detected.payload)
 				if err != nil {
 					logger.GetLogger(ID).Errorf("failed to marshal payload: %v", err)
 					continue
 				}
-				token := s.mqttClient.Publish(s.mqttTopic, 0, false, string(payload))
-				if !token.WaitTimeout(quakeSensePublishTimeout) {
+				token := mqttClient.Publish(detected.topic, 0, false, string(payload))
+				if !waitMQTTToken(runCtx, token, quakeSensePublishTimeout) {
+					if runCtx.Err() != nil {
+						return
+					}
 					logger.GetLogger(ID).Errorf("timed out publishing MQTT message after %s", quakeSensePublishTimeout)
 					continue
 				}
@@ -324,8 +384,8 @@ func (s *QuakeSenseServiceImpl) Start() error {
 					logger.GetLogger(ID).Errorf("failed to publish MQTT message: %v", token.Error())
 					continue
 				}
-				lastTriggerTime = events[index].time
-				lastPublishedAt = events[index].time
+				lastTriggerTime = triggerTime
+				lastPublishedAt = triggerTime
 				publishedEvents++
 			}
 			if publishedEvents == 0 {
@@ -333,7 +393,7 @@ func (s *QuakeSenseServiceImpl) Start() error {
 			}
 			lastTriggeredAt = lastPublishedAt
 			logger.GetLogger(ID).Infof("detected %d seismic event at UTC time: %s", publishedEvents, lastPublishedAt.UTC().Format(time.RFC3339))
-			if s.webNotificationEnabled && s.notifications != nil {
+			if detected.notify {
 				s.notifications.Publish(notification.Event{
 					ServiceID:  ID,
 					Message:    quakeSenseNotificationMessage(lastPublishedAt, publishedEvents),
@@ -348,7 +408,7 @@ func (s *QuakeSenseServiceImpl) Start() error {
 			return
 		}
 
-		<-s.ctx.Done()
+		<-runCtx.Done()
 	}()
 
 	return nil

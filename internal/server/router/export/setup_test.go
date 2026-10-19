@@ -253,7 +253,7 @@ func initExportCodes(t *testing.T, handler *action.Handler) {
 		&config.StationNetworkCodeConfigConstraintImpl{},
 	}
 	for _, constraint := range constraints {
-		if err := constraint.Init(handler); err != nil {
+		if err := constraint.Init(t.Context(), handler); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -272,7 +272,7 @@ func insertRecords(t *testing.T, db *dao.DAO, records []model.SeisRecord) {
 			seen[table] = struct{}{}
 		}
 	}
-	if err := action.NewHandler(db).SeisRecordsCreate(records...); err != nil {
+	if err := action.NewHandler(db).SeisRecordsCreate(t.Context(), records...); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -317,8 +317,8 @@ func (exportHardware) Open(context.Context) (context.Context, context.CancelFunc
 	return context.Background(), func() {}, nil
 }
 
-func (h exportHardware) GetConfig() explorer.DeviceConfig {
-	cfg := explorer.DeviceConfig{}
+func (h exportHardware) GetConfig() *explorer.DeviceConfig {
+	cfg := &explorer.DeviceConfig{}
 	cfg.SetChannelCodes(append([]string(nil), h.channels...))
 	cfg.SetSampleRate(100)
 	cfg.SetProtocol("v1")
@@ -326,9 +326,9 @@ func (h exportHardware) GetConfig() explorer.DeviceConfig {
 	return cfg
 }
 
-func (exportHardware) GetStatus() explorer.DeviceStatus { return explorer.DeviceStatus{} }
-func (exportHardware) Close() error                     { return nil }
-func (exportHardware) Flush() error                     { return nil }
+func (exportHardware) GetStatus() *explorer.DeviceStatus { return &explorer.DeviceStatus{} }
+func (exportHardware) Close() error                      { return nil }
+func (exportHardware) Flush() error                      { return nil }
 func (exportHardware) Subscribe(string, explorer.EventHandler) error {
 	return nil
 }

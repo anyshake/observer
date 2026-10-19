@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"net"
 	"net/http"
 	"time"
 
@@ -22,6 +23,8 @@ type HttpServer struct {
 	log             *logger.Adapter
 	engine          *gin.Engine
 	server          http.Server
+	listener        net.Listener
+	closeSocket     func(context.Context) error
 	shutdownCtx     context.Context
 	shutdownCancel  context.CancelFunc
 }

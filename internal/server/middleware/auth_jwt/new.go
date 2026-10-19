@@ -44,7 +44,7 @@ func New(timeSource *timesource.Source, actionHandler *action.Handler, expiratio
 				userCache.Del(userId)
 			}
 
-			userModel, err := actionHandler.SysUserGetByUserId(userId)
+			userModel, err := actionHandler.SysUserGetByUserId(c.Request.Context(), userId)
 			if err != nil {
 				return false
 			}

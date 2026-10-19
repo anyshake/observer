@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/anyshake/observer/pkg/timesource"
 	"tailscale.com/ipn"
@@ -76,6 +77,8 @@ type fakeNode struct {
 	startOnce sync.Once
 	closeOnce sync.Once
 	listener  *blockingListener
+	listenErr error
+	upPanic   bool
 }
 
 type blockingListener struct {
@@ -120,10 +123,16 @@ func (n *fakeNode) Start() error {
 
 func (n *fakeNode) Up(ctx context.Context) error {
 	n.startOnce.Do(func() { close(n.upStarted) })
+	if n.upPanic {
+		panic("tailscale node crashed")
+	}
 	return nil
 }
 
 func (n *fakeNode) Listen(_, _ string) (net.Listener, error) {
+	if n.listenErr != nil {
+		return nil, n.listenErr
+	}
 	return n.listener, nil
 }
 
@@ -141,8 +150,8 @@ func (n *fakeNode) Close() error {
 	return nil
 }
 
-func newTestService(store ipn.StateStore, log serviceLogger) *TailscaleServiceImpl {
-	service := New("0.0.0.0:8073", nil, timesource.New(nil))
+func newTestService(t *testing.T, store ipn.StateStore, log serviceLogger) *TailscaleServiceImpl {
+	service := New(t.Context(), "0.0.0.0:8073", nil, timesource.New(nil))
 	service.stateStore = store
 	service.log = log
 	service.hostname = "observer-test"
@@ -151,13 +160,13 @@ func newTestService(store ipn.StateStore, log serviceLogger) *TailscaleServiceIm
 }
 
 func TestStartRequiresAuthKeyForInitialRegistration(t *testing.T) {
-	service := newTestService(newMemoryStateStore(), &testLogger{})
+	service := newTestService(t, newMemoryStateStore(), &testLogger{})
 	service.newNode = func(nodeConfig) embeddedNode {
 		t.Fatal("node must not be created without an auth key or persisted identity")
 		return nil
 	}
 
-	err := service.Start()
+	err := service.Start(t.Context())
 	if err == nil || !strings.Contains(err.Error(), "auth key is required") {
 		t.Fatalf("unexpected start error: %v", err)
 	}
@@ -167,7 +176,7 @@ func TestStartUsesAuthKeyOnlyForInitialRegistration(t *testing.T) {
 	const authKey = "tskey-auth-secret"
 	store := newMemoryStateStore()
 	log := &testLogger{}
-	service := newTestService(store, log)
+	service := newTestService(t, store, log)
 	service.authKey = authKey
 	node := newFakeNode()
 	service.newNode = func(config nodeConfig) embeddedNode {
@@ -178,11 +187,11 @@ func TestStartUsesAuthKeyOnlyForInitialRegistration(t *testing.T) {
 		return node
 	}
 
-	if err := service.Start(); err != nil {
+	if err := service.Start(t.Context()); err != nil {
 		t.Fatalf("failed to start service: %v", err)
 	}
 	<-node.upStarted
-	if err := service.Stop(); err != nil {
+	if err := service.Stop(t.Context()); err != nil {
 		t.Fatalf("failed to stop service: %v", err)
 	}
 	<-node.closed
@@ -201,7 +210,7 @@ func TestStartRestoresPersistedIdentityWithoutAuthKey(t *testing.T) {
 		t.Fatalf("failed to seed state store: %v", err)
 	}
 
-	service := newTestService(store, &testLogger{})
+	service := newTestService(t, store, &testLogger{})
 	service.authKey = "unused-auth-key"
 	node := newFakeNode()
 	service.newNode = func(config nodeConfig) embeddedNode {
@@ -214,7 +223,7 @@ func TestStartRestoresPersistedIdentityWithoutAuthKey(t *testing.T) {
 		return node
 	}
 
-	if err := service.Start(); err != nil {
+	if err := service.Start(t.Context()); err != nil {
 		t.Fatalf("failed to start service with persisted identity: %v", err)
 	}
 	<-node.upStarted
@@ -222,11 +231,92 @@ func TestStartRestoresPersistedIdentityWithoutAuthKey(t *testing.T) {
 		t.Fatal("service did not enter running state")
 	}
 
-	if err := service.Stop(); err != nil {
+	if err := service.Stop(t.Context()); err != nil {
 		t.Fatalf("failed to stop service: %v", err)
 	}
 	<-node.closed
 	if service.GetStatus().GetIsRunning() {
 		t.Fatal("service remained running after context cancellation")
 	}
+}
+
+func TestStopDoesNotReturnPreviousRunError(t *testing.T) {
+	store := newMemoryStateStore()
+	if err := store.WriteState(ipn.CurrentProfileStateKey, []byte("profile-key")); err != nil {
+		t.Fatalf("failed to seed state store: %v", err)
+	}
+	log := &testLogger{}
+	service := newTestService(t, store, log)
+	node := newFakeNode()
+	node.listenErr = errors.New("tailnet listener unavailable")
+	service.newNode = func(nodeConfig) embeddedNode { return node }
+
+	if err := service.Start(t.Context()); err != nil {
+		t.Fatalf("failed to start service: %v", err)
+	}
+	waitNodeClosed(t, node)
+	waitStopped(t, service)
+	if !log.contains("embedded tailscale proxy failed") {
+		t.Fatal("proxy failure was not logged")
+	}
+	if err := service.Stop(t.Context()); err != nil {
+		t.Fatalf("Stop returned the previous run error: %v", err)
+	}
+}
+
+func TestRunPanicStopsServiceAndAllowsRestart(t *testing.T) {
+	store := newMemoryStateStore()
+	if err := store.WriteState(ipn.CurrentProfileStateKey, []byte("profile-key")); err != nil {
+		t.Fatalf("failed to seed state store: %v", err)
+	}
+	log := &testLogger{}
+	service := newTestService(t, store, log)
+	crashed := newFakeNode()
+	crashed.upPanic = true
+	service.newNode = func(nodeConfig) embeddedNode { return crashed }
+
+	if err := service.Start(t.Context()); err != nil {
+		t.Fatalf("failed to start service: %v", err)
+	}
+	waitNodeClosed(t, crashed)
+	waitStopped(t, service)
+	service.wg.Wait()
+	if !log.contains("recovered from panic") {
+		t.Fatal("worker panic was not logged")
+	}
+
+	healthy := newFakeNode()
+	service.newNode = func(nodeConfig) embeddedNode { return healthy }
+	if err := service.Start(t.Context()); err != nil {
+		t.Fatalf("failed to restart service after panic: %v", err)
+	}
+	<-healthy.upStarted
+	if err := service.Start(t.Context()); err == nil {
+		t.Fatal("duplicate Start succeeded")
+	}
+	if err := service.Stop(t.Context()); err != nil {
+		t.Fatalf("failed to stop service: %v", err)
+	}
+	waitNodeClosed(t, healthy)
+}
+
+func waitNodeClosed(t *testing.T, node *fakeNode) {
+	t.Helper()
+	select {
+	case <-node.closed:
+	case <-time.After(2 * time.Second):
+		t.Fatal("embedded node was not closed")
+	}
+}
+
+func waitStopped(t *testing.T, service *TailscaleServiceImpl) {
+	t.Helper()
+	deadline := time.Now().Add(2 * time.Second)
+	for time.Now().Before(deadline) {
+		if !service.GetStatus().GetIsRunning() {
+			return
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+	t.Fatal("service is still running")
 }

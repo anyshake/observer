@@ -9,8 +9,15 @@ import (
 	"github.com/anyshake/observer/internal/service"
 )
 
-func (s *MiniSeedServiceImpl) safeFileAccess(assetId string) (string, error) {
-	absFilePath, err := filepath.Abs(s.filePath)
+func (s *MiniSeedServiceImpl) getFilePath() string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	return s.filePath
+}
+
+func (s *MiniSeedServiceImpl) safeFileAccess(baseDir, assetId string) (string, error) {
+	absFilePath, err := filepath.Abs(baseDir)
 	if err != nil {
 		return "", err
 	}
@@ -55,7 +62,7 @@ func (s *MiniSeedServiceImpl) GetAssetList() ([]service.Asset, error) {
 	}
 
 	var assets []service.Asset
-	_ = filepath.Walk(s.filePath, func(path string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(s.getFilePath(), func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -80,7 +87,7 @@ func (s *MiniSeedServiceImpl) GetAssetData(assetId string) (*service.AssetData, 
 		return nil, fmt.Errorf("assets ID %s is not available on %s when service is not running", assetId, ID)
 	}
 
-	absPath, err := s.safeFileAccess(assetId)
+	absPath, err := s.safeFileAccess(s.getFilePath(), assetId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get safe file access for asset %s: %v", assetId, err)
 	}

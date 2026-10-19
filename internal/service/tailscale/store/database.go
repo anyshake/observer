@@ -2,6 +2,7 @@ package store
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -23,7 +24,7 @@ type Database struct {
 	state         map[string][]byte
 }
 
-func New(actionHandler *action.Handler, namespace string) (*Database, error) {
+func New(ctx context.Context, actionHandler *action.Handler, namespace string) (*Database, error) {
 	if actionHandler == nil {
 		return nil, errors.New("tailscale state database handler is not available")
 	}
@@ -32,6 +33,7 @@ func New(actionHandler *action.Handler, namespace string) (*Database, error) {
 	}
 
 	if _, err := actionHandler.SettingsInit(
+		ctx,
 		namespace,
 		stateKey,
 		action.String,
@@ -41,7 +43,7 @@ func New(actionHandler *action.Handler, namespace string) (*Database, error) {
 		return nil, fmt.Errorf("failed to initialize tailscale state setting: %w", err)
 	}
 
-	value, valueType, _, err := actionHandler.SettingsGet(namespace, stateKey)
+	value, valueType, _, err := actionHandler.SettingsGet(ctx, namespace, stateKey)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load tailscale state setting: %w", err)
 	}
@@ -109,6 +111,7 @@ func (s *Database) WriteState(id ipn.StateKey, value []byte) error {
 		return fmt.Errorf("failed to encode tailscale state: %w", err)
 	}
 	if err := s.actionHandler.SettingsSet(
+		context.Background(),
 		s.namespace,
 		stateKey,
 		action.String,

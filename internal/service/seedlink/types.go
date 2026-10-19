@@ -18,12 +18,14 @@ const (
 )
 
 type SeedLinkServiceImpl struct {
-	mu     sync.Mutex
-	status service.Status
+	lifecycle service.Lifecycle
+	mu        sync.Mutex
+	status    service.Status
 
-	wg       sync.WaitGroup
-	ctx      context.Context
-	cancelFn context.CancelFunc
+	wg        sync.WaitGroup
+	parentCtx context.Context
+	ctx       context.Context
+	cancelFn  context.CancelFunc
 
 	hardwareDev   hardware.IHardware
 	timeSource    *timesource.Source

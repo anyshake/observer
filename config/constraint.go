@@ -1,6 +1,10 @@
 package config
 
-import "github.com/anyshake/observer/internal/dao/action"
+import (
+	"context"
+
+	"github.com/anyshake/observer/internal/dao/action"
+)
 
 type IConstraint interface {
 	IsRequired() bool // double check in setter implementation
@@ -14,8 +18,8 @@ type IConstraint interface {
 	GetVersion() int
 	GetOptions() map[string]any
 
-	Init(handler *action.Handler) error // should be initialized during startup hook
-	Set(handler *action.Handler, newVal any) error
-	Get(handler *action.Handler) (any, error)
-	Restore(handler *action.Handler) error
+	Init(ctx context.Context, handler *action.Handler) error // should be initialized during startup hook
+	Set(ctx context.Context, handler *action.Handler, newVal any) error
+	Get(ctx context.Context, handler *action.Handler) (any, error)
+	Restore(ctx context.Context, handler *action.Handler) error
 }

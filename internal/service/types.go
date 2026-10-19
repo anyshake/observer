@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -34,11 +35,11 @@ type IService interface {
 	GetStatus() *Status
 	GetName() string
 	GetDescription() string
-	Init() error
-	IsEnabled() bool
-	Start() error
-	Stop() error
-	Restart() error
+	Init(ctx context.Context) error
+	IsEnabled(ctx context.Context) bool
+	Start(ctx context.Context) error
+	Stop(ctx context.Context) error
+	Restart(ctx context.Context) error
 	GetAssetList() ([]Asset, error)
 	GetAssetData(string) (*AssetData, error)
 	GetConfigConstraint() []config.IConstraint

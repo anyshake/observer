@@ -1,30 +1,45 @@
 package ntp_server
 
-import "fmt"
+import (
+	"context"
+	"fmt"
+)
 
-func (s *NtpServerServiceImpl) Init() error {
+func (s *NtpServerServiceImpl) Init(ctx context.Context) error {
+	if err := s.lifecycle.Lock(ctx); err != nil {
+		return err
+	}
+	defer s.lifecycle.Unlock()
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if s.status.GetIsRunning() {
+		return fmt.Errorf("service %s cannot be initialized while running", ID)
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
 	for _, con := range s.GetConfigConstraint() {
-		if err := con.Init(s.actionHandler); err != nil {
+		if err := con.Init(ctx, s.actionHandler); err != nil {
 			return fmt.Errorf("failed to initlize config constraint for service %s, namespace %s, key %s: %w", ID, con.GetNamespace(), con.GetKey(), err)
 		}
 	}
 
-	listenHost, err := (&ntpServerConfigListenHostImpl{}).Get(s.actionHandler)
+	listenHost, err := (&ntpServerConfigListenHostImpl{}).Get(ctx, s.actionHandler)
 	if err != nil {
 		return err
 	}
 	s.listenHost = listenHost.(string)
 
-	listenPort, err := (&ntpServerConfigListenPortImpl{}).Get(s.actionHandler)
+	listenPort, err := (&ntpServerConfigListenPortImpl{}).Get(ctx, s.actionHandler)
 	if err != nil {
 		return err
 	}
 	s.listenPort = listenPort.(int)
 
-	delayControl, err := (&ntpServerConfigDelayControlImpl{}).Get(s.actionHandler)
+	delayControl, err := (&ntpServerConfigDelayControlImpl{}).Get(ctx, s.actionHandler)
 	if err != nil {
 		return err
 	}

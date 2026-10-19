@@ -34,14 +34,15 @@ func (w *logWriter) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-func New(localServerAddr string, actionHandler *action.Handler, timeSource *timesource.Source) *FrpClientServiceImpl {
+func New(parentCtx context.Context, localServerAddr string, actionHandler *action.Handler, timeSource *timesource.Source) *FrpClientServiceImpl {
 	log.Logger = loglib.New(
 		loglib.WithLevel(log.InfoLevel),
 		loglib.WithOutput(loglib.NewConsoleWriter(loglib.ConsoleConfig{Colorful: false}, &logWriter{})),
 	)
 
-	ctx, cancelFn := context.WithCancel(context.Background())
+	ctx, cancelFn := context.WithCancel(parentCtx)
 	obj := &FrpClientServiceImpl{
+		parentCtx:       parentCtx,
 		ctx:             ctx,
 		cancelFn:        cancelFn,
 		timeSource:      timeSource,

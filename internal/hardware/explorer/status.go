@@ -2,6 +2,20 @@ package explorer
 
 import "time"
 
+// Snapshot returns an independent copy of the status with a fresh mutex.
+func (s *DeviceStatus) Snapshot() *DeviceStatus {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	return &DeviceStatus{
+		startedAt: s.startedAt,
+		updatedAt: s.updatedAt,
+		frames:    s.frames,
+		errors:    s.errors,
+		messages:  s.messages,
+	}
+}
+
 func (s *DeviceStatus) SetStartedAt(startedAt time.Time) {
 	s.mu.Lock()
 	defer s.mu.Unlock()

@@ -19,7 +19,7 @@ func TestLifecycle(t *testing.T) {
 	hw.Status.SetUpdatedAt(time.Unix(10, 0))
 	hw.Status.IncrementFrames()
 	fixed := time.Date(2026, time.October, 8, 1, 2, 3, 0, time.UTC)
-	svc := New(hw, handler, timesource.New(func() time.Time { return fixed }), semver.New("1", "2", "3", ""), unibuild.New("linux_arm32_v7a", "stable", "abc123", "1700000000"))
+	svc := New(t.Context(), hw, handler, timesource.New(func() time.Time { return fixed }), semver.New("1", "2", "3", ""), unibuild.New("linux_arm32_v7a", "stable", "abc123", "1700000000"))
 
 	if svc.GetName() != "Metrics Service" {
 		t.Fatalf("name = %q", svc.GetName())
@@ -30,7 +30,7 @@ func TestLifecycle(t *testing.T) {
 	if svc.GetStatus() == nil {
 		t.Fatal("status is nil")
 	}
-	if svc.IsEnabled() {
+	if svc.IsEnabled(t.Context()) {
 		t.Fatal("enabled before settings exist")
 	}
 	if _, err := svc.GetAssetList(); err == nil {
@@ -40,23 +40,23 @@ func TestLifecycle(t *testing.T) {
 		t.Fatal("asset data succeeded")
 	}
 
-	if err := svc.Init(); err != nil {
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatalf("Init() error = %v", err)
 	}
-	if !svc.IsEnabled() {
+	if !svc.IsEnabled(t.Context()) {
 		t.Fatal("metrics is disabled after Init")
 	}
-	if err := handler.SettingsSet(ID, "enabled", action.Bool, 0, false); err != nil {
+	if err := handler.SettingsSet(t.Context(), ID, "enabled", action.Bool, 0, false); err != nil {
 		t.Fatal(err)
 	}
-	if svc.IsEnabled() {
+	if svc.IsEnabled(t.Context()) {
 		t.Fatal("metrics stayed enabled")
 	}
-	if err := handler.SettingsSet(ID, "enabled", action.Bool, 0, true); err != nil {
+	if err := handler.SettingsSet(t.Context(), ID, "enabled", action.Bool, 0, true); err != nil {
 		t.Fatal(err)
 	}
 
-	withoutToolchain := New(hw, handler, timesource.New(nil), semver.New("0", "0", "1", ""), unibuild.New("", "dev", "commit", "0"))
+	withoutToolchain := New(t.Context(), hw, handler, timesource.New(nil), semver.New("0", "0", "1", ""), unibuild.New("", "dev", "commit", "0"))
 	if len(withoutToolchain.getBuildInfo()) < 4 {
 		t.Fatal("build info is missing the base attributes")
 	}
@@ -67,15 +67,15 @@ func TestLifecycle(t *testing.T) {
 	if !hasAttribute(info, "service.build.toolchain.name", "linux-arm32-v7a") {
 		t.Fatalf("toolchain was not included in %#v", info)
 	}
-	svc.reportCurrentStatus(noop.NewTracerProvider().Tracer("test"))
+	svc.reportCurrentStatus(t.Context(), noop.NewTracerProvider().Tracer("test"))
 
-	if err := svc.Start(); err != nil {
+	if err := svc.Start(t.Context()); err != nil {
 		t.Fatalf("Start() error = %v", err)
 	}
-	t.Cleanup(func() { _ = svc.Stop() })
+	t.Cleanup(func() { testsupport.StopService(t, svc) })
 	waitRunning(t, svc, true)
 
-	if err := svc.Restart(); err != nil {
+	if err := svc.Restart(t.Context()); err != nil {
 		t.Fatalf("Restart() error = %v", err)
 	}
 	waitRunning(t, svc, true)
@@ -83,15 +83,15 @@ func TestLifecycle(t *testing.T) {
 		t.Fatalf("restarts = %d, want 1", svc.GetStatus().GetRestarts())
 	}
 
-	if err := svc.Stop(); err != nil {
+	if err := svc.Stop(t.Context()); err != nil {
 		t.Fatalf("Stop() error = %v", err)
 	}
 	waitRunning(t, svc, false)
 }
 
 func TestInitRequiresDatabase(t *testing.T) {
-	svc := New(testsupport.NewHardware(), action.NewHandler(nil), timesource.New(nil), semver.New("0", "0", "1", ""), unibuild.New("", "", "", ""))
-	if err := svc.Init(); err == nil {
+	svc := New(t.Context(), testsupport.NewHardware(), action.NewHandler(nil), timesource.New(nil), semver.New("0", "0", "1", ""), unibuild.New("", "", "", ""))
+	if err := svc.Init(t.Context()); err == nil {
 		t.Fatal("Init() succeeded without a database")
 	}
 }

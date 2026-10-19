@@ -8,10 +8,11 @@ import (
 	"github.com/anyshake/observer/pkg/timesource"
 )
 
-func New(hardwareDev hardware.IHardware, timeSource *timesource.Source) *WatchCatServiceImpl {
-	ctx, cancelFn := context.WithCancel(context.Background())
+func New(parentCtx context.Context, hardwareDev hardware.IHardware, timeSource *timesource.Source) *WatchCatServiceImpl {
+	ctx, cancelFn := context.WithCancel(parentCtx)
 	obj := &WatchCatServiceImpl{
 		hardwareDev: hardwareDev,
+		parentCtx:   parentCtx,
 		ctx:         ctx,
 		cancelFn:    cancelFn,
 		timeSource:  timeSource,

@@ -12,14 +12,12 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/internal/hardware/explorer"
+	"github.com/anyshake/observer/internal/service"
+	"github.com/anyshake/observer/pkg/fileutil"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/bclswl0827/mseedio"
 	"github.com/samber/lo"
 )
-
-func (s *MiniSeedServiceImpl) handleInterrupt() {
-	s.wg.Done()
-}
 
 func (s *MiniSeedServiceImpl) getAppendInterval(gnssAvailable bool) int {
 	// Set write interval to 1 if GNSS time is not available
@@ -31,12 +29,24 @@ func (s *MiniSeedServiceImpl) getAppendInterval(gnssAvailable bool) int {
 	return MINISEED_APPEND_INTERVAL
 }
 
-func (s *MiniSeedServiceImpl) Start() error {
+func (s *MiniSeedServiceImpl) Start(ctx context.Context) error {
+	if err := s.lifecycle.Lock(ctx); err != nil {
+		return err
+	}
+	defer s.lifecycle.Unlock()
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if s.status.GetIsRunning() {
+		return errors.New("MiniSEED service is already running")
+	}
+
+	if err := s.parentCtx.Err(); err != nil {
+		return err
+	}
 	if s.ctx.Err() != nil {
-		s.ctx, s.cancelFn = context.WithCancel(context.Background())
+		s.ctx, s.cancelFn = context.WithCancel(s.parentCtx)
 	}
 
 	logger.GetLogger(ID).Infof("generated MiniSEED files will be saved to %s", s.filePath)
@@ -48,73 +58,81 @@ func (s *MiniSeedServiceImpl) Start() error {
 	s.appendCountDown = s.getAppendInterval(hardwareConfig.GetGnssAvailability())
 	s.recordBuffer = make([][]buffer, s.appendCountDown)
 
-	go func() {
-		s.status.SetStartedAt(s.timeSource.Now())
-		s.status.SetIsRunning(true)
-		defer func() {
-			if r := recover(); r != nil {
-				logger.GetLogger(ID).Errorf("service unexpectly crashed, recovered from panic: %v\n%s", r, debug.Stack())
-				s.handleInterrupt()
-				_ = s.Stop()
-			}
-		}()
+	runCtx, runCancel := s.ctx, s.cancelFn
+	err := s.hardwareDev.Subscribe(ID, func(event explorer.Event) {
+		defer service.RecoverCallback(ID, runCancel)
+		s.mu.Lock()
+		defer s.mu.Unlock()
 
-		err := s.hardwareDev.Subscribe(ID, func(event explorer.Event) {
-			s.mu.Lock()
-			defer s.mu.Unlock()
-
-			currentInterval := s.getAppendInterval(event.GNSSAvailable)
-			if len(s.recordBuffer) != currentInterval {
-				s.recordBuffer = make([][]buffer, currentInterval)
-				s.appendCountDown = currentInterval
-			}
-
-			bufferIndex := len(s.recordBuffer) - s.appendCountDown
-			if bufferIndex >= 0 && bufferIndex < len(s.recordBuffer) {
-				s.recordBuffer[bufferIndex] = make([]buffer, len(event.ChannelData))
-			}
-			lo.ForEach(event.ChannelData, func(ch explorer.ChannelData, idx int) {
-				s.recordBuffer[bufferIndex][idx] = buffer{
-					Timestamp:   event.Timestamp.UnixMilli(),
-					SampleRate:  event.SampleRate,
-					ChannelData: ch,
-				}
-			})
-
-			s.appendCountDown--
-			if s.lifeCycle > 0 {
-				s.cleanupCountDown--
-			}
-
-			if s.appendCountDown == 0 {
-				s.appendCountDown = currentInterval
-				channels, err := s.saveMiniSeedRecords(event.GNSSAvailable)
-				if err != nil {
-					logger.GetLogger(ID).Errorf("failed to append records to MiniSEED file: %v", err)
-					return
-				}
-				logger.GetLogger(ID).Infof("%d records in %d channels have been added to MiniSEED file", len(s.recordBuffer), channels)
-			}
-			if s.cleanupCountDown == 0 {
-				s.cleanupCountDown = MINISEED_CLEANUP_INTERVAL
-				endTime := event.Timestamp.Add(time.Duration(-s.lifeCycle) * time.Hour * 24)
-				if err := s.cleanupMiniSeedRecords(endTime); err != nil {
-					logger.GetLogger(ID).Errorf("failed to purge expired MiniSEED files: %v", err)
-					return
-				}
-				logger.GetLogger(ID).Infoln("expired MiniSEED files have been purged from storage")
-			}
-		})
-		if err != nil {
-			logger.GetLogger(ID).Errorf("failed to subscribe to hardware message bus: %v", err)
+		if runCtx.Err() != nil {
 			return
 		}
+		currentInterval := s.getAppendInterval(event.GNSSAvailable)
+		if len(s.recordBuffer) != currentInterval {
+			s.recordBuffer = make([][]buffer, currentInterval)
+			s.appendCountDown = currentInterval
+		}
 
-		<-s.ctx.Done()
-		s.handleInterrupt()
+		bufferIndex := len(s.recordBuffer) - s.appendCountDown
+		if bufferIndex >= 0 && bufferIndex < len(s.recordBuffer) {
+			s.recordBuffer[bufferIndex] = make([]buffer, len(event.ChannelData))
+		}
+		lo.ForEach(event.ChannelData, func(ch explorer.ChannelData, idx int) {
+			s.recordBuffer[bufferIndex][idx] = buffer{
+				Timestamp:   event.Timestamp.UnixMilli(),
+				SampleRate:  event.SampleRate,
+				ChannelData: ch,
+			}
+		})
+
+		s.appendCountDown--
+		if s.lifeCycle > 0 {
+			s.cleanupCountDown--
+		}
+
+		if s.appendCountDown == 0 {
+			s.appendCountDown = currentInterval
+			channels, err := s.saveMiniSeedRecords(event.GNSSAvailable)
+			if err != nil {
+				logger.GetLogger(ID).Errorf("failed to append records to MiniSEED file: %v", err)
+				return
+			}
+			logger.GetLogger(ID).Infof("%d records in %d channels have been added to MiniSEED file", len(s.recordBuffer), channels)
+		}
+		if s.cleanupCountDown == 0 {
+			s.cleanupCountDown = MINISEED_CLEANUP_INTERVAL
+			endTime := event.Timestamp.Add(time.Duration(-s.lifeCycle) * time.Hour * 24)
+			if err := s.cleanupMiniSeedRecords(runCtx, endTime); err != nil {
+				if !errors.Is(err, context.Canceled) {
+					logger.GetLogger(ID).Errorf("failed to purge expired MiniSEED files: %v", err)
+				}
+				return
+			}
+			logger.GetLogger(ID).Infoln("expired MiniSEED files have been purged from storage")
+		}
+	})
+	if err != nil {
+		runCancel()
+		return fmt.Errorf("failed to subscribe to hardware message bus: %w", err)
+	}
+
+	s.status.SetStartedAt(s.timeSource.Now())
+	s.status.SetIsRunning(true)
+	s.wg.Add(1)
+	go func() {
+		defer s.wg.Done()
+		defer func() {
+			runCancel()
+			_ = s.hardwareDev.Unsubscribe(ID)
+			s.status.SetStoppedAt(s.timeSource.Now())
+			s.status.SetIsRunning(false)
+			if r := recover(); r != nil {
+				logger.GetLogger(ID).Errorf("service unexpectedly crashed, recovered from panic: %v\n%s", r, debug.Stack())
+			}
+		}()
+		<-runCtx.Done()
 	}()
 
-	s.wg.Add(1)
 	return nil
 }
 
@@ -290,25 +308,25 @@ func (s *MiniSeedServiceImpl) saveMiniSeedRecords(gnssAvailable bool) (int, erro
 	return startChannels, nil
 }
 
-func (s *MiniSeedServiceImpl) cleanupMiniSeedRecords(until time.Time) error {
-	return s.actionHandler.CleanupExclusive(func() error {
-		return s.removeMiniSeedRecordsByDateRange(time.Unix(0, 0), until)
+func (s *MiniSeedServiceImpl) cleanupMiniSeedRecords(ctx context.Context, until time.Time) error {
+	return s.actionHandler.CleanupExclusive(ctx, func() error {
+		return s.removeMiniSeedRecordsByDateRange(ctx, time.Unix(0, 0), until)
 	})
 }
 
-func (s *MiniSeedServiceImpl) PurgeMiniSeedFiles() error {
+func (s *MiniSeedServiceImpl) PurgeMiniSeedFiles(ctx context.Context) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	return s.actionHandler.CleanupExclusive(func() error {
-		if err := os.RemoveAll(s.filePath); err != nil {
+	return s.actionHandler.CleanupExclusive(ctx, func() error {
+		if err := fileutil.RemoveAll(ctx, s.filePath); err != nil {
 			return fmt.Errorf("failed to remove MiniSEED directory %s: %w", s.filePath, err)
 		}
 		return nil
 	})
 }
 
-func (s *MiniSeedServiceImpl) PurgeMiniSeedFilesByDate(startDate, endDate time.Time) error {
+func (s *MiniSeedServiceImpl) PurgeMiniSeedFilesByDate(ctx context.Context, startDate, endDate time.Time) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -317,20 +335,23 @@ func (s *MiniSeedServiceImpl) PurgeMiniSeedFilesByDate(startDate, endDate time.T
 		return err
 	}
 
-	return s.actionHandler.CleanupExclusive(func() error {
-		return s.removeMiniSeedRecordsByDateRange(startTime, endTime)
+	return s.actionHandler.CleanupExclusive(ctx, func() error {
+		return s.removeMiniSeedRecordsByDateRange(ctx, startTime, endTime)
 	})
 }
 
-func (s *MiniSeedServiceImpl) removeMiniSeedRecordsByDateRange(startDate, endDate time.Time) error {
+func (s *MiniSeedServiceImpl) removeMiniSeedRecordsByDateRange(ctx context.Context, startDate, endDate time.Time) error {
 	startTime, endTime, err := normalizeDateRange(startDate, endDate)
 	if err != nil {
 		return err
 	}
 
 	for currentDate := startTime; !currentDate.After(endTime); currentDate = currentDate.AddDate(0, 0, 1) {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		dirPath := filepath.Join(s.filePath, currentDate.UTC().Format("2006-01-02"))
-		if err := os.RemoveAll(dirPath); err != nil {
+		if err := fileutil.RemoveAll(ctx, dirPath); err != nil {
 			return fmt.Errorf("failed to remove MiniSEED directory %s: %w", dirPath, err)
 		}
 	}

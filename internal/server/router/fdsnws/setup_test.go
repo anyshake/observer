@@ -28,7 +28,7 @@ func TestSetupAccessKeyAuthentication(t *testing.T) {
 		t.Fatal(err)
 	}
 	setting := &config.StationFDSNServiceEnabledConfigConstraintImpl{}
-	if err := setting.Init(handler); err != nil {
+	if err := setting.Init(t.Context(), handler); err != nil {
 		t.Fatal(err)
 	}
 	now := time.Date(2026, 10, 18, 12, 0, 0, 0, time.UTC)
@@ -81,7 +81,7 @@ func TestSetupAccessKeyAuthentication(t *testing.T) {
 			}
 		}
 	}
-	if err := setting.Set(handler, true); err != nil {
+	if err := setting.Set(t.Context(), handler, true); err != nil {
 		t.Fatal(err)
 	}
 	for _, page := range []struct {
@@ -246,7 +246,7 @@ func TestSetupAccessKeyAuthentication(t *testing.T) {
 			assertUnauthorized(request(path, "Bearer "+invalidKey), path, "Invalid, expired or revoked FDSN access key")
 		}
 	}
-	if err := setting.Set(handler, false); err != nil {
+	if err := setting.Set(t.Context(), handler, false); err != nil {
 		t.Fatal(err)
 	}
 	if rec := request("/fdsnws/station/1/version", "Bearer "+key); rec.Code != http.StatusNotImplemented {

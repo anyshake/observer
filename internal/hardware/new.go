@@ -1,6 +1,7 @@
 package hardware
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/anyshake/observer/config"
@@ -11,13 +12,13 @@ import (
 	"github.com/anyshake/observer/pkg/transport"
 )
 
-func New(logger *logger.Adapter, timeSrc *timesource.Source, actionHandler *action.Handler, explorerOptions explorer.ExplorerOptions, ntpOptions explorer.NtpOptions) (IHardware, error) {
+func New(ctx context.Context, logger *logger.Adapter, timeSrc *timesource.Source, actionHandler *action.Handler, explorerOptions explorer.ExplorerOptions, ntpOptions explorer.NtpOptions) (IHardware, error) {
 	tr, err := transport.New(explorerOptions.Endpoint, explorerOptions.ReadTimeout)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create hardware transport: %w", err)
 	}
 
-	channelCodes, err := (&config.StationChannelCodesConfigConstraintImpl{}).Get(actionHandler)
+	channelCodes, err := (&config.StationChannelCodesConfigConstraintImpl{}).Get(ctx, actionHandler)
 	if err != nil {
 		return nil, err
 	}

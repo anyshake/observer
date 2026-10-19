@@ -1,6 +1,7 @@
 package jobtracker_test
 
 import (
+	"context"
 	"errors"
 	"sync"
 	"sync/atomic"
@@ -13,7 +14,7 @@ import (
 
 func TestTrackerPreventsOverlappingJobsAndCopiesSnapshots(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
-		tracker := jobtracker.New("purge")
+		tracker := jobtracker.New(t.Context(), "purge")
 		idle := tracker.Get()
 		if idle.Status != jobtracker.JobStatusIdle || idle.Kind != "purge" || idle.ID != "" || idle.StartedAt != nil || idle.FinishedAt != nil {
 			t.Fatalf("initial job = %+v", idle)
@@ -22,13 +23,13 @@ func TestTrackerPreventsOverlappingJobsAndCopiesSnapshots(t *testing.T) {
 		release := make(chan struct{})
 		unblock := sync.OnceFunc(func() { close(release) })
 		defer unblock()
-		started := tracker.Start(now, "purge", func() error { <-release; return nil })
+		started := tracker.Start(now, "purge", func(context.Context) error { <-release; return nil })
 		if started.Status != jobtracker.JobStatusRunning || started.ID != "1700000000000" || started.StartedAt == nil || !started.StartedAt.Equal(now) {
 			t.Fatalf("started job = %+v", started)
 		}
 		synctest.Wait()
 		var duplicateRan atomic.Bool
-		duplicate := tracker.Start(now.Add(time.Second), "other", func() error { duplicateRan.Store(true); return nil })
+		duplicate := tracker.Start(now.Add(time.Second), "other", func(context.Context) error { duplicateRan.Store(true); return nil })
 		if duplicate.ID != started.ID || duplicate.Kind != "purge" {
 			t.Fatalf("overlapping Start() replaced active job: %+v", duplicate)
 		}
@@ -54,22 +55,83 @@ func TestTrackerPreventsOverlappingJobsAndCopiesSnapshots(t *testing.T) {
 
 func TestTrackerFailureAndRestart(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
-		tracker := jobtracker.New("purge")
+		tracker := jobtracker.New(t.Context(), "purge")
 		wantErr := errors.New("database unavailable")
-		failed := tracker.Start(time.Now(), "purge", func() error { return wantErr })
+		failed := tracker.Start(time.Now(), "purge", func(context.Context) error { return wantErr })
 		synctest.Wait()
 		job := tracker.Get()
 		if job.Status != jobtracker.JobStatusFailed || !errors.Is(job.Error, wantErr) || job.FinishedAt == nil {
 			t.Fatalf("failed job = %+v", job)
 		}
 		time.Sleep(time.Second)
-		restarted := tracker.Start(time.Now(), "retry", func() error { return nil })
+		restarted := tracker.Start(time.Now(), "retry", func(context.Context) error { return nil })
 		if restarted.ID == failed.ID || restarted.Kind != "retry" || restarted.Error != nil || restarted.FinishedAt != nil || restarted.Status != jobtracker.JobStatusRunning {
 			t.Fatalf("restart retained old job state: %+v", restarted)
 		}
 		synctest.Wait()
 		if got := tracker.Get(); got.Status != jobtracker.JobStatusSucceeded || got.Error != nil {
 			t.Fatalf("restarted job = %+v", got)
+		}
+	})
+}
+
+func TestTrackerCancelsRunningJob(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		ctx, cancel := context.WithCancel(t.Context())
+		defer cancel()
+		tracker := jobtracker.New(ctx, "purge")
+		started := make(chan struct{})
+		tracker.Start(time.Now(), "purge", func(ctx context.Context) error {
+			close(started)
+			<-ctx.Done()
+			return ctx.Err()
+		})
+		<-started
+		cancel()
+		waitCtx, cancelWait := context.WithTimeout(t.Context(), time.Second)
+		defer cancelWait()
+		if err := tracker.Wait(waitCtx); err != nil {
+			t.Fatal(err)
+		}
+		if job := tracker.Get(); job.Status != jobtracker.JobStatusFailed || !errors.Is(job.Error, context.Canceled) {
+			t.Fatalf("canceled job = %+v", job)
+		}
+	})
+}
+
+func TestTrackerSkipsJobAfterCancellation(t *testing.T) {
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+	tracker := jobtracker.New(ctx, "purge")
+	var ran atomic.Bool
+	tracker.Start(time.Now(), "purge", func(context.Context) error {
+		ran.Store(true)
+		return nil
+	})
+	if err := tracker.Wait(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+	if ran.Load() || !errors.Is(tracker.Get().Error, context.Canceled) {
+		t.Fatal("job ran after application cancellation")
+	}
+}
+
+func TestTrackerWaitDeadline(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		tracker := jobtracker.New(t.Context(), "purge")
+		if err := tracker.Wait(t.Context()); err != nil {
+			t.Fatalf("wait for idle tracker: %v", err)
+		}
+		release := make(chan struct{})
+		defer close(release)
+		tracker.Start(time.Now(), "purge", func(context.Context) error {
+			<-release
+			return nil
+		})
+		ctx, cancel := context.WithTimeout(t.Context(), time.Second)
+		defer cancel()
+		if err := tracker.Wait(ctx); !errors.Is(err, context.DeadlineExceeded) {
+			t.Fatalf("wait = %v; want deadline exceeded", err)
 		}
 	})
 }

@@ -1,10 +1,12 @@
 package seisevent
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 	"time"
 
 	"golang.org/x/sync/singleflight"
@@ -42,13 +44,13 @@ func (c *CWA_SC) GetProperty() DataSourceProperty {
 	}
 }
 
-func (c *CWA_SC) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (c *CWA_SC) GetEvents(ctx context.Context, latitude, longitude float64) ([]Event, error) {
 	var baseEvents []Event
 
 	if c.cache.Valid() {
 		baseEvents = c.cache.Get()
 	} else {
-		v, err, _ := c.sf.Do(CWA_SC_ID, func() (any, error) {
+		v, err := fetchEvents(ctx, &c.sf, CWA_SC_ID, func(ctx context.Context) ([]Event, error) {
 			if c.cache.Valid() {
 				return c.cache.Get(), nil
 			}
@@ -59,7 +61,7 @@ func (c *CWA_SC) GetEvents(latitude, longitude float64) ([]Event, error) {
 				transport = createCustomTransport(c.dnsClient, "")
 			}
 			res, err := request.POST(
-				"https://scweb.cwa.gov.tw/zh-tw/earthquake/ajaxhandler",
+				ctx, "https://scweb.cwa.gov.tw/zh-tw/earthquake/ajaxhandler",
 				c.getRequestBody(100),
 				"application/x-www-form-urlencoded",
 				10*time.Second, time.Second, 3, false,
@@ -108,9 +110,10 @@ func (c *CWA_SC) GetEvents(latitude, longitude float64) ([]Event, error) {
 			return nil, err
 		}
 
-		baseEvents = v.([]Event)
+		baseEvents = v
 	}
 
+	baseEvents = slices.Clone(baseEvents)
 	for i := range baseEvents {
 		baseEvents[i].Distance = getDistance(latitude, baseEvents[i].Latitude, longitude, baseEvents[i].Longitude)
 		baseEvents[i].Estimation = getSeismicEstimation(

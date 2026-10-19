@@ -2,6 +2,7 @@ package export
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"strconv"
 	"time"
@@ -22,7 +23,7 @@ func (e *seismicDataEncoderTxtImpl) GetName() string {
 	return "TXT"
 }
 
-func (e *seismicDataEncoderTxtImpl) Encode(records seismicRecordIterator, channelCode string) ([]byte, error) {
+func (e *seismicDataEncoderTxtImpl) Encode(ctx context.Context, records seismicRecordIterator, channelCode string) ([]byte, error) {
 	var buffer bytes.Buffer
 	line := make([]byte, 0, 48)
 	recordRange, err := forEachContinuousChannelRecord(records, channelCode, func(record model.SeisRecord, samples []int32) error {
@@ -47,16 +48,16 @@ func (e *seismicDataEncoderTxtImpl) Encode(records seismicRecordIterator, channe
 	return buffer.Bytes(), nil
 }
 
-func (e *seismicDataEncoderTxtImpl) GetFileName(startTime time.Time, channelCode string) (string, error) {
-	stationCode, err := e.stationCodeConfig.Get(e.actionHandler)
+func (e *seismicDataEncoderTxtImpl) GetFileName(ctx context.Context, startTime time.Time, channelCode string) (string, error) {
+	stationCode, err := e.stationCodeConfig.Get(ctx, e.actionHandler)
 	if err != nil {
 		return "", err
 	}
-	locationCode, err := e.locationCodeConfig.Get(e.actionHandler)
+	locationCode, err := e.locationCodeConfig.Get(ctx, e.actionHandler)
 	if err != nil {
 		return "", err
 	}
-	networkCode, err := e.networkCodeConfig.Get(e.actionHandler)
+	networkCode, err := e.networkCodeConfig.Get(ctx, e.actionHandler)
 	if err != nil {
 		return "", err
 	}

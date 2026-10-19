@@ -21,30 +21,30 @@ func ExerciseConstraint(t *testing.T, handler *action.Handler, constraint config
 	_ = constraint.GetType()
 	_ = constraint.GetOptions()
 
-	if _, err := constraint.Get(handler); err == nil {
+	if _, err := constraint.Get(t.Context(), handler); err == nil {
 		t.Fatalf("%s Get before Init succeeded", name)
 	}
-	if err := constraint.Set(handler, struct{ Invalid bool }{}); err == nil {
+	if err := constraint.Set(t.Context(), handler, struct{ Invalid bool }{}); err == nil {
 		t.Fatalf("%s accepted a struct", name)
 	}
-	if err := constraint.Init(handler); err != nil {
+	if err := constraint.Init(t.Context(), handler); err != nil {
 		t.Fatalf("%s Init: %v", name, err)
 	}
-	if err := constraint.Init(handler); err != nil {
+	if err := constraint.Init(t.Context(), handler); err != nil {
 		t.Fatalf("%s second Init: %v", name, err)
 	}
-	if _, err := constraint.Get(handler); err != nil {
+	if _, err := constraint.Get(t.Context(), handler); err != nil {
 		t.Fatalf("%s Get: %v", name, err)
 	}
 
 	var setErr error
 	accepted := false
 	for _, candidate := range constraintCandidates(constraint) {
-		setErr = constraint.Set(handler, candidate)
+		setErr = constraint.Set(t.Context(), handler, candidate)
 		if setErr != nil {
 			continue
 		}
-		if _, err := constraint.Get(handler); err != nil {
+		if _, err := constraint.Get(t.Context(), handler); err != nil {
 			t.Fatalf("%s Get after Set(%#v): %v", name, candidate, err)
 		}
 		accepted = true
@@ -55,12 +55,12 @@ func ExerciseConstraint(t *testing.T, handler *action.Handler, constraint config
 	}
 
 	for _, candidate := range invalidCandidates(constraint) {
-		_ = constraint.Set(handler, candidate)
+		_ = constraint.Set(t.Context(), handler, candidate)
 	}
-	if err := constraint.Restore(handler); err != nil {
+	if err := constraint.Restore(t.Context(), handler); err != nil {
 		t.Fatalf("%s Restore: %v", name, err)
 	}
-	if _, err := constraint.Get(handler); err != nil {
+	if _, err := constraint.Get(t.Context(), handler); err != nil {
 		t.Fatalf("%s Get after Restore: %v", name, err)
 	}
 }

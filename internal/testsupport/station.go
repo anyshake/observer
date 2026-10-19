@@ -27,7 +27,7 @@ func InitStation(t *testing.T, handler *action.Handler) {
 		&config.StationChannelCodesConfigConstraintImpl{},
 	}
 	for _, constraint := range constraints {
-		if err := constraint.Init(handler); err != nil {
+		if err := constraint.Init(t.Context(), handler); err != nil {
 			t.Fatalf("init station constraint %s: %v", constraint.GetKey(), err)
 		}
 	}

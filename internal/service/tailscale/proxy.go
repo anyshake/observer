@@ -12,6 +12,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/anyshake/observer/pkg/ctxutil"
 )
 
 const (
@@ -276,7 +278,7 @@ func serveTCPProxy(ctx context.Context, listener net.Listener, targetAddr string
 	proxyCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	stopClose := context.AfterFunc(proxyCtx, func() {
+	stopClose := ctxutil.AfterFunc(proxyCtx, func() {
 		_ = listener.Close()
 	})
 	defer stopClose()
@@ -316,7 +318,7 @@ func proxyTCPConnection(ctx context.Context, incoming net.Conn, targetAddr strin
 	}
 	defer outgoing.Close()
 
-	stopClose := context.AfterFunc(ctx, func() {
+	stopClose := ctxutil.AfterFunc(ctx, func() {
 		_ = incoming.Close()
 		_ = outgoing.Close()
 	})
@@ -331,6 +333,9 @@ func proxyTCPConnection(ctx context.Context, incoming net.Conn, targetAddr strin
 		_, _ = io.Copy(incoming, outgoing)
 		copyDone <- struct{}{}
 	}()
+	<-copyDone
+	_ = incoming.Close()
+	_ = outgoing.Close()
 	<-copyDone
 }
 
@@ -401,7 +406,7 @@ func serveUDPProxy(ctx context.Context, packetConn net.PacketConn, targetAddr st
 		sessions:   make(map[string]*udpSession),
 	}
 
-	stopClose := context.AfterFunc(proxyCtx, func() {
+	stopClose := ctxutil.AfterFunc(proxyCtx, func() {
 		_ = packetConn.Close()
 	})
 	sweepDone := make(chan struct{})

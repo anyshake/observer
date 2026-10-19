@@ -1,7 +1,9 @@
 package updater
 
-func (s *UpdaterServiceImpl) IsEnabled() bool {
-	enable, err := (&updaterConfigEnabledImpl{}).Get(s.actionHandler)
+import "context"
+
+func (s *UpdaterServiceImpl) IsEnabled(ctx context.Context) bool {
+	enable, err := (&updaterConfigEnabledImpl{}).Get(ctx, s.actionHandler)
 	if err != nil {
 		return false
 	}

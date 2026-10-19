@@ -13,6 +13,7 @@ import (
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/dao/model"
 	"github.com/anyshake/observer/internal/hardware/explorer"
+	"github.com/anyshake/observer/pkg/fileutil"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/bclswl0827/heligo"
 	"github.com/samber/lo"
@@ -68,7 +69,7 @@ func (d *provider) GetPlotData(startTime, endTime time.Time) ([]heligo.PlotData,
 			logger.GetLogger(ID).Warnf("failed to create waveform cache for timestamp %d: %v", cacheKey.StartUnixMilli, err)
 		}
 	}
-	err = d.actionHandler.SeisRecordsQueryEachContext(d.ctx, startTimestamp, endTimestamp, func(record model.SeisRecord) error {
+	err = d.actionHandler.SeisRecordsQueryEach(d.ctx, startTimestamp, endTimestamp, func(record model.SeisRecord) error {
 		_, sampleRate, channelData, err := record.Decode()
 		if err != nil {
 			return fmt.Errorf("failed to decode seismic waveform record on timestamp %d: %w", record.RecordTime, err)
@@ -152,23 +153,29 @@ func (d *provider) setChannelCode(channelCode string) {
 	d.channelCode = channelCode
 }
 
-func (s *HelicorderServiceImpl) handleInterrupt(timer *time.Timer) {
-	if !timer.Stop() {
-		<-timer.C
+func (s *HelicorderServiceImpl) Start(ctx context.Context) error {
+	if err := s.lifecycle.Lock(ctx); err != nil {
+		return err
 	}
-	s.wg.Done()
-}
+	defer s.lifecycle.Unlock()
 
-func (s *HelicorderServiceImpl) Start() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if s.ctx.Err() != nil {
-		s.ctx, s.cancelFn = context.WithCancel(context.Background())
+	if s.status.GetIsRunning() {
+		return errors.New("helicorder service is already running")
 	}
-	s.dataProvider.ctx = s.ctx
 
-	channelCodes, err := (&config.StationChannelCodesConfigConstraintImpl{}).Get(s.dataProvider.actionHandler)
+	if err := s.parentCtx.Err(); err != nil {
+		return err
+	}
+	if s.ctx.Err() != nil {
+		s.ctx, s.cancelFn = context.WithCancel(s.parentCtx)
+	}
+	runCtx, runCancel := s.ctx, s.cancelFn
+	s.dataProvider.ctx = runCtx
+
+	channelCodes, err := (&config.StationChannelCodesConfigConstraintImpl{}).Get(runCtx, s.dataProvider.actionHandler)
 	if err != nil {
 		logger.GetLogger(ID).Errorf("failed to get station channel codes: %v", err)
 		return err
@@ -180,23 +187,26 @@ func (s *HelicorderServiceImpl) Start() error {
 		logger.GetLogger(ID).Infof("helicorder waveform cache path: %s", s.cachePath)
 	}
 
+	s.status.SetStartedAt(s.timeSource.Now())
+	s.status.SetIsRunning(true)
+	s.wg.Add(1)
 	go func() {
+		defer s.wg.Done()
 		timer := time.NewTimer(time.Minute)
+		defer timer.Stop()
 
-		s.status.SetStartedAt(s.timeSource.Now())
-		s.status.SetIsRunning(true)
 		defer func() {
+			runCancel()
+			s.status.SetStoppedAt(s.timeSource.Now())
+			s.status.SetIsRunning(false)
 			if r := recover(); r != nil {
-				logger.GetLogger(ID).Errorf("service unexpectly crashed, recovered from panic: %v\n%s", r, debug.Stack())
-				s.handleInterrupt(timer)
-				_ = s.Stop()
+				logger.GetLogger(ID).Errorf("service unexpectedly crashed, recovered from panic: %v\n%s", r, debug.Stack())
 			}
 		}()
 
 		for {
 			select {
-			case <-s.ctx.Done():
-				s.handleInterrupt(timer)
+			case <-runCtx.Done():
 				return
 			case <-timer.C:
 				// Subtract one minute to avoid date rollover
@@ -261,8 +271,10 @@ func (s *HelicorderServiceImpl) Start() error {
 
 				if s.lifeCycle > 0 {
 					endTime := currentTime.Add(time.Duration(-s.lifeCycle) * time.Hour * 24)
-					if err := s.cleanupHelicorderFiles(endTime); err != nil {
-						logger.GetLogger(ID).Errorf("failed to purge expired helicorder files: %v", err)
+					if err := s.cleanupHelicorderFiles(runCtx, endTime); err != nil {
+						if !errors.Is(err, context.Canceled) {
+							logger.GetLogger(ID).Errorf("failed to purge expired helicorder files: %v", err)
+						}
 					}
 				}
 
@@ -271,7 +283,6 @@ func (s *HelicorderServiceImpl) Start() error {
 		}
 	}()
 
-	s.wg.Add(1)
 	return nil
 }
 
@@ -305,25 +316,25 @@ func (m *HelicorderServiceImpl) getHelicorderFileName(tm time.Time, channelCode 
 	)
 }
 
-func (s *HelicorderServiceImpl) cleanupHelicorderFiles(until time.Time) error {
-	return s.dataProvider.actionHandler.CleanupExclusive(func() error {
-		return s.removeHelicorderFilesByDateRange(time.Unix(0, 0), until)
+func (s *HelicorderServiceImpl) cleanupHelicorderFiles(ctx context.Context, until time.Time) error {
+	return s.dataProvider.actionHandler.CleanupExclusive(ctx, func() error {
+		return s.removeHelicorderFilesByDateRange(ctx, time.Unix(0, 0), until)
 	})
 }
 
-func (s *HelicorderServiceImpl) PurgeHelicorderFiles() error {
+func (s *HelicorderServiceImpl) PurgeHelicorderFiles(ctx context.Context) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	return s.dataProvider.actionHandler.CleanupExclusive(func() error {
-		if err := os.RemoveAll(s.filePath); err != nil {
+	return s.dataProvider.actionHandler.CleanupExclusive(ctx, func() error {
+		if err := fileutil.RemoveAll(ctx, s.filePath); err != nil {
 			return fmt.Errorf("failed to remove helicorder directory %s: %w", s.filePath, err)
 		}
 		return nil
 	})
 }
 
-func (s *HelicorderServiceImpl) PurgeHelicorderFilesByDate(startDate, endDate time.Time) error {
+func (s *HelicorderServiceImpl) PurgeHelicorderFilesByDate(ctx context.Context, startDate, endDate time.Time) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -332,20 +343,23 @@ func (s *HelicorderServiceImpl) PurgeHelicorderFilesByDate(startDate, endDate ti
 		return err
 	}
 
-	return s.dataProvider.actionHandler.CleanupExclusive(func() error {
-		return s.removeHelicorderFilesByDateRange(startTime, endTime)
+	return s.dataProvider.actionHandler.CleanupExclusive(ctx, func() error {
+		return s.removeHelicorderFilesByDateRange(ctx, startTime, endTime)
 	})
 }
 
-func (s *HelicorderServiceImpl) removeHelicorderFilesByDateRange(startDate, endDate time.Time) error {
+func (s *HelicorderServiceImpl) removeHelicorderFilesByDateRange(ctx context.Context, startDate, endDate time.Time) error {
 	startTime, endTime, err := normalizeDateRange(startDate, endDate)
 	if err != nil {
 		return err
 	}
 
 	for currentDate := startTime; !currentDate.After(endTime); currentDate = currentDate.AddDate(0, 0, 1) {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		dirPath := filepath.Join(s.filePath, currentDate.UTC().Format("2006-01-02"))
-		if err := os.RemoveAll(dirPath); err != nil {
+		if err := fileutil.RemoveAll(ctx, dirPath); err != nil {
 			return fmt.Errorf("failed to remove helicorder directory %s: %w", dirPath, err)
 		}
 	}

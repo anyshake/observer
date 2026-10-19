@@ -1,10 +1,12 @@
 package seisevent
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
+	"slices"
 	"time"
 
 	"github.com/anyshake/observer/pkg/cache"
@@ -42,19 +44,19 @@ func (c *CENC_WEB) getRequestParam(currentTime time.Time) string {
 	return fmt.Sprintf("orderBy=id&isAsc=false&startMg=1&startTime=%s&endTime=%s", startTime, endTime)
 }
 
-func (c *CENC_WEB) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (c *CENC_WEB) GetEvents(ctx context.Context, latitude, longitude float64) ([]Event, error) {
 	var baseEvents []Event
 
 	if c.cache.Valid() {
 		baseEvents = c.cache.Get()
 	} else {
-		v, err, _ := c.sf.Do(CENC_WEB_ID, func() (any, error) {
+		v, err := fetchEvents(ctx, &c.sf, CENC_WEB_ID, func(ctx context.Context) ([]Event, error) {
 			if c.cache.Valid() {
 				return c.cache.Get(), nil
 			}
 
 			res, err := request.GET(
-				fmt.Sprintf("https://www.cenc.ac.cn/prodlaunch-web-backend/open/data/geojson/catalogs?%s", c.getRequestParam(c.timeSource.Now())),
+				ctx, fmt.Sprintf("https://www.cenc.ac.cn/prodlaunch-web-backend/open/data/geojson/catalogs?%s", c.getRequestParam(c.timeSource.Now())),
 				10*time.Second, time.Second, 3, false, nil,
 				map[string]string{"User-Agent": uarand.GetRandom()},
 			)
@@ -119,9 +121,10 @@ func (c *CENC_WEB) GetEvents(latitude, longitude float64) ([]Event, error) {
 			return nil, err
 		}
 
-		baseEvents = v.([]Event)
+		baseEvents = v
 	}
 
+	baseEvents = slices.Clone(baseEvents)
 	for i := range baseEvents {
 		baseEvents[i].Distance = getDistance(latitude, baseEvents[i].Latitude, longitude, baseEvents[i].Longitude)
 		baseEvents[i].Estimation = getSeismicEstimation(

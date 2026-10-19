@@ -1,5 +1,7 @@
 package watchcat
 
-func (s *WatchCatServiceImpl) IsEnabled() bool {
+import "context"
+
+func (s *WatchCatServiceImpl) IsEnabled(ctx context.Context) bool {
 	return true
 }

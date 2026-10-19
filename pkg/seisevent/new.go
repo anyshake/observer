@@ -9,23 +9,23 @@ import (
 	"github.com/bclswl0827/travel"
 )
 
-func New(timeSrc *timesource.Source, cacheTTL time.Duration) (map[string]IDataSource, error) {
+func New(timeSrc *timesource.Source, cacheTTL time.Duration) (map[string]IDataSource, func() error, error) {
 	if timeSrc == nil {
 		timeSrc = timesource.New(time.Now)
 	}
 
 	travelTimeTable, err := travel.NewAK135()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	builtinResolvers, err := dnsquery.NewResolvers()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	dnsClient, err := dnsquery.NewClient(builtinResolvers, len(builtinResolvers), 5*time.Second)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	return map[string]IDataSource{
@@ -172,5 +172,5 @@ func New(timeSrc *timesource.Source, cacheTTL time.Duration) (map[string]IDataSo
 			cache:           cache.NewGeneric[[]Event](cacheTTL),
 			travelTimeTable: travelTimeTable,
 		},
-	}, nil
+	}, dnsClient.Close, nil
 }

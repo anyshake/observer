@@ -8,8 +8,8 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func (h *Helper) FetchRelease(ver *semver.Version, timeout time.Duration) ([]byte, string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+func (h *Helper) FetchRelease(ctx context.Context, ver *semver.Version, timeout time.Duration) ([]byte, string, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	toolchain := h.currentBuild.GetToolchainId()

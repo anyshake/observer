@@ -2,16 +2,17 @@ package request
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"net/http"
 	"net/textproto"
 	"time"
 )
 
-func GET(url string, timeout, retryInterval time.Duration, maxRetries int, trimSpace bool, customTransport http.RoundTripper, headers ...map[string]string) ([]byte, error) {
+func GET(ctx context.Context, url string, timeout, retryInterval time.Duration, maxRetries int, trimSpace bool, customTransport http.RoundTripper, headers ...map[string]string) ([]byte, error) {
 	customTransport = selectTransport(customTransport)
 	client := http.Client{Timeout: timeout, Transport: customTransport}
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -29,8 +30,13 @@ func GET(url string, timeout, retryInterval time.Duration, maxRetries int, trimS
 	for retries := 0; retries <= maxRetries; retries++ {
 		resp, err := client.Do(req)
 		if err != nil {
+			if ctxErr := ctx.Err(); ctxErr != nil {
+				return nil, ctxErr
+			}
 			if retries < maxRetries {
-				time.Sleep(retryInterval)
+				if err := waitRetry(ctx, retryInterval); err != nil {
+					return nil, err
+				}
 			}
 			continue
 		}
@@ -40,8 +46,14 @@ func GET(url string, timeout, retryInterval time.Duration, maxRetries int, trimS
 		}
 
 		var buf bytes.Buffer
-		_, _ = buf.ReadFrom(resp.Body)
+		_, err = buf.ReadFrom(resp.Body)
 		resp.Body.Close()
+		if err != nil {
+			if ctxErr := ctx.Err(); ctxErr != nil {
+				return nil, ctxErr
+			}
+			return nil, fmt.Errorf("failed to read response body: %w", err)
+		}
 		b := buf.Bytes()
 
 		if trimSpace {

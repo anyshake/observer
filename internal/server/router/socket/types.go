@@ -1,6 +1,8 @@
 package socket
 
 import (
+	"sync"
+
 	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/pkg/message"
 	"github.com/anyshake/observer/pkg/ringbuf"
@@ -20,4 +22,8 @@ type socket struct {
 	messageBus     *message.Bus[explorer.Event]
 	tokenValidator func(string) bool
 	history        *ringbuf.Buffer[buffer]
+
+	mu       sync.Mutex
+	closed   bool
+	handlers sync.WaitGroup
 }

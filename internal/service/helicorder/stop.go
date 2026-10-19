@@ -1,38 +1,29 @@
 package helicorder
 
 import (
-	"errors"
+	"context"
 	"fmt"
-	"time"
 )
 
-func (s *HelicorderServiceImpl) Stop() error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+func (s *HelicorderServiceImpl) Stop(ctx context.Context) error {
+	return s.lifecycle.Stop(ctx, func() error {
+		s.mu.Lock()
+		if s.cancelFn != nil {
+			s.cancelFn()
+		}
+		s.status.SetIsRunning(false)
+		s.mu.Unlock()
+		defer func() {
+			s.status.SetStoppedAt(s.timeSource.Now())
+			s.status.SetIsRunning(false)
+		}()
 
-	s.status.SetStoppedAt(s.timeSource.Now())
-	s.status.SetIsRunning(false)
-	s.cancelFn()
-
-	done := make(chan error, 1)
-	go func() {
 		s.wg.Wait()
 		if s.dataProvider.queryCache != nil {
 			if err := s.dataProvider.queryCache.Clear(); err != nil {
-				done <- fmt.Errorf("failed to clear helicorder cache: %w", err)
-				return
+				return fmt.Errorf("failed to clear helicorder cache: %w", err)
 			}
 		}
-		done <- nil
-	}()
-
-	timer := time.NewTimer(10 * time.Second)
-	defer timer.Stop()
-
-	select {
-	case err := <-done:
-		return err
-	case <-timer.C:
-		return errors.New("timeout waiting for goroutines to finish")
-	}
+		return nil
+	})
 }

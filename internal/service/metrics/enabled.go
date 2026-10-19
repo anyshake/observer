@@ -1,7 +1,9 @@
 package metrics
 
-func (s *MetricsServiceImpl) IsEnabled() bool {
-	enable, err := (&metricsConfigEnabledImpl{}).Get(s.actionHandler)
+import "context"
+
+func (s *MetricsServiceImpl) IsEnabled(ctx context.Context) bool {
+	enable, err := (&metricsConfigEnabledImpl{}).Get(ctx, s.actionHandler)
 	if err != nil {
 		return false
 	}

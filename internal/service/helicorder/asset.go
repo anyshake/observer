@@ -10,8 +10,15 @@ import (
 	"github.com/anyshake/observer/internal/service"
 )
 
-func (s *HelicorderServiceImpl) safeFileAccess(assetId string) (string, error) {
-	absFilePath, err := filepath.Abs(s.filePath)
+func (s *HelicorderServiceImpl) getAssetConfig() (string, string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	return s.filePath, s.imageFormat
+}
+
+func (s *HelicorderServiceImpl) safeFileAccess(baseDir, imageFormat, assetId string) (string, error) {
+	absFilePath, err := filepath.Abs(baseDir)
 	if err != nil {
 		return "", err
 	}
@@ -30,7 +37,7 @@ func (s *HelicorderServiceImpl) safeFileAccess(assetId string) (string, error) {
 		return "", fmt.Errorf("asset %s is not available on %s", assetId, ID)
 	}
 
-	if !strings.EqualFold(filepath.Ext(absAssetIdPath), fmt.Sprintf(".%s", s.imageFormat)) {
+	if !strings.EqualFold(filepath.Ext(absAssetIdPath), fmt.Sprintf(".%s", imageFormat)) {
 		return "", fmt.Errorf("asset %s is not available on %s", assetId, ID)
 	}
 
@@ -56,12 +63,13 @@ func (s *HelicorderServiceImpl) GetAssetList() ([]service.Asset, error) {
 	}
 
 	var assets []service.Asset
-	_ = filepath.Walk(s.filePath, func(path string, info os.FileInfo, err error) error {
+	filePath, imageFormat := s.getAssetConfig()
+	_ = filepath.Walk(filePath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 
-		if !info.IsDir() && (strings.HasSuffix(info.Name(), s.imageFormat)) {
+		if !info.IsDir() && (strings.HasSuffix(info.Name(), imageFormat)) {
 			assets = append(assets, service.Asset{
 				FilePath:   path,
 				FileName:   info.Name(),
@@ -81,7 +89,8 @@ func (s *HelicorderServiceImpl) GetAssetData(assetId string) (*service.AssetData
 		return nil, fmt.Errorf("assets ID %s is not available on %s when service is not running", assetId, ID)
 	}
 
-	absPath, err := s.safeFileAccess(assetId)
+	filePath, imageFormat := s.getAssetConfig()
+	absPath, err := s.safeFileAccess(filePath, imageFormat, assetId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get safe file access for asset %s: %v", assetId, err)
 	}

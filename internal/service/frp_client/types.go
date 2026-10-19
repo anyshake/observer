@@ -7,16 +7,17 @@ import (
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/service"
 	"github.com/anyshake/observer/pkg/timesource"
-	"github.com/fatedier/frp/client"
 )
 
 const ID = "service_frp_client"
 
 type FrpClientServiceImpl struct {
-	mu     sync.Mutex
-	status service.Status
+	lifecycle service.Lifecycle
+	mu        sync.Mutex
+	status    service.Status
 
 	wg              sync.WaitGroup
+	parentCtx       context.Context
 	ctx             context.Context
 	cancelFn        context.CancelFunc
 	timeSource      *timesource.Source
@@ -67,6 +68,4 @@ type FrpClientServiceImpl struct {
 	subdomain string
 	// List of custom domains, this field is available only when useDomainAccess is enabled
 	customDomains []string
-
-	clientObj *client.Service
 }

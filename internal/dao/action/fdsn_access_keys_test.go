@@ -6,6 +6,7 @@ import (
 	"sync"
 	"sync/atomic"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"github.com/anyshake/observer/internal/dao/model"
@@ -236,5 +237,100 @@ func TestFDSNAccessKeyStaleAuditRead(t *testing.T) {
 	}
 	if got := updates.Load(); got != 1 {
 		t.Fatalf("audit updates = %d; want no additional update from the stale read", got)
+	}
+}
+
+func TestFDSNAccessKeyRequestCancellation(t *testing.T) {
+	for _, cancelLeader := range []bool{true, false} {
+		name := "waiting request"
+		if cancelLeader {
+			name = "leading request"
+		}
+		t.Run(name, func(t *testing.T) {
+			db, handler := openActionDB(t)
+			if err := db.AutoMigrate(&model.FDSNAccessKey{}); err != nil {
+				t.Fatal(err)
+			}
+			now := time.Date(2026, 10, 18, 0, 0, 0, 0, time.UTC)
+			record, key, err := handler.FDSNAccessKeyCreate(t.Context(), "cancellation", nil, now)
+			if err != nil {
+				t.Fatal(err)
+			}
+			synctest.Test(t, func(t *testing.T) {
+				type requestID struct{}
+				leaderCtx, cancelFirst := context.WithCancel(context.WithValue(t.Context(), requestID{}, "leader"))
+				defer cancelFirst()
+				waiterCtx, cancelSecond := context.WithCancel(context.WithValue(t.Context(), requestID{}, "waiter"))
+				defer cancelSecond()
+				entered := make(chan struct{})
+				release := make(chan struct{})
+				unblock := sync.OnceFunc(func() { close(release) })
+				defer unblock()
+				var leaderReads, waiterReads atomic.Int32
+				// Replace only the reads so the two requests can deterministically
+				// share an audit flight without depending on database timing.
+				if err := db.Database.Callback().Query().Replace("gorm:query", func(tx *gorm.DB) {
+					destination, ok := tx.Statement.Dest.(*model.FDSNAccessKey)
+					if !ok {
+						tx.AddError(errors.New("unexpected query destination"))
+						return
+					}
+					*destination = record
+					tx.RowsAffected = 1
+					if tx.Statement.Context.Value(requestID{}) == "leader" {
+						if leaderReads.Add(1) == 2 {
+							close(entered)
+							<-release
+							if err := tx.Statement.Context.Err(); err != nil {
+								tx.AddError(err)
+								return
+							}
+							destination.LastRequestedAt = now.UnixMilli()
+						}
+					} else if waiterReads.Add(1) > 1 {
+						destination.LastRequestedAt = now.UnixMilli()
+					}
+				}); err != nil {
+					t.Fatal(err)
+				}
+				first := make(chan error, 1)
+				go func() {
+					_, err := handler.FDSNAccessKeyAuthenticate(leaderCtx, key, "192.0.2.1", "leader", now)
+					first <- err
+				}()
+				<-entered
+				second := make(chan error, 1)
+				go func() {
+					_, err := handler.FDSNAccessKeyAuthenticate(waiterCtx, key, "192.0.2.2", "waiter", now)
+					second <- err
+				}()
+				synctest.Wait()
+				if cancelLeader {
+					cancelFirst()
+					unblock()
+					if err := <-first; !errors.Is(err, context.Canceled) {
+						t.Fatalf("leading request = %v", err)
+					}
+					if err := <-second; err != nil {
+						t.Fatalf("leader cancellation failed the surviving request: %v", err)
+					}
+				} else {
+					cancelSecond()
+					synctest.Wait()
+					select {
+					case err := <-second:
+						if !errors.Is(err, context.Canceled) {
+							t.Fatalf("waiting request = %v", err)
+						}
+					default:
+						t.Fatal("canceled request kept waiting for another request's audit")
+					}
+					unblock()
+					if err := <-first; err != nil {
+						t.Fatalf("waiter cancellation failed the leading request: %v", err)
+					}
+				}
+			})
+		})
 	}
 }

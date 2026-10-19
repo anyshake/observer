@@ -1,7 +1,9 @@
 package seisevent
 
 import (
+	"context"
 	"encoding/json"
+	"slices"
 	"strings"
 	"time"
 
@@ -32,19 +34,19 @@ func (j *JMA_WOLFX) GetProperty() DataSourceProperty {
 	}
 }
 
-func (j *JMA_WOLFX) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (j *JMA_WOLFX) GetEvents(ctx context.Context, latitude, longitude float64) ([]Event, error) {
 	var baseEvents []Event
 
 	if j.cache.Valid() {
 		baseEvents = j.cache.Get()
 	} else {
-		v, err, _ := j.sf.Do(JMA_WOLFX_ID, func() (any, error) {
+		v, err := fetchEvents(ctx, &j.sf, JMA_WOLFX_ID, func(ctx context.Context) ([]Event, error) {
 			if j.cache.Valid() {
 				return j.cache.Get(), nil
 			}
 
 			res, err := request.GET(
-				"https://api.wolfx.jp/jma_eqlist.json",
+				ctx, "https://api.wolfx.jp/jma_eqlist.json",
 				10*time.Second, time.Second, 3, false, nil,
 				map[string]string{"User-Agent": uarand.GetRandom()},
 			)
@@ -98,9 +100,10 @@ func (j *JMA_WOLFX) GetEvents(latitude, longitude float64) ([]Event, error) {
 			return nil, err
 		}
 
-		baseEvents = v.([]Event)
+		baseEvents = v
 	}
 
+	baseEvents = slices.Clone(baseEvents)
 	for i := range baseEvents {
 		baseEvents[i].Distance = getDistance(latitude, baseEvents[i].Latitude, longitude, baseEvents[i].Longitude)
 		baseEvents[i].Estimation = getSeismicEstimation(

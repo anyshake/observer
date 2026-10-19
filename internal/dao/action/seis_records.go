@@ -21,7 +21,7 @@ func (h *Handler) SeisRecordsGetQueryWindow() time.Duration {
 	return time.Hour
 }
 
-func (h *Handler) SeisRecordsCreate(records ...model.SeisRecord) error {
+func (h *Handler) SeisRecordsCreate(ctx context.Context, records ...model.SeisRecord) error {
 	if h.daoObj == nil {
 		return errors.New("database is not opened")
 	}
@@ -36,7 +36,7 @@ func (h *Handler) SeisRecordsCreate(records ...model.SeisRecord) error {
 	for day, group := range groupedRecords {
 		tableName := fmt.Sprintf("%sseis_records_%d", h.daoObj.GetPrefix(), day%model.SEIS_RECORD_SHARDS)
 
-		if err := h.daoObj.Database.Table(tableName).Create(&group).Error; err != nil {
+		if err := h.daoObj.Database.WithContext(ctx).Table(tableName).Create(&group).Error; err != nil {
 			return fmt.Errorf("failed to insert records for day %d: %w", day, err)
 		}
 	}
@@ -44,9 +44,9 @@ func (h *Handler) SeisRecordsCreate(records ...model.SeisRecord) error {
 	return nil
 }
 
-func (h *Handler) SeisRecordsQuery(startTime, endTime time.Time) ([]model.SeisRecord, error) {
+func (h *Handler) SeisRecordsQuery(ctx context.Context, startTime, endTime time.Time) ([]model.SeisRecord, error) {
 	var records []model.SeisRecord
-	err := h.SeisRecordsQueryEach(startTime, endTime, func(record model.SeisRecord) error {
+	err := h.SeisRecordsQueryEach(ctx, startTime, endTime, func(record model.SeisRecord) error {
 		records = append(records, record)
 		return nil
 	})
@@ -56,11 +56,7 @@ func (h *Handler) SeisRecordsQuery(startTime, endTime time.Time) ([]model.SeisRe
 	return records, nil
 }
 
-func (h *Handler) SeisRecordsQueryEach(startTime, endTime time.Time, callback func(model.SeisRecord) error) error {
-	return h.SeisRecordsQueryEachContext(context.Background(), startTime, endTime, callback)
-}
-
-func (h *Handler) SeisRecordsQueryEachContext(ctx context.Context, startTime, endTime time.Time, callback func(model.SeisRecord) error) error {
+func (h *Handler) SeisRecordsQueryEach(ctx context.Context, startTime, endTime time.Time, callback func(model.SeisRecord) error) error {
 	if h.daoObj == nil {
 		return errors.New("database is not opened")
 	}
@@ -100,6 +96,9 @@ func (h *Handler) SeisRecordsQueryEachContext(ctx context.Context, startTime, en
 		queryErr := func() error {
 			defer rows.Close()
 			for rows.Next() {
+				if err := ctx.Err(); err != nil {
+					return err
+				}
 				var record model.SeisRecord
 				if err := rows.Scan(
 					&record.PrimaryKey,
@@ -129,7 +128,7 @@ func (h *Handler) SeisRecordsQueryEachContext(ctx context.Context, startTime, en
 	return nil
 }
 
-func (h *Handler) SeisRecordsPurge(startTime, endTime time.Time) error {
+func (h *Handler) SeisRecordsPurge(ctx context.Context, startTime, endTime time.Time) error {
 	if h.daoObj == nil {
 		return errors.New("database is not opened")
 	}
@@ -138,23 +137,23 @@ func (h *Handler) SeisRecordsPurge(startTime, endTime time.Time) error {
 		return errors.New("start time is after end time")
 	}
 
-	return h.CleanupExclusive(func() error {
-		return h.seisRecordsPurgeRange(startTime, endTime)
+	return h.CleanupExclusive(ctx, func() error {
+		return h.seisRecordsPurgeRange(ctx, startTime, endTime)
 	})
 }
 
-func (h *Handler) SeisRecordsPurgeAll() error {
+func (h *Handler) SeisRecordsPurgeAll(ctx context.Context) error {
 	if h.daoObj == nil {
 		return errors.New("database is not opened")
 	}
 
-	return h.CleanupExclusive(func() error {
-		return h.seisRecordsForEachShard(func(tableName string) error {
-			if err := h.seisRecordsEnsureTable(tableName); err != nil {
+	return h.CleanupExclusive(ctx, func() error {
+		return h.seisRecordsForEachShard(ctx, func(tableName string) error {
+			if err := h.seisRecordsEnsureTable(ctx, tableName); err != nil {
 				return fmt.Errorf("failed to ensure seismic waveform records table %s: %w", tableName, err)
 			}
 
-			if err := h.seisRecordsDeleteAll(tableName); err != nil {
+			if err := h.seisRecordsDeleteAll(ctx, tableName); err != nil {
 				return fmt.Errorf("failed to purge seismic waveform records table %s: %w", tableName, err)
 			}
 
@@ -163,8 +162,9 @@ func (h *Handler) SeisRecordsPurgeAll() error {
 	})
 }
 
-func (h *Handler) seisRecordsEnsureTable(tableName string) error {
+func (h *Handler) seisRecordsEnsureTable(ctx context.Context, tableName string) error {
 	tx := h.daoObj.Database.
+		WithContext(ctx).
 		Session(&gorm.Session{}).
 		Set(sharding.ShardingIgnoreStoreKey, nil).
 		Table(tableName)
@@ -176,26 +176,28 @@ func (h *Handler) seisRecordsEnsureTable(tableName string) error {
 	return tx.AutoMigrate(&model.SeisRecord{})
 }
 
-func (h *Handler) seisRecordsDeleteAll(tableName string) error {
+func (h *Handler) seisRecordsDeleteAll(ctx context.Context, tableName string) error {
 	quotedTableName, err := h.quoteSQLIdentifier(tableName)
 	if err != nil {
 		return err
 	}
 
 	return h.daoObj.Database.
+		WithContext(ctx).
 		Session(&gorm.Session{}).
 		Set(sharding.ShardingIgnoreStoreKey, nil).
 		Exec(fmt.Sprintf("DELETE FROM %s", quotedTableName)).
 		Error
 }
 
-func (h *Handler) seisRecordsPurgeRange(startTime, endTime time.Time) error {
-	return h.seisRecordsForEachShard(func(tableName string) error {
-		if err := h.seisRecordsEnsureTable(tableName); err != nil {
+func (h *Handler) seisRecordsPurgeRange(ctx context.Context, startTime, endTime time.Time) error {
+	return h.seisRecordsForEachShard(ctx, func(tableName string) error {
+		if err := h.seisRecordsEnsureTable(ctx, tableName); err != nil {
 			return fmt.Errorf("failed to ensure seismic waveform records table %s: %w", tableName, err)
 		}
 
 		err := h.daoObj.Database.
+			WithContext(ctx).
 			Session(&gorm.Session{}).
 			Set(sharding.ShardingIgnoreStoreKey, nil).
 			Table(tableName).
@@ -237,15 +239,23 @@ func (h *Handler) quoteSQLIdentifier(identifier string) (string, error) {
 	return quoted.String(), nil
 }
 
-func (h *Handler) seisRecordsForEachShard(fn func(tableName string) error) error {
+func (h *Handler) seisRecordsForEachShard(ctx context.Context, fn func(tableName string) error) error {
 	sem := make(chan struct{}, h.seisRecordsPurgeConcurrency())
 	errs := make(chan error, model.SEIS_RECORD_SHARDS)
 
 	var wg sync.WaitGroup
+shards:
 	for i := 0; i < model.SEIS_RECORD_SHARDS; i++ {
+		if ctx.Err() != nil {
+			break
+		}
 		tableName := fmt.Sprintf("%sseis_records_%d", h.daoObj.GetPrefix(), i)
 
-		sem <- struct{}{}
+		select {
+		case sem <- struct{}{}:
+		case <-ctx.Done():
+			break shards
+		}
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -259,7 +269,7 @@ func (h *Handler) seisRecordsForEachShard(fn func(tableName string) error) error
 	wg.Wait()
 	close(errs)
 
-	var joinedErr error
+	joinedErr := ctx.Err()
 	for err := range errs {
 		joinedErr = errors.Join(joinedErr, err)
 	}

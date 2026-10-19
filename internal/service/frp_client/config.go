@@ -1,6 +1,7 @@
 package frp_client
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -25,24 +26,24 @@ func (s *frpClientConfigEnabledImpl) GetDefaultValue() any        { return false
 func (s *frpClientConfigEnabledImpl) GetDescription() string {
 	return "Enable FRP client service to enable public access to Observer web interface via custom domain."
 }
-func (s *frpClientConfigEnabledImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *frpClientConfigEnabledImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default FRP client service availability: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigEnabledImpl) Set(handler *action.Handler, newVal any) error {
+func (s *frpClientConfigEnabledImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	enabled, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
 		return fmt.Errorf("failed to set FRP client service availability: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigEnabledImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get FRP client service availability: %w", err)
 	}
@@ -52,8 +53,8 @@ func (s *frpClientConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
 	}
 	return enabled, nil
 }
-func (s *frpClientConfigEnabledImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *frpClientConfigEnabledImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset FRP client service availability: %w", err)
 	}
 	return nil
@@ -72,22 +73,22 @@ func (s *frpClientConfigServerAddrImpl) GetDefaultValue() any        { return "a
 func (s *frpClientConfigServerAddrImpl) GetDescription() string {
 	return "The address of the FRP server to connect to."
 }
-func (s *frpClientConfigServerAddrImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *frpClientConfigServerAddrImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default FRP client server address: %w", err)
 	}
 
-	if currentVal, _, ver, err := handler.SettingsGet(s.GetNamespace(), s.GetKey());
+	if currentVal, _, ver, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey());
 	// migrate to new domain
 	err == nil && ver == 0 && currentVal == "anyshake.ip-ddns.com" {
-		if err = s.Set(handler, s.GetDefaultValue()); err != nil {
+		if err = s.Set(ctx, handler, s.GetDefaultValue()); err != nil {
 			return fmt.Errorf("failed to migrate server address: %w", err)
 		}
 	}
 
 	return nil
 }
-func (s *frpClientConfigServerAddrImpl) Set(handler *action.Handler, newVal any) error {
+func (s *frpClientConfigServerAddrImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	addr, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
@@ -95,13 +96,13 @@ func (s *frpClientConfigServerAddrImpl) Set(handler *action.Handler, newVal any)
 	if addr == "" {
 		return errors.New("server address cannot be empty")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), addr); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), addr); err != nil {
 		return fmt.Errorf("failed to set server address: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigServerAddrImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigServerAddrImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get server address: %w", err)
 	}
@@ -111,8 +112,8 @@ func (s *frpClientConfigServerAddrImpl) Get(handler *action.Handler) (any, error
 	}
 	return addr, nil
 }
-func (s *frpClientConfigServerAddrImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *frpClientConfigServerAddrImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset server address: %w", err)
 	}
 	return nil
@@ -131,13 +132,13 @@ func (s *frpClientConfigServerPortImpl) GetDefaultValue() any        { return 44
 func (s *frpClientConfigServerPortImpl) GetDescription() string {
 	return "The port on which the FRP server is listening."
 }
-func (s *frpClientConfigServerPortImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *frpClientConfigServerPortImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default FRP client server port: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigServerPortImpl) Set(handler *action.Handler, newVal any) error {
+func (s *frpClientConfigServerPortImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	port, err := config.GetConfigValInt64(newVal)
 	if err != nil {
 		return err
@@ -145,13 +146,13 @@ func (s *frpClientConfigServerPortImpl) Set(handler *action.Handler, newVal any)
 	if port < 1 || port > 65535 {
 		return errors.New("server port must be between 1 and 65535")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), port); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), port); err != nil {
 		return fmt.Errorf("failed to set server port: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigServerPortImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigServerPortImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get server port: %w", err)
 	}
@@ -161,8 +162,8 @@ func (s *frpClientConfigServerPortImpl) Get(handler *action.Handler) (any, error
 	}
 	return port, nil
 }
-func (s *frpClientConfigServerPortImpl) Restore(handler *action.Handler) error {
-	err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigServerPortImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 	if err != nil {
 		return fmt.Errorf("failed to reset server port: %w", err)
 	}
@@ -188,22 +189,22 @@ func (s *frpClientConfigDisableCustomTLSFirstByteImpl) GetDefaultValue() any    
 func (s *frpClientConfigDisableCustomTLSFirstByteImpl) GetDescription() string {
 	return "Disable the custom first byte when using TLS."
 }
-func (s *frpClientConfigDisableCustomTLSFirstByteImpl) Init(handler *action.Handler) error {
-	_, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigDisableCustomTLSFirstByteImpl) Init(ctx context.Context, handler *action.Handler) error {
+	_, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 	if err != nil {
 		return fmt.Errorf("failed to init disable_custom_tls_first_byte: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigDisableCustomTLSFirstByteImpl) Set(handler *action.Handler, newVal any) error {
+func (s *frpClientConfigDisableCustomTLSFirstByteImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	b, ok := newVal.(bool)
 	if !ok {
 		return errors.New("value must be a boolean")
 	}
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), b)
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), b)
 }
-func (s *frpClientConfigDisableCustomTLSFirstByteImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigDisableCustomTLSFirstByteImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get disable_custom_tls_first_byte: %w", err)
 	}
@@ -213,8 +214,8 @@ func (s *frpClientConfigDisableCustomTLSFirstByteImpl) Get(handler *action.Handl
 	}
 	return b, nil
 }
-func (s *frpClientConfigDisableCustomTLSFirstByteImpl) Restore(handler *action.Handler) error {
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigDisableCustomTLSFirstByteImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 type frpClientConfigKeyFileImpl struct{}
@@ -230,22 +231,22 @@ func (s *frpClientConfigKeyFileImpl) GetDefaultValue() any        { return "" }
 func (s *frpClientConfigKeyFileImpl) GetDescription() string {
 	return "Path of the secret key file that FRP client will load."
 }
-func (s *frpClientConfigKeyFileImpl) Init(handler *action.Handler) error {
-	_, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigKeyFileImpl) Init(ctx context.Context, handler *action.Handler) error {
+	_, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 	if err != nil {
 		return fmt.Errorf("failed to init key_file: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigKeyFileImpl) Set(handler *action.Handler, newVal any) error {
+func (s *frpClientConfigKeyFileImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	k, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
 	}
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), k)
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), k)
 }
-func (s *frpClientConfigKeyFileImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigKeyFileImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get key_file: %w", err)
 	}
@@ -255,8 +256,8 @@ func (s *frpClientConfigKeyFileImpl) Get(handler *action.Handler) (any, error) {
 	}
 	return b, nil
 }
-func (s *frpClientConfigKeyFileImpl) Restore(handler *action.Handler) error {
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigKeyFileImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 type frpClientConfigCertFileImpl struct{}
@@ -272,22 +273,22 @@ func (s *frpClientConfigCertFileImpl) GetDefaultValue() any        { return "" }
 func (s *frpClientConfigCertFileImpl) GetDescription() string {
 	return "Path of the cert file that FRP client will load."
 }
-func (s *frpClientConfigCertFileImpl) Init(handler *action.Handler) error {
-	_, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigCertFileImpl) Init(ctx context.Context, handler *action.Handler) error {
+	_, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 	if err != nil {
 		return fmt.Errorf("failed to init cert_file: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigCertFileImpl) Set(handler *action.Handler, newVal any) error {
+func (s *frpClientConfigCertFileImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	k, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
 	}
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), k)
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), k)
 }
-func (s *frpClientConfigCertFileImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigCertFileImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get cert_file: %w", err)
 	}
@@ -297,8 +298,8 @@ func (s *frpClientConfigCertFileImpl) Get(handler *action.Handler) (any, error) 
 	}
 	return b, nil
 }
-func (s *frpClientConfigCertFileImpl) Restore(handler *action.Handler) error {
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigCertFileImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 type frpClientConfigTrustedCaFileImpl struct{}
@@ -314,22 +315,22 @@ func (s *frpClientConfigTrustedCaFileImpl) GetDefaultValue() any        { return
 func (s *frpClientConfigTrustedCaFileImpl) GetDescription() string {
 	return "Path of the trusted CA file that FRP client will load."
 }
-func (s *frpClientConfigTrustedCaFileImpl) Init(handler *action.Handler) error {
-	_, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigTrustedCaFileImpl) Init(ctx context.Context, handler *action.Handler) error {
+	_, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 	if err != nil {
 		return fmt.Errorf("failed to init trusted_ca_file: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigTrustedCaFileImpl) Set(handler *action.Handler, newVal any) error {
+func (s *frpClientConfigTrustedCaFileImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	k, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
 	}
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), k)
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), k)
 }
-func (s *frpClientConfigTrustedCaFileImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigTrustedCaFileImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get trusted_ca_file: %w", err)
 	}
@@ -339,8 +340,8 @@ func (s *frpClientConfigTrustedCaFileImpl) Get(handler *action.Handler) (any, er
 	}
 	return b, nil
 }
-func (s *frpClientConfigTrustedCaFileImpl) Restore(handler *action.Handler) error {
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigTrustedCaFileImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 type frpClientConfigTlsServerNameImpl struct{}
@@ -356,22 +357,22 @@ func (s *frpClientConfigTlsServerNameImpl) GetDefaultValue() any        { return
 func (s *frpClientConfigTlsServerNameImpl) GetDescription() string {
 	return "TLS Server Name specifies the custom server name of tls certificate. By default, server name if same to Server Addr."
 }
-func (s *frpClientConfigTlsServerNameImpl) Init(handler *action.Handler) error {
-	_, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigTlsServerNameImpl) Init(ctx context.Context, handler *action.Handler) error {
+	_, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 	if err != nil {
 		return fmt.Errorf("failed to init tls_server_name: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigTlsServerNameImpl) Set(handler *action.Handler, newVal any) error {
+func (s *frpClientConfigTlsServerNameImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	k, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
 	}
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), k)
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), k)
 }
-func (s *frpClientConfigTlsServerNameImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigTlsServerNameImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get tls_server_name: %w", err)
 	}
@@ -381,8 +382,8 @@ func (s *frpClientConfigTlsServerNameImpl) Get(handler *action.Handler) (any, er
 	}
 	return b, nil
 }
-func (s *frpClientConfigTlsServerNameImpl) Restore(handler *action.Handler) error {
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigTlsServerNameImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 type frpClientConfigUserImpl struct{}
@@ -398,22 +399,22 @@ func (s *frpClientConfigUserImpl) GetDefaultValue() any        { return "" }
 func (s *frpClientConfigUserImpl) GetDescription() string {
 	return "User field as prefix in proxy name for distinguishing proxies."
 }
-func (s *frpClientConfigUserImpl) Init(handler *action.Handler) error {
-	_, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigUserImpl) Init(ctx context.Context, handler *action.Handler) error {
+	_, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 	if err != nil {
 		return fmt.Errorf("failed to init user: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigUserImpl) Set(handler *action.Handler, newVal any) error {
+func (s *frpClientConfigUserImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	user, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
 	}
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), user)
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), user)
 }
-func (s *frpClientConfigUserImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigUserImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
@@ -423,8 +424,8 @@ func (s *frpClientConfigUserImpl) Get(handler *action.Handler) (any, error) {
 	}
 	return user, nil
 }
-func (s *frpClientConfigUserImpl) Restore(handler *action.Handler) error {
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigUserImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 type frpClientConfigTokenImpl struct{}
@@ -440,21 +441,21 @@ func (s *frpClientConfigTokenImpl) GetDefaultValue() any        { return "anysha
 func (s *frpClientConfigTokenImpl) GetDescription() string {
 	return "Authentication token used to validate client connection with the server."
 }
-func (s *frpClientConfigTokenImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *frpClientConfigTokenImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default FRP client token: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigTokenImpl) Set(h *action.Handler, v any) error {
+func (s *frpClientConfigTokenImpl) Set(ctx context.Context, h *action.Handler, v any) error {
 	str, err := config.GetConfigValString(v)
 	if err != nil {
 		return errors.New("token must be a string")
 	}
-	return h.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), str)
+	return h.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), str)
 }
-func (s *frpClientConfigTokenImpl) Get(h *action.Handler) (any, error) {
-	val, _, _, err := h.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigTokenImpl) Get(ctx context.Context, h *action.Handler) (any, error) {
+	val, _, _, err := h.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get token: %w", err)
 	}
@@ -464,8 +465,8 @@ func (s *frpClientConfigTokenImpl) Get(h *action.Handler) (any, error) {
 	}
 	return str, nil
 }
-func (s *frpClientConfigTokenImpl) Restore(h *action.Handler) error {
-	return h.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigTokenImpl) Restore(ctx context.Context, h *action.Handler) error {
+	return h.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 type frpClientConfigPoolCountImpl struct{}
@@ -481,13 +482,13 @@ func (s *frpClientConfigPoolCountImpl) GetDefaultValue() any        { return 5 }
 func (s *frpClientConfigPoolCountImpl) GetDescription() string {
 	return "Number of connections to keep in the pool for each proxy."
 }
-func (s *frpClientConfigPoolCountImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *frpClientConfigPoolCountImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default pool_count: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigPoolCountImpl) Set(h *action.Handler, v any) error {
+func (s *frpClientConfigPoolCountImpl) Set(ctx context.Context, h *action.Handler, v any) error {
 	i, err := config.GetConfigValInt64(v)
 	if err != nil {
 		return err
@@ -495,10 +496,10 @@ func (s *frpClientConfigPoolCountImpl) Set(h *action.Handler, v any) error {
 	if i < 0 {
 		return errors.New("pool_count must be a non-negative integer")
 	}
-	return h.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), i)
+	return h.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), i)
 }
-func (s *frpClientConfigPoolCountImpl) Get(h *action.Handler) (any, error) {
-	val, _, _, err := h.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigPoolCountImpl) Get(ctx context.Context, h *action.Handler) (any, error) {
+	val, _, _, err := h.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get pool_count: %w", err)
 	}
@@ -508,8 +509,8 @@ func (s *frpClientConfigPoolCountImpl) Get(h *action.Handler) (any, error) {
 	}
 	return i, nil
 }
-func (s *frpClientConfigPoolCountImpl) Restore(h *action.Handler) error {
-	return h.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigPoolCountImpl) Restore(ctx context.Context, h *action.Handler) error {
+	return h.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 type frpClientConfigTcpMuxImpl struct{}
@@ -525,21 +526,21 @@ func (s *frpClientConfigTcpMuxImpl) GetDefaultValue() any        { return true }
 func (s *frpClientConfigTcpMuxImpl) GetDescription() string {
 	return "Enable TCP stream multiplexing for efficient connection reuse."
 }
-func (s *frpClientConfigTcpMuxImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *frpClientConfigTcpMuxImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default tcp_mux: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigTcpMuxImpl) Set(h *action.Handler, v any) error {
+func (s *frpClientConfigTcpMuxImpl) Set(ctx context.Context, h *action.Handler, v any) error {
 	b, err := config.GetConfigValBool(v)
 	if err != nil {
 		return err
 	}
-	return h.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), b)
+	return h.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), b)
 }
-func (s *frpClientConfigTcpMuxImpl) Get(h *action.Handler) (any, error) {
-	val, _, _, err := h.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigTcpMuxImpl) Get(ctx context.Context, h *action.Handler) (any, error) {
+	val, _, _, err := h.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get tcp_mux: %w", err)
 	}
@@ -549,8 +550,8 @@ func (s *frpClientConfigTcpMuxImpl) Get(h *action.Handler) (any, error) {
 	}
 	return b, nil
 }
-func (s *frpClientConfigTcpMuxImpl) Restore(h *action.Handler) error {
-	return h.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigTcpMuxImpl) Restore(ctx context.Context, h *action.Handler) error {
+	return h.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 type frpClientConfigTlsEnableImpl struct{}
@@ -566,21 +567,21 @@ func (s *frpClientConfigTlsEnableImpl) GetDefaultValue() any        { return tru
 func (s *frpClientConfigTlsEnableImpl) GetDescription() string {
 	return "Enable TLS encryption for control connection."
 }
-func (s *frpClientConfigTlsEnableImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *frpClientConfigTlsEnableImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default tls_enable: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigTlsEnableImpl) Set(h *action.Handler, v any) error {
+func (s *frpClientConfigTlsEnableImpl) Set(ctx context.Context, h *action.Handler, v any) error {
 	b, err := config.GetConfigValBool(v)
 	if err != nil {
 		return err
 	}
-	return h.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), b)
+	return h.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), b)
 }
-func (s *frpClientConfigTlsEnableImpl) Get(h *action.Handler) (any, error) {
-	val, _, _, err := h.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigTlsEnableImpl) Get(ctx context.Context, h *action.Handler) (any, error) {
+	val, _, _, err := h.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get tls_enable: %w", err)
 	}
@@ -590,8 +591,8 @@ func (s *frpClientConfigTlsEnableImpl) Get(h *action.Handler) (any, error) {
 	}
 	return b, nil
 }
-func (s *frpClientConfigTlsEnableImpl) Restore(h *action.Handler) error {
-	return h.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigTlsEnableImpl) Restore(ctx context.Context, h *action.Handler) error {
+	return h.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 type frpClientConfigProtocolImpl struct{}
@@ -615,13 +616,13 @@ func (s *frpClientConfigProtocolImpl) GetDefaultValue() any { return "wss" }
 func (s *frpClientConfigProtocolImpl) GetDescription() string {
 	return "Protocol used to communicate with the server."
 }
-func (s *frpClientConfigProtocolImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *frpClientConfigProtocolImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default protocol: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigProtocolImpl) Set(h *action.Handler, v any) error {
+func (s *frpClientConfigProtocolImpl) Set(ctx context.Context, h *action.Handler, v any) error {
 	str, err := config.GetConfigValString(v)
 	if err != nil {
 		return err
@@ -629,10 +630,10 @@ func (s *frpClientConfigProtocolImpl) Set(h *action.Handler, v any) error {
 	if str != "tcp" && str != "kcp" && str != "websocket" && str != "wss" && str != "quic" {
 		return errors.New("protocol must be one of TCP, KCP, WebSocket, WebSocket Secure or QUIC")
 	}
-	return h.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), str)
+	return h.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), str)
 }
-func (s *frpClientConfigProtocolImpl) Get(h *action.Handler) (any, error) {
-	val, _, _, err := h.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigProtocolImpl) Get(ctx context.Context, h *action.Handler) (any, error) {
+	val, _, _, err := h.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get protocol: %w", err)
 	}
@@ -642,8 +643,8 @@ func (s *frpClientConfigProtocolImpl) Get(h *action.Handler) (any, error) {
 	}
 	return str, nil
 }
-func (s *frpClientConfigProtocolImpl) Restore(h *action.Handler) error {
-	return h.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigProtocolImpl) Restore(ctx context.Context, h *action.Handler) error {
+	return h.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 type frpClientConfigProxyNameImpl struct{}
@@ -665,13 +666,13 @@ func (s *frpClientConfigProxyNameImpl) GetDefaultValue() any {
 func (s *frpClientConfigProxyNameImpl) GetDescription() string {
 	return "Unique name for the proxy instance."
 }
-func (s *frpClientConfigProxyNameImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *frpClientConfigProxyNameImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default proxy_name: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigProxyNameImpl) Set(handler *action.Handler, newVal any) error {
+func (s *frpClientConfigProxyNameImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	val, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
@@ -679,10 +680,10 @@ func (s *frpClientConfigProxyNameImpl) Set(handler *action.Handler, newVal any) 
 	if val == "" {
 		return errors.New("proxy name cannot be empty")
 	}
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), val)
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), val)
 }
-func (s *frpClientConfigProxyNameImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigProxyNameImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get proxy_name: %w", err)
 	}
@@ -692,8 +693,8 @@ func (s *frpClientConfigProxyNameImpl) Get(handler *action.Handler) (any, error)
 	}
 	return proxyName, nil
 }
-func (s *frpClientConfigProxyNameImpl) Restore(handler *action.Handler) error {
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigProxyNameImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 type frpClientConfigUseEncryptionImpl struct{}
@@ -709,21 +710,21 @@ func (s *frpClientConfigUseEncryptionImpl) GetDefaultValue() any        { return
 func (s *frpClientConfigUseEncryptionImpl) GetDescription() string {
 	return "Enable encryption for the proxy traffic."
 }
-func (s *frpClientConfigUseEncryptionImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *frpClientConfigUseEncryptionImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default use_encryption: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigUseEncryptionImpl) Set(handler *action.Handler, newVal any) error {
+func (s *frpClientConfigUseEncryptionImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	val, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), val)
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), val)
 }
-func (s *frpClientConfigUseEncryptionImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigUseEncryptionImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get use_encryption: %w", err)
 	}
@@ -733,8 +734,8 @@ func (s *frpClientConfigUseEncryptionImpl) Get(handler *action.Handler) (any, er
 	}
 	return encrypt, nil
 }
-func (s *frpClientConfigUseEncryptionImpl) Restore(handler *action.Handler) error {
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigUseEncryptionImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 type frpClientConfigUseCompressionImpl struct{}
@@ -750,21 +751,21 @@ func (s *frpClientConfigUseCompressionImpl) GetDefaultValue() any        { retur
 func (s *frpClientConfigUseCompressionImpl) GetDescription() string {
 	return "Enable compression for the proxy traffic."
 }
-func (s *frpClientConfigUseCompressionImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *frpClientConfigUseCompressionImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default use_compression: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigUseCompressionImpl) Set(handler *action.Handler, newVal any) error {
+func (s *frpClientConfigUseCompressionImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	val, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), val)
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), val)
 }
-func (s *frpClientConfigUseCompressionImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigUseCompressionImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get use_compression: %w", err)
 	}
@@ -774,8 +775,8 @@ func (s *frpClientConfigUseCompressionImpl) Get(handler *action.Handler) (any, e
 	}
 	return compress, nil
 }
-func (s *frpClientConfigUseCompressionImpl) Restore(handler *action.Handler) error {
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigUseCompressionImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 type frpClientConfigUseDomainAccessImpl struct{}
@@ -791,21 +792,21 @@ func (s *frpClientConfigUseDomainAccessImpl) GetDefaultValue() any        { retu
 func (s *frpClientConfigUseDomainAccessImpl) GetDescription() string {
 	return "Enable domain access for the proxy traffic. If enabled, the proxy will be accessible via subdomain or custom domains."
 }
-func (s *frpClientConfigUseDomainAccessImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *frpClientConfigUseDomainAccessImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default use_domain_access: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigUseDomainAccessImpl) Set(handler *action.Handler, newVal any) error {
+func (s *frpClientConfigUseDomainAccessImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	val, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), val)
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), val)
 }
-func (s *frpClientConfigUseDomainAccessImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigUseDomainAccessImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get use_domain_access: %w", err)
 	}
@@ -815,8 +816,8 @@ func (s *frpClientConfigUseDomainAccessImpl) Get(handler *action.Handler) (any, 
 	}
 	return domainAccess, nil
 }
-func (s *frpClientConfigUseDomainAccessImpl) Restore(handler *action.Handler) error {
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigUseDomainAccessImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 type frpClientConfigRemoteOutboundPortImpl struct{}
@@ -835,13 +836,13 @@ func (s *frpClientConfigRemoteOutboundPortImpl) GetDefaultValue() any {
 func (s *frpClientConfigRemoteOutboundPortImpl) GetDescription() string {
 	return "Remote outbound port for the proxy traffic, this field is available only when domain mode is disabled."
 }
-func (s *frpClientConfigRemoteOutboundPortImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *frpClientConfigRemoteOutboundPortImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default remote_outbound_port: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigRemoteOutboundPortImpl) Set(handler *action.Handler, newVal any) error {
+func (s *frpClientConfigRemoteOutboundPortImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	val, err := config.GetConfigValInt64(newVal)
 	if err != nil {
 		return err
@@ -849,10 +850,10 @@ func (s *frpClientConfigRemoteOutboundPortImpl) Set(handler *action.Handler, new
 	if val < 1 || val > 65535 {
 		return errors.New("remote outbound port must be between 1 and 65535")
 	}
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), val)
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), val)
 }
-func (s *frpClientConfigRemoteOutboundPortImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigRemoteOutboundPortImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get remote_outbound_port: %w", err)
 	}
@@ -862,8 +863,8 @@ func (s *frpClientConfigRemoteOutboundPortImpl) Get(handler *action.Handler) (an
 	}
 	return remoteOutboundPort, nil
 }
-func (s *frpClientConfigRemoteOutboundPortImpl) Restore(handler *action.Handler) error {
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigRemoteOutboundPortImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 type frpClientConfigSubdomainImpl struct{}
@@ -885,21 +886,21 @@ func (s *frpClientConfigSubdomainImpl) GetDefaultValue() any {
 func (s *frpClientConfigSubdomainImpl) GetDescription() string {
 	return "Subdomain to bind for this proxy, this field is available only when domain mode is enabled."
 }
-func (s *frpClientConfigSubdomainImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *frpClientConfigSubdomainImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default subdomain: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigSubdomainImpl) Set(handler *action.Handler, newVal any) error {
+func (s *frpClientConfigSubdomainImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	val, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
 	}
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), val)
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), val)
 }
-func (s *frpClientConfigSubdomainImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigSubdomainImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get subdomain: %w", err)
 	}
@@ -909,8 +910,8 @@ func (s *frpClientConfigSubdomainImpl) Get(handler *action.Handler) (any, error)
 	}
 	return subdomain, nil
 }
-func (s *frpClientConfigSubdomainImpl) Restore(handler *action.Handler) error {
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigSubdomainImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 type frpClientConfigCustomDomainsImpl struct{}
@@ -926,21 +927,21 @@ func (s *frpClientConfigCustomDomainsImpl) GetDefaultValue() any        { return
 func (s *frpClientConfigCustomDomainsImpl) GetDescription() string {
 	return "List of custom domains to bind for this proxy, this field is available only when domain mode is enabled."
 }
-func (s *frpClientConfigCustomDomainsImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *frpClientConfigCustomDomainsImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default custom_domains: %w", err)
 	}
 	return nil
 }
-func (s *frpClientConfigCustomDomainsImpl) Set(handler *action.Handler, newVal any) error {
+func (s *frpClientConfigCustomDomainsImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	val, err := config.GetConfigValStringArray(newVal)
 	if err != nil {
 		return err
 	}
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), val)
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), val)
 }
-func (s *frpClientConfigCustomDomainsImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *frpClientConfigCustomDomainsImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get custom_domains: %w", err)
 	}
@@ -950,8 +951,8 @@ func (s *frpClientConfigCustomDomainsImpl) Get(handler *action.Handler) (any, er
 	}
 	return customDomains, nil
 }
-func (s *frpClientConfigCustomDomainsImpl) Restore(handler *action.Handler) error {
-	return handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
+func (s *frpClientConfigCustomDomainsImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	return handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue())
 }
 
 func (s *FrpClientServiceImpl) GetConfigConstraint() []config.IConstraint {

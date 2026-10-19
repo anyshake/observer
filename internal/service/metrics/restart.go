@@ -1,19 +1,26 @@
 package metrics
 
-import "fmt"
+import (
+	"context"
+	"fmt"
+)
 
-func (s *MetricsServiceImpl) Restart() error {
+func (s *MetricsServiceImpl) Restart(ctx context.Context) error {
 	defer s.status.IncrementRestarts()
 
-	if err := s.Stop(); err != nil {
+	if err := s.Stop(ctx); err != nil {
 		return fmt.Errorf("restart failed when stopping service: %w", err)
 	}
 
-	if err := s.Init(); err != nil {
+	if err := s.Init(ctx); err != nil {
 		return fmt.Errorf("restart failed when initializing service: %w", err)
 	}
 
-	if err := s.Start(); err != nil {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
+	if err := s.Start(ctx); err != nil {
 		return fmt.Errorf("restart failed when starting service: %w", err)
 	}
 

@@ -66,6 +66,7 @@ func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, jwtMiddl
 				response.Data(c, code, msg, res)
 			case "login":
 				code, userId, err := h.login(
+					c.Request.Context(),
 					requestModel.Session,
 					requestModel.Secret,
 					requestModel.Nonce,

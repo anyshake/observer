@@ -9,7 +9,7 @@ import (
 func TestDeviceConfigAccessors(t *testing.T) {
 	t.Parallel()
 
-	var config DeviceConfig
+	config := &DeviceConfig{}
 	if config.GetPacketInterval() != 0 || config.GetSampleRate() != 0 || config.GetGnssAvailability() || config.GetModel() != "" || config.GetProtocol() != "" || config.GetChannelCodes() != nil {
 		t.Fatalf("zero config = %#v", config)
 	}
@@ -41,7 +41,7 @@ func TestDeviceConfigAccessors(t *testing.T) {
 func TestDeviceStatusAccessors(t *testing.T) {
 	t.Parallel()
 
-	var status DeviceStatus
+	status := &DeviceStatus{}
 	if !status.GetStartedAt().IsZero() || !status.GetUpdatedAt().IsZero() || status.GetFrames() != 0 || status.GetErrors() != 0 || status.GetMessages() != 0 {
 		t.Fatalf("zero status = %#v", status)
 	}

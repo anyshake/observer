@@ -1,6 +1,7 @@
 package updater
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -22,24 +23,24 @@ func (s *updaterConfigEnabledImpl) GetDefaultValue() any        { return false }
 func (s *updaterConfigEnabledImpl) GetDescription() string {
 	return "Once enabled, the software will automatically download and apply updates in the background, and complete the upgrade upon the next startup."
 }
-func (s *updaterConfigEnabledImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *updaterConfigEnabledImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default updater service availability: %w", err)
 	}
 	return nil
 }
-func (s *updaterConfigEnabledImpl) Set(handler *action.Handler, newVal any) error {
+func (s *updaterConfigEnabledImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	enabled, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
 		return fmt.Errorf("failed to set updater service availability: %w", err)
 	}
 	return nil
 }
-func (s *updaterConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *updaterConfigEnabledImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get updater service availability: %w", err)
 	}
@@ -49,8 +50,8 @@ func (s *updaterConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
 	}
 	return enabled, nil
 }
-func (s *updaterConfigEnabledImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *updaterConfigEnabledImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset updater service availability: %w", err)
 	}
 	return nil
@@ -71,24 +72,24 @@ func (s *updaterConfigReleaseFetchUrlImpl) GetDefaultValue() any {
 func (s *updaterConfigReleaseFetchUrlImpl) GetDescription() string {
 	return "Specify the base URL used to fetch the latest upgrade package. By default, it points to the AnyShake GitHub Releases page."
 }
-func (s *updaterConfigReleaseFetchUrlImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *updaterConfigReleaseFetchUrlImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default release package URL: %w", err)
 	}
 	return nil
 }
-func (s *updaterConfigReleaseFetchUrlImpl) Set(handler *action.Handler, newVal any) error {
+func (s *updaterConfigReleaseFetchUrlImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	str, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), str); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), str); err != nil {
 		return fmt.Errorf("failed to set release package URL: %w", err)
 	}
 	return nil
 }
-func (s *updaterConfigReleaseFetchUrlImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *updaterConfigReleaseFetchUrlImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get release package URL: %w", err)
 	}
@@ -97,8 +98,8 @@ func (s *updaterConfigReleaseFetchUrlImpl) Get(handler *action.Handler) (any, er
 	}
 	return val, nil
 }
-func (s *updaterConfigReleaseFetchUrlImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *updaterConfigReleaseFetchUrlImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset release package URL: %w", err)
 	}
 	return nil
@@ -117,24 +118,24 @@ func (s *updaterConfigAutoRestartImpl) GetDefaultValue() any        { return fal
 func (s *updaterConfigAutoRestartImpl) GetDescription() string {
 	return "Automatically restarts the entire application when upgrade is applied."
 }
-func (s *updaterConfigAutoRestartImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *updaterConfigAutoRestartImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default updater auto restart availability: %w", err)
 	}
 	return nil
 }
-func (s *updaterConfigAutoRestartImpl) Set(handler *action.Handler, newVal any) error {
+func (s *updaterConfigAutoRestartImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	enabled, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
 		return fmt.Errorf("failed to set updater auto restart availability: %w", err)
 	}
 	return nil
 }
-func (s *updaterConfigAutoRestartImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *updaterConfigAutoRestartImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get updater auto restart availability: %w", err)
 	}
@@ -144,8 +145,8 @@ func (s *updaterConfigAutoRestartImpl) Get(handler *action.Handler) (any, error)
 	}
 	return enabled, nil
 }
-func (s *updaterConfigAutoRestartImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *updaterConfigAutoRestartImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset updater service auto restart availability: %w", err)
 	}
 	return nil

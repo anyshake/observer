@@ -1,5 +1,7 @@
 package watchcat
 
-func (s *WatchCatServiceImpl) Init() error {
-	return nil
+import "context"
+
+func (s *WatchCatServiceImpl) Init(ctx context.Context) error {
+	return ctx.Err()
 }

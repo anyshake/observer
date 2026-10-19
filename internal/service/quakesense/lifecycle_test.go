@@ -1,8 +1,11 @@
 package quakesense
 
 import (
+	"context"
+	"errors"
 	"math"
 	"net"
+	"sync"
 	"testing"
 	"time"
 
@@ -23,11 +26,11 @@ func TestFiltersAndLifecycle(t *testing.T) {
 	hub := notification.NewHub(4)
 	events, unsubscribe := hub.Subscribe()
 	defer unsubscribe()
-	svc := New(hw, handler, timesource.New(func() time.Time { return fixed }), hub)
+	svc := New(t.Context(), hw, handler, timesource.New(func() time.Time { return fixed }), hub)
 	if svc.GetName() == "" || svc.GetDescription() == "" || svc.GetStatus() == nil {
 		t.Fatal("service metadata is incomplete")
 	}
-	if svc.IsEnabled() {
+	if svc.IsEnabled(t.Context()) {
 		t.Fatal("enabled before initialization")
 	}
 	if _, err := svc.GetAssetList(); err == nil {
@@ -95,17 +98,23 @@ func TestFiltersAndLifecycle(t *testing.T) {
 	if err := setConstraint(t, handler, svc, "enabled", true); err != nil {
 		t.Fatal(err)
 	}
-	if err := svc.Init(); err != nil {
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	if !svc.IsEnabled() {
+	if !svc.IsEnabled(t.Context()) {
 		t.Fatal("service stayed disabled")
 	}
-	if err := svc.Start(); err != nil {
+	if err := svc.Start(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { _ = svc.Stop() })
+	t.Cleanup(func() { testsupport.StopService(t, svc) })
 	hw.WaitSubscribedRealtime(t)
+	if err := svc.Start(t.Context()); err == nil {
+		t.Fatal("duplicate Start succeeded")
+	}
+	if err := svc.Init(t.Context()); err == nil {
+		t.Fatal("Init succeeded while the service was running")
+	}
 
 	stamp := fixed
 	emit := func(rate int, gnss bool, samples []int32) {
@@ -142,14 +151,14 @@ func TestFiltersAndLifecycle(t *testing.T) {
 	case <-events:
 	case <-time.After(200 * time.Millisecond):
 	}
-	if err := svc.Restart(); err != nil {
+	if err := svc.Restart(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	hw.WaitSubscribedRealtime(t)
 	if svc.GetStatus().GetRestarts() != 1 {
 		t.Fatalf("restarts = %d", svc.GetStatus().GetRestarts())
 	}
-	if err := svc.Stop(); err != nil {
+	if err := svc.Stop(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -157,8 +166,8 @@ func TestFiltersAndLifecycle(t *testing.T) {
 func TestInitRejectsInvertedWindows(t *testing.T) {
 	_, handler := testsupport.OpenDAO(t)
 	testsupport.InitStation(t, handler)
-	svc := New(testsupport.NewHardware(), handler, timesource.New(nil), nil)
-	if err := svc.Init(); err != nil {
+	svc := New(t.Context(), testsupport.NewHardware(), handler, timesource.New(nil), nil)
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	if err := setConstraint(t, handler, svc, "sta_window", 20.0); err != nil {
@@ -167,8 +176,120 @@ func TestInitRejectsInvertedWindows(t *testing.T) {
 	if err := setConstraint(t, handler, svc, "lta_window", 4.0); err != nil {
 		t.Fatal(err)
 	}
-	if err := svc.Init(); err == nil {
+	if err := svc.Init(t.Context()); err == nil {
 		t.Fatal("LTA window shorter than STA was accepted")
+	}
+}
+
+func TestStartConnectHonorsContext(t *testing.T) {
+	svc := New(t.Context(), testsupport.NewHardware(), nil, timesource.New(nil), nil)
+	svc.mqttBroker = serveSilentMQTT(t)
+	svc.mqttClientId = "observer-test"
+
+	ctx, cancel := context.WithTimeout(t.Context(), 100*time.Millisecond)
+	defer cancel()
+	started := time.Now()
+	if err := svc.Start(ctx); !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("Start with an unresponsive broker = %v", err)
+	}
+	if elapsed := time.Since(started); elapsed >= quakeSenseConnectTimeout {
+		t.Fatalf("Start returned after %s, ignoring the caller context", elapsed)
+	}
+	if svc.GetStatus().GetIsRunning() {
+		t.Fatal("service is running after a failed MQTT connection")
+	}
+}
+
+func serveSilentMQTT(t *testing.T) string {
+	t.Helper()
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var (
+		mu    sync.Mutex
+		conns []net.Conn
+	)
+	t.Cleanup(func() {
+		_ = listener.Close()
+		mu.Lock()
+		defer mu.Unlock()
+		for _, conn := range conns {
+			_ = conn.Close()
+		}
+	})
+	go func() {
+		for {
+			conn, err := listener.Accept()
+			if err != nil {
+				return
+			}
+			mu.Lock()
+			conns = append(conns, conn)
+			mu.Unlock()
+		}
+	}()
+	return "tcp://" + listener.Addr().String()
+}
+
+type blockingCoordinatesHardware struct {
+	*testsupport.Hardware
+	entered chan struct{}
+	release chan struct{}
+}
+
+func (h *blockingCoordinatesHardware) GetCoordinates(fuzzy bool) (float64, float64, float64, error) {
+	select {
+	case h.entered <- struct{}{}:
+	default:
+	}
+	<-h.release
+	return h.Hardware.GetCoordinates(fuzzy)
+}
+
+func TestStopDoesNotWaitForEventPublishing(t *testing.T) {
+	logger.Init()
+	hw := &blockingCoordinatesHardware{
+		Hardware: testsupport.NewHardware(),
+		entered:  make(chan struct{}, 1),
+		release:  make(chan struct{}),
+	}
+	svc := New(t.Context(), hw, nil, timesource.New(nil), nil)
+	svc.mqttBroker = serveMQTT(t)
+	svc.mqttClientId = "observer-test"
+	svc.mqttTopic = "observer/test"
+	svc.monitorChannel = "EHZ"
+	svc.triggerMethod = CLASSIC_STA_LTA
+	svc.filterType = NO_FILTER
+	svc.staWindow, svc.ltaWindow = 0.05, 0.2
+	svc.trigOn, svc.trigOff = 0.5, 0.2
+	if err := svc.Start(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { testsupport.StopService(t, svc) })
+	hw.WaitSubscribedRealtime(t)
+
+	stamp := time.Now()
+	emitted := make(chan struct{})
+	go func() {
+		defer close(emitted)
+		hw.EmitRealtime(explorer.Event{Timestamp: stamp, SampleRate: 100, ChannelData: []explorer.ChannelData{{ChannelCode: "EHZ", Data: samples(40, 0)}}})
+		hw.EmitRealtime(explorer.Event{Timestamp: stamp.Add(400 * time.Millisecond), SampleRate: 100, ChannelData: []explorer.ChannelData{{ChannelCode: "EHZ", Data: samples(40, 100000)}}})
+	}()
+	select {
+	case <-hw.entered:
+	case <-time.After(2 * time.Second):
+		close(hw.release)
+		t.Fatal("no seismic event was detected")
+	}
+
+	ctx, cancel := context.WithTimeout(t.Context(), time.Second)
+	defer cancel()
+	err := svc.Stop(ctx)
+	close(hw.release)
+	<-emitted
+	if err != nil {
+		t.Fatalf("Stop waited for event publishing: %v", err)
 	}
 }
 
@@ -219,7 +340,7 @@ func setConstraint(t *testing.T, handler *action.Handler, svc *QuakeSenseService
 	t.Helper()
 	for _, constraint := range svc.GetConfigConstraint() {
 		if constraint.GetKey() == key {
-			return constraint.Set(handler, value)
+			return constraint.Set(t.Context(), handler, value)
 		}
 	}
 	t.Fatalf("constraint %s was not found", key)

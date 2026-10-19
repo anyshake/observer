@@ -15,11 +15,11 @@ import (
 func TestJWTAndWebsocketAuth(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	_, handler := testsupport.OpenDAO(t)
-	adminID, err := handler.SysUserCreate("admin_user", "Anyshake@12#$", true)
+	adminID, err := handler.SysUserCreate(t.Context(), "admin_user", "Anyshake@12#$", true)
 	if err != nil {
 		t.Fatal(err)
 	}
-	userID, err := handler.SysUserCreate("plain_user", "Anyshake@12#$", false)
+	userID, err := handler.SysUserCreate(t.Context(), "plain_user", "Anyshake@12#$", false)
 	if err != nil {
 		t.Fatal(err)
 	}

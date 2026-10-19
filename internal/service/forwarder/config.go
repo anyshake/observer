@@ -1,6 +1,7 @@
 package forwarder
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -21,24 +22,24 @@ func (s *forwarderConfigEnabledImpl) GetDefaultValue() any        { return true 
 func (s *forwarderConfigEnabledImpl) GetDescription() string {
 	return "Enable Forwarder service to allow third-party client (e.g. Swarm) to connect to this station"
 }
-func (s *forwarderConfigEnabledImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *forwarderConfigEnabledImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default Forwarder service availability: %w", err)
 	}
 	return nil
 }
-func (s *forwarderConfigEnabledImpl) Set(handler *action.Handler, newVal any) error {
+func (s *forwarderConfigEnabledImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	enabled, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
 		return fmt.Errorf("failed to set Forwarder service availability: %w", err)
 	}
 	return nil
 }
-func (s *forwarderConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *forwarderConfigEnabledImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get Forwarder service availability: %w", err)
 	}
@@ -48,8 +49,8 @@ func (s *forwarderConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
 	}
 	return enabled, nil
 }
-func (s *forwarderConfigEnabledImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *forwarderConfigEnabledImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset Forwarder service availability: %w", err)
 	}
 	return nil
@@ -68,24 +69,24 @@ func (s *forwarderConfigListenHostImpl) GetDefaultValue() any        { return "l
 func (s *forwarderConfigListenHostImpl) GetDescription() string {
 	return "IP address or hostname for forwarder server to listen, by default, the server will listen on localhost."
 }
-func (s *forwarderConfigListenHostImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *forwarderConfigListenHostImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default forwarder listen host: %w", err)
 	}
 	return nil
 }
-func (s *forwarderConfigListenHostImpl) Set(handler *action.Handler, newVal any) error {
+func (s *forwarderConfigListenHostImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	host, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), host); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), host); err != nil {
 		return fmt.Errorf("failed to set forwarder listen host: %w", err)
 	}
 	return nil
 }
-func (s *forwarderConfigListenHostImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *forwarderConfigListenHostImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get forwarder listen host: %w", err)
 	}
@@ -95,8 +96,8 @@ func (s *forwarderConfigListenHostImpl) Get(handler *action.Handler) (any, error
 	}
 	return host, nil
 }
-func (s *forwarderConfigListenHostImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *forwarderConfigListenHostImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset forwarder listen host: %w", err)
 	}
 	return nil
@@ -115,13 +116,13 @@ func (s *forwarderConfigListenPortImpl) GetDefaultValue() any        { return 30
 func (s *forwarderConfigListenPortImpl) GetDescription() string {
 	return "IP address or hostname for forwarder server to listen, by default, the server will listen on localhost."
 }
-func (s *forwarderConfigListenPortImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *forwarderConfigListenPortImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default forwarder listen port: %w", err)
 	}
 	return nil
 }
-func (s *forwarderConfigListenPortImpl) Set(handler *action.Handler, newVal any) error {
+func (s *forwarderConfigListenPortImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	port, err := config.GetConfigValInt64(newVal)
 	if err != nil {
 		return err
@@ -129,13 +130,13 @@ func (s *forwarderConfigListenPortImpl) Set(handler *action.Handler, newVal any)
 	if port < 1 || port > 65535 {
 		return errors.New("port must be between 1 and 65535")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), port); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), port); err != nil {
 		return fmt.Errorf("failed to set forwarder listen port: %w", err)
 	}
 	return nil
 }
-func (s *forwarderConfigListenPortImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *forwarderConfigListenPortImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get forwarder listen port: %w", err)
 	}
@@ -145,8 +146,8 @@ func (s *forwarderConfigListenPortImpl) Get(handler *action.Handler) (any, error
 	}
 	return int(port), nil
 }
-func (s *forwarderConfigListenPortImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *forwarderConfigListenPortImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset forwarder listen port: %w", err)
 	}
 	return nil

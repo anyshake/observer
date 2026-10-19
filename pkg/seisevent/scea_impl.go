@@ -1,9 +1,11 @@
 package seisevent
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/anyshake/observer/pkg/cache"
@@ -53,19 +55,19 @@ func (s *SCEA) GetProperty() DataSourceProperty {
 	}
 }
 
-func (s *SCEA) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (s *SCEA) GetEvents(ctx context.Context, latitude, longitude float64) ([]Event, error) {
 	var baseEvents []Event
 
 	if s.cache.Valid() {
 		baseEvents = s.cache.Get()
 	} else {
-		v, err, _ := s.sf.Do(SCEA_ID, func() (any, error) {
+		v, err := fetchEvents(ctx, &s.sf, SCEA_ID, func(ctx context.Context) ([]Event, error) {
 			if s.cache.Valid() {
 				return s.cache.Get(), nil
 			}
 
 			res, err := request.GET(
-				SCEAListURL,
+				ctx, SCEAListURL,
 				10*time.Second, time.Second, 3, false, nil,
 				map[string]string{"User-Agent": uarand.GetRandom()},
 			)
@@ -117,9 +119,10 @@ func (s *SCEA) GetEvents(latitude, longitude float64) ([]Event, error) {
 			return nil, err
 		}
 
-		baseEvents = v.([]Event)
+		baseEvents = v
 	}
 
+	baseEvents = slices.Clone(baseEvents)
 	for i := range baseEvents {
 		baseEvents[i].Distance = getDistance(latitude, baseEvents[i].Latitude, longitude, baseEvents[i].Longitude)
 		baseEvents[i].Estimation = getSeismicEstimation(

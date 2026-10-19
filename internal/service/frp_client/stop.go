@@ -1,35 +1,23 @@
 package frp_client
 
 import (
-	"errors"
-	"time"
+	"context"
 )
 
-func (s *FrpClientServiceImpl) Stop() error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.status.SetStoppedAt(s.timeSource.Now())
-	s.status.SetIsRunning(false)
-	s.cancelFn()
-
-	done := make(chan struct{})
-	go func() {
-		// Run observes s.ctx and returns before Close reads the client.
-		s.wg.Wait()
-		if s.clientObj != nil {
-			s.clientObj.Close()
+func (s *FrpClientServiceImpl) Stop(ctx context.Context) error {
+	return s.lifecycle.Stop(ctx, func() error {
+		s.mu.Lock()
+		if s.cancelFn != nil {
+			s.cancelFn()
 		}
-		close(done)
-	}()
+		s.status.SetIsRunning(false)
+		s.mu.Unlock()
+		defer func() {
+			s.status.SetStoppedAt(s.timeSource.Now())
+			s.status.SetIsRunning(false)
+		}()
 
-	timer := time.NewTimer(5 * time.Second)
-	defer timer.Stop()
-
-	select {
-	case <-done:
+		s.wg.Wait()
 		return nil
-	case <-timer.C:
-		return errors.New("timeout waiting for goroutines to finish")
-	}
+	})
 }

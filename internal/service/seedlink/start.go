@@ -2,6 +2,7 @@ package seedlink
 
 import (
 	"context"
+	"errors"
 	"runtime/debug"
 	"sync"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/hardware"
 	"github.com/anyshake/observer/internal/hardware/explorer"
+	"github.com/anyshake/observer/internal/service"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/anyshake/observer/pkg/message"
 	"github.com/anyshake/observer/pkg/ringbuf"
@@ -23,20 +25,32 @@ const seedLinkWriteTimeout = 5 * time.Second
 // archiver writes and preserve the recent tail while history is queried.
 const seedLinkHistoryBufferSize = 120
 
-func (s *SeedLinkServiceImpl) Start() error {
+func (s *SeedLinkServiceImpl) Start(ctx context.Context) error {
+	if err := s.lifecycle.Lock(ctx); err != nil {
+		return err
+	}
+	defer s.lifecycle.Unlock()
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if s.status.GetIsRunning() {
+		return errors.New("SeedLink service is already running")
+	}
+	if err := s.parentCtx.Err(); err != nil {
+		return err
+	}
 	if s.ctx.Err() != nil {
-		s.ctx, s.cancelFn = context.WithCancel(context.Background())
+		s.ctx, s.cancelFn = context.WithCancel(s.parentCtx)
 	}
 
+	runCtx, runCancel := s.ctx, s.cancelFn
 	seedlinkMessageBus := message.NewBus[explorer.Event](ID)
 	recentBuffer := ringbuf.New[explorer.Event](seedLinkHistoryBufferSize)
 	clients := newSeedLinkClientRegistry()
 	server := slgo.New(
 		&provider{
-			ctx:           s.ctx,
+			ctx:           runCtx,
 			hardwareDev:   s.hardwareDev,
 			timeSource:    s.timeSource,
 			actionHandler: s.actionHandler,
@@ -53,10 +67,24 @@ func (s *SeedLinkServiceImpl) Start() error {
 		&hooks{clients: clients},
 	)
 
+	compression := slgo.CompressionNone
+	if s.useCompress {
+		switch s.compressScheme {
+		case COMPRESS_SCHEME_STEIM_2:
+			compression = slgo.CompressionSteim2
+		default:
+			compression = slgo.CompressionSteim1
+		}
+	}
+	listenHost, listenPort := s.listenHost, s.listenPort
+
+	s.status.SetStartedAt(s.timeSource.Now())
+	s.status.SetIsRunning(true)
+	s.wg.Add(1)
 	go func() {
-		s.status.SetStartedAt(s.timeSource.Now())
-		s.status.SetIsRunning(true)
+		defer s.wg.Done()
 		defer func() {
+			runCancel()
 			seedlinkMessageBus.Close()
 			_ = s.hardwareDev.Unsubscribe(ID)
 			s.status.SetStoppedAt(s.timeSource.Now())
@@ -64,10 +92,10 @@ func (s *SeedLinkServiceImpl) Start() error {
 			if r := recover(); r != nil {
 				logger.GetLogger(ID).Errorf("service unexpectedly crashed, recovered from panic: %v\n%s", r, debug.Stack())
 			}
-			s.wg.Done()
 		}()
 
 		err := s.hardwareDev.Subscribe(ID, func(event explorer.Event) {
+			defer service.RecoverCallback(ID, runCancel)
 			// Cache before publishing so a history query can always see events
 			// emitted before the client's live subscription was installed.
 			recentBuffer.Push(event)
@@ -78,27 +106,19 @@ func (s *SeedLinkServiceImpl) Start() error {
 			return
 		}
 
-		compression := slgo.CompressionNone
-		if s.useCompress {
-			switch s.compressScheme {
-			case COMPRESS_SCHEME_STEIM_2:
-				compression = slgo.CompressionSteim2
-			default:
-				compression = slgo.CompressionSteim1
-			}
-		}
-
-		logger.GetLogger(ID).Infof("service seedlink is listening on %s:%d", s.listenHost, s.listenPort)
-		if err := server.Start(s.ctx, s.listenHost, s.listenPort, compression); err != nil {
+		logger.GetLogger(ID).Infof("service seedlink is listening on %s:%d", listenHost, listenPort)
+		if err := server.Start(runCtx, listenHost, listenPort, compression); err != nil {
 			logger.GetLogger(ID).Errorf("failed to start seedlink server: %v", err)
 		}
 	}()
 
-	s.wg.Add(1)
 	return nil
 }
 
 func (s *SeedLinkServiceImpl) GetListenPort() int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	return s.listenPort
 }
 

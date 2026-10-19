@@ -12,6 +12,7 @@ import (
 	"github.com/anyshake/observer/internal/dao/model"
 	"github.com/anyshake/observer/internal/hardware"
 	"github.com/anyshake/observer/internal/hardware/explorer"
+	"github.com/anyshake/observer/internal/service"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/anyshake/observer/pkg/ringbuf"
 	"github.com/bclswl0827/winsgo"
@@ -19,7 +20,7 @@ import (
 
 type waveformStore interface {
 	SeisRecordsGetQueryWindow() time.Duration
-	SeisRecordsQuery(time.Time, time.Time) ([]model.SeisRecord, error)
+	SeisRecordsQuery(context.Context, time.Time, time.Time) ([]model.SeisRecord, error)
 }
 
 type waveformRecord struct {
@@ -37,20 +38,31 @@ func cloneChannelData(data []explorer.ChannelData) []explorer.ChannelData {
 	return cloned
 }
 
-func (s *WinstonServiceImpl) Start() error {
+func (s *WinstonServiceImpl) Start(ctx context.Context) error {
+	if err := s.lifecycle.Lock(ctx); err != nil {
+		return err
+	}
+	defer s.lifecycle.Unlock()
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	if s.status.GetIsRunning() {
 		return errors.New("Winston service is already running")
 	}
+	if err := s.parentCtx.Err(); err != nil {
+		return err
+	}
 	if s.ctx.Err() != nil {
-		s.ctx, s.cancelFn = context.WithCancel(context.Background())
+		s.ctx, s.cancelFn = context.WithCancel(s.parentCtx)
 	}
 	if s.ringBuffer == nil {
 		return errors.New("Winston service is not initialized")
 	}
 
+	runCtx, runCancel := s.ctx, s.cancelFn
+	ringBuffer := s.ringBuffer
+	listenHost, listenPort := s.listenHost, s.listenPort
 	server := winsgo.New(
 		&provider{
 			hardwareDev:  s.hardwareDev,
@@ -63,7 +75,7 @@ func (s *WinstonServiceImpl) Start() error {
 			stationCode:  s.stationCode,
 			networkCode:  s.networkCode,
 			locationCode: s.locationCode,
-			ringBuffer:   s.ringBuffer,
+			ringBuffer:   ringBuffer,
 			store:        s.actionHandler,
 		},
 		&hooks{},
@@ -71,22 +83,25 @@ func (s *WinstonServiceImpl) Start() error {
 	server.DisableHelicorder = true
 
 	err := s.hardwareDev.Subscribe(ID, func(event explorer.Event) {
-		s.ringBuffer.Push(winstonRingBuffer{
+		defer service.RecoverCallback(ID, runCancel)
+		ringBuffer.Push(winstonRingBuffer{
 			timestamp:   event.Timestamp,
 			sampleRate:  event.SampleRate,
 			channelData: cloneChannelData(event.ChannelData),
 		})
 	})
 	if err != nil {
+		runCancel()
 		return fmt.Errorf("failed to subscribe to hardware message bus: %w", err)
 	}
 
-	s.wg.Add(1)
 	s.status.SetStartedAt(s.timeSource.Now())
 	s.status.SetIsRunning(true)
+	s.wg.Add(1)
 	go func() {
 		defer s.wg.Done()
 		defer func() {
+			runCancel()
 			_ = s.hardwareDev.Unsubscribe(ID)
 			s.status.SetStoppedAt(s.timeSource.Now())
 			s.status.SetIsRunning(false)
@@ -95,8 +110,8 @@ func (s *WinstonServiceImpl) Start() error {
 			}
 		}()
 
-		logger.GetLogger(ID).Infof("service Winston is listening on %s:%d", s.listenHost, s.listenPort)
-		if err := server.Start(s.ctx, s.listenHost, s.listenPort); err != nil {
+		logger.GetLogger(ID).Infof("service Winston is listening on %s:%d", listenHost, listenPort)
+		if err := server.Start(runCtx, listenHost, listenPort); err != nil {
 			logger.GetLogger(ID).Errorf("failed to start Winston server: %v", err)
 		}
 	}()
@@ -234,7 +249,7 @@ func (c *consumer) queryDAO(ctx context.Context, request winsgo.WaveformRequest)
 		return nil, err
 	}
 
-	daoRecords, err := c.store.SeisRecordsQuery(request.StartTime, request.EndTime)
+	daoRecords, err := c.store.SeisRecordsQuery(ctx, request.StartTime, request.EndTime)
 	if err != nil {
 		return nil, fmt.Errorf("query Winston waveform history: %w", err)
 	}
@@ -417,5 +432,8 @@ func (*hooks) OnCommand(client *winsgo.Client, command winsgo.Command) {
 }
 
 func (s *WinstonServiceImpl) GetListenPort() int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	return s.listenPort
 }

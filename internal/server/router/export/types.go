@@ -1,6 +1,7 @@
 package export
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"time"
@@ -15,8 +16,8 @@ type seismicRecordIterator func(func(model.SeisRecord) error) error
 
 type seismicDataEncoder interface {
 	GetName() string
-	Encode(records seismicRecordIterator, channel string) ([]byte, error)
-	GetFileName(startTime time.Time, channelCode string) (string, error)
+	Encode(ctx context.Context, records seismicRecordIterator, channel string) ([]byte, error)
+	GetFileName(ctx context.Context, startTime time.Time, channelCode string) (string, error)
 }
 
 type channelRecordRange struct {

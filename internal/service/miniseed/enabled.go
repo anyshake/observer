@@ -1,7 +1,9 @@
 package miniseed
 
-func (s *MiniSeedServiceImpl) IsEnabled() bool {
-	enable, err := (&miniSeedConfigEnabledImpl{}).Get(s.actionHandler)
+import "context"
+
+func (s *MiniSeedServiceImpl) IsEnabled(ctx context.Context) bool {
+	enable, err := (&miniSeedConfigEnabledImpl{}).Get(ctx, s.actionHandler)
 	if err != nil {
 		return false
 	}

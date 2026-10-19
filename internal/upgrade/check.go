@@ -13,14 +13,14 @@ import (
 	"github.com/miekg/dns"
 )
 
-func (u *Helper) CheckUpdate() (latest, required *semver.Version, eligible bool, applied bool, err error) {
+func (u *Helper) CheckUpdate(ctx context.Context) (latest, required *semver.Version, eligible bool, applied bool, err error) {
 	if u.latestVer.Valid() && u.requiredVer.Valid() {
 		latest, required := u.latestVer.Get(), u.requiredVer.Get()
 		eligible, applied := u.updateStatus(latest, required)
 		return latest, required, eligible, applied, nil
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	client, err := u.getDNSClient()
@@ -79,6 +79,9 @@ func (u *Helper) CheckUpdate() (latest, required *semver.Version, eligible bool,
 func (u *Helper) getDNSClient() (*dnsquery.Client, error) {
 	u.mu.Lock()
 	defer u.mu.Unlock()
+	if u.closed {
+		return nil, dnsquery.ErrClosed
+	}
 	if u.resolverErr != nil {
 		return nil, u.resolverErr
 	}

@@ -9,9 +9,10 @@ import (
 	"github.com/anyshake/observer/pkg/timesource"
 )
 
-func New(actionHandler *action.Handler, timeSource *timesource.Source, helper *upgrade.Helper, currentExePath string, restartChan chan struct{}) *UpdaterServiceImpl {
-	ctx, cancelFn := context.WithCancel(context.Background())
+func New(parentCtx context.Context, actionHandler *action.Handler, timeSource *timesource.Source, helper *upgrade.Helper, currentExePath string, restartChan chan struct{}) *UpdaterServiceImpl {
+	ctx, cancelFn := context.WithCancel(parentCtx)
 	obj := &UpdaterServiceImpl{
+		parentCtx:      parentCtx,
 		ctx:            ctx,
 		cancelFn:       cancelFn,
 		upgradeHelper:  helper,

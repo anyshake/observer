@@ -1,6 +1,7 @@
 package helicorder
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"path/filepath"
@@ -23,24 +24,24 @@ func (s *helicorderConfigEnabledImpl) GetDefaultValue() any        { return fals
 func (s *helicorderConfigEnabledImpl) GetDescription() string {
 	return "Enable helicorder service to save daily waveforms per channel in the specified path, creating it if the path does not exist."
 }
-func (s *helicorderConfigEnabledImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigEnabledImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default helicorder service availability: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigEnabledImpl) Set(handler *action.Handler, newVal any) error {
+func (s *helicorderConfigEnabledImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	enabled, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
 		return fmt.Errorf("failed to set helicorder service availability: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *helicorderConfigEnabledImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get helicorder service availability: %w", err)
 	}
@@ -50,8 +51,8 @@ func (s *helicorderConfigEnabledImpl) Get(handler *action.Handler) (any, error) 
 	}
 	return enabled, nil
 }
-func (s *helicorderConfigEnabledImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigEnabledImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset helicorder service availability: %w", err)
 	}
 	return nil
@@ -70,13 +71,13 @@ func (s *helicorderConfigFilePathImpl) GetDefaultValue() any        { return "./
 func (s *helicorderConfigFilePathImpl) GetDescription() string {
 	return "The path to which helicorder images will be written, if the path does not exist, it will be automatically created."
 }
-func (s *helicorderConfigFilePathImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigFilePathImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default helicorder service availability: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigFilePathImpl) Set(handler *action.Handler, newVal any) error {
+func (s *helicorderConfigFilePathImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	filePath, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
@@ -85,13 +86,13 @@ func (s *helicorderConfigFilePathImpl) Set(handler *action.Handler, newVal any) 
 		return errors.New("file path cannot be empty")
 	}
 	filePath = filepath.Clean(filePath)
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), filePath); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), filePath); err != nil {
 		return fmt.Errorf("failed to set helicorder service availability: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigFilePathImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *helicorderConfigFilePathImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get helicorder service availability: %w", err)
 	}
@@ -101,8 +102,8 @@ func (s *helicorderConfigFilePathImpl) Get(handler *action.Handler) (any, error)
 	}
 	return filePath, nil
 }
-func (s *helicorderConfigFilePathImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigFilePathImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset helicorder service availability: %w", err)
 	}
 	return nil
@@ -129,13 +130,13 @@ func (s *helicorderConfigCacheStorageImpl) GetDefaultValue() any { return CACHE_
 func (s *helicorderConfigCacheStorageImpl) GetDescription() string {
 	return "Cache decoded waveform spans while plotting. Memory is fastest but increases RAM usage; disk uses indexed temporary files under the configured cache path; disabled uses the least memory."
 }
-func (s *helicorderConfigCacheStorageImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigCacheStorageImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default helicorder cache storage: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigCacheStorageImpl) Set(handler *action.Handler, newVal any) error {
+func (s *helicorderConfigCacheStorageImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	cacheStorage, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
@@ -143,13 +144,13 @@ func (s *helicorderConfigCacheStorageImpl) Set(handler *action.Handler, newVal a
 	if !lo.Contains([]string{CACHE_STORAGE_DISABLED, CACHE_STORAGE_DISK, CACHE_STORAGE_MEMORY}, cacheStorage) {
 		return errors.New("cache storage must be one of the given options")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), cacheStorage); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), cacheStorage); err != nil {
 		return fmt.Errorf("failed to set helicorder cache storage: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigCacheStorageImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *helicorderConfigCacheStorageImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get helicorder cache storage: %w", err)
 	}
@@ -159,8 +160,8 @@ func (s *helicorderConfigCacheStorageImpl) Get(handler *action.Handler) (any, er
 	}
 	return cacheStorage, nil
 }
-func (s *helicorderConfigCacheStorageImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigCacheStorageImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset helicorder cache storage: %w", err)
 	}
 	return nil
@@ -179,13 +180,13 @@ func (s *helicorderConfigCachePathImpl) GetDefaultValue() any        { return CA
 func (s *helicorderConfigCachePathImpl) GetDescription() string {
 	return "Temporary cache directory used when cache storage is set to disk. The directory will be created automatically."
 }
-func (s *helicorderConfigCachePathImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigCachePathImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default helicorder cache path: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigCachePathImpl) Set(handler *action.Handler, newVal any) error {
+func (s *helicorderConfigCachePathImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	cachePath, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
@@ -194,13 +195,13 @@ func (s *helicorderConfigCachePathImpl) Set(handler *action.Handler, newVal any)
 		return errors.New("cache path cannot be empty")
 	}
 	cachePath = filepath.Clean(cachePath)
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), cachePath); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), cachePath); err != nil {
 		return fmt.Errorf("failed to set helicorder cache path: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigCachePathImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *helicorderConfigCachePathImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get helicorder cache path: %w", err)
 	}
@@ -210,8 +211,8 @@ func (s *helicorderConfigCachePathImpl) Get(handler *action.Handler) (any, error
 	}
 	return cachePath, nil
 }
-func (s *helicorderConfigCachePathImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigCachePathImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset helicorder cache path: %w", err)
 	}
 	return nil
@@ -235,13 +236,13 @@ func (s *helicorderConfigImageFormatImpl) GetDefaultValue() any { return IMAGE_F
 func (s *helicorderConfigImageFormatImpl) GetDescription() string {
 	return "Specify image format for helicorder images, supported formats are PNG and SVG, by default SVG is used."
 }
-func (s *helicorderConfigImageFormatImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigImageFormatImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default image format for helicorder service: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigImageFormatImpl) Set(handler *action.Handler, newVal any) error {
+func (s *helicorderConfigImageFormatImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	imageFormat, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
@@ -252,13 +253,13 @@ func (s *helicorderConfigImageFormatImpl) Set(handler *action.Handler, newVal an
 	}, imageFormat) {
 		return errors.New("image format must be one of the given options")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), imageFormat); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), imageFormat); err != nil {
 		return fmt.Errorf("failed to set helicorder image format: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigImageFormatImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *helicorderConfigImageFormatImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get helicorder image format: %w", err)
 	}
@@ -268,8 +269,8 @@ func (s *helicorderConfigImageFormatImpl) Get(handler *action.Handler) (any, err
 	}
 	return imageFormat, nil
 }
-func (s *helicorderConfigImageFormatImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigImageFormatImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset helicorder image format: %w", err)
 	}
 	return nil
@@ -294,13 +295,13 @@ func (s *helicorderConfigTimeSpanImpl) GetDefaultValue() any { return TIMESPAN_1
 func (s *helicorderConfigTimeSpanImpl) GetDescription() string {
 	return "Time span defines the duration of the horizontal axis of the halicorder chart."
 }
-func (s *helicorderConfigTimeSpanImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigTimeSpanImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default time span for helicorder service: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigTimeSpanImpl) Set(handler *action.Handler, newVal any) error {
+func (s *helicorderConfigTimeSpanImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	timeSpan, err := config.GetConfigValInt64(newVal)
 	if err != nil {
 		return err
@@ -312,13 +313,13 @@ func (s *helicorderConfigTimeSpanImpl) Set(handler *action.Handler, newVal any) 
 	}, timeSpan) {
 		return errors.New("time span must be one of the given options")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), timeSpan); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), timeSpan); err != nil {
 		return fmt.Errorf("failed to set helicorder time span: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigTimeSpanImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *helicorderConfigTimeSpanImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get helicorder time span: %w", err)
 	}
@@ -328,8 +329,8 @@ func (s *helicorderConfigTimeSpanImpl) Get(handler *action.Handler) (any, error)
 	}
 	return int(path), nil
 }
-func (s *helicorderConfigTimeSpanImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigTimeSpanImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset helicorder time span: %w", err)
 	}
 	return nil
@@ -348,13 +349,13 @@ func (s *helicorderConfigLifeCycleImpl) GetDefaultValue() any        { return 0 
 func (s *helicorderConfigLifeCycleImpl) GetDescription() string {
 	return "The number of days after which helicorder images will be automatically purged, set to 0 to keep files indefinitely."
 }
-func (s *helicorderConfigLifeCycleImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigLifeCycleImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default life cycle for helicorder service: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigLifeCycleImpl) Set(handler *action.Handler, newVal any) error {
+func (s *helicorderConfigLifeCycleImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	lifeCycle, err := config.GetConfigValInt64(newVal)
 	if err != nil {
 		return err
@@ -362,13 +363,13 @@ func (s *helicorderConfigLifeCycleImpl) Set(handler *action.Handler, newVal any)
 	if lifeCycle < 0 {
 		return errors.New("life cycle cannot be negative")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), lifeCycle); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), lifeCycle); err != nil {
 		return fmt.Errorf("failed to set helicorder life cycle: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigLifeCycleImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *helicorderConfigLifeCycleImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get helicorder life cycle: %w", err)
 	}
@@ -378,8 +379,8 @@ func (s *helicorderConfigLifeCycleImpl) Get(handler *action.Handler) (any, error
 	}
 	return int(lifeCycle), nil
 }
-func (s *helicorderConfigLifeCycleImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigLifeCycleImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset helicorder life cycle: %w", err)
 	}
 	return nil
@@ -398,13 +399,13 @@ func (s *helicorderConfigImageSizeImpl) GetDefaultValue() any        { return 80
 func (s *helicorderConfigImageSizeImpl) GetDescription() string {
 	return "Image size in pixels for helicorder images."
 }
-func (s *helicorderConfigImageSizeImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigImageSizeImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default image size for helicorder service: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigImageSizeImpl) Set(handler *action.Handler, newVal any) error {
+func (s *helicorderConfigImageSizeImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	imageSize, err := config.GetConfigValInt64(newVal)
 	if err != nil {
 		return err
@@ -415,13 +416,13 @@ func (s *helicorderConfigImageSizeImpl) Set(handler *action.Handler, newVal any)
 	if imageSize > 4096 {
 		return errors.New("image size cannot be greater than 4096")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), imageSize); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), imageSize); err != nil {
 		return fmt.Errorf("failed to set helicorder image size: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigImageSizeImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *helicorderConfigImageSizeImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get helicorder image size: %w", err)
 	}
@@ -431,8 +432,8 @@ func (s *helicorderConfigImageSizeImpl) Get(handler *action.Handler) (any, error
 	}
 	return int(imageSize), nil
 }
-func (s *helicorderConfigImageSizeImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigImageSizeImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset helicorder image size: %w", err)
 	}
 	return nil
@@ -451,13 +452,13 @@ func (s *helicorderConfigSpanSamplesImpl) GetDefaultValue() any        { return 
 func (s *helicorderConfigSpanSamplesImpl) GetDescription() string {
 	return "Samples per time span in points for helicorder images."
 }
-func (s *helicorderConfigSpanSamplesImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigSpanSamplesImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default image size for helicorder service: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigSpanSamplesImpl) Set(handler *action.Handler, newVal any) error {
+func (s *helicorderConfigSpanSamplesImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	spanSamples, err := config.GetConfigValInt64(newVal)
 	if err != nil {
 		return err
@@ -468,13 +469,13 @@ func (s *helicorderConfigSpanSamplesImpl) Set(handler *action.Handler, newVal an
 	if spanSamples > 100000 {
 		return errors.New("span samples cannot be greater than 100000")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), spanSamples); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), spanSamples); err != nil {
 		return fmt.Errorf("failed to set helicorder span samples: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigSpanSamplesImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *helicorderConfigSpanSamplesImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get helicorder span samples: %w", err)
 	}
@@ -484,8 +485,8 @@ func (s *helicorderConfigSpanSamplesImpl) Get(handler *action.Handler) (any, err
 	}
 	return int(spanSamples), nil
 }
-func (s *helicorderConfigSpanSamplesImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigSpanSamplesImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset helicorder span samples: %w", err)
 	}
 	return nil
@@ -504,13 +505,13 @@ func (s *helicorderConfigLineWidthImpl) GetDefaultValue() any        { return 1.
 func (s *helicorderConfigLineWidthImpl) GetDescription() string {
 	return "Line width for helicorder images."
 }
-func (s *helicorderConfigLineWidthImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigLineWidthImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default plot line width for helicorder service: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigLineWidthImpl) Set(handler *action.Handler, newVal any) error {
+func (s *helicorderConfigLineWidthImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	lineWidth, err := config.GetConfigValFloat64(newVal)
 	if err != nil {
 		return err
@@ -521,13 +522,13 @@ func (s *helicorderConfigLineWidthImpl) Set(handler *action.Handler, newVal any)
 	if lineWidth > 5 {
 		return errors.New("line width cannot be greater than 5")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), lineWidth); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), lineWidth); err != nil {
 		return fmt.Errorf("failed to set helicorder plot line width: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigLineWidthImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *helicorderConfigLineWidthImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get helicorder plot line width: %w", err)
 	}
@@ -537,8 +538,8 @@ func (s *helicorderConfigLineWidthImpl) Get(handler *action.Handler) (any, error
 	}
 	return spanSamples, nil
 }
-func (s *helicorderConfigLineWidthImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigLineWidthImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset helicorder plot line width: %w", err)
 	}
 	return nil
@@ -562,13 +563,13 @@ func (s *helicorderConfigScaleFactorsImpl) GetDefaultValue() any {
 func (s *helicorderConfigScaleFactorsImpl) GetDescription() string {
 	return "Each channel has an associated scale factor. If the value is 0 or undefined, a helicorder will not be generated for that channel. The display order follows the channel number, and a higher scale factor results in a larger waveform amplitude."
 }
-func (s *helicorderConfigScaleFactorsImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigScaleFactorsImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default waveform scale factor for helicorder service: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigScaleFactorsImpl) Set(handler *action.Handler, newVal any) error {
+func (s *helicorderConfigScaleFactorsImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	scaleFactors, err := config.GetConfigValFloat64Array(newVal)
 	if err != nil {
 		return err
@@ -577,13 +578,13 @@ func (s *helicorderConfigScaleFactorsImpl) Set(handler *action.Handler, newVal a
 	if hasNegative {
 		return errors.New("scale factors cannot be negative")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), scaleFactors); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), scaleFactors); err != nil {
 		return fmt.Errorf("failed to set helicorder waveform scale factor: %w", err)
 	}
 	return nil
 }
-func (s *helicorderConfigScaleFactorsImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *helicorderConfigScaleFactorsImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get helicorder waveform scale factor: %w", err)
 	}
@@ -593,8 +594,8 @@ func (s *helicorderConfigScaleFactorsImpl) Get(handler *action.Handler) (any, er
 	}
 	return scaleFactor, nil
 }
-func (s *helicorderConfigScaleFactorsImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *helicorderConfigScaleFactorsImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset helicorder waveform scale factor: %w", err)
 	}
 	return nil

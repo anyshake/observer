@@ -8,7 +8,6 @@ import (
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/hardware"
 	fdsnwsgo "github.com/bclswl0827/fdsnws-go"
-	"github.com/bclswl0827/fdsnws-go/service/station"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,7 +19,7 @@ const (
 func Setup(engine *gin.Engine, handler *action.Handler, device hardware.IHardware, now func() time.Time) error {
 	modules := []fdsnwsgo.Module{fdsnwsgo.ModuleStation, fdsnwsgo.ModuleDataSelect}
 	dataProvider := &provider{handler: handler, device: device, now: now}
-	stationService := station.New(dataProvider)
+	stationService := newStationService(dataProvider)
 	dataSelectService := newDataSelectService(dataProvider)
 	server, err := fdsnwsgo.NewFDSNWS(
 		dataProvider,

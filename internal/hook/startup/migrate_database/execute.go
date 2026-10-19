@@ -1,7 +1,9 @@
 package migrate_database
 
-func (t *MigrateDatabaseStartupImpl) Execute() error {
-	if err := t.ActionHandler.SchemaVersionInit(); err != nil {
+import "context"
+
+func (t *MigrateDatabaseStartupImpl) Execute(ctx context.Context) error {
+	if err := t.ActionHandler.SchemaVersionInit(ctx); err != nil {
 		return err
 	}
 

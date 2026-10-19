@@ -1,9 +1,11 @@
 package seisevent
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/anyshake/observer/pkg/cache"
@@ -33,19 +35,19 @@ func (c *ICL) GetProperty() DataSourceProperty {
 	}
 }
 
-func (h *ICL) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (h *ICL) GetEvents(ctx context.Context, latitude, longitude float64) ([]Event, error) {
 	var baseEvents []Event
 
 	if h.cache.Valid() {
 		baseEvents = h.cache.Get()
 	} else {
-		v, err, _ := h.sf.Do(ICL_ID, func() (any, error) {
+		v, err := fetchEvents(ctx, &h.sf, ICL_ID, func(ctx context.Context) ([]Event, error) {
 			if h.cache.Valid() {
 				return h.cache.Get(), nil
 			}
 
 			res, err := request.GET(
-				"https://mobile-new.chinaeew.cn/v1/earlywarnings?start_at=&updates=",
+				ctx, "https://mobile-new.chinaeew.cn/v1/earlywarnings?start_at=&updates=",
 				10*time.Second, time.Second, 3, false, nil,
 				map[string]string{"User-Agent": uarand.GetRandom()},
 			)
@@ -101,9 +103,10 @@ func (h *ICL) GetEvents(latitude, longitude float64) ([]Event, error) {
 			return nil, err
 		}
 
-		baseEvents = v.([]Event)
+		baseEvents = v
 	}
 
+	baseEvents = slices.Clone(baseEvents)
 	for i := range baseEvents {
 		baseEvents[i].Distance = getDistance(latitude, baseEvents[i].Latitude, longitude, baseEvents[i].Longitude)
 		baseEvents[i].Estimation = getSeismicEstimation(

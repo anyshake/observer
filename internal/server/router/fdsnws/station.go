@@ -1,6 +1,7 @@
 package fdsnws
 
 import (
+	"context"
 	"errors"
 	"math"
 	"time"
@@ -10,11 +11,16 @@ import (
 	"github.com/bclswl0827/obsgo/inventory/stationxml"
 )
 
-func (p *provider) Station(query fdsnwsgo.StationQuery) (*stationxml.Document, fdsnwsgo.ProviderErrorKind, error) {
+type stationProvider struct {
+	*provider
+	ctx context.Context
+}
+
+func (p *stationProvider) Station(query fdsnwsgo.StationQuery) (*stationxml.Document, fdsnwsgo.ProviderErrorKind, error) {
 	if query.UpdatedAfter != nil || query.MatchTimeSeries || query.IncludeAvailability {
 		return nil, fdsnwsgo.ProviderErrorClient, errors.New("updatedafter, matchtimeseries and includeavailability are not supported")
 	}
-	network, station, location, err := p.stationCodes()
+	network, station, location, err := p.stationCodes(p.ctx)
 	if err != nil {
 		return nil, fdsnwsgo.ProviderErrorServer, err
 	}
@@ -26,7 +32,7 @@ func (p *provider) Station(query fdsnwsgo.StationQuery) (*stationxml.Document, f
 	}
 	values := make([]string, len(constraints))
 	for i, constraint := range constraints {
-		value, err := constraint.Get(p.handler)
+		value, err := constraint.Get(p.ctx, p.handler)
 		if err != nil {
 			return nil, fdsnwsgo.ProviderErrorServer, err
 		}

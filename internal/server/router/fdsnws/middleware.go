@@ -13,7 +13,7 @@ import (
 func serviceMiddleware(handler *action.Handler, server *fdsnwsgo.FDSNWS) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.Header("Cache-Control", "no-store")
-		enabled, err := (&config.StationFDSNServiceEnabledConfigConstraintImpl{}).Get(handler)
+		enabled, err := (&config.StationFDSNServiceEnabledConfigConstraintImpl{}).Get(ctx.Request.Context(), handler)
 		status := http.StatusNotImplemented
 		detail := "FDSN service is disabled"
 		if err != nil {

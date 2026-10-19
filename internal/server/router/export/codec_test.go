@@ -87,11 +87,11 @@ func TestTxtEncoder(t *testing.T) {
 	if encoder.GetName() != "TXT" {
 		t.Fatalf("name = %s", encoder.GetName())
 	}
-	if data, err := encoder.Encode(iterOf(nil), "EHZ"); err != nil || data != nil {
+	if data, err := encoder.Encode(t.Context(), iterOf(nil), "EHZ"); err != nil || data != nil {
 		t.Fatalf("empty encode = %q, %v", data, err)
 	}
 
-	data, err := encoder.Encode(iterOf(records), "EHZ")
+	data, err := encoder.Encode(t.Context(), iterOf(records), "EHZ")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -101,13 +101,13 @@ func TestTxtEncoder(t *testing.T) {
 			t.Fatalf("txt %q missing %q", text, sample)
 		}
 	}
-	if _, err := encoder.Encode(iterOf([]model.SeisRecord{{ChannelData: []byte{9}}}), "EHZ"); err == nil {
+	if _, err := encoder.Encode(t.Context(), iterOf([]model.SeisRecord{{ChannelData: []byte{9}}}), "EHZ"); err == nil {
 		t.Fatal("corrupt txt record accepted")
 	}
 
 	handler := openSettings(t, "station", "location", "network")
 	named := txtEncoder(handler)
-	filename, err := named.GetFileName(start, "EHZ")
+	filename, err := named.GetFileName(t.Context(), start, "EHZ")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -115,13 +115,13 @@ func TestTxtEncoder(t *testing.T) {
 		t.Fatalf("filename = %s", filename)
 	}
 
-	if _, err := txtEncoder(openSettings(t)).GetFileName(start, "EHZ"); err == nil {
+	if _, err := txtEncoder(openSettings(t)).GetFileName(t.Context(), start, "EHZ"); err == nil {
 		t.Fatal("missing station code accepted")
 	}
-	if _, err := txtEncoder(openSettings(t, "station")).GetFileName(start, "EHZ"); err == nil {
+	if _, err := txtEncoder(openSettings(t, "station")).GetFileName(t.Context(), start, "EHZ"); err == nil {
 		t.Fatal("missing location code accepted")
 	}
-	if _, err := txtEncoder(openSettings(t, "station", "location")).GetFileName(start, "EHZ"); err == nil {
+	if _, err := txtEncoder(openSettings(t, "station", "location")).GetFileName(t.Context(), start, "EHZ"); err == nil {
 		t.Fatal("missing network code accepted")
 	}
 }
@@ -136,40 +136,40 @@ func TestSacEncoder(t *testing.T) {
 	if encoder.GetName() != "SAC" {
 		t.Fatalf("name = %s", encoder.GetName())
 	}
-	if data, err := encoder.Encode(iterOf(nil), "EHZ"); err != nil || data != nil {
+	if data, err := encoder.Encode(t.Context(), iterOf(nil), "EHZ"); err != nil || data != nil {
 		t.Fatalf("empty encode = %d bytes, %v", len(data), err)
 	}
-	data, err := encoder.Encode(iterOf(records), "EHZ")
+	data, err := encoder.Encode(t.Context(), iterOf(records), "EHZ")
 	if err != nil || len(data) == 0 {
 		t.Fatalf("sac encode = %d bytes, %v", len(data), err)
 	}
-	if data, err := encoder.Encode(iterOf(records), "EHE"); err != nil || len(data) == 0 {
+	if data, err := encoder.Encode(t.Context(), iterOf(records), "EHE"); err != nil || len(data) == 0 {
 		t.Fatalf("missing channel encode = %d bytes, %v", len(data), err)
 	}
-	if _, err := encoder.Encode(func(func(model.SeisRecord) error) error { return errors.New("read failed") }, "EHZ"); err == nil {
+	if _, err := encoder.Encode(t.Context(), func(func(model.SeisRecord) error) error { return errors.New("read failed") }, "EHZ"); err == nil {
 		t.Fatal("iterator error ignored")
 	}
 
-	filename, err := encoder.GetFileName(start, "EHZ")
+	filename, err := encoder.GetFileName(t.Context(), start, "EHZ")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if filename != "2024.075.13.05.09.0123.SHAKE.AS.SHAKE.EHZ.D.sac" {
 		t.Fatalf("filename = %s", filename)
 	}
-	if _, err := sacEncoder(openSettings(t)).GetFileName(start, "EHZ"); err == nil {
+	if _, err := sacEncoder(openSettings(t)).GetFileName(t.Context(), start, "EHZ"); err == nil {
 		t.Fatal("missing station code accepted")
 	}
-	if _, err := sacEncoder(openSettings(t, "station")).GetFileName(start, "EHZ"); err == nil {
+	if _, err := sacEncoder(openSettings(t, "station")).GetFileName(t.Context(), start, "EHZ"); err == nil {
 		t.Fatal("missing network code accepted")
 	}
-	if _, err := sacEncoder(openSettings(t)).Encode(iterOf(records), "EHZ"); err == nil {
+	if _, err := sacEncoder(openSettings(t)).Encode(t.Context(), iterOf(records), "EHZ"); err == nil {
 		t.Fatal("encode without station code accepted")
 	}
-	if _, err := sacEncoder(openSettings(t, "station")).Encode(iterOf(records), "EHZ"); err == nil {
+	if _, err := sacEncoder(openSettings(t, "station")).Encode(t.Context(), iterOf(records), "EHZ"); err == nil {
 		t.Fatal("encode without location code accepted")
 	}
-	if _, err := sacEncoder(openSettings(t, "station", "location")).Encode(iterOf(records), "EHZ"); err == nil {
+	if _, err := sacEncoder(openSettings(t, "station", "location")).Encode(t.Context(), iterOf(records), "EHZ"); err == nil {
 		t.Fatal("encode without network code accepted")
 	}
 }
@@ -198,17 +198,17 @@ func TestMseedEncoder(t *testing.T) {
 		if encoder.GetName() != tc.name {
 			t.Fatalf("name = %s", encoder.GetName())
 		}
-		if data, err := encoder.Encode(iterOf(nil), "EHZ"); err != nil || data != nil {
+		if data, err := encoder.Encode(t.Context(), iterOf(nil), "EHZ"); err != nil || data != nil {
 			t.Fatalf("%s empty encode = %d bytes, %v", tc.name, len(data), err)
 		}
-		data, err := encoder.Encode(iterOf(records), "EHZ")
+		data, err := encoder.Encode(t.Context(), iterOf(records), "EHZ")
 		if err != nil || len(data) == 0 {
 			t.Fatalf("%s encode = %d bytes, %v", tc.name, len(data), err)
 		}
-		if data, err := encoder.Encode(iterOf(records), "EHE"); err != nil || len(data) != 0 {
+		if data, err := encoder.Encode(t.Context(), iterOf(records), "EHE"); err != nil || len(data) != 0 {
 			t.Fatalf("%s missing channel = %d bytes, %v", tc.name, len(data), err)
 		}
-		filename, err := encoder.GetFileName(start, "EHZ")
+		filename, err := encoder.GetFileName(t.Context(), start, "EHZ")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -217,36 +217,36 @@ func TestMseedEncoder(t *testing.T) {
 		}
 	}
 
-	if _, err := mseedEncoder(handler, "bad", 999).Encode(iterOf(records), "EHZ"); err == nil {
+	if _, err := mseedEncoder(handler, "bad", 999).Encode(t.Context(), iterOf(records), "EHZ"); err == nil {
 		t.Fatal("invalid encoding accepted")
 	}
-	if _, err := mseedEncoder(handler, "int32", mseedio.INT32).Encode(func(func(model.SeisRecord) error) error {
+	if _, err := mseedEncoder(handler, "int32", mseedio.INT32).Encode(t.Context(), func(func(model.SeisRecord) error) error {
 		return errors.New("read failed")
 	}, "EHZ"); err == nil {
 		t.Fatal("iterator error ignored")
 	}
 	broken := records[0]
 	broken.ChannelData = []byte{2}
-	if _, err := mseedEncoder(handler, "int32", mseedio.INT32).Encode(iterOf([]model.SeisRecord{broken}), "EHZ"); err == nil {
+	if _, err := mseedEncoder(handler, "int32", mseedio.INT32).Encode(t.Context(), iterOf([]model.SeisRecord{broken}), "EHZ"); err == nil {
 		t.Fatal("corrupt mseed record accepted")
 	}
 
-	if _, err := mseedEncoder(openSettings(t), "int32", mseedio.INT32).Encode(iterOf(records), "EHZ"); err == nil {
+	if _, err := mseedEncoder(openSettings(t), "int32", mseedio.INT32).Encode(t.Context(), iterOf(records), "EHZ"); err == nil {
 		t.Fatal("missing station code accepted")
 	}
-	if _, err := mseedEncoder(openSettings(t, "station"), "int32", mseedio.INT32).Encode(iterOf(records), "EHZ"); err == nil {
+	if _, err := mseedEncoder(openSettings(t, "station"), "int32", mseedio.INT32).Encode(t.Context(), iterOf(records), "EHZ"); err == nil {
 		t.Fatal("missing location code accepted")
 	}
-	if _, err := mseedEncoder(openSettings(t, "station", "location"), "int32", mseedio.INT32).Encode(iterOf(records), "EHZ"); err == nil {
+	if _, err := mseedEncoder(openSettings(t, "station", "location"), "int32", mseedio.INT32).Encode(t.Context(), iterOf(records), "EHZ"); err == nil {
 		t.Fatal("missing network code accepted")
 	}
-	if _, err := mseedEncoder(openSettings(t, "station"), "int32", mseedio.INT32).GetFileName(start, "EHZ"); err == nil {
+	if _, err := mseedEncoder(openSettings(t, "station"), "int32", mseedio.INT32).GetFileName(t.Context(), start, "EHZ"); err == nil {
 		t.Fatal("missing location code accepted")
 	}
-	if _, err := mseedEncoder(openSettings(t, "station", "location"), "int32", mseedio.INT32).GetFileName(start, "EHZ"); err == nil {
+	if _, err := mseedEncoder(openSettings(t, "station", "location"), "int32", mseedio.INT32).GetFileName(t.Context(), start, "EHZ"); err == nil {
 		t.Fatal("missing network code accepted")
 	}
-	if _, err := mseedEncoder(openSettings(t), "int32", mseedio.INT32).GetFileName(start, "EHZ"); err == nil {
+	if _, err := mseedEncoder(openSettings(t), "int32", mseedio.INT32).GetFileName(t.Context(), start, "EHZ"); err == nil {
 		t.Fatal("filename without station code accepted")
 	}
 }
@@ -261,17 +261,17 @@ func TestWavEncoder(t *testing.T) {
 	if encoder.GetName() != "WAV (Audio)" {
 		t.Fatalf("name = %s", encoder.GetName())
 	}
-	if data, err := encoder.Encode(iterOf(nil), "EHZ"); err != nil || data != nil {
+	if data, err := encoder.Encode(t.Context(), iterOf(nil), "EHZ"); err != nil || data != nil {
 		t.Fatalf("empty encode = %d bytes, %v", len(data), err)
 	}
 
 	one := syntheticRecords(start, 1, 8, channels)
-	if _, err := encoder.Encode(iterOf(one), "EHZ"); err == nil || !strings.Contains(err.Error(), "time difference") {
+	if _, err := encoder.Encode(t.Context(), iterOf(one), "EHZ"); err == nil || !strings.Contains(err.Error(), "time difference") {
 		t.Fatalf("single record error = %v", err)
 	}
 
 	records := syntheticRecords(start, 2, 8, channels)
-	data, err := encoder.Encode(iterOf(records), "EHZ")
+	data, err := encoder.Encode(t.Context(), iterOf(records), "EHZ")
 	if err != nil || len(data) < 12 || string(data[:4]) != "RIFF" {
 		t.Fatalf("wav encode = %d bytes, %v", len(data), err)
 	}
@@ -279,13 +279,13 @@ func TestWavEncoder(t *testing.T) {
 	zeros := syntheticRecords(start, 2, 4, []explorer.ChannelData{{
 		ChannelCode: "EHZ", Data: []int32{0, 0, 0, 0},
 	}})
-	if data, err := encoder.Encode(iterOf(zeros), "EHZ"); err != nil || len(data) < 12 {
+	if data, err := encoder.Encode(t.Context(), iterOf(zeros), "EHZ"); err != nil || len(data) < 12 {
 		t.Fatalf("silent wav = %d bytes, %v", len(data), err)
 	}
-	if _, err := encoder.Encode(iterOf(records), "EHE"); err != nil {
+	if _, err := encoder.Encode(t.Context(), iterOf(records), "EHE"); err != nil {
 		t.Fatalf("missing channel error = %v", err)
 	}
-	if _, err := encoder.Encode(func(func(model.SeisRecord) error) error { return errors.New("read failed") }, "EHZ"); err == nil {
+	if _, err := encoder.Encode(t.Context(), func(func(model.SeisRecord) error) error { return errors.New("read failed") }, "EHZ"); err == nil {
 		t.Fatal("iterator error ignored")
 	}
 
@@ -320,20 +320,20 @@ func TestWavEncoder(t *testing.T) {
 
 	handler := openSettings(t, "station", "location", "network")
 	named := wavEncoder(handler, 8000)
-	filename, err := named.GetFileName(start, "EHZ")
+	filename, err := named.GetFileName(t.Context(), start, "EHZ")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if filename != "2024.075.13.05.09.0123.SHAKE.AS.00.EHZ.D.wav" {
 		t.Fatalf("filename = %s", filename)
 	}
-	if _, err := wavEncoder(openSettings(t), 8000).GetFileName(start, "EHZ"); err == nil {
+	if _, err := wavEncoder(openSettings(t), 8000).GetFileName(t.Context(), start, "EHZ"); err == nil {
 		t.Fatal("missing station code accepted")
 	}
-	if _, err := wavEncoder(openSettings(t, "station"), 8000).GetFileName(start, "EHZ"); err == nil {
+	if _, err := wavEncoder(openSettings(t, "station"), 8000).GetFileName(t.Context(), start, "EHZ"); err == nil {
 		t.Fatal("missing location code accepted")
 	}
-	if _, err := wavEncoder(openSettings(t, "station", "location"), 8000).GetFileName(start, "EHZ"); err == nil {
+	if _, err := wavEncoder(openSettings(t, "station", "location"), 8000).GetFileName(t.Context(), start, "EHZ"); err == nil {
 		t.Fatal("missing network code accepted")
 	}
 }
@@ -373,7 +373,7 @@ func openSettings(t *testing.T, codes ...string) *action.Handler {
 		"network":  &config.StationNetworkCodeConfigConstraintImpl{},
 	}
 	for _, code := range codes {
-		if err := known[code].Init(handler); err != nil {
+		if err := known[code].Init(t.Context(), handler); err != nil {
 			t.Fatal(err)
 		}
 	}

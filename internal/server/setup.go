@@ -81,7 +81,7 @@ func (s *HttpServer) Setup(listen string) error {
 	auth.Setup(api, s.resolver.ActionHandler, jwtMiddlewareFn, jwtHandler.LoginHandler, jwtHandler.RefreshHandler)
 	export.Setup(api, s.resolver.ActionHandler, s.resolver.HardwareDev, jwtMiddlewareFn)
 	notifications.Setup(api, s.notificationHub, jwtMiddlewareFn, s.shutdownCtx)
-	socket.Setup(api, s.resolver.TimeSource, s.resolver.HardwareDev, jwtMiddlewareFn)
+	s.closeSocket = socket.Setup(api, s.resolver.TimeSource, s.resolver.HardwareDev, jwtMiddlewareFn, s.shutdownCtx)
 	if err := files.Setup(api, s.resolver.ServiceMap, jwtMiddlewareFn); err != nil {
 		return fmt.Errorf("failed to setup files router: %w", err)
 	}

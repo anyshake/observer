@@ -116,12 +116,12 @@ func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, hardware
 		endTimestamp := time.UnixMilli(endTime)
 		recordFound := false
 		records := seismicRecordIterator(func(callback func(model.SeisRecord) error) error {
-			return actionHandler.SeisRecordsQueryEachContext(ctx.Request.Context(), startTimestamp, endTimestamp, func(record model.SeisRecord) error {
+			return actionHandler.SeisRecordsQueryEach(ctx.Request.Context(), startTimestamp, endTimestamp, func(record model.SeisRecord) error {
 				recordFound = true
 				return callback(record)
 			})
 		})
-		dataBytes, err := encoder.Encode(records, requestModel.ChannelCode)
+		dataBytes, err := encoder.Encode(ctx.Request.Context(), records, requestModel.ChannelCode)
 		if err != nil {
 			err = fmt.Errorf("failed to encode seismic records: %w", err)
 			response.Error(ctx, http.StatusInternalServerError, err.Error())
@@ -133,7 +133,7 @@ func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, hardware
 		}
 
 		if len(dataBytes) > 0 {
-			fileName, err := encoder.GetFileName(startTimestamp, requestModel.ChannelCode)
+			fileName, err := encoder.GetFileName(ctx.Request.Context(), startTimestamp, requestModel.ChannelCode)
 			if err != nil {
 				err = fmt.Errorf("failed to get file name: %w", err)
 				response.Error(ctx, http.StatusInternalServerError, err.Error())

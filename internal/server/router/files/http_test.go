@@ -1,6 +1,7 @@
 package files
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -87,11 +88,11 @@ type assetService struct {
 func (s *assetService) GetStatus() *service.Status                { return &service.Status{} }
 func (s *assetService) GetName() string                           { return "assets" }
 func (s *assetService) GetDescription() string                    { return "assets" }
-func (s *assetService) Init() error                               { return nil }
-func (s *assetService) IsEnabled() bool                           { return true }
-func (s *assetService) Start() error                              { return nil }
-func (s *assetService) Stop() error                               { return nil }
-func (s *assetService) Restart() error                            { return nil }
+func (s *assetService) Init(context.Context) error                { return nil }
+func (s *assetService) IsEnabled(context.Context) bool            { return true }
+func (s *assetService) Start(context.Context) error               { return nil }
+func (s *assetService) Stop(context.Context) error                { return nil }
+func (s *assetService) Restart(context.Context) error             { return nil }
 func (s *assetService) GetAssetList() ([]service.Asset, error)    { return nil, nil }
 func (s *assetService) GetConfigConstraint() []config.IConstraint { return nil }
 func (s *assetService) GetAssetData(id string) (*service.AssetData, error) {

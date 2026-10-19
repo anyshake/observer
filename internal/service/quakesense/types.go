@@ -11,7 +11,6 @@ import (
 	"github.com/anyshake/observer/pkg/ringbuf"
 	"github.com/anyshake/observer/pkg/timesource"
 	"github.com/bclswl0827/obsgo/signal"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 const ID = "service_quakesense"
@@ -32,12 +31,14 @@ const (
 )
 
 type QuakeSenseServiceImpl struct {
-	mu     sync.Mutex
-	status service.Status
+	lifecycle service.Lifecycle
+	mu        sync.Mutex
+	status    service.Status
 
-	wg       sync.WaitGroup
-	ctx      context.Context
-	cancelFn context.CancelFunc
+	wg        sync.WaitGroup
+	parentCtx context.Context
+	ctx       context.Context
+	cancelFn  context.CancelFunc
 
 	hardwareDev   hardware.IHardware
 	timeSource    *timesource.Source
@@ -52,7 +53,6 @@ type QuakeSenseServiceImpl struct {
 	mqttUsername string
 	mqttPassword string
 	mqttClientId string
-	mqttClient   mqtt.Client
 
 	stationName        string
 	stationDescription string

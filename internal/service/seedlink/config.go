@@ -1,6 +1,7 @@
 package seedlink
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -21,24 +22,24 @@ func (s *seedlinkConfigEnabledImpl) GetDefaultValue() any        { return true }
 func (s *seedlinkConfigEnabledImpl) GetDescription() string {
 	return "Enable SeedLink service to allow third-party client (e.g. Swarm) to connect to this station."
 }
-func (s *seedlinkConfigEnabledImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *seedlinkConfigEnabledImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default SeedLink service availability: %w", err)
 	}
 	return nil
 }
-func (s *seedlinkConfigEnabledImpl) Set(handler *action.Handler, newVal any) error {
+func (s *seedlinkConfigEnabledImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	enabled, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
 		return fmt.Errorf("failed to set SeedLink service availability: %w", err)
 	}
 	return nil
 }
-func (s *seedlinkConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *seedlinkConfigEnabledImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get SeedLink service availability: %w", err)
 	}
@@ -48,8 +49,8 @@ func (s *seedlinkConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
 	}
 	return enabled, nil
 }
-func (s *seedlinkConfigEnabledImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *seedlinkConfigEnabledImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset SeedLink service availability: %w", err)
 	}
 	return nil
@@ -68,24 +69,24 @@ func (s *seedlinkConfigCompressImpl) GetDefaultValue() any        { return false
 func (s *seedlinkConfigCompressImpl) GetDescription() string {
 	return "Whether to compress SeedLink data stream."
 }
-func (s *seedlinkConfigCompressImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *seedlinkConfigCompressImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default SeedLink compression flag: %w", err)
 	}
 	return nil
 }
-func (s *seedlinkConfigCompressImpl) Set(handler *action.Handler, newVal any) error {
+func (s *seedlinkConfigCompressImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	seedlinkCompress, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), seedlinkCompress); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), seedlinkCompress); err != nil {
 		return fmt.Errorf("failed to set SeedLink compression flag: %w", err)
 	}
 	return nil
 }
-func (s *seedlinkConfigCompressImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *seedlinkConfigCompressImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get SeedLink compression flag: %w", err)
 	}
@@ -95,8 +96,8 @@ func (s *seedlinkConfigCompressImpl) Get(handler *action.Handler) (any, error) {
 	}
 	return seedlinkCompress, nil
 }
-func (s *seedlinkConfigCompressImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *seedlinkConfigCompressImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset SeedLink compression flag: %w", err)
 	}
 	return nil
@@ -124,13 +125,13 @@ func (s *seedlinkConfigCompressSchemeImpl) GetDefaultValue() any {
 func (s *seedlinkConfigCompressSchemeImpl) GetDescription() string {
 	return "Compression scheme used when compression is enabled. STEIM-2 encodes count data as 30-bit instead of 32-bit, which may cause data overflow and checksum errors if a 32-bit ADC reaches full scale."
 }
-func (s *seedlinkConfigCompressSchemeImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *seedlinkConfigCompressSchemeImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default SeedLink compression scheme: %w", err)
 	}
 	return nil
 }
-func (s *seedlinkConfigCompressSchemeImpl) Set(handler *action.Handler, newVal any) error {
+func (s *seedlinkConfigCompressSchemeImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	compressScheme, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
@@ -138,13 +139,13 @@ func (s *seedlinkConfigCompressSchemeImpl) Set(handler *action.Handler, newVal a
 	if compressScheme != COMPRESS_SCHEME_STEIM_1 && compressScheme != COMPRESS_SCHEME_STEIM_2 {
 		return errors.New("compression scheme must be one of STEIM-1 or STEIM-2")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), compressScheme); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), compressScheme); err != nil {
 		return fmt.Errorf("failed to set SeedLink compression scheme: %w", err)
 	}
 	return nil
 }
-func (s *seedlinkConfigCompressSchemeImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *seedlinkConfigCompressSchemeImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get SeedLink compression scheme: %w", err)
 	}
@@ -154,8 +155,8 @@ func (s *seedlinkConfigCompressSchemeImpl) Get(handler *action.Handler) (any, er
 	}
 	return compressScheme, nil
 }
-func (s *seedlinkConfigCompressSchemeImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *seedlinkConfigCompressSchemeImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset SeedLink compression scheme: %w", err)
 	}
 	return nil
@@ -174,24 +175,24 @@ func (s *seedlinkConfigListenHostImpl) GetDefaultValue() any        { return "lo
 func (s *seedlinkConfigListenHostImpl) GetDescription() string {
 	return "IP address or hostname for SeedLink server to listen, by default, the server will listen on localhost."
 }
-func (s *seedlinkConfigListenHostImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *seedlinkConfigListenHostImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default SeedLink listen host: %w", err)
 	}
 	return nil
 }
-func (s *seedlinkConfigListenHostImpl) Set(handler *action.Handler, newVal any) error {
+func (s *seedlinkConfigListenHostImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	host, err := config.GetConfigValString(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), host); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), host); err != nil {
 		return fmt.Errorf("failed to set SeedLink listen host: %w", err)
 	}
 	return nil
 }
-func (s *seedlinkConfigListenHostImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *seedlinkConfigListenHostImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get SeedLink listen host: %w", err)
 	}
@@ -201,8 +202,8 @@ func (s *seedlinkConfigListenHostImpl) Get(handler *action.Handler) (any, error)
 	}
 	return host, nil
 }
-func (s *seedlinkConfigListenHostImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *seedlinkConfigListenHostImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset SeedLink listen host: %w", err)
 	}
 	return nil
@@ -221,13 +222,13 @@ func (s *seedlinkConfigListenPortImpl) GetDefaultValue() any        { return 180
 func (s *seedlinkConfigListenPortImpl) GetDescription() string {
 	return "Port for SeedLink server to listen, by default, the server will listen on localhost."
 }
-func (s *seedlinkConfigListenPortImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *seedlinkConfigListenPortImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default SeedLink listen port: %w", err)
 	}
 	return nil
 }
-func (s *seedlinkConfigListenPortImpl) Set(handler *action.Handler, newVal any) error {
+func (s *seedlinkConfigListenPortImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	port, err := config.GetConfigValInt64(newVal)
 	if err != nil {
 		return err
@@ -235,13 +236,13 @@ func (s *seedlinkConfigListenPortImpl) Set(handler *action.Handler, newVal any) 
 	if port < 1 || port > 65535 {
 		return errors.New("port must be between 1 and 65535")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), port); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), port); err != nil {
 		return fmt.Errorf("failed to set SeedLink listen port: %w", err)
 	}
 	return nil
 }
-func (s *seedlinkConfigListenPortImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *seedlinkConfigListenPortImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get SeedLink listen port: %w", err)
 	}
@@ -251,8 +252,8 @@ func (s *seedlinkConfigListenPortImpl) Get(handler *action.Handler) (any, error)
 	}
 	return int(port), nil
 }
-func (s *seedlinkConfigListenPortImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *seedlinkConfigListenPortImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset SeedLink listen port: %w", err)
 	}
 	return nil

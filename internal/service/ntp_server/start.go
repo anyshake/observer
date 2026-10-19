@@ -3,6 +3,7 @@ package ntp_server
 import (
 	"context"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"net"
 	"net/netip"
@@ -11,51 +12,58 @@ import (
 	"sync"
 	"time"
 
+	"github.com/anyshake/observer/internal/service"
 	"github.com/anyshake/observer/pkg/logger"
 )
 
-func (s *NtpServerServiceImpl) handleInterrupt() {
-	s.wg.Done()
-}
+func (s *NtpServerServiceImpl) Start(ctx context.Context) error {
+	if err := s.lifecycle.Lock(ctx); err != nil {
+		return err
+	}
+	defer s.lifecycle.Unlock()
 
-func (s *NtpServerServiceImpl) Start() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if s.status.GetIsRunning() {
+		return errors.New("NTP server service is already running")
+	}
+	if err := s.parentCtx.Err(); err != nil {
+		return err
+	}
 	if s.ctx.Err() != nil {
-		s.ctx, s.cancelFn = context.WithCancel(context.Background())
+		s.ctx, s.cancelFn = context.WithCancel(s.parentCtx)
 	}
 
-	ntpSrv, err := newNtpServer(s.listenHost, s.listenPort, func() time.Time {
-		return s.timeSource.Now().Add(time.Duration(s.delayControl) * time.Microsecond)
+	listenHost, listenPort, delayControl := s.listenHost, s.listenPort, s.delayControl
+	ntpSrv, err := newNtpServer(listenHost, listenPort, func() time.Time {
+		return s.timeSource.Now().Add(time.Duration(delayControl) * time.Microsecond)
 	})
 	if err != nil {
 		return fmt.Errorf("failed to start NTP server: %w", err)
 	}
 
+	runCtx, runCancel := s.ctx, s.cancelFn
+	s.status.SetStartedAt(s.timeSource.Now())
+	s.status.SetIsRunning(true)
+	s.wg.Add(1)
 	go func() {
-		s.status.SetStartedAt(s.timeSource.Now())
-		s.status.SetIsRunning(true)
+		defer s.wg.Done()
 		defer func() {
+			runCancel()
+			s.status.SetStoppedAt(s.timeSource.Now())
+			s.status.SetIsRunning(false)
 			if r := recover(); r != nil {
-				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
-				s.handleInterrupt()
-				_ = s.Stop()
+				logger.GetLogger(ID).Errorf("service unexpectedly crashed, recovered from panic: %v\n%s", r, debug.Stack())
 			}
 		}()
 
-		logger.GetLogger(ID).Infof("starting NTP server service, listening on %s:%d", s.listenHost, s.listenPort)
-		if err := ntpSrv.Run(s.ctx); err != nil {
+		logger.GetLogger(ID).Infof("starting NTP server service, listening on %s:%d", listenHost, listenPort)
+		if err := ntpSrv.Run(runCtx); err != nil {
 			logger.GetLogger(ID).Errorf("failed to run NTP server service: %v", err)
-			s.handleInterrupt()
-			_ = s.Stop()
-			return
 		}
-
-		s.handleInterrupt()
 	}()
 
-	s.wg.Add(1)
 	return nil
 }
 
@@ -81,6 +89,8 @@ const (
 	readDeadline      = 100 * time.Millisecond
 	packetQueueFactor = 128
 )
+
+var errPacketWorkerCrashed = errors.New("NTP packet worker crashed")
 
 type ntpPacket struct {
 	addr *net.UDPAddr
@@ -124,12 +134,22 @@ func newNtpServer(addr string, port int, timeFn func() time.Time) (*ntpServer, e
 }
 
 func (p *ntpServer) Run(ctx context.Context) error {
+	runCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	stopErr := func() error {
+		if ctx.Err() != nil {
+			return nil
+		}
+		return errPacketWorkerCrashed
+	}
+
 	workerCount := p.workerCount()
 	packets := make(chan ntpPacket, workerCount*packetQueueFactor)
 	for i := 0; i < workerCount; i++ {
 		p.wg.Add(1)
 		go func() {
 			defer p.wg.Done()
+			defer service.RecoverWorker(ID, cancel)
 			for packet := range packets {
 				p.handleData(packet.t2, packet.addr, packet.data)
 			}
@@ -147,8 +167,8 @@ func (p *ntpServer) Run(ctx context.Context) error {
 
 	for readBuf := make([]byte, 512); ; {
 		select {
-		case <-ctx.Done():
-			return nil
+		case <-runCtx.Done():
+			return stopErr()
 		default:
 		}
 
@@ -163,8 +183,8 @@ func (p *ntpServer) Run(ctx context.Context) error {
 			}
 
 			select {
-			case <-ctx.Done():
-				return nil
+			case <-runCtx.Done():
+				return stopErr()
 			default:
 			}
 
@@ -180,8 +200,8 @@ func (p *ntpServer) Run(ctx context.Context) error {
 
 			select {
 			case packets <- packet:
-			case <-ctx.Done():
-				return nil
+			case <-runCtx.Done():
+				return stopErr()
 			}
 		}
 	}

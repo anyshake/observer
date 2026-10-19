@@ -1,6 +1,7 @@
 package archiver
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -21,24 +22,24 @@ func (s *archiverConfigEnabledImpl) GetDefaultValue() any        { return true }
 func (s *archiverConfigEnabledImpl) GetDescription() string {
 	return "Set to true if you want to enable archiver service, otherwise the history seismic waveform query and export feature will be not available."
 }
-func (s *archiverConfigEnabledImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *archiverConfigEnabledImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default archiver service availability: %w", err)
 	}
 	return nil
 }
-func (s *archiverConfigEnabledImpl) Set(handler *action.Handler, newVal any) error {
+func (s *archiverConfigEnabledImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	enabled, err := config.GetConfigValBool(newVal)
 	if err != nil {
 		return err
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), enabled); err != nil {
 		return fmt.Errorf("failed to set archiver service availability: %w", err)
 	}
 	return nil
 }
-func (s *archiverConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *archiverConfigEnabledImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get archiver service availability: %w", err)
 	}
@@ -48,8 +49,8 @@ func (s *archiverConfigEnabledImpl) Get(handler *action.Handler) (any, error) {
 	}
 	return enabled, nil
 }
-func (s *archiverConfigEnabledImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *archiverConfigEnabledImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset archiver service availability: %w", err)
 	}
 	return nil
@@ -68,13 +69,13 @@ func (s *archiverConfigRotationImpl) GetDefaultValue() any        { return 0 }
 func (s *archiverConfigRotationImpl) GetDescription() string {
 	return "Number of days to keep the archiver history, set to 0 to disable data rotation."
 }
-func (s *archiverConfigRotationImpl) Init(handler *action.Handler) error {
-	if _, err := handler.SettingsInit(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *archiverConfigRotationImpl) Init(ctx context.Context, handler *action.Handler) error {
+	if _, err := handler.SettingsInit(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to set default archiver rotation: %w", err)
 	}
 	return nil
 }
-func (s *archiverConfigRotationImpl) Set(handler *action.Handler, newVal any) error {
+func (s *archiverConfigRotationImpl) Set(ctx context.Context, handler *action.Handler, newVal any) error {
 	archiverRotation, err := config.GetConfigValInt64(newVal)
 	if err != nil {
 		return err
@@ -82,13 +83,13 @@ func (s *archiverConfigRotationImpl) Set(handler *action.Handler, newVal any) er
 	if archiverRotation < 0 {
 		return errors.New("rotation cannot be negative")
 	}
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), archiverRotation); err != nil {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), archiverRotation); err != nil {
 		return fmt.Errorf("failed to set archiver rotation: %w", err)
 	}
 	return nil
 }
-func (s *archiverConfigRotationImpl) Get(handler *action.Handler) (any, error) {
-	val, _, _, err := handler.SettingsGet(s.GetNamespace(), s.GetKey())
+func (s *archiverConfigRotationImpl) Get(ctx context.Context, handler *action.Handler) (any, error) {
+	val, _, _, err := handler.SettingsGet(ctx, s.GetNamespace(), s.GetKey())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get archiver rotation: %w", err)
 	}
@@ -98,8 +99,8 @@ func (s *archiverConfigRotationImpl) Get(handler *action.Handler) (any, error) {
 	}
 	return int(archiverRotation), nil
 }
-func (s *archiverConfigRotationImpl) Restore(handler *action.Handler) error {
-	if err := handler.SettingsSet(s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
+func (s *archiverConfigRotationImpl) Restore(ctx context.Context, handler *action.Handler) error {
+	if err := handler.SettingsSet(ctx, s.GetNamespace(), s.GetKey(), s.GetType(), s.GetVersion(), s.GetDefaultValue()); err != nil {
 		return fmt.Errorf("failed to reset archiver rotation: %w", err)
 	}
 	return nil

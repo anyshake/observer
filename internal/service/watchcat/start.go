@@ -2,43 +2,53 @@ package watchcat
 
 import (
 	"context"
+	"errors"
 	"runtime/debug"
 	"time"
 
 	"github.com/anyshake/observer/pkg/logger"
 )
 
-func (s *WatchCatServiceImpl) handleInterrupt(ticker *time.Ticker) {
-	ticker.Stop()
-	s.wg.Done()
-}
+func (s *WatchCatServiceImpl) Start(ctx context.Context) error {
+	if err := s.lifecycle.Lock(ctx); err != nil {
+		return err
+	}
+	defer s.lifecycle.Unlock()
 
-func (s *WatchCatServiceImpl) Start() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if s.status.GetIsRunning() {
+		return errors.New("WatchCat service is already running")
+	}
+	if err := s.parentCtx.Err(); err != nil {
+		return err
+	}
 	if s.ctx.Err() != nil {
-		s.ctx, s.cancelFn = context.WithCancel(context.Background())
+		s.ctx, s.cancelFn = context.WithCancel(s.parentCtx)
 	}
 
+	runCtx, runCancel := s.ctx, s.cancelFn
+	s.status.SetStartedAt(s.timeSource.Now())
+	s.status.SetIsRunning(true)
+	s.wg.Add(1)
 	go func() {
+		defer s.wg.Done()
 		ticker := time.NewTicker(WATCHCAT_CHECK_INTERVAL)
-
-		s.status.SetStartedAt(s.timeSource.Now())
-		s.status.SetIsRunning(true)
 		defer func() {
+			ticker.Stop()
+			runCancel()
+			s.status.SetStoppedAt(s.timeSource.Now())
+			s.status.SetIsRunning(false)
 			if r := recover(); r != nil {
-				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
-				s.handleInterrupt(ticker)
-				_ = s.Stop()
+				logger.GetLogger(ID).Errorf("service unexpectedly crashed, recovered from panic: %v\n%s", r, debug.Stack())
 			}
 		}()
 
 		var lastUpdatedAt time.Time
 		for {
 			select {
-			case <-s.ctx.Done():
-				s.handleInterrupt(ticker)
+			case <-runCtx.Done():
 				return
 			case <-ticker.C:
 				status := s.hardwareDev.GetStatus()
@@ -54,6 +64,5 @@ func (s *WatchCatServiceImpl) Start() error {
 		}
 	}()
 
-	s.wg.Add(1)
 	return nil
 }

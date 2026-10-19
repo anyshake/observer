@@ -1,8 +1,10 @@
 package seisevent
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
+	"slices"
 	"time"
 
 	"github.com/anyshake/observer/pkg/cache"
@@ -32,19 +34,19 @@ func (u *USGS) GetProperty() DataSourceProperty {
 	}
 }
 
-func (u *USGS) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (u *USGS) GetEvents(ctx context.Context, latitude, longitude float64) ([]Event, error) {
 	var baseEvents []Event
 
 	if u.cache.Valid() {
 		baseEvents = u.cache.Get()
 	} else {
-		v, err, _ := u.sf.Do(USGS_ID, func() (any, error) {
+		v, err := fetchEvents(ctx, &u.sf, USGS_ID, func(ctx context.Context) ([]Event, error) {
 			if u.cache.Valid() {
 				return u.cache.Get(), nil
 			}
 
 			res, err := request.GET(
-				"https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson",
+				ctx, "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson",
 				10*time.Second, time.Second, 3, false, nil,
 				map[string]string{"User-Agent": uarand.GetRandom()},
 			)
@@ -111,9 +113,10 @@ func (u *USGS) GetEvents(latitude, longitude float64) ([]Event, error) {
 			return nil, err
 		}
 
-		baseEvents = v.([]Event)
+		baseEvents = v
 	}
 
+	baseEvents = slices.Clone(baseEvents)
 	for i := range baseEvents {
 		baseEvents[i].Distance = getDistance(latitude, baseEvents[i].Latitude, longitude, baseEvents[i].Longitude)
 		baseEvents[i].Estimation = getSeismicEstimation(

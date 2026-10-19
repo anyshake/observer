@@ -1,8 +1,10 @@
 package seisevent
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
+	"slices"
 	"time"
 
 	"github.com/anyshake/observer/pkg/cache"
@@ -32,19 +34,19 @@ func (u *GEONET) GetProperty() DataSourceProperty {
 	}
 }
 
-func (c *GEONET) GetEvents(latitude, longitude float64) ([]Event, error) {
+func (c *GEONET) GetEvents(ctx context.Context, latitude, longitude float64) ([]Event, error) {
 	var baseEvents []Event
 
 	if c.cache.Valid() {
 		baseEvents = c.cache.Get()
 	} else {
-		v, err, _ := c.sf.Do(GEONET_ID, func() (any, error) {
+		v, err := fetchEvents(ctx, &c.sf, GEONET_ID, func(ctx context.Context) ([]Event, error) {
 			if c.cache.Valid() {
 				return c.cache.Get(), nil
 			}
 
 			res, err := request.GET(
-				"https://api.geonet.org.nz/quake?MMI=1",
+				ctx, "https://api.geonet.org.nz/quake?MMI=1",
 				10*time.Second, time.Second, 3, false, nil,
 				map[string]string{"User-Agent": uarand.GetRandom()},
 			)
@@ -108,9 +110,10 @@ func (c *GEONET) GetEvents(latitude, longitude float64) ([]Event, error) {
 			return nil, err
 		}
 
-		baseEvents = v.([]Event)
+		baseEvents = v
 	}
 
+	baseEvents = slices.Clone(baseEvents)
 	for i := range baseEvents {
 		baseEvents[i].Distance = getDistance(latitude, baseEvents[i].Latitude, longitude, baseEvents[i].Longitude)
 		baseEvents[i].Estimation = getSeismicEstimation(

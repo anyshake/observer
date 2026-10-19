@@ -1,7 +1,9 @@
 package helicorder
 
-func (s *HelicorderServiceImpl) IsEnabled() bool {
-	enable, err := (&helicorderConfigEnabledImpl{}).Get(s.dataProvider.actionHandler)
+import "context"
+
+func (s *HelicorderServiceImpl) IsEnabled(ctx context.Context) bool {
+	enable, err := (&helicorderConfigEnabledImpl{}).Get(ctx, s.dataProvider.actionHandler)
 	if err != nil {
 		return false
 	}

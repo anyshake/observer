@@ -1,7 +1,9 @@
 package seedlink
 
-func (s *SeedLinkServiceImpl) IsEnabled() bool {
-	enable, err := (&seedlinkConfigEnabledImpl{}).Get(s.actionHandler)
+import "context"
+
+func (s *SeedLinkServiceImpl) IsEnabled(ctx context.Context) bool {
+	enable, err := (&seedlinkConfigEnabledImpl{}).Get(ctx, s.actionHandler)
 	if err != nil {
 		return false
 	}

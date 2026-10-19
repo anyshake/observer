@@ -2,6 +2,7 @@ package mdns_discovery
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"runtime/debug"
@@ -13,11 +14,6 @@ import (
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/grandcat/zeroconf"
 )
-
-func (s *DiscoveryServiceImpl) handleInterrupt(ticker *time.Ticker) {
-	ticker.Stop()
-	s.wg.Done()
-}
 
 func (s *DiscoveryServiceImpl) newRegistration(instanceName, serviceType string, port int) (*mdnsRegistration, error) {
 	srv, err := zeroconf.Register(instanceName, serviceType, "local.", port, nil, nil)
@@ -151,24 +147,46 @@ func (s *DiscoveryServiceImpl) syncRegistrations() {
 	}
 }
 
-func (s *DiscoveryServiceImpl) Start() error {
+func (s *DiscoveryServiceImpl) Start(ctx context.Context) error {
+	if err := s.lifecycle.Lock(ctx); err != nil {
+		return err
+	}
+	defer s.lifecycle.Unlock()
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if s.status.GetIsRunning() {
+		return errors.New("mDNS discovery service is already running")
+	}
+	if err := s.parentCtx.Err(); err != nil {
+		return err
+	}
 	if s.ctx.Err() != nil {
-		s.ctx, s.cancelFn = context.WithCancel(context.Background())
+		s.ctx, s.cancelFn = context.WithCancel(s.parentCtx)
 	}
 
+	runCtx, runCancel := s.ctx, s.cancelFn
+	s.status.SetStartedAt(s.timeSource.Now())
+	s.status.SetIsRunning(true)
+	s.wg.Add(1)
 	go func() {
+		defer s.wg.Done()
 		ticker := time.NewTicker(DISCOVERY_SCAN_INTERVAL)
-
-		s.status.SetStartedAt(s.timeSource.Now())
-		s.status.SetIsRunning(true)
 		defer func() {
+			ticker.Stop()
+			runCancel()
+			for _, reg := range []*mdnsRegistration{s.httpReg, s.seedlinkReg, s.winstonReg, s.forwarderReg} {
+				shutdownReg(reg)
+			}
+			s.httpReg = nil
+			s.seedlinkReg = nil
+			s.winstonReg = nil
+			s.forwarderReg = nil
+			s.status.SetStoppedAt(s.timeSource.Now())
+			s.status.SetIsRunning(false)
 			if r := recover(); r != nil {
-				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
-				s.handleInterrupt(ticker)
-				_ = s.Stop()
+				logger.GetLogger(ID).Errorf("service unexpectedly crashed, recovered from panic: %v\n%s", r, debug.Stack())
 			}
 		}()
 
@@ -185,8 +203,7 @@ func (s *DiscoveryServiceImpl) Start() error {
 
 		for {
 			select {
-			case <-s.ctx.Done():
-				s.handleInterrupt(ticker)
+			case <-runCtx.Done():
 				return
 			case <-ticker.C:
 				s.syncRegistrations()
@@ -194,6 +211,5 @@ func (s *DiscoveryServiceImpl) Start() error {
 		}
 	}()
 
-	s.wg.Add(1)
 	return nil
 }

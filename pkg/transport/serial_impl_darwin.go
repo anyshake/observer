@@ -20,6 +20,12 @@ type SerialTransportImpl struct {
 }
 
 func (t *SerialTransportImpl) Open() error {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
+	if t.conn != nil {
+		return errors.New("connection is already opened")
+	}
 	conn, err := serial.Open(
 		t.port,
 		&serial.Mode{
@@ -33,13 +39,16 @@ func (t *SerialTransportImpl) Open() error {
 		return fmt.Errorf("failed to open serial port %s: %w", t.port, err)
 	}
 	if err = conn.SetReadTimeout(t.timeout); err != nil {
+		_ = conn.Close()
 		return fmt.Errorf("failed to set read timeout: %w", err)
 	}
 
 	if err = conn.ResetInputBuffer(); err != nil {
+		_ = conn.Close()
 		return fmt.Errorf("failed to reset input buffer: %w", err)
 	}
 	if err = conn.ResetOutputBuffer(); err != nil {
+		_ = conn.Close()
 		return fmt.Errorf("failed to reset output buffer: %w", err)
 	}
 
@@ -48,14 +57,16 @@ func (t *SerialTransportImpl) Open() error {
 }
 
 func (t *SerialTransportImpl) Close() error {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
 	if t.conn == nil {
 		return errors.New("connection is not opened")
 	}
 
-	t.mutex.Lock()
-	defer t.mutex.Unlock()
-
-	return t.conn.Close()
+	err := t.conn.Close()
+	t.conn = nil
+	return err
 }
 
 func (t *SerialTransportImpl) GetLatency(packetSize int) time.Duration {
@@ -67,8 +78,10 @@ func (t *SerialTransportImpl) SetTimeout(timeout time.Duration) error {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
-	if err := t.conn.SetReadTimeout(t.timeout); err != nil {
-		return fmt.Errorf("failed to set read timeout: %w", err)
+	if t.conn != nil {
+		if err := t.conn.SetReadTimeout(timeout); err != nil {
+			return fmt.Errorf("failed to set read timeout: %w", err)
+		}
 	}
 
 	t.timeout = timeout
@@ -76,34 +89,34 @@ func (t *SerialTransportImpl) SetTimeout(timeout time.Duration) error {
 }
 
 func (t *SerialTransportImpl) Read(buf []byte) (int, error) {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
 	if t.conn == nil {
 		return 0, errors.New("connection is not opened")
 	}
-
-	t.mutex.Lock()
-	defer t.mutex.Unlock()
 
 	return t.conn.Read(buf)
 }
 
 func (t *SerialTransportImpl) Write(buf []byte) (int, error) {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
 	if t.conn == nil {
 		return 0, errors.New("connection is not opened")
 	}
-
-	t.mutex.Lock()
-	defer t.mutex.Unlock()
 
 	return t.conn.Write(buf)
 }
 
 func (t *SerialTransportImpl) Flush() error {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
 	if t.conn == nil {
 		return errors.New("connection is not opened")
 	}
-
-	t.mutex.Lock()
-	defer t.mutex.Unlock()
 
 	if err := t.conn.ResetInputBuffer(); err != nil {
 		return err
@@ -116,10 +129,6 @@ func (t *SerialTransportImpl) Flush() error {
 }
 
 func (t *SerialTransportImpl) ReadUntil(ctx context.Context, maxBytes int, doneFunc func(buf *[]byte, updatedAt *time.Time) bool, timeout time.Duration) ([]byte, bool, time.Duration, error) {
-	if t.conn == nil {
-		return nil, false, 0, errors.New("connection is not opened")
-	}
-
 	if doneFunc == nil {
 		return nil, false, 0, errors.New("doneFunc cannot be nil")
 	}
@@ -143,6 +152,10 @@ func (t *SerialTransportImpl) ReadUntil(ctx context.Context, maxBytes int, doneF
 		}
 
 		t.mutex.Lock()
+		if t.conn == nil {
+			t.mutex.Unlock()
+			return nil, false, 0, errors.New("connection is not opened")
+		}
 		n, err := t.conn.Read(temp)
 		currentTime := time.Now()
 		t.mutex.Unlock()

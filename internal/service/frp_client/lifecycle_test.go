@@ -15,11 +15,11 @@ func TestLifecycle(t *testing.T) {
 	logger.Init()
 	_, handler := testsupport.OpenDAO(t)
 	fixed := time.Date(2026, time.October, 8, 1, 2, 3, 0, time.UTC)
-	svc := New("bad-address", handler, timesource.New(func() time.Time { return fixed }))
+	svc := New(t.Context(), "bad-address", handler, timesource.New(func() time.Time { return fixed }))
 	if svc.GetName() != "FRP Client Service" || svc.GetDescription() == "" || svc.GetStatus() == nil {
 		t.Fatal("service metadata is incomplete")
 	}
-	if svc.IsEnabled() {
+	if svc.IsEnabled(t.Context()) {
 		t.Fatal("enabled before initialization")
 	}
 	if _, err := svc.GetAssetList(); err == nil {
@@ -35,7 +35,7 @@ func TestLifecycle(t *testing.T) {
 	if _, _, err := svc.parseLocalServerAddr(); err == nil {
 		t.Fatal("invalid local port was accepted")
 	}
-	if err := svc.Init(); err != nil {
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	if err := setConstraint(t, handler, svc, "enabled", true); err != nil {
@@ -47,30 +47,30 @@ func TestLifecycle(t *testing.T) {
 	if err := setConstraint(t, handler, svc, "server_port", int64(1)); err != nil {
 		t.Fatal(err)
 	}
-	if err := svc.Init(); err != nil {
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	if !svc.IsEnabled() {
+	if !svc.IsEnabled(t.Context()) {
 		t.Fatal("service stayed disabled")
 	}
-	if err := svc.Start(); err == nil {
+	if err := svc.Start(t.Context()); err == nil {
 		t.Fatal("invalid local address was started")
 	}
 
 	svc.localServerAddr = "127.0.0.1:8080"
-	if err := svc.Start(); err != nil {
+	if err := svc.Start(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { _ = svc.Stop() })
+	t.Cleanup(func() { testsupport.StopService(t, svc) })
 	waitRunning(t, svc, true)
-	if err := svc.Restart(); err != nil {
+	if err := svc.Restart(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	waitRunning(t, svc, true)
 	if svc.GetStatus().GetRestarts() != 1 {
 		t.Fatalf("restarts = %d", svc.GetStatus().GetRestarts())
 	}
-	if err := svc.Stop(); err != nil {
+	if err := svc.Stop(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 
@@ -80,14 +80,14 @@ func TestLifecycle(t *testing.T) {
 	if err := setConstraint(t, handler, svc, "user", "alice"); err != nil {
 		t.Fatal(err)
 	}
-	if err := svc.Init(); err != nil {
+	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	if err := svc.Start(); err != nil {
+	if err := svc.Start(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 	waitRunning(t, svc, true)
-	if err := svc.Stop(); err != nil {
+	if err := svc.Stop(t.Context()); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -110,7 +110,7 @@ func setConstraint(t *testing.T, handler *action.Handler, svc *FrpClientServiceI
 	t.Helper()
 	for _, constraint := range svc.GetConfigConstraint() {
 		if constraint.GetKey() == key {
-			return constraint.Set(handler, value)
+			return constraint.Set(t.Context(), handler, value)
 		}
 	}
 	t.Fatalf("constraint %s was not found", key)

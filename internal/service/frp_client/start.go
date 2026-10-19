@@ -2,6 +2,7 @@ package frp_client
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"runtime/debug"
@@ -13,14 +14,21 @@ import (
 	"github.com/samber/lo"
 )
 
-func (s *FrpClientServiceImpl) handleInterrupt() {
-	s.wg.Done()
-}
+func (s *FrpClientServiceImpl) Start(ctx context.Context) error {
+	if err := s.lifecycle.Lock(ctx); err != nil {
+		return err
+	}
+	defer s.lifecycle.Unlock()
 
-func (s *FrpClientServiceImpl) Start() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if s.status.GetIsRunning() {
+		return errors.New("FRP client service is already running")
+	}
+	if err := s.parentCtx.Err(); err != nil {
+		return err
+	}
 	localServerHostname, localServerPort, err := s.parseLocalServerAddr()
 	if err != nil {
 		return err
@@ -77,30 +85,31 @@ func (s *FrpClientServiceImpl) Start() error {
 	if err != nil {
 		return fmt.Errorf("failed to create FRP client instance: %w", err)
 	}
-	s.clientObj = svr
 
 	if s.ctx.Err() != nil {
-		s.ctx, s.cancelFn = context.WithCancel(context.Background())
+		s.ctx, s.cancelFn = context.WithCancel(s.parentCtx)
 	}
 
+	runCtx, runCancel := s.ctx, s.cancelFn
+	s.status.SetStartedAt(s.timeSource.Now())
+	s.status.SetIsRunning(true)
+	s.wg.Add(1)
 	go func() {
-		s.status.SetStartedAt(s.timeSource.Now())
-		s.status.SetIsRunning(true)
+		defer s.wg.Done()
 		defer func() {
+			runCancel()
+			s.status.SetStoppedAt(s.timeSource.Now())
+			s.status.SetIsRunning(false)
 			if r := recover(); r != nil {
-				logger.GetLogger(ID).Errorf("service unexpectly stopped, recovered from panic: %v\n%s", r, debug.Stack())
-				s.handleInterrupt()
-				_ = s.Stop()
+				logger.GetLogger(ID).Errorf("service unexpectedly crashed, recovered from panic: %v\n%s", r, debug.Stack())
 			}
 		}()
 
-		if err := s.clientObj.Run(s.ctx); err != nil {
+		if err := svr.Run(runCtx); err != nil {
 			logger.GetLogger(ID).Errorf("error running frpc: %v", err)
 		}
-		s.handleInterrupt()
 	}()
 
-	s.wg.Add(1)
 	return nil
 }
 

@@ -2,8 +2,11 @@ package ntp_server
 
 import (
 	"context"
+	"errors"
 	"net"
 	"net/netip"
+	"runtime/debug"
+	"strings"
 	"testing"
 	"time"
 )
@@ -125,5 +128,38 @@ func TestNTPServerExchange(t *testing.T) {
 		}
 	case <-time.After(3 * time.Second):
 		t.Fatal("NTP server did not stop")
+	}
+}
+
+func TestPacketWorkerPanicStopsServer(t *testing.T) {
+	server, err := newNtpServer("127.0.0.1", 0, func() time.Time {
+		if strings.Contains(string(debug.Stack()), "encodePacket") {
+			panic("time source failed")
+		}
+		return time.Now()
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	done := make(chan error, 1)
+	go func() { done <- server.Run(t.Context()) }()
+
+	client, err := net.DialUDP("udp", nil, server.conn.LocalAddr().(*net.UDPAddr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer client.Close()
+	request := make([]byte, 48)
+	request[0] = 0x23
+	if _, err := client.Write(request); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case err := <-done:
+		if !errors.Is(err, errPacketWorkerCrashed) {
+			t.Fatalf("Run() error = %v, want %v", err, errPacketWorkerCrashed)
+		}
+	case <-time.After(3 * time.Second):
+		t.Fatal("NTP server kept running after a packet worker panic")
 	}
 }

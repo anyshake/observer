@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -24,6 +25,7 @@ import (
 	"github.com/anyshake/observer/internal/server"
 	"github.com/anyshake/observer/internal/service"
 	"github.com/anyshake/observer/internal/upgrade"
+	"github.com/anyshake/observer/pkg/jobtracker"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/anyshake/observer/pkg/seisevent"
 	"github.com/anyshake/observer/pkg/semver"
@@ -78,10 +80,14 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 	}
 	logger.GetLogger(main).Infoln("global configuration has been loaded")
 
+	var pprofServer *http.Server
 	if conf.Server.Debug {
+		pprofServer = &http.Server{Addr: "localhost:6060", Handler: http.DefaultServeMux}
 		go func() {
 			logger.GetLogger(main).Infoln("pprof server running on http://localhost:6060/debug/pprof/")
-			http.ListenAndServe("localhost:6060", nil)
+			if err := pprofServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+				logger.GetLogger(main).Errorf("pprof server stopped unexpectedly: %v", err)
+			}
 		}()
 	}
 
@@ -119,6 +125,10 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 	}
 	logger.GetLogger(main).Infoln("database connection has been established")
 
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	defer signal.Stop(signalChan)
+
 	if err = daoObj.AutoMigrate(
 		&model.SchemaVersion{},
 		&model.SeisRecord{},
@@ -126,14 +136,19 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		&model.FDSNAccessKey{},
 		&model.UserSettings{},
 	); err != nil {
-		logger.GetLogger(main).Fatalln(err)
+		logger.GetLogger(main).Errorln(err)
+		_ = daoObj.Close()
+		os.Exit(1)
 	}
 	logger.GetLogger(main).Infoln("database schema has been configured")
 	actionHandler := action.NewHandler(daoObj)
+	appCtx, cancelApp := context.WithCancel(context.Background())
+	defer cancelApp()
 
 	var hardwareDevice hardware.IHardware
 
-	runCleanerTasks := func() {
+	runCleanerTasks := func(ctx context.Context) error {
+		var errs []error
 		cleanerTasks := []hook.IHook{
 			&cleaner_close_explorer.CloseExplorerCleanerImpl{HardwareDev: hardwareDevice},
 			&cleaner_close_database.CloseDatabaseCleanerImpl{DAO: daoObj},
@@ -141,10 +156,12 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		for _, t := range cleanerTasks {
 			taskName := t.GetName()
 			logger.GetLogger(taskName).Infof("running cleaner task: %s", taskName)
-			if err = t.Execute(); err != nil {
+			if err := t.Execute(ctx); err != nil {
 				logger.GetLogger(taskName).Errorf("failed to run cleaner task %s: %v", taskName, err)
+				errs = append(errs, fmt.Errorf("%s: %w", taskName, err))
 			}
 		}
+		return errors.Join(errs...)
 	}
 
 	stationConfigConstraints := config.NewStationConstraints()
@@ -161,15 +178,16 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 	for _, t := range startupTasks {
 		taskName := t.GetName()
 		logger.GetLogger(taskName).Infof("running startup task: %s", taskName)
-		if err = t.Execute(); err != nil {
+		if err = t.Execute(appCtx); err != nil {
 			logger.GetLogger(taskName).Errorf("failed to run startup task %s: %v", taskName, err)
-			runCleanerTasks()
+			runCleanerTasks(appCtx)
 			os.Exit(1)
 		}
 	}
 
 	timeSrc := timesource.New(nil)
 	hardwareDevice, err = hardware.New(
+		appCtx,
 		logger.GetLogger("explorer_driver"),
 		timeSrc,
 		actionHandler,
@@ -189,11 +207,25 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		},
 	)
 	if err != nil {
-		logger.GetLogger(main).Fatalf("failed to create explorer instance: %v", err)
+		logger.GetLogger(main).Errorf("failed to create explorer instance: %v", err)
+		runCleanerTasks(appCtx)
+		os.Exit(1)
 	}
-	hardwareCtx, sendHardwareAbortSignal, err := hardwareDevice.Open(context.Background())
+	hardwareCtx, sendHardwareAbortSignal, interrupted, err := openHardware(signalChan, hardwareDevice.Open)
 	if err != nil {
-		logger.GetLogger(main).Fatalf("failed to open explorer instance: %v", err)
+		hardwareDevice = nil
+	} else if interrupted {
+		sendHardwareAbortSignal()
+	}
+	if interrupted {
+		logger.GetLogger(main).Warnln("interrupt signal received during startup, shutting down...")
+		runCleanerTasks(appCtx)
+		os.Exit(0)
+	}
+	if err != nil {
+		logger.GetLogger(main).Errorf("failed to open explorer instance: %v", err)
+		runCleanerTasks(appCtx)
+		os.Exit(1)
 	}
 	logger.GetLogger(main).Infof("hardware device has been connected, current time in UTC: %s", timeSrc.Now().Format(time.RFC3339))
 
@@ -204,52 +236,38 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 	notificationHub := notification.NewHub(32)
 
 	serviceMap := map[string]service.IService{
-		service_archiver.ID:   service_archiver.New(hardwareDevice, actionHandler, timeSrc),
-		service_forwarder.ID:  service_forwarder.New(hardwareDevice, actionHandler, timeSrc),
-		service_frp_client.ID: service_frp_client.New(conf.Server.Listen, actionHandler, timeSrc),
-		service_helicorder.ID: service_helicorder.New(hardwareDevice, actionHandler, timeSrc),
-		service_metrics.ID:    service_metrics.New(hardwareDevice, actionHandler, timeSrc, ver, build),
-		service_miniseed.ID:   service_miniseed.New(hardwareDevice, actionHandler, timeSrc),
-		service_ntp_server.ID: service_ntp_server.New(actionHandler, timeSrc),
-		service_quakesense.ID: service_quakesense.New(hardwareDevice, actionHandler, timeSrc, notificationHub),
-		service_seedlink.ID:   service_seedlink.New(hardwareDevice, actionHandler, timeSrc),
+		service_archiver.ID:   service_archiver.New(appCtx, hardwareDevice, actionHandler, timeSrc),
+		service_forwarder.ID:  service_forwarder.New(appCtx, hardwareDevice, actionHandler, timeSrc),
+		service_frp_client.ID: service_frp_client.New(appCtx, conf.Server.Listen, actionHandler, timeSrc),
+		service_helicorder.ID: service_helicorder.New(appCtx, hardwareDevice, actionHandler, timeSrc),
+		service_metrics.ID:    service_metrics.New(appCtx, hardwareDevice, actionHandler, timeSrc, ver, build),
+		service_miniseed.ID:   service_miniseed.New(appCtx, hardwareDevice, actionHandler, timeSrc),
+		service_ntp_server.ID: service_ntp_server.New(appCtx, actionHandler, timeSrc),
+		service_quakesense.ID: service_quakesense.New(appCtx, hardwareDevice, actionHandler, timeSrc, notificationHub),
+		service_seedlink.ID:   service_seedlink.New(appCtx, hardwareDevice, actionHandler, timeSrc),
 		service_tailscale.ID: service_tailscale.New(
+			appCtx,
 			conf.Server.Listen,
 			actionHandler,
 			timeSrc,
 		),
-		service_watchcat.ID: service_watchcat.New(hardwareDevice, timeSrc),
-		service_winston.ID:  service_winston.New(hardwareDevice, actionHandler, timeSrc),
+		service_watchcat.ID: service_watchcat.New(appCtx, hardwareDevice, timeSrc),
+		service_winston.ID:  service_winston.New(appCtx, hardwareDevice, actionHandler, timeSrc),
 	}
 	var upgradeHelper *upgrade.Helper
 	if !ver.IsPreRelease() && build.GetChannel() == officialBuildChannel {
 		upgradeHelper = upgrade.NewHelper(exePath, ver, build)
-		serviceMap[service_updater.ID] = service_updater.New(actionHandler, timeSrc, upgradeHelper, exePath, restartChan)
+		serviceMap[service_updater.ID] = service_updater.New(appCtx, actionHandler, timeSrc, upgradeHelper, exePath, restartChan)
 	}
-	serviceMap[service_discovery.ID] = service_discovery.New(conf.Server.Listen, serviceMap, actionHandler, timeSrc)
+	serviceMap[service_discovery.ID] = service_discovery.New(appCtx, conf.Server.Listen, serviceMap, actionHandler, timeSrc)
 
-	for serviceName, serviceObj := range serviceMap {
-		if err = serviceObj.Init(); err != nil {
-			logger.GetLogger(serviceName).Errorf("failed to initialize service %s: %v", serviceName, err)
-			continue
-		}
-		if enabled := serviceObj.IsEnabled(); !enabled {
-			logger.GetLogger(serviceName).Infof("service %s is disabled by configuration", serviceName)
-			continue
-		}
-		if err = serviceObj.Start(); err != nil {
-			logger.GetLogger(serviceName).Errorf("failed to start service %s: %v", serviceName, err)
-			continue
-		}
-		logger.GetLogger(serviceName).Infof("service %s has been started", serviceName)
-	}
-
-	seisEventSource, err := seisevent.New(timeSrc, 30*time.Second)
+	seisEventSource, closeSeisEventSource, err := seisevent.New(timeSrc, 30*time.Second)
 	if err != nil {
 		logger.GetLogger(main).Errorf("failed to create seis event source: %v", err)
 	}
 
 	graphqlResolver := &graph_resolver.Resolver{
+		AppContext:               appCtx,
 		RestartChan:              restartChan,
 		ExecutablePath:           exePath,
 		CurrentVersion:           ver,
@@ -262,25 +280,44 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 		LogBuffer:                logBuffer,
 		SeisEventSource:          seisEventSource,
 		StationConfigConstraints: stationConfigConstraints,
+		DataPurgeJob:             jobtracker.New(appCtx, "data_purge_job"),
 	}
-	graphqlResolver.DataPurgeJob = graph_resolver.LoadOrCreatePurgeDataJob(graphqlResolver)
-	httpServer := server.New(conf.Server.Debug, conf.Server.CORS, graphqlResolver, notificationHub, logger.GetLogger("http_server"))
+	httpServer := server.New(appCtx, conf.Server.Debug, conf.Server.CORS, graphqlResolver, notificationHub, logger.GetLogger("http_server"))
 	if err = httpServer.Setup(conf.Server.Listen); err != nil {
 		logger.GetLogger(main).Errorln(err)
-		runCleanerTasks()
+		sendHardwareAbortSignal()
+		runCleanerTasks(appCtx)
 		os.Exit(1)
 	}
+	if err = httpServer.Listen(); err != nil {
+		logger.GetLogger(main).Errorln(err)
+		sendHardwareAbortSignal()
+		runCleanerTasks(appCtx)
+		os.Exit(1)
+	}
+
+	for serviceName, serviceObj := range serviceMap {
+		if err = serviceObj.Init(appCtx); err != nil {
+			logger.GetLogger(serviceName).Errorf("failed to initialize service %s: %v", serviceName, err)
+			continue
+		}
+		if enabled := serviceObj.IsEnabled(appCtx); !enabled {
+			logger.GetLogger(serviceName).Infof("service %s is disabled by configuration", serviceName)
+			continue
+		}
+		if err = serviceObj.Start(appCtx); err != nil {
+			logger.GetLogger(serviceName).Errorf("failed to start service %s: %v", serviceName, err)
+			continue
+		}
+		logger.GetLogger(serviceName).Infof("service %s has been started", serviceName)
+	}
+
+	httpErrChan := make(chan error, 1)
 	go func() {
 		if err := httpServer.Start(); err != nil {
-			logger.GetLogger(main).Errorln(err)
-			runCleanerTasks()
-			os.Exit(1)
+			httpErrChan <- err
 		}
 	}()
-
-	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-	defer signal.Stop(signalChan)
 
 	var exitWithReason ExitReason
 	select {
@@ -293,34 +330,39 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 	case <-hardwareCtx.Done():
 		exitWithReason = ExitError
 		logger.GetLogger(main).Warnln("fatal error detected (probably hardware connection lost), shutting down...")
+	case err := <-httpErrChan:
+		exitWithReason = ExitError
+		logger.GetLogger(main).Errorf("http server stopped unexpectedly, shutting down: %v", err)
 	}
 
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 	defer cancel()
+	graphqlResolver.BeginShutdown()
+	cancelApp()
 
-	done := make(chan struct{})
-	go func() {
-		defer close(done)
-
-		if err = httpServer.Stop(); err != nil {
-			logger.GetLogger(main).Errorf("failed to stop http server: %v", err)
-		}
-
-		for serviceName, serviceObj := range serviceMap {
-			if !serviceObj.GetStatus().GetIsRunning() {
-				continue
+	shutdown := &applicationShutdown{
+		resolver: graphqlResolver,
+		stopHTTP: httpServer.Stop,
+		services: serviceMap,
+		cleanup: func(ctx context.Context) error {
+			sendHardwareAbortSignal()
+			var errs []error
+			if closeSeisEventSource != nil {
+				errs = append(errs, closeSeisEventSource())
 			}
-			if err = serviceObj.Stop(); err != nil {
-				logger.GetLogger(serviceName).Errorf("failed to stop service %s: %v", serviceName, err)
-			} else {
-				logger.GetLogger(serviceName).Infof("service %s has been stopped", serviceName)
+			if upgradeHelper != nil {
+				errs = append(errs, upgradeHelper.Close())
 			}
-		}
-	}()
+			return errors.Join(append(errs, runCleanerTasks(ctx))...)
+		},
+	}
+	if pprofServer != nil {
+		shutdown.stopPprof = pprofServer.Shutdown
+	}
+	done := make(chan error, 1)
+	go func() { done <- shutdown.Run(shutdownCtx) }()
 
 	handleExit := func(reason string, warn bool, callback func()) {
-		sendHardwareAbortSignal()
-		runCleanerTasks()
 		if warn {
 			logger.GetLogger(main).Warnln(reason)
 		} else {
@@ -330,23 +372,39 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 			callback()
 		}
 		switch {
+		case warn:
+			os.Exit(1)
 		case exitWithReason == ExitInterrupt:
 			os.Exit(0)
 		case exitWithReason == ExitRestart:
 			os.Exit(0)
-		case exitWithReason == ExitError || warn:
+		case exitWithReason == ExitError:
 			os.Exit(1)
 		}
 	}
 
 	select {
-	case <-done:
+	case err := <-done:
+		if shutdownCtx.Err() != nil {
+			handleExit("shutdown timed out, forcing exit", true, nil)
+		}
+		if err != nil {
+			handleExit(fmt.Sprintf("shutdown completed with errors: %v", err), true, nil)
+		}
 		handleExit("program exited successfully, goodbye", false, func() {
 			if exitWithReason == ExitRestart {
 				restartOnce.Do(func() { executeBinary(exePath) })
 			}
 		})
 	case <-shutdownCtx.Done():
+		for _, name := range shutdown.Pending() {
+			logger.GetLogger(main).Warnf("shutdown incomplete: %s", name)
+		}
 		handleExit("shutdown timed out, forcing exit", true, nil)
+	case <-signalChan:
+		for _, name := range shutdown.Pending() {
+			logger.GetLogger(main).Warnf("shutdown incomplete: %s", name)
+		}
+		handleExit("interrupt signal received again, forcing exit", true, nil)
 	}
 }

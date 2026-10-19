@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"runtime/debug"
 	"strings"
 
 	"tailscale.com/ipn"
@@ -48,12 +49,20 @@ func (s *TailscaleServiceImpl) userLogf(format string, args ...any) {
 	s.log.Infof("tsnet: %s", message)
 }
 
-func (s *TailscaleServiceImpl) Start() error {
+func (s *TailscaleServiceImpl) Start(ctx context.Context) error {
+	if err := s.lifecycle.Lock(ctx); err != nil {
+		return err
+	}
+	defer s.lifecycle.Unlock()
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	if s.status.GetIsRunning() {
 		return errors.New("tailscale service is already running")
+	}
+	if err := s.parentCtx.Err(); err != nil {
+		return err
 	}
 	forwards, err := buildForwards(s.webServerAddr, s.forwardPorts)
 	if err != nil {
@@ -68,8 +77,8 @@ func (s *TailscaleServiceImpl) Start() error {
 		return errors.New("tailscale auth key is required for initial registration")
 	}
 
-	s.ctx, s.cancelFn = context.WithCancel(context.Background())
-	s.setRunError(nil)
+	s.ctx, s.cancelFn = context.WithCancel(s.parentCtx)
+	runCtx, runCancel := s.ctx, s.cancelFn
 	authKey := s.authKey
 	if hasIdentity {
 		authKey = ""
@@ -83,50 +92,37 @@ func (s *TailscaleServiceImpl) Start() error {
 		UserLogf:   s.userLogf,
 	})
 	if err := node.Start(); err != nil {
-		s.cancelFn()
+		runCancel()
 		return fmt.Errorf("failed to start embedded tailscale node: %s", s.redact(err.Error()))
 	}
 	s.status.SetStartedAt(s.timeSource.Now())
 	s.status.SetIsRunning(true)
 
 	s.wg.Add(1)
-	go s.run(node, s.ctx, forwards)
+	go s.run(runCtx, runCancel, node, forwards)
 	return nil
 }
 
-func (s *TailscaleServiceImpl) run(node embeddedNode, ctx context.Context, forwards proxyForwards) {
+func (s *TailscaleServiceImpl) run(ctx context.Context, cancel context.CancelFunc, node embeddedNode, forwards proxyForwards) {
 	defer s.wg.Done()
+	defer func() {
+		cancel()
+		if err := node.Close(); err != nil {
+			s.log.Errorf("failed to close embedded tailscale node: %s", s.redact(err.Error()))
+		}
+		s.status.SetStoppedAt(s.timeSource.Now())
+		s.status.SetIsRunning(false)
+		if r := recover(); r != nil {
+			s.log.Errorf("service unexpectedly crashed, recovered from panic: %v\n%s", r, debug.Stack())
+		}
+	}()
 
 	upErr := node.Up(ctx)
 	if upErr == nil {
 		if err := serveForwards(ctx, node, forwards, s.log); err != nil && ctx.Err() == nil {
-			s.setRunError(fmt.Errorf("embedded tailscale proxy failed: %s", s.redact(err.Error())))
 			s.log.Errorf("embedded tailscale proxy failed: %s", s.redact(err.Error()))
 		}
 	} else if ctx.Err() == nil {
 		s.log.Errorf("embedded tailscale node stopped: %s", s.redact(upErr.Error()))
 	}
-
-	closeErr := node.Close()
-	if closeErr != nil {
-		closeErr = fmt.Errorf("failed to close embedded tailscale node: %s", s.redact(closeErr.Error()))
-		s.log.Errorf("%v", closeErr)
-	}
-	if closeErr != nil || s.getRunError() == nil {
-		s.setRunError(closeErr)
-	}
-	s.status.SetStoppedAt(s.timeSource.Now())
-	s.status.SetIsRunning(false)
-}
-
-func (s *TailscaleServiceImpl) setRunError(err error) {
-	s.errMu.Lock()
-	s.runError = err
-	s.errMu.Unlock()
-}
-
-func (s *TailscaleServiceImpl) getRunError() error {
-	s.errMu.Lock()
-	defer s.errMu.Unlock()
-	return s.runError
 }

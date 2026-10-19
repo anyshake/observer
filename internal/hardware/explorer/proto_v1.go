@@ -312,25 +312,12 @@ func (g *ExplorerProtoImplV1) UnsubscribeRealtime(clientId string) error {
 	return g.messageBusRealtime.Unsubscribe(clientId)
 }
 
-func (g *ExplorerProtoImplV1) GetConfig() DeviceConfig {
-	return DeviceConfig{
-		packetInterval: g.deviceConfig.GetPacketInterval(),
-		sampleRate:     g.deviceConfig.GetSampleRate(),
-		gnssEnabled:    g.deviceConfig.GetGnssAvailability(),
-		channelCodes:   g.deviceConfig.GetChannelCodes(),
-		model:          g.deviceConfig.GetModel(),
-		protocol:       g.deviceConfig.GetProtocol(),
-	}
+func (g *ExplorerProtoImplV1) GetConfig() *DeviceConfig {
+	return g.deviceConfig.Snapshot()
 }
 
-func (g *ExplorerProtoImplV1) GetStatus() DeviceStatus {
-	return DeviceStatus{
-		startedAt: g.deviceStatus.GetStartedAt(),
-		updatedAt: g.deviceStatus.GetUpdatedAt(),
-		frames:    g.deviceStatus.GetFrames(),
-		errors:    g.deviceStatus.GetErrors(),
-		messages:  g.deviceStatus.GetMessages(),
-	}
+func (g *ExplorerProtoImplV1) GetStatus() *DeviceStatus {
+	return g.deviceStatus.Snapshot()
 }
 
 func (g *ExplorerProtoImplV1) GetCoordinates(fuzzy bool) (float64, float64, float64, error) {

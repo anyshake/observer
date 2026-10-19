@@ -1,10 +1,12 @@
 package seisevent
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"math"
 	"net/http"
+	"slices"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -13,9 +15,11 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/anyshake/observer/pkg/cache"
+	"github.com/anyshake/observer/pkg/dnsquery"
 	"github.com/anyshake/observer/pkg/request"
 	"github.com/anyshake/observer/pkg/timesource"
 	"github.com/bclswl0827/travel"
+	"github.com/miekg/dns"
 	"github.com/paulmach/orb"
 	"github.com/paulmach/orb/geojson"
 )
@@ -75,76 +79,75 @@ func fdsnValidBody() string {
 }
 
 func resetCache(src IDataSource) {
-	fresh := cache.NewGeneric[[]Event](time.Minute)
 	switch s := src.(type) {
 	case *AFAD:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *BCSF:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *BGS:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *BMKG:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *CEA:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *CENC_APP:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *CENC_WEB:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *CENC_WOLFX:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *CWA_SC:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *DOST:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *EMSC:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *GA:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *GEONET:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *GFZ:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *HKO:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *ICL:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *INFP:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *INGV:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *JMA_OFFICIAL:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *JMA_P2PQUAKE:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *JMA_WOLFX:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *KMA:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *KNDC:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *KNMI:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *KRDAE:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *NCS:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *NRCAN:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *PALERT:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *SCEA:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *SED:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *SSN:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *TMD:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *USGS:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	case *USP:
-		s.cache = fresh
+		s.cache = cache.NewGeneric[[]Event](time.Minute)
 	default:
 		panic(fmt.Sprintf("resetCache: %T", src))
 	}
@@ -181,10 +184,11 @@ func assertMag(t *testing.T, ev Event, typ MagnitudeType, val float64) {
 }
 
 func TestNewSources(t *testing.T) {
-	sources, err := New(nil, time.Minute)
+	sources, closeSources, err := New(nil, time.Minute)
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(func() { _ = closeSources() })
 	wantIDs := []string{
 		AFAD_ID, BCSF_ID, BGS_ID, BMKG_ID, CEA_ID, CENC_APP_ID, CENC_WEB_ID, CENC_WOLFX_ID,
 		CWA_SC_ID, DOST_ID, EMSC_ID, GA_ID, GEONET_ID, GFZ_ID, HKO_ID, ICL_ID, INFP_ID, INGV_ID,
@@ -209,15 +213,27 @@ func TestNewSources(t *testing.T) {
 		t.Fatal("injected transport must stay nil in production")
 	}
 
-	again, err := New(timesource.New(time.Now), time.Minute)
+	again, closeAgain, err := New(timesource.New(time.Now), time.Minute)
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(func() { _ = closeAgain() })
 	if len(again) != len(sources) {
 		t.Fatalf("second New returned %d sources", len(again))
 	}
-	if _, err := New(nil, time.Minute); err != nil {
+	third, closeThird, err := New(nil, time.Minute)
+	if err != nil {
 		t.Fatal(err)
+	}
+	if err := closeThird(); err != nil {
+		t.Fatal(err)
+	}
+	if err := closeThird(); err != nil {
+		t.Fatalf("second close = %v", err)
+	}
+	query := new(dns.Msg).SetQuestion("example.com.", dns.TypeA)
+	if _, err := third[BMKG_ID].(*BMKG).dnsClient.QueryContext(t.Context(), query); !errors.Is(err, dnsquery.ErrClosed) {
+		t.Fatalf("query after close = %v, want %v", err, dnsquery.ErrClosed)
 	}
 }
 
@@ -264,10 +280,11 @@ func TestDataSourceGetEvents(t *testing.T) {
 	restore := request.SetRoundTripperOverrideForTest(rt)
 	t.Cleanup(restore)
 
-	sources, err := New(nil, time.Minute)
+	sources, closeSources, err := New(nil, time.Minute)
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(func() { _ = closeSources() })
 	for _, src := range sources {
 		injectTransport(src, rt)
 	}
@@ -281,7 +298,7 @@ func TestDataSourceGetEvents(t *testing.T) {
 
 			resetCache(src)
 			rt.use(http.StatusOK, fx.malformed, nil)
-			events, err := src.GetEvents(25, 121)
+			events, err := src.GetEvents(t.Context(), 25, 121)
 			if fx.malformedErr {
 				if err == nil {
 					t.Fatal("malformed body accepted")
@@ -294,7 +311,7 @@ func TestDataSourceGetEvents(t *testing.T) {
 
 			resetCache(src)
 			rt.use(http.StatusServiceUnavailable, "down", nil)
-			if _, err := src.GetEvents(25, 121); err == nil {
+			if _, err := src.GetEvents(t.Context(), 25, 121); err == nil {
 				t.Fatal("non-200 response accepted")
 			}
 
@@ -305,7 +322,7 @@ func TestDataSourceGetEvents(t *testing.T) {
 			} else {
 				rt.use(http.StatusOK, fx.valid, nil)
 			}
-			events, err = src.GetEvents(25, 121)
+			events, err = src.GetEvents(t.Context(), 25, 121)
 			if err != nil {
 				t.Fatalf("valid fixture: %v", err)
 			}
@@ -334,7 +351,7 @@ func TestDataSourceGetEvents(t *testing.T) {
 			}
 
 			calls := rt.calls.Load()
-			again, err := src.GetEvents(25, 121)
+			again, err := src.GetEvents(t.Context(), 25, 121)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -348,8 +365,49 @@ func TestDataSourceGetEvents(t *testing.T) {
 			if !ok || cached.Region != ev.Region {
 				t.Fatalf("cached event = %+v", cached)
 			}
+
+			snapshot := slices.Clone(events)
+			if _, err := src.GetEvents(t.Context(), -45, -70); err != nil {
+				t.Fatal(err)
+			}
+			for i := range events {
+				if events[i].Distance != snapshot[i].Distance || events[i].Estimation != snapshot[i].Estimation {
+					t.Fatalf("later GetEvents call changed returned event %d: %+v -> %+v", i, snapshot[i], events[i])
+				}
+			}
 		})
 	}
+}
+
+func TestGetEventsConcurrentCallersGetOwnResults(t *testing.T) {
+	rt := &stubRT{}
+	t.Cleanup(request.SetRoundTripperOverrideForTest(rt))
+	sources, closeSources, err := New(nil, time.Minute)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = closeSources() })
+	fixture := sourceFixtures[slices.IndexFunc(sourceFixtures, func(fx sourceFixture) bool { return fx.id == USGS_ID })]
+	rt.use(http.StatusOK, fixture.valid, nil)
+	src := sources[USGS_ID]
+
+	var wg sync.WaitGroup
+	for i := range 8 {
+		latitude := float64(i*10 - 40)
+		wg.Go(func() {
+			events, err := src.GetEvents(t.Context(), latitude, 121)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			for _, ev := range events {
+				if want := getDistance(latitude, ev.Latitude, 121, ev.Longitude); ev.Distance != want {
+					t.Errorf("latitude %.0f: distance = %v, want %v", latitude, ev.Distance, want)
+				}
+			}
+		})
+	}
+	wg.Wait()
 }
 
 func bgsItem(string) string {
@@ -721,10 +779,11 @@ func TestGetEventsEdgeBodies(t *testing.T) {
 	restore := request.SetRoundTripperOverrideForTest(rt)
 	t.Cleanup(restore)
 
-	sources, err := New(nil, time.Minute)
+	sources, closeSources, err := New(nil, time.Minute)
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(func() { _ = closeSources() })
 	for _, src := range sources {
 		injectTransport(src, rt)
 	}
@@ -769,7 +828,7 @@ func TestGetEventsEdgeBodies(t *testing.T) {
 			src := sources[tc.id]
 			resetCache(src)
 			rt.use(http.StatusOK, tc.body, nil)
-			events, err := src.GetEvents(25, 121)
+			events, err := src.GetEvents(t.Context(), 25, 121)
 			if tc.wantErr {
 				if err == nil {
 					t.Fatal("expected error")
