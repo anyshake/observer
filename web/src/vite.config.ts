@@ -25,7 +25,16 @@ export default defineConfig({
     build: {
         chunkSizeWarningLimit: 4096,
         sourcemap: false,
-        outDir: '../dist'
+        outDir: '../dist',
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (id.includes('/src/locales/') && id.endsWith('.json')) {
+                        return 'locales';
+                    }
+                }
+            }
+        }
     },
     server: {
         host: '0.0.0.0',

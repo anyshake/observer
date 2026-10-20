@@ -1,10 +1,13 @@
 import { mdiBugPause } from '@mdi/js';
 import Icon from '@mdi/react';
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { hideLoaderAnimation } from '../../helpers/app/hideLoaderAnimation';
-import { CodeBlock } from '../widget/CodeBlock';
+
+const CodeBlock = lazy(() =>
+    import('../widget/CodeBlock').then(({ CodeBlock }) => ({ default: CodeBlock }))
+);
 
 interface IErrorPage {
     readonly code?: number;
@@ -54,9 +57,11 @@ export const ErrorPage = ({ code, heading, content, action, debug }: IErrorPage)
 
             {debug && isDebug && (
                 <div className="app-error-details">
-                    <CodeBlock language="javascript" fileName={`error_stack_${currentTime}.log`}>
-                        {debug}
-                    </CodeBlock>
+                    <Suspense fallback={<pre>{debug}</pre>}>
+                        <CodeBlock language="javascript" fileName={`error_stack_${currentTime}.log`}>
+                            {debug}
+                        </CodeBlock>
+                    </Suspense>
                 </div>
             )}
         </div>

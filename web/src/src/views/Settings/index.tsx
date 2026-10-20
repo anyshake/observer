@@ -10,22 +10,27 @@ import {
     mdiTimelineText
 } from '@mdi/js';
 import Icon from '@mdi/react';
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
 import { Skeleton } from '../../components/ui/Skeleton';
 import { IRouterComponent } from '../../config/router';
 import { useIsCurrentUserAdminQuery } from '../../graphql';
-import { AppLogs } from './applogs';
-import { Backup } from './backup';
-import { Dangerous } from './dangerous';
-import { FDSN } from './fdsnws';
-import { Metadata } from './metadata';
-import { Preference } from './preference';
-import { Service } from './service';
-import { Station } from './station';
-import { Users } from './users';
+
+const AppLogs = lazy(() => import('./applogs').then(({ AppLogs }) => ({ default: AppLogs })));
+const Backup = lazy(() => import('./backup').then(({ Backup }) => ({ default: Backup })));
+const Dangerous = lazy(() =>
+    import('./dangerous').then(({ Dangerous }) => ({ default: Dangerous }))
+);
+const FDSN = lazy(() => import('./fdsnws').then(({ FDSN }) => ({ default: FDSN })));
+const Metadata = lazy(() => import('./metadata').then(({ Metadata }) => ({ default: Metadata })));
+const Preference = lazy(() =>
+    import('./preference').then(({ Preference }) => ({ default: Preference }))
+);
+const Service = lazy(() => import('./service').then(({ Service }) => ({ default: Service })));
+const Station = lazy(() => import('./station').then(({ Station }) => ({ default: Station })));
+const Users = lazy(() => import('./users').then(({ Users }) => ({ default: Users })));
 
 const Settings = ({ currentLocale }: IRouterComponent) => {
     const { t } = useTranslation();
@@ -141,7 +146,9 @@ const Settings = ({ currentLocale }: IRouterComponent) => {
                             ))}
                     </div>
 
-                    {tabs[activeTab as keyof typeof tabs].element}
+                    <Suspense fallback={<Skeleton />}>
+                        {tabs[activeTab as keyof typeof tabs].element}
+                    </Suspense>
                 </>
             )}
         </div>

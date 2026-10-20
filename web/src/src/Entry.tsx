@@ -1,7 +1,7 @@
 import { mdiEmailNewsletter } from '@mdi/js';
 import Icon from '@mdi/react';
 import axios from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
@@ -12,7 +12,6 @@ import { Header } from './components/base/Header';
 import { DialogModal } from './components/ui/DialogModal';
 import { RouterView } from './components/ui/RouterView';
 import { Skeleton } from './components/ui/Skeleton';
-import { Markdown } from './components/widget/Markdown';
 import { Scroller } from './components/widget/Scroller';
 import { globalConfig } from './config/global';
 import { localeConfig } from './config/locale';
@@ -43,6 +42,10 @@ interface IServiceNotification {
     readonly level: ServiceNotificationLevel;
     readonly occurred_at: number;
 }
+
+const Markdown = lazy(() =>
+    import('./components/widget/Markdown').then(({ Markdown }) => ({ default: Markdown }))
+);
 
 const isServiceNotification = (value: unknown): value is IServiceNotification => {
     if (!value || typeof value !== 'object') {
@@ -230,7 +233,9 @@ export const Entry = ({ currentLocale, locales, onSwitchLocale }: IEntry) => {
                         setCtaModalShouldOpen(false);
                     }}
                 >
-                    <Markdown className="app-announcement">{ctaMessage.content}</Markdown>
+                    <Suspense fallback={<span className="loading loading-spinner app-loading-primary" />}>
+                        <Markdown className="app-announcement">{ctaMessage.content}</Markdown>
+                    </Suspense>
                 </DialogModal>
             )}
         </div>
