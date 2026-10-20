@@ -17,7 +17,9 @@ export const CodeBlock = ({ fileName, language, children, showLineNumbers }: ICo
     const [isCopied, setIsCopied] = useState(false);
 
     const handleCopy = useCallback(async (text: string) => {
-        await setClipboardText(text);
+        if (!(await setClipboardText(text))) {
+            return;
+        }
         setIsCopied(true);
         await new Promise((resolve) => setTimeout(resolve, 2000));
         setIsCopied(false);
