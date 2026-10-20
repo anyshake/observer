@@ -1,0 +1,650 @@
+{
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "Luister naar het fluisteren van de aarde."
+        },
+        "router": {
+            "home": "Stationstatus",
+            "realtime": "Realtime golfvorm",
+            "history": "Historische golfvormen",
+            "download": "Gegevens downloaden",
+            "settings": "Systeeminstellingen",
+            "default": "Pagina niet gevonden"
+        }
+    },
+    "components": {
+        "ThemeToggle": {
+            "label": "Thema",
+            "light": "Licht",
+            "dark": "Donker",
+            "system": "Systeem"
+        },
+        "ErrorPage": {
+            "something_went_wrong": "Er is iets misgegaan.",
+            "try_again_later": "Vernieuw de pagina of probeer het later opnieuw."
+        },
+        "TypedInput": {
+            "yes": "Ja",
+            "no": "Nee",
+            "add_new_item": "Voer een nieuw item in.",
+            "editing_list": "Lijst van {{fieldName}} bewerken",
+            "table_value": "Waarde",
+            "table_actions": "Acties"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "Spectrograminstellingen",
+                "min_db": "Min. dB",
+                "max_db": "Max. dB"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "Spectrograminstellingen",
+                "min_db": "Min. dB",
+                "max_db": "Max. dB"
+            }
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "Bestandsnaam",
+                "time": "Gewijzigd op",
+                "size": "Bestandsgrootte",
+                "actions": "Acties"
+            },
+            "file_list_actions": {
+                "download": "Downloaden",
+                "preview": "Voorbeeld"
+            },
+            "miniseed_list": {
+                "title": "Dagelijkse MiniSEED",
+                "search": "Zoeken"
+            },
+            "helicorder_list": {
+                "title": "Helicorderlijst",
+                "search": "Zoeken"
+            },
+            "request_file": {
+                "requesting": "Downloadlink voor bestand {{fileName}} aanvragen.",
+                "success": "Downloadlink voor bestand {{fileName}} opgehaald.",
+                "error": "Link voor bestand {{fileName}} aanvragen mislukt: {{error}}"
+            },
+            "preview_file": {
+                "requesting": "Voorbeeldlink voor bestand {{fileName}} aanvragen.",
+                "success": "Voorbeeldlink voor bestand {{fileName}} opgehaald.",
+                "error": "Link voor bestand {{fileName}} aanvragen mislukt: {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "Gebeurtenissen zoeken",
+                "data_agency": "Gegevensleverancier",
+                "search_button": "Gebeurtenissen zoeken",
+                "searching": "Gebeurtenissen zoeken in de geselecteerde bron.",
+                "success": "{{count}} gebeurtenissen gevonden in de geselecteerde bron.",
+                "no_data": "Geen gebeurtenissen gevonden in de geselecteerde bron.",
+                "error": "Gebeurtenissen zoeken mislukt: {{error}}"
+            },
+            "event_list_modal": {
+                "title": "Selecteer een seismische gebeurtenis",
+                "earthquake_at": "Aardbeving om {{time}}",
+                "p_wave_arrival": "Aankomst P-golf {{time}} ({{seconds}} sec)",
+                "s_wave_arrival": "Aankomst S-golf {{time}} ({{seconds}} sec)",
+                "epicenter_distance": "Afstand tot epicentrum {{distance}} km",
+                "earthquake_depth": "Diepte {{depth}} km",
+                "selected_an_event": "Aardbeving in {{region}} om {{time}} geselecteerd."
+            },
+            "data_export": {
+                "title": "Gegevens exporteren",
+                "file_format": "Bestandsformaat",
+                "channel_code": "Kanaalcode",
+                "export_button": "Gegevens ophalen",
+                "exporting": "Kanaal {{channel}} exporteren naar {{format}}.",
+                "success": "Kanaal {{channel}} geëxporteerd naar {{format}}.",
+                "error": "Kanaal {{channel}} exporteren naar {{format}} mislukt: {{error}}"
+            },
+            "search_records": {
+                "title": "Zoeken op tijd",
+                "start_time": "Begintijd",
+                "end_time": "Eindtijd",
+                "invalid_time": "De begintijd moet vóór de eindtijd liggen.",
+                "search_button": "Registraties zoeken",
+                "searching": "Seismische registraties zoeken in de database.",
+                "success": "{{count}} seismische registraties gevonden in de database.",
+                "no_data": "Geen seismische registraties gevonden in de database.",
+                "error": "Registraties zoeken mislukt: {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "Indeling vergrendelen",
+                "unlock_button": "Indeling ontgrendelen"
+            },
+            "reset_layout": {
+                "reset_button": "Alles opnieuw instellen",
+                "confirm_message": "Weet je zeker dat je de indeling opnieuw wilt instellen?",
+                "confirm_title": "Opnieuw instellen bevestigen",
+                "confirm_button": "Opnieuw instellen",
+                "cancel_button": "Annuleren"
+            },
+            "display_mode": {
+                "waveform_mode": "Golfvormmodus",
+                "spectrogram_mode": "Spectrogrammodus"
+            },
+            "share_link": {
+                "share_button": "Link delen",
+                "link_copied": "De gedeelde link is naar het klembord gekopieerd."
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "Stationinformatie",
+                "name": "Naam",
+                "country": "Land",
+                "place": "Locatie",
+                "affiliation": "Organisatie",
+                "channels": "Kanalen"
+            },
+            "device_info": {
+                "yes": "Ja",
+                "no": "Nee",
+                "title": "Apparaatinformatie",
+                "product_model": "Productmodel",
+                "device_id": "Apparaat-ID",
+                "link_protocol": "Verbindingsprotocol",
+                "packet_interval": "Pakketinterval",
+                "gnss_active": "GNSS actief"
+            },
+            "device_status": {
+                "title": "Apparaatstatus",
+                "sample_rate": "Bemonsteringsfrequentie",
+                "latitude": "Breedtegraad",
+                "longitude": "Lengtegraad",
+                "elevation": "Hoogte",
+                "temperature": "Apparaattemperatuur"
+            },
+            "link_status": {
+                "title": "Verbindingsstatus",
+                "started_at": "Gestart op",
+                "last_frame": "Laatste frame",
+                "frames": "Frames",
+                "errors": "Fouten",
+                "messages": "Berichten"
+            },
+            "connectivity": {
+                "loading": "Verbinding maken met het station...",
+                "success": "Verbonden met het station. Server actief sinds {{uptime}} seconden, bijgewerkt om {{updatedAt}}.",
+                "error": "Er is een fout opgetreden bij het verbinden met het station. Controleer je verbinding."
+            },
+            "station_location": {
+                "title": "Stationlocatie"
+            },
+            "upgrade": {
+                "check_failed": "Controleren op updates is mislukt.",
+                "update_available": "Er is een nieuwe versie {{latest}} beschikbaar. Je kunt automatische updates inschakelen of deze handmatig downloaden en installeren.",
+                "restart_needed": "De nieuwste versie {{latest}} is geïnstalleerd, maar {{current}} wordt nog uitgevoerd. Herstart de software op een geschikt moment om de update toe te passen.",
+                "manual_upgrade_needed": "Er is een nieuwe versie {{latest}} beschikbaar, maar de huidige versie {{current}} is ouder dan de minimaal ondersteunde versie {{required}}. Handmatig bijwerken is vereist."
+            },
+            "service_status": {
+                "title": "Servicestatus"
+            },
+            "cpu_usage": {
+                "title": "CPU-gebruik"
+            },
+            "memory_usage": {
+                "title": "Geheugengebruik"
+            },
+            "disk_usage": {
+                "title": "Schijfgebruik"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "Pagina niet gevonden.",
+            "check_your_url": "Controleer de URL en probeer het opnieuw.",
+            "go_back_button": "Terug"
+        },
+        "RealTime": {
+            "display_mode": {
+                "waveform_mode": "Golfvormmodus",
+                "spectrogram_mode": "Spectrogrammodus"
+            },
+            "reset_layout": {
+                "reset_button": "Alles opnieuw instellen",
+                "confirm_message": "Weet je zeker dat je de indeling opnieuw wilt instellen?",
+                "confirm_title": "Opnieuw instellen bevestigen",
+                "confirm_button": "Opnieuw instellen",
+                "cancel_button": "Annuleren"
+            },
+            "layout_locker": {
+                "lock_button": "Indeling vergrendelen",
+                "unlock_button": "Indeling ontgrendelen"
+            },
+            "record_data": {
+                "start_button": "Opname starten",
+                "stop_button": "Opname stoppen",
+                "start_recording": "Opname gestart om {{startedAt}}.",
+                "link_created": "Opname gestopt om {{endedAt}} ({{duration}} seconden). Er is een link aangemaakt.",
+                "no_data_recorded": "Er zijn geen gegevens opgenomen in deze periode."
+            },
+            "connectivity": {
+                "connecting": "Geen verbinding, bezig met verbinden...",
+                "connected": "Verbonden, laatst bijgewerkt om {{updatedAt}}."
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} samples/s",
+                "channels": "{{num}} kanalen",
+                "retention": "{{retention}} seconden"
+            }
+        },
+        "Settings": {
+            "FDSN": {
+                "title": "FDSN-toegangssleutels",
+                "key": "Sleutelvoorvoegsel",
+                "remark": "Opmerking",
+                "remark_placeholder": "Voer een opmerking in (optioneel)",
+                "created_at": "Aangemaakt op",
+                "expires_at": "Verloopt op",
+                "expiration_placeholder": "Kies een tijdstip",
+                "status": "Status",
+                "active": "Actief",
+                "expired": "Verlopen",
+                "revoked": "Ingetrokken",
+                "revoked_at": "Ingetrokken op",
+                "hide_revoked": "Ingetrokken sleutels verbergen",
+                "last_requested_at": "Laatst vastgelegde aanvraag",
+                "user_ip": "Laatste IP-adres",
+                "actions": "Acties",
+                "never": "Nooit",
+                "no_expiration": "Geen vervaldatum",
+                "refresh": "Vernieuwen",
+                "create": "Toegangssleutel aanmaken",
+                "created": "Toegangssleutel aangemaakt!",
+                "create_failed": "Toegangssleutel aanmaken mislukt.",
+                "refresh_after_create_failed": "De toegangssleutel is aangemaakt, maar de lijst vernieuwen is mislukt: {{error}}",
+                "expiration_help": "Selecteer een toekomstig tijdstip in de tijdzone van je browser.",
+                "invalid_expiration": "De vervaldatum moet in de toekomst liggen.",
+                "disabled": "Schakel de FDSN-webservice in bij de stationinstellingen voordat je toegangssleutels aanmaakt.",
+                "usage": "Stuur de header Authorization: Bearer <access key> mee met queryverzoeken.",
+                "secret_help": "Sla deze toegangssleutel nu op. Deze wordt slechts één keer getoond.",
+                "revoke": "Intrekken",
+                "revoke_selected": "Geselecteerde intrekken",
+                "revoke_selected_confirm": "Wil je de geselecteerde toegangssleutels ({{count}}) intrekken? Aanvragen met deze sleutels worden direct geweigerd.",
+                "revoke_selected_success": "Ingetrokken toegangssleutels: {{count}}.",
+                "revoke_failed": "Toegangssleutels intrekken mislukt.",
+                "cancel": "Annuleren",
+                "revoking": "Toegangssleutel intrekken...",
+                "revoke_confirm": "Wil je deze toegangssleutel intrekken? Volgende FDSN-aanvragen met deze sleutel worden direct geweigerd.",
+                "revoke_success": "Toegangssleutel ingetrokken."
+            },
+            "Logs": {
+                "title": "Applicatielogboeken"
+            },
+            "Dangerous": {
+                "executable_backups": {
+                    "title": "Back-ups van oude uitvoerbare bestanden",
+                    "description": "Back-ups die zijn gemaakt bij het bijwerken van deze applicatie. Selecteer de bestanden die je permanent wilt verwijderen.",
+                    "submit_button": "Back-ups opruimen",
+                    "refresh_button": "Vernieuwen",
+                    "delete_button": "Geselecteerde verwijderen ({{count}})",
+                    "select_all": "Alles selecteren",
+                    "loading": "Zoeken naar back-ups...",
+                    "empty": "Geen back-ups van oude uitvoerbare bestanden gevonden.",
+                    "list_failed": "Zoeken naar back-ups mislukt: {{error}}",
+                    "confirm_title": "Back-ups verwijderen",
+                    "confirm_message": "Wil je de {{count}} geselecteerde back-ups permanent verwijderen?",
+                    "cancel_button": "Annuleren",
+                    "removing": "Back-ups verwijderen...",
+                    "result_summary": "{{removed}} back-ups verwijderd; {{failed}} mislukt.",
+                    "empty_response": "Er zijn geen resultaten ontvangen voor het verwijderen van back-ups.",
+                    "remove_failed": "Back-ups verwijderen mislukt: {{error}}"
+                },
+                "title": "Gevarenzone",
+                "restart_application": {
+                    "title": "Volledige applicatie herstarten",
+                    "description": "Hiermee wordt de volledige applicatie herstart. Dit kan even duren en sluit tijdelijk alle actieve verbindingen, waardoor services en opnamen worden onderbroken.",
+                    "submit_button": "Applicatie herstarten",
+                    "confirm_title": "Herstart bevestigen",
+                    "confirm_message": "Weet je zeker dat je de applicatie wilt herstarten?",
+                    "confirm_button": "Herstarten",
+                    "cancel_button": "Annuleren",
+                    "restarting": "Verzoek om de applicatie te herstarten verzenden...",
+                    "success": "Herstartverzoek verzonden. De applicatie wordt over enkele seconden herstart.",
+                    "error": "Herstart van de applicatie aanvragen mislukt: {{error}}"
+                },
+                "purge_waveform_records": {
+                    "title": "Golfvormregistraties wissen",
+                    "description": "Hiermee worden alle golfvormregistraties uit de database verwijderd. Deze actie kan niet ongedaan worden gemaakt.",
+                    "submit_button": "Registraties wissen",
+                    "confirm_title": "Wissen bevestigen",
+                    "confirm_message": "Weet je zeker dat je alle golfvormregistraties wilt wissen?",
+                    "confirm_button": "Wissen",
+                    "cancel_button": "Annuleren",
+                    "purging": "Golfvormregistraties wissen...",
+                    "success": "Golfvormregistraties gewist.",
+                    "error": "Golfvormregistraties wissen mislukt: {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "MiniSEED-bestanden wissen",
+                    "description": "Hiermee worden alle MiniSEED-bestanden uit het systeem verwijderd. Deze actie kan niet ongedaan worden gemaakt.",
+                    "submit_button": "MiniSEED wissen",
+                    "confirm_title": "Wissen bevestigen",
+                    "confirm_message": "Weet je zeker dat je alle MiniSEED-bestanden wilt wissen?",
+                    "confirm_button": "Wissen",
+                    "cancel_button": "Annuleren",
+                    "purging": "MiniSEED-bestanden wissen...",
+                    "success": "MiniSEED-bestanden gewist.",
+                    "error": "MiniSEED-bestanden wissen mislukt: {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "Helicorderbestanden wissen",
+                    "description": "Hiermee worden alle helicorderbestanden uit het systeem verwijderd. Deze actie kan niet ongedaan worden gemaakt.",
+                    "submit_button": "Helicorders wissen",
+                    "confirm_title": "Wissen bevestigen",
+                    "confirm_message": "Weet je zeker dat je alle helicorderbestanden wilt wissen?",
+                    "confirm_button": "Wissen",
+                    "cancel_button": "Annuleren",
+                    "purging": "Helicorderbestanden wissen...",
+                    "success": "Helicorderbestanden gewist.",
+                    "error": "Helicorderbestanden wissen mislukt: {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "Stationinstellingen opnieuw instellen",
+                    "description": "Hiermee worden alle stationinstellingen opnieuw ingesteld. Deze actie kan niet ongedaan worden gemaakt en vereist een herstart om de wijzigingen toe te passen.",
+                    "submit_button": "Station opnieuw instellen",
+                    "confirm_title": "Opnieuw instellen bevestigen",
+                    "confirm_message": "Weet je zeker dat je alle stationinstellingen opnieuw wilt instellen?",
+                    "confirm_button": "Opnieuw instellen",
+                    "cancel_button": "Annuleren",
+                    "resetting": "Stationinstellingen opnieuw instellen...",
+                    "success": "Stationinstellingen opnieuw ingesteld.",
+                    "error": "Stationinstellingen opnieuw instellen mislukt: {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "Service-instellingen opnieuw instellen",
+                    "description": "Hiermee worden alle service-instellingen opnieuw ingesteld. Deze actie kan niet ongedaan worden gemaakt en vereist een herstart om de wijzigingen toe te passen.",
+                    "submit_button": "Service opnieuw instellen",
+                    "confirm_title": "Opnieuw instellen bevestigen",
+                    "confirm_message": "Weet je zeker dat je alle service-instellingen opnieuw wilt instellen?",
+                    "confirm_button": "Opnieuw instellen",
+                    "cancel_button": "Annuleren",
+                    "resetting": "Service-instellingen opnieuw instellen...",
+                    "success": "Service-instellingen opnieuw ingesteld.",
+                    "error": "Service-instellingen opnieuw instellen mislukt: {{error}}"
+                },
+                "purge_data": {
+                    "mode_running": "Actief",
+                    "invalid_range": "Selecteer een geldige begin- en einddatum.",
+                    "started": "Wistaak gestart.",
+                    "request_failed": "Wistaak starten mislukt: {{error}}",
+                    "running_hint": "Er kan geen nieuwe wistaak worden gestart voordat de huidige is voltooid.",
+                    "status_query_failed": "Wisstatus ophalen mislukt: {{error}}",
+                    "status_idle": "Er is momenteel geen wistaak actief.",
+                    "status_running": "Wissen: {{kind}}.",
+                    "status_success": "Wissen voltooid: {{kind}}.",
+                    "status_failed": "Wissen mislukt: {{kind}}: {{error}}",
+                    "verification_label": "Verificatietekst",
+                    "verification_help": "Voer \"{{verificationText}}\" in om de uitvoerknop te activeren.",
+                    "kind_seis_records_full": "Golfvormregistraties",
+                    "kind_seis_records_by_date": "Golfvormregistraties in het opgegeven datumbereik",
+                    "kind_miniseed_full": "MiniSEED-bestanden",
+                    "kind_miniseed_by_date": "MiniSEED-bestanden in het opgegeven datumbereik",
+                    "kind_helicorder_full": "Helicorderbestanden",
+                    "kind_helicorder_by_date": "Helicorderbestanden in het opgegeven datumbereik",
+                    "kind_unknown": "Wistaak",
+                    "start_date": "Begindatum",
+                    "end_date": "Einddatum",
+                    "mode_label": "Wismodus",
+                    "mode_all": "Alles",
+                    "mode_range": "Datumbereik"
+                }
+            },
+            "Metadata": {
+                "title": "Stationsmetadata"
+            },
+            "Preference": {
+                "title": "Webvoorkeuren",
+                "reset_layout_preference": {
+                    "title": "Indelingsvoorkeuren opnieuw instellen",
+                    "description": "Hiermee worden alle indelingsvoorkeuren opnieuw ingesteld. Deze actie kan niet ongedaan worden gemaakt.",
+                    "submit_button": "Voorkeuren opnieuw instellen",
+                    "confirm_title": "Opnieuw instellen bevestigen",
+                    "confirm_message": "Weet je zeker dat je alle indelingsvoorkeuren opnieuw wilt instellen?",
+                    "confirm_button": "Opnieuw instellen",
+                    "cancel_button": "Annuleren",
+                    "success": "Indelingsvoorkeuren opnieuw ingesteld."
+                }
+            },
+            "Service": {
+                "title": "Servicebeheer",
+                "restart_service": {
+                    "submit_button": "Herstarten",
+                    "confirm_title": "Herstart bevestigen",
+                    "confirm_message": "Weet je zeker dat je de service wilt herstarten?",
+                    "confirm_button": "Herstarten",
+                    "cancel_button": "Annuleren",
+                    "restarting": "Service herstarten...",
+                    "success": "Service herstart.",
+                    "error": "Service herstarten mislukt: {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "Starten",
+                    "confirm_title": "Starten bevestigen",
+                    "confirm_message": "Weet je zeker dat je de service wilt starten?",
+                    "confirm_button": "Starten",
+                    "cancel_button": "Annuleren",
+                    "starting": "Service starten...",
+                    "success": "Service gestart.",
+                    "error": "Service starten mislukt: {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "Stoppen",
+                    "confirm_title": "Stoppen bevestigen",
+                    "confirm_message": "Weet je zeker dat je de service wilt stoppen?",
+                    "confirm_button": "Stoppen",
+                    "cancel_button": "Annuleren",
+                    "stopping": "Service stoppen...",
+                    "success": "Service gestopt.",
+                    "error": "Service stoppen mislukt: {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "Opnieuw instellen",
+                    "confirm_title": "Opnieuw instellen bevestigen",
+                    "confirm_message": "Weet je zeker dat je de service opnieuw wilt instellen?",
+                    "confirm_button": "Opnieuw instellen",
+                    "cancel_button": "Annuleren",
+                    "resetting": "Service opnieuw instellen...",
+                    "success": "Service opnieuw ingesteld.",
+                    "error": "Service opnieuw instellen mislukt: {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "Bewerken",
+                    "updating": "Wijzigingen toepassen...",
+                    "success": "Wijzigingen toegepast.",
+                    "error": "Service-instellingen bijwerken mislukt: {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "Service bewerken: {{name}}"
+                },
+                "service_status": {
+                    "yes": "Ja",
+                    "no": "Nee",
+                    "is_running": "Actief",
+                    "restarts": "Herstarts",
+                    "stopped_at": "Gestopt op",
+                    "started_at": "Gestart op",
+                    "updated_at": "Bijgewerkt op"
+                }
+            },
+            "Station": {
+                "title": "Stationinstellingen",
+                "update_station": {
+                    "field_required": "Dit veld is verplicht.",
+                    "updating": "Stationinstellingen bijwerken...",
+                    "success": "Stationinstellingen bijgewerkt.",
+                    "error": "Stationinstellingen bijwerken mislukt: {{error}}"
+                }
+            },
+            "Users": {
+                "title": "Gebruikersbeheer",
+                "search_users": {
+                    "placeholder": "Gebruikers zoeken"
+                },
+                "refresh_list": {
+                    "submit_button": "Vernieuwen",
+                    "refreshing": "Gebruikerslijst vernieuwen...",
+                    "success": "Gebruikerslijst vernieuwd.",
+                    "error": "Gebruikerslijst vernieuwen mislukt: {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "Gebruikers verwijderen",
+                    "confirm_title": "Verwijderen bevestigen",
+                    "confirm_message": "Weet je zeker dat je de geselecteerde gebruikers wilt verwijderen?",
+                    "confirm_button": "Verwijderen",
+                    "cancel_button": "Annuleren",
+                    "removing": "Geselecteerde gebruikers verwijderen...",
+                    "success": "{{num}} gebruikers verwijderd.",
+                    "error": "Geselecteerde gebruikers verwijderen mislukt: {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "Gebruiker aanmaken",
+                    "creating": "Nieuwe gebruiker aanmaken...",
+                    "success": "Gebruiker {{username}} aangemaakt.",
+                    "error": "Nieuwe gebruiker aanmaken mislukt: {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "Nieuwe gebruiker aanmaken",
+                    "username": {
+                        "label": "Gebruikersnaam",
+                        "placeholder": "Gebruikersnaam van de nieuwe gebruiker"
+                    },
+                    "password": {
+                        "label": "Wachtwoord",
+                        "placeholder": "Wachtwoord van de nieuwe gebruiker"
+                    },
+                    "admin": {
+                        "label": "Gebruiker met beheerdersrechten"
+                    },
+                    "create_button": "Aanmaken"
+                },
+                "edit_user": {
+                    "submit_button": "Bewerken",
+                    "updating": "Gebruiker bijwerken...",
+                    "success": "Gebruiker {{username}} bijgewerkt.",
+                    "error": "Gebruiker bijwerken mislukt: {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "Gebruiker bewerken",
+                    "username": {
+                        "label": "Gebruikersnaam",
+                        "placeholder": "Laat leeg om niet te wijzigen."
+                    },
+                    "password": {
+                        "label": "Wachtwoord",
+                        "placeholder": "Laat leeg om niet te wijzigen."
+                    },
+                    "admin": {
+                        "label": "Gebruiker met beheerdersrechten"
+                    },
+                    "update_button": "Bijwerken"
+                },
+                "remove_user": {
+                    "submit_button": "Verwijderen",
+                    "confirm_title": "Verwijderen bevestigen",
+                    "confirm_message": "Weet je zeker dat je gebruiker {{username}} wilt verwijderen?",
+                    "confirm_button": "Verwijderen",
+                    "cancel_button": "Annuleren",
+                    "removing": "Gebruiker verwijderen...",
+                    "success": "Gebruiker {{username}} verwijderd.",
+                    "error": "Gebruiker verwijderen mislukt: {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "Ja",
+                    "no": "Nee",
+                    "never": "Nooit",
+                    "id": "ID",
+                    "user_id": "Gebruikers-ID",
+                    "username": "Gebruikersnaam",
+                    "admin": "Beheerder",
+                    "created_at": "Aangemaakt op",
+                    "last_login": "Laatste aanmelding",
+                    "user_ip": "IP-adres gebruiker",
+                    "user_agent": "Gebruikersagent",
+                    "updated_at": "Bijgewerkt op",
+                    "actions": "Acties"
+                }
+            },
+            "Backup": {
+                "title": "Back-upbeheer",
+                "select_mode": {
+                    "backup": "Back-up maken",
+                    "restore": "Back-up herstellen"
+                },
+                "backup_config": {
+                    "title": "Een back-up maken",
+                    "description": "Hiermee worden je instellingen geëxporteerd als JSON-bestand. Je kunt dit bestand bewaren en later gebruiken om je instellingen te herstellen, bijvoorbeeld bij een overstap naar een nieuw systeem.",
+                    "submit_button": "Back-up genereren",
+                    "generating": "Back-upgegevens genereren...",
+                    "success": "Back-upgegevens gegenereerd.",
+                    "error": "Back-upgegevens genereren mislukt: {{error}}"
+                },
+                "restore_config": {
+                    "title": "Selecteer een back-upbestand",
+                    "description": "Kies een JSON-back-upbestand om je instellingen te herstellen. AnyShake Observer overschrijft je huidige instellingen met de gegevens uit het geselecteerde bestand.",
+                    "submit_button": "Instellingen herstellen",
+                    "no_file_selected": "Geen bestand geselecteerd.",
+                    "confirm_title": "Herstellen bevestigen",
+                    "confirm_message": "Weet je zeker dat je de instellingen wilt herstellen? Deze actie overschrijft je huidige instellingen.",
+                    "confirm_button": "Herstellen",
+                    "cancel_button": "Annuleren",
+                    "restoring": "Instellingen herstellen...",
+                    "success": "Instellingen hersteld.",
+                    "error": "Instellingen herstellen mislukt: {{error}}"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "Er is een nieuwe update beschikbaar. Wil je nu bijwerken?",
+            "confirm_title": "Update beschikbaar",
+            "confirm_button": "Bijwerken",
+            "cancel_button": "Annuleren"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "Weet je zeker dat je je wilt afmelden?",
+            "confirm_title": "Afmelden",
+            "confirm_button": "OK",
+            "cancel_button": "Annuleren"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "Gebruikersnaam",
+            "placeholder": "Je gebruikersnaam"
+        },
+        "password": {
+            "label": "Wachtwoord",
+            "placeholder": "Je wachtwoord"
+        },
+        "captcha": {
+            "label": "Voer de captcha in",
+            "countdown": "({{seconds}} s)",
+            "loading": "Captcha laden...",
+            "error": "Captcha laden mislukt",
+            "placeholder": "Captchacode",
+            "refreshing": "Captcha vernieuwen.",
+            "refresh_success": "Captcha vernieuwd.",
+            "refresh_error": "Captcha vernieuwen mislukt."
+        },
+        "signin": {
+            "button": "Aanmelden",
+            "loading": "Aanmelden...",
+            "success": "Je bent aangemeld.",
+            "error": "Aanmelden mislukt."
+        }
+    }
+}

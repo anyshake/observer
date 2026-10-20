@@ -231,16 +231,20 @@ export const Login = ({ currentLocale, locales, onSwitchLocale }: ILogin) => {
                                         </button>
                                         <ul
                                             tabIndex={0}
-                                            className="menu dropdown-content rounded-box app-login-locales"
+                                            className="menu dropdown-content rounded-box app-dropdown-menu app-login-locales"
                                         >
                                             {Object.entries(locales).map(([key, value]) => (
                                                 <li
                                                     className={`app-text-body ${key === currentLocale ? 'app-text-bold' : ''}`}
                                                     key={key}
                                                 >
-                                                    <a onClick={() => onSwitchLocale(key)}>
+                                                    <button
+                                                        type="button"
+                                                        aria-pressed={key === currentLocale}
+                                                        onClick={() => onSwitchLocale(key)}
+                                                    >
                                                         {value}
-                                                    </a>
+                                                    </button>
                                                 </li>
                                             ))}
                                         </ul>

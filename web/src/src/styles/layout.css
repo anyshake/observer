@@ -28,7 +28,7 @@
     }
 
     .app-header-locales {
-        @apply bg-base-100 w-36 p-2 shadow;
+        @apply bg-base-100 p-2 shadow;
     }
 
     .app-sidebar {

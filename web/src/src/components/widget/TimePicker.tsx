@@ -10,6 +10,7 @@ import * as XDatePickers from '@mui/x-date-pickers/locales';
 import * as DateFnsLang from 'date-fns/locale';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { localeConfig } from '../../config/locale';
 import { getDateString } from '../../helpers/utils/getDateString';
 import { getTimeString } from '../../helpers/utils/getTimeString';
 import { selectThemeMode, useThemeStore } from '../../stores/theme';
@@ -39,42 +40,11 @@ export const TimePicker = ({
     const pickerRef = useRef<HTMLDivElement>(null);
     const [open, setOpen] = useState(false);
     const mode = useThemeStore(selectThemeMode);
-    const safeCurrentLocale = currentLocale || 'en-US';
+    const locale =
+        localeConfig.resources[currentLocale] ?? localeConfig.resources[localeConfig.fallback];
 
-    const themeRecords = useMemo(
-        () =>
-            Object.entries(XDatePickers).reduce(
-                (acc, [locale, value]) => {
-                    acc[locale] = value;
-                    return acc;
-                },
-                {} as Record<string, object>
-            ),
-        []
-    );
-    const adapterLocaleRecords = useMemo(
-        () =>
-            Object.entries(DateFnsLang).reduce(
-                (acc, [locale, value]) => {
-                    acc[locale] = value;
-                    return acc;
-                },
-                {} as Record<string, object>
-            ),
-        []
-    );
-
-    const [locale4Component, setLocale4Component] = useState('enUS');
-    useEffect(() => {
-        const componentLocale = safeCurrentLocale.replace(/[^a-z0-9]/gi, '');
-        setLocale4Component(themeRecords[componentLocale] ? componentLocale : 'enUS');
-    }, [safeCurrentLocale, themeRecords]);
-
-    const [locale4Adapter, setLocale4Adapter] = useState('enUS');
-    useEffect(() => {
-        const componentLocale = safeCurrentLocale.replace(/[^a-z0-9]/gi, '');
-        setLocale4Adapter(adapterLocaleRecords[componentLocale] ? componentLocale : 'enUS');
-    }, [safeCurrentLocale, adapterLocaleRecords]);
+    const locale4Component = XDatePickers[locale.key4mui.datePickers];
+    const locale4Adapter = DateFnsLang[locale.key4datefns];
 
     const [internalValue, setInternalValue] = useState<number | null>();
     useEffect(() => {
@@ -90,10 +60,7 @@ export const TimePicker = ({
         [onChange]
     );
 
-    const theme = useMemo(
-        () => createAppTheme(mode, themeRecords[locale4Component]),
-        [mode, locale4Component, themeRecords]
-    );
+    const theme = useMemo(() => createAppTheme(mode, locale4Component), [mode, locale4Component]);
     const getDialogContainer = useCallback(
         () => pickerRef.current?.closest('dialog') ?? document.body,
         []
@@ -122,7 +89,7 @@ export const TimePicker = ({
                 <ThemeProvider theme={theme}>
                     <LocalizationProvider
                         dateAdapter={AdapterDateFns}
-                        adapterLocale={adapterLocaleRecords[locale4Adapter]}
+                        adapterLocale={locale4Adapter}
                     >
                         {dateOnly ? (
                             <MobileDatePicker

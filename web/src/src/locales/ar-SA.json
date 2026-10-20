@@ -1,0 +1,650 @@
+{
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "أصغِ إلى همسات الأرض."
+        },
+        "router": {
+            "home": "حالة المحطة",
+            "realtime": "الموجات الآنية",
+            "history": "الموجات المسجلة",
+            "download": "تنزيل البيانات",
+            "settings": "إعدادات النظام",
+            "default": "الصفحة غير موجودة"
+        }
+    },
+    "components": {
+        "ThemeToggle": {
+            "label": "المظهر",
+            "light": "فاتح",
+            "dark": "داكن",
+            "system": "النظام"
+        },
+        "ErrorPage": {
+            "something_went_wrong": "حدث خطأ.",
+            "try_again_later": "يرجى تحديث الصفحة أو المحاولة لاحقًا."
+        },
+        "TypedInput": {
+            "yes": "نعم",
+            "no": "لا",
+            "add_new_item": "أدخل عنصرًا جديدًا.",
+            "editing_list": "تحرير قائمة {{fieldName}}",
+            "table_value": "القيمة",
+            "table_actions": "الإجراءات"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "إعدادات المخطط الطيفي",
+                "min_db": "الحد الأدنى بالديسيبل",
+                "max_db": "الحد الأقصى بالديسيبل"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "إعدادات المخطط الطيفي",
+                "min_db": "الحد الأدنى بالديسيبل",
+                "max_db": "الحد الأقصى بالديسيبل"
+            }
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "المعرّف",
+                "name": "اسم الملف",
+                "time": "وقت التعديل",
+                "size": "حجم الملف",
+                "actions": "الإجراءات"
+            },
+            "file_list_actions": {
+                "download": "تنزيل",
+                "preview": "معاينة"
+            },
+            "miniseed_list": {
+                "title": "ملفات MiniSEED اليومية",
+                "search": "بحث"
+            },
+            "helicorder_list": {
+                "title": "قائمة مخططات Helicorder",
+                "search": "بحث"
+            },
+            "request_file": {
+                "requesting": "جارٍ طلب رابط تنزيل الملف {{fileName}}.",
+                "success": "تم الحصول على رابط تنزيل الملف {{fileName}}.",
+                "error": "تعذّر طلب رابط الملف {{fileName}}: {{error}}"
+            },
+            "preview_file": {
+                "requesting": "جارٍ طلب رابط معاينة الملف {{fileName}}.",
+                "success": "تم الحصول على رابط معاينة الملف {{fileName}}.",
+                "error": "تعذّر طلب رابط الملف {{fileName}}: {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "الاستعلام عن الأحداث",
+                "data_agency": "الجهة المزوّدة للبيانات",
+                "search_button": "بحث عن أحداث",
+                "searching": "جارٍ البحث عن أحداث في المصدر المحدد.",
+                "success": "عدد الأحداث التي عُثر عليها في المصدر المحدد: {{count}}.",
+                "no_data": "لم يُعثر على أحداث في المصدر المحدد.",
+                "error": "تعذّر البحث عن الأحداث: {{error}}"
+            },
+            "event_list_modal": {
+                "title": "اختر حدثًا زلزاليًا",
+                "earthquake_at": "زلزال في {{time}}",
+                "p_wave_arrival": "وصول الموجة P في {{time}} ({{seconds}} ثانية)",
+                "s_wave_arrival": "وصول الموجة S في {{time}} ({{seconds}} ثانية)",
+                "epicenter_distance": "المسافة إلى المركز السطحي {{distance}} كم",
+                "earthquake_depth": "العمق {{depth}} كم",
+                "selected_an_event": "تم اختيار حدث زلزالي في {{region}} بتاريخ {{time}}."
+            },
+            "data_export": {
+                "title": "تصدير البيانات",
+                "file_format": "صيغة الملف",
+                "channel_code": "رمز القناة",
+                "export_button": "الحصول على البيانات",
+                "exporting": "جارٍ تصدير القناة {{channel}} بصيغة {{format}}.",
+                "success": "تم تصدير القناة {{channel}} بصيغة {{format}} بنجاح.",
+                "error": "تعذّر تصدير القناة {{channel}} بصيغة {{format}}: {{error}}"
+            },
+            "search_records": {
+                "title": "الاستعلام حسب الوقت",
+                "start_time": "وقت البدء",
+                "end_time": "وقت الانتهاء",
+                "invalid_time": "يجب أن يسبق وقت البدء وقت الانتهاء.",
+                "search_button": "بحث عن سجلات",
+                "searching": "جارٍ البحث عن سجلات زلزالية في قاعدة البيانات.",
+                "success": "عدد السجلات الزلزالية التي عُثر عليها في قاعدة البيانات: {{count}}.",
+                "no_data": "لم يُعثر على سجلات زلزالية في قاعدة البيانات.",
+                "error": "تعذّر البحث عن السجلات: {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "قفل التخطيط",
+                "unlock_button": "إلغاء قفل التخطيط"
+            },
+            "reset_layout": {
+                "reset_button": "إعادة تعيين الكل",
+                "confirm_message": "هل تريد إعادة تعيين التخطيط؟",
+                "confirm_title": "تأكيد إعادة التعيين",
+                "confirm_button": "إعادة تعيين",
+                "cancel_button": "إلغاء"
+            },
+            "display_mode": {
+                "waveform_mode": "وضع الموجات",
+                "spectrogram_mode": "وضع المخطط الطيفي"
+            },
+            "share_link": {
+                "share_button": "مشاركة الرابط",
+                "link_copied": "تم نسخ رابط المشاركة إلى الحافظة."
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "معلومات المحطة",
+                "name": "الاسم",
+                "country": "البلد",
+                "place": "الموقع",
+                "affiliation": "الجهة التابعة لها",
+                "channels": "القنوات"
+            },
+            "device_info": {
+                "yes": "نعم",
+                "no": "لا",
+                "title": "معلومات الجهاز",
+                "product_model": "طراز المنتج",
+                "device_id": "معرّف الجهاز",
+                "link_protocol": "بروتوكول الاتصال",
+                "packet_interval": "الفاصل بين الحزم",
+                "gnss_active": "GNSS مفعّل"
+            },
+            "device_status": {
+                "title": "حالة الجهاز",
+                "sample_rate": "معدل أخذ العينات",
+                "latitude": "خط العرض",
+                "longitude": "خط الطول",
+                "elevation": "الارتفاع",
+                "temperature": "درجة حرارة الجهاز"
+            },
+            "link_status": {
+                "title": "حالة الاتصال",
+                "started_at": "وقت البدء",
+                "last_frame": "آخر إطار",
+                "frames": "الإطارات",
+                "errors": "الأخطاء",
+                "messages": "الرسائل"
+            },
+            "connectivity": {
+                "loading": "جارٍ الاتصال بالمحطة...",
+                "success": "تم الاتصال بالمحطة. مدة تشغيل الخادم {{uptime}} ثانية، وآخر تحديث في {{updatedAt}}.",
+                "error": "حدث خطأ أثناء الاتصال بالمحطة. يرجى التحقق من اتصالك."
+            },
+            "station_location": {
+                "title": "موقع المحطة"
+            },
+            "upgrade": {
+                "check_failed": "تعذّر التحقق من وجود تحديثات.",
+                "update_available": "يتوفر إصدار جديد {{latest}}. يمكنك تفعيل التحديثات التلقائية أو تنزيله وتثبيته يدويًا.",
+                "restart_needed": "تم تثبيت أحدث إصدار {{latest}}، لكن الإصدار {{current}} لا يزال قيد التشغيل. يرجى إعادة تشغيل البرنامج في وقت مناسب لتطبيق التحديث.",
+                "manual_upgrade_needed": "يتوفر إصدار جديد {{latest}}، لكن الإصدار الحالي {{current}} أقدم من الحد الأدنى المتوافق {{required}}. يلزم التحديث يدويًا."
+            },
+            "service_status": {
+                "title": "حالة الخدمات"
+            },
+            "cpu_usage": {
+                "title": "استخدام المعالج"
+            },
+            "memory_usage": {
+                "title": "استخدام الذاكرة"
+            },
+            "disk_usage": {
+                "title": "استخدام القرص"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "الصفحة غير موجودة.",
+            "check_your_url": "يرجى التحقق من الرابط والمحاولة مجددًا.",
+            "go_back_button": "رجوع"
+        },
+        "RealTime": {
+            "display_mode": {
+                "waveform_mode": "وضع الموجات",
+                "spectrogram_mode": "وضع المخطط الطيفي"
+            },
+            "reset_layout": {
+                "reset_button": "إعادة تعيين الكل",
+                "confirm_message": "هل تريد إعادة تعيين التخطيط؟",
+                "confirm_title": "تأكيد إعادة التعيين",
+                "confirm_button": "إعادة تعيين",
+                "cancel_button": "إلغاء"
+            },
+            "layout_locker": {
+                "lock_button": "قفل التخطيط",
+                "unlock_button": "إلغاء قفل التخطيط"
+            },
+            "record_data": {
+                "start_button": "بدء التسجيل",
+                "stop_button": "إيقاف التسجيل",
+                "start_recording": "بدأ التسجيل في {{startedAt}}.",
+                "link_created": "توقف التسجيل في {{endedAt}} ({{duration}} ثانية). تم إنشاء رابط.",
+                "no_data_recorded": "لم تُسجّل بيانات خلال هذه الفترة."
+            },
+            "connectivity": {
+                "connecting": "لا يوجد اتصال، جارٍ الاتصال...",
+                "connected": "متصل، آخر تحديث في {{updatedAt}}."
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} عينة/ثانية",
+                "channels": "عدد القنوات: {{num}}",
+                "retention": "{{retention}} ثانية"
+            }
+        },
+        "Settings": {
+            "FDSN": {
+                "title": "مفاتيح الوصول إلى FDSN",
+                "key": "بادئة المفتاح",
+                "remark": "ملاحظة",
+                "remark_placeholder": "أدخل ملاحظة (اختياري)",
+                "created_at": "وقت الإنشاء",
+                "expires_at": "وقت انتهاء الصلاحية",
+                "expiration_placeholder": "اختر وقتًا",
+                "status": "الحالة",
+                "active": "ساري",
+                "expired": "منتهي الصلاحية",
+                "revoked": "ملغى",
+                "revoked_at": "وقت الإلغاء",
+                "hide_revoked": "إخفاء المفاتيح الملغاة",
+                "last_requested_at": "آخر طلب مسجّل",
+                "user_ip": "آخر عنوان IP",
+                "actions": "الإجراءات",
+                "never": "أبدًا",
+                "no_expiration": "بلا انتهاء صلاحية",
+                "refresh": "تحديث",
+                "create": "إنشاء مفتاح وصول",
+                "created": "تم إنشاء مفتاح الوصول!",
+                "create_failed": "تعذّر إنشاء مفتاح الوصول.",
+                "refresh_after_create_failed": "تم إنشاء مفتاح الوصول، لكن تعذّر تحديث القائمة: {{error}}",
+                "expiration_help": "اختر وقتًا مستقبليًا حسب المنطقة الزمنية للمتصفح.",
+                "invalid_expiration": "يجب أن يكون وقت انتهاء الصلاحية في المستقبل.",
+                "disabled": "فعّل خدمة FDSN على الويب في إعدادات المحطة قبل إنشاء مفاتيح الوصول.",
+                "usage": "أرسل الترويسة Authorization: Bearer <access key> مع طلبات الاستعلام.",
+                "secret_help": "احفظ مفتاح الوصول الآن، فلن يظهر إلا مرة واحدة.",
+                "revoke": "إلغاء المفتاح",
+                "revoke_selected": "إلغاء المفاتيح المحددة",
+                "revoke_selected_confirm": "هل تريد إلغاء مفاتيح الوصول المحددة ({{count}})؟ ستُرفض الطلبات التي تستخدمها فورًا.",
+                "revoke_selected_success": "عدد مفاتيح الوصول الملغاة: {{count}}.",
+                "revoke_failed": "تعذّر إلغاء مفاتيح الوصول.",
+                "cancel": "إلغاء",
+                "revoking": "جارٍ إلغاء مفتاح الوصول...",
+                "revoke_confirm": "هل تريد إلغاء مفتاح الوصول هذا؟ ستُرفض فورًا طلبات FDSN اللاحقة التي تستخدمه.",
+                "revoke_success": "تم إلغاء مفتاح الوصول."
+            },
+            "Logs": {
+                "title": "سجلات التطبيق"
+            },
+            "Dangerous": {
+                "executable_backups": {
+                    "title": "نسخ احتياطية للملفات التنفيذية القديمة",
+                    "description": "نسخ احتياطية أُنشئت عند ترقية التطبيق. اختر الملفات التي تريد حذفها نهائيًا.",
+                    "submit_button": "تنظيف النسخ الاحتياطية",
+                    "refresh_button": "تحديث",
+                    "delete_button": "حذف المحدد ({{count}})",
+                    "select_all": "تحديد الكل",
+                    "loading": "جارٍ البحث عن النسخ الاحتياطية...",
+                    "empty": "لم يُعثر على نسخ احتياطية للملفات التنفيذية القديمة.",
+                    "list_failed": "تعذّر البحث عن النسخ الاحتياطية: {{error}}",
+                    "confirm_title": "حذف النسخ الاحتياطية",
+                    "confirm_message": "هل تريد حذف النسخ الاحتياطية المحددة ({{count}}) نهائيًا؟",
+                    "cancel_button": "إلغاء",
+                    "removing": "جارٍ حذف النسخ الاحتياطية...",
+                    "result_summary": "عدد النسخ الاحتياطية المحذوفة: {{removed}}؛ تعذّر حذف {{failed}}.",
+                    "empty_response": "لم تُرجع عملية حذف النسخ الاحتياطية أي نتائج.",
+                    "remove_failed": "تعذّر حذف النسخ الاحتياطية: {{error}}"
+                },
+                "title": "منطقة الخطر",
+                "restart_application": {
+                    "title": "إعادة تشغيل التطبيق بالكامل",
+                    "description": "سيُعاد تشغيل التطبيق بالكامل. قد يستغرق ذلك بعض الوقت، وستُغلق جميع الاتصالات النشطة مؤقتًا، مما يؤدي إلى انقطاع الخدمات والتسجيل.",
+                    "submit_button": "إعادة تشغيل التطبيق",
+                    "confirm_title": "تأكيد إعادة التشغيل",
+                    "confirm_message": "هل تريد إعادة تشغيل التطبيق؟",
+                    "confirm_button": "إعادة تشغيل",
+                    "cancel_button": "إلغاء",
+                    "restarting": "جارٍ إرسال طلب إعادة تشغيل التطبيق...",
+                    "success": "تم إرسال طلب إعادة التشغيل. سيُعاد تشغيل التطبيق خلال بضع ثوانٍ.",
+                    "error": "تعذّر طلب إعادة تشغيل التطبيق: {{error}}"
+                },
+                "purge_waveform_records": {
+                    "title": "حذف سجلات الموجات",
+                    "description": "ستُحذف جميع سجلات الموجات من قاعدة البيانات. لا يمكن التراجع عن هذه العملية.",
+                    "submit_button": "حذف السجلات",
+                    "confirm_title": "تأكيد الحذف",
+                    "confirm_message": "هل تريد حذف جميع سجلات الموجات؟",
+                    "confirm_button": "حذف",
+                    "cancel_button": "إلغاء",
+                    "purging": "جارٍ حذف سجلات الموجات...",
+                    "success": "تم حذف سجلات الموجات بنجاح.",
+                    "error": "تعذّر حذف سجلات الموجات: {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "حذف ملفات MiniSEED",
+                    "description": "ستُحذف جميع ملفات MiniSEED من النظام. لا يمكن التراجع عن هذه العملية.",
+                    "submit_button": "حذف MiniSEED",
+                    "confirm_title": "تأكيد الحذف",
+                    "confirm_message": "هل تريد حذف جميع ملفات MiniSEED؟",
+                    "confirm_button": "حذف",
+                    "cancel_button": "إلغاء",
+                    "purging": "جارٍ حذف ملفات MiniSEED...",
+                    "success": "تم حذف ملفات MiniSEED بنجاح.",
+                    "error": "تعذّر حذف ملفات MiniSEED: {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "حذف ملفات Helicorder",
+                    "description": "ستُحذف جميع ملفات Helicorder من النظام. لا يمكن التراجع عن هذه العملية.",
+                    "submit_button": "حذف Helicorder",
+                    "confirm_title": "تأكيد الحذف",
+                    "confirm_message": "هل تريد حذف جميع ملفات Helicorder؟",
+                    "confirm_button": "حذف",
+                    "cancel_button": "إلغاء",
+                    "purging": "جارٍ حذف ملفات Helicorder...",
+                    "success": "تم حذف ملفات Helicorder بنجاح.",
+                    "error": "تعذّر حذف ملفات Helicorder: {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "إعادة تعيين إعدادات المحطة",
+                    "description": "ستُعاد جميع إعدادات المحطة إلى القيم الافتراضية. لا يمكن التراجع عن هذه العملية، ويلزم إعادة التشغيل لتطبيقها.",
+                    "submit_button": "إعادة تعيين المحطة",
+                    "confirm_title": "تأكيد إعادة التعيين",
+                    "confirm_message": "هل تريد إعادة تعيين جميع إعدادات المحطة؟",
+                    "confirm_button": "إعادة تعيين",
+                    "cancel_button": "إلغاء",
+                    "resetting": "جارٍ إعادة تعيين إعدادات المحطة...",
+                    "success": "تمت إعادة تعيين إعدادات المحطة بنجاح.",
+                    "error": "تعذّرت إعادة تعيين إعدادات المحطة: {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "إعادة تعيين إعدادات الخدمات",
+                    "description": "ستُعاد جميع إعدادات الخدمات إلى القيم الافتراضية. لا يمكن التراجع عن هذه العملية، ويلزم إعادة التشغيل لتطبيقها.",
+                    "submit_button": "إعادة تعيين الخدمة",
+                    "confirm_title": "تأكيد إعادة التعيين",
+                    "confirm_message": "هل تريد إعادة تعيين جميع إعدادات الخدمات؟",
+                    "confirm_button": "إعادة تعيين",
+                    "cancel_button": "إلغاء",
+                    "resetting": "جارٍ إعادة تعيين إعدادات الخدمات...",
+                    "success": "تمت إعادة تعيين إعدادات الخدمات بنجاح.",
+                    "error": "تعذّرت إعادة تعيين إعدادات الخدمات: {{error}}"
+                },
+                "purge_data": {
+                    "mode_running": "قيد التشغيل",
+                    "invalid_range": "يرجى اختيار تاريخ بدء وانتهاء صالحين.",
+                    "started": "بدأت مهمة الحذف.",
+                    "request_failed": "تعذّر بدء مهمة الحذف: {{error}}",
+                    "running_hint": "لا يمكن بدء عملية حذف أخرى حتى تكتمل العملية الحالية.",
+                    "status_query_failed": "تعذّر جلب حالة الحذف: {{error}}",
+                    "status_idle": "لا توجد مهمة حذف قيد التشغيل حاليًا.",
+                    "status_running": "جارٍ الحذف: {{kind}}.",
+                    "status_success": "اكتمل الحذف: {{kind}}.",
+                    "status_failed": "فشل الحذف: {{kind}}: {{error}}",
+                    "verification_label": "نص التحقق",
+                    "verification_help": "يرجى إدخال \"{{verificationText}}\" لتفعيل زر التنفيذ.",
+                    "kind_seis_records_full": "سجلات الموجات",
+                    "kind_seis_records_by_date": "سجلات الموجات ضمن الفترة المحددة",
+                    "kind_miniseed_full": "ملفات MiniSEED",
+                    "kind_miniseed_by_date": "ملفات MiniSEED ضمن الفترة المحددة",
+                    "kind_helicorder_full": "ملفات Helicorder",
+                    "kind_helicorder_by_date": "ملفات Helicorder ضمن الفترة المحددة",
+                    "kind_unknown": "مهمة الحذف",
+                    "start_date": "تاريخ البدء",
+                    "end_date": "تاريخ الانتهاء",
+                    "mode_label": "وضع الحذف",
+                    "mode_all": "الكل",
+                    "mode_range": "الفترة الزمنية"
+                }
+            },
+            "Metadata": {
+                "title": "البيانات الوصفية للمحطة"
+            },
+            "Preference": {
+                "title": "تفضيلات الويب",
+                "reset_layout_preference": {
+                    "title": "إعادة تعيين تفضيلات التخطيط",
+                    "description": "ستُعاد جميع تفضيلات التخطيط إلى القيم الافتراضية. لا يمكن التراجع عن هذه العملية.",
+                    "submit_button": "إعادة تعيين التفضيلات",
+                    "confirm_title": "تأكيد إعادة التعيين",
+                    "confirm_message": "هل تريد إعادة تعيين جميع تفضيلات التخطيط؟",
+                    "confirm_button": "إعادة تعيين",
+                    "cancel_button": "إلغاء",
+                    "success": "تمت إعادة تعيين تفضيلات التخطيط بنجاح."
+                }
+            },
+            "Service": {
+                "title": "إدارة الخدمات",
+                "restart_service": {
+                    "submit_button": "إعادة تشغيل",
+                    "confirm_title": "تأكيد إعادة التشغيل",
+                    "confirm_message": "هل تريد إعادة تشغيل الخدمة؟",
+                    "confirm_button": "إعادة تشغيل",
+                    "cancel_button": "إلغاء",
+                    "restarting": "جارٍ إعادة تشغيل الخدمة...",
+                    "success": "تمت إعادة تشغيل الخدمة بنجاح.",
+                    "error": "تعذّرت إعادة تشغيل الخدمة: {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "بدء",
+                    "confirm_title": "تأكيد البدء",
+                    "confirm_message": "هل تريد بدء الخدمة؟",
+                    "confirm_button": "بدء",
+                    "cancel_button": "إلغاء",
+                    "starting": "جارٍ بدء الخدمة...",
+                    "success": "تم بدء الخدمة بنجاح.",
+                    "error": "تعذّر بدء الخدمة: {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "إيقاف",
+                    "confirm_title": "تأكيد الإيقاف",
+                    "confirm_message": "هل تريد إيقاف الخدمة؟",
+                    "confirm_button": "إيقاف",
+                    "cancel_button": "إلغاء",
+                    "stopping": "جارٍ إيقاف الخدمة...",
+                    "success": "تم إيقاف الخدمة بنجاح.",
+                    "error": "تعذّر إيقاف الخدمة: {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "إعادة تعيين",
+                    "confirm_title": "تأكيد إعادة التعيين",
+                    "confirm_message": "هل تريد إعادة تعيين الخدمة؟",
+                    "confirm_button": "إعادة تعيين",
+                    "cancel_button": "إلغاء",
+                    "resetting": "جارٍ إعادة تعيين الخدمة...",
+                    "success": "تمت إعادة تعيين الخدمة بنجاح.",
+                    "error": "تعذّرت إعادة تعيين الخدمة: {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "تحرير",
+                    "updating": "جارٍ تطبيق التغييرات الجديدة...",
+                    "success": "تم تطبيق التغييرات.",
+                    "error": "تعذّر تحديث إعدادات الخدمة: {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "تحرير الخدمة: {{name}}"
+                },
+                "service_status": {
+                    "yes": "نعم",
+                    "no": "لا",
+                    "is_running": "قيد التشغيل",
+                    "restarts": "عدد مرات إعادة التشغيل",
+                    "stopped_at": "وقت الإيقاف",
+                    "started_at": "وقت البدء",
+                    "updated_at": "وقت التحديث"
+                }
+            },
+            "Station": {
+                "title": "إعدادات المحطة",
+                "update_station": {
+                    "field_required": "هذا الحقل مطلوب.",
+                    "updating": "جارٍ تحديث إعدادات المحطة...",
+                    "success": "تم تحديث إعدادات المحطة بنجاح.",
+                    "error": "تعذّر تحديث إعدادات المحطة: {{error}}"
+                }
+            },
+            "Users": {
+                "title": "إدارة المستخدمين",
+                "search_users": {
+                    "placeholder": "بحث عن مستخدمين"
+                },
+                "refresh_list": {
+                    "submit_button": "تحديث",
+                    "refreshing": "جارٍ تحديث قائمة المستخدمين...",
+                    "success": "تم تحديث قائمة المستخدمين بنجاح.",
+                    "error": "تعذّر تحديث قائمة المستخدمين: {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "حذف المستخدمين",
+                    "confirm_title": "تأكيد الحذف",
+                    "confirm_message": "هل تريد حذف المستخدمين المحددين؟",
+                    "confirm_button": "حذف",
+                    "cancel_button": "إلغاء",
+                    "removing": "جارٍ حذف المستخدمين المحددين...",
+                    "success": "عدد المستخدمين المحذوفين: {{num}}.",
+                    "error": "تعذّر حذف المستخدمين المحددين: {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "إنشاء مستخدم",
+                    "creating": "جارٍ إنشاء مستخدم جديد...",
+                    "success": "تم إنشاء المستخدم {{username}}.",
+                    "error": "تعذّر إنشاء مستخدم جديد: {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "إنشاء مستخدم جديد",
+                    "username": {
+                        "label": "اسم المستخدم",
+                        "placeholder": "اسم المستخدم الجديد"
+                    },
+                    "password": {
+                        "label": "كلمة المرور",
+                        "placeholder": "كلمة مرور المستخدم الجديد"
+                    },
+                    "admin": {
+                        "label": "مستخدم بصلاحيات المسؤول"
+                    },
+                    "create_button": "إنشاء"
+                },
+                "edit_user": {
+                    "submit_button": "تحرير",
+                    "updating": "جارٍ تحديث المستخدم...",
+                    "success": "تم تحديث المستخدم {{username}}.",
+                    "error": "تعذّر تحديث المستخدم: {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "تحرير المستخدم",
+                    "username": {
+                        "label": "اسم المستخدم",
+                        "placeholder": "اتركه فارغًا للإبقاء عليه دون تغيير."
+                    },
+                    "password": {
+                        "label": "كلمة المرور",
+                        "placeholder": "اتركه فارغًا للإبقاء عليه دون تغيير."
+                    },
+                    "admin": {
+                        "label": "مستخدم بصلاحيات المسؤول"
+                    },
+                    "update_button": "تحديث"
+                },
+                "remove_user": {
+                    "submit_button": "حذف",
+                    "confirm_title": "تأكيد الحذف",
+                    "confirm_message": "هل تريد حذف المستخدم {{username}}؟",
+                    "confirm_button": "حذف",
+                    "cancel_button": "إلغاء",
+                    "removing": "جارٍ حذف المستخدم...",
+                    "success": "تم حذف المستخدم {{username}}.",
+                    "error": "تعذّر حذف المستخدم: {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "نعم",
+                    "no": "لا",
+                    "never": "أبدًا",
+                    "id": "المعرّف",
+                    "user_id": "معرّف المستخدم",
+                    "username": "اسم المستخدم",
+                    "admin": "المسؤول",
+                    "created_at": "وقت الإنشاء",
+                    "last_login": "آخر تسجيل دخول",
+                    "user_ip": "عنوان IP للمستخدم",
+                    "user_agent": "وكيل المستخدم",
+                    "updated_at": "وقت التحديث",
+                    "actions": "الإجراءات"
+                }
+            },
+            "Backup": {
+                "title": "إدارة النسخ الاحتياطية",
+                "select_mode": {
+                    "backup": "إنشاء نسخة احتياطية",
+                    "restore": "استعادة نسخة احتياطية"
+                },
+                "backup_config": {
+                    "title": "إنشاء نسخة احتياطية",
+                    "description": "سيُصدّر هذا بيانات الإعدادات إلى ملف JSON. يمكنك حفظ الملف واستخدامه لاحقًا لاستعادة إعداداتك، مثلًا عند الانتقال إلى نظام جديد.",
+                    "submit_button": "إنشاء النسخة الاحتياطية",
+                    "generating": "جارٍ إنشاء بيانات النسخة الاحتياطية...",
+                    "success": "تم إنشاء بيانات النسخة الاحتياطية بنجاح.",
+                    "error": "تعذّر إنشاء بيانات النسخة الاحتياطية: {{error}}"
+                },
+                "restore_config": {
+                    "title": "اختر ملف نسخة احتياطية",
+                    "description": "اختر ملف نسخة احتياطية بصيغة JSON لاستعادة إعداداتك. سيستبدل AnyShake Observer إعداداتك الحالية ببيانات الملف المحدد.",
+                    "submit_button": "استعادة الإعدادات",
+                    "no_file_selected": "لم يتم اختيار ملف.",
+                    "confirm_title": "تأكيد الاستعادة",
+                    "confirm_message": "هل تريد استعادة الإعدادات؟ سيؤدي هذا الإجراء إلى استبدال إعداداتك الحالية.",
+                    "confirm_button": "استعادة",
+                    "cancel_button": "إلغاء",
+                    "restoring": "جارٍ استعادة الإعدادات...",
+                    "success": "تمت استعادة الإعدادات بنجاح.",
+                    "error": "تعذّرت استعادة الإعدادات: {{error}}"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "يتوفر تحديث جديد. هل تريد التحديث الآن؟",
+            "confirm_title": "يتوفر تحديث",
+            "confirm_button": "تحديث",
+            "cancel_button": "إلغاء"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "هل تريد تسجيل الخروج؟",
+            "confirm_title": "تسجيل الخروج",
+            "confirm_button": "موافق",
+            "cancel_button": "إلغاء"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "اسم المستخدم",
+            "placeholder": "اسم المستخدم الخاص بك"
+        },
+        "password": {
+            "label": "كلمة المرور",
+            "placeholder": "كلمة المرور الخاصة بك"
+        },
+        "captcha": {
+            "label": "أدخل رمز التحقق",
+            "countdown": "({{seconds}} ثانية)",
+            "loading": "جارٍ تحميل رمز التحقق...",
+            "error": "تعذّر تحميل رمز التحقق",
+            "placeholder": "رمز التحقق",
+            "refreshing": "جارٍ تحديث رمز التحقق.",
+            "refresh_success": "تم تحديث رمز التحقق بنجاح.",
+            "refresh_error": "تعذّر تحديث رمز التحقق."
+        },
+        "signin": {
+            "button": "تسجيل الدخول",
+            "loading": "جارٍ تسجيل الدخول...",
+            "success": "تم تسجيل الدخول بنجاح.",
+            "error": "فشل تسجيل الدخول."
+        }
+    }
+}

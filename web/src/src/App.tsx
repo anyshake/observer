@@ -88,13 +88,15 @@ const App = () => {
 
     const localeMap = useMemo(
         () =>
-            Object.entries(localeConfig.resources).reduce(
-                (acc, [key, value]) => {
-                    acc[key] = value.label;
-                    return acc;
-                },
-                {} as Record<string, string>
-            ),
+            Object.entries(localeConfig.resources)
+                .sort(([left], [right]) => left.localeCompare(right, 'en'))
+                .reduce(
+                    (acc, [key, value]) => {
+                        acc[key] = value.label;
+                        return acc;
+                    },
+                    {} as Record<string, string>
+                ),
         []
     );
     const [currentLocale, setCurrentLocale] = useState(localeConfig.fallback);

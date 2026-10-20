@@ -26,14 +26,20 @@ export const Header = ({ title, onLogout, locales, currentLocale, onSwitchLocale
                     </button>
                     <ul
                         tabIndex={0}
-                        className="dropdown-content menu rounded-box app-header-locales"
+                        className="dropdown-content menu rounded-box app-dropdown-menu app-header-locales"
                     >
                         {Object.entries(locales).map(([key, value]) => (
                             <li
                                 className={`app-text-body ${key === currentLocale ? 'app-text-bold' : ''}`}
                                 key={key}
                             >
-                                <a onClick={() => onSwitchLocale(key)}>{value}</a>
+                                <button
+                                    type="button"
+                                    aria-pressed={key === currentLocale}
+                                    onClick={() => onSwitchLocale(key)}
+                                >
+                                    {value}
+                                </button>
                             </li>
                         ))}
                     </ul>

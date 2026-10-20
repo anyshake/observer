@@ -11,12 +11,17 @@
         @apply text-app-muted;
     }
 
+    .app-dropdown-menu {
+        @apply w-max max-w-52 min-w-36 flex-nowrap space-y-1 overflow-x-hidden overflow-y-auto overscroll-contain;
+        max-height: min(24rem, calc(100dvh - 6rem));
+    }
+
     .app-theme-options {
-        @apply bg-base-100 text-app-text z-30 mt-2 w-max max-w-[calc(100vw-2rem)] min-w-40 p-2 shadow-md;
+        @apply bg-base-100 text-app-text p-2 shadow;
     }
 
     .app-theme-options button[aria-pressed='true'] {
-        @apply text-app-primary font-semibold;
+        @apply font-semibold;
     }
 
     .app-icon-leading {

@@ -6,8 +6,6 @@ import {
     GridValidRowModel
 } from '@mui/x-data-grid';
 import * as dataGridLocales from '@mui/x-data-grid/locales';
-import { Localization } from '@mui/x-data-grid/utils/getGridLocalization';
-import { useEffect, useMemo, useState } from 'react';
 
 import { localeConfig } from '../../config/locale';
 
@@ -32,30 +30,13 @@ export const TableList = ({
     sortField = 'id',
     sortDirection
 }: TableListProps) => {
-    const themeRecords = useMemo(
-        () =>
-            Object.entries(dataGridLocales).reduce(
-                (acc, [locale, value]) => {
-                    acc[locale] = value;
-                    return acc;
-                },
-                {} as Record<string, object>
-            ),
-        []
-    );
-
-    const [locale4Component, setLocale4Component] = useState('enUS');
-    useEffect(() => {
-        const componentLocale = currentLocale.replace(/[^a-z0-9]/gi, '');
-        setLocale4Component(themeRecords[componentLocale] ? componentLocale : 'enUS');
-    }, [currentLocale, themeRecords]);
+    const locale =
+        localeConfig.resources[currentLocale] ?? localeConfig.resources[localeConfig.fallback];
+    const locale4Component = dataGridLocales[locale.key4mui.dataGrid];
 
     return (
         <DataGrid
-            localeText={
-                (themeRecords[locale4Component] as Localization).components.MuiDataGrid.defaultProps
-                    .localeText
-            }
+            localeText={locale4Component.components.MuiDataGrid.defaultProps.localeText}
             columns={columns}
             rows={data}
             className={`app-data-grid ${!onSelect ? 'app-data-grid-unselectable' : ''}`}

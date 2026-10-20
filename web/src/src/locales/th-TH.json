@@ -1,0 +1,650 @@
+{
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "ฟังเสียงกระซิบของโลก"
+        },
+        "router": {
+            "home": "สถานะสถานี",
+            "realtime": "รูปคลื่นแบบเรียลไทม์",
+            "history": "รูปคลื่นย้อนหลัง",
+            "download": "ดาวน์โหลดข้อมูล",
+            "settings": "การตั้งค่าระบบ",
+            "default": "ไม่พบหน้า"
+        }
+    },
+    "components": {
+        "ThemeToggle": {
+            "label": "ธีม",
+            "light": "สว่าง",
+            "dark": "มืด",
+            "system": "ตามระบบ"
+        },
+        "ErrorPage": {
+            "something_went_wrong": "เกิดข้อผิดพลาด",
+            "try_again_later": "โปรดลองรีเฟรชหน้าหรือกลับมาใหม่ภายหลัง"
+        },
+        "TypedInput": {
+            "yes": "ใช่",
+            "no": "ไม่ใช่",
+            "add_new_item": "ป้อนรายการใหม่",
+            "editing_list": "กำลังแก้ไขรายการ {{fieldName}}",
+            "table_value": "ค่า",
+            "table_actions": "การดำเนินการ"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "การตั้งค่าสเปกโตรแกรม",
+                "min_db": "dB ต่ำสุด",
+                "max_db": "dB สูงสุด"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "การตั้งค่าสเปกโตรแกรม",
+                "min_db": "dB ต่ำสุด",
+                "max_db": "dB สูงสุด"
+            }
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "ชื่อไฟล์",
+                "time": "เวลาแก้ไข",
+                "size": "ขนาดไฟล์",
+                "actions": "การดำเนินการ"
+            },
+            "file_list_actions": {
+                "download": "ดาวน์โหลด",
+                "preview": "ดูตัวอย่าง"
+            },
+            "miniseed_list": {
+                "title": "MiniSEED รายวัน",
+                "search": "ค้นหา"
+            },
+            "helicorder_list": {
+                "title": "รายการ Helicorder",
+                "search": "ค้นหา"
+            },
+            "request_file": {
+                "requesting": "กำลังขอลิงก์ดาวน์โหลดไฟล์ {{fileName}}",
+                "success": "ได้รับลิงก์ดาวน์โหลดไฟล์ {{fileName}} แล้ว",
+                "error": "ขอลิงก์ไฟล์ {{fileName}} ไม่สำเร็จ: {{error}}"
+            },
+            "preview_file": {
+                "requesting": "กำลังขอลิงก์ดูตัวอย่างไฟล์ {{fileName}}",
+                "success": "ได้รับลิงก์ดูตัวอย่างไฟล์ {{fileName}} แล้ว",
+                "error": "ขอลิงก์ไฟล์ {{fileName}} ไม่สำเร็จ: {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "ค้นหาเหตุการณ์",
+                "data_agency": "หน่วยงานข้อมูล",
+                "search_button": "ค้นหาเหตุการณ์",
+                "searching": "กำลังค้นหาเหตุการณ์จากแหล่งข้อมูลที่เลือก",
+                "success": "พบ {{count}} เหตุการณ์จากแหล่งข้อมูลที่เลือก",
+                "no_data": "ไม่พบเหตุการณ์ในแหล่งข้อมูลที่เลือก",
+                "error": "ค้นหาเหตุการณ์ไม่สำเร็จ: {{error}}"
+            },
+            "event_list_modal": {
+                "title": "เลือกเหตุการณ์แผ่นดินไหว",
+                "earthquake_at": "แผ่นดินไหวเมื่อ {{time}}",
+                "p_wave_arrival": "คลื่น P มาถึง {{time}} ({{seconds}} วินาที)",
+                "s_wave_arrival": "คลื่น S มาถึง {{time}} ({{seconds}} วินาที)",
+                "epicenter_distance": "ระยะจากศูนย์กลาง {{distance}} กม.",
+                "earthquake_depth": "ความลึก {{depth}} กม.",
+                "selected_an_event": "เลือกเหตุการณ์แผ่นดินไหวใน {{region}} เมื่อ {{time}} แล้ว"
+            },
+            "data_export": {
+                "title": "ส่งออกข้อมูล",
+                "file_format": "รูปแบบไฟล์",
+                "channel_code": "รหัสช่องสัญญาณ",
+                "export_button": "รับข้อมูล",
+                "exporting": "กำลังส่งออกช่อง {{channel}} เป็นรูปแบบ {{format}}",
+                "success": "ส่งออกช่อง {{channel}} เป็นรูปแบบ {{format}} สำเร็จ",
+                "error": "ส่งออกช่อง {{channel}} เป็นรูปแบบ {{format}} ไม่สำเร็จ: {{error}}"
+            },
+            "search_records": {
+                "title": "ค้นหาตามเวลา",
+                "start_time": "เวลาเริ่มต้น",
+                "end_time": "เวลาสิ้นสุด",
+                "invalid_time": "เวลาเริ่มต้นต้องอยู่ก่อนเวลาสิ้นสุด",
+                "search_button": "ค้นหาบันทึก",
+                "searching": "กำลังค้นหาบันทึกคลื่นไหวสะเทือนจากฐานข้อมูล",
+                "success": "พบ {{count}} บันทึกคลื่นไหวสะเทือนจากฐานข้อมูล",
+                "no_data": "ไม่พบบันทึกคลื่นไหวสะเทือนในฐานข้อมูล",
+                "error": "ค้นหาบันทึกไม่สำเร็จ: {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "ล็อกเค้าโครง",
+                "unlock_button": "ปลดล็อกเค้าโครง"
+            },
+            "reset_layout": {
+                "reset_button": "รีเซ็ตทั้งหมด",
+                "confirm_message": "ต้องการรีเซ็ตเค้าโครงหรือไม่",
+                "confirm_title": "ยืนยันการรีเซ็ต",
+                "confirm_button": "รีเซ็ต",
+                "cancel_button": "ยกเลิก"
+            },
+            "display_mode": {
+                "waveform_mode": "โหมดรูปคลื่น",
+                "spectrogram_mode": "โหมดสเปกโตรแกรม"
+            },
+            "share_link": {
+                "share_button": "แชร์ลิงก์",
+                "link_copied": "คัดลอกลิงก์แชร์ไปยังคลิปบอร์ดแล้ว"
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "ข้อมูลสถานี",
+                "name": "ชื่อ",
+                "country": "ประเทศ",
+                "place": "สถานที่",
+                "affiliation": "หน่วยงานต้นสังกัด",
+                "channels": "ช่องสัญญาณ"
+            },
+            "device_info": {
+                "yes": "ใช่",
+                "no": "ไม่ใช่",
+                "title": "ข้อมูลอุปกรณ์",
+                "product_model": "รุ่นผลิตภัณฑ์",
+                "device_id": "ID อุปกรณ์",
+                "link_protocol": "โพรโทคอลการเชื่อมต่อ",
+                "packet_interval": "ช่วงเวลาระหว่างแพ็กเก็ต",
+                "gnss_active": "GNSS ทำงานอยู่"
+            },
+            "device_status": {
+                "title": "สถานะอุปกรณ์",
+                "sample_rate": "อัตราการสุ่มตัวอย่าง",
+                "latitude": "ละติจูด",
+                "longitude": "ลองจิจูด",
+                "elevation": "ระดับความสูง",
+                "temperature": "อุณหภูมิอุปกรณ์"
+            },
+            "link_status": {
+                "title": "สถานะการเชื่อมต่อ",
+                "started_at": "เวลาเริ่มทำงาน",
+                "last_frame": "เฟรมล่าสุด",
+                "frames": "เฟรม",
+                "errors": "ข้อผิดพลาด",
+                "messages": "ข้อความ"
+            },
+            "connectivity": {
+                "loading": "กำลังเชื่อมต่อสถานี...",
+                "success": "เชื่อมต่อสถานีแล้ว เซิร์ฟเวอร์ทำงานมา {{uptime}} วินาที อัปเดตเมื่อ {{updatedAt}}",
+                "error": "เกิดข้อผิดพลาดในการเชื่อมต่อสถานี โปรดตรวจสอบการเชื่อมต่อ"
+            },
+            "station_location": {
+                "title": "ตำแหน่งสถานี"
+            },
+            "upgrade": {
+                "check_failed": "ตรวจสอบการอัปเดตไม่ได้",
+                "update_available": "มีเวอร์ชันใหม่ {{latest}} คุณสามารถเปิดการอัปเดตอัตโนมัติหรือดาวน์โหลดและติดตั้งด้วยตนเอง",
+                "restart_needed": "ติดตั้งเวอร์ชันล่าสุด {{latest}} แล้ว แต่ยังใช้งาน {{current}} อยู่ โปรดเริ่มซอฟต์แวร์ใหม่ในเวลาที่สะดวกเพื่อใช้การอัปเดต",
+                "manual_upgrade_needed": "มีเวอร์ชันใหม่ {{latest}} แต่เวอร์ชันปัจจุบัน {{current}} ต่ำกว่าเวอร์ชันขั้นต่ำที่รองรับ {{required}} ต้องอัปเกรดด้วยตนเอง"
+            },
+            "service_status": {
+                "title": "สถานะบริการ"
+            },
+            "cpu_usage": {
+                "title": "การใช้ CPU"
+            },
+            "memory_usage": {
+                "title": "การใช้หน่วยความจำ"
+            },
+            "disk_usage": {
+                "title": "การใช้ดิสก์"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "ไม่พบหน้าที่ต้องการ",
+            "check_your_url": "โปรดตรวจสอบ URL แล้วลองอีกครั้ง",
+            "go_back_button": "ย้อนกลับ"
+        },
+        "RealTime": {
+            "display_mode": {
+                "waveform_mode": "โหมดรูปคลื่น",
+                "spectrogram_mode": "โหมดสเปกโตรแกรม"
+            },
+            "reset_layout": {
+                "reset_button": "รีเซ็ตทั้งหมด",
+                "confirm_message": "ต้องการรีเซ็ตเค้าโครงหรือไม่",
+                "confirm_title": "ยืนยันการรีเซ็ต",
+                "confirm_button": "รีเซ็ต",
+                "cancel_button": "ยกเลิก"
+            },
+            "layout_locker": {
+                "lock_button": "ล็อกเค้าโครง",
+                "unlock_button": "ปลดล็อกเค้าโครง"
+            },
+            "record_data": {
+                "start_button": "เริ่มบันทึก",
+                "stop_button": "หยุดบันทึก",
+                "start_recording": "เริ่มบันทึกเมื่อ {{startedAt}}",
+                "link_created": "หยุดบันทึกเมื่อ {{endedAt}} ({{duration}} วินาที) สร้างลิงก์แล้ว",
+                "no_data_recorded": "ไม่มีข้อมูลที่บันทึกในช่วงเวลานี้"
+            },
+            "connectivity": {
+                "connecting": "ไม่มีการเชื่อมต่อ กำลังเชื่อมต่อ...",
+                "connected": "เชื่อมต่อแล้ว อัปเดตล่าสุดเมื่อ {{updatedAt}}"
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} ตัวอย่าง/วินาที",
+                "channels": "{{num}} ช่องสัญญาณ",
+                "retention": "{{retention}} วินาที"
+            }
+        },
+        "Settings": {
+            "FDSN": {
+                "title": "คีย์การเข้าถึง FDSN",
+                "key": "คำนำหน้าคีย์",
+                "remark": "หมายเหตุ",
+                "remark_placeholder": "ป้อนหมายเหตุ (ไม่บังคับ)",
+                "created_at": "สร้างเมื่อ",
+                "expires_at": "หมดอายุเมื่อ",
+                "expiration_placeholder": "เลือกเวลา",
+                "status": "สถานะ",
+                "active": "ใช้งานอยู่",
+                "expired": "หมดอายุแล้ว",
+                "revoked": "เพิกถอนแล้ว",
+                "revoked_at": "เพิกถอนเมื่อ",
+                "hide_revoked": "ซ่อนคีย์ที่เพิกถอนแล้ว",
+                "last_requested_at": "คำขอล่าสุดที่บันทึกไว้",
+                "user_ip": "IP ล่าสุด",
+                "actions": "การดำเนินการ",
+                "never": "ไม่เคย",
+                "no_expiration": "ไม่มีวันหมดอายุ",
+                "refresh": "รีเฟรช",
+                "create": "สร้างคีย์การเข้าถึง",
+                "created": "สร้างคีย์การเข้าถึงแล้ว!",
+                "create_failed": "สร้างคีย์การเข้าถึงไม่สำเร็จ",
+                "refresh_after_create_failed": "สร้างคีย์การเข้าถึงแล้ว แต่รีเฟรชรายการไม่สำเร็จ: {{error}}",
+                "expiration_help": "เลือกเวลาในอนาคตตามเขตเวลาของเบราว์เซอร์",
+                "invalid_expiration": "เวลาหมดอายุต้องเป็นเวลาในอนาคต",
+                "disabled": "เปิดใช้งานบริการเว็บ FDSN ในการตั้งค่าสถานีก่อนสร้างคีย์การเข้าถึง",
+                "usage": "ส่ง Authorization: Bearer <access key> พร้อมคำขอสืบค้น",
+                "secret_help": "บันทึกคีย์การเข้าถึงนี้ทันที คีย์จะแสดงเพียงครั้งเดียว",
+                "revoke": "เพิกถอน",
+                "revoke_selected": "เพิกถอนรายการที่เลือก",
+                "revoke_selected_confirm": "เพิกถอนคีย์การเข้าถึงที่เลือก ({{count}} คีย์) หรือไม่? คำขอที่ใช้คีย์เหล่านี้จะถูกปฏิเสธทันที",
+                "revoke_selected_success": "เพิกถอนคีย์การเข้าถึงแล้ว: {{count}} คีย์",
+                "revoke_failed": "เพิกถอนคีย์การเข้าถึงไม่สำเร็จ",
+                "cancel": "ยกเลิก",
+                "revoking": "กำลังเพิกถอนคีย์การเข้าถึง...",
+                "revoke_confirm": "เพิกถอนคีย์การเข้าถึงนี้หรือไม่? คำขอ FDSN ถัดไปที่ใช้คีย์นี้จะถูกปฏิเสธทันที",
+                "revoke_success": "เพิกถอนคีย์การเข้าถึงแล้ว"
+            },
+            "Logs": {
+                "title": "บันทึกแอปพลิเคชัน"
+            },
+            "Dangerous": {
+                "executable_backups": {
+                    "title": "ไฟล์สำรองโปรแกรมรุ่นเก่า",
+                    "description": "ไฟล์สำรองที่สร้างขึ้นเมื่ออัปเกรดแอปพลิเคชันนี้ เลือกไฟล์ที่ต้องการลบถาวร",
+                    "submit_button": "ล้างไฟล์สำรอง",
+                    "refresh_button": "รีเฟรช",
+                    "delete_button": "ลบรายการที่เลือก ({{count}})",
+                    "select_all": "เลือกทั้งหมด",
+                    "loading": "กำลังค้นหาไฟล์สำรอง...",
+                    "empty": "ไม่พบไฟล์สำรองโปรแกรมรุ่นเก่า",
+                    "list_failed": "ค้นหาไฟล์สำรองไม่สำเร็จ: {{error}}",
+                    "confirm_title": "ลบไฟล์สำรอง",
+                    "confirm_message": "ลบไฟล์สำรองที่เลือก {{count}} ไฟล์อย่างถาวรหรือไม่?",
+                    "cancel_button": "ยกเลิก",
+                    "removing": "กำลังลบไฟล์สำรอง...",
+                    "result_summary": "ลบไฟล์สำรองแล้ว {{removed}} ไฟล์; ไม่สำเร็จ {{failed}} ไฟล์",
+                    "empty_response": "ไม่ได้รับผลการลบไฟล์สำรอง",
+                    "remove_failed": "ลบไฟล์สำรองไม่สำเร็จ: {{error}}"
+                },
+                "title": "โซนอันตราย",
+                "restart_application": {
+                    "title": "รีสตาร์ทแอปพลิเคชันทั้งหมด",
+                    "description": "การดำเนินการนี้จะรีสตาร์ทแอปพลิเคชันทั้งหมด อาจใช้เวลาสักครู่และจะปิดการเชื่อมต่อที่ใช้งานอยู่ทั้งหมดชั่วคราว ทำให้บริการและการบันทึกหยุดชะงัก",
+                    "submit_button": "รีสตาร์ทแอปพลิเคชัน",
+                    "confirm_title": "ยืนยันการรีสตาร์ท",
+                    "confirm_message": "คุณแน่ใจหรือไม่ว่าต้องการรีสตาร์ทแอปพลิเคชัน?",
+                    "confirm_button": "รีสตาร์ท",
+                    "cancel_button": "ยกเลิก",
+                    "restarting": "กำลังส่งคำขอรีสตาร์ทแอปพลิเคชัน...",
+                    "success": "ส่งคำขอรีสตาร์ทแล้ว แอปพลิเคชันจะรีสตาร์ทในอีกไม่กี่วินาที",
+                    "error": "ส่งคำขอรีสตาร์ทแอปพลิเคชันไม่สำเร็จ: {{error}}"
+                },
+                "purge_waveform_records": {
+                    "title": "ล้างระเบียนรูปคลื่น",
+                    "description": "การดำเนินการนี้จะลบระเบียนรูปคลื่นทั้งหมดในฐานข้อมูล และไม่สามารถย้อนกลับได้",
+                    "submit_button": "ล้างระเบียน",
+                    "confirm_title": "ยืนยันการล้าง",
+                    "confirm_message": "คุณแน่ใจหรือไม่ว่าต้องการล้างระเบียนรูปคลื่นทั้งหมด?",
+                    "confirm_button": "ล้าง",
+                    "cancel_button": "ยกเลิก",
+                    "purging": "กำลังล้างระเบียนรูปคลื่น...",
+                    "success": "ล้างระเบียนรูปคลื่นสำเร็จแล้ว",
+                    "error": "ล้างระเบียนรูปคลื่นไม่สำเร็จ: {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "ล้างไฟล์ MiniSEED",
+                    "description": "การดำเนินการนี้จะลบไฟล์ MiniSEED ทั้งหมดในระบบ และไม่สามารถย้อนกลับได้",
+                    "submit_button": "ล้าง MiniSEED",
+                    "confirm_title": "ยืนยันการล้าง",
+                    "confirm_message": "คุณแน่ใจหรือไม่ว่าต้องการล้างไฟล์ MiniSEED ทั้งหมด?",
+                    "confirm_button": "ล้าง",
+                    "cancel_button": "ยกเลิก",
+                    "purging": "กำลังล้างไฟล์ MiniSEED...",
+                    "success": "ล้างไฟล์ MiniSEED สำเร็จแล้ว",
+                    "error": "ล้างไฟล์ MiniSEED ไม่สำเร็จ: {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "ล้างไฟล์ Helicorder",
+                    "description": "การดำเนินการนี้จะลบไฟล์ Helicorder ทั้งหมดในระบบ และไม่สามารถย้อนกลับได้",
+                    "submit_button": "ล้าง Helicorder",
+                    "confirm_title": "ยืนยันการล้าง",
+                    "confirm_message": "คุณแน่ใจหรือไม่ว่าต้องการล้างไฟล์ Helicorder ทั้งหมด?",
+                    "confirm_button": "ล้าง",
+                    "cancel_button": "ยกเลิก",
+                    "purging": "กำลังล้างไฟล์ Helicorder...",
+                    "success": "ล้างไฟล์ Helicorder สำเร็จแล้ว",
+                    "error": "ล้างไฟล์ Helicorder ไม่สำเร็จ: {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "รีเซ็ตการกำหนดค่าสถานี",
+                    "description": "การดำเนินการนี้จะรีเซ็ตการกำหนดค่าสถานีทั้งหมด ไม่สามารถย้อนกลับได้ และต้องรีสตาร์ทเพื่อให้มีผล",
+                    "submit_button": "รีเซ็ตสถานี",
+                    "confirm_title": "ยืนยันการรีเซ็ต",
+                    "confirm_message": "คุณแน่ใจหรือไม่ว่าต้องการรีเซ็ตการกำหนดค่าสถานีทั้งหมด?",
+                    "confirm_button": "รีเซ็ต",
+                    "cancel_button": "ยกเลิก",
+                    "resetting": "กำลังรีเซ็ตการกำหนดค่าสถานี...",
+                    "success": "รีเซ็ตการกำหนดค่าสถานีสำเร็จแล้ว",
+                    "error": "รีเซ็ตการกำหนดค่าสถานีไม่สำเร็จ: {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "รีเซ็ตการกำหนดค่าบริการ",
+                    "description": "การดำเนินการนี้จะรีเซ็ตการกำหนดค่าบริการทั้งหมด ไม่สามารถย้อนกลับได้ และต้องรีสตาร์ทเพื่อให้มีผล",
+                    "submit_button": "รีเซ็ตบริการ",
+                    "confirm_title": "ยืนยันการรีเซ็ต",
+                    "confirm_message": "คุณแน่ใจหรือไม่ว่าต้องการรีเซ็ตการกำหนดค่าบริการทั้งหมด?",
+                    "confirm_button": "รีเซ็ต",
+                    "cancel_button": "ยกเลิก",
+                    "resetting": "กำลังรีเซ็ตการกำหนดค่าบริการ...",
+                    "success": "รีเซ็ตการกำหนดค่าบริการสำเร็จแล้ว",
+                    "error": "รีเซ็ตการกำหนดค่าบริการไม่สำเร็จ: {{error}}"
+                },
+                "purge_data": {
+                    "mode_running": "กำลังทำงาน",
+                    "invalid_range": "โปรดเลือกวันที่เริ่มต้นและสิ้นสุดที่ถูกต้อง",
+                    "started": "เริ่มงานล้างแล้ว",
+                    "request_failed": "เริ่มงานล้างไม่สำเร็จ: {{error}}",
+                    "running_hint": "ไม่สามารถเริ่มการล้างรายการอื่นได้จนกว่าการล้างปัจจุบันจะเสร็จสิ้น",
+                    "status_query_failed": "ดึงสถานะการล้างไม่สำเร็จ: {{error}}",
+                    "status_idle": "ไม่มีงานล้างที่กำลังทำงานอยู่",
+                    "status_running": "กำลังล้าง: {{kind}}",
+                    "status_success": "ล้างเสร็จสิ้น: {{kind}}",
+                    "status_failed": "ล้างไม่สำเร็จ: {{kind}}: {{error}}",
+                    "verification_label": "ข้อความยืนยัน",
+                    "verification_help": "โปรดป้อน \"{{verificationText}}\" เพื่อเปิดใช้งานปุ่มดำเนินการ",
+                    "kind_seis_records_full": "ระเบียนรูปคลื่น",
+                    "kind_seis_records_by_date": "ระเบียนรูปคลื่นในช่วงวันที่ที่ระบุ",
+                    "kind_miniseed_full": "ไฟล์ MiniSEED",
+                    "kind_miniseed_by_date": "ไฟล์ MiniSEED ในช่วงวันที่ที่ระบุ",
+                    "kind_helicorder_full": "ไฟล์ Helicorder",
+                    "kind_helicorder_by_date": "ไฟล์ Helicorder ในช่วงวันที่ที่ระบุ",
+                    "kind_unknown": "งานล้าง",
+                    "start_date": "วันที่เริ่มต้น",
+                    "end_date": "วันที่สิ้นสุด",
+                    "mode_label": "โหมดการล้าง",
+                    "mode_all": "ทั้งหมด",
+                    "mode_range": "ช่วงวันที่"
+                }
+            },
+            "Metadata": {
+                "title": "ข้อมูลเมตาของสถานี"
+            },
+            "Preference": {
+                "title": "การตั้งค่าเว็บ",
+                "reset_layout_preference": {
+                    "title": "รีเซ็ตการตั้งค่าเลย์เอาต์",
+                    "description": "การดำเนินการนี้จะรีเซ็ตการตั้งค่าเลย์เอาต์ทั้งหมด และไม่สามารถย้อนกลับได้",
+                    "submit_button": "รีเซ็ตการตั้งค่า",
+                    "confirm_title": "ยืนยันการรีเซ็ต",
+                    "confirm_message": "คุณแน่ใจหรือไม่ว่าต้องการรีเซ็ตการตั้งค่าเลย์เอาต์ทั้งหมด?",
+                    "confirm_button": "รีเซ็ต",
+                    "cancel_button": "ยกเลิก",
+                    "success": "รีเซ็ตการตั้งค่าเลย์เอาต์สำเร็จแล้ว"
+                }
+            },
+            "Service": {
+                "title": "การควบคุมบริการ",
+                "restart_service": {
+                    "submit_button": "รีสตาร์ท",
+                    "confirm_title": "ยืนยันการรีสตาร์ท",
+                    "confirm_message": "คุณแน่ใจหรือไม่ว่าต้องการรีสตาร์ทบริการ?",
+                    "confirm_button": "รีสตาร์ท",
+                    "cancel_button": "ยกเลิก",
+                    "restarting": "กำลังรีสตาร์ทบริการ...",
+                    "success": "รีสตาร์ทบริการสำเร็จแล้ว",
+                    "error": "รีสตาร์ทบริการไม่สำเร็จ: {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "เริ่ม",
+                    "confirm_title": "ยืนยันการเริ่ม",
+                    "confirm_message": "คุณแน่ใจหรือไม่ว่าต้องการเริ่มบริการ?",
+                    "confirm_button": "เริ่ม",
+                    "cancel_button": "ยกเลิก",
+                    "starting": "กำลังเริ่มบริการ...",
+                    "success": "เริ่มบริการสำเร็จแล้ว",
+                    "error": "เริ่มบริการไม่สำเร็จ: {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "หยุด",
+                    "confirm_title": "ยืนยันการหยุด",
+                    "confirm_message": "คุณแน่ใจหรือไม่ว่าต้องการหยุดบริการ?",
+                    "confirm_button": "หยุด",
+                    "cancel_button": "ยกเลิก",
+                    "stopping": "กำลังหยุดบริการ...",
+                    "success": "หยุดบริการสำเร็จแล้ว",
+                    "error": "หยุดบริการไม่สำเร็จ: {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "รีเซ็ต",
+                    "confirm_title": "ยืนยันการรีเซ็ต",
+                    "confirm_message": "คุณแน่ใจหรือไม่ว่าต้องการรีเซ็ตบริการ?",
+                    "confirm_button": "รีเซ็ต",
+                    "cancel_button": "ยกเลิก",
+                    "resetting": "กำลังรีเซ็ตบริการ...",
+                    "success": "รีเซ็ตบริการสำเร็จแล้ว",
+                    "error": "รีเซ็ตบริการไม่สำเร็จ: {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "แก้ไข",
+                    "updating": "กำลังใช้การเปลี่ยนแปลงใหม่...",
+                    "success": "ใช้การเปลี่ยนแปลงแล้ว",
+                    "error": "อัปเดตการกำหนดค่าบริการไม่สำเร็จ: {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "กำลังแก้ไขบริการ: {{name}}"
+                },
+                "service_status": {
+                    "yes": "ใช่",
+                    "no": "ไม่ใช่",
+                    "is_running": "กำลังทำงาน",
+                    "restarts": "จำนวนครั้งที่รีสตาร์ท",
+                    "stopped_at": "หยุดเมื่อ",
+                    "started_at": "เวลาเริ่มทำงาน",
+                    "updated_at": "อัปเดตเมื่อ"
+                }
+            },
+            "Station": {
+                "title": "การตั้งค่าสถานี",
+                "update_station": {
+                    "field_required": "จำเป็นต้องกรอกช่องนี้",
+                    "updating": "กำลังอัปเดตการกำหนดค่าสถานี...",
+                    "success": "อัปเดตการกำหนดค่าสถานีสำเร็จแล้ว",
+                    "error": "อัปเดตการกำหนดค่าสถานีไม่สำเร็จ: {{error}}"
+                }
+            },
+            "Users": {
+                "title": "การจัดการผู้ใช้",
+                "search_users": {
+                    "placeholder": "ค้นหาผู้ใช้"
+                },
+                "refresh_list": {
+                    "submit_button": "รีเฟรช",
+                    "refreshing": "กำลังรีเฟรชรายชื่อผู้ใช้...",
+                    "success": "รีเฟรชรายชื่อผู้ใช้สำเร็จแล้ว",
+                    "error": "รีเฟรชรายชื่อผู้ใช้ไม่สำเร็จ: {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "ลบผู้ใช้",
+                    "confirm_title": "ยืนยันการลบ",
+                    "confirm_message": "คุณแน่ใจหรือไม่ว่าต้องการลบผู้ใช้ที่เลือก?",
+                    "confirm_button": "ลบ",
+                    "cancel_button": "ยกเลิก",
+                    "removing": "กำลังลบผู้ใช้ที่เลือก...",
+                    "success": "ลบผู้ใช้แล้ว {{num}} คน",
+                    "error": "ลบผู้ใช้ที่เลือกไม่สำเร็จ: {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "สร้างผู้ใช้",
+                    "creating": "กำลังสร้างผู้ใช้ใหม่...",
+                    "success": "สร้างผู้ใช้ {{username}} แล้ว",
+                    "error": "สร้างผู้ใช้ใหม่ไม่สำเร็จ: {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "สร้างผู้ใช้ใหม่",
+                    "username": {
+                        "label": "ชื่อผู้ใช้",
+                        "placeholder": "ชื่อผู้ใช้ของผู้ใช้ใหม่"
+                    },
+                    "password": {
+                        "label": "รหัสผ่าน",
+                        "placeholder": "รหัสผ่านของผู้ใช้ใหม่"
+                    },
+                    "admin": {
+                        "label": "ผู้ใช้ที่มีสิทธิ์ผู้ดูแลระบบ"
+                    },
+                    "create_button": "สร้าง"
+                },
+                "edit_user": {
+                    "submit_button": "แก้ไข",
+                    "updating": "กำลังอัปเดตผู้ใช้...",
+                    "success": "อัปเดตผู้ใช้ {{username}} แล้ว",
+                    "error": "อัปเดตผู้ใช้ไม่สำเร็จ: {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "แก้ไขผู้ใช้",
+                    "username": {
+                        "label": "ชื่อผู้ใช้",
+                        "placeholder": "เว้นว่างไว้หากไม่ต้องการเปลี่ยนแปลง"
+                    },
+                    "password": {
+                        "label": "รหัสผ่าน",
+                        "placeholder": "เว้นว่างไว้หากไม่ต้องการเปลี่ยนแปลง"
+                    },
+                    "admin": {
+                        "label": "ผู้ใช้ที่มีสิทธิ์ผู้ดูแลระบบ"
+                    },
+                    "update_button": "อัปเดต"
+                },
+                "remove_user": {
+                    "submit_button": "ลบ",
+                    "confirm_title": "ยืนยันการลบ",
+                    "confirm_message": "คุณแน่ใจหรือไม่ว่าต้องการลบผู้ใช้ {{username}}?",
+                    "confirm_button": "ลบ",
+                    "cancel_button": "ยกเลิก",
+                    "removing": "กำลังลบผู้ใช้...",
+                    "success": "ลบผู้ใช้ {{username}} แล้ว",
+                    "error": "ลบผู้ใช้ไม่สำเร็จ: {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "ใช่",
+                    "no": "ไม่ใช่",
+                    "never": "ไม่เคย",
+                    "id": "ID",
+                    "user_id": "ID ผู้ใช้",
+                    "username": "ชื่อผู้ใช้",
+                    "admin": "ผู้ดูแลระบบ",
+                    "created_at": "สร้างเมื่อ",
+                    "last_login": "เข้าสู่ระบบครั้งล่าสุด",
+                    "user_ip": "IP ผู้ใช้",
+                    "user_agent": "ตัวแทนผู้ใช้",
+                    "updated_at": "อัปเดตเมื่อ",
+                    "actions": "การดำเนินการ"
+                }
+            },
+            "Backup": {
+                "title": "การจัดการข้อมูลสำรอง",
+                "select_mode": {
+                    "backup": "สร้างข้อมูลสำรอง",
+                    "restore": "กู้คืนข้อมูลสำรอง"
+                },
+                "backup_config": {
+                    "title": "สร้างข้อมูลสำรอง",
+                    "description": "การดำเนินการนี้จะส่งออกข้อมูลการกำหนดค่าเป็นไฟล์ JSON คุณสามารถบันทึกไฟล์นี้ไว้แล้วใช้กู้คืนการตั้งค่าในภายหลังได้ เช่น เมื่อย้ายไปยังระบบใหม่",
+                    "submit_button": "สร้างข้อมูลสำรอง",
+                    "generating": "กำลังสร้างข้อมูลสำรอง...",
+                    "success": "สร้างข้อมูลสำรองสำเร็จแล้ว",
+                    "error": "สร้างข้อมูลสำรองไม่สำเร็จ: {{error}}"
+                },
+                "restore_config": {
+                    "title": "เลือกไฟล์ข้อมูลสำรอง",
+                    "description": "เลือกไฟล์สำรอง JSON เพื่อกู้คืนการกำหนดค่า AnyShake Observer จะเขียนทับการตั้งค่าปัจจุบันด้วยข้อมูลจากไฟล์ที่เลือก",
+                    "submit_button": "กู้คืนการกำหนดค่า",
+                    "no_file_selected": "ยังไม่ได้เลือกไฟล์",
+                    "confirm_title": "ยืนยันการกู้คืน",
+                    "confirm_message": "คุณแน่ใจหรือไม่ว่าต้องการกู้คืนการกำหนดค่า? การดำเนินการนี้จะเขียนทับการตั้งค่าปัจจุบัน",
+                    "confirm_button": "กู้คืน",
+                    "cancel_button": "ยกเลิก",
+                    "restoring": "กำลังกู้คืนการกำหนดค่า...",
+                    "success": "กู้คืนการกำหนดค่าสำเร็จแล้ว",
+                    "error": "กู้คืนการกำหนดค่าไม่สำเร็จ: {{error}}"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "มีอัปเดตใหม่ คุณต้องการอัปเดตตอนนี้หรือไม่?",
+            "confirm_title": "มีอัปเดตใหม่",
+            "confirm_button": "อัปเดต",
+            "cancel_button": "ยกเลิก"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?",
+            "confirm_title": "ออกจากระบบ",
+            "confirm_button": "ตกลง",
+            "cancel_button": "ยกเลิก"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "ชื่อผู้ใช้",
+            "placeholder": "ชื่อผู้ใช้ของคุณ"
+        },
+        "password": {
+            "label": "รหัสผ่าน",
+            "placeholder": "รหัสผ่านของคุณ"
+        },
+        "captcha": {
+            "label": "ป้อนรหัส CAPTCHA",
+            "countdown": "({{seconds}} วินาที)",
+            "loading": "กำลังโหลด CAPTCHA...",
+            "error": "โหลด CAPTCHA ไม่สำเร็จ",
+            "placeholder": "รหัส CAPTCHA",
+            "refreshing": "กำลังรีเฟรช CAPTCHA",
+            "refresh_success": "รีเฟรช CAPTCHA สำเร็จแล้ว",
+            "refresh_error": "รีเฟรช CAPTCHA ไม่สำเร็จ"
+        },
+        "signin": {
+            "button": "เข้าสู่ระบบ",
+            "loading": "กำลังเข้าสู่ระบบ...",
+            "success": "เข้าสู่ระบบสำเร็จแล้ว",
+            "error": "เข้าสู่ระบบไม่สำเร็จ"
+        }
+    }
+}

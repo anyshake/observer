@@ -1,0 +1,650 @@
+{
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "به زمزمهٔ زمین گوش بسپارید."
+        },
+        "router": {
+            "home": "وضعیت ایستگاه",
+            "realtime": "شکل موج زنده",
+            "history": "شکل موج‌های گذشته",
+            "download": "دریافت داده‌ها",
+            "settings": "تنظیمات سامانه",
+            "default": "صفحه پیدا نشد"
+        }
+    },
+    "components": {
+        "ThemeToggle": {
+            "label": "ظاهر",
+            "light": "روشن",
+            "dark": "تیره",
+            "system": "پیروی از سیستم"
+        },
+        "ErrorPage": {
+            "something_went_wrong": "خطایی رخ داده است.",
+            "try_again_later": "لطفاً صفحه را بازخوانی کنید یا بعداً دوباره تلاش کنید."
+        },
+        "TypedInput": {
+            "yes": "بله",
+            "no": "خیر",
+            "add_new_item": "مورد جدید را وارد کنید.",
+            "editing_list": "ویرایش فهرست {{fieldName}}",
+            "table_value": "مقدار",
+            "table_actions": "عملیات"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "تنظیمات طیف‌نگاره",
+                "min_db": "کمینهٔ dB",
+                "max_db": "بیشینهٔ dB"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "تنظیمات طیف‌نگاره",
+                "min_db": "کمینهٔ dB",
+                "max_db": "بیشینهٔ dB"
+            }
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "شناسه",
+                "name": "نام پرونده",
+                "time": "زمان ویرایش",
+                "size": "اندازهٔ پرونده",
+                "actions": "عملیات"
+            },
+            "file_list_actions": {
+                "download": "دریافت",
+                "preview": "پیش‌نمایش"
+            },
+            "miniseed_list": {
+                "title": "MiniSEED روزانه",
+                "search": "جست‌وجو"
+            },
+            "helicorder_list": {
+                "title": "فهرست Helicorder",
+                "search": "جست‌وجو"
+            },
+            "request_file": {
+                "requesting": "در حال درخواست پیوند دریافت پروندهٔ {{fileName}}.",
+                "success": "پیوند دریافت پروندهٔ {{fileName}} دریافت شد.",
+                "error": "درخواست پیوند پروندهٔ {{fileName}} ناموفق بود: {{error}}"
+            },
+            "preview_file": {
+                "requesting": "در حال درخواست پیوند پیش‌نمایش پروندهٔ {{fileName}}.",
+                "success": "پیوند پیش‌نمایش پروندهٔ {{fileName}} دریافت شد.",
+                "error": "درخواست پیوند پروندهٔ {{fileName}} ناموفق بود: {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "جست‌وجوی رویداد",
+                "data_agency": "سازمان ارائه‌دهندهٔ داده",
+                "search_button": "جست‌وجوی رویدادها",
+                "searching": "در حال جست‌وجوی رویدادها در منبع انتخاب‌شده.",
+                "success": "تعداد رویدادهای یافت‌شده در منبع انتخاب‌شده: {{count}}.",
+                "no_data": "رویدادی در منبع انتخاب‌شده پیدا نشد.",
+                "error": "جست‌وجوی رویدادها ناموفق بود: {{error}}"
+            },
+            "event_list_modal": {
+                "title": "یک رویداد لرزه‌ای انتخاب کنید",
+                "earthquake_at": "زمین‌لرزه در {{time}}",
+                "p_wave_arrival": "رسیدن موج P در {{time}} ({{seconds}} ثانیه)",
+                "s_wave_arrival": "رسیدن موج S در {{time}} ({{seconds}} ثانیه)",
+                "epicenter_distance": "فاصله از رومرکز {{distance}} کیلومتر",
+                "earthquake_depth": "ژرفا {{depth}} کیلومتر",
+                "selected_an_event": "زمین‌لرزه‌ای در {{region}} در زمان {{time}} انتخاب شد."
+            },
+            "data_export": {
+                "title": "برون‌بری داده‌ها",
+                "file_format": "قالب پرونده",
+                "channel_code": "کد کانال",
+                "export_button": "دریافت داده‌ها",
+                "exporting": "در حال برون‌بری کانال {{channel}} به قالب {{format}}.",
+                "success": "کانال {{channel}} به قالب {{format}} برون‌بری شد.",
+                "error": "برون‌بری کانال {{channel}} به قالب {{format}} ناموفق بود: {{error}}"
+            },
+            "search_records": {
+                "title": "جست‌وجو بر اساس زمان",
+                "start_time": "زمان شروع",
+                "end_time": "زمان پایان",
+                "invalid_time": "زمان شروع باید پیش از زمان پایان باشد.",
+                "search_button": "جست‌وجوی رکوردها",
+                "searching": "در حال جست‌وجوی رکوردهای لرزه‌ای در پایگاه داده.",
+                "success": "تعداد رکوردهای لرزه‌ای یافت‌شده در پایگاه داده: {{count}}.",
+                "no_data": "رکورد لرزه‌ای در پایگاه داده پیدا نشد.",
+                "error": "جست‌وجوی رکوردها ناموفق بود: {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "قفل کردن چیدمان",
+                "unlock_button": "باز کردن قفل چیدمان"
+            },
+            "reset_layout": {
+                "reset_button": "بازنشانی همه",
+                "confirm_message": "آیا می‌خواهید چیدمان را بازنشانی کنید؟",
+                "confirm_title": "تأیید بازنشانی",
+                "confirm_button": "بازنشانی",
+                "cancel_button": "انصراف"
+            },
+            "display_mode": {
+                "waveform_mode": "حالت شکل موج",
+                "spectrogram_mode": "حالت طیف‌نگاره"
+            },
+            "share_link": {
+                "share_button": "اشتراک‌گذاری پیوند",
+                "link_copied": "پیوند اشتراک‌گذاری در کلیپ‌بورد کپی شد."
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "اطلاعات ایستگاه",
+                "name": "نام",
+                "country": "کشور",
+                "place": "مکان",
+                "affiliation": "سازمان وابسته",
+                "channels": "کانال‌ها"
+            },
+            "device_info": {
+                "yes": "بله",
+                "no": "خیر",
+                "title": "اطلاعات دستگاه",
+                "product_model": "مدل محصول",
+                "device_id": "شناسهٔ دستگاه",
+                "link_protocol": "پروتکل ارتباط",
+                "packet_interval": "فاصلهٔ زمانی بسته‌ها",
+                "gnss_active": "GNSS فعال"
+            },
+            "device_status": {
+                "title": "وضعیت دستگاه",
+                "sample_rate": "نرخ نمونه‌برداری",
+                "latitude": "عرض جغرافیایی",
+                "longitude": "طول جغرافیایی",
+                "elevation": "ارتفاع",
+                "temperature": "دمای دستگاه"
+            },
+            "link_status": {
+                "title": "وضعیت ارتباط",
+                "started_at": "زمان آغاز",
+                "last_frame": "آخرین فریم",
+                "frames": "فریم‌ها",
+                "errors": "خطاها",
+                "messages": "پیام‌ها"
+            },
+            "connectivity": {
+                "loading": "در حال اتصال به ایستگاه...",
+                "success": "به ایستگاه متصل شد. سرور {{uptime}} ثانیه فعال بوده و در {{updatedAt}} به‌روز شده است.",
+                "error": "هنگام اتصال به ایستگاه خطایی رخ داد. لطفاً اتصال خود را بررسی کنید."
+            },
+            "station_location": {
+                "title": "موقعیت ایستگاه"
+            },
+            "upgrade": {
+                "check_failed": "بررسی به‌روزرسانی‌ها امکان‌پذیر نیست.",
+                "update_available": "نسخهٔ جدید {{latest}} در دسترس است. می‌توانید به‌روزرسانی خودکار را فعال کنید یا آن را دستی دریافت و نصب کنید.",
+                "restart_needed": "آخرین نسخهٔ {{latest}} نصب شده است، اما {{current}} هنوز اجرا می‌شود. برای اعمال به‌روزرسانی، در زمان مناسب نرم‌افزار را دوباره راه‌اندازی کنید.",
+                "manual_upgrade_needed": "نسخهٔ جدید {{latest}} در دسترس است، اما نسخهٔ فعلی {{current}} از حداقل نسخهٔ سازگار {{required}} قدیمی‌تر است. ارتقای دستی لازم است."
+            },
+            "service_status": {
+                "title": "وضعیت سرویس‌ها"
+            },
+            "cpu_usage": {
+                "title": "مصرف پردازنده"
+            },
+            "memory_usage": {
+                "title": "مصرف حافظه"
+            },
+            "disk_usage": {
+                "title": "مصرف دیسک"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "صفحه پیدا نشد.",
+            "check_your_url": "لطفاً نشانی را بررسی کنید و دوباره تلاش کنید.",
+            "go_back_button": "بازگشت"
+        },
+        "RealTime": {
+            "display_mode": {
+                "waveform_mode": "حالت شکل موج",
+                "spectrogram_mode": "حالت طیف‌نگاره"
+            },
+            "reset_layout": {
+                "reset_button": "بازنشانی همه",
+                "confirm_message": "آیا می‌خواهید چیدمان را بازنشانی کنید؟",
+                "confirm_title": "تأیید بازنشانی",
+                "confirm_button": "بازنشانی",
+                "cancel_button": "انصراف"
+            },
+            "layout_locker": {
+                "lock_button": "قفل کردن چیدمان",
+                "unlock_button": "باز کردن قفل چیدمان"
+            },
+            "record_data": {
+                "start_button": "شروع ضبط",
+                "stop_button": "توقف ضبط",
+                "start_recording": "ضبط در {{startedAt}} آغاز شد.",
+                "link_created": "ضبط در {{endedAt}} متوقف شد ({{duration}} ثانیه). پیوند ایجاد شد.",
+                "no_data_recorded": "در این بازه داده‌ای ضبط نشد."
+            },
+            "connectivity": {
+                "connecting": "اتصال برقرار نیست، در حال اتصال...",
+                "connected": "متصل است، آخرین به‌روزرسانی در {{updatedAt}}."
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} نمونه در ثانیه",
+                "channels": "تعداد کانال‌ها: {{num}}",
+                "retention": "{{retention}} ثانیه"
+            }
+        },
+        "Settings": {
+            "FDSN": {
+                "title": "کلیدهای دسترسی FDSN",
+                "key": "پیشوند کلید",
+                "remark": "یادداشت",
+                "remark_placeholder": "یادداشتی وارد کنید (اختیاری)",
+                "created_at": "زمان ایجاد",
+                "expires_at": "زمان انقضا",
+                "expiration_placeholder": "زمانی را انتخاب کنید",
+                "status": "وضعیت",
+                "active": "فعال",
+                "expired": "منقضی‌شده",
+                "revoked": "لغوشده",
+                "revoked_at": "زمان لغو",
+                "hide_revoked": "پنهان کردن کلیدهای لغوشده",
+                "last_requested_at": "آخرین درخواست ثبت‌شده",
+                "user_ip": "آخرین IP",
+                "actions": "عملیات",
+                "never": "هرگز",
+                "no_expiration": "بدون انقضا",
+                "refresh": "تازه‌سازی",
+                "create": "ایجاد کلید دسترسی",
+                "created": "کلید دسترسی ایجاد شد!",
+                "create_failed": "ایجاد کلید دسترسی ناموفق بود.",
+                "refresh_after_create_failed": "کلید دسترسی ایجاد شد، اما تازه‌سازی فهرست ناموفق بود: {{error}}",
+                "expiration_help": "زمانی در آینده بر اساس منطقه زمانی مرورگرتان انتخاب کنید.",
+                "invalid_expiration": "زمان انقضا باید در آینده باشد.",
+                "disabled": "پیش از ایجاد کلیدهای دسترسی، سرویس وب FDSN را در تنظیمات ایستگاه فعال کنید.",
+                "usage": "همراه درخواست‌های پرس‌وجو، سربرگ Authorization: Bearer <access key> را ارسال کنید.",
+                "secret_help": "این کلید دسترسی را اکنون ذخیره کنید. این کلید فقط یک بار نمایش داده می‌شود.",
+                "revoke": "لغو",
+                "revoke_selected": "لغو موارد انتخاب‌شده",
+                "revoke_selected_confirm": "کلیدهای دسترسی انتخاب‌شده ({{count}}) لغو شوند؟ درخواست‌هایی که از آن‌ها استفاده می‌کنند بلافاصله رد خواهند شد.",
+                "revoke_selected_success": "تعداد کلیدهای دسترسی لغوشده: {{count}}.",
+                "revoke_failed": "لغو کلیدهای دسترسی ناموفق بود.",
+                "cancel": "انصراف",
+                "revoking": "در حال لغو کلید دسترسی...",
+                "revoke_confirm": "این کلید دسترسی لغو شود؟ درخواست‌های بعدی FDSN که از آن استفاده می‌کنند بلافاصله رد خواهند شد.",
+                "revoke_success": "کلید دسترسی لغو شد."
+            },
+            "Logs": {
+                "title": "گزارش‌های برنامه"
+            },
+            "Dangerous": {
+                "executable_backups": {
+                    "title": "نسخه‌های پشتیبان فایل اجرایی قدیمی",
+                    "description": "نسخه‌های پشتیبان ایجادشده هنگام ارتقای این برنامه. فایل‌هایی را برای حذف دائمی انتخاب کنید.",
+                    "submit_button": "پاک‌سازی نسخه‌های پشتیبان",
+                    "refresh_button": "تازه‌سازی",
+                    "delete_button": "حذف موارد انتخاب‌شده ({{count}})",
+                    "select_all": "انتخاب همه",
+                    "loading": "در حال جست‌وجوی نسخه‌های پشتیبان...",
+                    "empty": "هیچ نسخه پشتیبانی از فایل اجرایی قدیمی یافت نشد.",
+                    "list_failed": "جست‌وجوی نسخه‌های پشتیبان ناموفق بود: {{error}}",
+                    "confirm_title": "حذف نسخه‌های پشتیبان",
+                    "confirm_message": "{{count}} نسخه پشتیبان انتخاب‌شده برای همیشه حذف شوند؟",
+                    "cancel_button": "انصراف",
+                    "removing": "در حال حذف نسخه‌های پشتیبان...",
+                    "result_summary": "{{removed}} نسخه پشتیبان حذف شد؛ حذف {{failed}} مورد ناموفق بود.",
+                    "empty_response": "هیچ نتیجه‌ای برای حذف نسخه‌های پشتیبان دریافت نشد.",
+                    "remove_failed": "حذف نسخه‌های پشتیبان ناموفق بود: {{error}}"
+                },
+                "title": "بخش پرخطر",
+                "restart_application": {
+                    "title": "راه‌اندازی مجدد کل برنامه",
+                    "description": "این کار کل برنامه را دوباره راه‌اندازی می‌کند. ممکن است کمی طول بکشد و با بستن موقت تمام اتصال‌های فعال، باعث وقفه در سرویس‌ها و ضبط شود.",
+                    "submit_button": "راه‌اندازی مجدد برنامه",
+                    "confirm_title": "تأیید راه‌اندازی مجدد",
+                    "confirm_message": "آیا مطمئنید که می‌خواهید برنامه را دوباره راه‌اندازی کنید؟",
+                    "confirm_button": "راه‌اندازی مجدد",
+                    "cancel_button": "انصراف",
+                    "restarting": "در حال ارسال درخواست راه‌اندازی مجدد برنامه...",
+                    "success": "درخواست راه‌اندازی مجدد ارسال شد؛ برنامه تا چند ثانیه دیگر دوباره راه‌اندازی می‌شود.",
+                    "error": "درخواست راه‌اندازی مجدد برنامه ناموفق بود: {{error}}"
+                },
+                "purge_waveform_records": {
+                    "title": "پاک‌سازی رکوردهای شکل موج",
+                    "description": "این کار تمام رکوردهای شکل موج را از پایگاه داده حذف می‌کند و قابل بازگشت نیست.",
+                    "submit_button": "پاک‌سازی رکوردها",
+                    "confirm_title": "تأیید پاک‌سازی",
+                    "confirm_message": "آیا مطمئنید که می‌خواهید تمام رکوردهای شکل موج را پاک‌سازی کنید؟",
+                    "confirm_button": "پاک‌سازی",
+                    "cancel_button": "انصراف",
+                    "purging": "در حال پاک‌سازی رکوردهای شکل موج...",
+                    "success": "رکوردهای شکل موج با موفقیت پاک‌سازی شدند.",
+                    "error": "پاک‌سازی رکوردهای شکل موج ناموفق بود: {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "پاک‌سازی فایل‌های MiniSEED",
+                    "description": "این کار تمام فایل‌های MiniSEED را از سیستم حذف می‌کند و قابل بازگشت نیست.",
+                    "submit_button": "پاک‌سازی MiniSEED",
+                    "confirm_title": "تأیید پاک‌سازی",
+                    "confirm_message": "آیا مطمئنید که می‌خواهید تمام فایل‌های MiniSEED را پاک‌سازی کنید؟",
+                    "confirm_button": "پاک‌سازی",
+                    "cancel_button": "انصراف",
+                    "purging": "در حال پاک‌سازی فایل‌های MiniSEED...",
+                    "success": "فایل‌های MiniSEED با موفقیت پاک‌سازی شدند.",
+                    "error": "پاک‌سازی فایل‌های MiniSEED ناموفق بود: {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "پاک‌سازی فایل‌های هلیکوردر",
+                    "description": "این کار تمام فایل‌های هلیکوردر را از سیستم حذف می‌کند و قابل بازگشت نیست.",
+                    "submit_button": "پاک‌سازی هلیکوردر",
+                    "confirm_title": "تأیید پاک‌سازی",
+                    "confirm_message": "آیا مطمئنید که می‌خواهید تمام فایل‌های هلیکوردر را پاک‌سازی کنید؟",
+                    "confirm_button": "پاک‌سازی",
+                    "cancel_button": "انصراف",
+                    "purging": "در حال پاک‌سازی فایل‌های هلیکوردر...",
+                    "success": "فایل‌های هلیکوردر با موفقیت پاک‌سازی شدند.",
+                    "error": "پاک‌سازی فایل‌های هلیکوردر ناموفق بود: {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "بازنشانی پیکربندی ایستگاه",
+                    "description": "این کار تمام پیکربندی ایستگاه را بازنشانی می‌کند و قابل بازگشت نیست. برای اعمال آن راه‌اندازی مجدد لازم است.",
+                    "submit_button": "بازنشانی ایستگاه",
+                    "confirm_title": "تأیید بازنشانی",
+                    "confirm_message": "آیا مطمئنید که می‌خواهید تمام پیکربندی ایستگاه را بازنشانی کنید؟",
+                    "confirm_button": "بازنشانی",
+                    "cancel_button": "انصراف",
+                    "resetting": "در حال بازنشانی پیکربندی ایستگاه...",
+                    "success": "پیکربندی ایستگاه با موفقیت بازنشانی شد.",
+                    "error": "بازنشانی پیکربندی ایستگاه ناموفق بود: {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "بازنشانی پیکربندی سرویس",
+                    "description": "این کار تمام پیکربندی سرویس‌ها را بازنشانی می‌کند و قابل بازگشت نیست. برای اعمال آن راه‌اندازی مجدد لازم است.",
+                    "submit_button": "بازنشانی سرویس",
+                    "confirm_title": "تأیید بازنشانی",
+                    "confirm_message": "آیا مطمئنید که می‌خواهید تمام پیکربندی سرویس‌ها را بازنشانی کنید؟",
+                    "confirm_button": "بازنشانی",
+                    "cancel_button": "انصراف",
+                    "resetting": "در حال بازنشانی پیکربندی سرویس...",
+                    "success": "پیکربندی سرویس با موفقیت بازنشانی شد.",
+                    "error": "بازنشانی پیکربندی سرویس ناموفق بود: {{error}}"
+                },
+                "purge_data": {
+                    "mode_running": "در حال اجرا",
+                    "invalid_range": "لطفاً تاریخ شروع و پایان معتبری انتخاب کنید.",
+                    "started": "کار پاک‌سازی آغاز شد.",
+                    "request_failed": "آغاز کار پاک‌سازی ناموفق بود: {{error}}",
+                    "running_hint": "تا پایان عملیات پاک‌سازی فعلی، نمی‌توان عملیات دیگری را آغاز کرد.",
+                    "status_query_failed": "دریافت وضعیت پاک‌سازی ناموفق بود: {{error}}",
+                    "status_idle": "در حال حاضر هیچ کار پاک‌سازی در حال اجرا نیست.",
+                    "status_running": "در حال پاک‌سازی: {{kind}}.",
+                    "status_success": "پاک‌سازی تکمیل شد: {{kind}}.",
+                    "status_failed": "پاک‌سازی ناموفق بود: {{kind}}: {{error}}",
+                    "verification_label": "متن تأیید",
+                    "verification_help": "برای فعال کردن دکمه اجرا، لطفاً \"{{verificationText}}\" را وارد کنید.",
+                    "kind_seis_records_full": "رکوردهای شکل موج",
+                    "kind_seis_records_by_date": "رکوردهای شکل موج در بازه تاریخی مشخص‌شده",
+                    "kind_miniseed_full": "فایل‌های MiniSEED",
+                    "kind_miniseed_by_date": "فایل‌های MiniSEED در بازه تاریخی مشخص‌شده",
+                    "kind_helicorder_full": "فایل‌های هلیکوردر",
+                    "kind_helicorder_by_date": "فایل‌های هلیکوردر در بازه تاریخی مشخص‌شده",
+                    "kind_unknown": "کار پاک‌سازی",
+                    "start_date": "تاریخ شروع",
+                    "end_date": "تاریخ پایان",
+                    "mode_label": "حالت پاک‌سازی",
+                    "mode_all": "همه",
+                    "mode_range": "بازه تاریخی"
+                }
+            },
+            "Metadata": {
+                "title": "فراداده ایستگاه"
+            },
+            "Preference": {
+                "title": "ترجیحات وب",
+                "reset_layout_preference": {
+                    "title": "بازنشانی ترجیحات چیدمان",
+                    "description": "این کار تمام ترجیحات چیدمان را بازنشانی می‌کند و قابل بازگشت نیست.",
+                    "submit_button": "بازنشانی ترجیحات",
+                    "confirm_title": "تأیید بازنشانی",
+                    "confirm_message": "آیا مطمئنید که می‌خواهید تمام ترجیحات چیدمان را بازنشانی کنید؟",
+                    "confirm_button": "بازنشانی",
+                    "cancel_button": "انصراف",
+                    "success": "ترجیحات چیدمان با موفقیت بازنشانی شدند."
+                }
+            },
+            "Service": {
+                "title": "کنترل سرویس",
+                "restart_service": {
+                    "submit_button": "راه‌اندازی مجدد",
+                    "confirm_title": "تأیید راه‌اندازی مجدد",
+                    "confirm_message": "آیا مطمئنید که می‌خواهید سرویس را دوباره راه‌اندازی کنید؟",
+                    "confirm_button": "راه‌اندازی مجدد",
+                    "cancel_button": "انصراف",
+                    "restarting": "در حال راه‌اندازی مجدد سرویس...",
+                    "success": "سرویس با موفقیت دوباره راه‌اندازی شد.",
+                    "error": "راه‌اندازی مجدد سرویس ناموفق بود: {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "شروع",
+                    "confirm_title": "تأیید شروع",
+                    "confirm_message": "آیا مطمئنید که می‌خواهید سرویس را شروع کنید؟",
+                    "confirm_button": "شروع",
+                    "cancel_button": "انصراف",
+                    "starting": "در حال شروع سرویس...",
+                    "success": "سرویس با موفقیت شروع شد.",
+                    "error": "شروع سرویس ناموفق بود: {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "توقف",
+                    "confirm_title": "تأیید توقف",
+                    "confirm_message": "آیا مطمئنید که می‌خواهید سرویس را متوقف کنید؟",
+                    "confirm_button": "توقف",
+                    "cancel_button": "انصراف",
+                    "stopping": "در حال توقف سرویس...",
+                    "success": "سرویس با موفقیت متوقف شد.",
+                    "error": "توقف سرویس ناموفق بود: {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "بازنشانی",
+                    "confirm_title": "تأیید بازنشانی",
+                    "confirm_message": "آیا مطمئنید که می‌خواهید سرویس را بازنشانی کنید؟",
+                    "confirm_button": "بازنشانی",
+                    "cancel_button": "انصراف",
+                    "resetting": "در حال بازنشانی سرویس...",
+                    "success": "سرویس با موفقیت بازنشانی شد.",
+                    "error": "بازنشانی سرویس ناموفق بود: {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "ویرایش",
+                    "updating": "در حال اعمال تغییرات جدید...",
+                    "success": "تغییرات اعمال شدند.",
+                    "error": "به‌روزرسانی پیکربندی سرویس ناموفق بود: {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "ویرایش سرویس: {{name}}"
+                },
+                "service_status": {
+                    "yes": "بله",
+                    "no": "خیر",
+                    "is_running": "در حال اجرا",
+                    "restarts": "تعداد راه‌اندازی مجدد",
+                    "stopped_at": "زمان توقف",
+                    "started_at": "زمان آغاز",
+                    "updated_at": "زمان به‌روزرسانی"
+                }
+            },
+            "Station": {
+                "title": "تنظیمات ایستگاه",
+                "update_station": {
+                    "field_required": "این فیلد الزامی است.",
+                    "updating": "در حال به‌روزرسانی پیکربندی ایستگاه...",
+                    "success": "پیکربندی ایستگاه با موفقیت به‌روزرسانی شد.",
+                    "error": "به‌روزرسانی پیکربندی ایستگاه ناموفق بود: {{error}}"
+                }
+            },
+            "Users": {
+                "title": "مدیریت کاربران",
+                "search_users": {
+                    "placeholder": "جست‌وجوی کاربران"
+                },
+                "refresh_list": {
+                    "submit_button": "تازه‌سازی",
+                    "refreshing": "در حال تازه‌سازی فهرست کاربران...",
+                    "success": "فهرست کاربران با موفقیت تازه‌سازی شد.",
+                    "error": "تازه‌سازی فهرست کاربران ناموفق بود: {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "حذف کاربران",
+                    "confirm_title": "تأیید حذف",
+                    "confirm_message": "آیا مطمئنید که می‌خواهید کاربران انتخاب‌شده را حذف کنید؟",
+                    "confirm_button": "حذف",
+                    "cancel_button": "انصراف",
+                    "removing": "در حال حذف کاربران انتخاب‌شده...",
+                    "success": "{{num}} کاربر حذف شد.",
+                    "error": "حذف کاربران انتخاب‌شده ناموفق بود: {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "ایجاد کاربر",
+                    "creating": "در حال ایجاد کاربر جدید...",
+                    "success": "کاربر {{username}} ایجاد شد.",
+                    "error": "ایجاد کاربر جدید ناموفق بود: {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "ایجاد کاربر جدید",
+                    "username": {
+                        "label": "نام کاربری",
+                        "placeholder": "نام کاربری کاربر جدید"
+                    },
+                    "password": {
+                        "label": "گذرواژه",
+                        "placeholder": "گذرواژه کاربر جدید"
+                    },
+                    "admin": {
+                        "label": "کاربر با دسترسی مدیر"
+                    },
+                    "create_button": "ایجاد"
+                },
+                "edit_user": {
+                    "submit_button": "ویرایش",
+                    "updating": "در حال به‌روزرسانی کاربر...",
+                    "success": "کاربر {{username}} به‌روزرسانی شد.",
+                    "error": "به‌روزرسانی کاربر ناموفق بود: {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "ویرایش کاربر",
+                    "username": {
+                        "label": "نام کاربری",
+                        "placeholder": "برای حفظ مقدار فعلی، خالی بگذارید."
+                    },
+                    "password": {
+                        "label": "گذرواژه",
+                        "placeholder": "برای حفظ مقدار فعلی، خالی بگذارید."
+                    },
+                    "admin": {
+                        "label": "کاربر با دسترسی مدیر"
+                    },
+                    "update_button": "به‌روزرسانی"
+                },
+                "remove_user": {
+                    "submit_button": "حذف",
+                    "confirm_title": "تأیید حذف",
+                    "confirm_message": "آیا مطمئنید که می‌خواهید کاربر {{username}} را حذف کنید؟",
+                    "confirm_button": "حذف",
+                    "cancel_button": "انصراف",
+                    "removing": "در حال حذف کاربر...",
+                    "success": "کاربر {{username}} حذف شد.",
+                    "error": "حذف کاربر ناموفق بود: {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "بله",
+                    "no": "خیر",
+                    "never": "هرگز",
+                    "id": "شناسه",
+                    "user_id": "شناسه کاربر",
+                    "username": "نام کاربری",
+                    "admin": "مدیر",
+                    "created_at": "زمان ایجاد",
+                    "last_login": "آخرین ورود",
+                    "user_ip": "IP کاربر",
+                    "user_agent": "عامل کاربر",
+                    "updated_at": "زمان به‌روزرسانی",
+                    "actions": "عملیات"
+                }
+            },
+            "Backup": {
+                "title": "مدیریت نسخه‌های پشتیبان",
+                "select_mode": {
+                    "backup": "ایجاد نسخه پشتیبان",
+                    "restore": "بازیابی نسخه پشتیبان"
+                },
+                "backup_config": {
+                    "title": "ایجاد نسخه پشتیبان",
+                    "description": "این کار داده‌های پیکربندی شما را به صورت فایل JSON صادر می‌کند. می‌توانید این فایل را ذخیره کنید و بعداً برای بازیابی تنظیمات، مثلاً هنگام انتقال به سیستمی جدید، از آن استفاده کنید.",
+                    "submit_button": "تولید نسخه پشتیبان",
+                    "generating": "در حال تولید داده‌های پشتیبان...",
+                    "success": "داده‌های پشتیبان با موفقیت تولید شدند.",
+                    "error": "تولید داده‌های پشتیبان ناموفق بود: {{error}}"
+                },
+                "restore_config": {
+                    "title": "انتخاب فایل پشتیبان",
+                    "description": "برای بازیابی پیکربندی، یک فایل پشتیبان JSON انتخاب کنید. AnyShake Observer تنظیمات فعلی شما را با داده‌های فایل انتخاب‌شده جایگزین می‌کند.",
+                    "submit_button": "بازیابی پیکربندی",
+                    "no_file_selected": "هیچ فایلی انتخاب نشده است.",
+                    "confirm_title": "تأیید بازیابی",
+                    "confirm_message": "آیا مطمئنید که می‌خواهید پیکربندی را بازیابی کنید؟ این کار تنظیمات فعلی شما را جایگزین می‌کند.",
+                    "confirm_button": "بازیابی",
+                    "cancel_button": "انصراف",
+                    "restoring": "در حال بازیابی پیکربندی...",
+                    "success": "پیکربندی با موفقیت بازیابی شد.",
+                    "error": "بازیابی پیکربندی ناموفق بود: {{error}}"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "به‌روزرسانی جدیدی موجود است؛ آیا می‌خواهید اکنون به‌روزرسانی کنید؟",
+            "confirm_title": "به‌روزرسانی موجود است",
+            "confirm_button": "به‌روزرسانی",
+            "cancel_button": "انصراف"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "آیا مطمئنید که می‌خواهید خارج شوید؟",
+            "confirm_title": "خروج",
+            "confirm_button": "تأیید",
+            "cancel_button": "انصراف"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "نام کاربری",
+            "placeholder": "نام کاربری شما"
+        },
+        "password": {
+            "label": "گذرواژه",
+            "placeholder": "گذرواژه شما"
+        },
+        "captcha": {
+            "label": "کد کپچا را وارد کنید",
+            "countdown": "({{seconds}} ثانیه)",
+            "loading": "در حال بارگذاری کپچا...",
+            "error": "بارگذاری کپچا ناموفق بود",
+            "placeholder": "کد کپچا",
+            "refreshing": "در حال تازه‌سازی کپچا.",
+            "refresh_success": "کپچا با موفقیت تازه‌سازی شد.",
+            "refresh_error": "تازه‌سازی کپچا ناموفق بود."
+        },
+        "signin": {
+            "button": "ورود",
+            "loading": "در حال ورود شما...",
+            "success": "با موفقیت وارد شدید.",
+            "error": "ورود ناموفق بود."
+        }
+    }
+}

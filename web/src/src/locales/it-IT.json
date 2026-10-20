@@ -1,0 +1,650 @@
+{
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "Ascolta il sussurro della Terra."
+        },
+        "router": {
+            "home": "Stato della stazione",
+            "realtime": "Forma d'onda in tempo reale",
+            "history": "Forme d'onda storiche",
+            "download": "Download dei dati",
+            "settings": "Impostazioni di sistema",
+            "default": "Pagina non trovata"
+        }
+    },
+    "components": {
+        "ThemeToggle": {
+            "label": "Tema",
+            "light": "Chiaro",
+            "dark": "Scuro",
+            "system": "Sistema"
+        },
+        "ErrorPage": {
+            "something_went_wrong": "Si è verificato un errore.",
+            "try_again_later": "Prova ad aggiornare la pagina o riprova più tardi."
+        },
+        "TypedInput": {
+            "yes": "Sì",
+            "no": "No",
+            "add_new_item": "Inserisci un nuovo elemento.",
+            "editing_list": "Modifica dell'elenco di {{fieldName}}",
+            "table_value": "Valore",
+            "table_actions": "Azioni"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "Impostazioni dello spettrogramma",
+                "min_db": "dB minimi",
+                "max_db": "dB massimi"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "Impostazioni dello spettrogramma",
+                "min_db": "dB minimi",
+                "max_db": "dB massimi"
+            }
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "Nome del file",
+                "time": "Data di modifica",
+                "size": "Dimensione del file",
+                "actions": "Azioni"
+            },
+            "file_list_actions": {
+                "download": "Scarica",
+                "preview": "Anteprima"
+            },
+            "miniseed_list": {
+                "title": "MiniSEED giornalieri",
+                "search": "Cerca"
+            },
+            "helicorder_list": {
+                "title": "Elenco degli helicorder",
+                "search": "Cerca"
+            },
+            "request_file": {
+                "requesting": "Richiesta del collegamento per scaricare il file {{fileName}}.",
+                "success": "Collegamento per scaricare il file {{fileName}} ottenuto.",
+                "error": "Impossibile ottenere il collegamento al file {{fileName}}: {{error}}"
+            },
+            "preview_file": {
+                "requesting": "Richiesta del collegamento per visualizzare il file {{fileName}}.",
+                "success": "Collegamento per visualizzare il file {{fileName}} ottenuto.",
+                "error": "Impossibile ottenere il collegamento al file {{fileName}}: {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "Ricerca degli eventi",
+                "data_agency": "Ente fornitore dei dati",
+                "search_button": "Cerca eventi",
+                "searching": "Ricerca degli eventi nella fonte selezionata.",
+                "success": "Eventi trovati nella fonte selezionata: {{count}}.",
+                "no_data": "Nessun evento trovato nella fonte selezionata.",
+                "error": "Ricerca degli eventi non riuscita: {{error}}"
+            },
+            "event_list_modal": {
+                "title": "Seleziona un evento sismico",
+                "earthquake_at": "Terremoto alle {{time}}",
+                "p_wave_arrival": "Arrivo dell'onda P {{time}} ({{seconds}} s)",
+                "s_wave_arrival": "Arrivo dell'onda S {{time}} ({{seconds}} s)",
+                "epicenter_distance": "Distanza dall'epicentro {{distance}} km",
+                "earthquake_depth": "Profondità {{depth}} km",
+                "selected_an_event": "Selezionato un terremoto in {{region}} alle {{time}}."
+            },
+            "data_export": {
+                "title": "Esportazione dei dati",
+                "file_format": "Formato del file",
+                "channel_code": "Codice del canale",
+                "export_button": "Ottieni dati",
+                "exporting": "Esportazione del canale {{channel}} in formato {{format}}.",
+                "success": "Canale {{channel}} esportato in formato {{format}}.",
+                "error": "Impossibile esportare il canale {{channel}} in formato {{format}}: {{error}}"
+            },
+            "search_records": {
+                "title": "Ricerca per intervallo di tempo",
+                "start_time": "Ora di inizio",
+                "end_time": "Ora di fine",
+                "invalid_time": "L'ora di inizio deve precedere l'ora di fine.",
+                "search_button": "Cerca registrazioni",
+                "searching": "Ricerca delle registrazioni sismiche nel database.",
+                "success": "Registrazioni sismiche trovate nel database: {{count}}.",
+                "no_data": "Nessuna registrazione sismica trovata nel database.",
+                "error": "Ricerca delle registrazioni non riuscita: {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "Blocca disposizione",
+                "unlock_button": "Sblocca disposizione"
+            },
+            "reset_layout": {
+                "reset_button": "Ripristina tutto",
+                "confirm_message": "Vuoi ripristinare la disposizione?",
+                "confirm_title": "Conferma ripristino",
+                "confirm_button": "Ripristina",
+                "cancel_button": "Annulla"
+            },
+            "display_mode": {
+                "waveform_mode": "Modalità forma d'onda",
+                "spectrogram_mode": "Modalità spettrogramma"
+            },
+            "share_link": {
+                "share_button": "Condividi collegamento",
+                "link_copied": "Collegamento di condivisione copiato negli appunti."
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "Informazioni sulla stazione",
+                "name": "Nome",
+                "country": "Paese",
+                "place": "Località",
+                "affiliation": "Ente di appartenenza",
+                "channels": "Canali"
+            },
+            "device_info": {
+                "yes": "Sì",
+                "no": "No",
+                "title": "Informazioni sul dispositivo",
+                "product_model": "Modello del prodotto",
+                "device_id": "ID del dispositivo",
+                "link_protocol": "Protocollo di connessione",
+                "packet_interval": "Intervallo dei pacchetti",
+                "gnss_active": "GNSS attivo"
+            },
+            "device_status": {
+                "title": "Stato del dispositivo",
+                "sample_rate": "Frequenza di campionamento",
+                "latitude": "Latitudine",
+                "longitude": "Longitudine",
+                "elevation": "Altitudine",
+                "temperature": "Temperatura del dispositivo"
+            },
+            "link_status": {
+                "title": "Stato della connessione",
+                "started_at": "Avviato il",
+                "last_frame": "Ultimo frame",
+                "frames": "Frame",
+                "errors": "Errori",
+                "messages": "Messaggi"
+            },
+            "connectivity": {
+                "loading": "Connessione alla stazione...",
+                "success": "Connesso alla stazione. Server attivo da {{uptime}} secondi, aggiornato alle {{updatedAt}}.",
+                "error": "Errore durante la connessione alla stazione. Controlla la connessione."
+            },
+            "station_location": {
+                "title": "Posizione della stazione"
+            },
+            "upgrade": {
+                "check_failed": "Impossibile verificare la disponibilità di aggiornamenti.",
+                "update_available": "È disponibile la nuova versione {{latest}}. Puoi abilitare gli aggiornamenti automatici oppure scaricarla e installarla manualmente.",
+                "restart_needed": "L'ultima versione {{latest}} è stata installata, ma è ancora in esecuzione la versione {{current}}. Riavvia il programma quando opportuno per applicare l'aggiornamento.",
+                "manual_upgrade_needed": "È disponibile la nuova versione {{latest}}, ma la versione attuale {{current}} è precedente alla versione minima compatibile {{required}}. È necessario aggiornare manualmente."
+            },
+            "service_status": {
+                "title": "Stato dei servizi"
+            },
+            "cpu_usage": {
+                "title": "Utilizzo della CPU"
+            },
+            "memory_usage": {
+                "title": "Utilizzo della memoria"
+            },
+            "disk_usage": {
+                "title": "Utilizzo del disco"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "Pagina non trovata.",
+            "check_your_url": "Controlla l'URL e riprova.",
+            "go_back_button": "Torna indietro"
+        },
+        "RealTime": {
+            "display_mode": {
+                "waveform_mode": "Modalità forma d'onda",
+                "spectrogram_mode": "Modalità spettrogramma"
+            },
+            "reset_layout": {
+                "reset_button": "Ripristina tutto",
+                "confirm_message": "Vuoi ripristinare la disposizione?",
+                "confirm_title": "Conferma ripristino",
+                "confirm_button": "Ripristina",
+                "cancel_button": "Annulla"
+            },
+            "layout_locker": {
+                "lock_button": "Blocca disposizione",
+                "unlock_button": "Sblocca disposizione"
+            },
+            "record_data": {
+                "start_button": "Avvia registrazione",
+                "stop_button": "Interrompi registrazione",
+                "start_recording": "Registrazione avviata alle {{startedAt}}.",
+                "link_created": "Registrazione interrotta alle {{endedAt}} ({{duration}} secondi). È stato generato un collegamento.",
+                "no_data_recorded": "Nessun dato registrato in questo intervallo."
+            },
+            "connectivity": {
+                "connecting": "Nessuna connessione, connessione in corso...",
+                "connected": "Connesso, ultimo aggiornamento alle {{updatedAt}}."
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} campioni/s",
+                "channels": "Canali: {{num}}",
+                "retention": "{{retention}} secondi"
+            }
+        },
+        "Settings": {
+            "FDSN": {
+                "title": "Chiavi di accesso FDSN",
+                "key": "Prefisso della chiave",
+                "remark": "Nota",
+                "remark_placeholder": "Inserisci una nota (facoltativa)",
+                "created_at": "Creato il",
+                "expires_at": "Scade il",
+                "expiration_placeholder": "Scegli un orario",
+                "status": "Stato",
+                "active": "Attiva",
+                "expired": "Scaduta",
+                "revoked": "Revocata",
+                "revoked_at": "Revocata il",
+                "hide_revoked": "Nascondi le chiavi revocate",
+                "last_requested_at": "Ultima richiesta registrata",
+                "user_ip": "Ultimo IP",
+                "actions": "Azioni",
+                "never": "Mai",
+                "no_expiration": "Nessuna scadenza",
+                "refresh": "Aggiorna",
+                "create": "Crea chiave di accesso",
+                "created": "Chiave di accesso creata!",
+                "create_failed": "Impossibile creare la chiave di accesso.",
+                "refresh_after_create_failed": "Chiave di accesso creata, ma impossibile aggiornare l'elenco: {{error}}",
+                "expiration_help": "Seleziona un orario futuro nel fuso orario del browser.",
+                "invalid_expiration": "La scadenza deve essere nel futuro.",
+                "disabled": "Abilita il servizio web FDSN nelle impostazioni della stazione prima di creare le chiavi di accesso.",
+                "usage": "Invia l'intestazione Authorization: Bearer <access key> con le richieste di interrogazione.",
+                "secret_help": "Salva subito questa chiave di accesso. Verrà mostrata una sola volta.",
+                "revoke": "Revoca",
+                "revoke_selected": "Revoca selezionate",
+                "revoke_selected_confirm": "Vuoi revocare le chiavi di accesso selezionate ({{count}})? Le richieste che le utilizzano saranno rifiutate immediatamente.",
+                "revoke_selected_success": "Chiavi di accesso revocate: {{count}}.",
+                "revoke_failed": "Impossibile revocare le chiavi di accesso.",
+                "cancel": "Annulla",
+                "revoking": "Revoca della chiave di accesso...",
+                "revoke_confirm": "Vuoi revocare questa chiave di accesso? Le successive richieste FDSN che la utilizzano saranno rifiutate immediatamente.",
+                "revoke_success": "Chiave di accesso revocata."
+            },
+            "Logs": {
+                "title": "Log dell'applicazione"
+            },
+            "Dangerous": {
+                "executable_backups": {
+                    "title": "Backup dei vecchi eseguibili",
+                    "description": "Backup creati durante l'aggiornamento dell'applicazione. Seleziona i file da eliminare definitivamente.",
+                    "submit_button": "Pulisci backup",
+                    "refresh_button": "Aggiorna",
+                    "delete_button": "Elimina selezionati ({{count}})",
+                    "select_all": "Seleziona tutto",
+                    "loading": "Ricerca dei backup...",
+                    "empty": "Nessun backup di vecchi eseguibili trovato.",
+                    "list_failed": "Ricerca dei backup non riuscita: {{error}}",
+                    "confirm_title": "Elimina backup",
+                    "confirm_message": "Vuoi eliminare definitivamente i backup selezionati ({{count}})?",
+                    "cancel_button": "Annulla",
+                    "removing": "Eliminazione dei backup...",
+                    "result_summary": "Backup eliminati: {{removed}}; non riusciti: {{failed}}.",
+                    "empty_response": "Nessun risultato restituito dall'eliminazione dei backup.",
+                    "remove_failed": "Impossibile eliminare i backup: {{error}}"
+                },
+                "title": "Zona pericolosa",
+                "restart_application": {
+                    "title": "Riavvia l'intera applicazione",
+                    "description": "L'intera applicazione verrà riavviata. L'operazione potrebbe richiedere un po' di tempo e chiuderà temporaneamente tutte le connessioni attive, interrompendo i servizi e le registrazioni.",
+                    "submit_button": "Riavvia applicazione",
+                    "confirm_title": "Conferma riavvio",
+                    "confirm_message": "Vuoi riavviare l'applicazione?",
+                    "confirm_button": "Riavvia",
+                    "cancel_button": "Annulla",
+                    "restarting": "Invio della richiesta di riavvio dell'applicazione...",
+                    "success": "Richiesta di riavvio inviata. L'applicazione si riavvierà tra pochi secondi.",
+                    "error": "Impossibile richiedere il riavvio dell'applicazione: {{error}}"
+                },
+                "purge_waveform_records": {
+                    "title": "Elimina registrazioni delle forme d'onda",
+                    "description": "Verranno eliminate tutte le registrazioni delle forme d'onda dal database. L'operazione è irreversibile.",
+                    "submit_button": "Elimina registrazioni",
+                    "confirm_title": "Conferma eliminazione",
+                    "confirm_message": "Vuoi eliminare tutte le registrazioni delle forme d'onda?",
+                    "confirm_button": "Elimina",
+                    "cancel_button": "Annulla",
+                    "purging": "Eliminazione delle registrazioni delle forme d'onda...",
+                    "success": "Registrazioni delle forme d'onda eliminate.",
+                    "error": "Impossibile eliminare le registrazioni delle forme d'onda: {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "Elimina file MiniSEED",
+                    "description": "Verranno eliminati tutti i file MiniSEED dal sistema. L'operazione è irreversibile.",
+                    "submit_button": "Elimina MiniSEED",
+                    "confirm_title": "Conferma eliminazione",
+                    "confirm_message": "Vuoi eliminare tutti i file MiniSEED?",
+                    "confirm_button": "Elimina",
+                    "cancel_button": "Annulla",
+                    "purging": "Eliminazione dei file MiniSEED...",
+                    "success": "File MiniSEED eliminati.",
+                    "error": "Impossibile eliminare i file MiniSEED: {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "Elimina file helicorder",
+                    "description": "Verranno eliminati tutti i file helicorder dal sistema. L'operazione è irreversibile.",
+                    "submit_button": "Elimina helicorder",
+                    "confirm_title": "Conferma eliminazione",
+                    "confirm_message": "Vuoi eliminare tutti i file helicorder?",
+                    "confirm_button": "Elimina",
+                    "cancel_button": "Annulla",
+                    "purging": "Eliminazione dei file helicorder...",
+                    "success": "File helicorder eliminati.",
+                    "error": "Impossibile eliminare i file helicorder: {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "Ripristina impostazioni della stazione",
+                    "description": "Verranno ripristinate tutte le impostazioni della stazione. L'operazione è irreversibile e richiede un riavvio per applicare le modifiche.",
+                    "submit_button": "Ripristina stazione",
+                    "confirm_title": "Conferma ripristino",
+                    "confirm_message": "Vuoi ripristinare tutte le impostazioni della stazione?",
+                    "confirm_button": "Ripristina",
+                    "cancel_button": "Annulla",
+                    "resetting": "Ripristino delle impostazioni della stazione...",
+                    "success": "Impostazioni della stazione ripristinate.",
+                    "error": "Impossibile ripristinare le impostazioni della stazione: {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "Ripristina impostazioni dei servizi",
+                    "description": "Verranno ripristinate tutte le impostazioni dei servizi. L'operazione è irreversibile e richiede un riavvio per applicare le modifiche.",
+                    "submit_button": "Ripristina servizio",
+                    "confirm_title": "Conferma ripristino",
+                    "confirm_message": "Vuoi ripristinare tutte le impostazioni dei servizi?",
+                    "confirm_button": "Ripristina",
+                    "cancel_button": "Annulla",
+                    "resetting": "Ripristino delle impostazioni dei servizi...",
+                    "success": "Impostazioni dei servizi ripristinate.",
+                    "error": "Impossibile ripristinare le impostazioni dei servizi: {{error}}"
+                },
+                "purge_data": {
+                    "mode_running": "In esecuzione",
+                    "invalid_range": "Seleziona date di inizio e fine valide.",
+                    "started": "Operazione di eliminazione avviata.",
+                    "request_failed": "Impossibile avviare l'operazione di eliminazione: {{error}}",
+                    "running_hint": "Non è possibile avviare un'altra eliminazione finché quella attuale non è terminata.",
+                    "status_query_failed": "Impossibile ottenere lo stato dell'eliminazione: {{error}}",
+                    "status_idle": "Nessuna operazione di eliminazione in corso.",
+                    "status_running": "Eliminazione in corso: {{kind}}.",
+                    "status_success": "Eliminazione completata: {{kind}}.",
+                    "status_failed": "Eliminazione non riuscita: {{kind}}: {{error}}",
+                    "verification_label": "Testo di verifica",
+                    "verification_help": "Inserisci \"{{verificationText}}\" per abilitare il pulsante di esecuzione.",
+                    "kind_seis_records_full": "Registrazioni delle forme d'onda",
+                    "kind_seis_records_by_date": "Registrazioni delle forme d'onda nell'intervallo di date specificato",
+                    "kind_miniseed_full": "File MiniSEED",
+                    "kind_miniseed_by_date": "File MiniSEED nell'intervallo di date specificato",
+                    "kind_helicorder_full": "File helicorder",
+                    "kind_helicorder_by_date": "File helicorder nell'intervallo di date specificato",
+                    "kind_unknown": "Operazione di eliminazione",
+                    "start_date": "Data di inizio",
+                    "end_date": "Data di fine",
+                    "mode_label": "Modalità di eliminazione",
+                    "mode_all": "Tutto",
+                    "mode_range": "Intervallo di date"
+                }
+            },
+            "Metadata": {
+                "title": "Metadati della stazione"
+            },
+            "Preference": {
+                "title": "Preferenze web",
+                "reset_layout_preference": {
+                    "title": "Ripristina preferenze di disposizione",
+                    "description": "Verranno ripristinate tutte le preferenze di disposizione. L'operazione è irreversibile.",
+                    "submit_button": "Ripristina preferenze",
+                    "confirm_title": "Conferma ripristino",
+                    "confirm_message": "Vuoi ripristinare tutte le preferenze di disposizione?",
+                    "confirm_button": "Ripristina",
+                    "cancel_button": "Annulla",
+                    "success": "Preferenze di disposizione ripristinate."
+                }
+            },
+            "Service": {
+                "title": "Gestione dei servizi",
+                "restart_service": {
+                    "submit_button": "Riavvia",
+                    "confirm_title": "Conferma riavvio",
+                    "confirm_message": "Vuoi riavviare il servizio?",
+                    "confirm_button": "Riavvia",
+                    "cancel_button": "Annulla",
+                    "restarting": "Riavvio del servizio...",
+                    "success": "Servizio riavviato.",
+                    "error": "Impossibile riavviare il servizio: {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "Avvia",
+                    "confirm_title": "Conferma avvio",
+                    "confirm_message": "Vuoi avviare il servizio?",
+                    "confirm_button": "Avvia",
+                    "cancel_button": "Annulla",
+                    "starting": "Avvio del servizio...",
+                    "success": "Servizio avviato.",
+                    "error": "Impossibile avviare il servizio: {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "Arresta",
+                    "confirm_title": "Conferma arresto",
+                    "confirm_message": "Vuoi arrestare il servizio?",
+                    "confirm_button": "Arresta",
+                    "cancel_button": "Annulla",
+                    "stopping": "Arresto del servizio...",
+                    "success": "Servizio arrestato.",
+                    "error": "Impossibile arrestare il servizio: {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "Ripristina",
+                    "confirm_title": "Conferma ripristino",
+                    "confirm_message": "Vuoi ripristinare il servizio?",
+                    "confirm_button": "Ripristina",
+                    "cancel_button": "Annulla",
+                    "resetting": "Ripristino del servizio...",
+                    "success": "Servizio ripristinato.",
+                    "error": "Impossibile ripristinare il servizio: {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "Modifica",
+                    "updating": "Applicazione delle modifiche...",
+                    "success": "Modifiche applicate.",
+                    "error": "Impossibile aggiornare le impostazioni del servizio: {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "Modifica del servizio: {{name}}"
+                },
+                "service_status": {
+                    "yes": "Sì",
+                    "no": "No",
+                    "is_running": "In esecuzione",
+                    "restarts": "Riavvii",
+                    "stopped_at": "Arrestato il",
+                    "started_at": "Avviato il",
+                    "updated_at": "Aggiornato il"
+                }
+            },
+            "Station": {
+                "title": "Impostazioni della stazione",
+                "update_station": {
+                    "field_required": "Questo campo è obbligatorio.",
+                    "updating": "Aggiornamento delle impostazioni della stazione...",
+                    "success": "Impostazioni della stazione aggiornate.",
+                    "error": "Impossibile aggiornare le impostazioni della stazione: {{error}}"
+                }
+            },
+            "Users": {
+                "title": "Gestione degli utenti",
+                "search_users": {
+                    "placeholder": "Cerca utenti"
+                },
+                "refresh_list": {
+                    "submit_button": "Aggiorna",
+                    "refreshing": "Aggiornamento dell'elenco degli utenti...",
+                    "success": "Elenco degli utenti aggiornato.",
+                    "error": "Impossibile aggiornare l'elenco degli utenti: {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "Elimina utenti",
+                    "confirm_title": "Conferma eliminazione",
+                    "confirm_message": "Vuoi eliminare gli utenti selezionati?",
+                    "confirm_button": "Elimina",
+                    "cancel_button": "Annulla",
+                    "removing": "Eliminazione degli utenti selezionati...",
+                    "success": "Utenti eliminati: {{num}}.",
+                    "error": "Impossibile eliminare gli utenti selezionati: {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "Crea utente",
+                    "creating": "Creazione di un nuovo utente...",
+                    "success": "Utente {{username}} creato.",
+                    "error": "Impossibile creare il nuovo utente: {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "Crea nuovo utente",
+                    "username": {
+                        "label": "Nome utente",
+                        "placeholder": "Nome del nuovo utente"
+                    },
+                    "password": {
+                        "label": "Password",
+                        "placeholder": "Password del nuovo utente"
+                    },
+                    "admin": {
+                        "label": "Utente con privilegi di amministratore"
+                    },
+                    "create_button": "Crea"
+                },
+                "edit_user": {
+                    "submit_button": "Modifica",
+                    "updating": "Aggiornamento dell'utente...",
+                    "success": "Utente {{username}} aggiornato.",
+                    "error": "Impossibile aggiornare l'utente: {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "Modifica utente",
+                    "username": {
+                        "label": "Nome utente",
+                        "placeholder": "Lascia vuoto per non modificare."
+                    },
+                    "password": {
+                        "label": "Password",
+                        "placeholder": "Lascia vuoto per non modificare."
+                    },
+                    "admin": {
+                        "label": "Utente con privilegi di amministratore"
+                    },
+                    "update_button": "Aggiorna"
+                },
+                "remove_user": {
+                    "submit_button": "Elimina",
+                    "confirm_title": "Conferma eliminazione",
+                    "confirm_message": "Vuoi eliminare l'utente {{username}}?",
+                    "confirm_button": "Elimina",
+                    "cancel_button": "Annulla",
+                    "removing": "Eliminazione dell'utente...",
+                    "success": "Utente {{username}} eliminato.",
+                    "error": "Impossibile eliminare l'utente: {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "Sì",
+                    "no": "No",
+                    "never": "Mai",
+                    "id": "ID",
+                    "user_id": "ID utente",
+                    "username": "Nome utente",
+                    "admin": "Amministratore",
+                    "created_at": "Creato il",
+                    "last_login": "Ultimo accesso",
+                    "user_ip": "IP dell'utente",
+                    "user_agent": "User agent",
+                    "updated_at": "Aggiornato il",
+                    "actions": "Azioni"
+                }
+            },
+            "Backup": {
+                "title": "Gestione dei backup",
+                "select_mode": {
+                    "backup": "Crea backup",
+                    "restore": "Ripristina backup"
+                },
+                "backup_config": {
+                    "title": "Crea un backup",
+                    "description": "Le impostazioni verranno esportate in un file JSON. Puoi salvare il file e usarlo in seguito per ripristinare la configurazione, ad esempio durante la migrazione a un nuovo sistema.",
+                    "submit_button": "Genera backup",
+                    "generating": "Generazione dei dati di backup...",
+                    "success": "Dati di backup generati.",
+                    "error": "Impossibile generare i dati di backup: {{error}}"
+                },
+                "restore_config": {
+                    "title": "Seleziona un file di backup",
+                    "description": "Scegli un file di backup JSON per ripristinare la configurazione. AnyShake Observer sovrascriverà le impostazioni attuali con i dati del file selezionato.",
+                    "submit_button": "Ripristina configurazione",
+                    "no_file_selected": "Nessun file selezionato.",
+                    "confirm_title": "Conferma ripristino",
+                    "confirm_message": "Vuoi ripristinare la configurazione? Questa azione sovrascriverà le impostazioni attuali.",
+                    "confirm_button": "Ripristina",
+                    "cancel_button": "Annulla",
+                    "restoring": "Ripristino della configurazione...",
+                    "success": "Configurazione ripristinata.",
+                    "error": "Impossibile ripristinare la configurazione: {{error}}"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "È disponibile un nuovo aggiornamento. Vuoi aggiornare ora?",
+            "confirm_title": "Aggiornamento disponibile",
+            "confirm_button": "Aggiorna",
+            "cancel_button": "Annulla"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "Vuoi uscire?",
+            "confirm_title": "Esci",
+            "confirm_button": "OK",
+            "cancel_button": "Annulla"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "Nome utente",
+            "placeholder": "Il tuo nome utente"
+        },
+        "password": {
+            "label": "Password",
+            "placeholder": "La tua password"
+        },
+        "captcha": {
+            "label": "Inserisci il codice captcha",
+            "countdown": "({{seconds}} s)",
+            "loading": "Caricamento del captcha...",
+            "error": "Impossibile caricare il captcha",
+            "placeholder": "Codice captcha",
+            "refreshing": "Aggiornamento del captcha.",
+            "refresh_success": "Captcha aggiornato.",
+            "refresh_error": "Impossibile aggiornare il captcha."
+        },
+        "signin": {
+            "button": "Accedi",
+            "loading": "Accesso in corso...",
+            "success": "Accesso effettuato.",
+            "error": "Accesso non riuscito."
+        }
+    }
+}

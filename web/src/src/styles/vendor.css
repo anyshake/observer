@@ -81,3 +81,29 @@
 .menu li > a:focus {
     background-color: transparent !important;
 }
+
+.app-dropdown-menu > li > button {
+    background-color: transparent;
+    color: var(--app-text);
+    transition: color 300ms ease, background-color 300ms ease;
+}
+
+.app-dropdown-menu > li > button:is(:hover, :focus-visible) {
+    background-color: var(--app-hover);
+}
+
+.app-dropdown-menu > li > button:focus-visible {
+    outline: 2px solid var(--app-primary);
+    outline-offset: -2px;
+}
+
+.app-dropdown-menu > li > button:is(:active, [aria-pressed='true']) {
+    background-color: var(--app-info-soft);
+    color: var(--app-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-dropdown-menu > li > button {
+        transition: none;
+    }
+}

@@ -1,0 +1,650 @@
+{
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "Lắng nghe tiếng thì thầm của Trái Đất."
+        },
+        "router": {
+            "home": "Trạng thái trạm",
+            "realtime": "Dạng sóng thời gian thực",
+            "history": "Dạng sóng lịch sử",
+            "download": "Tải dữ liệu",
+            "settings": "Cài đặt hệ thống",
+            "default": "Không tìm thấy trang"
+        }
+    },
+    "components": {
+        "ThemeToggle": {
+            "label": "Giao diện",
+            "light": "Sáng",
+            "dark": "Tối",
+            "system": "Theo hệ thống"
+        },
+        "ErrorPage": {
+            "something_went_wrong": "Đã xảy ra lỗi.",
+            "try_again_later": "Vui lòng tải lại trang hoặc thử lại sau."
+        },
+        "TypedInput": {
+            "yes": "Có",
+            "no": "Không",
+            "add_new_item": "Nhập mục mới.",
+            "editing_list": "Chỉnh sửa danh sách {{fieldName}}",
+            "table_value": "Giá trị",
+            "table_actions": "Thao tác"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "Cài đặt phổ đồ",
+                "min_db": "dB tối thiểu",
+                "max_db": "dB tối đa"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "Cài đặt phổ đồ",
+                "min_db": "dB tối thiểu",
+                "max_db": "dB tối đa"
+            }
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "Tên tệp",
+                "time": "Thời gian sửa đổi",
+                "size": "Kích thước tệp",
+                "actions": "Thao tác"
+            },
+            "file_list_actions": {
+                "download": "Tải xuống",
+                "preview": "Xem trước"
+            },
+            "miniseed_list": {
+                "title": "MiniSEED hằng ngày",
+                "search": "Tìm kiếm"
+            },
+            "helicorder_list": {
+                "title": "Danh sách Helicorder",
+                "search": "Tìm kiếm"
+            },
+            "request_file": {
+                "requesting": "Đang yêu cầu liên kết tải tệp {{fileName}}.",
+                "success": "Đã nhận liên kết tải tệp {{fileName}}.",
+                "error": "Không thể yêu cầu liên kết tệp {{fileName}}: {{error}}"
+            },
+            "preview_file": {
+                "requesting": "Đang yêu cầu liên kết xem trước tệp {{fileName}}.",
+                "success": "Đã nhận liên kết xem trước tệp {{fileName}}.",
+                "error": "Không thể yêu cầu liên kết tệp {{fileName}}: {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "Tra cứu sự kiện",
+                "data_agency": "Đơn vị cung cấp dữ liệu",
+                "search_button": "Tìm sự kiện",
+                "searching": "Đang tìm sự kiện từ nguồn đã chọn.",
+                "success": "Tìm thấy {{count}} sự kiện từ nguồn đã chọn.",
+                "no_data": "Không tìm thấy sự kiện trong nguồn đã chọn.",
+                "error": "Không thể tìm sự kiện: {{error}}"
+            },
+            "event_list_modal": {
+                "title": "Chọn một sự kiện địa chấn",
+                "earthquake_at": "Động đất lúc {{time}}",
+                "p_wave_arrival": "Sóng P đến lúc {{time}} ({{seconds}} giây)",
+                "s_wave_arrival": "Sóng S đến lúc {{time}} ({{seconds}} giây)",
+                "epicenter_distance": "Khoảng cách đến tâm chấn {{distance}} km",
+                "earthquake_depth": "Độ sâu {{depth}} km",
+                "selected_an_event": "Đã chọn trận động đất tại {{region}} lúc {{time}}."
+            },
+            "data_export": {
+                "title": "Xuất dữ liệu",
+                "file_format": "Định dạng tệp",
+                "channel_code": "Mã kênh",
+                "export_button": "Lấy dữ liệu",
+                "exporting": "Đang xuất kênh {{channel}} sang định dạng {{format}}.",
+                "success": "Đã xuất kênh {{channel}} sang định dạng {{format}}.",
+                "error": "Không thể xuất kênh {{channel}} sang định dạng {{format}}: {{error}}"
+            },
+            "search_records": {
+                "title": "Tra cứu theo thời gian",
+                "start_time": "Thời gian bắt đầu",
+                "end_time": "Thời gian kết thúc",
+                "invalid_time": "Thời gian bắt đầu phải trước thời gian kết thúc.",
+                "search_button": "Tìm bản ghi",
+                "searching": "Đang tìm bản ghi địa chấn trong cơ sở dữ liệu.",
+                "success": "Tìm thấy {{count}} bản ghi địa chấn trong cơ sở dữ liệu.",
+                "no_data": "Không tìm thấy bản ghi địa chấn trong cơ sở dữ liệu.",
+                "error": "Không thể tìm bản ghi: {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "Khóa bố cục",
+                "unlock_button": "Mở khóa bố cục"
+            },
+            "reset_layout": {
+                "reset_button": "Đặt lại tất cả",
+                "confirm_message": "Bạn có chắc muốn đặt lại bố cục không?",
+                "confirm_title": "Xác nhận đặt lại",
+                "confirm_button": "Đặt lại",
+                "cancel_button": "Hủy"
+            },
+            "display_mode": {
+                "waveform_mode": "Chế độ dạng sóng",
+                "spectrogram_mode": "Chế độ phổ đồ"
+            },
+            "share_link": {
+                "share_button": "Chia sẻ liên kết",
+                "link_copied": "Đã sao chép liên kết chia sẻ vào bộ nhớ tạm."
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "Thông tin trạm",
+                "name": "Tên",
+                "country": "Quốc gia",
+                "place": "Địa điểm",
+                "affiliation": "Đơn vị trực thuộc",
+                "channels": "Kênh"
+            },
+            "device_info": {
+                "yes": "Có",
+                "no": "Không",
+                "title": "Thông tin thiết bị",
+                "product_model": "Mẫu sản phẩm",
+                "device_id": "ID thiết bị",
+                "link_protocol": "Giao thức kết nối",
+                "packet_interval": "Khoảng thời gian giữa các gói",
+                "gnss_active": "GNSS đang hoạt động"
+            },
+            "device_status": {
+                "title": "Trạng thái thiết bị",
+                "sample_rate": "Tần số lấy mẫu",
+                "latitude": "Vĩ độ",
+                "longitude": "Kinh độ",
+                "elevation": "Độ cao",
+                "temperature": "Nhiệt độ thiết bị"
+            },
+            "link_status": {
+                "title": "Trạng thái kết nối",
+                "started_at": "Thời điểm bắt đầu",
+                "last_frame": "Khung gần nhất",
+                "frames": "Khung",
+                "errors": "Lỗi",
+                "messages": "Thông báo"
+            },
+            "connectivity": {
+                "loading": "Đang kết nối với trạm...",
+                "success": "Đã kết nối với trạm. Máy chủ đã chạy {{uptime}} giây, cập nhật lúc {{updatedAt}}.",
+                "error": "Có lỗi khi kết nối với trạm. Vui lòng kiểm tra kết nối."
+            },
+            "station_location": {
+                "title": "Vị trí trạm"
+            },
+            "upgrade": {
+                "check_failed": "Không thể kiểm tra bản cập nhật.",
+                "update_available": "Có phiên bản mới {{latest}}. Bạn có thể bật cập nhật tự động hoặc tải về và cài đặt thủ công.",
+                "restart_needed": "Đã cài phiên bản mới nhất {{latest}}, nhưng {{current}} vẫn đang chạy. Hãy khởi động lại phần mềm vào lúc phù hợp để áp dụng cập nhật.",
+                "manual_upgrade_needed": "Có phiên bản mới {{latest}}, nhưng phiên bản hiện tại {{current}} cũ hơn phiên bản tương thích tối thiểu {{required}}. Cần nâng cấp thủ công."
+            },
+            "service_status": {
+                "title": "Trạng thái dịch vụ"
+            },
+            "cpu_usage": {
+                "title": "Mức sử dụng CPU"
+            },
+            "memory_usage": {
+                "title": "Mức sử dụng bộ nhớ"
+            },
+            "disk_usage": {
+                "title": "Mức sử dụng đĩa"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "Không tìm thấy trang.",
+            "check_your_url": "Vui lòng kiểm tra URL và thử lại.",
+            "go_back_button": "Quay lại"
+        },
+        "RealTime": {
+            "display_mode": {
+                "waveform_mode": "Chế độ dạng sóng",
+                "spectrogram_mode": "Chế độ phổ đồ"
+            },
+            "reset_layout": {
+                "reset_button": "Đặt lại tất cả",
+                "confirm_message": "Bạn có chắc muốn đặt lại bố cục không?",
+                "confirm_title": "Xác nhận đặt lại",
+                "confirm_button": "Đặt lại",
+                "cancel_button": "Hủy"
+            },
+            "layout_locker": {
+                "lock_button": "Khóa bố cục",
+                "unlock_button": "Mở khóa bố cục"
+            },
+            "record_data": {
+                "start_button": "Bắt đầu ghi",
+                "stop_button": "Dừng ghi",
+                "start_recording": "Đã bắt đầu ghi lúc {{startedAt}}.",
+                "link_created": "Đã dừng ghi lúc {{endedAt}} ({{duration}} giây). Đã tạo liên kết.",
+                "no_data_recorded": "Không có dữ liệu được ghi trong khoảng thời gian này."
+            },
+            "connectivity": {
+                "connecting": "Chưa kết nối, đang kết nối...",
+                "connected": "Đã kết nối, cập nhật gần nhất lúc {{updatedAt}}."
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} mẫu/giây",
+                "channels": "{{num}} kênh",
+                "retention": "{{retention}} giây"
+            }
+        },
+        "Settings": {
+            "FDSN": {
+                "title": "Khóa truy cập FDSN",
+                "key": "Tiền tố khóa",
+                "remark": "Ghi chú",
+                "remark_placeholder": "Nhập ghi chú (không bắt buộc)",
+                "created_at": "Thời gian tạo",
+                "expires_at": "Thời gian hết hạn",
+                "expiration_placeholder": "Chọn thời gian",
+                "status": "Trạng thái",
+                "active": "Đang hoạt động",
+                "expired": "Đã hết hạn",
+                "revoked": "Đã thu hồi",
+                "revoked_at": "Thời gian thu hồi",
+                "hide_revoked": "Ẩn khóa đã thu hồi",
+                "last_requested_at": "Yêu cầu được ghi nhận gần nhất",
+                "user_ip": "IP gần nhất",
+                "actions": "Thao tác",
+                "never": "Chưa từng",
+                "no_expiration": "Không hết hạn",
+                "refresh": "Làm mới",
+                "create": "Tạo khóa truy cập",
+                "created": "Đã tạo khóa truy cập!",
+                "create_failed": "Không thể tạo khóa truy cập.",
+                "refresh_after_create_failed": "Đã tạo khóa truy cập nhưng không thể làm mới danh sách: {{error}}",
+                "expiration_help": "Chọn thời điểm trong tương lai theo múi giờ của trình duyệt.",
+                "invalid_expiration": "Thời gian hết hạn phải ở trong tương lai.",
+                "disabled": "Bật dịch vụ web FDSN trong cài đặt trạm trước khi tạo khóa truy cập.",
+                "usage": "Gửi Authorization: Bearer <access key> kèm các yêu cầu truy vấn.",
+                "secret_help": "Hãy lưu khóa truy cập này ngay. Khóa chỉ được hiển thị một lần.",
+                "revoke": "Thu hồi",
+                "revoke_selected": "Thu hồi khóa đã chọn",
+                "revoke_selected_confirm": "Thu hồi các khóa truy cập đã chọn ({{count}})? Các yêu cầu sử dụng chúng sẽ bị từ chối ngay lập tức.",
+                "revoke_selected_success": "Đã thu hồi {{count}} khóa truy cập.",
+                "revoke_failed": "Không thể thu hồi khóa truy cập.",
+                "cancel": "Hủy",
+                "revoking": "Đang thu hồi khóa truy cập...",
+                "revoke_confirm": "Thu hồi khóa truy cập này? Các yêu cầu FDSN tiếp theo sử dụng khóa này sẽ bị từ chối ngay lập tức.",
+                "revoke_success": "Đã thu hồi khóa truy cập."
+            },
+            "Logs": {
+                "title": "Nhật ký ứng dụng"
+            },
+            "Dangerous": {
+                "executable_backups": {
+                    "title": "Bản sao lưu tệp thực thi cũ",
+                    "description": "Các bản sao lưu được tạo khi nâng cấp ứng dụng này. Chọn tệp để xóa vĩnh viễn.",
+                    "submit_button": "Dọn dẹp bản sao lưu",
+                    "refresh_button": "Làm mới",
+                    "delete_button": "Xóa mục đã chọn ({{count}})",
+                    "select_all": "Chọn tất cả",
+                    "loading": "Đang tìm bản sao lưu...",
+                    "empty": "Không tìm thấy bản sao lưu tệp thực thi cũ.",
+                    "list_failed": "Không thể tìm bản sao lưu: {{error}}",
+                    "confirm_title": "Xóa bản sao lưu",
+                    "confirm_message": "Xóa vĩnh viễn {{count}} bản sao lưu đã chọn?",
+                    "cancel_button": "Hủy",
+                    "removing": "Đang xóa bản sao lưu...",
+                    "result_summary": "Đã xóa {{removed}} bản sao lưu; {{failed}} bản không xóa được.",
+                    "empty_response": "Không nhận được kết quả xóa bản sao lưu.",
+                    "remove_failed": "Không thể xóa bản sao lưu: {{error}}"
+                },
+                "title": "Khu vực nguy hiểm",
+                "restart_application": {
+                    "title": "Khởi động lại toàn bộ ứng dụng",
+                    "description": "Thao tác này sẽ khởi động lại toàn bộ ứng dụng, có thể mất một lúc và sẽ tạm đóng mọi kết nối đang hoạt động, gây gián đoạn dịch vụ và quá trình ghi dữ liệu.",
+                    "submit_button": "Khởi động lại ứng dụng",
+                    "confirm_title": "Xác nhận khởi động lại",
+                    "confirm_message": "Bạn có chắc muốn khởi động lại ứng dụng không?",
+                    "confirm_button": "Khởi động lại",
+                    "cancel_button": "Hủy",
+                    "restarting": "Đang gửi yêu cầu khởi động lại ứng dụng...",
+                    "success": "Đã gửi yêu cầu khởi động lại, ứng dụng sẽ khởi động lại sau vài giây.",
+                    "error": "Không thể yêu cầu khởi động lại ứng dụng: {{error}}"
+                },
+                "purge_waveform_records": {
+                    "title": "Xóa toàn bộ bản ghi dạng sóng",
+                    "description": "Thao tác này sẽ xóa tất cả bản ghi dạng sóng trong cơ sở dữ liệu và không thể hoàn tác.",
+                    "submit_button": "Xóa toàn bộ bản ghi",
+                    "confirm_title": "Xác nhận xóa",
+                    "confirm_message": "Bạn có chắc muốn xóa toàn bộ bản ghi dạng sóng không?",
+                    "confirm_button": "Xóa",
+                    "cancel_button": "Hủy",
+                    "purging": "Đang xóa bản ghi dạng sóng...",
+                    "success": "Đã xóa bản ghi dạng sóng thành công.",
+                    "error": "Không thể xóa bản ghi dạng sóng: {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "Xóa toàn bộ tệp MiniSEED",
+                    "description": "Thao tác này sẽ xóa tất cả tệp MiniSEED trong hệ thống và không thể hoàn tác.",
+                    "submit_button": "Xóa MiniSEED",
+                    "confirm_title": "Xác nhận xóa",
+                    "confirm_message": "Bạn có chắc muốn xóa toàn bộ tệp MiniSEED không?",
+                    "confirm_button": "Xóa",
+                    "cancel_button": "Hủy",
+                    "purging": "Đang xóa tệp MiniSEED...",
+                    "success": "Đã xóa tệp MiniSEED thành công.",
+                    "error": "Không thể xóa tệp MiniSEED: {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "Xóa toàn bộ tệp Helicorder",
+                    "description": "Thao tác này sẽ xóa tất cả tệp Helicorder trong hệ thống và không thể hoàn tác.",
+                    "submit_button": "Xóa Helicorder",
+                    "confirm_title": "Xác nhận xóa",
+                    "confirm_message": "Bạn có chắc muốn xóa toàn bộ tệp Helicorder không?",
+                    "confirm_button": "Xóa",
+                    "cancel_button": "Hủy",
+                    "purging": "Đang xóa tệp Helicorder...",
+                    "success": "Đã xóa tệp Helicorder thành công.",
+                    "error": "Không thể xóa tệp Helicorder: {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "Đặt lại cấu hình trạm",
+                    "description": "Thao tác này sẽ đặt lại toàn bộ cấu hình trạm, không thể hoàn tác và cần khởi động lại để có hiệu lực.",
+                    "submit_button": "Đặt lại trạm",
+                    "confirm_title": "Xác nhận đặt lại",
+                    "confirm_message": "Bạn có chắc muốn đặt lại toàn bộ cấu hình trạm không?",
+                    "confirm_button": "Đặt lại",
+                    "cancel_button": "Hủy",
+                    "resetting": "Đang đặt lại cấu hình trạm...",
+                    "success": "Đã đặt lại cấu hình trạm thành công.",
+                    "error": "Không thể đặt lại cấu hình trạm: {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "Đặt lại cấu hình dịch vụ",
+                    "description": "Thao tác này sẽ đặt lại toàn bộ cấu hình dịch vụ, không thể hoàn tác và cần khởi động lại để có hiệu lực.",
+                    "submit_button": "Đặt lại dịch vụ",
+                    "confirm_title": "Xác nhận đặt lại",
+                    "confirm_message": "Bạn có chắc muốn đặt lại toàn bộ cấu hình dịch vụ không?",
+                    "confirm_button": "Đặt lại",
+                    "cancel_button": "Hủy",
+                    "resetting": "Đang đặt lại cấu hình dịch vụ...",
+                    "success": "Đã đặt lại cấu hình dịch vụ thành công.",
+                    "error": "Không thể đặt lại cấu hình dịch vụ: {{error}}"
+                },
+                "purge_data": {
+                    "mode_running": "Đang chạy",
+                    "invalid_range": "Vui lòng chọn ngày bắt đầu và ngày kết thúc hợp lệ.",
+                    "started": "Đã bắt đầu tác vụ xóa.",
+                    "request_failed": "Không thể bắt đầu tác vụ xóa: {{error}}",
+                    "running_hint": "Không thể bắt đầu thao tác xóa khác cho đến khi thao tác hiện tại hoàn tất.",
+                    "status_query_failed": "Không thể lấy trạng thái xóa: {{error}}",
+                    "status_idle": "Hiện không có tác vụ xóa nào đang chạy.",
+                    "status_running": "Đang xóa: {{kind}}.",
+                    "status_success": "Đã xóa xong: {{kind}}.",
+                    "status_failed": "Xóa thất bại: {{kind}}: {{error}}",
+                    "verification_label": "Văn bản xác minh",
+                    "verification_help": "Vui lòng nhập \"{{verificationText}}\" để bật nút thực hiện.",
+                    "kind_seis_records_full": "Bản ghi dạng sóng",
+                    "kind_seis_records_by_date": "Bản ghi dạng sóng trong khoảng ngày đã chỉ định",
+                    "kind_miniseed_full": "Tệp MiniSEED",
+                    "kind_miniseed_by_date": "Tệp MiniSEED trong khoảng ngày đã chỉ định",
+                    "kind_helicorder_full": "Tệp Helicorder",
+                    "kind_helicorder_by_date": "Tệp Helicorder trong khoảng ngày đã chỉ định",
+                    "kind_unknown": "Tác vụ xóa",
+                    "start_date": "Ngày bắt đầu",
+                    "end_date": "Ngày kết thúc",
+                    "mode_label": "Chế độ xóa",
+                    "mode_all": "Tất cả",
+                    "mode_range": "Khoảng ngày"
+                }
+            },
+            "Metadata": {
+                "title": "Siêu dữ liệu trạm"
+            },
+            "Preference": {
+                "title": "Tùy chọn web",
+                "reset_layout_preference": {
+                    "title": "Đặt lại tùy chọn bố cục",
+                    "description": "Thao tác này sẽ đặt lại tất cả tùy chọn bố cục và không thể hoàn tác.",
+                    "submit_button": "Đặt lại tùy chọn",
+                    "confirm_title": "Xác nhận đặt lại",
+                    "confirm_message": "Bạn có chắc muốn đặt lại tất cả tùy chọn bố cục không?",
+                    "confirm_button": "Đặt lại",
+                    "cancel_button": "Hủy",
+                    "success": "Đã đặt lại tùy chọn bố cục thành công."
+                }
+            },
+            "Service": {
+                "title": "Điều khiển dịch vụ",
+                "restart_service": {
+                    "submit_button": "Khởi động lại",
+                    "confirm_title": "Xác nhận khởi động lại",
+                    "confirm_message": "Bạn có chắc muốn khởi động lại dịch vụ không?",
+                    "confirm_button": "Khởi động lại",
+                    "cancel_button": "Hủy",
+                    "restarting": "Đang khởi động lại dịch vụ...",
+                    "success": "Đã khởi động lại dịch vụ thành công.",
+                    "error": "Không thể khởi động lại dịch vụ: {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "Khởi động",
+                    "confirm_title": "Xác nhận khởi động",
+                    "confirm_message": "Bạn có chắc muốn khởi động dịch vụ không?",
+                    "confirm_button": "Khởi động",
+                    "cancel_button": "Hủy",
+                    "starting": "Đang khởi động dịch vụ...",
+                    "success": "Đã khởi động dịch vụ thành công.",
+                    "error": "Không thể khởi động dịch vụ: {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "Dừng",
+                    "confirm_title": "Xác nhận dừng",
+                    "confirm_message": "Bạn có chắc muốn dừng dịch vụ không?",
+                    "confirm_button": "Dừng",
+                    "cancel_button": "Hủy",
+                    "stopping": "Đang dừng dịch vụ...",
+                    "success": "Đã dừng dịch vụ thành công.",
+                    "error": "Không thể dừng dịch vụ: {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "Đặt lại",
+                    "confirm_title": "Xác nhận đặt lại",
+                    "confirm_message": "Bạn có chắc muốn đặt lại dịch vụ không?",
+                    "confirm_button": "Đặt lại",
+                    "cancel_button": "Hủy",
+                    "resetting": "Đang đặt lại dịch vụ...",
+                    "success": "Đã đặt lại dịch vụ thành công.",
+                    "error": "Không thể đặt lại dịch vụ: {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "Chỉnh sửa",
+                    "updating": "Đang áp dụng các thay đổi mới...",
+                    "success": "Đã áp dụng các thay đổi.",
+                    "error": "Không thể cập nhật cấu hình dịch vụ: {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "Đang chỉnh sửa dịch vụ: {{name}}"
+                },
+                "service_status": {
+                    "yes": "Có",
+                    "no": "Không",
+                    "is_running": "Đang chạy",
+                    "restarts": "Số lần khởi động lại",
+                    "stopped_at": "Thời gian dừng",
+                    "started_at": "Thời điểm bắt đầu",
+                    "updated_at": "Thời gian cập nhật"
+                }
+            },
+            "Station": {
+                "title": "Cài đặt trạm",
+                "update_station": {
+                    "field_required": "Trường này là bắt buộc.",
+                    "updating": "Đang cập nhật cấu hình trạm...",
+                    "success": "Đã cập nhật cấu hình trạm thành công.",
+                    "error": "Không thể cập nhật cấu hình trạm: {{error}}"
+                }
+            },
+            "Users": {
+                "title": "Quản lý người dùng",
+                "search_users": {
+                    "placeholder": "Tìm người dùng"
+                },
+                "refresh_list": {
+                    "submit_button": "Làm mới",
+                    "refreshing": "Đang làm mới danh sách người dùng...",
+                    "success": "Đã làm mới danh sách người dùng thành công.",
+                    "error": "Không thể làm mới danh sách người dùng: {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "Xóa người dùng",
+                    "confirm_title": "Xác nhận xóa",
+                    "confirm_message": "Bạn có chắc muốn xóa những người dùng đã chọn không?",
+                    "confirm_button": "Xóa",
+                    "cancel_button": "Hủy",
+                    "removing": "Đang xóa người dùng đã chọn...",
+                    "success": "Đã xóa {{num}} người dùng.",
+                    "error": "Không thể xóa người dùng đã chọn: {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "Tạo người dùng",
+                    "creating": "Đang tạo người dùng mới...",
+                    "success": "Đã tạo người dùng {{username}}.",
+                    "error": "Không thể tạo người dùng mới: {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "Tạo người dùng mới",
+                    "username": {
+                        "label": "Tên người dùng",
+                        "placeholder": "Tên của người dùng mới"
+                    },
+                    "password": {
+                        "label": "Mật khẩu",
+                        "placeholder": "Mật khẩu của người dùng mới"
+                    },
+                    "admin": {
+                        "label": "Người dùng có quyền quản trị"
+                    },
+                    "create_button": "Tạo"
+                },
+                "edit_user": {
+                    "submit_button": "Chỉnh sửa",
+                    "updating": "Đang cập nhật người dùng...",
+                    "success": "Đã cập nhật người dùng {{username}}.",
+                    "error": "Không thể cập nhật người dùng: {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "Chỉnh sửa người dùng",
+                    "username": {
+                        "label": "Tên người dùng",
+                        "placeholder": "Để trống nếu không muốn thay đổi."
+                    },
+                    "password": {
+                        "label": "Mật khẩu",
+                        "placeholder": "Để trống nếu không muốn thay đổi."
+                    },
+                    "admin": {
+                        "label": "Người dùng có quyền quản trị"
+                    },
+                    "update_button": "Cập nhật"
+                },
+                "remove_user": {
+                    "submit_button": "Xóa",
+                    "confirm_title": "Xác nhận xóa",
+                    "confirm_message": "Bạn có chắc muốn xóa người dùng {{username}} không?",
+                    "confirm_button": "Xóa",
+                    "cancel_button": "Hủy",
+                    "removing": "Đang xóa người dùng...",
+                    "success": "Đã xóa người dùng {{username}}.",
+                    "error": "Không thể xóa người dùng: {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "Có",
+                    "no": "Không",
+                    "never": "Chưa từng",
+                    "id": "ID",
+                    "user_id": "ID người dùng",
+                    "username": "Tên người dùng",
+                    "admin": "Quản trị viên",
+                    "created_at": "Thời gian tạo",
+                    "last_login": "Lần đăng nhập gần nhất",
+                    "user_ip": "IP người dùng",
+                    "user_agent": "Tác nhân người dùng",
+                    "updated_at": "Thời gian cập nhật",
+                    "actions": "Thao tác"
+                }
+            },
+            "Backup": {
+                "title": "Quản lý bản sao lưu",
+                "select_mode": {
+                    "backup": "Tạo bản sao lưu",
+                    "restore": "Khôi phục bản sao lưu"
+                },
+                "backup_config": {
+                    "title": "Tạo bản sao lưu",
+                    "description": "Thao tác này sẽ xuất dữ liệu cấu hình thành tệp JSON. Bạn có thể lưu tệp này và dùng để khôi phục thiết lập sau này, chẳng hạn khi chuyển sang hệ thống mới.",
+                    "submit_button": "Tạo bản sao lưu",
+                    "generating": "Đang tạo dữ liệu sao lưu...",
+                    "success": "Đã tạo dữ liệu sao lưu thành công.",
+                    "error": "Không thể tạo dữ liệu sao lưu: {{error}}"
+                },
+                "restore_config": {
+                    "title": "Chọn tệp sao lưu",
+                    "description": "Chọn tệp sao lưu JSON để khôi phục cấu hình. AnyShake Observer sẽ ghi đè cài đặt hiện tại bằng dữ liệu từ tệp đã chọn.",
+                    "submit_button": "Khôi phục cấu hình",
+                    "no_file_selected": "Chưa chọn tệp.",
+                    "confirm_title": "Xác nhận khôi phục",
+                    "confirm_message": "Bạn có chắc muốn khôi phục cấu hình không? Thao tác này sẽ ghi đè cài đặt hiện tại.",
+                    "confirm_button": "Khôi phục",
+                    "cancel_button": "Hủy",
+                    "restoring": "Đang khôi phục cấu hình...",
+                    "success": "Đã khôi phục cấu hình thành công.",
+                    "error": "Không thể khôi phục cấu hình: {{error}}"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "Có bản cập nhật mới, bạn có muốn cập nhật ngay không?",
+            "confirm_title": "Có bản cập nhật",
+            "confirm_button": "Cập nhật",
+            "cancel_button": "Hủy"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "Bạn có chắc muốn đăng xuất không?",
+            "confirm_title": "Đăng xuất",
+            "confirm_button": "OK",
+            "cancel_button": "Hủy"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "Tên người dùng",
+            "placeholder": "Tên người dùng của bạn"
+        },
+        "password": {
+            "label": "Mật khẩu",
+            "placeholder": "Mật khẩu của bạn"
+        },
+        "captcha": {
+            "label": "Nhập CAPTCHA",
+            "countdown": "({{seconds}} giây)",
+            "loading": "Đang tải CAPTCHA...",
+            "error": "Không thể tải CAPTCHA",
+            "placeholder": "Mã CAPTCHA",
+            "refreshing": "Đang làm mới CAPTCHA.",
+            "refresh_success": "Đã làm mới CAPTCHA thành công.",
+            "refresh_error": "Không thể làm mới CAPTCHA."
+        },
+        "signin": {
+            "button": "Đăng nhập",
+            "loading": "Đang đăng nhập...",
+            "success": "Bạn đã đăng nhập thành công.",
+            "error": "Đăng nhập thất bại."
+        }
+    }
+}

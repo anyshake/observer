@@ -1,0 +1,650 @@
+{
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "धरती की फुसफुसाहट सुनें।"
+        },
+        "router": {
+            "home": "स्टेशन की स्थिति",
+            "realtime": "वास्तविक समय तरंगरूप",
+            "history": "पुराने तरंगरूप",
+            "download": "डेटा डाउनलोड",
+            "settings": "सिस्टम सेटिंग्स",
+            "default": "पृष्ठ नहीं मिला"
+        }
+    },
+    "components": {
+        "ThemeToggle": {
+            "label": "थीम",
+            "light": "हल्का",
+            "dark": "गहरा",
+            "system": "सिस्टम के अनुसार"
+        },
+        "ErrorPage": {
+            "something_went_wrong": "कुछ गड़बड़ हुई।",
+            "try_again_later": "कृपया पृष्ठ रीफ़्रेश करें या बाद में फिर प्रयास करें।"
+        },
+        "TypedInput": {
+            "yes": "हाँ",
+            "no": "नहीं",
+            "add_new_item": "नया आइटम दर्ज करें।",
+            "editing_list": "{{fieldName}} की सूची संपादित करें",
+            "table_value": "मान",
+            "table_actions": "कार्रवाइयाँ"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "स्पेक्ट्रोग्राम सेटिंग्स",
+                "min_db": "न्यूनतम dB",
+                "max_db": "अधिकतम dB"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "स्पेक्ट्रोग्राम सेटिंग्स",
+                "min_db": "न्यूनतम dB",
+                "max_db": "अधिकतम dB"
+            }
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "फ़ाइल का नाम",
+                "time": "संशोधन का समय",
+                "size": "फ़ाइल का आकार",
+                "actions": "कार्रवाइयाँ"
+            },
+            "file_list_actions": {
+                "download": "डाउनलोड करें",
+                "preview": "पूर्वावलोकन"
+            },
+            "miniseed_list": {
+                "title": "दैनिक MiniSEED",
+                "search": "खोजें"
+            },
+            "helicorder_list": {
+                "title": "Helicorder सूची",
+                "search": "खोजें"
+            },
+            "request_file": {
+                "requesting": "{{fileName}} फ़ाइल का डाउनलोड लिंक माँगा जा रहा है।",
+                "success": "{{fileName}} फ़ाइल का डाउनलोड लिंक मिल गया।",
+                "error": "{{fileName}} फ़ाइल का लिंक माँगने में विफल: {{error}}"
+            },
+            "preview_file": {
+                "requesting": "{{fileName}} फ़ाइल का पूर्वावलोकन लिंक माँगा जा रहा है।",
+                "success": "{{fileName}} फ़ाइल का पूर्वावलोकन लिंक मिल गया।",
+                "error": "{{fileName}} फ़ाइल का लिंक माँगने में विफल: {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "घटना खोज",
+                "data_agency": "डेटा प्रदाता संस्था",
+                "search_button": "घटनाएँ खोजें",
+                "searching": "चुने गए स्रोत में घटनाएँ खोजी जा रही हैं।",
+                "success": "चुने गए स्रोत में {{count}} घटनाएँ मिलीं।",
+                "no_data": "चुने गए स्रोत में कोई घटना नहीं मिली।",
+                "error": "घटनाएँ खोजने में विफल: {{error}}"
+            },
+            "event_list_modal": {
+                "title": "भूकंपीय घटना चुनें",
+                "earthquake_at": "{{time}} पर भूकंप",
+                "p_wave_arrival": "P-तरंग आगमन {{time}} ({{seconds}} सेकंड)",
+                "s_wave_arrival": "S-तरंग आगमन {{time}} ({{seconds}} सेकंड)",
+                "epicenter_distance": "अधिकेंद्र की दूरी {{distance}} किमी",
+                "earthquake_depth": "गहराई {{depth}} किमी",
+                "selected_an_event": "{{time}} पर {{region}} में आए भूकंप को चुना गया।"
+            },
+            "data_export": {
+                "title": "डेटा निर्यात",
+                "file_format": "फ़ाइल प्रारूप",
+                "channel_code": "चैनल कोड",
+                "export_button": "डेटा प्राप्त करें",
+                "exporting": "चैनल {{channel}} को {{format}} प्रारूप में निर्यात किया जा रहा है।",
+                "success": "चैनल {{channel}} को {{format}} प्रारूप में निर्यात किया गया।",
+                "error": "चैनल {{channel}} को {{format}} प्रारूप में निर्यात करने में विफल: {{error}}"
+            },
+            "search_records": {
+                "title": "समय के अनुसार खोज",
+                "start_time": "प्रारंभ समय",
+                "end_time": "समाप्ति समय",
+                "invalid_time": "प्रारंभ समय समाप्ति समय से पहले होना चाहिए।",
+                "search_button": "रिकॉर्ड खोजें",
+                "searching": "डेटाबेस में भूकंपीय रिकॉर्ड खोजे जा रहे हैं।",
+                "success": "डेटाबेस में {{count}} भूकंपीय रिकॉर्ड मिले।",
+                "no_data": "डेटाबेस में कोई भूकंपीय रिकॉर्ड नहीं मिला।",
+                "error": "रिकॉर्ड खोजने में विफल: {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "लेआउट लॉक करें",
+                "unlock_button": "लेआउट अनलॉक करें"
+            },
+            "reset_layout": {
+                "reset_button": "सभी रीसेट करें",
+                "confirm_message": "क्या आप लेआउट रीसेट करना चाहते हैं?",
+                "confirm_title": "रीसेट की पुष्टि",
+                "confirm_button": "रीसेट करें",
+                "cancel_button": "रद्द करें"
+            },
+            "display_mode": {
+                "waveform_mode": "तरंगरूप मोड",
+                "spectrogram_mode": "स्पेक्ट्रोग्राम मोड"
+            },
+            "share_link": {
+                "share_button": "लिंक साझा करें",
+                "link_copied": "साझा लिंक क्लिपबोर्ड पर कॉपी किया गया।"
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "स्टेशन की जानकारी",
+                "name": "नाम",
+                "country": "देश",
+                "place": "स्थान",
+                "affiliation": "संबद्ध संस्था",
+                "channels": "चैनल"
+            },
+            "device_info": {
+                "yes": "हाँ",
+                "no": "नहीं",
+                "title": "उपकरण की जानकारी",
+                "product_model": "उत्पाद मॉडल",
+                "device_id": "उपकरण ID",
+                "link_protocol": "कनेक्शन प्रोटोकॉल",
+                "packet_interval": "पैकेट अंतराल",
+                "gnss_active": "GNSS सक्रिय"
+            },
+            "device_status": {
+                "title": "उपकरण की स्थिति",
+                "sample_rate": "नमूना दर",
+                "latitude": "अक्षांश",
+                "longitude": "देशांतर",
+                "elevation": "ऊँचाई",
+                "temperature": "उपकरण का तापमान"
+            },
+            "link_status": {
+                "title": "कनेक्शन की स्थिति",
+                "started_at": "शुरू होने का समय",
+                "last_frame": "अंतिम फ़्रेम",
+                "frames": "फ़्रेम",
+                "errors": "त्रुटियाँ",
+                "messages": "संदेश"
+            },
+            "connectivity": {
+                "loading": "स्टेशन से कनेक्ट किया जा रहा है...",
+                "success": "स्टेशन से कनेक्ट हो गया। सर्वर {{uptime}} सेकंड से चल रहा है, अद्यतन समय {{updatedAt}}।",
+                "error": "स्टेशन से कनेक्ट करते समय त्रुटि हुई। कृपया अपना कनेक्शन जाँचें।"
+            },
+            "station_location": {
+                "title": "स्टेशन का स्थान"
+            },
+            "upgrade": {
+                "check_failed": "अपडेट की जाँच नहीं हो सकी।",
+                "update_available": "नया संस्करण {{latest}} उपलब्ध है। आप स्वचालित अपडेट सक्षम कर सकते हैं या इसे स्वयं डाउनलोड करके इंस्टॉल कर सकते हैं।",
+                "restart_needed": "नवीनतम संस्करण {{latest}} इंस्टॉल हो गया है, लेकिन {{current}} अभी चल रहा है। अपडेट लागू करने के लिए सुविधाजनक समय पर सॉफ़्टवेयर फिर से शुरू करें।",
+                "manual_upgrade_needed": "नया संस्करण {{latest}} उपलब्ध है, लेकिन वर्तमान संस्करण {{current}} न्यूनतम संगत संस्करण {{required}} से पुराना है। मैन्युअल अपग्रेड आवश्यक है।"
+            },
+            "service_status": {
+                "title": "सेवा की स्थिति"
+            },
+            "cpu_usage": {
+                "title": "CPU उपयोग"
+            },
+            "memory_usage": {
+                "title": "मेमोरी उपयोग"
+            },
+            "disk_usage": {
+                "title": "डिस्क उपयोग"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "पृष्ठ नहीं मिला।",
+            "check_your_url": "कृपया URL जाँचें और फिर प्रयास करें।",
+            "go_back_button": "वापस जाएँ"
+        },
+        "RealTime": {
+            "display_mode": {
+                "waveform_mode": "तरंगरूप मोड",
+                "spectrogram_mode": "स्पेक्ट्रोग्राम मोड"
+            },
+            "reset_layout": {
+                "reset_button": "सभी रीसेट करें",
+                "confirm_message": "क्या आप लेआउट रीसेट करना चाहते हैं?",
+                "confirm_title": "रीसेट की पुष्टि",
+                "confirm_button": "रीसेट करें",
+                "cancel_button": "रद्द करें"
+            },
+            "layout_locker": {
+                "lock_button": "लेआउट लॉक करें",
+                "unlock_button": "लेआउट अनलॉक करें"
+            },
+            "record_data": {
+                "start_button": "रिकॉर्डिंग शुरू करें",
+                "stop_button": "रिकॉर्डिंग रोकें",
+                "start_recording": "रिकॉर्डिंग {{startedAt}} पर शुरू हुई।",
+                "link_created": "रिकॉर्डिंग {{endedAt}} पर रोकी गई ({{duration}} सेकंड)। लिंक बनाया गया।",
+                "no_data_recorded": "इस अवधि में कोई डेटा रिकॉर्ड नहीं हुआ।"
+            },
+            "connectivity": {
+                "connecting": "कनेक्शन नहीं है, कनेक्ट किया जा रहा है...",
+                "connected": "कनेक्ट हो गया, अंतिम अद्यतन {{updatedAt}} पर।"
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} नमूने/सेकंड",
+                "channels": "{{num}} चैनल",
+                "retention": "{{retention}} सेकंड"
+            }
+        },
+        "Settings": {
+            "FDSN": {
+                "title": "FDSN एक्सेस कुंजियाँ",
+                "key": "कुंजी का उपसर्ग",
+                "remark": "टिप्पणी",
+                "remark_placeholder": "टिप्पणी दर्ज करें (वैकल्पिक)",
+                "created_at": "बनाने का समय",
+                "expires_at": "समाप्ति का समय",
+                "expiration_placeholder": "समय चुनें",
+                "status": "स्थिति",
+                "active": "सक्रिय",
+                "expired": "समाप्त",
+                "revoked": "निरस्त",
+                "revoked_at": "निरस्त करने का समय",
+                "hide_revoked": "निरस्त कुंजियाँ छिपाएँ",
+                "last_requested_at": "अंतिम दर्ज अनुरोध",
+                "user_ip": "अंतिम IP",
+                "actions": "कार्रवाइयाँ",
+                "never": "कभी नहीं",
+                "no_expiration": "कोई समाप्ति नहीं",
+                "refresh": "रीफ़्रेश करें",
+                "create": "एक्सेस कुंजी बनाएँ",
+                "created": "एक्सेस कुंजी बनाई गई!",
+                "create_failed": "एक्सेस कुंजी नहीं बनाई जा सकी।",
+                "refresh_after_create_failed": "एक्सेस कुंजी बनाई गई, लेकिन सूची रीफ़्रेश नहीं हो सकी: {{error}}",
+                "expiration_help": "अपने ब्राउज़र के समय क्षेत्र के अनुसार भविष्य का समय चुनें।",
+                "invalid_expiration": "समाप्ति का समय भविष्य में होना चाहिए।",
+                "disabled": "एक्सेस कुंजियाँ बनाने से पहले स्टेशन सेटिंग्स में FDSN वेब सेवा सक्षम करें।",
+                "usage": "क्वेरी अनुरोधों के साथ Authorization: Bearer <access key> भेजें।",
+                "secret_help": "इस एक्सेस कुंजी को अभी सहेजें। यह केवल एक बार दिखाई जाएगी।",
+                "revoke": "निरस्त करें",
+                "revoke_selected": "चयनित कुंजियाँ निरस्त करें",
+                "revoke_selected_confirm": "चयनित एक्सेस कुंजियाँ ({{count}}) निरस्त करें? उनका उपयोग करने वाले अनुरोध तुरंत अस्वीकार कर दिए जाएँगे।",
+                "revoke_selected_success": "निरस्त एक्सेस कुंजियाँ: {{count}}।",
+                "revoke_failed": "एक्सेस कुंजियाँ निरस्त नहीं की जा सकीं।",
+                "cancel": "रद्द करें",
+                "revoking": "एक्सेस कुंजी निरस्त की जा रही है...",
+                "revoke_confirm": "यह एक्सेस कुंजी निरस्त करें? इसका उपयोग करने वाले अगले FDSN अनुरोध तुरंत अस्वीकार कर दिए जाएँगे।",
+                "revoke_success": "एक्सेस कुंजी निरस्त की गई।"
+            },
+            "Logs": {
+                "title": "एप्लिकेशन लॉग"
+            },
+            "Dangerous": {
+                "executable_backups": {
+                    "title": "पुरानी निष्पादन योग्य फ़ाइलों के बैकअप",
+                    "description": "इस एप्लिकेशन के अपग्रेड के दौरान बनाए गए बैकअप। स्थायी रूप से हटाने के लिए फ़ाइलें चुनें।",
+                    "submit_button": "बैकअप साफ़ करें",
+                    "refresh_button": "रीफ़्रेश करें",
+                    "delete_button": "चयनित हटाएँ ({{count}})",
+                    "select_all": "सभी चुनें",
+                    "loading": "बैकअप खोजे जा रहे हैं...",
+                    "empty": "पुरानी निष्पादन योग्य फ़ाइलों के बैकअप नहीं मिले।",
+                    "list_failed": "बैकअप नहीं खोजे जा सके: {{error}}",
+                    "confirm_title": "बैकअप हटाएँ",
+                    "confirm_message": "चयनित {{count}} बैकअप स्थायी रूप से हटाएँ?",
+                    "cancel_button": "रद्द करें",
+                    "removing": "बैकअप हटाए जा रहे हैं...",
+                    "result_summary": "{{removed}} बैकअप हटाए गए; {{failed}} विफल रहे।",
+                    "empty_response": "बैकअप हटाने का कोई परिणाम नहीं मिला।",
+                    "remove_failed": "बैकअप नहीं हटाए जा सके: {{error}}"
+                },
+                "title": "खतरनाक क्षेत्र",
+                "restart_application": {
+                    "title": "पूरा एप्लिकेशन पुनः प्रारंभ करें",
+                    "description": "इससे पूरा एप्लिकेशन पुनः प्रारंभ होगा। इसमें थोड़ा समय लग सकता है और सभी सक्रिय कनेक्शन अस्थायी रूप से बंद हो जाएँगे, जिससे सेवाएँ और रिकॉर्डिंग बाधित होंगी।",
+                    "submit_button": "एप्लिकेशन पुनः प्रारंभ करें",
+                    "confirm_title": "पुनः प्रारंभ करने की पुष्टि करें",
+                    "confirm_message": "क्या आप वाकई एप्लिकेशन पुनः प्रारंभ करना चाहते हैं?",
+                    "confirm_button": "पुनः प्रारंभ करें",
+                    "cancel_button": "रद्द करें",
+                    "restarting": "एप्लिकेशन पुनः प्रारंभ करने का अनुरोध भेजा जा रहा है...",
+                    "success": "पुनः प्रारंभ करने का अनुरोध भेज दिया गया है। एप्लिकेशन कुछ सेकंड में पुनः प्रारंभ होगा।",
+                    "error": "एप्लिकेशन पुनः प्रारंभ करने का अनुरोध नहीं भेजा जा सका: {{error}}"
+                },
+                "purge_waveform_records": {
+                    "title": "तरंगरूप रिकॉर्ड मिटाएँ",
+                    "description": "इससे डेटाबेस के सभी तरंगरूप रिकॉर्ड हट जाएँगे। यह कार्रवाई वापस नहीं ली जा सकती।",
+                    "submit_button": "रिकॉर्ड मिटाएँ",
+                    "confirm_title": "मिटाने की पुष्टि करें",
+                    "confirm_message": "क्या आप वाकई सभी तरंगरूप रिकॉर्ड मिटाना चाहते हैं?",
+                    "confirm_button": "मिटाएँ",
+                    "cancel_button": "रद्द करें",
+                    "purging": "तरंगरूप रिकॉर्ड मिटाए जा रहे हैं...",
+                    "success": "तरंगरूप रिकॉर्ड सफलतापूर्वक मिटाए गए।",
+                    "error": "तरंगरूप रिकॉर्ड नहीं मिटाए जा सके: {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "MiniSEED फ़ाइलें मिटाएँ",
+                    "description": "इससे सिस्टम की सभी MiniSEED फ़ाइलें हट जाएँगी। यह कार्रवाई वापस नहीं ली जा सकती।",
+                    "submit_button": "MiniSEED मिटाएँ",
+                    "confirm_title": "मिटाने की पुष्टि करें",
+                    "confirm_message": "क्या आप वाकई सभी MiniSEED फ़ाइलें मिटाना चाहते हैं?",
+                    "confirm_button": "मिटाएँ",
+                    "cancel_button": "रद्द करें",
+                    "purging": "MiniSEED फ़ाइलें मिटाई जा रही हैं...",
+                    "success": "MiniSEED फ़ाइलें सफलतापूर्वक मिटाई गईं।",
+                    "error": "MiniSEED फ़ाइलें नहीं मिटाई जा सकीं: {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "Helicorder फ़ाइलें मिटाएँ",
+                    "description": "इससे सिस्टम की सभी Helicorder फ़ाइलें हट जाएँगी। यह कार्रवाई वापस नहीं ली जा सकती।",
+                    "submit_button": "Helicorder मिटाएँ",
+                    "confirm_title": "मिटाने की पुष्टि करें",
+                    "confirm_message": "क्या आप वाकई सभी Helicorder फ़ाइलें मिटाना चाहते हैं?",
+                    "confirm_button": "मिटाएँ",
+                    "cancel_button": "रद्द करें",
+                    "purging": "Helicorder फ़ाइलें मिटाई जा रही हैं...",
+                    "success": "Helicorder फ़ाइलें सफलतापूर्वक मिटाई गईं।",
+                    "error": "Helicorder फ़ाइलें नहीं मिटाई जा सकीं: {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "स्टेशन कॉन्फ़िगरेशन रीसेट करें",
+                    "description": "इससे स्टेशन की सभी कॉन्फ़िगरेशन रीसेट हो जाएँगी। यह कार्रवाई वापस नहीं ली जा सकती और प्रभावी होने के लिए पुनः प्रारंभ करना आवश्यक है।",
+                    "submit_button": "स्टेशन रीसेट करें",
+                    "confirm_title": "रीसेट की पुष्टि",
+                    "confirm_message": "क्या आप वाकई स्टेशन की सभी कॉन्फ़िगरेशन रीसेट करना चाहते हैं?",
+                    "confirm_button": "रीसेट करें",
+                    "cancel_button": "रद्द करें",
+                    "resetting": "स्टेशन कॉन्फ़िगरेशन रीसेट की जा रही है...",
+                    "success": "स्टेशन कॉन्फ़िगरेशन सफलतापूर्वक रीसेट की गई।",
+                    "error": "स्टेशन कॉन्फ़िगरेशन रीसेट नहीं की जा सकी: {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "सेवा कॉन्फ़िगरेशन रीसेट करें",
+                    "description": "इससे सेवा की सभी कॉन्फ़िगरेशन रीसेट हो जाएँगी। यह कार्रवाई वापस नहीं ली जा सकती और प्रभावी होने के लिए पुनः प्रारंभ करना आवश्यक है।",
+                    "submit_button": "सेवा रीसेट करें",
+                    "confirm_title": "रीसेट की पुष्टि",
+                    "confirm_message": "क्या आप वाकई सेवा की सभी कॉन्फ़िगरेशन रीसेट करना चाहते हैं?",
+                    "confirm_button": "रीसेट करें",
+                    "cancel_button": "रद्द करें",
+                    "resetting": "सेवा कॉन्फ़िगरेशन रीसेट की जा रही है...",
+                    "success": "सेवा कॉन्फ़िगरेशन सफलतापूर्वक रीसेट की गई।",
+                    "error": "सेवा कॉन्फ़िगरेशन रीसेट नहीं की जा सकी: {{error}}"
+                },
+                "purge_data": {
+                    "mode_running": "चल रहा है",
+                    "invalid_range": "कृपया मान्य प्रारंभ और समाप्ति तिथियाँ चुनें।",
+                    "started": "मिटाने का कार्य शुरू हुआ।",
+                    "request_failed": "मिटाने का कार्य शुरू नहीं हो सका: {{error}}",
+                    "running_hint": "वर्तमान कार्रवाई पूरी होने तक मिटाने की दूसरी कार्रवाई शुरू नहीं की जा सकती।",
+                    "status_query_failed": "मिटाने की स्थिति प्राप्त नहीं हो सकी: {{error}}",
+                    "status_idle": "अभी मिटाने का कोई कार्य नहीं चल रहा है।",
+                    "status_running": "मिटाया जा रहा है: {{kind}}।",
+                    "status_success": "मिटाना पूरा हुआ: {{kind}}।",
+                    "status_failed": "मिटाना विफल: {{kind}}: {{error}}",
+                    "verification_label": "सत्यापन पाठ",
+                    "verification_help": "चलाने का बटन सक्षम करने के लिए कृपया \"{{verificationText}}\" दर्ज करें।",
+                    "kind_seis_records_full": "तरंगरूप रिकॉर्ड",
+                    "kind_seis_records_by_date": "निर्दिष्ट तिथि सीमा के तरंगरूप रिकॉर्ड",
+                    "kind_miniseed_full": "MiniSEED फ़ाइलें",
+                    "kind_miniseed_by_date": "निर्दिष्ट तिथि सीमा की MiniSEED फ़ाइलें",
+                    "kind_helicorder_full": "Helicorder फ़ाइलें",
+                    "kind_helicorder_by_date": "निर्दिष्ट तिथि सीमा की Helicorder फ़ाइलें",
+                    "kind_unknown": "मिटाने का कार्य",
+                    "start_date": "प्रारंभ तिथि",
+                    "end_date": "समाप्ति तिथि",
+                    "mode_label": "मिटाने का मोड",
+                    "mode_all": "सभी",
+                    "mode_range": "तिथि सीमा"
+                }
+            },
+            "Metadata": {
+                "title": "स्टेशन मेटाडेटा"
+            },
+            "Preference": {
+                "title": "वेब प्राथमिकताएँ",
+                "reset_layout_preference": {
+                    "title": "लेआउट प्राथमिकताएँ रीसेट करें",
+                    "description": "इससे सभी लेआउट प्राथमिकताएँ रीसेट हो जाएँगी। यह कार्रवाई वापस नहीं ली जा सकती।",
+                    "submit_button": "प्राथमिकताएँ रीसेट करें",
+                    "confirm_title": "रीसेट की पुष्टि",
+                    "confirm_message": "क्या आप वाकई सभी लेआउट प्राथमिकताएँ रीसेट करना चाहते हैं?",
+                    "confirm_button": "रीसेट करें",
+                    "cancel_button": "रद्द करें",
+                    "success": "लेआउट प्राथमिकताएँ सफलतापूर्वक रीसेट की गईं।"
+                }
+            },
+            "Service": {
+                "title": "सेवा नियंत्रण",
+                "restart_service": {
+                    "submit_button": "पुनः प्रारंभ करें",
+                    "confirm_title": "पुनः प्रारंभ करने की पुष्टि करें",
+                    "confirm_message": "क्या आप वाकई सेवा पुनः प्रारंभ करना चाहते हैं?",
+                    "confirm_button": "पुनः प्रारंभ करें",
+                    "cancel_button": "रद्द करें",
+                    "restarting": "सेवा पुनः प्रारंभ की जा रही है...",
+                    "success": "सेवा सफलतापूर्वक पुनः प्रारंभ की गई।",
+                    "error": "सेवा पुनः प्रारंभ नहीं की जा सकी: {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "शुरू करें",
+                    "confirm_title": "शुरू करने की पुष्टि करें",
+                    "confirm_message": "क्या आप वाकई सेवा शुरू करना चाहते हैं?",
+                    "confirm_button": "शुरू करें",
+                    "cancel_button": "रद्द करें",
+                    "starting": "सेवा शुरू की जा रही है...",
+                    "success": "सेवा सफलतापूर्वक शुरू की गई।",
+                    "error": "सेवा शुरू नहीं की जा सकी: {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "रोकें",
+                    "confirm_title": "रोकने की पुष्टि करें",
+                    "confirm_message": "क्या आप वाकई सेवा रोकना चाहते हैं?",
+                    "confirm_button": "रोकें",
+                    "cancel_button": "रद्द करें",
+                    "stopping": "सेवा रोकी जा रही है...",
+                    "success": "सेवा सफलतापूर्वक रोकी गई।",
+                    "error": "सेवा नहीं रोकी जा सकी: {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "रीसेट करें",
+                    "confirm_title": "रीसेट की पुष्टि",
+                    "confirm_message": "क्या आप वाकई सेवा रीसेट करना चाहते हैं?",
+                    "confirm_button": "रीसेट करें",
+                    "cancel_button": "रद्द करें",
+                    "resetting": "सेवा रीसेट की जा रही है...",
+                    "success": "सेवा सफलतापूर्वक रीसेट की गई।",
+                    "error": "सेवा रीसेट नहीं की जा सकी: {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "संपादित करें",
+                    "updating": "नए बदलाव लागू किए जा रहे हैं...",
+                    "success": "बदलाव लागू कर दिए गए हैं।",
+                    "error": "सेवा कॉन्फ़िगरेशन अपडेट नहीं की जा सकी: {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "सेवा संपादित की जा रही है: {{name}}"
+                },
+                "service_status": {
+                    "yes": "हाँ",
+                    "no": "नहीं",
+                    "is_running": "चल रहा है",
+                    "restarts": "पुनः प्रारंभ की संख्या",
+                    "stopped_at": "रोकने का समय",
+                    "started_at": "शुरू होने का समय",
+                    "updated_at": "अपडेट का समय"
+                }
+            },
+            "Station": {
+                "title": "स्टेशन सेटिंग्स",
+                "update_station": {
+                    "field_required": "यह फ़ील्ड आवश्यक है।",
+                    "updating": "स्टेशन कॉन्फ़िगरेशन अपडेट की जा रही है...",
+                    "success": "स्टेशन कॉन्फ़िगरेशन सफलतापूर्वक अपडेट की गई।",
+                    "error": "स्टेशन कॉन्फ़िगरेशन अपडेट नहीं की जा सकी: {{error}}"
+                }
+            },
+            "Users": {
+                "title": "उपयोगकर्ता प्रबंधन",
+                "search_users": {
+                    "placeholder": "उपयोगकर्ता खोजें"
+                },
+                "refresh_list": {
+                    "submit_button": "रीफ़्रेश करें",
+                    "refreshing": "उपयोगकर्ता सूची रीफ़्रेश की जा रही है...",
+                    "success": "उपयोगकर्ता सूची सफलतापूर्वक रीफ़्रेश की गई।",
+                    "error": "उपयोगकर्ता सूची रीफ़्रेश नहीं की जा सकी: {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "उपयोगकर्ता हटाएँ",
+                    "confirm_title": "हटाने की पुष्टि करें",
+                    "confirm_message": "क्या आप वाकई चयनित उपयोगकर्ता हटाना चाहते हैं?",
+                    "confirm_button": "हटाएँ",
+                    "cancel_button": "रद्द करें",
+                    "removing": "चयनित उपयोगकर्ता हटाए जा रहे हैं...",
+                    "success": "{{num}} उपयोगकर्ता हटा दिए गए हैं।",
+                    "error": "चयनित उपयोगकर्ता नहीं हटाए जा सके: {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "उपयोगकर्ता बनाएँ",
+                    "creating": "नया उपयोगकर्ता बनाया जा रहा है...",
+                    "success": "उपयोगकर्ता {{username}} बनाया गया है।",
+                    "error": "नया उपयोगकर्ता नहीं बनाया जा सका: {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "नया उपयोगकर्ता बनाएँ",
+                    "username": {
+                        "label": "उपयोगकर्ता नाम",
+                        "placeholder": "नए उपयोगकर्ता का नाम"
+                    },
+                    "password": {
+                        "label": "पासवर्ड",
+                        "placeholder": "नए उपयोगकर्ता का पासवर्ड"
+                    },
+                    "admin": {
+                        "label": "व्यवस्थापक अधिकार वाला उपयोगकर्ता"
+                    },
+                    "create_button": "बनाएँ"
+                },
+                "edit_user": {
+                    "submit_button": "संपादित करें",
+                    "updating": "उपयोगकर्ता अपडेट किया जा रहा है...",
+                    "success": "उपयोगकर्ता {{username}} अपडेट किया गया है।",
+                    "error": "उपयोगकर्ता अपडेट नहीं किया जा सका: {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "उपयोगकर्ता संपादित करें",
+                    "username": {
+                        "label": "उपयोगकर्ता नाम",
+                        "placeholder": "बदलाव न करने के लिए खाली छोड़ें।"
+                    },
+                    "password": {
+                        "label": "पासवर्ड",
+                        "placeholder": "बदलाव न करने के लिए खाली छोड़ें।"
+                    },
+                    "admin": {
+                        "label": "व्यवस्थापक अधिकार वाला उपयोगकर्ता"
+                    },
+                    "update_button": "अपडेट करें"
+                },
+                "remove_user": {
+                    "submit_button": "हटाएँ",
+                    "confirm_title": "हटाने की पुष्टि करें",
+                    "confirm_message": "क्या आप वाकई उपयोगकर्ता {{username}} को हटाना चाहते हैं?",
+                    "confirm_button": "हटाएँ",
+                    "cancel_button": "रद्द करें",
+                    "removing": "उपयोगकर्ता हटाया जा रहा है...",
+                    "success": "उपयोगकर्ता {{username}} हटा दिया गया है।",
+                    "error": "उपयोगकर्ता नहीं हटाया जा सका: {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "हाँ",
+                    "no": "नहीं",
+                    "never": "कभी नहीं",
+                    "id": "ID",
+                    "user_id": "उपयोगकर्ता ID",
+                    "username": "उपयोगकर्ता नाम",
+                    "admin": "व्यवस्थापक",
+                    "created_at": "बनाने का समय",
+                    "last_login": "अंतिम लॉगिन",
+                    "user_ip": "उपयोगकर्ता IP",
+                    "user_agent": "उपयोगकर्ता एजेंट",
+                    "updated_at": "अपडेट का समय",
+                    "actions": "कार्रवाइयाँ"
+                }
+            },
+            "Backup": {
+                "title": "बैकअप प्रबंधन",
+                "select_mode": {
+                    "backup": "बैकअप बनाएँ",
+                    "restore": "बैकअप बहाल करें"
+                },
+                "backup_config": {
+                    "title": "बैकअप बनाएँ",
+                    "description": "इससे आपका कॉन्फ़िगरेशन डेटा JSON फ़ाइल के रूप में निर्यात होगा। आप इस फ़ाइल को सहेजकर बाद में अपना सेटअप बहाल करने के लिए उपयोग कर सकते हैं, जैसे किसी नए सिस्टम पर स्थानांतरण के समय।",
+                    "submit_button": "बैकअप जनरेट करें",
+                    "generating": "बैकअप डेटा जनरेट किया जा रहा है...",
+                    "success": "बैकअप डेटा सफलतापूर्वक जनरेट किया गया है।",
+                    "error": "बैकअप डेटा जनरेट नहीं किया जा सका: {{error}}"
+                },
+                "restore_config": {
+                    "title": "बैकअप फ़ाइल चुनें",
+                    "description": "अपना कॉन्फ़िगरेशन बहाल करने के लिए JSON बैकअप फ़ाइल चुनें। AnyShake Observer चयनित फ़ाइल के डेटा से आपकी वर्तमान सेटिंग्स को अधिलेखित करेगा।",
+                    "submit_button": "कॉन्फ़िगरेशन बहाल करें",
+                    "no_file_selected": "कोई फ़ाइल नहीं चुनी गई।",
+                    "confirm_title": "बहाली की पुष्टि करें",
+                    "confirm_message": "क्या आप वाकई कॉन्फ़िगरेशन बहाल करना चाहते हैं? यह कार्रवाई आपकी वर्तमान सेटिंग्स को अधिलेखित कर देगी।",
+                    "confirm_button": "बहाल करें",
+                    "cancel_button": "रद्द करें",
+                    "restoring": "कॉन्फ़िगरेशन बहाल किया जा रहा है...",
+                    "success": "कॉन्फ़िगरेशन सफलतापूर्वक बहाल किया गया है।",
+                    "error": "कॉन्फ़िगरेशन बहाल नहीं किया जा सका: {{error}}"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "नया अपडेट उपलब्ध है। क्या आप अभी अपडेट करना चाहते हैं?",
+            "confirm_title": "अपडेट उपलब्ध है",
+            "confirm_button": "अपडेट करें",
+            "cancel_button": "रद्द करें"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "क्या आप वाकई लॉगआउट करना चाहते हैं?",
+            "confirm_title": "लॉगआउट करें",
+            "confirm_button": "ठीक है",
+            "cancel_button": "रद्द करें"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "उपयोगकर्ता नाम",
+            "placeholder": "आपका उपयोगकर्ता नाम"
+        },
+        "password": {
+            "label": "पासवर्ड",
+            "placeholder": "आपका पासवर्ड"
+        },
+        "captcha": {
+            "label": "कैप्चा दर्ज करें",
+            "countdown": "({{seconds}} सेकंड)",
+            "loading": "कैप्चा लोड हो रहा है...",
+            "error": "कैप्चा लोड नहीं हो सका",
+            "placeholder": "कैप्चा कोड",
+            "refreshing": "कैप्चा रीफ़्रेश किया जा रहा है।",
+            "refresh_success": "कैप्चा सफलतापूर्वक रीफ़्रेश किया गया।",
+            "refresh_error": "कैप्चा रीफ़्रेश नहीं किया जा सका।"
+        },
+        "signin": {
+            "button": "लॉगिन करें",
+            "loading": "आपको लॉगिन कराया जा रहा है...",
+            "success": "आपने सफलतापूर्वक लॉगिन कर लिया है।",
+            "error": "लॉगिन विफल हुआ।"
+        }
+    }
+}

@@ -1,9 +1,9 @@
-import { mdiCheck, mdiThemeLightDark, mdiWeatherNight, mdiWhiteBalanceSunny } from '@mdi/js';
+import { mdiThemeLightDark, mdiWeatherNight, mdiWhiteBalanceSunny } from '@mdi/js';
 import Icon from '@mdi/react';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ThemePreference, useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/theme';
 
 const themeOptions = [
     { value: 'light', icon: mdiWhiteBalanceSunny },
@@ -42,15 +42,6 @@ export const ThemeToggle = () => {
         };
     }, []);
 
-    const selectTheme = (value: ThemePreference) => {
-        setTheme(value);
-        const details = detailsRef.current;
-        if (details) {
-            details.open = false;
-            details.querySelector('summary')?.focus();
-        }
-    };
-
     return (
         <details ref={detailsRef} className="dropdown dropdown-end">
             <summary
@@ -64,19 +55,19 @@ export const ThemeToggle = () => {
                     size={0.8}
                 />
             </summary>
-            <ul className="dropdown-content menu rounded-box app-theme-options" aria-label={label}>
+            <ul
+                className="dropdown-content menu rounded-box app-dropdown-menu app-theme-options"
+                aria-label={label}
+            >
                 {themeOptions.map(({ value, icon }) => (
                     <li key={value}>
                         <button
                             type="button"
                             aria-pressed={theme === value}
-                            onClick={() => selectTheme(value)}
+                            onClick={() => setTheme(value)}
                         >
                             <Icon className="app-icon" path={icon} size={0.7} />
                             <span className="app-grow">{t(`components.ThemeToggle.${value}`)}</span>
-                            {theme === value && (
-                                <Icon className="app-icon" path={mdiCheck} size={0.7} />
-                            )}
                         </button>
                     </li>
                 ))}

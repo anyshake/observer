@@ -1,0 +1,650 @@
+{
+    "config": {
+        "global": {
+            "name": "AnyShake Observer",
+            "footer": "지구의 속삭임에 귀 기울이세요."
+        },
+        "router": {
+            "home": "관측소 상태",
+            "realtime": "실시간 파형",
+            "history": "과거 파형",
+            "download": "데이터 다운로드",
+            "settings": "시스템 설정",
+            "default": "페이지를 찾을 수 없음"
+        }
+    },
+    "components": {
+        "ThemeToggle": {
+            "label": "테마",
+            "light": "라이트",
+            "dark": "다크",
+            "system": "시스템"
+        },
+        "ErrorPage": {
+            "something_went_wrong": "문제가 발생했습니다.",
+            "try_again_later": "페이지를 새로 고치거나 나중에 다시 시도해 주세요."
+        },
+        "TypedInput": {
+            "yes": "예",
+            "no": "아니요",
+            "add_new_item": "새 항목을 입력하세요.",
+            "editing_list": "{{fieldName}} 목록 편집",
+            "table_value": "값",
+            "table_actions": "작업"
+        },
+        "Spectrogram": {
+            "settings": {
+                "title": "스펙트로그램 설정",
+                "min_db": "최소 dB",
+                "max_db": "최대 dB"
+            }
+        },
+        "DequeSpectrogram": {
+            "settings": {
+                "title": "스펙트로그램 설정",
+                "min_db": "최소 dB",
+                "max_db": "최대 dB"
+            }
+        }
+    },
+    "views": {
+        "Download": {
+            "file_list_columns": {
+                "id": "ID",
+                "name": "파일 이름",
+                "time": "수정 시간",
+                "size": "파일 크기",
+                "actions": "작업"
+            },
+            "file_list_actions": {
+                "download": "다운로드",
+                "preview": "미리 보기"
+            },
+            "miniseed_list": {
+                "title": "일별 MiniSEED",
+                "search": "검색"
+            },
+            "helicorder_list": {
+                "title": "헬리코더 목록",
+                "search": "검색"
+            },
+            "request_file": {
+                "requesting": "{{fileName}} 파일의 다운로드 링크를 요청하는 중입니다.",
+                "success": "{{fileName}} 파일의 다운로드 링크를 가져왔습니다.",
+                "error": "{{fileName}} 파일 링크 요청에 실패했습니다: {{error}}"
+            },
+            "preview_file": {
+                "requesting": "{{fileName}} 파일의 미리 보기 링크를 요청하는 중입니다.",
+                "success": "{{fileName}} 파일의 미리 보기 링크를 가져왔습니다.",
+                "error": "{{fileName}} 파일 링크 요청에 실패했습니다: {{error}}"
+            }
+        },
+        "History": {
+            "search_events": {
+                "title": "이벤트 조회",
+                "data_agency": "데이터 제공 기관",
+                "search_button": "이벤트 검색",
+                "searching": "선택한 출처에서 이벤트를 검색하는 중입니다.",
+                "success": "선택한 출처에서 이벤트 {{count}}개를 찾았습니다.",
+                "no_data": "선택한 출처에서 이벤트를 찾지 못했습니다.",
+                "error": "이벤트 검색에 실패했습니다: {{error}}"
+            },
+            "event_list_modal": {
+                "title": "지진 이벤트 선택",
+                "earthquake_at": "{{time}} 발생 지진",
+                "p_wave_arrival": "P파 도착 {{time}} ({{seconds}}초)",
+                "s_wave_arrival": "S파 도착 {{time}} ({{seconds}}초)",
+                "epicenter_distance": "진앙 거리 {{distance}} km",
+                "earthquake_depth": "깊이 {{depth}} km",
+                "selected_an_event": "{{time}}에 {{region}}에서 발생한 지진 이벤트를 선택했습니다."
+            },
+            "data_export": {
+                "title": "데이터 내보내기",
+                "file_format": "파일 형식",
+                "channel_code": "채널 코드",
+                "export_button": "데이터 가져오기",
+                "exporting": "{{channel}} 채널을 {{format}} 형식으로 내보내는 중입니다.",
+                "success": "{{channel}} 채널을 {{format}} 형식으로 내보냈습니다.",
+                "error": "{{channel}} 채널을 {{format}} 형식으로 내보내지 못했습니다: {{error}}"
+            },
+            "search_records": {
+                "title": "시간 조회",
+                "start_time": "시작 시간",
+                "end_time": "종료 시간",
+                "invalid_time": "시작 시간은 종료 시간보다 빨라야 합니다.",
+                "search_button": "기록 검색",
+                "searching": "데이터베이스에서 지진 기록을 검색하는 중입니다.",
+                "success": "데이터베이스에서 지진 기록 {{count}}개를 찾았습니다.",
+                "no_data": "데이터베이스에서 지진 기록을 찾지 못했습니다.",
+                "error": "기록 검색에 실패했습니다: {{error}}"
+            },
+            "layout_locker": {
+                "lock_button": "레이아웃 잠금",
+                "unlock_button": "레이아웃 잠금 해제"
+            },
+            "reset_layout": {
+                "reset_button": "모두 초기화",
+                "confirm_message": "레이아웃을 초기화하시겠습니까?",
+                "confirm_title": "초기화 확인",
+                "confirm_button": "초기화",
+                "cancel_button": "취소"
+            },
+            "display_mode": {
+                "waveform_mode": "파형 모드",
+                "spectrogram_mode": "스펙트로그램 모드"
+            },
+            "share_link": {
+                "share_button": "링크 공유",
+                "link_copied": "공유 링크를 클립보드에 복사했습니다."
+            }
+        },
+        "Home": {
+            "station_info": {
+                "title": "관측소 정보",
+                "name": "이름",
+                "country": "국가",
+                "place": "위치",
+                "affiliation": "소속 기관",
+                "channels": "채널"
+            },
+            "device_info": {
+                "yes": "예",
+                "no": "아니요",
+                "title": "장치 정보",
+                "product_model": "제품 모델",
+                "device_id": "장치 ID",
+                "link_protocol": "연결 프로토콜",
+                "packet_interval": "패킷 간격",
+                "gnss_active": "GNSS 활성화"
+            },
+            "device_status": {
+                "title": "장치 상태",
+                "sample_rate": "샘플링 속도",
+                "latitude": "위도",
+                "longitude": "경도",
+                "elevation": "고도",
+                "temperature": "장치 온도"
+            },
+            "link_status": {
+                "title": "연결 상태",
+                "started_at": "시작 시간",
+                "last_frame": "마지막 프레임",
+                "frames": "프레임 수",
+                "errors": "오류",
+                "messages": "메시지"
+            },
+            "connectivity": {
+                "loading": "관측소에 연결하는 중...",
+                "success": "관측소에 연결되었습니다. 서버 가동 시간: {{uptime}}초, 업데이트 시간: {{updatedAt}}.",
+                "error": "관측소 연결 중 오류가 발생했습니다. 연결 상태를 확인해 주세요."
+            },
+            "station_location": {
+                "title": "관측소 위치"
+            },
+            "upgrade": {
+                "check_failed": "업데이트를 확인할 수 없습니다.",
+                "update_available": "새 버전 {{latest}}을(를) 사용할 수 있습니다. 자동 업데이트를 활성화하거나 직접 다운로드하여 설치할 수 있습니다.",
+                "restart_needed": "최신 버전 {{latest}}이(가) 설치되었지만 {{current}} 버전이 아직 실행 중입니다. 업데이트를 적용하려면 적절한 시점에 프로그램을 다시 시작해 주세요.",
+                "manual_upgrade_needed": "새 버전 {{latest}}을(를) 사용할 수 있지만 현재 버전 {{current}}이(가) 최소 호환 버전 {{required}}보다 낮습니다. 수동으로 업그레이드해야 합니다."
+            },
+            "service_status": {
+                "title": "서비스 상태"
+            },
+            "cpu_usage": {
+                "title": "CPU 사용량"
+            },
+            "memory_usage": {
+                "title": "메모리 사용량"
+            },
+            "disk_usage": {
+                "title": "디스크 사용량"
+            }
+        },
+        "NotFound": {
+            "page_not_found": "페이지를 찾을 수 없습니다.",
+            "check_your_url": "URL을 확인하고 다시 시도해 주세요.",
+            "go_back_button": "돌아가기"
+        },
+        "RealTime": {
+            "display_mode": {
+                "waveform_mode": "파형 모드",
+                "spectrogram_mode": "스펙트로그램 모드"
+            },
+            "reset_layout": {
+                "reset_button": "모두 초기화",
+                "confirm_message": "레이아웃을 초기화하시겠습니까?",
+                "confirm_title": "초기화 확인",
+                "confirm_button": "초기화",
+                "cancel_button": "취소"
+            },
+            "layout_locker": {
+                "lock_button": "레이아웃 잠금",
+                "unlock_button": "레이아웃 잠금 해제"
+            },
+            "record_data": {
+                "start_button": "기록 시작",
+                "stop_button": "기록 중지",
+                "start_recording": "{{startedAt}}에 기록을 시작했습니다.",
+                "link_created": "{{endedAt}}에 기록을 중지했습니다 ({{duration}}초). 링크가 생성되었습니다.",
+                "no_data_recorded": "이 기간에 기록된 데이터가 없습니다."
+            },
+            "connectivity": {
+                "connecting": "연결되지 않았습니다. 연결하는 중...",
+                "connected": "연결되었습니다. 마지막 업데이트: {{updatedAt}}."
+            },
+            "stream_status": {
+                "sample_rate": "{{value}} SPS",
+                "channels": "{{num}}개 채널",
+                "retention": "{{retention}}초"
+            }
+        },
+        "Settings": {
+            "FDSN": {
+                "title": "FDSN 액세스 키",
+                "key": "키 접두사",
+                "remark": "비고",
+                "remark_placeholder": "비고 입력 (선택 사항)",
+                "created_at": "생성 시간",
+                "expires_at": "만료 시간",
+                "expiration_placeholder": "시간 선택",
+                "status": "상태",
+                "active": "유효",
+                "expired": "만료됨",
+                "revoked": "폐기됨",
+                "revoked_at": "폐기 시간",
+                "hide_revoked": "폐기된 키 숨기기",
+                "last_requested_at": "마지막 기록 요청",
+                "user_ip": "마지막 IP",
+                "actions": "작업",
+                "never": "없음",
+                "no_expiration": "만료 없음",
+                "refresh": "새로 고침",
+                "create": "액세스 키 생성",
+                "created": "액세스 키가 생성되었습니다!",
+                "create_failed": "액세스 키 생성에 실패했습니다.",
+                "refresh_after_create_failed": "액세스 키가 생성되었지만 목록을 새로 고치지 못했습니다: {{error}}",
+                "expiration_help": "브라우저 시간대를 기준으로 미래 시간을 선택하세요.",
+                "invalid_expiration": "만료 시간은 미래여야 합니다.",
+                "disabled": "액세스 키를 생성하려면 먼저 관측소 설정에서 FDSN 웹 서비스를 활성화하세요.",
+                "usage": "조회 요청에 Authorization: Bearer <access key>를 포함하세요.",
+                "secret_help": "이 액세스 키를 지금 저장하세요. 한 번만 표시됩니다.",
+                "revoke": "폐기",
+                "revoke_selected": "선택 항목 폐기",
+                "revoke_selected_confirm": "선택한 액세스 키 {{count}}개를 폐기하시겠습니까? 해당 키를 사용하는 요청은 즉시 거부됩니다.",
+                "revoke_selected_success": "액세스 키 {{count}}개를 폐기했습니다.",
+                "revoke_failed": "액세스 키 폐기에 실패했습니다.",
+                "cancel": "취소",
+                "revoking": "액세스 키를 폐기하는 중...",
+                "revoke_confirm": "이 액세스 키를 폐기하시겠습니까? 이후 해당 키를 사용하는 FDSN 요청은 즉시 거부됩니다.",
+                "revoke_success": "액세스 키를 폐기했습니다."
+            },
+            "Logs": {
+                "title": "애플리케이션 로그"
+            },
+            "Dangerous": {
+                "executable_backups": {
+                    "title": "이전 실행 파일 백업",
+                    "description": "애플리케이션 업그레이드 시 생성된 백업입니다. 영구적으로 삭제할 파일을 선택하세요.",
+                    "submit_button": "백업 정리",
+                    "refresh_button": "새로 고침",
+                    "delete_button": "선택 항목 삭제 ({{count}})",
+                    "select_all": "모두 선택",
+                    "loading": "백업을 검색하는 중...",
+                    "empty": "이전 실행 파일 백업이 없습니다.",
+                    "list_failed": "백업 검색에 실패했습니다: {{error}}",
+                    "confirm_title": "백업 삭제",
+                    "confirm_message": "선택한 백업 {{count}}개를 영구적으로 삭제하시겠습니까?",
+                    "cancel_button": "취소",
+                    "removing": "백업을 삭제하는 중...",
+                    "result_summary": "백업 {{removed}}개를 삭제했습니다. {{failed}}개는 실패했습니다.",
+                    "empty_response": "백업 삭제 결과가 반환되지 않았습니다.",
+                    "remove_failed": "백업 삭제에 실패했습니다: {{error}}"
+                },
+                "title": "위험 구역",
+                "restart_application": {
+                    "title": "전체 애플리케이션 다시 시작",
+                    "description": "전체 애플리케이션이 다시 시작됩니다. 완료까지 잠시 걸릴 수 있으며 모든 활성 연결이 일시적으로 종료되어 서비스와 기록이 중단됩니다.",
+                    "submit_button": "애플리케이션 다시 시작",
+                    "confirm_title": "다시 시작 확인",
+                    "confirm_message": "애플리케이션을 다시 시작하시겠습니까?",
+                    "confirm_button": "다시 시작",
+                    "cancel_button": "취소",
+                    "restarting": "애플리케이션 다시 시작 요청을 보내는 중...",
+                    "success": "다시 시작 요청을 보냈습니다. 잠시 후 애플리케이션이 다시 시작됩니다.",
+                    "error": "애플리케이션 다시 시작 요청에 실패했습니다: {{error}}"
+                },
+                "purge_waveform_records": {
+                    "title": "파형 기록 삭제",
+                    "description": "데이터베이스의 모든 파형 기록이 삭제됩니다. 이 작업은 되돌릴 수 없습니다.",
+                    "submit_button": "기록 삭제",
+                    "confirm_title": "삭제 확인",
+                    "confirm_message": "모든 파형 기록을 삭제하시겠습니까?",
+                    "confirm_button": "삭제",
+                    "cancel_button": "취소",
+                    "purging": "파형 기록을 삭제하는 중...",
+                    "success": "파형 기록을 삭제했습니다.",
+                    "error": "파형 기록 삭제에 실패했습니다: {{error}}"
+                },
+                "purge_miniseed_files": {
+                    "title": "MiniSEED 파일 삭제",
+                    "description": "시스템의 모든 MiniSEED 파일이 삭제됩니다. 이 작업은 되돌릴 수 없습니다.",
+                    "submit_button": "MiniSEED 삭제",
+                    "confirm_title": "삭제 확인",
+                    "confirm_message": "모든 MiniSEED 파일을 삭제하시겠습니까?",
+                    "confirm_button": "삭제",
+                    "cancel_button": "취소",
+                    "purging": "MiniSEED 파일을 삭제하는 중...",
+                    "success": "MiniSEED 파일을 삭제했습니다.",
+                    "error": "MiniSEED 파일 삭제에 실패했습니다: {{error}}"
+                },
+                "purge_helicorder_files": {
+                    "title": "헬리코더 파일 삭제",
+                    "description": "시스템의 모든 헬리코더 파일이 삭제됩니다. 이 작업은 되돌릴 수 없습니다.",
+                    "submit_button": "헬리코더 삭제",
+                    "confirm_title": "삭제 확인",
+                    "confirm_message": "모든 헬리코더 파일을 삭제하시겠습니까?",
+                    "confirm_button": "삭제",
+                    "cancel_button": "취소",
+                    "purging": "헬리코더 파일을 삭제하는 중...",
+                    "success": "헬리코더 파일을 삭제했습니다.",
+                    "error": "헬리코더 파일 삭제에 실패했습니다: {{error}}"
+                },
+                "reset_station_config": {
+                    "title": "관측소 설정 초기화",
+                    "description": "모든 관측소 설정이 초기화됩니다. 이 작업은 되돌릴 수 없으며 적용하려면 다시 시작해야 합니다.",
+                    "submit_button": "관측소 초기화",
+                    "confirm_title": "초기화 확인",
+                    "confirm_message": "모든 관측소 설정을 초기화하시겠습니까?",
+                    "confirm_button": "초기화",
+                    "cancel_button": "취소",
+                    "resetting": "관측소 설정을 초기화하는 중...",
+                    "success": "관측소 설정을 초기화했습니다.",
+                    "error": "관측소 설정 초기화에 실패했습니다: {{error}}"
+                },
+                "reset_service_config": {
+                    "title": "서비스 설정 초기화",
+                    "description": "모든 서비스 설정이 초기화됩니다. 이 작업은 되돌릴 수 없으며 적용하려면 다시 시작해야 합니다.",
+                    "submit_button": "서비스 초기화",
+                    "confirm_title": "초기화 확인",
+                    "confirm_message": "모든 서비스 설정을 초기화하시겠습니까?",
+                    "confirm_button": "초기화",
+                    "cancel_button": "취소",
+                    "resetting": "서비스 설정을 초기화하는 중...",
+                    "success": "서비스 설정을 초기화했습니다.",
+                    "error": "서비스 설정 초기화에 실패했습니다: {{error}}"
+                },
+                "purge_data": {
+                    "mode_running": "실행 중",
+                    "invalid_range": "유효한 시작 날짜와 종료 날짜를 선택하세요.",
+                    "started": "삭제 작업을 시작했습니다.",
+                    "request_failed": "삭제 작업을 시작하지 못했습니다: {{error}}",
+                    "running_hint": "현재 삭제 작업이 완료될 때까지 다른 삭제 작업을 시작할 수 없습니다.",
+                    "status_query_failed": "삭제 상태를 가져오지 못했습니다: {{error}}",
+                    "status_idle": "현재 실행 중인 삭제 작업이 없습니다.",
+                    "status_running": "삭제 중: {{kind}}.",
+                    "status_success": "삭제 완료: {{kind}}.",
+                    "status_failed": "삭제 실패: {{kind}}: {{error}}",
+                    "verification_label": "확인 문구",
+                    "verification_help": "실행 버튼을 활성화하려면 \"{{verificationText}}\"를 입력하세요.",
+                    "kind_seis_records_full": "파형 기록",
+                    "kind_seis_records_by_date": "지정한 기간의 파형 기록",
+                    "kind_miniseed_full": "MiniSEED 파일",
+                    "kind_miniseed_by_date": "지정한 기간의 MiniSEED 파일",
+                    "kind_helicorder_full": "헬리코더 파일",
+                    "kind_helicorder_by_date": "지정한 기간의 헬리코더 파일",
+                    "kind_unknown": "삭제 작업",
+                    "start_date": "시작 날짜",
+                    "end_date": "종료 날짜",
+                    "mode_label": "삭제 방식",
+                    "mode_all": "전체",
+                    "mode_range": "날짜 범위"
+                }
+            },
+            "Metadata": {
+                "title": "관측소 메타데이터"
+            },
+            "Preference": {
+                "title": "웹 환경 설정",
+                "reset_layout_preference": {
+                    "title": "레이아웃 환경 설정 초기화",
+                    "description": "모든 레이아웃 환경 설정이 초기화됩니다. 이 작업은 되돌릴 수 없습니다.",
+                    "submit_button": "환경 설정 초기화",
+                    "confirm_title": "초기화 확인",
+                    "confirm_message": "모든 레이아웃 환경 설정을 초기화하시겠습니까?",
+                    "confirm_button": "초기화",
+                    "cancel_button": "취소",
+                    "success": "레이아웃 환경 설정을 초기화했습니다."
+                }
+            },
+            "Service": {
+                "title": "서비스 관리",
+                "restart_service": {
+                    "submit_button": "다시 시작",
+                    "confirm_title": "다시 시작 확인",
+                    "confirm_message": "서비스를 다시 시작하시겠습니까?",
+                    "confirm_button": "다시 시작",
+                    "cancel_button": "취소",
+                    "restarting": "서비스를 다시 시작하는 중...",
+                    "success": "서비스를 다시 시작했습니다.",
+                    "error": "서비스 다시 시작에 실패했습니다: {{error}}"
+                },
+                "start_service": {
+                    "submit_button": "시작",
+                    "confirm_title": "시작 확인",
+                    "confirm_message": "서비스를 시작하시겠습니까?",
+                    "confirm_button": "시작",
+                    "cancel_button": "취소",
+                    "starting": "서비스를 시작하는 중...",
+                    "success": "서비스를 시작했습니다.",
+                    "error": "서비스 시작에 실패했습니다: {{error}}"
+                },
+                "stop_service": {
+                    "submit_button": "중지",
+                    "confirm_title": "중지 확인",
+                    "confirm_message": "서비스를 중지하시겠습니까?",
+                    "confirm_button": "중지",
+                    "cancel_button": "취소",
+                    "stopping": "서비스를 중지하는 중...",
+                    "success": "서비스를 중지했습니다.",
+                    "error": "서비스 중지에 실패했습니다: {{error}}"
+                },
+                "reset_service": {
+                    "submit_button": "초기화",
+                    "confirm_title": "초기화 확인",
+                    "confirm_message": "서비스를 초기화하시겠습니까?",
+                    "confirm_button": "초기화",
+                    "cancel_button": "취소",
+                    "resetting": "서비스를 초기화하는 중...",
+                    "success": "서비스를 초기화했습니다.",
+                    "error": "서비스 초기화에 실패했습니다: {{error}}"
+                },
+                "edit_service": {
+                    "submit_button": "편집",
+                    "updating": "변경 사항을 적용하는 중...",
+                    "success": "변경 사항을 적용했습니다.",
+                    "error": "서비스 설정 업데이트에 실패했습니다: {{error}}"
+                },
+                "edit_service_modal": {
+                    "title": "서비스 편집: {{name}}"
+                },
+                "service_status": {
+                    "yes": "예",
+                    "no": "아니요",
+                    "is_running": "실행 중",
+                    "restarts": "다시 시작 횟수",
+                    "stopped_at": "중지 시간",
+                    "started_at": "시작 시간",
+                    "updated_at": "업데이트 시간"
+                }
+            },
+            "Station": {
+                "title": "관측소 설정",
+                "update_station": {
+                    "field_required": "필수 입력 항목입니다.",
+                    "updating": "관측소 설정을 업데이트하는 중...",
+                    "success": "관측소 설정을 업데이트했습니다.",
+                    "error": "관측소 설정 업데이트에 실패했습니다: {{error}}"
+                }
+            },
+            "Users": {
+                "title": "사용자 관리",
+                "search_users": {
+                    "placeholder": "사용자 검색"
+                },
+                "refresh_list": {
+                    "submit_button": "새로 고침",
+                    "refreshing": "사용자 목록을 새로 고치는 중...",
+                    "success": "사용자 목록을 새로 고쳤습니다.",
+                    "error": "사용자 목록 새로 고침에 실패했습니다: {{error}}"
+                },
+                "remove_users": {
+                    "submit_button": "사용자 삭제",
+                    "confirm_title": "삭제 확인",
+                    "confirm_message": "선택한 사용자를 삭제하시겠습니까?",
+                    "confirm_button": "삭제",
+                    "cancel_button": "취소",
+                    "removing": "선택한 사용자를 삭제하는 중...",
+                    "success": "사용자 {{num}}명을 삭제했습니다.",
+                    "error": "선택한 사용자 삭제에 실패했습니다: {{error}}"
+                },
+                "create_user": {
+                    "submit_button": "사용자 생성",
+                    "creating": "새 사용자를 생성하는 중...",
+                    "success": "사용자 {{username}}을(를) 생성했습니다.",
+                    "error": "새 사용자 생성에 실패했습니다: {{error}}"
+                },
+                "create_user_modal": {
+                    "title": "새 사용자 생성",
+                    "username": {
+                        "label": "사용자 이름",
+                        "placeholder": "새 사용자의 이름"
+                    },
+                    "password": {
+                        "label": "비밀번호",
+                        "placeholder": "새 사용자의 비밀번호"
+                    },
+                    "admin": {
+                        "label": "관리자 권한이 있는 사용자"
+                    },
+                    "create_button": "생성"
+                },
+                "edit_user": {
+                    "submit_button": "편집",
+                    "updating": "사용자를 업데이트하는 중...",
+                    "success": "사용자 {{username}}을(를) 업데이트했습니다.",
+                    "error": "사용자 업데이트에 실패했습니다: {{error}}"
+                },
+                "edit_user_modal": {
+                    "title": "사용자 편집",
+                    "username": {
+                        "label": "사용자 이름",
+                        "placeholder": "변경하지 않으려면 비워 두세요."
+                    },
+                    "password": {
+                        "label": "비밀번호",
+                        "placeholder": "변경하지 않으려면 비워 두세요."
+                    },
+                    "admin": {
+                        "label": "관리자 권한이 있는 사용자"
+                    },
+                    "update_button": "업데이트"
+                },
+                "remove_user": {
+                    "submit_button": "삭제",
+                    "confirm_title": "삭제 확인",
+                    "confirm_message": "사용자 {{username}}을(를) 삭제하시겠습니까?",
+                    "confirm_button": "삭제",
+                    "cancel_button": "취소",
+                    "removing": "사용자를 삭제하는 중...",
+                    "success": "사용자 {{username}}을(를) 삭제했습니다.",
+                    "error": "사용자 삭제에 실패했습니다: {{error}}"
+                },
+                "user_list_columns": {
+                    "yes": "예",
+                    "no": "아니요",
+                    "never": "없음",
+                    "id": "ID",
+                    "user_id": "사용자 ID",
+                    "username": "사용자 이름",
+                    "admin": "관리자",
+                    "created_at": "생성 시간",
+                    "last_login": "마지막 로그인",
+                    "user_ip": "사용자 IP",
+                    "user_agent": "사용자 에이전트",
+                    "updated_at": "업데이트 시간",
+                    "actions": "작업"
+                }
+            },
+            "Backup": {
+                "title": "백업 관리",
+                "select_mode": {
+                    "backup": "백업 생성",
+                    "restore": "백업 복원"
+                },
+                "backup_config": {
+                    "title": "백업 생성",
+                    "description": "설정 데이터를 JSON 파일로 내보냅니다. 이 파일을 저장해 두면 새 시스템으로 이전할 때 등의 상황에서 설정을 복원할 수 있습니다.",
+                    "submit_button": "백업 생성",
+                    "generating": "백업 데이터를 생성하는 중...",
+                    "success": "백업 데이터를 생성했습니다.",
+                    "error": "백업 데이터 생성에 실패했습니다: {{error}}"
+                },
+                "restore_config": {
+                    "title": "백업 파일 선택",
+                    "description": "설정을 복원할 JSON 백업 파일을 선택하세요. AnyShake Observer가 선택한 파일의 데이터로 현재 설정을 덮어씁니다.",
+                    "submit_button": "설정 복원",
+                    "no_file_selected": "선택한 파일이 없습니다.",
+                    "confirm_title": "복원 확인",
+                    "confirm_message": "설정을 복원하시겠습니까? 이 작업은 현재 설정을 덮어씁니다.",
+                    "confirm_button": "복원",
+                    "cancel_button": "취소",
+                    "restoring": "설정을 복원하는 중...",
+                    "success": "설정을 복원했습니다.",
+                    "error": "설정 복원에 실패했습니다: {{error}}"
+                }
+            }
+        }
+    },
+    "App": {
+        "app_update": {
+            "confirm_message": "새 업데이트가 있습니다. 지금 업데이트하시겠습니까?",
+            "confirm_title": "업데이트 사용 가능",
+            "confirm_button": "업데이트",
+            "cancel_button": "취소"
+        }
+    },
+    "Entry": {
+        "signout": {
+            "confirm_message": "로그아웃하시겠습니까?",
+            "confirm_title": "로그아웃",
+            "confirm_button": "확인",
+            "cancel_button": "취소"
+        }
+    },
+    "Login": {
+        "username": {
+            "label": "사용자 이름",
+            "placeholder": "사용자 이름 입력"
+        },
+        "password": {
+            "label": "비밀번호",
+            "placeholder": "비밀번호 입력"
+        },
+        "captcha": {
+            "label": "자동 입력 방지 코드 입력",
+            "countdown": "({{seconds}}초)",
+            "loading": "자동 입력 방지 코드를 불러오는 중...",
+            "error": "자동 입력 방지 코드를 불러오지 못했습니다",
+            "placeholder": "자동 입력 방지 코드",
+            "refreshing": "자동 입력 방지 코드를 새로 고치는 중입니다.",
+            "refresh_success": "자동 입력 방지 코드를 새로 고쳤습니다.",
+            "refresh_error": "자동 입력 방지 코드 새로 고침에 실패했습니다."
+        },
+        "signin": {
+            "button": "로그인",
+            "loading": "로그인하는 중...",
+            "success": "로그인했습니다.",
+            "error": "로그인에 실패했습니다."
+        }
+    }
+}
