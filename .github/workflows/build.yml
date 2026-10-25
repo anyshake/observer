@@ -22,17 +22,17 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Go toolchain
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
           cache: true
           cache-dependency-path: go.sum
 
       - name: Download web artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: web-dist
           path: web
@@ -54,7 +54,7 @@ jobs:
           node-version: "24"
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
@@ -66,7 +66,7 @@ jobs:
           tar -zcf ../web_dist.tar.gz ../dist
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: web-dist
           path: web/web_dist.tar.gz
@@ -123,7 +123,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
@@ -142,7 +142,7 @@ jobs:
 
       - name: Setup Go toolchain
         if: ${{ matrix.target_id != 'windows7_386' && matrix.target_id != 'windows7_amd64' }}
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           cache: false
           go-version: "stable"
@@ -159,7 +159,7 @@ jobs:
           $GOROOT/bin/go version
 
       - name: Download web artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: web-dist
           path: web
@@ -197,7 +197,7 @@ jobs:
           make digest | tee build/${{ matrix.target_id }}.dgst
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.target_id }}
           path: build/dist/*
@@ -211,7 +211,7 @@ jobs:
       - name: Create release note
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         id: release_note
-        uses: mikepenz/release-changelog-builder-action@v5
+        uses: mikepenz/release-changelog-builder-action@v6
         with:
           mode: "COMMIT"
           configurationJson: |
@@ -305,7 +305,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
