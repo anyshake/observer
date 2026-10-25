@@ -26,5 +26,9 @@ func New(parentCtx context.Context, debug, cors bool, resolver *graph_resolver.R
 		shutdownCancel:  shutdownCancel,
 	}
 	obj.server.BaseContext = func(net.Listener) context.Context { return shutdownCtx }
+	obj.server.ReadHeaderTimeout = readHeaderTimeout
+	obj.server.ReadTimeout = readTimeout
+	obj.server.IdleTimeout = idleTimeout
+	// SSE and WebSocket writes use per-message deadlines, not a lifetime limit.
 	return obj
 }

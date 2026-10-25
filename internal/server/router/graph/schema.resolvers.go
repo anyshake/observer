@@ -17,6 +17,7 @@ import (
 	"github.com/anyshake/observer/internal/service"
 	service_helicorder "github.com/anyshake/observer/internal/service/helicorder"
 	service_miniseed "github.com/anyshake/observer/internal/service/miniseed"
+	"github.com/anyshake/observer/internal/service/updater"
 	"github.com/anyshake/observer/internal/upgrade"
 	"github.com/anyshake/observer/pkg/seisevent"
 	"github.com/anyshake/observer/pkg/system"
@@ -394,6 +395,28 @@ func (r *mutationResolver) RestartApplication(ctx context.Context) (bool, error)
 		default:
 		}
 	})
+	return true, nil
+}
+
+// TriggerUpgrade is the resolver for the triggerUpgrade field.
+func (r *mutationResolver) TriggerUpgrade(ctx context.Context) (bool, error) {
+	if !r.checkIsAdmin(ctx) {
+		return false, errors.New("permission denied")
+	}
+
+	ctx, release, err := r.beginServiceOperation(ctx)
+	if err != nil {
+		return false, err
+	}
+	defer release()
+
+	updaterService, _ := r.ServiceMap[updater.ID].(*updater.UpdaterServiceImpl)
+	if updaterService == nil {
+		return false, errors.New("updater service is unavailable for this build")
+	}
+	if err := updaterService.RequestUpgrade(ctx); err != nil {
+		return false, err
+	}
 	return true, nil
 }
 
@@ -891,14 +914,29 @@ func (r *queryResolver) GetEventsBySource(ctx context.Context, code string) ([]*
 
 // GetSeisRecordsByTime is the resolver for the getSeisRecordsByTime field.
 func (r *queryResolver) GetSeisRecordsByTime(ctx context.Context, startTime int64, endTime int64) ([]*graph_model.SeisRecord, error) {
+	release, err := r.historyQueries.acquire(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer release()
+
+	var samples, storedBytes int
 	var respRecords []*graph_model.SeisRecord
-	err := r.ActionHandler.SeisRecordsQueryEach(ctx, time.UnixMilli(startTime), time.UnixMilli(endTime), func(record model.SeisRecord) error {
+	err = r.ActionHandler.SeisRecordsQueryEach(ctx, time.UnixMilli(startTime), time.UnixMilli(endTime), func(record model.SeisRecord) error {
+		if len(respRecords) >= maxHistoryRecords || len(record.ChannelData) > maxHistoryStoredBytes-storedBytes {
+			return errors.New("history query exceeds data limit; select a shorter time range")
+		}
+		storedBytes += len(record.ChannelData)
 		_, sampleRate, channelData, err := record.Decode()
 		if err != nil {
 			return fmt.Errorf("failed to decode seismic waveform record: %w", err)
 		}
 		respChannelData := make([]*graph_model.ChannelData, len(channelData))
 		for i, data := range channelData {
+			if len(data.Data) > maxHistorySamples-samples {
+				return errors.New("history query exceeds sample limit; select a shorter time range")
+			}
+			samples += len(data.Data)
 			respChannelData[i] = &graph_model.ChannelData{
 				ChannelCode: data.ChannelCode,
 				ChannelID:   data.ChannelId,
@@ -1100,7 +1138,7 @@ func (r *queryResolver) ExportGlobalConfig(ctx context.Context) (string, error) 
 }
 
 // GetUpgradeStatus is the resolver for the getUpgradeStatus field.
-func (r *queryResolver) GetUpgradeStatus(ctx context.Context) (*graph_model.UpgradeStatus, error) {
+func (r *queryResolver) GetUpgradeStatus(ctx context.Context, fresh bool) (*graph_model.UpgradeStatus, error) {
 	if !r.checkIsAdmin(ctx) {
 		return nil, errors.New("permission denied")
 	}
@@ -1109,7 +1147,11 @@ func (r *queryResolver) GetUpgradeStatus(ctx context.Context) (*graph_model.Upgr
 		return nil, nil
 	}
 
-	latest, required, eligible, applied, err := r.UpgradeHelper.CheckUpdate(ctx)
+	checkUpdate := r.UpgradeHelper.CheckUpdate
+	if fresh {
+		checkUpdate = r.UpgradeHelper.CheckUpdateFresh
+	}
+	latest, required, eligible, applied, err := checkUpdate(ctx)
 	if err != nil {
 		return &graph_model.UpgradeStatus{
 			Current:     r.CurrentVersion.String(),

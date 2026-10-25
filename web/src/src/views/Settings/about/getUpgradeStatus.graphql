@@ -1,0 +1,11 @@
+query getUpgradeStatus($fresh: Boolean! = false) {
+    getSoftwareVersion
+    getUpgradeStatus(fresh: $fresh) {
+        current
+        required
+        latest
+        eligible
+        applied
+        checkFailed
+    }
+}

@@ -1,3 +1,5 @@
+import { mdiRefresh } from '@mdi/js';
+import Icon from '@mdi/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -141,11 +143,21 @@ export const ExecutableBackups = () => {
                             </label>
                             <button
                                 type="button"
-                                className="btn btn-sm"
+                                className="btn btn-sm app-button-toolbar"
                                 disabled={loading || removing}
                                 onClick={() => void refetch().catch(() => undefined)}
                             >
-                                {t('views.Settings.Dangerous.executable_backups.refresh_button')}
+                                <Icon
+                                    className="app-icon"
+                                    path={mdiRefresh}
+                                    size={0.7}
+                                    aria-hidden="true"
+                                />
+                                <span>
+                                    {t(
+                                        'views.Settings.Dangerous.executable_backups.refresh_button'
+                                    )}
+                                </span>
                             </button>
                         </div>
 

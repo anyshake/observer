@@ -239,6 +239,51 @@
             }
         },
         "Settings": {
+            "About": {
+                "title": "About Software",
+                "description": "An easy-to-deploy, open-source platform for real-time seismic waveform acquisition, archiving, and sharing.",
+                "version": "Version",
+                "copyright": "Copyright",
+                "license": "License",
+                "inquiries": "Inquiries",
+                "license_note": "Distributed under AGPL-3.0-or-later. Contact us for commercial licensing options.",
+                "website": "Website",
+                "source_code": "Source code",
+                "third_party": {
+                    "title": "Third-party licenses",
+                    "description": "Expand a section below to view license terms and copyright notices for third-party libraries.",
+                    "web": "Web libraries",
+                    "backend": "Go libraries",
+                    "loading": "Loading licenses...",
+                    "load_error": "Unable to load license information.",
+                    "retry": "Retry"
+                },
+                "upgrade": {
+                    "title": "Software update",
+                    "loading": "Loading",
+                    "admin_only": "Only administrators can perform software updates.",
+                    "unsupported": "Official upgrades unavailable for this build",
+                    "current": "Current version",
+                    "latest": "Remote version",
+                    "required": "Minimum compatible version",
+                    "eligible": "Eligible for official upgrade",
+                    "applied": "Upgrade applied",
+                    "eligible_yes": "Update available",
+                    "eligible_no": "No eligible update",
+                    "applied_yes": "Upgrade applied; restart needed",
+                    "yes": "Yes",
+                    "no": "No",
+                    "check_button": "Check for updates",
+                    "checking": "Checking...",
+                    "upgrade_button": "Upgrade now",
+                    "queued": "Upgrade queued. Progress will appear in notifications.",
+                    "confirm_title": "Upgrade application",
+                    "confirm_message": "Download and apply the official update now? The application will restart after a successful upgrade.",
+                    "confirm_button": "Upgrade",
+                    "cancel_button": "Cancel",
+                    "check_failed": "Unable to check for updates."
+                }
+            },
             "FDSN": {
                 "title": "FDSN Access Keys",
                 "key": "Key prefix",

@@ -77,6 +77,7 @@
     "globals": "^15.15.0",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
+    "rollup-plugin-license": "^3.7.1",
     "tailwindcss": "^4.3.3",
     "tailwindcss-animated": "^2.0.0",
     "typescript": "~5.7.2",

@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"context"
+	"errors"
 	"net/http"
 	"time"
 
@@ -10,36 +12,29 @@ import (
 	"github.com/anyshake/observer/internal/server/response"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/gin-gonic/gin"
-	lru "github.com/hashicorp/golang-lru/v2"
 )
 
-func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, jwtMiddleware, loginCallback, refreshCallback gin.HandlerFunc) {
-	nonceCache, _ := lru.New[string, time.Time](100000)
+func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, jwtMiddleware, loginCallback, refreshCallback gin.HandlerFunc, shutdownCtx context.Context) {
 	h := auth{
 		actionHandler:     actionHandler,
-		nonceCache:        nonceCache,
+		nonceCache:        make(map[[32]byte]time.Time),
 		keyPairDataPool:   haxmap.New[string, *keyPair](),
 		authChallengePool: haxmap.New[string, *authChallenge](),
+		sources:           make(map[string]*authSource),
 	}
+	go h.runCleanup(shutdownCtx)
 	routerGroup.GET("/auth", jwtMiddleware, func(ctx *gin.Context) {
 		response.Data(ctx, http.StatusOK, "user token is still valid", nil)
 	})
 	routerGroup.POST("/auth",
 		func(c *gin.Context) {
-			for key, pair := range h.keyPairDataPool.Iterator() {
-				if !pair.isKeyPairAlive() {
-					h.keyPairDataPool.Del(key)
-				}
+			c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, maxAuthBodyBytes)
+			if c.Request.ContentLength > maxAuthBodyBytes {
+				response.Error(c, http.StatusRequestEntityTooLarge, "request body is too large")
+				return
 			}
-			for key, attempt := range h.authChallengePool.Iterator() {
-				if !attempt.isChallengeAlive() {
-					h.authChallengePool.Del(key)
-				}
-			}
-		},
-		func(c *gin.Context) {
 			var requestModel struct {
-				Action            string `form:"action" json:"action" xml:"action" binding:"required"`
+				Action            string `form:"action" json:"action" xml:"action" binding:"required,max=16"`
 				Session           string `form:"session" json:"session" xml:"session"`
 				Secret            string `form:"secret" json:"secret" xml:"secret"`                                     // AES secret encrypted with RSA public key
 				Nonce             string `form:"nonce" json:"nonce" xml:"nonce"`                                        // nonce encrypted with AES secret
@@ -50,6 +45,11 @@ func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, jwtMiddl
 				Payload           string `form:"payload" json:"payload" xml:"payload"`                                  // credential encrypted with AES secret
 			}
 			if err := c.ShouldBind(&requestModel); err != nil {
+				var sizeError *http.MaxBytesError
+				if errors.As(err, &sizeError) {
+					response.Error(c, http.StatusRequestEntityTooLarge, "request body is too large")
+					return
+				}
 				logger.GetLogger(LOG_PREFIX).Errorf("request body is not valid: %v", err)
 				response.Error(c, http.StatusBadRequest, "request body is not valid")
 				return
@@ -57,7 +57,8 @@ func Setup(routerGroup *gin.RouterGroup, actionHandler *action.Handler, jwtMiddl
 
 			switch requestModel.Action {
 			case "preauth":
-				code, msg, res, err := h.preAuth(30 * time.Second)
+				// Use the TCP peer, not untrusted X-Forwarded-For/X-Real-IP headers.
+				code, msg, res, err := h.preAuth(c.RemoteIP(), 30*time.Second)
 				if err != nil {
 					logger.GetLogger(LOG_PREFIX).Errorln(err)
 					response.Error(c, code, msg)

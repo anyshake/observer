@@ -239,6 +239,51 @@
             }
         },
         "Settings": {
+            "About": {
+                "title": "Über die Software",
+                "description": "Einfach bereitzustellende Open-Source-Plattform für die Erfassung, Archivierung und gemeinsame Nutzung seismischer Wellenformen in Echtzeit.",
+                "version": "Version",
+                "copyright": "Copyright",
+                "license": "Lizenz",
+                "inquiries": "Anfragen",
+                "license_note": "Vertrieben unter AGPL-3.0-or-later. Kontaktieren Sie uns für kommerzielle Lizenzoptionen.",
+                "website": "Webseite",
+                "source_code": "Quellcode",
+                "third_party": {
+                    "title": "Drittanbieter-Lizenzen",
+                    "description": "Klappen Sie einen Abschnitt auf, um Lizenzbedingungen und Urheberrechtshinweise der Drittanbieter-Bibliotheken anzuzeigen.",
+                    "web": "Web-Bibliotheken",
+                    "backend": "Go-Bibliotheken",
+                    "loading": "Lizenzen werden geladen...",
+                    "load_error": "Lizenzinformationen konnten nicht geladen werden.",
+                    "retry": "Erneut versuchen"
+                },
+                "upgrade": {
+                    "title": "Software-Update",
+                    "loading": "Wird geladen",
+                    "admin_only": "Nur Administratoren können Software-Updates durchführen.",
+                    "unsupported": "Offizielle Upgrades sind für diesen Build nicht verfügbar",
+                    "current": "Aktuelle Version",
+                    "latest": "Remote-Version",
+                    "required": "Mindestkompatible Version",
+                    "eligible": "Für offizielles Upgrade geeignet",
+                    "applied": "Upgrade angewendet",
+                    "eligible_yes": "Update verfügbar",
+                    "eligible_no": "Kein geeignetes Update",
+                    "applied_yes": "Upgrade angewendet; Neustart erforderlich",
+                    "yes": "Ja",
+                    "no": "Nein",
+                    "check_button": "Nach Updates suchen",
+                    "checking": "Wird geprüft...",
+                    "upgrade_button": "Jetzt aktualisieren",
+                    "queued": "Upgrade in Warteschlange. Der Fortschritt erscheint in den Benachrichtigungen.",
+                    "confirm_title": "Anwendung aktualisieren",
+                    "confirm_message": "Das offizielle Update jetzt herunterladen und anwenden? Die Anwendung wird nach einem erfolgreichen Upgrade neu gestartet.",
+                    "confirm_button": "Aktualisieren",
+                    "cancel_button": "Abbrechen",
+                    "check_failed": "Nach Updates kann nicht gesucht werden."
+                }
+            },
             "FDSN": {
                 "title": "FDSN-Zugriffsschlüssel",
                 "key": "Schlüsselpräfix",

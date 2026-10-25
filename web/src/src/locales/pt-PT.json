@@ -239,6 +239,51 @@
             }
         },
         "Settings": {
+            "About": {
+                "title": "Acerca do software",
+                "description": "Plataforma sismográfica de código aberto e fácil de implementar, com suporte à aquisição, ao arquivo e à partilha de formas de onda em tempo real.",
+                "version": "Versão",
+                "copyright": "Direitos de autor",
+                "license": "Licença",
+                "inquiries": "Consultas gerais",
+                "license_note": "Distribuído sob AGPL-3.0-or-later. Contacte-nos para opções de licenciamento comercial.",
+                "website": "Site",
+                "source_code": "Código-fonte",
+                "third_party": {
+                    "title": "Licenças de terceiros",
+                    "description": "Expanda uma secção abaixo para consultar os termos de licença e os avisos de direitos de autor das bibliotecas de terceiros.",
+                    "web": "Bibliotecas web",
+                    "backend": "Bibliotecas Go",
+                    "loading": "A carregar licenças...",
+                    "load_error": "Não foi possível carregar as informações de licença.",
+                    "retry": "Tentar novamente"
+                },
+                "upgrade": {
+                    "title": "Atualização de software",
+                    "loading": "A carregar",
+                    "admin_only": "Apenas os administradores podem efetuar atualizações de software.",
+                    "unsupported": "Atualizações oficiais indisponíveis para esta compilação",
+                    "current": "Versão atual",
+                    "latest": "Versão remota",
+                    "required": "Versão mínima compatível",
+                    "eligible": "Elegível para atualização oficial",
+                    "applied": "Atualização aplicada",
+                    "eligible_yes": "Atualização disponível",
+                    "eligible_no": "Nenhuma atualização elegível",
+                    "applied_yes": "Atualização aplicada; é necessário reiniciar",
+                    "yes": "Sim",
+                    "no": "Não",
+                    "check_button": "Procurar atualizações",
+                    "checking": "A verificar...",
+                    "upgrade_button": "Atualizar agora",
+                    "queued": "Atualização em fila. O progresso aparecerá nas notificações.",
+                    "confirm_title": "Atualizar a aplicação",
+                    "confirm_message": "Transferir e aplicar a atualização oficial agora? A aplicação será reiniciada após uma atualização bem-sucedida.",
+                    "confirm_button": "Atualizar",
+                    "cancel_button": "Cancelar",
+                    "check_failed": "Não foi possível procurar atualizações."
+                }
+            },
             "FDSN": {
                 "title": "Chaves de Acesso FDSN",
                 "key": "Prefixo da chave",

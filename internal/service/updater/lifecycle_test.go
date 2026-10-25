@@ -22,7 +22,7 @@ func TestLifecycle(t *testing.T) {
 	dir := t.TempDir()
 	exe := filepath.Join(dir, "observer")
 	helper := upgrade.NewHelper(exe, semver.New("1", "0", "0", ""), unibuild.New("test", "stable", "abc", "1"))
-	svc := New(t.Context(), handler, timesource.New(func() time.Time { return fixed }), helper, exe, make(chan struct{}, 1))
+	svc := New(t.Context(), handler, timesource.New(func() time.Time { return fixed }), helper, exe, make(chan struct{}, 1), nil)
 	if svc.GetName() != "Updater Service" || svc.GetDescription() == "" || svc.GetStatus() == nil {
 		t.Fatal("service metadata is incomplete")
 	}
@@ -95,7 +95,7 @@ func TestStartRejectsReadOnlyDirectory(t *testing.T) {
 	}
 	exe := filepath.Join(locked, "observer")
 	helper := upgrade.NewHelper(exe, semver.New("1", "0", "0", ""), unibuild.New("test", "stable", "abc", "1"))
-	svc := New(t.Context(), handler, timesource.New(nil), helper, exe, make(chan struct{}, 1))
+	svc := New(t.Context(), handler, timesource.New(nil), helper, exe, make(chan struct{}, 1), nil)
 	if err := svc.Init(t.Context()); err != nil {
 		t.Fatal(err)
 	}

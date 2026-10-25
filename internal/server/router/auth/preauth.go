@@ -3,7 +3,6 @@ package auth
 import (
 	"bytes"
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"image/color"
 	"image/png"
@@ -26,11 +25,9 @@ func (h *auth) cleanupExpiredAuthState() {
 			h.keyPairDataPool.Del(key)
 		}
 	}
-	for key, attempt := range h.authChallengePool.Iterator() {
-		if !attempt.isChallengeAlive() {
-			h.authChallengePool.Del(key)
-		}
-	}
+	h.stateMu.Lock()
+	defer h.stateMu.Unlock()
+	h.cleanupStateLocked(time.Now())
 }
 
 func (h *auth) getSharedKeyPair(ttl time.Duration) (*keyPair, error) {
@@ -52,13 +49,19 @@ func (h *auth) getSharedKeyPair(ttl time.Duration) (*keyPair, error) {
 	return kp, nil
 }
 
-func (h *auth) preAuth(ttl time.Duration) (code int, msg string, res any, err error) {
-	h.cleanupExpiredAuthState()
-
-	if h.authChallengePool.Len() >= maxPendingChallenges {
-		errText := "too many pending login challenges"
-		return http.StatusServiceUnavailable, errText, nil, errors.New(errText)
+func (h *auth) preAuth(source string, ttl time.Duration) (code int, msg string, res any, err error) {
+	if code, err := h.reserveChallenge(source); err != nil {
+		return code, err.Error(), nil, err
 	}
+	var challenge *authChallenge
+	var challengeId, captchaId string
+	defer func() {
+		if err != nil {
+			challenge = nil
+			captchaStore.Get(captchaId, true)
+		}
+		h.finishChallenge(source, challengeId, challenge)
+	}()
 
 	kp, err := h.getSharedKeyPair(sharedKeyPairTTL)
 	if err != nil {
@@ -73,7 +76,7 @@ func (h *auth) preAuth(ttl time.Duration) (code int, msg string, res any, err er
 	}
 
 	var buf bytes.Buffer
-	captchaId := captcha.New()
+	captchaId = captcha.New()
 	captchaDigits := captchaStore.Get(captchaId, false)
 	if captchaDigits == nil {
 		errText := "failed to create captcha"
@@ -87,13 +90,13 @@ func (h *auth) preAuth(ttl time.Duration) (code int, msg string, res any, err er
 		return http.StatusInternalServerError, errText, nil, fmt.Errorf("%s: %w", errText, err)
 	}
 
-	challenge, err := newAuthChallenge(ttl)
+	challenge, err = newAuthChallenge(ttl)
 	if err != nil {
 		errText := "failed to create PoW challenge for pre-auth"
 		return http.StatusInternalServerError, errText, nil, fmt.Errorf("%s: %w", errText, err)
 	}
-	challengeId := challenge.getChallengeId()
-	h.authChallengePool.Set(challengeId, challenge)
+	challengeId = challenge.getChallengeId()
+	challenge.captchaID = captchaId
 
 	return http.StatusOK, "successfully created pre-auth key", map[string]any{
 		"ttl":            ttl.Milliseconds(),

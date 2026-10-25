@@ -12,7 +12,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const AUTH_TIMEOUT = 24 * time.Hour
+const (
+	authTimeout       = 24 * time.Hour
+	readHeaderTimeout = 5 * time.Second
+	readTimeout       = 15 * time.Second
+	idleTimeout       = 60 * time.Second
+	maxConnections    = 256
+)
 
 type HttpServer struct {
 	debug bool

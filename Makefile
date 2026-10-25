@@ -8,7 +8,7 @@ REQUIRED_VERSION_PATCH = 0
 
 # Caution: software versioning mechanism depends on format of above lines in this file
 
-.PHONY: build test digest clean run gen version
+.PHONY: build licenses test digest clean run gen version
 
 GO ?= go
 
@@ -35,13 +35,18 @@ BUILD_FLAGS = -s -w \
 	-X main.buildCommit=$(COMMIT)
 BUILD_ARGS = -v -trimpath
 
-build:
+build: licenses
 	@echo "[Info] Building project, output file path: $(DIST_DIR)/$(BINARY)"
 	@mkdir -p $(DIST_DIR)
 	CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} GOARM=${GOARM} GOMIPS=${GOMIPS} \
 		$(GO) build -ldflags="$(BUILD_FLAGS)" $(BUILD_ARGS) -o $(DIST_DIR)/$(BINARY) $(SRC_DIR)
 	@cp -r $(ASSETS_DIR) $(DIST_DIR)
 	@echo "[Info] Build completed."
+
+licenses:
+	@echo "[Info] Generating third-party Go licenses..."
+	@GOOS= GOARCH= GOARM= GOMIPS= CGO_ENABLED=0 $(GO) run ./cmd/licensegen \
+		-go "$(GO)" -goos "${GOOS}" -goarch "${GOARCH}" -goarm "${GOARM}" -gomips "${GOMIPS}"
 
 test:
 	@echo "[Info] Running unit tests..."

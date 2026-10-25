@@ -239,6 +239,51 @@
             }
         },
         "Settings": {
+            "About": {
+                "title": "Over de software",
+                "description": "Eenvoudig te implementeren opensourceplatform voor seismografen, met ondersteuning voor realtime acquisitie, archivering en delen van golfvormen.",
+                "version": "Versie",
+                "copyright": "Auteursrecht",
+                "license": "Licentie",
+                "inquiries": "Vragen",
+                "license_note": "Gedistribueerd onder AGPL-3.0-or-later. Neem contact met ons op voor commerciële licentieopties.",
+                "website": "Website",
+                "source_code": "Broncode",
+                "third_party": {
+                    "title": "Licenties van derden",
+                    "description": "Klap een onderdeel hieronder open om de licentievoorwaarden en auteursrechtvermeldingen van bibliotheken van derden te bekijken.",
+                    "web": "Webbibliotheken",
+                    "backend": "Go-bibliotheken",
+                    "loading": "Licenties laden...",
+                    "load_error": "Kan licentie-informatie niet laden.",
+                    "retry": "Opnieuw proberen"
+                },
+                "upgrade": {
+                    "title": "Software-update",
+                    "loading": "Laden",
+                    "admin_only": "Alleen beheerders kunnen software-updates uitvoeren.",
+                    "unsupported": "Officiële upgrades niet beschikbaar voor deze build",
+                    "current": "Huidige versie",
+                    "latest": "Externe versie",
+                    "required": "Minimaal compatibele versie",
+                    "eligible": "In aanmerking voor officiële upgrade",
+                    "applied": "Upgrade toegepast",
+                    "eligible_yes": "Update beschikbaar",
+                    "eligible_no": "Geen geschikte update",
+                    "applied_yes": "Upgrade toegepast; herstart vereist",
+                    "yes": "Ja",
+                    "no": "Nee",
+                    "check_button": "Controleren op updates",
+                    "checking": "Controleren...",
+                    "upgrade_button": "Nu upgraden",
+                    "queued": "Upgrade in wachtrij. De voortgang verschijnt in de meldingen.",
+                    "confirm_title": "Applicatie upgraden",
+                    "confirm_message": "De officiële update nu downloaden en toepassen? De applicatie wordt na een geslaagde upgrade opnieuw gestart.",
+                    "confirm_button": "Upgraden",
+                    "cancel_button": "Annuleren",
+                    "check_failed": "Kan niet op updates controleren."
+                }
+            },
             "FDSN": {
                 "title": "FDSN-toegangssleutels",
                 "key": "Sleutelvoorvoegsel",

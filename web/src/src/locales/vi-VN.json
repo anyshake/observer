@@ -239,6 +239,51 @@
             }
         },
         "Settings": {
+            "About": {
+                "title": "Giới thiệu phần mềm",
+                "description": "Nền tảng địa chấn mã nguồn mở, dễ triển khai, hỗ trợ thu nhận, lưu trữ và chia sẻ dạng sóng theo thời gian thực.",
+                "version": "Phiên bản",
+                "copyright": "Bản quyền",
+                "license": "Giấy phép",
+                "inquiries": "Yêu cầu thông tin",
+                "license_note": "Được phân phối theo AGPL-3.0-or-later. Liên hệ với chúng tôi để biết các tùy chọn cấp phép thương mại.",
+                "website": "Trang web",
+                "source_code": "Mã nguồn",
+                "third_party": {
+                    "title": "Giấy phép bên thứ ba",
+                    "description": "Mở rộng một mục bên dưới để xem điều khoản giấy phép và thông báo bản quyền của các thư viện bên thứ ba.",
+                    "web": "Thư viện web",
+                    "backend": "Thư viện Go",
+                    "loading": "Đang tải giấy phép...",
+                    "load_error": "Không thể tải thông tin giấy phép.",
+                    "retry": "Thử lại"
+                },
+                "upgrade": {
+                    "title": "Cập nhật phần mềm",
+                    "loading": "Đang tải",
+                    "admin_only": "Chỉ quản trị viên mới có thể thực hiện cập nhật phần mềm.",
+                    "unsupported": "Không có bản nâng cấp chính thức cho bản dựng này",
+                    "current": "Phiên bản hiện tại",
+                    "latest": "Phiên bản từ xa",
+                    "required": "Phiên bản tương thích tối thiểu",
+                    "eligible": "Đủ điều kiện nâng cấp chính thức",
+                    "applied": "Đã áp dụng nâng cấp",
+                    "eligible_yes": "Có bản cập nhật",
+                    "eligible_no": "Không có bản cập nhật phù hợp",
+                    "applied_yes": "Đã áp dụng nâng cấp; cần khởi động lại",
+                    "yes": "Có",
+                    "no": "Không",
+                    "check_button": "Kiểm tra cập nhật",
+                    "checking": "Đang kiểm tra...",
+                    "upgrade_button": "Nâng cấp ngay",
+                    "queued": "Đã xếp hàng nâng cấp. Tiến trình sẽ hiển thị trong thông báo.",
+                    "confirm_title": "Nâng cấp ứng dụng",
+                    "confirm_message": "Tải xuống và áp dụng bản cập nhật chính thức ngay bây giờ? Ứng dụng sẽ khởi động lại sau khi nâng cấp thành công.",
+                    "confirm_button": "Nâng cấp",
+                    "cancel_button": "Hủy",
+                    "check_failed": "Không thể kiểm tra cập nhật."
+                }
+            },
             "FDSN": {
                 "title": "Khóa truy cập FDSN",
                 "key": "Tiền tố khóa",

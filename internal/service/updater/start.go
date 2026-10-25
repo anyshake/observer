@@ -10,6 +10,7 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/anyshake/observer/internal/notification"
 	"github.com/anyshake/observer/pkg/logger"
 )
 
@@ -41,6 +42,10 @@ func (s *UpdaterServiceImpl) checkReadWritePermission() error {
 }
 
 func (s *UpdaterServiceImpl) Start(ctx context.Context) error {
+	return s.start(ctx, false)
+}
+
+func (s *UpdaterServiceImpl) start(ctx context.Context, manualOnly bool) error {
 	if err := s.lifecycle.Lock(ctx); err != nil {
 		return err
 	}
@@ -75,6 +80,9 @@ func (s *UpdaterServiceImpl) Start(ctx context.Context) error {
 			runCancel()
 			s.status.SetStoppedAt(s.timeSource.Now())
 			s.status.SetIsRunning(false)
+			if manualOnly {
+				s.manualPending.Store(false)
+			}
 			if r := recover(); r != nil {
 				logger.GetLogger(ID).Errorf("service unexpectedly crashed, recovered from panic: %v\n%s", r, debug.Stack())
 			}
@@ -84,6 +92,14 @@ func (s *UpdaterServiceImpl) Start(ctx context.Context) error {
 			select {
 			case <-runCtx.Done():
 				return
+			case <-s.manualRequests:
+				if err := s.runManualUpgrade(runCtx); err != nil {
+					logger.GetLogger(ID).Errorf("manual upgrade failed: %v", err)
+				}
+				if manualOnly {
+					return
+				}
+				s.manualPending.Store(false)
 			case <-ticker.C:
 				latestVer, _, needUpdate, isApplied, err := s.upgradeHelper.CheckUpdate(runCtx)
 				if err != nil {
@@ -97,22 +113,13 @@ func (s *UpdaterServiceImpl) Start(ctx context.Context) error {
 
 				if needUpdate && !isApplied {
 					logger.GetLogger(ID).Infof("found new version %s, upgrading process will start now", latestVer.String())
-					release, url, err := s.upgradeHelper.FetchRelease(runCtx, latestVer, UPDATE_FETCH_TIMEOUT)
-					if err != nil {
-						if runCtx.Err() == nil {
-							logger.GetLogger(ID).Errorf("failed to fetch release package: %v", err)
-						}
-						continue
-					}
-					logger.GetLogger(ID).Infof("received %d bytes from URL: %s", len(release), url)
-					if err := s.upgradeHelper.ApplyUpgrade(latestVer, release); err != nil {
-						logger.GetLogger(ID).Errorf("failed to apply upgrade: %v", err)
+					if err := s.applyUpdate(runCtx, latestVer, s.autoRestartEnabled); err != nil {
+						logger.GetLogger(ID).Errorf("failed to upgrade: %v", err)
 						continue
 					}
 					if !s.autoRestartEnabled {
 						logger.GetLogger(ID).Infof("new release %s has been applied successfully, restart to take effect", latestVer.String())
 					}
-					needRestart = s.autoRestartEnabled
 				} else if needUpdate && isApplied {
 					if !s.autoRestartEnabled {
 						logger.GetLogger(ID).Infoln("the new version has already been applied, restart to take effect")
@@ -125,6 +132,7 @@ func (s *UpdaterServiceImpl) Start(ctx context.Context) error {
 
 				if needRestart {
 					logger.GetLogger(ID).Infoln("restarting application in 3 second...")
+					s.notify("Application will restart in 3 seconds.", notification.LevelWarning)
 					time.AfterFunc(3*time.Second, s.requestRestart)
 				}
 			}

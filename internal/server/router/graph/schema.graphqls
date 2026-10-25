@@ -194,6 +194,7 @@ type Mutation {
   restoreStationConfig: Boolean!
   importGlobalConfig(data: String!): Boolean!
   restartApplication: Boolean!
+  triggerUpgrade: Boolean!
   removeExecutableBackups(names: [String!]!): [executableBackupRemoval!]!
 
   # service management - admin only
@@ -233,7 +234,7 @@ type Query {
   isGenuineProduct: Boolean! # admin only
   getApplicationLogs: [String!] # admin only
   exportGlobalConfig: String! # admin only
-  getUpgradeStatus: upgradeStatus # admin only
+  getUpgradeStatus(fresh: Boolean! = false): upgradeStatus # admin only
   getExecutableBackups: [executableBackup!]! # admin only
   getCleanupStatus: purgeDataJob! # admin only
 }

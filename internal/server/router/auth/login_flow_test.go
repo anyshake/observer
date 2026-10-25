@@ -17,7 +17,6 @@ import (
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/testsupport"
 	"github.com/anyshake/observer/pkg/logger"
-	lru "github.com/hashicorp/golang-lru/v2"
 )
 
 func TestLoginFlow(t *testing.T) {
@@ -35,10 +34,16 @@ func TestLoginFlow(t *testing.T) {
 	if err != nil || code != http.StatusOK || userID == "" {
 		t.Fatalf("login = %d %s %v", code, userID, err)
 	}
+	if len(session.auth.nonceCache) != 1 {
+		t.Fatal("successful login nonce was not retained")
+	}
 
 	code, _, err = session.login(mustCredential(t, "alice", "WrongPass1!"), "000000", "", "")
 	if err == nil || code != http.StatusUnauthorized {
 		t.Fatalf("bad password = %d %v", code, err)
+	}
+	if len(session.auth.nonceCache) != 1 {
+		t.Fatal("failed credentials polluted replay state")
 	}
 	code, _, err = session.login([]byte(`{"username":"alice"}`), "000000", "", "")
 	if err == nil || code != http.StatusUnauthorized {
@@ -62,7 +67,7 @@ func TestLoginFlow(t *testing.T) {
 
 	secret, _, payload := session.material(mustCredential(t, "alice", "GoodPass1!"))
 	code, _, err = session.attempt(secret, base64.StdEncoding.EncodeToString([]byte("short")), payload, "000000")
-	if err == nil || code != http.StatusForbidden {
+	if err == nil || code != http.StatusBadRequest {
 		t.Fatalf("malformed nonce = %d %v", code, err)
 	}
 
@@ -112,6 +117,14 @@ func TestLoginFlow(t *testing.T) {
 	if err == nil || code != http.StatusUnauthorized {
 		t.Fatalf("expired session = %d %v", code, err)
 	}
+
+	secret, nonce, payload = session.material(mustCredential(t, "alice", "GoodPass1!"))
+	if code, _, err = session.attempt(secret, nonce, payload, "000000"); err != nil || code != http.StatusOK {
+		t.Fatalf("initial nonce use = %d %v", code, err)
+	}
+	if code, _, err = session.attempt(secret, nonce, payload, "000000"); err == nil || code != http.StatusForbidden {
+		t.Fatalf("nonce replay with a new challenge = %d %v", code, err)
+	}
 }
 
 func TestPreAuthLimits(t *testing.T) {
@@ -143,7 +156,7 @@ func TestPreAuthLimits(t *testing.T) {
 	if err != nil || second.getKeyPairId() != first.getKeyPairId() {
 		t.Fatal(err)
 	}
-	code, _, _, err := service.preAuth(time.Minute)
+	code, _, _, err := service.preAuth("127.0.0.1", time.Minute)
 	if err != nil || code != http.StatusOK {
 		t.Fatalf("preauth = %d %v", code, err)
 	}
@@ -155,7 +168,7 @@ func TestPreAuthLimits(t *testing.T) {
 		}
 		service.authChallengePool.Set(challenge.getChallengeId(), challenge)
 	}
-	code, _, _, err = service.preAuth(time.Minute)
+	code, _, _, err = service.preAuth("127.0.0.1", time.Minute)
 	if err == nil || code != http.StatusServiceUnavailable {
 		t.Fatalf("full challenge pool = %d %v", code, err)
 	}
@@ -172,15 +185,12 @@ type loginSession struct {
 
 func newAuthService(t *testing.T, handler *action.Handler) *auth {
 	t.Helper()
-	cache, err := lru.New[string, time.Time](100)
-	if err != nil {
-		t.Fatal(err)
-	}
 	return &auth{
 		actionHandler:     handler,
-		nonceCache:        cache,
+		nonceCache:        make(map[[32]byte]time.Time),
 		keyPairDataPool:   haxmap.New[string, *keyPair](),
 		authChallengePool: haxmap.New[string, *authChallenge](),
+		sources:           make(map[string]*authSource),
 	}
 }
 
@@ -240,7 +250,7 @@ func (s *loginSession) material(credential []byte) (string, string, string) {
 		panic(err)
 	}
 	return string(encrypted),
-		base64.StdEncoding.EncodeToString(sealLogin(raw, []byte("ok"), []byte(s.id))),
+		base64.StdEncoding.EncodeToString(sealLogin(raw, make([]byte, 16), []byte(s.id))),
 		base64.StdEncoding.EncodeToString(sealLogin(raw, credential, []byte(s.id)))
 }
 
@@ -280,7 +290,7 @@ func mustCredential(t *testing.T, username, password string) []byte {
 }
 
 func uniqueNonce() string {
-	buf := make([]byte, 18)
+	buf := make([]byte, encryptedNonceBytes)
 	_, _ = rand.Read(buf)
 	return base64.StdEncoding.EncodeToString(buf)
 }

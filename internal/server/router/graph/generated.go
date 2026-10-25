@@ -66,6 +66,7 @@ type ComplexityRoot struct {
 		RevokeFDSNAccessKeys       func(childComplexity int, keyIds []string) int
 		StartService               func(childComplexity int, serviceID string) int
 		StopService                func(childComplexity int, serviceID string) int
+		TriggerUpgrade             func(childComplexity int) int
 		UpdateServiceConfig        func(childComplexity int, serviceID string, key string, val interface{}) int
 		UpdateStationConfig        func(childComplexity int, key string, value interface{}) int
 		UpdateSysUser              func(childComplexity int, userID string, username string, password *string, admin bool) int
@@ -96,7 +97,7 @@ type ComplexityRoot struct {
 		GetStationMetadata         func(childComplexity int, format string) int
 		GetSysUsers                func(childComplexity int) int
 		GetSystemStatus            func(childComplexity int) int
-		GetUpgradeStatus           func(childComplexity int) int
+		GetUpgradeStatus           func(childComplexity int, fresh bool) int
 		IsGenuineProduct           func(childComplexity int) int
 	}
 
@@ -274,6 +275,7 @@ type MutationResolver interface {
 	RestoreStationConfig(ctx context.Context) (bool, error)
 	ImportGlobalConfig(ctx context.Context, data string) (bool, error)
 	RestartApplication(ctx context.Context) (bool, error)
+	TriggerUpgrade(ctx context.Context) (bool, error)
 	RemoveExecutableBackups(ctx context.Context, names []string) ([]*graph_model.ExecutableBackupRemoval, error)
 	StopService(ctx context.Context, serviceID string) (bool, error)
 	StartService(ctx context.Context, serviceID string) (bool, error)
@@ -305,7 +307,7 @@ type QueryResolver interface {
 	IsGenuineProduct(ctx context.Context) (bool, error)
 	GetApplicationLogs(ctx context.Context) ([]string, error)
 	ExportGlobalConfig(ctx context.Context) (string, error)
-	GetUpgradeStatus(ctx context.Context) (*graph_model.UpgradeStatus, error)
+	GetUpgradeStatus(ctx context.Context, fresh bool) (*graph_model.UpgradeStatus, error)
 	GetExecutableBackups(ctx context.Context) ([]*graph_model.ExecutableBackup, error)
 	GetCleanupStatus(ctx context.Context) (*graph_model.PurgeDataJob, error)
 }
@@ -502,6 +504,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.StopService(childComplexity, args["serviceId"].(string)), true
+	case "Mutation.triggerUpgrade":
+		if e.complexity.Mutation.TriggerUpgrade == nil {
+			break
+		}
+
+		return e.complexity.Mutation.TriggerUpgrade(childComplexity), true
 	case "Mutation.updateServiceConfig":
 		if e.complexity.Mutation.UpdateServiceConfig == nil {
 			break
@@ -700,7 +708,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			break
 		}
 
-		return e.complexity.Query.GetUpgradeStatus(childComplexity), true
+		args, err := ec.field_Query_getUpgradeStatus_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetUpgradeStatus(childComplexity, args["fresh"].(bool)), true
 	case "Query.isGenuineProduct":
 		if e.complexity.Query.IsGenuineProduct == nil {
 			break
@@ -1735,6 +1748,17 @@ func (ec *executionContext) field_Query_getStationMetadata_args(ctx context.Cont
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_getUpgradeStatus_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "fresh", ec.unmarshalNBoolean2bool)
+	if err != nil {
+		return nil, err
+	}
+	args["fresh"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field___Directive_args_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -2426,6 +2450,35 @@ func (ec *executionContext) _Mutation_restartApplication(ctx context.Context, fi
 }
 
 func (ec *executionContext) fieldContext_Mutation_restartApplication(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_triggerUpgrade(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_triggerUpgrade,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Mutation().TriggerUpgrade(ctx)
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_triggerUpgrade(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -3618,7 +3671,8 @@ func (ec *executionContext) _Query_getUpgradeStatus(ctx context.Context, field g
 		field,
 		ec.fieldContext_Query_getUpgradeStatus,
 		func(ctx context.Context) (any, error) {
-			return ec.resolvers.Query().GetUpgradeStatus(ctx)
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().GetUpgradeStatus(ctx, fc.Args["fresh"].(bool))
 		},
 		nil,
 		ec.marshalOupgradeStatus2ᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐUpgradeStatus,
@@ -3627,7 +3681,7 @@ func (ec *executionContext) _Query_getUpgradeStatus(ctx context.Context, field g
 	)
 }
 
-func (ec *executionContext) fieldContext_Query_getUpgradeStatus(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_getUpgradeStatus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -3650,6 +3704,17 @@ func (ec *executionContext) fieldContext_Query_getUpgradeStatus(_ context.Contex
 			}
 			return nil, fmt.Errorf("no field named %q was found under type upgradeStatus", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getUpgradeStatus_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -8362,6 +8427,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "restartApplication":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_restartApplication(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "triggerUpgrade":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_triggerUpgrade(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++

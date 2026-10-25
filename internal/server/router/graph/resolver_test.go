@@ -203,8 +203,11 @@ func TestPermissionChecks(t *testing.T) {
 		if _, err := query.ExportGlobalConfig(ctx); err == nil {
 			t.Fatal("export allowed")
 		}
-		if _, err := query.GetUpgradeStatus(ctx); err == nil {
+		if _, err := query.GetUpgradeStatus(ctx, false); err == nil {
 			t.Fatal("upgrade status allowed")
+		}
+		if _, err := mut.TriggerUpgrade(ctx); err == nil {
+			t.Fatal("upgrade trigger allowed")
 		}
 		if _, err := query.GetExecutableBackups(ctx); err == nil {
 			t.Fatal("backup listing allowed")
@@ -868,7 +871,7 @@ func TestDeviceQueries(t *testing.T) {
 	if err != nil || len(logs) != 2 || logs[0] != "alpha" || logs[1] != "beta" {
 		t.Fatalf("logs = %#v, %v", logs, err)
 	}
-	upgrade, err := query.GetUpgradeStatus(admin)
+	upgrade, err := query.GetUpgradeStatus(admin, false)
 	if err != nil || upgrade != nil {
 		t.Fatalf("upgrade = %+v, %v", upgrade, err)
 	}

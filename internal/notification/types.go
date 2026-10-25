@@ -15,6 +15,7 @@ type Event struct {
 	Message    string `json:"message"`
 	Level      Level  `json:"level"`
 	OccurredAt int64  `json:"occurred_at"`
+	AdminOnly  bool   `json:"-"`
 }
 
 type Publisher interface {

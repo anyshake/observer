@@ -148,6 +148,36 @@ func TestClientPeriodicDiscoveryIncludesUntriedResolvers(t *testing.T) {
 	})
 }
 
+func TestClientTimedOutDiscoveryTriesUnprobedResolvers(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		client := stubClient(t, 2*concurrentQueries+1, 2, func(i int, ctx context.Context, msg *dns.Msg) (*dns.Msg, error) {
+			if i == 2*concurrentQueries {
+				return exampleReply(msg), nil
+			}
+			<-ctx.Done()
+			return nil, ctx.Err()
+		})
+		for range 2 {
+			ctx, cancel := context.WithTimeout(t.Context(), time.Second)
+			_, err := client.QueryContext(ctx, exampleQuestion())
+			cancel()
+			if !errors.Is(err, context.DeadlineExceeded) {
+				t.Fatalf("blocked discovery = %v", err)
+			}
+		}
+		for _, state := range client.servers {
+			if state.backoff != 0 || !state.nextTry.IsZero() {
+				t.Fatal("caller deadline penalized a resolver")
+			}
+		}
+		ctx, cancel := context.WithTimeout(t.Context(), time.Second)
+		defer cancel()
+		if _, err := client.QueryContext(ctx, exampleQuestion()); err != nil {
+			t.Fatalf("unprobed reachable resolver was not tried: %v", err)
+		}
+	})
+}
+
 func TestClientFailureBackoffAndRecovery(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		calls := 0

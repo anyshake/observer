@@ -67,6 +67,10 @@ func (h *Helper) buildReleaseUrl(ver *semver.Version, toolchain string, digest b
 }
 
 func (h *Helper) fetchDataFromUrl(ctx context.Context, url string) ([]byte, error) {
+	return h.fetchDataFromUrlWithProgress(ctx, url, nil)
+}
+
+func (h *Helper) fetchDataFromUrlWithProgress(ctx context.Context, url string, progress func(read, total int64)) ([]byte, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
@@ -82,7 +86,27 @@ func (h *Helper) fetchDataFromUrl(ctx context.Context, url string) ([]byte, erro
 		return nil, fmt.Errorf("failed to fetch url %s: status %s", url, resp.Status)
 	}
 
-	return io.ReadAll(resp.Body)
+	if progress == nil || resp.ContentLength <= 0 {
+		return io.ReadAll(resp.Body)
+	}
+
+	var data bytes.Buffer
+	buf := make([]byte, 32*1024)
+	var read int64
+	for {
+		n, err := resp.Body.Read(buf)
+		if n > 0 {
+			_, _ = data.Write(buf[:n])
+			read += int64(n)
+			progress(read, resp.ContentLength)
+		}
+		if err == io.EOF {
+			return data.Bytes(), nil
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
 }
 
 func (h *Helper) verifyChecksum(data []byte, expect map[string]any) error {

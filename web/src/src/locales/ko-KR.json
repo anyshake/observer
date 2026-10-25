@@ -239,6 +239,51 @@
             }
         },
         "Settings": {
+            "About": {
+                "title": "소프트웨어 정보",
+                "description": "간편하게 배포할 수 있는 오픈 소스 지진계 플랫폼으로, 실시간 파형 수집, 보관 및 공유를 지원합니다.",
+                "version": "버전",
+                "copyright": "저작권",
+                "license": "라이선스",
+                "inquiries": "문의",
+                "license_note": "AGPL-3.0-or-later 라이선스로 배포됩니다. 상업용 라이선스 옵션은 문의해 주세요.",
+                "website": "웹사이트",
+                "source_code": "소스 코드",
+                "third_party": {
+                    "title": "타사 라이선스",
+                    "description": "아래 항목을 펼치면 타사 라이브러리의 라이선스 조건과 저작권 고지를 확인할 수 있습니다.",
+                    "web": "웹 라이브러리",
+                    "backend": "Go 라이브러리",
+                    "loading": "라이선스를 불러오는 중...",
+                    "load_error": "라이선스 정보를 불러올 수 없습니다.",
+                    "retry": "다시 시도"
+                },
+                "upgrade": {
+                    "title": "소프트웨어 업데이트",
+                    "loading": "불러오는 중",
+                    "admin_only": "소프트웨어 업데이트는 관리자만 수행할 수 있습니다.",
+                    "unsupported": "이 빌드에서는 공식 업그레이드를 사용할 수 없습니다",
+                    "current": "현재 버전",
+                    "latest": "원격 버전",
+                    "required": "최소 호환 버전",
+                    "eligible": "공식 업그레이드 대상",
+                    "applied": "업그레이드 적용됨",
+                    "eligible_yes": "업데이트 가능",
+                    "eligible_no": "해당하는 업데이트 없음",
+                    "applied_yes": "업그레이드 적용됨; 재시작 필요",
+                    "yes": "예",
+                    "no": "아니요",
+                    "check_button": "업데이트 확인",
+                    "checking": "확인 중...",
+                    "upgrade_button": "지금 업그레이드",
+                    "queued": "업그레이드가 대기열에 추가되었습니다. 진행 상황은 알림에 표시됩니다.",
+                    "confirm_title": "애플리케이션 업그레이드",
+                    "confirm_message": "지금 공식 업데이트를 다운로드하고 적용할까요? 업그레이드가 성공하면 애플리케이션이 다시 시작됩니다.",
+                    "confirm_button": "업그레이드",
+                    "cancel_button": "취소",
+                    "check_failed": "업데이트를 확인할 수 없습니다."
+                }
+            },
             "FDSN": {
                 "title": "FDSN 액세스 키",
                 "key": "키 접두사",

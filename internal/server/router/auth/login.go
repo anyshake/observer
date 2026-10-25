@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"time"
 
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/dchest/captcha"
@@ -31,23 +30,23 @@ func (h *auth) login(ctx context.Context, sessionId, secret, nonce, challengeId,
 	if sessionId == "" || secret == "" || nonce == "" || challengeId == "" || challengeSolution == "" || captchaId == "" || captchaVal == "" || payload == "" {
 		return fail(http.StatusBadRequest, errInvalidLoginRequest, "login rejected: missing required fields")
 	}
+	if len(sessionId) > 128 || len(secret) > 344 || len(nonce) != base64.StdEncoding.EncodedLen(encryptedNonceBytes) ||
+		len(challengeId) > 20 || len(challengeSolution) > 149 || len(captchaId) > 64 || len(captchaVal) > 6 || len(payload) > 4096 {
+		return fail(http.StatusBadRequest, errInvalidLoginRequest, "login rejected: invalid field length")
+	}
 
-	// 1. Check if the nonce is valid and not reused
+	// 1. Bound the nonce before decoding; unauthenticated data is never cached.
 	nc, err := base64.StdEncoding.DecodeString(nonce)
-	if err != nil {
+	if err != nil || len(nc) != encryptedNonceBytes {
 		return fail(http.StatusBadRequest, errInvalidLoginRequest, "login rejected: invalid nonce encoding: %v", err)
 	}
-	ncStr := string(nc)
-	if t, ok := h.nonceCache.Get(ncStr); ok && time.Since(t) <= time.Hour {
-		return fail(http.StatusForbidden, errAuthenticationFailed, "login rejected: nonce replay detected")
-	}
-	h.nonceCache.Add(ncStr, time.Now())
 
 	// 2. Verify PoW challenge solution
-	challenge, ok := h.authChallengePool.GetAndDel(challengeId)
+	challenge, ok := h.takeChallenge(challengeId)
 	if !ok {
 		return fail(http.StatusUnauthorized, errAuthenticationFailed, "login rejected: unknown challenge id")
 	}
+	defer captchaStore.Get(challenge.captchaID, true)
 	if !challenge.isChallengeAlive() {
 		return fail(http.StatusUnauthorized, errAuthenticationFailed, "login rejected: challenge expired")
 	}
@@ -77,7 +76,7 @@ func (h *auth) login(ctx context.Context, sessionId, secret, nonce, challengeId,
 		return fail(http.StatusUnauthorized, errAuthenticationFailed, "login rejected: secret decrypt failed: %v", err)
 	}
 	aesSecretBytes, err := base64.StdEncoding.DecodeString(string(aesSecretBytesB64))
-	if err != nil {
+	if err != nil || len(aesSecretBytes) != 32 {
 		return fail(http.StatusUnauthorized, errAuthenticationFailed, "login rejected: secret decode failed: %v", err)
 	}
 	encryptor := newAES256GCM(aesSecretBytes)
@@ -114,6 +113,9 @@ func (h *auth) login(ctx context.Context, sessionId, secret, nonce, challengeId,
 	userId, err = h.actionHandler.SysUserLogin(ctx, username, password, userAgent, userIp)
 	if err != nil {
 		return fail(http.StatusUnauthorized, errAuthenticationFailed, "login rejected: user auth failed for %s: %v", username, err)
+	}
+	if code, err := h.rememberNonce(nc); err != nil {
+		return fail(code, err, "login rejected: nonce replay or cache capacity exceeded")
 	}
 
 	return http.StatusOK, userId, nil

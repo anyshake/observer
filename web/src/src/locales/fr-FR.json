@@ -239,6 +239,51 @@
             }
         },
         "Settings": {
+            "About": {
+                "title": "À propos du logiciel",
+                "description": "Plateforme sismique open source facile à déployer, permettant l'acquisition, l'archivage et le partage de formes d'onde en temps réel.",
+                "version": "Version",
+                "copyright": "Droits d'auteur",
+                "license": "Licence",
+                "inquiries": "Renseignements",
+                "license_note": "Distribué sous AGPL-3.0-or-later. Contactez-nous pour les options de licence commerciale.",
+                "website": "Site web",
+                "source_code": "Code source",
+                "third_party": {
+                    "title": "Licences tierces",
+                    "description": "Développez une section ci-dessous pour consulter les conditions de licence et les mentions de droit d’auteur des bibliothèques tierces.",
+                    "web": "Bibliothèques web",
+                    "backend": "Bibliothèques Go",
+                    "loading": "Chargement des licences...",
+                    "load_error": "Impossible de charger les informations de licence.",
+                    "retry": "Réessayer"
+                },
+                "upgrade": {
+                    "title": "Mise à jour du logiciel",
+                    "loading": "Chargement",
+                    "admin_only": "Seuls les administrateurs peuvent effectuer des mises à jour logicielles.",
+                    "unsupported": "Mises à niveau officielles indisponibles pour cette version",
+                    "current": "Version actuelle",
+                    "latest": "Version distante",
+                    "required": "Version minimale compatible",
+                    "eligible": "Éligible à la mise à niveau officielle",
+                    "applied": "Mise à niveau appliquée",
+                    "eligible_yes": "Mise à jour disponible",
+                    "eligible_no": "Aucune mise à jour éligible",
+                    "applied_yes": "Mise à niveau appliquée ; redémarrage requis",
+                    "yes": "Oui",
+                    "no": "Non",
+                    "check_button": "Rechercher des mises à jour",
+                    "checking": "Vérification...",
+                    "upgrade_button": "Mettre à niveau maintenant",
+                    "queued": "Mise à niveau en file d'attente. La progression apparaîtra dans les notifications.",
+                    "confirm_title": "Mettre à niveau l'application",
+                    "confirm_message": "Télécharger et appliquer la mise à jour officielle maintenant ? L'application redémarrera après une mise à niveau réussie.",
+                    "confirm_button": "Mettre à niveau",
+                    "cancel_button": "Annuler",
+                    "check_failed": "Impossible de rechercher des mises à jour."
+                }
+            },
             "FDSN": {
                 "title": "Clés d’accès FDSN",
                 "key": "Préfixe de la clé",

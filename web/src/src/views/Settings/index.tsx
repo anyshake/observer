@@ -2,6 +2,7 @@ import {
     mdiAccount,
     mdiAlertDecagram,
     mdiBackupRestore,
+    mdiCopyright,
     mdiCube,
     mdiHeart,
     mdiHomeEdit,
@@ -20,6 +21,7 @@ import { useIsCurrentUserAdminQuery } from '../../graphql';
 
 const AppLogs = lazy(() => import('./applogs').then(({ AppLogs }) => ({ default: AppLogs })));
 const Backup = lazy(() => import('./backup').then(({ Backup }) => ({ default: Backup })));
+const About = lazy(() => import('./about').then(({ About }) => ({ default: About })));
 const Dangerous = lazy(() =>
     import('./dangerous').then(({ Dangerous }) => ({ default: Dangerous }))
 );
@@ -35,6 +37,9 @@ const Users = lazy(() => import('./users').then(({ Users }) => ({ default: Users
 const Settings = ({ currentLocale }: IRouterComponent) => {
     const { t } = useTranslation();
     const [searchParams, setSearchParams] = useSearchParams();
+    const { data: isCurrentUserAdminData, loading: isCurrentUserAdminLoading } =
+        useIsCurrentUserAdminQuery();
+    const isAdmin = isCurrentUserAdminData?.getCurrentUser.admin ?? false;
 
     const tabs = useMemo(() => {
         return {
@@ -91,9 +96,15 @@ const Settings = ({ currentLocale }: IRouterComponent) => {
                 icon: mdiAlertDecagram,
                 label: t('views.Settings.Dangerous.title'),
                 element: <Dangerous currentLocale={currentLocale} />
+            },
+            about: {
+                adminOnly: false,
+                icon: mdiCopyright,
+                label: t('views.Settings.About.title'),
+                element: <About isAdmin={isAdmin} />
             }
         };
-    }, [t, currentLocale]);
+    }, [t, currentLocale, isAdmin]);
     const [activeTab, setActiveTab] = useState(
         (() => {
             const tabFromUrl = searchParams.get('tab');
@@ -109,15 +120,6 @@ const Settings = ({ currentLocale }: IRouterComponent) => {
             setSearchParams({ tab: activeTab });
         }
     }, [activeTab, setSearchParams]);
-
-    const [isAdmin, setIsAdmin] = useState(false);
-    const { data: isCurrentUserAdminData, loading: isCurrentUserAdminLoading } =
-        useIsCurrentUserAdminQuery();
-    useEffect(() => {
-        if (isCurrentUserAdminData) {
-            setIsAdmin(isCurrentUserAdminData.getCurrentUser.admin);
-        }
-    }, [isCurrentUserAdminData]);
 
     return (
         <div className="app-page">

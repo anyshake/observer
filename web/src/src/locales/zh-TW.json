@@ -239,6 +239,51 @@
             }
         },
         "Settings": {
+            "About": {
+                "title": "關於軟體",
+                "description": "易於部署且開源的地震儀平臺，支援即時波形擷取、封存與分享。",
+                "version": "版本",
+                "copyright": "版權",
+                "license": "授權",
+                "inquiries": "聯絡洽詢",
+                "license_note": "本軟體以 AGPL-3.0-or-later 授權釋出。商業授權請與我們聯絡。",
+                "website": "官方網站",
+                "source_code": "原始碼",
+                "third_party": {
+                    "title": "第三方套件授權",
+                    "description": "展開下方分類，查看第三方套件的授權條款與版權聲明。",
+                    "web": "Web 套件",
+                    "backend": "Go 套件",
+                    "loading": "正在載入授權資訊…",
+                    "load_error": "無法載入授權資訊。",
+                    "retry": "重試"
+                },
+                "upgrade": {
+                    "title": "軟體更新",
+                    "loading": "載入中",
+                    "admin_only": "僅限管理員執行軟體更新。",
+                    "unsupported": "此版本不支援官方升級",
+                    "current": "目前版本",
+                    "latest": "遠端版本",
+                    "required": "最低相容版本",
+                    "eligible": "符合官方升級資格",
+                    "applied": "已套用升級",
+                    "eligible_yes": "有可用更新",
+                    "eligible_no": "沒有符合資格的更新",
+                    "applied_yes": "已套用升級，等待重啟",
+                    "yes": "是",
+                    "no": "否",
+                    "check_button": "檢查新版本",
+                    "checking": "檢查中...",
+                    "upgrade_button": "立即升級",
+                    "queued": "已排入升級，進度將顯示於通知。",
+                    "confirm_title": "升級應用程式",
+                    "confirm_message": "現在下載並套用官方更新？成功後應用程式將重新啟動。",
+                    "confirm_button": "確認升級",
+                    "cancel_button": "取消",
+                    "check_failed": "檢查更新失敗。"
+                }
+            },
             "FDSN": {
                 "title": "FDSN 存取金鑰",
                 "key": "金鑰前綴",

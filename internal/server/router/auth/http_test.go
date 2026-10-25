@@ -2,6 +2,7 @@ package auth
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -32,7 +33,7 @@ func TestAuthRoutes(t *testing.T) {
 		ctx.Status(http.StatusCreated)
 	}, func(ctx *gin.Context) {
 		ctx.Status(http.StatusAccepted)
-	})
+	}, t.Context())
 
 	recorder := httptest.NewRecorder()
 	router.ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, "/auth", nil))
@@ -69,12 +70,12 @@ func TestAuthRoutes(t *testing.T) {
 	if postJSON(router, "/auth", loginBody).Code != http.StatusBadRequest {
 		t.Fatal("invalid nonce encoding was accepted")
 	}
-	loginBody["nonce"] = "YQ=="
+	loginBody["nonce"] = base64.StdEncoding.EncodeToString(make([]byte, encryptedNonceBytes))
 	if postJSON(router, "/auth", loginBody).Code != http.StatusUnauthorized {
 		t.Fatal("unknown challenge was accepted")
 	}
-	if postJSON(router, "/auth", loginBody).Code != http.StatusForbidden {
-		t.Fatal("replayed nonce was accepted")
+	if postJSON(router, "/auth", loginBody).Code != http.StatusUnauthorized {
+		t.Fatal("unknown challenge polluted replay state")
 	}
 	recorder = postJSON(router, "/auth", map[string]any{"action": "refresh"})
 	if recorder.Code != http.StatusAccepted {

@@ -102,4 +102,83 @@
     .app-service-actions {
         @apply my-1 flex justify-center;
     }
+
+    .app-software-panel {
+        @apply space-y-4 p-4 text-sm leading-6;
+    }
+
+    .app-software-heading {
+        @apply flex items-center gap-4;
+    }
+
+    .app-software-logo {
+        @apply h-12 w-12 shrink-0;
+    }
+
+    .app-software-facts {
+        @apply grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2;
+    }
+
+    .app-software-facts dt {
+        @apply text-app-muted text-sm font-medium;
+    }
+
+    .app-software-facts dd {
+        @apply text-app-text text-sm;
+    }
+
+    .app-software-footer {
+        @apply border-app-border-strong flex flex-col gap-3 border-t pt-4;
+    }
+
+    .app-license-list {
+        @apply space-y-6;
+    }
+
+    .app-license-section {
+        @apply rounded-none;
+    }
+
+    .app-license-section,
+    .app-license-section.collapse > .collapse-content,
+    .app-license-section > .app-license-heading,
+    .app-license-section > .app-license-heading::after {
+        @apply transition-none;
+    }
+
+    .app-license-heading {
+        @apply bg-app-hover text-app-heading rounded-lg text-lg font-semibold;
+    }
+
+    .app-license-heading:focus-visible {
+        @apply ring-app-primary ring-2 ring-inset;
+    }
+
+    .app-license-section[open] > .collapse-content {
+        @apply pt-4;
+    }
+
+    .app-license-markdown {
+        @apply min-w-0 max-w-none;
+    }
+
+    .app-license-markdown .app-markdown {
+        @apply text-sm leading-6;
+    }
+
+    .app-license-markdown .app-markdown h2 {
+        @apply text-base font-semibold;
+    }
+
+    .app-license-markdown .app-markdown h3 {
+        @apply text-sm font-medium;
+    }
+
+    .app-license-markdown .app-markdown-pre {
+        @apply whitespace-pre-wrap wrap-anywhere;
+    }
+
+    .app-license-markdown .app-markdown-pre .app-markdown-inline-code {
+        @apply block overflow-visible bg-transparent p-0;
+    }
 }

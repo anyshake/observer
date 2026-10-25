@@ -239,6 +239,51 @@
             }
         },
         "Settings": {
+            "About": {
+                "title": "ソフトウェアについて",
+                "description": "導入が容易なオープンソースの地震計プラットフォーム。リアルタイムの波形取得・保存・共有に対応。",
+                "version": "バージョン",
+                "copyright": "著作権",
+                "license": "ライセンス",
+                "inquiries": "お問い合わせ",
+                "license_note": "AGPL-3.0-or-later の下で配布されています。商用ライセンスについてはお問い合わせください。",
+                "website": "ウェブサイト",
+                "source_code": "ソースコード",
+                "third_party": {
+                    "title": "サードパーティのライセンス",
+                    "description": "下の項目を展開すると、サードパーティライブラリのライセンス条項と著作権表示を確認できます。",
+                    "web": "Web ライブラリ",
+                    "backend": "Go ライブラリ",
+                    "loading": "ライセンスを読み込み中...",
+                    "load_error": "ライセンス情報を読み込めませんでした。",
+                    "retry": "再試行"
+                },
+                "upgrade": {
+                    "title": "ソフトウェア更新",
+                    "loading": "読み込み中",
+                    "admin_only": "ソフトウェア更新は管理者のみが実行できます。",
+                    "unsupported": "このビルドでは公式アップグレードを利用できません",
+                    "current": "現在のバージョン",
+                    "latest": "リモートバージョン",
+                    "required": "最低互換バージョン",
+                    "eligible": "公式アップグレードの対象",
+                    "applied": "アップグレード適用済み",
+                    "eligible_yes": "更新があります",
+                    "eligible_no": "対象となる更新はありません",
+                    "applied_yes": "アップグレード適用済み。再起動が必要です",
+                    "yes": "はい",
+                    "no": "いいえ",
+                    "check_button": "更新を確認",
+                    "checking": "確認中...",
+                    "upgrade_button": "今すぐアップグレード",
+                    "queued": "アップグレードをキューに追加しました。進行状況は通知に表示されます。",
+                    "confirm_title": "アプリケーションをアップグレード",
+                    "confirm_message": "公式更新を今すぐダウンロードして適用しますか？アップグレードに成功するとアプリケーションが再起動します。",
+                    "confirm_button": "アップグレード",
+                    "cancel_button": "キャンセル",
+                    "check_failed": "更新を確認できませんでした。"
+                }
+            },
             "FDSN": {
                 "title": "FDSN アクセスキー",
                 "key": "キーのプレフィックス",

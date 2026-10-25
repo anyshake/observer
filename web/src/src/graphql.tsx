@@ -42,6 +42,7 @@ export type Mutation = {
   revokeFDSNAccessKeys: Scalars['Boolean']['output'];
   startService: Scalars['Boolean']['output'];
   stopService: Scalars['Boolean']['output'];
+  triggerUpgrade: Scalars['Boolean']['output'];
   updateServiceConfig: Scalars['Boolean']['output'];
   updateStationConfig: Scalars['Boolean']['output'];
   updateSysUser: Scalars['Boolean']['output'];
@@ -183,6 +184,11 @@ export type QueryGetSeisRecordsByTimeArgs = {
 
 export type QueryGetStationMetadataArgs = {
   format: Scalars['String']['input'];
+};
+
+
+export type QueryGetUpgradeStatusArgs = {
+  fresh?: Scalars['Boolean']['input'];
 };
 
 export type _ChannelData = {
@@ -408,10 +414,17 @@ export type GetHomeDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetHomeDataQuery = { __typename?: 'Query', getCurrentTime: number, getStationConfig: any, getDeviceId: string, getCurrentUser: { __typename?: 'sysUser', admin: boolean }, getDeviceConfig: { __typename?: 'deviceConfig', packetInterval: number, sampleRate: number, channelCodes: Array<string>, gnssEnabled: boolean, model: string, protocol: string }, getDeviceInfo: { __typename?: 'deviceInfo', latitude?: number | null, longitude?: number | null, elevation?: number | null, temperature?: number | null }, getDeviceStatus: { __typename?: 'deviceStatus', startedAt: number, updatedAt: number, frames: number, errors: number, messages: number }, getServiceStatus?: Array<{ __typename?: 'serviceStatus', serviceId: string, isRunning: boolean, name: string, description: string }> | null, getSystemStatus: { __typename?: 'systemStatus', cpu: number, memory: number, disk: number, uptime: number } };
 
-export type GetUpgradeStatusQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetUpgradeStatusQueryVariables = Exact<{
+  fresh?: Scalars['Boolean']['input'];
+}>;
 
 
-export type GetUpgradeStatusQuery = { __typename?: 'Query', getUpgradeStatus?: { __typename?: 'upgradeStatus', current: string, required: string, latest: string, eligible: boolean, applied: boolean, checkFailed: boolean } | null };
+export type GetUpgradeStatusQuery = { __typename?: 'Query', getSoftwareVersion: string, getUpgradeStatus?: { __typename?: 'upgradeStatus', current: string, required: string, latest: string, eligible: boolean, applied: boolean, checkFailed: boolean } | null };
+
+export type TriggerUpgradeMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type TriggerUpgradeMutation = { __typename?: 'Mutation', triggerUpgrade: boolean };
 
 export type GetApplicationLogsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -954,8 +967,9 @@ export type GetHomeDataLazyQueryHookResult = ReturnType<typeof useGetHomeDataLaz
 export type GetHomeDataSuspenseQueryHookResult = ReturnType<typeof useGetHomeDataSuspenseQuery>;
 export type GetHomeDataQueryResult = ApolloReactCommon.QueryResult<GetHomeDataQuery, GetHomeDataQueryVariables>;
 export const GetUpgradeStatusDocument = gql`
-    query getUpgradeStatus {
-  getUpgradeStatus {
+    query getUpgradeStatus($fresh: Boolean! = false) {
+  getSoftwareVersion
+  getUpgradeStatus(fresh: $fresh) {
     current
     required
     latest
@@ -978,6 +992,7 @@ export const GetUpgradeStatusDocument = gql`
  * @example
  * const { data, loading, error } = useGetUpgradeStatusQuery({
  *   variables: {
+ *      fresh: // value for 'fresh'
  *   },
  * });
  */
@@ -997,6 +1012,36 @@ export type GetUpgradeStatusQueryHookResult = ReturnType<typeof useGetUpgradeSta
 export type GetUpgradeStatusLazyQueryHookResult = ReturnType<typeof useGetUpgradeStatusLazyQuery>;
 export type GetUpgradeStatusSuspenseQueryHookResult = ReturnType<typeof useGetUpgradeStatusSuspenseQuery>;
 export type GetUpgradeStatusQueryResult = ApolloReactCommon.QueryResult<GetUpgradeStatusQuery, GetUpgradeStatusQueryVariables>;
+export const TriggerUpgradeDocument = gql`
+    mutation triggerUpgrade {
+  triggerUpgrade
+}
+    `;
+export type TriggerUpgradeMutationFn = ApolloReactCommon.MutationFunction<TriggerUpgradeMutation, TriggerUpgradeMutationVariables>;
+
+/**
+ * __useTriggerUpgradeMutation__
+ *
+ * To run a mutation, you first call `useTriggerUpgradeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTriggerUpgradeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [triggerUpgradeMutation, { data, loading, error }] = useTriggerUpgradeMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useTriggerUpgradeMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<TriggerUpgradeMutation, TriggerUpgradeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<TriggerUpgradeMutation, TriggerUpgradeMutationVariables>(TriggerUpgradeDocument, options);
+      }
+export type TriggerUpgradeMutationHookResult = ReturnType<typeof useTriggerUpgradeMutation>;
+export type TriggerUpgradeMutationResult = ApolloReactCommon.MutationResult<TriggerUpgradeMutation>;
+export type TriggerUpgradeMutationOptions = ApolloReactCommon.BaseMutationOptions<TriggerUpgradeMutation, TriggerUpgradeMutationVariables>;
 export const GetApplicationLogsDocument = gql`
     query getApplicationLogs {
   getApplicationLogs

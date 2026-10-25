@@ -63,6 +63,8 @@ func (c *Client) QueryContext(ctx context.Context, msg *dns.Msg) (*dns.Msg, erro
 		servers = servers[:min(len(servers), limit)]
 		for _, server := range servers {
 			seen[server] = true
+			// Keep discovery moving even if the caller cancels this batch.
+			c.servers[server].lastProbe = time.Now()
 		}
 		c.infof("DNS probe batch %d: endpoints=%d", round+1, len(servers))
 		results := c.probe(ctx, servers, msg)
@@ -74,7 +76,6 @@ func (c *Client) QueryContext(ctx context.Context, msg *dns.Msg) (*dns.Msg, erro
 		for i := range results {
 			result := &results[i]
 			state := c.servers[result.server]
-			state.lastProbe = time.Now()
 			if result.canceled {
 				continue
 			}

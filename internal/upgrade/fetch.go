@@ -9,6 +9,10 @@ import (
 )
 
 func (h *Helper) FetchRelease(ctx context.Context, ver *semver.Version, timeout time.Duration) ([]byte, string, error) {
+	return h.FetchReleaseWithProgress(ctx, ver, timeout, nil)
+}
+
+func (h *Helper) FetchReleaseWithProgress(ctx context.Context, ver *semver.Version, timeout time.Duration, progress func(read, total int64)) ([]byte, string, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -40,7 +44,7 @@ func (h *Helper) FetchRelease(ctx context.Context, ver *semver.Version, timeout 
 	})
 
 	g.Go(func() error {
-		data, err := h.fetchDataFromUrl(ctx, archiveUrl)
+		data, err := h.fetchDataFromUrlWithProgress(ctx, archiveUrl, progress)
 		if err != nil {
 			return err
 		}

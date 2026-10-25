@@ -2,14 +2,84 @@ package server
 
 import (
 	"context"
+	"io"
 	"net"
 	"net/http"
+	"strings"
 	"testing"
 	"testing/synctest"
 	"time"
 
 	"github.com/anyshake/observer/pkg/logger"
 )
+
+func TestReadTimeoutsCloseIncompleteRequests(t *testing.T) {
+	for _, test := range []struct {
+		name    string
+		request string
+	}{
+		{"header", "GET / HTTP/1.1\r\nHost: localhost\r\n"},
+		{"body", "POST / HTTP/1.1\r\nHost: localhost\r\nContent-Length: 10\r\n\r\nx"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			srv := newTestServer(t, "127.0.0.1:0", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				_, _ = io.Copy(io.Discard, r.Body)
+			}))
+			if srv.server.ReadHeaderTimeout <= 0 || srv.server.ReadTimeout <= 0 || srv.server.IdleTimeout <= 0 {
+				t.Fatal("server has unbounded HTTP read/idle timeouts")
+			}
+			srv.server.ReadHeaderTimeout = 100 * time.Millisecond
+			srv.server.ReadTimeout = 100 * time.Millisecond
+			if err := srv.Listen(); err != nil {
+				t.Fatal(err)
+			}
+			go func() { _ = srv.Start() }()
+			t.Cleanup(func() { _ = srv.server.Close() })
+			conn, err := net.DialTimeout("tcp", srv.listener.Addr().String(), time.Second)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer conn.Close()
+			if err := conn.SetDeadline(time.Now().Add(2 * time.Second)); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := io.Copy(conn, strings.NewReader(test.request)); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := io.ReadAll(conn); err != nil {
+				t.Fatalf("incomplete request was not closed before client deadline: %v", err)
+			}
+		})
+	}
+}
+
+func TestReadTimeoutsAllowActiveStreams(t *testing.T) {
+	srv := newTestServer(t, "127.0.0.1:0", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/event-stream")
+		_, _ = io.WriteString(w, ": connected\n\n")
+		w.(http.Flusher).Flush()
+		time.Sleep(300 * time.Millisecond)
+		_, _ = io.WriteString(w, ": still connected\n\n")
+	}))
+	srv.server.ReadHeaderTimeout = 100 * time.Millisecond
+	srv.server.ReadTimeout = 100 * time.Millisecond
+	srv.server.IdleTimeout = 100 * time.Millisecond
+	if err := srv.Listen(); err != nil {
+		t.Fatal(err)
+	}
+	go func() { _ = srv.Start() }()
+	t.Cleanup(func() { _ = srv.server.Close() })
+	client := &http.Client{Timeout: 2 * time.Second}
+	response, err := client.Get("http://" + srv.listener.Addr().String())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer response.Body.Close()
+	body, err := io.ReadAll(response.Body)
+	if err != nil || !strings.Contains(string(body), "still connected") {
+		t.Fatalf("HTTP timeout interrupted an active stream: %q, %v", body, err)
+	}
+}
 
 func newTestServer(t *testing.T, addr string, handler http.Handler) *HttpServer {
 	t.Helper()

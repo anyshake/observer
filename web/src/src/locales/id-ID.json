@@ -239,6 +239,51 @@
             }
         },
         "Settings": {
+            "About": {
+                "title": "Tentang Perangkat Lunak",
+                "description": "Platform seismograf sumber terbuka yang mudah diterapkan, mendukung akuisisi, pengarsipan, dan berbagi bentuk gelombang secara waktu nyata.",
+                "version": "Versi",
+                "copyright": "Hak cipta",
+                "license": "Lisensi",
+                "inquiries": "Pertanyaan",
+                "license_note": "Didistribusikan di bawah AGPL-3.0-or-later. Hubungi kami untuk opsi lisensi komersial.",
+                "website": "Situs web",
+                "source_code": "Kode sumber",
+                "third_party": {
+                    "title": "Lisensi pihak ketiga",
+                    "description": "Buka bagian di bawah untuk melihat ketentuan lisensi dan pemberitahuan hak cipta pustaka pihak ketiga.",
+                    "web": "Pustaka web",
+                    "backend": "Pustaka Go",
+                    "loading": "Memuat lisensi...",
+                    "load_error": "Tidak dapat memuat informasi lisensi.",
+                    "retry": "Coba lagi"
+                },
+                "upgrade": {
+                    "title": "Pembaruan perangkat lunak",
+                    "loading": "Memuat",
+                    "admin_only": "Hanya administrator yang dapat melakukan pembaruan perangkat lunak.",
+                    "unsupported": "Peningkatan resmi tidak tersedia untuk build ini",
+                    "current": "Versi saat ini",
+                    "latest": "Versi jarak jauh",
+                    "required": "Versi kompatibel minimum",
+                    "eligible": "Memenuhi syarat untuk peningkatan resmi",
+                    "applied": "Peningkatan diterapkan",
+                    "eligible_yes": "Pembaruan tersedia",
+                    "eligible_no": "Tidak ada pembaruan yang memenuhi syarat",
+                    "applied_yes": "Peningkatan diterapkan; perlu mulai ulang",
+                    "yes": "Ya",
+                    "no": "Tidak",
+                    "check_button": "Periksa pembaruan",
+                    "checking": "Memeriksa...",
+                    "upgrade_button": "Tingkatkan sekarang",
+                    "queued": "Peningkatan diantrekan. Progres akan muncul di notifikasi.",
+                    "confirm_title": "Tingkatkan aplikasi",
+                    "confirm_message": "Unduh dan terapkan pembaruan resmi sekarang? Aplikasi akan dimulai ulang setelah peningkatan berhasil.",
+                    "confirm_button": "Tingkatkan",
+                    "cancel_button": "Batal",
+                    "check_failed": "Tidak dapat memeriksa pembaruan."
+                }
+            },
             "FDSN": {
                 "title": "Kunci Akses FDSN",
                 "key": "Prefiks kunci",

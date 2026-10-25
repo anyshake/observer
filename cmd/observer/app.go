@@ -257,7 +257,7 @@ func appStart(ver *semver.Version, build *unibuild.UniBuild, args arguments) {
 	var upgradeHelper *upgrade.Helper
 	if !ver.IsPreRelease() && build.GetChannel() == officialBuildChannel {
 		upgradeHelper = upgrade.NewHelper(exePath, ver, build)
-		serviceMap[service_updater.ID] = service_updater.New(appCtx, actionHandler, timeSrc, upgradeHelper, exePath, restartChan)
+		serviceMap[service_updater.ID] = service_updater.New(appCtx, actionHandler, timeSrc, upgradeHelper, exePath, restartChan, notificationHub)
 	}
 	serviceMap[service_discovery.ID] = service_discovery.New(appCtx, conf.Server.Listen, serviceMap, actionHandler, timeSrc)
 

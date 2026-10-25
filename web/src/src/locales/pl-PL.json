@@ -239,6 +239,51 @@
             }
         },
         "Settings": {
+            "About": {
+                "title": "O programie",
+                "description": "Łatwa we wdrożeniu platforma sejsmograficzna o otwartym kodzie źródłowym, obsługująca pozyskiwanie, archiwizację i udostępnianie przebiegów falowych w czasie rzeczywistym.",
+                "version": "Wersja",
+                "copyright": "Prawa autorskie",
+                "license": "Licencja",
+                "inquiries": "Zapytania",
+                "license_note": "Rozpowszechniane na licencji AGPL-3.0-or-later. Skontaktuj się z nami w sprawie licencji komercyjnej.",
+                "website": "Strona internetowa",
+                "source_code": "Kod źródłowy",
+                "third_party": {
+                    "title": "Licencje bibliotek zewnętrznych",
+                    "description": "Rozwiń sekcję poniżej, aby zobaczyć warunki licencji i informacje o prawach autorskich bibliotek zewnętrznych.",
+                    "web": "Biblioteki webowe",
+                    "backend": "Biblioteki Go",
+                    "loading": "Wczytywanie licencji...",
+                    "load_error": "Nie udało się wczytać informacji o licencjach.",
+                    "retry": "Spróbuj ponownie"
+                },
+                "upgrade": {
+                    "title": "Aktualizacja oprogramowania",
+                    "loading": "Ładowanie",
+                    "admin_only": "Tylko administratorzy mogą przeprowadzać aktualizacje oprogramowania.",
+                    "unsupported": "Oficjalne aktualizacje są niedostępne dla tej kompilacji",
+                    "current": "Bieżąca wersja",
+                    "latest": "Wersja zdalna",
+                    "required": "Minimalna zgodna wersja",
+                    "eligible": "Kwalifikuje się do oficjalnej aktualizacji",
+                    "applied": "Aktualizacja zastosowana",
+                    "eligible_yes": "Dostępna aktualizacja",
+                    "eligible_no": "Brak odpowiedniej aktualizacji",
+                    "applied_yes": "Aktualizacja zastosowana; wymagane ponowne uruchomienie",
+                    "yes": "Tak",
+                    "no": "Nie",
+                    "check_button": "Sprawdź aktualizacje",
+                    "checking": "Sprawdzanie...",
+                    "upgrade_button": "Zaktualizuj teraz",
+                    "queued": "Aktualizacja w kolejce. Postęp pojawi się w powiadomieniach.",
+                    "confirm_title": "Zaktualizuj aplikację",
+                    "confirm_message": "Pobrać i zastosować oficjalną aktualizację teraz? Po udanej aktualizacji aplikacja zostanie ponownie uruchomiona.",
+                    "confirm_button": "Zaktualizuj",
+                    "cancel_button": "Anuluj",
+                    "check_failed": "Nie można sprawdzić aktualizacji."
+                }
+            },
             "FDSN": {
                 "title": "Klucze dostępu FDSN",
                 "key": "Prefiks klucza",

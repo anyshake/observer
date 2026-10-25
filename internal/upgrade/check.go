@@ -9,18 +9,33 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/pkg/dnsquery"
+	"github.com/anyshake/observer/pkg/logger"
 	"github.com/anyshake/observer/pkg/semver"
 	"github.com/miekg/dns"
 )
 
+const (
+	versionCheckTimeout = 20 * time.Second
+	resolverTimeout     = 2 * time.Second
+)
+
 func (u *Helper) CheckUpdate(ctx context.Context) (latest, required *semver.Version, eligible bool, applied bool, err error) {
-	if u.latestVer.Valid() && u.requiredVer.Valid() {
+	return u.checkUpdate(ctx, false)
+}
+
+func (u *Helper) CheckUpdateFresh(ctx context.Context) (latest, required *semver.Version, eligible bool, applied bool, err error) {
+	return u.checkUpdate(ctx, true)
+}
+
+func (u *Helper) checkUpdate(ctx context.Context, fresh bool) (latest, required *semver.Version, eligible bool, applied bool, err error) {
+	if !fresh && u.latestVer.Valid() && u.requiredVer.Valid() {
 		latest, required := u.latestVer.Get(), u.requiredVer.Get()
 		eligible, applied := u.updateStatus(latest, required)
 		return latest, required, eligible, applied, nil
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	// Leave time for later resolver batches when earlier endpoints are blocked.
+	ctx, cancel := context.WithTimeout(ctx, versionCheckTimeout)
 	defer cancel()
 
 	client, err := u.getDNSClient()
@@ -86,7 +101,8 @@ func (u *Helper) getDNSClient() (*dnsquery.Client, error) {
 		return nil, u.resolverErr
 	}
 	if u.dnsClient == nil {
-		client, err := dnsquery.NewClient(u.resolvers, len(u.resolvers), 5*time.Second)
+		client, err := dnsquery.NewClient(u.resolvers, len(u.resolvers), resolverTimeout,
+			dnsquery.WithLogger(logger.GetLogger("upgrade")))
 		if err != nil {
 			return nil, err
 		}

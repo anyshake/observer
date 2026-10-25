@@ -9,7 +9,6 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/anyshake/observer/internal/server/middleware/auth_jwt"
 	"github.com/anyshake/observer/internal/server/middleware/date_header"
@@ -53,7 +52,7 @@ func (s *HttpServer) Setup(listen string) error {
 	}))
 	if s.cors {
 		s.engine.Use(cors.New(cors.Config{
-			MaxAge:        12 * time.Hour,
+			MaxAge:        time.Hour,
 			AllowOrigins:  []string{"*"},
 			ExposeHeaders: []string{"Content-Length", "Content-Disposition"},
 			AllowMethods:  []string{"GET", "POST", "PATCH"},
@@ -71,14 +70,14 @@ func (s *HttpServer) Setup(listen string) error {
 		return fmt.Errorf("failed to setup FDSN router: %w", err)
 	}
 
-	jwtHandler, err := auth_jwt.New(s.resolver.TimeSource, s.resolver.ActionHandler, AUTH_TIMEOUT)
+	jwtHandler, err := auth_jwt.New(s.resolver.TimeSource, s.resolver.ActionHandler, authTimeout)
 	if err != nil {
 		return fmt.Errorf("failed to create JWT handler: %w", err)
 	}
 	jwtMiddlewareFn := jwtHandler.MiddlewareFunc()
 
 	api := s.engine.Group("/api")
-	auth.Setup(api, s.resolver.ActionHandler, jwtMiddlewareFn, jwtHandler.LoginHandler, jwtHandler.RefreshHandler)
+	auth.Setup(api, s.resolver.ActionHandler, jwtMiddlewareFn, jwtHandler.LoginHandler, jwtHandler.RefreshHandler, s.shutdownCtx)
 	export.Setup(api, s.resolver.ActionHandler, s.resolver.HardwareDev, jwtMiddlewareFn)
 	notifications.Setup(api, s.notificationHub, jwtMiddlewareFn, s.shutdownCtx)
 	s.closeSocket = socket.Setup(api, s.resolver.TimeSource, s.resolver.HardwareDev, jwtMiddlewareFn, s.shutdownCtx)
@@ -87,14 +86,21 @@ func (s *HttpServer) Setup(listen string) error {
 	}
 	tiles.Setup(api, s.resolver.CurrentVersion.String(), jwtMiddlewareFn)
 
-	graphql := handler.NewDefaultServer(graph_resolver.NewExecutableSchema(graph_resolver.Config{Resolvers: s.resolver}))
+	graphql := graph_resolver.NewHandler(s.resolver)
 	graphql.SetRecoverFunc(func(ctx context.Context, err any) (userMessage error) {
 		s.log.Errorf("recovered from panic in GraphQL: %v\n%s", err, debug.Stack())
 		return errors.New("fatal error occured")
 	})
 
 	api.POST("/graphql", jwtMiddlewareFn, func(ctx *gin.Context) {
-		ctxWithUserStatus := context.WithValue(ctx.Request.Context(), graph_resolver.ContextKey("user_status"), map[string]any{
+		if ctx.Request.ContentLength > graph_resolver.MaxRequestBytes {
+			response.Error(ctx, http.StatusRequestEntityTooLarge, "request body is too large")
+			return
+		}
+		ctx.Request.Body = http.MaxBytesReader(ctx.Writer, ctx.Request.Body, graph_resolver.MaxRequestBytes)
+		requestCtx, cancel := context.WithTimeout(ctx.Request.Context(), graph_resolver.RequestTimeout)
+		defer cancel()
+		ctxWithUserStatus := context.WithValue(requestCtx, graph_resolver.ContextKey("user_status"), map[string]any{
 			auth_jwt.IsAdminKey: ctx.GetBool(auth_jwt.IsAdminKey),
 			auth_jwt.UserIdKey:  ctx.GetString(auth_jwt.UserIdKey),
 		})

@@ -239,6 +239,51 @@
             }
         },
         "Settings": {
+            "About": {
+                "title": "Yazılım Hakkında",
+                "description": "Gerçek zamanlı dalga biçimi toplama, arşivleme ve paylaşmayı destekleyen, kurulumu kolay, açık kaynaklı bir sismograf platformu.",
+                "version": "Sürüm",
+                "copyright": "Telif hakkı",
+                "license": "Lisans",
+                "inquiries": "Sorular",
+                "license_note": "AGPL-3.0-or-later ile dağıtılır. Ticari lisanslama seçenekleri için bizimle iletişime geçin.",
+                "website": "Web sitesi",
+                "source_code": "Kaynak kodu",
+                "third_party": {
+                    "title": "Üçüncü taraf lisansları",
+                    "description": "Üçüncü taraf kütüphanelerin lisans koşullarını ve telif hakkı bildirimlerini görmek için aşağıdaki bir bölümü genişletin.",
+                    "web": "Web kütüphaneleri",
+                    "backend": "Go kütüphaneleri",
+                    "loading": "Lisanslar yükleniyor...",
+                    "load_error": "Lisans bilgileri yüklenemedi.",
+                    "retry": "Yeniden dene"
+                },
+                "upgrade": {
+                    "title": "Yazılım güncellemesi",
+                    "loading": "Yükleniyor",
+                    "admin_only": "Yazılım güncellemelerini yalnızca yöneticiler gerçekleştirebilir.",
+                    "unsupported": "Bu sürüm için resmi yükseltmeler kullanılamıyor",
+                    "current": "Geçerli sürüm",
+                    "latest": "Uzak sürüm",
+                    "required": "Minimum uyumlu sürüm",
+                    "eligible": "Resmi yükseltmeye uygun",
+                    "applied": "Yükseltme uygulandı",
+                    "eligible_yes": "Güncelleme mevcut",
+                    "eligible_no": "Uygun güncelleme yok",
+                    "applied_yes": "Yükseltme uygulandı; yeniden başlatma gerekli",
+                    "yes": "Evet",
+                    "no": "Hayır",
+                    "check_button": "Güncellemeleri denetle",
+                    "checking": "Denetleniyor...",
+                    "upgrade_button": "Şimdi yükselt",
+                    "queued": "Yükseltme kuyruğa alındı. İlerleme bildirimlerde görünecek.",
+                    "confirm_title": "Uygulamayı yükselt",
+                    "confirm_message": "Resmi güncelleme şimdi indirilip uygulansın mı? Başarılı bir yükseltmeden sonra uygulama yeniden başlatılacak.",
+                    "confirm_button": "Yükselt",
+                    "cancel_button": "İptal",
+                    "check_failed": "Güncellemeler denetlenemedi."
+                }
+            },
             "FDSN": {
                 "title": "FDSN Erişim Anahtarları",
                 "key": "Anahtar öneki",

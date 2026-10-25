@@ -1,0 +1,3 @@
+mutation triggerUpgrade {
+    triggerUpgrade
+}

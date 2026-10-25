@@ -79,8 +79,9 @@ func (s *FrpClientServiceImpl) Start(ctx context.Context) error {
 		},
 	)
 	svr, err := client.NewService(client.ServiceOptions{
-		Common:    commonConfig,
-		ProxyCfgs: []v1.ProxyConfigurer{proxyConfig},
+		Common:           commonConfig,
+		ProxyCfgs:        []v1.ProxyConfigurer{proxyConfig},
+		ConnectorCreator: newLoggedConnector,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create FRP client instance: %w", err)

@@ -15,6 +15,8 @@ type authChallenge struct {
 	ttl       time.Duration
 	createdAt time.Time
 	seed      []byte
+	source    string
+	captchaID string
 }
 
 func newAuthChallenge(ttl time.Duration) (*authChallenge, error) {

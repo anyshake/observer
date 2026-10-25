@@ -23,6 +23,13 @@ func (w *logWriter) Write(p []byte) (n int, err error) {
 	}
 
 	switch logText[25:26] {
+	case "T":
+		// FRP routes yamux warnings and errors through its trace logger.
+		if strings.Contains(logText[28:], "[ERR] yamux:") {
+			logger.GetLogger(ID).Errorf("FRP transport error: %s", logText[28:])
+		} else if strings.Contains(logText[28:], "[WARN] yamux:") {
+			logger.GetLogger(ID).Warnf("FRP transport warning: %s", logText[28:])
+		}
 	case "I":
 		logger.GetLogger(ID).Infof("FRP client returned info: %s", logText[28:])
 	case "W":
@@ -36,7 +43,7 @@ func (w *logWriter) Write(p []byte) (n int, err error) {
 
 func New(parentCtx context.Context, localServerAddr string, actionHandler *action.Handler, timeSource *timesource.Source) *FrpClientServiceImpl {
 	log.Logger = loglib.New(
-		loglib.WithLevel(log.InfoLevel),
+		loglib.WithLevel(log.TraceLevel),
 		loglib.WithOutput(loglib.NewConsoleWriter(loglib.ConsoleConfig{Colorful: false}, &logWriter{})),
 	)
 

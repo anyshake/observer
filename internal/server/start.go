@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"golang.org/x/net/netutil"
 )
 
 func (s *HttpServer) Listen() error {
@@ -14,7 +16,7 @@ func (s *HttpServer) Listen() error {
 	if err != nil {
 		return fmt.Errorf("failed to listen http server at %s: %w", s.server.Addr, err)
 	}
-	s.listener = listener
+	s.listener = netutil.LimitListener(listener, maxConnections)
 	return nil
 }
 

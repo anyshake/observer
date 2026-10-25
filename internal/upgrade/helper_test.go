@@ -193,6 +193,28 @@ func TestCheckUpdateFromLocalDNS(t *testing.T) {
 	}
 }
 
+func TestCheckUpdateReachesLaterResolvers(t *testing.T) {
+	helper := helperWithTXT(t, "latest_major=1;latest_minor=4;latest_patch=0;required_major=1;required_minor=1;required_patch=0")
+	var blocked dnsquery.Resolvers
+	for range 6 {
+		packet, err := net.ListenPacket("udp", "127.0.0.1:0")
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Cleanup(func() { _ = packet.Close() })
+		blocked = append(blocked, dnsquery.Resolver{Server: "udp://" + packet.LocalAddr().String()})
+	}
+	helper.resolvers = append(blocked, helper.resolvers...)
+	t.Cleanup(func() { _ = helper.Close() })
+
+	ctx, cancel := context.WithTimeout(t.Context(), 10*time.Second)
+	defer cancel()
+	latest, required, eligible, applied, err := helper.CheckUpdateFresh(ctx)
+	if err != nil || latest.String() != "v1.4.0" || required.String() != "v1.1.0" || !eligible || applied {
+		t.Fatalf("version check with blocked early resolvers = %v %v %v %v %v", latest, required, eligible, applied, err)
+	}
+}
+
 func TestCheckUpdateRejectsBadMetadata(t *testing.T) {
 	fields := []string{"latest_major", "latest_minor", "latest_patch", "required_major", "required_minor", "required_patch"}
 	base := map[string]string{

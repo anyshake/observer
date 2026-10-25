@@ -3,9 +3,11 @@ package updater
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/anyshake/observer/internal/dao/action"
+	"github.com/anyshake/observer/internal/notification"
 	"github.com/anyshake/observer/internal/service"
 	"github.com/anyshake/observer/internal/upgrade"
 	"github.com/anyshake/observer/pkg/timesource"
@@ -33,6 +35,9 @@ type UpdaterServiceImpl struct {
 	upgradeHelper  *upgrade.Helper
 	currentExePath string
 	restartChan    chan struct{}
+	notifications  notification.Publisher
+	manualRequests chan struct{}
+	manualPending  atomic.Bool
 
 	autoRestartEnabled bool
 }

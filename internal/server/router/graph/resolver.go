@@ -31,6 +31,7 @@ type ContextKey string
 type Resolver struct {
 	AppContext               context.Context
 	serviceControl           serviceControl
+	historyQueries           historyQueryLimit
 	RestartChan              chan struct{}
 	ExecutablePath           string
 	CurrentVersion           *semver.Version
