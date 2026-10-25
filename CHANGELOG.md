@@ -2,6 +2,37 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.9.0
+
+### Release Notes
+
+This release adds **manual software upgrades, third-party license information, and 13 additional interface languages**. It also limits web resource usage and fixes seismic arrival estimates, WAV export timing, and update checks.
+
+### New Features
+
+- Added administrator controls to check for and apply **official software upgrades** from the About Software page, with progress notifications and automatic restart after a successful manual upgrade. Manual upgrades can also run when the automatic updater is stopped.
+- Added an **About Software** page visible to all users, with software information and a third-party license dialog containing separate, expandable Go and web library reports. Software update controls remain restricted to administrators.
+- Added **Arabic, Burmese, Dutch, Hindi, Italian, Korean, Nepali, Persian, Portuguese (Brazil), Spanish (Spain), Thai, Ukrainian, and Vietnamese** translations.
+
+### Improvements
+
+- Deferred loading of settings tabs and Markdown rendering, and separated locale data into its own frontend bundle.
+- Unified language and theme menu sizing, spacing, scrolling, and selection styles. Centralized component locale mappings with explicit English fallbacks where translations are unavailable.
+- Added HTTP connection limits and read timeouts, bounded login challenge and nonce state, and limited authentication request sizes and challenge generation per source address. Challenge limits use the TCP peer address rather than forwarded IP headers.
+- Added GraphQL request size, complexity, depth, and execution limits, with bounds on concurrent historical waveform queries and their result sizes. Added write deadlines to service notification streams.
+- Added automated Markdown license reports for Go and web dependencies, including bundled FDSN web assets. Go reports are generated for the target platform and written to the built frontend before the application is compiled.
+- Improved FRP control connection diagnostics and aligned the yamux dependency with FRP's fork.
+- Updated GitHub Actions dependencies and standardized frontend CI builds on Node.js 24.
+
+### Bug Fixes
+
+- Fixed missing deep S-wave estimates by upgrading `travel` to v0.0.2. S-wave estimates now use the earliest available S, SKS, or SKIKS arrival.
+- Fixed unavailable P/S estimates appearing as arrivals before the earthquake origin time. Unavailable estimates now have dedicated messages and are excluded from waveform query time ranges.
+- Fixed WAV exports omitting the duration of the last data packet, failing with a single packet, and exporting silent data as empty audio. Playback now consistently uses the intended 30× speed ([#43](https://github.com/anyshake/observer/pull/43)).
+- Fixed update checks repeatedly probing the same blocked DNS endpoints after cancellation, and allowed later resolver batches more time to complete.
+- Fixed clipboard operations failing when the browser exposes but rejects the Clipboard API, including fallback handling for multiline text and accurate success reporting.
+- Fixed the About Software copyright year being hardcoded instead of following the current year.
+
 ## v4.8.0
 
 ### Release Notes
