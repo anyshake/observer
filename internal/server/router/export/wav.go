@@ -41,19 +41,16 @@ func (e *seismicDataEncoderWavImpl) Encode(ctx context.Context, records seismicR
 	if recordRange.Count == 0 {
 		return nil, nil
 	}
-
-	audioData := e.normalizeToInt16(channelBuffer)
-
-	timeDiff := time.UnixMilli(recordRange.EndTimestamp).Sub(time.UnixMilli(recordRange.StartTimestamp)).Seconds()
-	if timeDiff == 0 {
-		return nil, errors.New("invalid time difference")
+	if recordRange.SampleRate <= 0 {
+		return nil, errors.New("invalid sample rate")
 	}
 
-	originalSampleRate := int(float64(len(audioData)) / (timeDiff / 30.0))
-	filterKernel := e.getLowPassFilter(originalSampleRate, 40, FILTER_NUM_TAPS)
+	audioData := e.normalizeToInt16(channelBuffer)
+	playbackSampleRate := recordRange.SampleRate * 30
+	filterKernel := e.getLowPassFilter(playbackSampleRate, 40, FILTER_NUM_TAPS)
 	audioData = e.applyFilter(audioData, filterKernel)
 
-	interpolatedData := e.linearInterpolate(audioData, originalSampleRate, e.outputSampleRate)
+	interpolatedData := e.linearInterpolate(audioData, playbackSampleRate, e.outputSampleRate)
 
 	dataBytes, err := e.saveToWavBytes(interpolatedData, e.outputSampleRate)
 	if err != nil {
@@ -103,7 +100,7 @@ func (e *seismicDataEncoderWavImpl) normalizeToInt16(data []int32) []int16 {
 		}
 	}
 	if absMaxVal == 0 {
-		return nil
+		return make([]int16, len(data))
 	}
 	scaleFactor := float64(math.MaxInt16) / absMaxVal
 	normalized := make([]int16, len(data))

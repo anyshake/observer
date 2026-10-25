@@ -1,6 +1,7 @@
 package export
 
 import (
+	"bytes"
 	"errors"
 	"strings"
 	"testing"
@@ -12,6 +13,7 @@ import (
 	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/internal/testsupport"
 	"github.com/bclswl0827/mseedio"
+	"github.com/go-audio/wav"
 )
 
 func TestForEachContinuousChannelRecord(t *testing.T) {
@@ -266,8 +268,11 @@ func TestWavEncoder(t *testing.T) {
 	}
 
 	one := syntheticRecords(start, 1, 8, channels)
-	if _, err := encoder.Encode(t.Context(), iterOf(one), "EHZ"); err == nil || !strings.Contains(err.Error(), "time difference") {
-		t.Fatalf("single record error = %v", err)
+	if data, err := encoder.Encode(t.Context(), iterOf(one), "EHZ"); err != nil || !bytes.HasPrefix(data, []byte("RIFF")) {
+		t.Fatalf("single record encode = %d bytes, %v", len(data), err)
+	}
+	if _, err := encoder.Encode(t.Context(), iterOf(syntheticRecords(start, 1, 0, channels)), "EHZ"); err == nil || !strings.Contains(err.Error(), "sample rate") {
+		t.Fatalf("invalid sample rate error = %v", err)
 	}
 
 	records := syntheticRecords(start, 2, 8, channels)
@@ -306,8 +311,8 @@ func TestWavEncoder(t *testing.T) {
 	if len(normalized) != 2 || normalized[1] <= 0 || normalized[0] >= 0 {
 		t.Fatalf("normalized = %v", normalized)
 	}
-	if encoder.normalizeToInt16([]int32{0, 0}) != nil {
-		t.Fatal("zero samples were normalized")
+	if normalized := encoder.normalizeToInt16([]int32{0, 0}); len(normalized) != 2 || normalized[0] != 0 || normalized[1] != 0 {
+		t.Fatalf("silent samples = %v", normalized)
 	}
 	kernel := encoder.getLowPassFilter(200, 10, 5)
 	if len(kernel) != 5 {
@@ -335,6 +340,56 @@ func TestWavEncoder(t *testing.T) {
 	}
 	if _, err := wavEncoder(openSettings(t, "station", "location"), 8000).GetFileName(t.Context(), start, "EHZ"); err == nil {
 		t.Fatal("missing network code accepted")
+	}
+}
+
+func TestWavEncoderDuration(t *testing.T) {
+	start := time.Date(2026, 10, 20, 12, 0, 0, 0, time.UTC)
+	for _, tc := range []struct {
+		name       string
+		rate       int
+		packets    int
+		samples    int
+		outputRate int
+		silent     bool
+	}{
+		{name: "single packet", rate: 100, packets: 1, samples: 100, outputRate: 44100},
+		{name: "two seconds", rate: 100, packets: 2, samples: 100, outputRate: 44100},
+		{name: "thirty seconds", rate: 100, packets: 30, samples: 100, outputRate: 44100},
+		{name: "different rates", rate: 125, packets: 2, samples: 125, outputRate: 8000},
+		{name: "partial packet", rate: 100, packets: 1, samples: 25, outputRate: 44100},
+		{name: "silence", rate: 100, packets: 2, samples: 100, outputRate: 44100, silent: true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			samples := make([]int32, tc.samples)
+			if !tc.silent {
+				for i := range samples {
+					samples[i] = int32(i + 1)
+				}
+			}
+			records := syntheticRecords(start, tc.packets, tc.rate, []explorer.ChannelData{{ChannelCode: "EHZ", Data: samples}})
+			encoder := &seismicDataEncoderWavImpl{outputSampleRate: tc.outputRate}
+			data, err := encoder.Encode(t.Context(), iterOf(records), "EHZ")
+			if err != nil {
+				t.Fatal(err)
+			}
+			decoder := wav.NewDecoder(bytes.NewReader(data))
+			decoded, err := decoder.FullPCMBuffer()
+			if err != nil {
+				t.Fatal(err)
+			}
+			wantSamples := tc.packets * tc.samples * tc.outputRate / (tc.rate * 30)
+			if len(decoded.Data) != wantSamples || decoded.Format.SampleRate != tc.outputRate {
+				t.Fatalf("audio = %d samples at %d Hz, want %d samples at %d Hz", len(decoded.Data), decoded.Format.SampleRate, wantSamples, tc.outputRate)
+			}
+			if tc.silent {
+				for _, sample := range decoded.Data {
+					if sample != 0 {
+						t.Fatal("silent input produced nonzero audio")
+					}
+				}
+			}
+		})
 	}
 }
 
