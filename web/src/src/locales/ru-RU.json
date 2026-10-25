@@ -93,7 +93,9 @@
                 "title": "Выберите сейсмическое событие",
                 "earthquake_at": "Землетрясение в {{time}}",
                 "p_wave_arrival": "Приход P-волны {{time}} ({{seconds}} сек)",
+                "p_wave_unavailable": "Невозможно оценить время прихода P-волны",
                 "s_wave_arrival": "Приход S-волны {{time}} ({{seconds}} сек)",
+                "s_wave_unavailable": "Невозможно оценить время прихода S-волны",
                 "epicenter_distance": "Эпицентр {{distance}} км",
                 "earthquake_depth": "Глубина {{depth}} км",
                 "selected_an_event": "Выбрано землетрясение в регионе {{region}} в {{time}}."

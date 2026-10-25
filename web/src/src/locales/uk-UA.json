@@ -93,7 +93,9 @@
                 "title": "Виберіть сейсмічну подію",
                 "earthquake_at": "Землетрус о {{time}}",
                 "p_wave_arrival": "Прибуття P-хвилі {{time}} ({{seconds}} с)",
+                "p_wave_unavailable": "Неможливо оцінити час прибуття P-хвилі",
                 "s_wave_arrival": "Прибуття S-хвилі {{time}} ({{seconds}} с)",
+                "s_wave_unavailable": "Неможливо оцінити час прибуття S-хвилі",
                 "epicenter_distance": "Відстань до епіцентру {{distance}} км",
                 "earthquake_depth": "Глибина {{depth}} км",
                 "selected_an_event": "Вибрано землетрус у регіоні {{region}}, що стався о {{time}}."

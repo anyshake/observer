@@ -93,7 +93,9 @@
                 "title": "یک رویداد لرزه‌ای انتخاب کنید",
                 "earthquake_at": "زمین‌لرزه در {{time}}",
                 "p_wave_arrival": "رسیدن موج P در {{time}} ({{seconds}} ثانیه)",
+                "p_wave_unavailable": "زمان رسیدن موج P قابل برآورد نیست",
                 "s_wave_arrival": "رسیدن موج S در {{time}} ({{seconds}} ثانیه)",
+                "s_wave_unavailable": "زمان رسیدن موج S قابل برآورد نیست",
                 "epicenter_distance": "فاصله از رومرکز {{distance}} کیلومتر",
                 "earthquake_depth": "ژرفا {{depth}} کیلومتر",
                 "selected_an_event": "زمین‌لرزه‌ای در {{region}} در زمان {{time}} انتخاب شد."

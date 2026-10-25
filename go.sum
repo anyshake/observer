@@ -130,8 +130,8 @@ github.com/bclswl0827/slgo v0.4.3 h1:gabMlHNSumN9EXj5SfTBN5aAXMUUxlDgTo+smVpFx7s
 github.com/bclswl0827/slgo v0.4.3/go.mod h1:p44eRwt8AvEgyVIL6Xl8d/yRyv/60zvjSMV+DasVjDc=
 github.com/bclswl0827/sqlite v1.11.1-0.20240613172512-9e6ac9861470 h1:VYRieWhizTvSnQ3iJ9cVvB+4go+f/2mTp6CC2MSXnn4=
 github.com/bclswl0827/sqlite v1.11.1-0.20240613172512-9e6ac9861470/go.mod h1:/xElCFPGgTMHBhfSjGBlITMQ/qe6CLTinWdxSbc4oDE=
-github.com/bclswl0827/travel v0.0.1 h1:nP903ucJuq7hWB1Upbzlh8zIZ4gFVHRpCi1xLnprvbw=
-github.com/bclswl0827/travel v0.0.1/go.mod h1:vvBD+hMgRQzgMYHvHMxdxWvc6FlVvXiKmbilUKaDRKE=
+github.com/bclswl0827/travel v0.0.2 h1:iVPlH3dWSflC4OfQnGfXVRDMC2E0l/CU8ojRbHcxg20=
+github.com/bclswl0827/travel v0.0.2/go.mod h1:vvBD+hMgRQzgMYHvHMxdxWvc6FlVvXiKmbilUKaDRKE=
 github.com/bclswl0827/winsgo v0.0.1 h1:Ogn9NIkmygrPR7/651Pu5GkXcpSL4/lbQ/h0KLa8DKw=
 github.com/bclswl0827/winsgo v0.0.1/go.mod h1:R9TBVY+n1nT7zsvP09n6MJ4pD6YigBZTZ2ZnLkPtHSE=
 github.com/beevik/ntp v1.5.0 h1:y+uj/JjNwlY2JahivxYvtmv4ehfi3h74fAuABB9ZSM4=

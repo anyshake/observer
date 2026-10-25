@@ -93,7 +93,9 @@
                 "title": "Wybierz wydarzenie sejsmiczne",
                 "earthquake_at": "Trzęsienie ziemi o {{time}}",
                 "p_wave_arrival": "Przybycie fali P {{time}} ({{seconds}} sek)",
+                "p_wave_unavailable": "Nie można oszacować czasu nadejścia fali P",
                 "s_wave_arrival": "Przybycie fali S {{time}} ({{seconds}} sek)",
+                "s_wave_unavailable": "Nie można oszacować czasu nadejścia fali S",
                 "epicenter_distance": "Epicentrum {{distance}} km",
                 "earthquake_depth": "Głębokość {{depth}} km",
                 "selected_an_event": "Wybrano zdarzenie trzęsienia ziemi w {{region}} o {{time}}."

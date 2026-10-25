@@ -93,7 +93,9 @@
                 "title": "Selecteer een seismische gebeurtenis",
                 "earthquake_at": "Aardbeving om {{time}}",
                 "p_wave_arrival": "Aankomst P-golf {{time}} ({{seconds}} sec)",
+                "p_wave_unavailable": "Aankomsttijd van de P-golf kan niet worden geschat",
                 "s_wave_arrival": "Aankomst S-golf {{time}} ({{seconds}} sec)",
+                "s_wave_unavailable": "Aankomsttijd van de S-golf kan niet worden geschat",
                 "epicenter_distance": "Afstand tot epicentrum {{distance}} km",
                 "earthquake_depth": "Diepte {{depth}} km",
                 "selected_an_event": "Aardbeving in {{region}} om {{time}} geselecteerd."

@@ -6,6 +6,8 @@ import { sendPromiseAlert } from '../../helpers/alert/sendPromiseAlert';
 import { sendUserAlert } from '../../helpers/alert/sendUserAlert';
 import { getTimeString } from '../../helpers/utils/getTimeString';
 
+const isTravelTimeAvailable = (seconds: number) => Number.isFinite(seconds) && seconds >= 0;
+
 export const useSeismicEvents = ({
     setIsBusy,
     setStartTime,
@@ -77,26 +79,34 @@ export const useSeismicEvents = ({
                                                 })}
                                             </li>
                                             <li>
-                                                {t(
-                                                    'views.History.event_list_modal.p_wave_arrival',
-                                                    {
-                                                        time: getTimeString(
-                                                            timestamp + estimation[0] * 1000
-                                                        ),
-                                                        seconds: estimation[0].toFixed(1)
-                                                    }
-                                                )}
+                                                {isTravelTimeAvailable(estimation[0])
+                                                    ? t(
+                                                          'views.History.event_list_modal.p_wave_arrival',
+                                                          {
+                                                              time: getTimeString(
+                                                                  timestamp + estimation[0] * 1000
+                                                              ),
+                                                              seconds: estimation[0].toFixed(1)
+                                                          }
+                                                      )
+                                                    : t(
+                                                          'views.History.event_list_modal.p_wave_unavailable'
+                                                      )}
                                             </li>
                                             <li>
-                                                {t(
-                                                    'views.History.event_list_modal.s_wave_arrival',
-                                                    {
-                                                        time: getTimeString(
-                                                            timestamp + estimation[1] * 1000
-                                                        ),
-                                                        seconds: estimation[1].toFixed(1)
-                                                    }
-                                                )}
+                                                {isTravelTimeAvailable(estimation[1])
+                                                    ? t(
+                                                          'views.History.event_list_modal.s_wave_arrival',
+                                                          {
+                                                              time: getTimeString(
+                                                                  timestamp + estimation[1] * 1000
+                                                              ),
+                                                              seconds: estimation[1].toFixed(1)
+                                                          }
+                                                      )
+                                                    : t(
+                                                          'views.History.event_list_modal.s_wave_unavailable'
+                                                      )}
                                             </li>
                                             <li>
                                                 {t(
@@ -144,9 +154,11 @@ export const useSeismicEvents = ({
             const selectedEvent = seismicEventsData[eventId];
             if (selectedEvent) {
                 const { timestamp, estimation, region } = selectedEvent;
-                const [pWave, sWave] = estimation;
-                setStartTime(Math.floor(timestamp + pWave * 1000 - 1000 * 60 * 5));
-                setEndTime(Math.floor(timestamp + sWave * 1000 + 1000 * 60 * 5));
+                const travelTimes = estimation.filter(isTravelTimeAvailable);
+                const firstArrival = travelTimes.length ? Math.min(...travelTimes) : 0;
+                const lastArrival = travelTimes.length ? Math.max(...travelTimes) : 0;
+                setStartTime(Math.floor(timestamp + firstArrival * 1000 - 1000 * 60 * 5));
+                setEndTime(Math.floor(timestamp + lastArrival * 1000 + 1000 * 60 * 5));
                 sendUserAlert(
                     t('views.History.event_list_modal.selected_an_event', {
                         region,

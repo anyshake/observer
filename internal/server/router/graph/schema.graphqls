@@ -63,7 +63,7 @@ type seisEvent {
   longitude: Float!
   magnitude: Map!
   distance: Float!
-  estimation: [Float!]! # [P-wave travel time, S-wave travel time]
+  estimation: [Float!]! # [P-wave travel time, S-wave travel time] in seconds; -1 means unavailable
 }
 
 type serviceStatus {

@@ -9,6 +9,7 @@ type Magnitude struct {
 	Value float64       `json:"value"`
 }
 
+// Estimation contains travel times in seconds; -1 means no estimate is available.
 type Estimation struct {
 	P_Wave float64 `json:"p_wave"`
 	S_Wave float64 `json:"s_wave"`

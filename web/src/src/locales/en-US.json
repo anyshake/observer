@@ -93,7 +93,9 @@
                 "title": "Select a Seismic Event",
                 "earthquake_at": "Earthquake at {{time}}",
                 "p_wave_arrival": "P-Wave Arrival {{time}} ({{seconds}} sec)",
+                "p_wave_unavailable": "Cannot estimate P-wave arrival time",
                 "s_wave_arrival": "S-Wave Arrival {{time}} ({{seconds}} sec)",
+                "s_wave_unavailable": "Cannot estimate S-wave arrival time",
                 "epicenter_distance": "Epicenter {{distance}} km",
                 "earthquake_depth": "Depth {{depth}} km",
                 "selected_an_event": "Selected an earthquake event in {{region}} at {{time}}."

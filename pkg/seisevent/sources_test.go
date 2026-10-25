@@ -275,6 +275,35 @@ func TestSeismicHelpers(t *testing.T) {
 	}
 }
 
+func TestSeismicEstimationUsesEarliestSArrival(t *testing.T) {
+	table, err := travel.NewAK135()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Reference times are from the bundled AK135 tables, in seconds.
+	tests := []struct {
+		name  string
+		delta float64
+		depth float64
+		want  float64
+	}{
+		{"SKS before S", 90, 0, 1413.52},
+		{"SKS before SKIKS without S", 130, 0, 1582.03},
+		{"SKIKS before SKS", 140, 0, 1601.87},
+		{"zero-length arrival", 0, 0, 0},
+		{"no available arrival", 130, 701, -1},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := getSeismicEstimation(table, 0, 0, 0, test.delta, test.depth).S_Wave
+			if math.Abs(got-test.want) > 0.01 {
+				t.Fatalf("S travel time = %.5f s, want %.5f s", got, test.want)
+			}
+		})
+	}
+}
+
 func TestDataSourceGetEvents(t *testing.T) {
 	rt := &stubRT{}
 	restore := request.SetRoundTripperOverrideForTest(rt)

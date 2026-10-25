@@ -93,7 +93,9 @@
                 "title": "Selecionar um Evento Sísmico",
                 "earthquake_at": "Sismo às {{time}}",
                 "p_wave_arrival": "Chegada da Onda P {{time}} ({{seconds}} seg)",
+                "p_wave_unavailable": "Não é possível estimar a hora de chegada da onda P",
                 "s_wave_arrival": "Chegada da Onda S {{time}} ({{seconds}} seg)",
+                "s_wave_unavailable": "Não é possível estimar a hora de chegada da onda S",
                 "epicenter_distance": "Epicentro {{distance}} km",
                 "earthquake_depth": "Profundidade {{depth}} km",
                 "selected_an_event": "Selecionado um evento sísmico em {{region}} às {{time}}."

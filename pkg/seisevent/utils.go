@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/bclswl0827/travel"
+	"github.com/bclswl0827/travel/resource"
 	"github.com/samber/lo"
 )
 
@@ -87,10 +88,15 @@ func getSeismicEstimation(table *travel.AK135, lat1, lat2, lng1, lng2, depth flo
 		estObj.P_Wave = result.PKIKP.Duration.Seconds()
 	}
 
-	if result.S != nil {
-		estObj.S_Wave = result.S.Duration.Seconds()
-	} else if result.SKIKS != nil {
-		estObj.S_Wave = result.SKIKS.Duration.Seconds()
+	// SKS can be the earliest S-type arrival even when S exists.
+	for _, arrival := range []*resource.TravelTimeEntry{result.S, result.SKS, result.SKIKS} {
+		if arrival == nil || arrival.Duration < 0 {
+			continue
+		}
+		seconds := arrival.Duration.Seconds()
+		if estObj.S_Wave < 0 || seconds < estObj.S_Wave {
+			estObj.S_Wave = seconds
+		}
 	}
 
 	return estObj

@@ -93,7 +93,9 @@
                 "title": "เลือกเหตุการณ์แผ่นดินไหว",
                 "earthquake_at": "แผ่นดินไหวเมื่อ {{time}}",
                 "p_wave_arrival": "คลื่น P มาถึง {{time}} ({{seconds}} วินาที)",
+                "p_wave_unavailable": "ไม่สามารถประมาณเวลามาถึงของคลื่น P ได้",
                 "s_wave_arrival": "คลื่น S มาถึง {{time}} ({{seconds}} วินาที)",
+                "s_wave_unavailable": "ไม่สามารถประมาณเวลามาถึงของคลื่น S ได้",
                 "epicenter_distance": "ระยะจากศูนย์กลาง {{distance}} กม.",
                 "earthquake_depth": "ความลึก {{depth}} กม.",
                 "selected_an_event": "เลือกเหตุการณ์แผ่นดินไหวใน {{region}} เมื่อ {{time}} แล้ว"

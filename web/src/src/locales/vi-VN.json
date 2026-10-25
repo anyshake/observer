@@ -93,7 +93,9 @@
                 "title": "Chọn một sự kiện địa chấn",
                 "earthquake_at": "Động đất lúc {{time}}",
                 "p_wave_arrival": "Sóng P đến lúc {{time}} ({{seconds}} giây)",
+                "p_wave_unavailable": "Không thể ước tính thời gian đến của sóng P",
                 "s_wave_arrival": "Sóng S đến lúc {{time}} ({{seconds}} giây)",
+                "s_wave_unavailable": "Không thể ước tính thời gian đến của sóng S",
                 "epicenter_distance": "Khoảng cách đến tâm chấn {{distance}} km",
                 "earthquake_depth": "Độ sâu {{depth}} km",
                 "selected_an_event": "Đã chọn trận động đất tại {{region}} lúc {{time}}."

@@ -19,11 +19,9 @@ export const Footer = ({ text, homepage, copyright, repository }: IFooter) => {
         <footer className="app-footer">
             <span className="app-footer-text">{t(text)}</span>
             <div className="app-footer-links">
-                <Link
-                    className="app-footer-copyright"
-                    to={homepage}
-                    target="_blank"
-                >{`© ${currentYear} ${copyright}`}</Link>
+                <Link className="app-footer-copyright" to={homepage} target="_blank">
+                    {`© ${currentYear} ${copyright}`}
+                </Link>
                 <Link to={repository} target="_blank">
                     <Icon className="app-footer-icon" path={mdiGithub} size={1} />
                 </Link>

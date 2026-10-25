@@ -93,7 +93,9 @@
                 "title": "지진 이벤트 선택",
                 "earthquake_at": "{{time}} 발생 지진",
                 "p_wave_arrival": "P파 도착 {{time}} ({{seconds}}초)",
+                "p_wave_unavailable": "P파 도착 시간을 추정할 수 없습니다",
                 "s_wave_arrival": "S파 도착 {{time}} ({{seconds}}초)",
+                "s_wave_unavailable": "S파 도착 시간을 추정할 수 없습니다",
                 "epicenter_distance": "진앙 거리 {{distance}} km",
                 "earthquake_depth": "깊이 {{depth}} km",
                 "selected_an_event": "{{time}}에 {{region}}에서 발생한 지진 이벤트를 선택했습니다."

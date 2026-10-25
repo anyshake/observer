@@ -93,7 +93,9 @@
                 "title": "ငလျင်ဖြစ်စဉ်တစ်ခု ရွေးချယ်ပါ",
                 "earthquake_at": "{{time}} တွင် ဖြစ်ပွားသော ငလျင်",
                 "p_wave_arrival": "P လှိုင်း ရောက်ရှိချိန် {{time}} ({{seconds}} စက္ကန့်)",
+                "p_wave_unavailable": "P လှိုင်း ရောက်ရှိချိန်ကို မခန့်မှန်းနိုင်ပါ",
                 "s_wave_arrival": "S လှိုင်း ရောက်ရှိချိန် {{time}} ({{seconds}} စက္ကန့်)",
+                "s_wave_unavailable": "S လှိုင်း ရောက်ရှိချိန်ကို မခန့်မှန်းနိုင်ပါ",
                 "epicenter_distance": "ငလျင်ဗဟိုချက်အကွာအဝေး {{distance}} ကီလိုမီတာ",
                 "earthquake_depth": "အနက် {{depth}} ကီလိုမီတာ",
                 "selected_an_event": "{{time}} တွင် {{region}} ၌ ဖြစ်ပွားသော ငလျင်ဖြစ်စဉ်ကို ရွေးချယ်ပြီးပါပြီ။"

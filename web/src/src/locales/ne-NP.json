@@ -93,7 +93,9 @@
                 "title": "भूकम्पीय घटना चयन गर्नुहोस्",
                 "earthquake_at": "{{time}} मा गएको भूकम्प",
                 "p_wave_arrival": "P-तरङ्ग आगमन {{time}} ({{seconds}} सेकेन्ड)",
+                "p_wave_unavailable": "P-तरङ्गको आगमन समय अनुमान गर्न सकिएन",
                 "s_wave_arrival": "S-तरङ्ग आगमन {{time}} ({{seconds}} सेकेन्ड)",
+                "s_wave_unavailable": "S-तरङ्गको आगमन समय अनुमान गर्न सकिएन",
                 "epicenter_distance": "अधिकेन्द्रको दूरी {{distance}} किमि",
                 "earthquake_depth": "गहिराइ {{depth}} किमि",
                 "selected_an_event": "{{time}} मा {{region}} मा गएको भूकम्प चयन गरियो।"

@@ -93,7 +93,9 @@
                 "title": "اختر حدثًا زلزاليًا",
                 "earthquake_at": "زلزال في {{time}}",
                 "p_wave_arrival": "وصول الموجة P في {{time}} ({{seconds}} ثانية)",
+                "p_wave_unavailable": "يتعذر تقدير وقت وصول الموجة P",
                 "s_wave_arrival": "وصول الموجة S في {{time}} ({{seconds}} ثانية)",
+                "s_wave_unavailable": "يتعذر تقدير وقت وصول الموجة S",
                 "epicenter_distance": "المسافة إلى المركز السطحي {{distance}} كم",
                 "earthquake_depth": "العمق {{depth}} كم",
                 "selected_an_event": "تم اختيار حدث زلزالي في {{region}} بتاريخ {{time}}."

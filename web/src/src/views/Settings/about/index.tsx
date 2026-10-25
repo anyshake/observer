@@ -1,5 +1,6 @@
 import { mdiGithub, mdiOpenInNew } from '@mdi/js';
 import Icon from '@mdi/react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { globalConfig } from '../../../config/global';
@@ -8,6 +9,7 @@ import { ThirdPartyLicenses } from './ThirdPartyLicenses';
 import { UpgradePanel } from './UpgradePanel';
 
 export const About = ({ isAdmin }: { isAdmin: boolean }) => {
+    const currentYear = useMemo(() => new Date().getFullYear(), []);
     const { t } = useTranslation();
     const { data, loading, error } = useGetSoftwareVersionQuery({ fetchPolicy: 'cache-first' });
 
@@ -35,7 +37,7 @@ export const About = ({ isAdmin }: { isAdmin: boolean }) => {
                     </div>
                     <div>
                         <dt>{t('views.Settings.About.copyright')}</dt>
-                        <dd>© 2025 {globalConfig.copyright}</dd>
+                        <dd>{`© ${currentYear} ${globalConfig.copyright}`}</dd>
                     </div>
                     <div>
                         <dt>{t('views.Settings.About.license')}</dt>
