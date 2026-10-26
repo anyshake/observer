@@ -10,7 +10,7 @@ require (
 	github.com/appleboy/gin-jwt/v2 v2.10.1
 	github.com/bclswl0827/fdsnws-go v0.0.4
 	github.com/bclswl0827/go-serial v0.0.1
-	github.com/bclswl0827/heligo v0.2.2
+	github.com/bclswl0827/heligo v0.2.3
 	github.com/bclswl0827/mseedio v1.2.2
 	github.com/bclswl0827/obsgo v1.0.1
 	github.com/bclswl0827/sacio v1.0.6
