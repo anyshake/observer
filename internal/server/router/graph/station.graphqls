@@ -1,0 +1,24 @@
+type configConstraint {
+  namespace: String!
+  key: String!
+  name: String!
+  description: String!
+  configType: String!
+  isRequired: Boolean!
+  currentValue: Any!
+  options: Any
+}
+
+extend type Query {
+  getStationConfig: Map!
+  getStationConfigConstraint: [configConstraint!]! # admin only
+  getStationMetadata(format: String!): String!
+  exportGlobalConfig: String! # admin only
+}
+
+extend type Mutation {
+  # station management - admin only
+  updateStationConfig(key: String!, value: Any!): Boolean!
+  restoreStationConfig: Boolean!
+  importGlobalConfig(data: String!): Boolean!
+}

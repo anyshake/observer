@@ -1,0 +1,37 @@
+type _channelData {
+  channelCode: String!
+  channelId: Int!
+  data: [Int32!]!
+}
+
+type seisRecord {
+  timestamp: Int64!
+  sampleRate: Int!
+  channelData: [_channelData!]!
+}
+
+type seisEventSource {
+  id: String!
+  country: String!
+  locales: Map!
+  defaultLocale: String!
+}
+
+type seisEvent {
+  verfied: Boolean!
+  timestamp: Int64!
+  eventId: String!
+  region: String!
+  depth: Float!
+  latitude: Float!
+  longitude: Float!
+  magnitude: Map!
+  distance: Float!
+  estimation: [Float!]! # [P-wave travel time, S-wave travel time] in seconds; -1 means unavailable
+}
+
+extend type Query {
+  getEventSource: [seisEventSource]!
+  getEventsBySource(code: String!): [seisEvent!]!
+  getSeisRecordsByTime(startTime: Int64!, endTime: Int64!): [seisRecord]!
+}

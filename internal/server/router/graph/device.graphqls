@@ -1,0 +1,30 @@
+type deviceConfig {
+  packetInterval: Int64!
+  sampleRate: Int!
+  channelCodes: [String!]!
+  gnssEnabled: Boolean!
+  model: String!
+  protocol: String!
+}
+
+type deviceStatus {
+  startedAt: Int64!
+  updatedAt: Int64!
+  frames: Int64!
+  errors: Int64!
+  messages: Int64!
+}
+
+type deviceInfo {
+  latitude: Float
+  longitude: Float
+  elevation: Float
+  temperature: Float
+}
+
+extend type Query {
+  getDeviceId: String! # return ******** to non-admin users
+  getDeviceConfig: deviceConfig!
+  getDeviceStatus: deviceStatus!
+  getDeviceInfo: deviceInfo!
+}

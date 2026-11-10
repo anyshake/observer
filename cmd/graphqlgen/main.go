@@ -12,7 +12,14 @@ import (
 var generatedFiles = []string{
 	"internal/server/router/graph/generated.go",
 	"internal/server/router/graph/model/models_gen.go",
-	"internal/server/router/graph/schema.resolvers.go",
+	"internal/server/router/graph/device.resolvers.go",
+	"internal/server/router/graph/fdsn.resolvers.go",
+	"internal/server/router/graph/maintenance.resolvers.go",
+	"internal/server/router/graph/seismic.resolvers.go",
+	"internal/server/router/graph/service.resolvers.go",
+	"internal/server/router/graph/station.resolvers.go",
+	"internal/server/router/graph/system.resolvers.go",
+	"internal/server/router/graph/user.resolvers.go",
 }
 
 func main() {

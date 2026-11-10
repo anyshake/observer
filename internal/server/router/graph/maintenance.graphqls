@@ -1,0 +1,56 @@
+type upgradeStatus {
+  required: String!
+  current: String!
+  latest: String!
+  eligible: Boolean!
+  applied: Boolean!
+  checkFailed: Boolean!
+}
+
+type executableBackup {
+  name: String!
+  size: Int64!
+  modifiedAt: Int64!
+}
+
+type executableBackupRemoval {
+  name: String!
+  removed: Boolean!
+  error: String
+}
+
+enum jobStatus {
+  IDLE
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+type purgeDataJob {
+  id: String!
+  kind: String!
+  status: jobStatus!
+  startedAt: Int64
+  finishedAt: Int64
+  error: String
+}
+
+extend type Query {
+  getUpgradeStatus(fresh: Boolean! = false): upgradeStatus # admin only
+  getExecutableBackups: [executableBackup!]! # admin only
+  getCleanupStatus: purgeDataJob! # admin only
+}
+
+extend type Mutation {
+  # data management - admin only
+  purgeSeisRecords: purgeDataJob!
+  purgeSeisRecordsByDate(startDate: Int64!, endDate: Int64!): purgeDataJob!
+  purgeMiniSeedFiles: purgeDataJob!
+  purgeMiniSeedFilesByDate(startDate: Int64!, endDate: Int64!): purgeDataJob!
+  purgeHelicorderFiles: purgeDataJob!
+  purgeHelicorderFilesByDate(startDate: Int64!, endDate: Int64!): purgeDataJob!
+
+  # application maintenance - admin only
+  triggerUpgrade: Boolean!
+  removeExecutableBackups(names: [String!]!): [executableBackupRemoval!]!
+}

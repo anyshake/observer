@@ -1,0 +1,40 @@
+type serviceStatus {
+  serviceId: String!
+  name: String!
+  description: String!
+  restarts: Int!
+  startedAt: Int64!
+  stoppedAt: Int64!
+  updatedAt: Int64!
+  isRunning: Boolean!
+}
+
+type serviceAsset {
+  namespace: String!
+  size: Int64!
+  filePath: String!
+  fileName: String!
+  modifiedAt: Int64!
+}
+
+type serviceConfigConstraint {
+  serviceName: String!
+  serviceId: String!
+  constraints: [configConstraint]!
+}
+
+extend type Query {
+  getServiceConfigConstraint: [serviceConfigConstraint!]! # admin only
+  getServiceStatus: [serviceStatus!]
+  getMiniSeedFiles: [serviceAsset]!
+  getHelicorderFiles: [serviceAsset]!
+}
+
+extend type Mutation {
+  # service management - admin only
+  stopService(serviceId: String!): Boolean!
+  startService(serviceId: String!): Boolean!
+  restartService(serviceId: String!): Boolean!
+  restoreServiceConfig(serviceId: String): Boolean!
+  updateServiceConfig(serviceId: String!, key: String!, val: Any!): Boolean!
+}

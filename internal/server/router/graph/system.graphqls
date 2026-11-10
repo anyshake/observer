@@ -1,0 +1,18 @@
+type systemStatus {
+  cpu: Float!
+  memory: Float!
+  disk: Float!
+  uptime: Int64!
+}
+
+type Query {
+  getSoftwareVersion: String!
+  getCurrentTime: Int64!
+  getSystemStatus: systemStatus!
+  isGenuineProduct: Boolean! # admin only
+  getApplicationLogs: [String!] # admin only
+}
+
+type Mutation {
+  restartApplication: Boolean!
+}

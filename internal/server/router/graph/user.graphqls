@@ -1,0 +1,27 @@
+type sysUser {
+  createdAt: Int64!
+  userId: String!
+  username: String!
+  lastLogin: Int64!
+  userIp: String!
+  userAgent: String!
+  admin: Boolean!
+  updatedAt: Int64!
+}
+
+extend type Query {
+  getCurrentUser: sysUser!
+  getSysUsers: [sysUser!]! # admin only
+}
+
+extend type Mutation {
+  # user management - admin only
+  createSysUser(username: String!, password: String!, admin: Boolean!): String!
+  removeSysUser(userId: String!): Boolean!
+  updateSysUser(
+    userId: String!
+    username: String!
+    password: String
+    admin: Boolean!
+  ): Boolean!
+}
