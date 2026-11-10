@@ -151,9 +151,10 @@ jobs:
       - name: Setup Go toolchain (Windows 7)
         if: ${{ matrix.target_id == 'windows7_386' || matrix.target_id == 'windows7_amd64'}}
         run: |
-          curl -L -o /tmp/go-legacy-win7.tar.gz https://github.com/thongtech/go-legacy-win7/releases/download/v1.27.1-1/go-legacy-win7-1.27.1-1.linux_amd64.tar.gz
+          curl -L -o /tmp/go-legacy-win7.tar.gz https://github.com/thongtech/go-legacy-win7/releases/download/v1.27.3-1/go-legacy-win7-1.27.3-1.linux_amd64.tar.gz
+          echo "069ceddac4917c528be492e560bb71bcf5c8ed5ff5d952ce1c8519e9b169228e  /tmp/go-legacy-win7.tar.gz" | sha256sum --check
           tar -xvf /tmp/go-legacy-win7.tar.gz -C $HOME
-          rm -f go-legacy-win7.tar.gz
+          rm -f /tmp/go-legacy-win7.tar.gz
           export GOROOT=$HOME/go-legacy-win7
           echo "GOROOT=$GOROOT" >> $GITHUB_ENV
           $GOROOT/bin/go version
@@ -208,8 +209,44 @@ jobs:
         run: |
           zip -r ../${{ matrix.target_id }}.zip *
 
-      - name: Create release note
+      - name: Upload release artifacts
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-${{ matrix.target_id }}
+          path: |
+            build/${{ matrix.target_id }}.zip
+            build/${{ matrix.target_id }}.dgst
+          if-no-files-found: error
+
+  release:
+    runs-on: ubuntu-latest
+
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    needs:
+      - build_core
+
+    permissions:
+      contents: write
+
+    concurrency:
+      group: release-${{ github.ref }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - name: Download release artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: release-*
+          path: build/release
+          merge-multiple: true
+
+      - name: Create release note
         id: release_note
         uses: mikepenz/release-changelog-builder-action@v6
         with:
@@ -284,11 +321,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload to GitHub Release
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: build/${{ matrix.target_id }}*
+          file: build/release/*
           tag: ${{ github.ref }}
           file_glob: true
           overwrite: true
@@ -299,9 +335,7 @@ jobs:
 
     if: ${{ startsWith(github.ref, 'refs/tags/') }}
     needs:
-      - build_web
-      - build_core
-      - unit_tests
+      - release
 
     steps:
       - name: Checkout repository

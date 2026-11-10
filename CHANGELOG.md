@@ -2,6 +2,32 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.10.0
+
+### Release Notes
+
+This release adds **FFT amplitude spectra, resizable chart workspaces, and PNG workspace exports** to live and historical views. It also corrects Explorer v3 timestamp compensation and MiniSEED timing, and expands live waveform history.
+
+### New Features
+
+- Added optional **FFT amplitude spectra** alongside live and historical waveforms, calculated from the visible time range with a logarithmic frequency axis and background worker processing.
+- Added **resizable chart workspaces** with remembered heights, keyboard controls, and PNG exports of the displayed chart panels.
+- Added a custom waveform retention dialog supporting **10–300 seconds** in 10-second steps.
+
+### Improvements
+
+- Increased the WebSocket history buffer from 120 to 300 packets to support longer live waveform views.
+- Refined chart panels, axis labels, drag and resize handling, and interface styling.
+- Bundled map label glyphs and added versioned caching for map tiles and glyphs, with documentation for rebuilding map assets.
+- Split GraphQL schemas and resolvers by domain and updated backend and frontend code generation configuration.
+- Updated `heligo` to v0.2.3 and `mseedio` to v1.3.0.
+
+### Bug Fixes
+
+- Fixed Explorer v3 host timestamps and the GNSS clock shared with the NTP service ignoring firmware-reported sample latency. Delay metadata is now applied when valid and invalidated after configuration changes or MCU clock discontinuities.
+- Fixed MiniSEED recordings and exports accumulating timestamp jitter between continuous packets. Records now follow the sample timeline while preserving real gaps and sample rate changes, store the applied time correction, and include blockette 1001 timing quality metadata.
+- Fixed invalid persisted waveform retention values by normalizing them to the supported range and step.
+
 ## v4.9.0
 
 ### Release Notes
