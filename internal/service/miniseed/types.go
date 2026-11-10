@@ -8,6 +8,7 @@ import (
 	"github.com/anyshake/observer/internal/hardware"
 	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/internal/service"
+	"github.com/anyshake/observer/internal/waveform"
 	"github.com/anyshake/observer/pkg/timesource"
 )
 
@@ -55,4 +56,5 @@ type MiniSeedServiceImpl struct {
 	appendCountDown  int
 	dataSequence     sequence
 	recordBuffer     [][]buffer
+	timelines        map[string]*waveform.Timeline
 }

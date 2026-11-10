@@ -10,7 +10,7 @@ import (
 
 const LOG_PREFIX = "websocket_api_stream"
 
-const HISTORY_BUFFER_SIZE = 120
+const HISTORY_BUFFER_SIZE = 300
 
 type buffer struct {
 	SampleRate  int

@@ -19,6 +19,7 @@ import (
 	"github.com/anyshake/observer/internal/hardware"
 	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/internal/testsupport"
+	"github.com/anyshake/observer/internal/waveform"
 	"github.com/anyshake/observer/pkg/metadata"
 	"github.com/bclswl0827/mseedio"
 	"github.com/gin-gonic/gin"
@@ -151,8 +152,7 @@ func TestSetupPostExportsAllChannels(t *testing.T) {
 				if !series.FixedSection.StartTime.Truncate(time.Second).Equal(wantTime.Truncate(time.Second)) {
 					t.Fatalf("%s start time = %s, want %s", channel, series.FixedSection.StartTime, wantTime)
 				}
-				// mseedio v1.2.1 decodes BTIME fractions as nanoseconds instead of 100us units.
-				// Check the fractional field directly to preserve subsecond coverage.
+				// Check the encoded BTIME field directly to preserve wire-format coverage.
 				header := rec.Body.Bytes()[series.FixedSection.ReaderOffset.Start:]
 				gotFraction := binary.BigEndian.Uint16(header[28:30])
 				wantFraction := uint16(wantTime.Nanosecond() / int(100*time.Microsecond))
@@ -176,6 +176,65 @@ func TestSetupPostExportsAllChannels(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestSetupPostMseedWritesTimeCorrection(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	db, handler := testsupport.OpenDAO(t)
+	initExportCodes(t, handler)
+	start := time.Date(2024, 3, 15, 13, 5, 9, 123000000, time.UTC)
+	jitters := []time.Duration{0, 15 * time.Millisecond, 30 * time.Millisecond}
+	records := syntheticRecords(start, 3, 4, []explorer.ChannelData{{
+		ChannelCode: "EHZ", ChannelId: 1, ByteSize: 4, DataType: "int32", Data: []int32{1, -2, 3, -4},
+	}})
+	records[1].RecordTime += jitters[1].Milliseconds()
+	records[2].RecordTime += jitters[2].Milliseconds()
+	insertRecords(t, db, records)
+
+	engine := gin.New()
+	Setup(engine.Group("/api"), handler, hardwareWithChannels("EHZ"), func(ctx *gin.Context) { ctx.Next() })
+	rec := postExport(engine, map[string]any{
+		"start_time": start.UnixMilli(), "end_time": start.Add(4 * time.Second).UnixMilli(),
+		"channel_code": "EHZ", "data_format": "mseed_int32",
+	})
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d body = %s", rec.Code, rec.Body.String())
+	}
+
+	var decoded mseedio.MiniSeedData
+	if err := decoded.ReadFromReader(bytes.NewReader(rec.Body.Bytes())); err != nil {
+		t.Fatal(err)
+	}
+	if len(decoded.Series) != 3 {
+		t.Fatalf("series count = %d, want 3", len(decoded.Series))
+	}
+	for i, series := range decoded.Series {
+		wantTime := start.Add(time.Duration(i) * time.Second)
+		recordTime := wantTime.Add(jitters[i])
+		if !series.FixedSection.StartTime.Equal(wantTime) {
+			t.Fatalf("record %d effective start time = %s, want %s", i, series.FixedSection.StartTime, wantTime)
+		}
+		header := rec.Body.Bytes()[series.FixedSection.ReaderOffset.Start:]
+		gotFraction := binary.BigEndian.Uint16(header[28:30])
+		wantFraction := uint16(wantTime.Nanosecond() / int(waveform.MiniSeedTimeCorrectionUnit))
+		if gotFraction != wantFraction {
+			t.Fatalf("record %d BTIME fraction = %d, want %d (100us units)", i, gotFraction, wantFraction)
+		}
+		wantCorrection := int32(-jitters[i] / waveform.MiniSeedTimeCorrectionUnit)
+		if series.FixedSection.TimeCorrection != wantCorrection {
+			t.Fatalf("record %d time correction = %d, want %d", i, series.FixedSection.TimeCorrection, wantCorrection)
+		}
+		if series.FixedSection.ActivityFlags&mseedio.ACTIVITY_TIME_CORRECTION_APPLIED == 0 {
+			t.Fatalf("record %d does not mark time correction as applied", i)
+		}
+		reconstructedRecordTime := wantTime.Add(-time.Duration(series.FixedSection.TimeCorrection) * waveform.MiniSeedTimeCorrectionUnit)
+		if !reconstructedRecordTime.Equal(recordTime) {
+			t.Fatalf("record %d reconstructed raw time = %s, want %s", i, reconstructedRecordTime, recordTime)
+		}
+		if len(series.BlocketteSections) != 2 || series.BlocketteSections[1].BlocketteCode != 1001 || series.BlocketteSections[1].TimingQuality != 0 {
+			t.Fatalf("record %d blockettes = %#v", i, series.BlocketteSections)
+		}
 	}
 }
 

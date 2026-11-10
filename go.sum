@@ -120,8 +120,8 @@ github.com/bclswl0827/go-serial v0.0.1 h1:pIQZytCy9gg5lxxhfkhbHEz3WF0+tkZRQsE9qz
 github.com/bclswl0827/go-serial v0.0.1/go.mod h1:qt+s3rGDzar90EshNSPN0myWyCMaSj32BFQNmrh3Pnw=
 github.com/bclswl0827/heligo v0.2.3 h1:DVHKnq0iPcfg9dx4849C5mtJ5x7L4y+KIRGk77GVPrQ=
 github.com/bclswl0827/heligo v0.2.3/go.mod h1:WH8m+FusI8/vwTUotWCrBj/VKHBeP3dwhYAKL8g6CCc=
-github.com/bclswl0827/mseedio v1.2.2 h1:beFcOfFmKQvwwRrzBnZQsYvQUmqfg4wM9oBYzls1LzY=
-github.com/bclswl0827/mseedio v1.2.2/go.mod h1:G9nOPR8epxb7ihX5pUpvs3HqYZMnMlXc1Ha1WSMWn7s=
+github.com/bclswl0827/mseedio v1.3.0 h1:59LXGMll6J3nozw5Yr+pvs3ehtt62vrBj3W9HyEI6pA=
+github.com/bclswl0827/mseedio v1.3.0/go.mod h1:G9nOPR8epxb7ihX5pUpvs3HqYZMnMlXc1Ha1WSMWn7s=
 github.com/bclswl0827/obsgo v1.0.1 h1:XM8AW4EC9O/Ppq+TSAo8t+OQg/D4vvue+d2biBG2Hkk=
 github.com/bclswl0827/obsgo v1.0.1/go.mod h1:zDtmmUIsl9xd7kR3xDv4bVKxPPcIK+TaGPbH4q5DY7w=
 github.com/bclswl0827/sacio v1.0.6 h1:kR6ll6xjoQGO+YVEZvvvbAxKGUD3qUXsyIuQape1+vc=

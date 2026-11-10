@@ -13,6 +13,7 @@ import (
 
 	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/internal/service"
+	"github.com/anyshake/observer/internal/waveform"
 	"github.com/anyshake/observer/pkg/fileutil"
 	"github.com/anyshake/observer/pkg/logger"
 	"github.com/bclswl0827/mseedio"
@@ -20,9 +21,9 @@ import (
 )
 
 func (s *MiniSeedServiceImpl) getAppendInterval(gnssAvailable bool) int {
-	// Set write interval to 1 if GNSS time is not available
-	// This is a simple solution to sample rate and timestamp jittering
-	// However, it will increase the disk I/O and file size
+	// Without GNSS, write each packet separately so NTP jitter does not make a
+	// multi-packet batch fail validation. The output timeline is normalized when
+	// each record is written below.
 	if !gnssAvailable {
 		return 1
 	}
@@ -209,14 +210,14 @@ func (s *MiniSeedServiceImpl) saveMiniSeedRecords(gnssAvailable bool) (int, erro
 		logger.GetLogger(ID).Warnf("failed to read data sequence, starting from 0: %v", err)
 	}
 
-	allowedJitterMs := lo.Ternary[float64](gnssAvailable, explorer.ALLOWED_JITTER_MS_GNSS, explorer.ALLOWED_JITTER_MS_NTP)
+	allowedJitterMs := lo.Ternary(gnssAvailable, explorer.ALLOWED_JITTER_MS_GNSS, explorer.ALLOWED_JITTER_MS_NTP)
 
 	startTimestamp := s.recordBuffer[0][0].Timestamp
 	startSampleRate := s.recordBuffer[0][0].SampleRate
 	startChannels := len(s.recordBuffer[0])
 	for i := 1; i < len(s.recordBuffer); i++ {
 		expectedTimestamp := startTimestamp + int64(i)*1000
-		if math.Abs(float64(s.recordBuffer[i][0].Timestamp-expectedTimestamp)) >= allowedJitterMs {
+		if math.Abs(float64(s.recordBuffer[i][0].Timestamp-expectedTimestamp)) >= float64(allowedJitterMs) {
 			return 0, fmt.Errorf(
 				"timestamp out of jitter range %d ms, expected %d, got %d",
 				int(allowedJitterMs),
@@ -268,21 +269,49 @@ func (s *MiniSeedServiceImpl) saveMiniSeedRecords(gnssAvailable bool) (int, erro
 			seq = 0
 		}
 
-		dateDir := filepath.Join(s.filePath, time.UnixMilli(startTimestamp).UTC().Format("2006-01-02"))
-		filePath := filepath.Join(dateDir, s.getMiniSeedFileName(time.UnixMilli(startTimestamp).UTC(), channelCode))
+		if s.timelines == nil {
+			s.timelines = make(map[string]*waveform.Timeline)
+		}
+		timelineKey := fmt.Sprintf("%s\x00%s.%s.%s.%s", s.filePath, s.networkCode, s.stationCode, s.locationCode, channelCode)
+		timeline := s.timelines[timelineKey]
+		if timeline == nil {
+			timeline = &waveform.Timeline{}
+			s.timelines[timelineKey] = timeline
+		}
+		allowedJitter := time.Duration(allowedJitterMs) * time.Millisecond
+		recordTime := time.UnixMilli(startTimestamp).UTC()
+		correctedStartTime := timeline.AppendStartTime(
+			recordTime,
+			startSampleRate,
+			len(channelBuffer),
+			allowedJitter,
+		)
+		timeCorrection, err := waveform.MiniSeedTimeCorrection(recordTime, correctedStartTime)
+		if err != nil {
+			return 0, err
+		}
+		timingQuality := lo.Ternary[int32](gnssAvailable, 100, 90)
+
+		dateDir := filepath.Join(s.filePath, correctedStartTime.Format("2006-01-02"))
+		filePath := filepath.Join(dateDir, s.getMiniSeedFileName(correctedStartTime, channelCode))
 
 		if err := os.MkdirAll(dateDir, 0755); err != nil {
 			return 0, fmt.Errorf("failed to create directory %s: %w", dateDir, err)
 		}
 
 		err = miniseed.Append(channelBuffer, &mseedio.AppendOptions{
-			SequenceNumber: fmt.Sprintf("%06d", seq),
-			SampleRate:     float64(startSampleRate),
-			StartTime:      time.UnixMilli(startTimestamp).UTC(),
-			ChannelCode:    channelCode,
-			StationCode:    s.stationCode,
-			NetworkCode:    s.networkCode,
-			LocationCode:   s.locationCode,
+			SequenceNumber:        fmt.Sprintf("%06d", seq),
+			SampleRate:            float64(startSampleRate),
+			StartTime:             correctedStartTime,
+			ChannelCode:           channelCode,
+			StationCode:           s.stationCode,
+			NetworkCode:           s.networkCode,
+			LocationCode:          s.locationCode,
+			TimeCorrection:        timeCorrection,
+			TimeCorrectionApplied: true,
+			Blockette1001: &mseedio.Blockette1001Options{
+				TimingQuality: timingQuality,
+			},
 		})
 		if err != nil {
 			return 0, err

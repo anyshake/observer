@@ -6,6 +6,7 @@ import (
 
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/hardware"
+	"github.com/anyshake/observer/internal/waveform"
 	"github.com/anyshake/observer/pkg/timesource"
 )
 
@@ -18,6 +19,7 @@ func New(parentCtx context.Context, hardwareDev hardware.IHardware, actionHandle
 		cancelFn:      cancelFn,
 		timeSource:    timeSource,
 		actionHandler: actionHandler,
+		timelines:     make(map[string]*waveform.Timeline),
 	}
 	obj.status.SetStartedAt(time.Unix(0, 0))
 	obj.status.SetStoppedAt(time.Unix(0, 0))
