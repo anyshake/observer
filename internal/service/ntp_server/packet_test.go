@@ -2,6 +2,7 @@ package ntp_server
 
 import (
 	"context"
+	"encoding/binary"
 	"errors"
 	"net"
 	"net/netip"
@@ -9,7 +10,37 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/anyshake/observer/pkg/timesource"
 )
+
+func TestPacketUsesUpdatedSharedClock(t *testing.T) {
+	local := time.Unix(1_800_000_000, 0).UTC()
+	source := timesource.New(func() time.Time { return local })
+	server := &ntpServer{timeFn: source.Now}
+	request := make([]byte, 48)
+	request[0] = 0x23
+	// Model the GNSS receive-time UTC reference after adding the entire
+	// sample-to-receive latency. The running server shares this same source.
+	reference := local.Add(307297 * time.Microsecond)
+	source.Update(local, reference, 0, nil)
+	for step := 0; step < 2; step++ {
+		want := reference.Add(time.Duration(step) * time.Second)
+		response, err := server.encodePacket(source.Now(), request)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, offset := range []int{32, 40} { // Receive and transmit timestamps.
+			seconds := binary.BigEndian.Uint32(response[offset : offset+4])
+			fraction := binary.BigEndian.Uint32(response[offset+4 : offset+8])
+			wantFraction := uint32((uint64(want.Nanosecond()) << 32) / 1_000_000_000)
+			if seconds != uint32(want.Unix()+FROM_1900_TO_1970) || fraction != wantFraction {
+				t.Fatalf("NTP timestamp at %d = %d/%d, want corrected UTC %v", offset, seconds, fraction, want)
+			}
+		}
+		local = local.Add(time.Second)
+	}
+}
 
 func TestPacketValidationAndEncoding(t *testing.T) {
 	fixed := time.Unix(1_700_000_000, 123456789).UTC()

@@ -78,6 +78,7 @@ func (g *ExplorerProtoImplV3) resetVariables() {
 	g.flagMutex.Unlock()
 
 	g.deviceVariable.Reset()
+	g.stream.packetDelayKnown = false
 }
 
 func (g *ExplorerProtoImplV3) variablesReady() bool {
@@ -126,6 +127,26 @@ func (g *ExplorerProtoImplV3) getChannelSize(deviceConfig uint32) (channelChunkL
 	}
 
 	return channelChunkLength, totalChannelSize, channelData
+}
+
+// Collect timing metadata in the reader, before it timestamps or calibrates
+// anything. The decoder may be behind the reader by several packets.
+func (g *ExplorerProtoImplV3) updatePacketDelay(mcuTimestamp int64, deviceConfig, variableData uint32) {
+	// Delay is cached across the ten-second metadata cycle, but must not
+	// survive a change in sample rate, packet interval, channels or GNSS mode.
+	delayConfig := deviceConfig &^ uint32(0x3FF)
+	if deviceConfig&(1<<5) == 0 || g.stream.packetDelayConfig != delayConfig {
+		g.stream.packetDelayKnown = false
+	}
+	g.stream.packetDelayConfig = delayConfig
+	if deviceConfig&(1<<5) != 0 && (mcuTimestamp/1000)%10 == 5 {
+		delay := int32(variableData)
+		// INT32_MAX means the firmware could not measure a valid delay.
+		g.stream.packetDelayKnown = delay >= 0 && delay != math.MaxInt32
+		if g.stream.packetDelayKnown {
+			g.stream.packetDelay = time.Duration(delay) * time.Microsecond
+		}
+	}
 }
 
 func (g *ExplorerProtoImplV3) getVariableData(mcuTimestamp int64, deviceConfig uint32, variableBytes [4]byte) {
@@ -198,6 +219,9 @@ func (g *ExplorerProtoImplV3) getVariableData(mcuTimestamp int64, deviceConfig u
 		if _, err := g.deviceVariable.GetTemperature(); err != nil {
 			variableAllSet = false
 		}
+	}
+	if variableBits&(1<<5) != 0 && (!g.stream.packetDelayKnown || g.stream.packetDelayConfig != deviceConfig&^uint32(0x3FF)) {
+		variableAllSet = false
 	}
 
 	g.flagMutex.Lock()

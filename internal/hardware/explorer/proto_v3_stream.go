@@ -14,12 +14,16 @@ import (
 
 type explorerProtocolPacketV3 struct {
 	dataTime  time.Time
+	timeReady bool
 	dataBytes []byte
 }
 
 type explorerStreamV3 struct {
 	timeSourceInitialized bool
 	timeDiffSamples       []int64
+	packetDelay           time.Duration
+	packetDelayKnown      bool
+	packetDelayConfig     uint32
 }
 
 func (g *ExplorerProtoImplV3) readStream(subCtx context.Context, readyChan chan struct{}, initFlag *int32) {
@@ -109,9 +113,27 @@ func (g *ExplorerProtoImplV3) processPacket(subCtx context.Context, packetBytes 
 			g.deviceStatus.IncrementErrors()
 			return
 		}
+		// Discard time jumps before using cached delay or disciplining the
+		// shared clock consumed by the NTP service.
+		if (mcuTimestamp < g.prevMcuTimestamp || math.Abs(float64(mcuTimestamp-g.prevMcuTimestamp)) >= 5000) && g.prevMcuTimestamp != 0 {
+			g.fifoBuffer.Reset()
+			g.resetVariables()
+			g.resetFlags()
+			g.prevMcuTimestamp = 0
+			g.isDataStreamStable = false
+			g.stream.timeDiffSamples = make([]int64, 0, STABLE_CHECK_SAMPLES)
+			return
+		}
+		g.updatePacketDelay(mcuTimestamp, deviceConfig, binary.LittleEndian.Uint32(packetBytes[12:16]))
 		packetInterval := g.parsePacketInterval(deviceConfig)
 		sampleRate := g.parseSampleRate(deviceConfig)
 		packetLatency := packetInterval + time.Duration(1000/sampleRate*channelChunkLength)*time.Millisecond
+		timeReady := deviceConfig&(1<<5) == 0 || g.stream.packetDelayKnown
+		if deviceConfig&(1<<5) != 0 && timeReady {
+			// The reader finishes at the next header. Use the same complete
+			// latency for GNSS clock calibration and NTP sample timestamps.
+			packetLatency = packetInterval + g.stream.packetDelay + g.Transport.GetLatency(2)
+		}
 
 		if !g.isDataStreamStable && !gnssEnabled {
 			timeDiff := recvEndTime.UnixMilli() - mcuTimestamp - packetLatency.Milliseconds()
@@ -135,7 +157,7 @@ func (g *ExplorerProtoImplV3) processPacket(subCtx context.Context, packetBytes 
 			g.isDataStreamStable = true
 		}
 
-		variableAllSet := g.variablesReady()
+		variableAllSet := g.variablesReady() && timeReady
 
 		if variableAllSet {
 			if gnssEnabled && !g.stream.timeSourceInitialized {
@@ -176,31 +198,19 @@ func (g *ExplorerProtoImplV3) processPacket(subCtx context.Context, packetBytes 
 			}
 		}
 
-		// Handle MCU time jumps (usually caused by Explorer power loss or PC hibernation)
-		// 5000 ms is a threshold determined by max packet interval with a safety margin (see getPacketInterval function)
-		if (mcuTimestamp < g.prevMcuTimestamp || math.Abs(float64(mcuTimestamp-g.prevMcuTimestamp)) >= 5000) && g.prevMcuTimestamp != 0 {
-			g.fifoBuffer.Reset()
-			g.resetVariables()
-			g.resetFlags()
-			g.prevMcuTimestamp = 0
-			g.isDataStreamStable = false
-			g.stream.timeDiffSamples = make([]int64, 0, STABLE_CHECK_SAMPLES)
-		} else {
-			variableAllSet := g.variablesReady()
-
-			if gnssEnabled && g.isDataStreamStable && variableAllSet {
-				select {
-				case g.timeCalibrationChan <- [2]time.Time{recvEndMonotonicTime, time.UnixMilli(mcuTimestamp).Add(packetLatency)}:
-				default:
-				}
+		if gnssEnabled && g.isDataStreamStable && variableAllSet {
+			select {
+			case g.timeCalibrationChan <- [2]time.Time{recvEndMonotonicTime, time.UnixMilli(mcuTimestamp).Add(packetLatency)}:
+			default:
 			}
-			g.prevMcuTimestamp = mcuTimestamp
 		}
+		g.prevMcuTimestamp = mcuTimestamp
 
 		if g.isDataStreamStable {
 			_, _ = g.fifoBuffer.Write(&explorerProtocolPacketV3{
 				dataBytes: packetBytes,
 				dataTime:  recvEndTime.Add(-packetLatency),
+				timeReady: timeReady,
 			})
 		}
 	} else if g.isDataStreamStable && variableAllSet {
@@ -246,7 +256,8 @@ func (g *ExplorerProtoImplV3) decodePacket(initFlag *int32) {
 	g.getVariableData(mcuTimestamp, deviceConfig, variableBytes)
 
 	variableAllSet := g.variablesReady()
-	if !variableAllSet {
+	if !variableAllSet || !dataPacketObj.timeReady {
+		g.resetFlags()
 		if (mcuTimestamp/1000)%4 == 0 {
 			g.Logger.Warnln("waiting for device config to be fully collected, this may take a while")
 		}
