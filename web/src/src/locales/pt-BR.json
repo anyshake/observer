@@ -45,6 +45,10 @@
                 "min_db": "dB mínimo",
                 "max_db": "dB máximo"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "Exportar PNG",
+            "export_failed": "Falha ao exportar a imagem: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "Modo de forma de onda",
                 "spectrogram_mode": "Modo de espectrograma"
             },
+            "fft_analysis": {
+                "show_button": "Mostrar FFT",
+                "hide_button": "Ocultar FFT"
+            },
             "share_link": {
                 "share_button": "Compartilhar link",
                 "link_copied": "Link de compartilhamento copiado para a área de transferência."
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "Modo de forma de onda",
                 "spectrogram_mode": "Modo de espectrograma"
+            },
+            "fft_analysis": {
+                "show_button": "Mostrar FFT",
+                "hide_button": "Ocultar FFT"
             },
             "reset_layout": {
                 "reset_button": "Redefinir tudo",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "Preferências da interface web",
+                "realtime_retention": {
+                    "title": "Retenção de dados em tempo real",
+                    "description": "Intervalo de formas de onda e espectrogramas em tempo real mantidos nos gráficos, de 10 segundos a 5 minutos.",
+                    "unit": "s",
+                    "edit_button": "Ajustar",
+                    "cancel_button": "Cancelar",
+                    "save_button": "Salvar",
+                    "success": "Retenção de dados em tempo real atualizada."
+                },
                 "reset_layout_preference": {
                     "title": "Redefinir preferências de layout",
                     "description": "Isso redefinirá todas as preferências de layout. Esta operação é irreversível.",

@@ -45,6 +45,10 @@
                 "min_db": "الحد الأدنى بالديسيبل",
                 "max_db": "الحد الأقصى بالديسيبل"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "تصدير PNG",
+            "export_failed": "فشل تصدير الصورة: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "وضع الموجات",
                 "spectrogram_mode": "وضع المخطط الطيفي"
             },
+            "fft_analysis": {
+                "show_button": "عرض FFT",
+                "hide_button": "إخفاء FFT"
+            },
             "share_link": {
                 "share_button": "مشاركة الرابط",
                 "link_copied": "تم نسخ رابط المشاركة إلى الحافظة."
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "وضع الموجات",
                 "spectrogram_mode": "وضع المخطط الطيفي"
+            },
+            "fft_analysis": {
+                "show_button": "عرض FFT",
+                "hide_button": "إخفاء FFT"
             },
             "reset_layout": {
                 "reset_button": "إعادة تعيين الكل",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "تفضيلات الويب",
+                "realtime_retention": {
+                    "title": "مدة الاحتفاظ بالبيانات الآنية",
+                    "description": "المدة الزمنية للأشكال الموجية والمخططات الطيفية الآنية المحفوظة في الرسوم البيانية، من 10 ثوانٍ إلى 5 دقائق.",
+                    "unit": "ث",
+                    "edit_button": "ضبط",
+                    "cancel_button": "إلغاء",
+                    "save_button": "حفظ",
+                    "success": "تم تحديث مدة الاحتفاظ بالبيانات الآنية."
+                },
                 "reset_layout_preference": {
                     "title": "إعادة تعيين تفضيلات التخطيط",
                     "description": "ستُعاد جميع تفضيلات التخطيط إلى القيم الافتراضية. لا يمكن التراجع عن هذه العملية.",

@@ -45,6 +45,10 @@
                 "min_db": "dB minimi",
                 "max_db": "dB massimi"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "Esporta PNG",
+            "export_failed": "Esportazione dell'immagine non riuscita: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "Modalità forma d'onda",
                 "spectrogram_mode": "Modalità spettrogramma"
             },
+            "fft_analysis": {
+                "show_button": "Mostra FFT",
+                "hide_button": "Nascondi FFT"
+            },
             "share_link": {
                 "share_button": "Condividi collegamento",
                 "link_copied": "Collegamento di condivisione copiato negli appunti."
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "Modalità forma d'onda",
                 "spectrogram_mode": "Modalità spettrogramma"
+            },
+            "fft_analysis": {
+                "show_button": "Mostra FFT",
+                "hide_button": "Nascondi FFT"
             },
             "reset_layout": {
                 "reset_button": "Ripristina tutto",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "Preferenze web",
+                "realtime_retention": {
+                    "title": "Conservazione dei dati in tempo reale",
+                    "description": "Intervallo di forme d'onda e spettrogrammi in tempo reale mantenuti nei grafici, da 10 secondi a 5 minuti.",
+                    "unit": "s",
+                    "edit_button": "Regola",
+                    "cancel_button": "Annulla",
+                    "save_button": "Salva",
+                    "success": "Conservazione dei dati in tempo reale aggiornata."
+                },
                 "reset_layout_preference": {
                     "title": "Ripristina preferenze di disposizione",
                     "description": "Verranno ripristinate tutte le preferenze di disposizione. L'operazione è irreversibile.",

@@ -13,6 +13,7 @@
     --app-subtle: #99a1af;
     --app-border: #e5e7eb;
     --app-border-strong: #d1d5dc;
+    --app-border-soft: #f1f5f9;
     --app-primary: #8b3dff;
     --app-button: #ad46ff;
     --app-button-hover: #8200db;
@@ -43,7 +44,6 @@
     --app-chart-label: #6e7079;
     --app-chart-axis: #6e7079;
     --app-chart-grid: #e0e6f1;
-    --app-chart-title: #f0f0f0;
     --app-map-background: #f8f9fc;
     --app-map-water: #d1d1f0;
     --app-map-land: #f2f0eb;
@@ -96,6 +96,7 @@
     --app-subtle: #a592b9;
     --app-border: #40314f;
     --app-border-strong: #604974;
+    --app-border-soft: #33263f;
     --app-primary: #c197f3;
     --app-button: #8752c9;
     --app-button-hover: #7543b4;
@@ -125,7 +126,6 @@
     --app-chart-label: #cbb9e0;
     --app-chart-axis: #8e70ac;
     --app-chart-grid: #3c2e4b;
-    --app-chart-title: #38264b;
     --app-map-background: #171020;
     --app-map-water: #1e142e;
     --app-map-land: #34263f;

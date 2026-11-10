@@ -1,15 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const schemaPath = (import.meta as any).env.VITE_APP_GRAPHQL_SCHEMA_PATH;
+if (!schemaPath) {
+    throw new Error('VITE_APP_GRAPHQL_SCHEMA_PATH must be set to the backend GraphQL schema path.');
+}
+
 const config: CodegenConfig = {
-    schema: {
-        [`${(import.meta as any).env.VITE_APP_BACKEND_BASE_HOST}${(import.meta as any).env.VITE_APP_GRAPHQL_API_ENDPOINT}`]:
-            {
-                headers: {
-                    Authorization: `Bearer ${(import.meta as any).env.VITE_APP_GRAPHQL_API_ENDPOINT_DEV_TOKEN}`
-                }
-            }
-    },
+    schema: schemaPath,
     overwrite: true,
     documents: 'src/**/*.graphql',
     generates: {

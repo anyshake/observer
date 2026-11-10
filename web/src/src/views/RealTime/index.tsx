@@ -1,5 +1,6 @@
 import {
     mdiBlurLinear,
+    mdiChartBellCurve,
     mdiClose,
     mdiLock,
     mdiLockOpen,
@@ -9,14 +10,17 @@ import {
     mdiWaveform
 } from '@mdi/js';
 import Icon from '@mdi/react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { FFTExecutor } from 'spectrogram-js';
 
+import { ResizableWorkspace } from '../../components/ui/ResizableWorkspace';
+import { WorkspaceExportButton } from '../../components/ui/WorkspaceExportButton';
 import { Banner } from '../../components/widget/Banner';
 import { RealTimeConstraints } from '../../config/constraints';
 import { routerConfig } from '../../config/router';
+import { SpectrumExecutor } from '../../helpers/dsp/SpectrumExecutor';
 import { getTimeString } from '../../helpers/utils/getTimeString';
 import { useRetentionStore } from '../../stores/retention';
 import { RealtimeChannel } from './RealtimeChannel';
@@ -41,6 +45,8 @@ const RealTime = () => {
     const {
         locks,
         toggleLock,
+        fftModes,
+        toggleFftMode,
         getInitialLayout,
         handleResetLayout,
         handleDragStop,
@@ -58,11 +64,20 @@ const RealTime = () => {
     }, [sampleRate]);
 
     const sharedFFTExecutor = useMemo(() => new FFTExecutor(RealTimeConstraints.fftSize), []);
+    const sharedSpectrumExecutor = useMemo(() => new SpectrumExecutor(), []);
+    useEffect(() => () => sharedSpectrumExecutor.dispose(), [sharedSpectrumExecutor]);
+    const fftMode = Boolean(fftModes[RealTimeConstraints.id]);
     const [activeChart, setActiveChart] = useState<string | null>(null); // Track the active chart
+    const workspaceRef = useRef<HTMLDivElement>(null);
 
     const handleActiveChart = useCallback((channel: string) => {
         setActiveChart(channel);
     }, []);
+
+    const handleToggleFftMode = useCallback(
+        () => toggleFftMode(RealTimeConstraints.id),
+        [toggleFftMode]
+    );
 
     const handleToggleDisplayMode = useCallback(() => {
         setDisplayMode((prevMode) => (prevMode === 'waveform' ? 'spectrogram' : 'waveform'));
@@ -101,6 +116,18 @@ const RealTime = () => {
                     <Icon className="app-icon" path={mdiLockReset} size={0.7} />
                     <span>{t('views.RealTime.reset_layout.reset_button')}</span>
                 </button>
+                <button
+                    className="btn btn-sm app-button-toolbar"
+                    disabled={displayMode !== 'waveform'}
+                    onClick={handleToggleFftMode}
+                >
+                    <Icon className="app-icon" path={mdiChartBellCurve} size={0.7} />
+                    <span>
+                        {fftMode
+                            ? t('views.RealTime.fft_analysis.hide_button')
+                            : t('views.RealTime.fft_analysis.show_button')}
+                    </span>
+                </button>
                 {sampleRate >= RealTimeConstraints.freqRange[1] * 2 && (
                     <button
                         className="btn btn-sm app-button-toolbar"
@@ -118,6 +145,11 @@ const RealTime = () => {
                         </span>
                     </button>
                 )}
+                <WorkspaceExportButton
+                    workspaceRef={workspaceRef}
+                    fileName="realtime_workspace"
+                    disabled={!Object.keys(activeChannels).length}
+                />
                 <button
                     className={`btn btn-sm app-button-toolbar ${recordingState.isRecording ? 'app-recording' : ''}`}
                     onClick={handleToggleRecording}
@@ -171,7 +203,11 @@ const RealTime = () => {
                 </div>
             )}
 
-            <div className="app-chart-workspace">
+            <ResizableWorkspace
+                id={RealTimeConstraints.id}
+                className="app-chart-workspace"
+                containerRef={workspaceRef}
+            >
                 {Object.keys(activeChannels)
                     .sort((a, b) => {
                         // Move active chart to the end
@@ -195,9 +231,11 @@ const RealTime = () => {
                                 layout={getInitialLayout(channelInfo.id, channelInfo.index)}
                                 locked={Boolean(locks[RealTimeConstraints.id])}
                                 waveformMode={displayMode === 'waveform'}
+                                fftMode={fftMode}
                                 retention={retention}
                                 sampleRate={sampleRate}
                                 fftExecutor={sharedFFTExecutor}
+                                spectrumExecutor={sharedSpectrumExecutor}
                                 waveformRef={waveformRefs.current[channel]}
                                 spectrogramRef={spectrogramRefs.current[channel]}
                                 onActive={handleActiveChart}
@@ -207,7 +245,7 @@ const RealTime = () => {
                             />
                         );
                     })}
-            </div>
+            </ResizableWorkspace>
         </div>
     );
 };

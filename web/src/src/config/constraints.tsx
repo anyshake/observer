@@ -1,6 +1,12 @@
 import type { LayerSpecification } from 'maplibre-gl';
 
+import { getMapGlyphsUrl } from '../helpers/app/getMapGlyphsUrl';
 import { getMapTilesUrl } from '../helpers/app/getMapTilesUrl';
+
+export const MapGlyphsConstraints = {
+    glyphsUrl: getMapGlyphsUrl(),
+    fontStack: ['Noto_Sans_Regular']
+};
 
 export const HomeConstraints = {
     lineChartRetention: 100,
@@ -138,7 +144,7 @@ export const HomeConstraints = {
                 'text-size': 10,
                 'text-offset': [0, -0.6],
                 'text-anchor': 'bottom',
-                'text-font': ['monospace'],
+                'text-font': MapGlyphsConstraints.fontStack,
                 'text-letter-spacing': 0.05
             },
             paint: {
@@ -150,6 +156,26 @@ export const HomeConstraints = {
     ] satisfies LayerSpecification[]
 };
 
+export const SpectrumConstraints = {
+    debounceDelay: 300,
+    minSamples: 16,
+    maxPoints: 2000,
+    minFrequency: 0.01
+};
+
+export const RetentionConstraints = {
+    minValue: 10,
+    maxValue: 300,
+    step: 10,
+    defaultValue: 120
+};
+
+export const WorkspaceConstraints = {
+    minHeight: 320,
+    maxHeight: 4000,
+    keyboardStep: 40
+};
+
 export const RealTimeConstraints = {
     id: 'realtime',
     minWidth: 200,
@@ -159,6 +185,7 @@ export const RealTimeConstraints = {
     // waveform default options
     minSpanValue: 100,
     // spectrogram default options
+    gapThreshold: 2000,
     fftSize: 1024,
     windowSize: 512,
     overlap: Math.floor(512 * 0.86),
@@ -180,6 +207,7 @@ export const HistoryConstraints = {
     // waveform default options
     minSpanValue: 100,
     // spectrogram default options
+    gapThreshold: 2000,
     fftSize: 1024,
     windowSize: 512,
     overlap: Math.floor(512 * 0.86),

@@ -45,6 +45,10 @@
                 "min_db": "dB tối thiểu",
                 "max_db": "dB tối đa"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "Xuất PNG",
+            "export_failed": "Xuất hình ảnh thất bại: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "Chế độ dạng sóng",
                 "spectrogram_mode": "Chế độ phổ đồ"
             },
+            "fft_analysis": {
+                "show_button": "Hiện FFT",
+                "hide_button": "Ẩn FFT"
+            },
             "share_link": {
                 "share_button": "Chia sẻ liên kết",
                 "link_copied": "Đã sao chép liên kết chia sẻ vào bộ nhớ tạm."
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "Chế độ dạng sóng",
                 "spectrogram_mode": "Chế độ phổ đồ"
+            },
+            "fft_analysis": {
+                "show_button": "Hiện FFT",
+                "hide_button": "Ẩn FFT"
             },
             "reset_layout": {
                 "reset_button": "Đặt lại tất cả",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "Tùy chọn web",
+                "realtime_retention": {
+                    "title": "Thời gian lưu dữ liệu thời gian thực",
+                    "description": "Khoảng thời gian dạng sóng và phổ đồ thời gian thực được giữ trên biểu đồ, từ 10 giây đến 5 phút.",
+                    "unit": "giây",
+                    "edit_button": "Điều chỉnh",
+                    "cancel_button": "Hủy",
+                    "save_button": "Lưu",
+                    "success": "Đã cập nhật thời gian lưu dữ liệu thời gian thực."
+                },
                 "reset_layout_preference": {
                     "title": "Đặt lại tùy chọn bố cục",
                     "description": "Thao tác này sẽ đặt lại tất cả tùy chọn bố cục và không thể hoàn tác.",

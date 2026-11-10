@@ -45,6 +45,10 @@
                 "min_db": "Minimum dB",
                 "max_db": "Maksimum dB"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "PNG'yi dışa aktar",
+            "export_failed": "Görüntü dışa aktarılamadı: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "Dalga Formu Modu",
                 "spectrogram_mode": "Spektrogram Modu"
             },
+            "fft_analysis": {
+                "show_button": "FFT'yi Göster",
+                "hide_button": "FFT'yi Gizle"
+            },
             "share_link": {
                 "share_button": "Bağlantıyı Paylaş",
                 "link_copied": "Paylaşılan bağlantı panoya kopyalandı."
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "Dalga Formu Modu",
                 "spectrogram_mode": "Spektrogram Modu"
+            },
+            "fft_analysis": {
+                "show_button": "FFT'yi Göster",
+                "hide_button": "FFT'yi Gizle"
             },
             "reset_layout": {
                 "reset_button": "Tümünü Sıfırla",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "Web Tercihleri",
+                "realtime_retention": {
+                    "title": "Gerçek Zamanlı Veri Saklama Süresi",
+                    "description": "Grafiklerde tutulan gerçek zamanlı dalga formu ve spektrogramların süresi, 10 saniyeden 5 dakikaya kadar.",
+                    "unit": "sn",
+                    "edit_button": "Ayarla",
+                    "cancel_button": "İptal",
+                    "save_button": "Kaydet",
+                    "success": "Gerçek zamanlı veri saklama süresi güncellendi."
+                },
                 "reset_layout_preference": {
                     "title": "Düzen Tercihlerini Sıfırla",
                     "description": "Bu, tüm düzen tercihlerini sıfırlayacaktır, işlem geri alınamaz.",

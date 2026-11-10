@@ -45,6 +45,10 @@
                 "min_db": "dB mínimo",
                 "max_db": "dB máximo"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "Exportar PNG",
+            "export_failed": "Error al exportar la imagen: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "Modo de forma de onda",
                 "spectrogram_mode": "Modo de espectrograma"
             },
+            "fft_analysis": {
+                "show_button": "Mostrar FFT",
+                "hide_button": "Ocultar FFT"
+            },
             "share_link": {
                 "share_button": "Compartir enlace",
                 "link_copied": "El enlace compartido se copió al portapapeles."
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "Modo de forma de onda",
                 "spectrogram_mode": "Modo de espectrograma"
+            },
+            "fft_analysis": {
+                "show_button": "Mostrar FFT",
+                "hide_button": "Ocultar FFT"
             },
             "reset_layout": {
                 "reset_button": "Restablecer todo",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "Preferencias web",
+                "realtime_retention": {
+                    "title": "Retención de datos en tiempo real",
+                    "description": "Intervalo de formas de onda y espectrogramas en tiempo real que se conservan en las gráficas, de 10 segundos a 5 minutos.",
+                    "unit": "s",
+                    "edit_button": "Ajustar",
+                    "cancel_button": "Cancelar",
+                    "save_button": "Guardar",
+                    "success": "Retención de datos en tiempo real actualizada."
+                },
                 "reset_layout_preference": {
                     "title": "Restablecer preferencias de diseño",
                     "description": "Esto restablecerá todas las preferencias de diseño. Esta operación es irreversible.",

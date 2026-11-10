@@ -45,6 +45,10 @@
                 "min_db": "Min dB",
                 "max_db": "Max dB"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "Export PNG",
+            "export_failed": "Failed to export image: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "Waveform Mode",
                 "spectrogram_mode": "Spectrogram Mode"
             },
+            "fft_analysis": {
+                "show_button": "Show FFT",
+                "hide_button": "Hide FFT"
+            },
             "share_link": {
                 "share_button": "Share Link",
                 "link_copied": "Shared link has been copied to clipboard."
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "Waveform Mode",
                 "spectrogram_mode": "Spectrogram Mode"
+            },
+            "fft_analysis": {
+                "show_button": "Show FFT",
+                "hide_button": "Hide FFT"
             },
             "reset_layout": {
                 "reset_button": "Reset All",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "Web Preference",
+                "realtime_retention": {
+                    "title": "Real-time Data Retention",
+                    "description": "Time span of real-time waveforms and spectrograms kept in charts, from 10 seconds to 5 minutes.",
+                    "unit": "s",
+                    "edit_button": "Adjust",
+                    "cancel_button": "Cancel",
+                    "save_button": "Save",
+                    "success": "Real-time data retention updated."
+                },
                 "reset_layout_preference": {
                     "title": "Reset Layout Preference",
                     "description": "This will reset all layout preference, operation is irreversible.",

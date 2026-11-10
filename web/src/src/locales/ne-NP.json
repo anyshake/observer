@@ -45,6 +45,10 @@
                 "min_db": "न्यूनतम dB",
                 "max_db": "अधिकतम dB"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "PNG निर्यात गर्नुहोस्",
+            "export_failed": "छवि निर्यात गर्न असफल: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "तरङ्गरूप मोड",
                 "spectrogram_mode": "स्पेक्ट्रोग्राम मोड"
             },
+            "fft_analysis": {
+                "show_button": "FFT देखाउनुहोस्",
+                "hide_button": "FFT लुकाउनुहोस्"
+            },
             "share_link": {
                 "share_button": "लिङ्क साझा गर्नुहोस्",
                 "link_copied": "साझा लिङ्क क्लिपबोर्डमा प्रतिलिपि गरियो।"
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "तरङ्गरूप मोड",
                 "spectrogram_mode": "स्पेक्ट्रोग्राम मोड"
+            },
+            "fft_analysis": {
+                "show_button": "FFT देखाउनुहोस्",
+                "hide_button": "FFT लुकाउनुहोस्"
             },
             "reset_layout": {
                 "reset_button": "सबै रिसेट गर्नुहोस्",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "वेब प्राथमिकताहरू",
+                "realtime_retention": {
+                    "title": "वास्तविक समयको डेटा राख्ने अवधि",
+                    "description": "चार्टमा राखिने वास्तविक समयको वेभफर्म र स्पेक्ट्रोग्रामको समय अवधि, 10 सेकेन्डदेखि 5 मिनेटसम्म।",
+                    "unit": "सेकेन्ड",
+                    "edit_button": "मिलाउनुहोस्",
+                    "cancel_button": "रद्द गर्नुहोस्",
+                    "save_button": "सुरक्षित गर्नुहोस्",
+                    "success": "वास्तविक समयको डेटा राख्ने अवधि अद्यावधिक गरियो।"
+                },
                 "reset_layout_preference": {
                     "title": "लेआउट प्राथमिकताहरू रिसेट गर्नुहोस्",
                     "description": "यसले सबै लेआउट प्राथमिकताहरू रिसेट गर्नेछ। यो कार्य उल्टाउन सकिँदैन।",

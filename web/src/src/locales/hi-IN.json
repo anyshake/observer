@@ -45,6 +45,10 @@
                 "min_db": "न्यूनतम dB",
                 "max_db": "अधिकतम dB"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "PNG निर्यात करें",
+            "export_failed": "छवि निर्यात करने में विफल: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "तरंगरूप मोड",
                 "spectrogram_mode": "स्पेक्ट्रोग्राम मोड"
             },
+            "fft_analysis": {
+                "show_button": "FFT दिखाएँ",
+                "hide_button": "FFT छिपाएँ"
+            },
             "share_link": {
                 "share_button": "लिंक साझा करें",
                 "link_copied": "साझा लिंक क्लिपबोर्ड पर कॉपी किया गया।"
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "तरंगरूप मोड",
                 "spectrogram_mode": "स्पेक्ट्रोग्राम मोड"
+            },
+            "fft_analysis": {
+                "show_button": "FFT दिखाएँ",
+                "hide_button": "FFT छिपाएँ"
             },
             "reset_layout": {
                 "reset_button": "सभी रीसेट करें",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "वेब प्राथमिकताएँ",
+                "realtime_retention": {
+                    "title": "वास्तविक समय डेटा प्रतिधारण",
+                    "description": "चार्ट में रखे जाने वाले वास्तविक समय वेवफ़ॉर्म और स्पेक्ट्रोग्राम की समय-अवधि, 10 सेकंड से 5 मिनट तक।",
+                    "unit": "सेकंड",
+                    "edit_button": "समायोजित करें",
+                    "cancel_button": "रद्द करें",
+                    "save_button": "सहेजें",
+                    "success": "वास्तविक समय डेटा प्रतिधारण अपडेट किया गया।"
+                },
                 "reset_layout_preference": {
                     "title": "लेआउट प्राथमिकताएँ रीसेट करें",
                     "description": "इससे सभी लेआउट प्राथमिकताएँ रीसेट हो जाएँगी। यह कार्रवाई वापस नहीं ली जा सकती।",

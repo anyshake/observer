@@ -45,6 +45,10 @@
                 "min_db": "کمینهٔ dB",
                 "max_db": "بیشینهٔ dB"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "خروجی PNG",
+            "export_failed": "خروجی گرفتن از تصویر ناموفق بود: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "حالت شکل موج",
                 "spectrogram_mode": "حالت طیف‌نگاره"
             },
+            "fft_analysis": {
+                "show_button": "نمایش FFT",
+                "hide_button": "پنهان کردن FFT"
+            },
             "share_link": {
                 "share_button": "اشتراک‌گذاری پیوند",
                 "link_copied": "پیوند اشتراک‌گذاری در کلیپ‌بورد کپی شد."
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "حالت شکل موج",
                 "spectrogram_mode": "حالت طیف‌نگاره"
+            },
+            "fft_analysis": {
+                "show_button": "نمایش FFT",
+                "hide_button": "پنهان کردن FFT"
             },
             "reset_layout": {
                 "reset_button": "بازنشانی همه",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "ترجیحات وب",
+                "realtime_retention": {
+                    "title": "مدت نگهداری داده‌های زنده",
+                    "description": "بازه زمانی شکل‌موج‌ها و طیف‌نگاره‌های زنده که در نمودارها نگهداری می‌شوند، از 10 ثانیه تا 5 دقیقه.",
+                    "unit": "ثانیه",
+                    "edit_button": "تنظیم",
+                    "cancel_button": "انصراف",
+                    "save_button": "ذخیره",
+                    "success": "مدت نگهداری داده‌های زنده به‌روزرسانی شد."
+                },
                 "reset_layout_preference": {
                     "title": "بازنشانی ترجیحات چیدمان",
                     "description": "این کار تمام ترجیحات چیدمان را بازنشانی می‌کند و قابل بازگشت نیست.",

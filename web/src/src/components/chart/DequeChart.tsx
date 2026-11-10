@@ -10,9 +10,11 @@ import {
 } from 'react';
 
 import TimeSeriesBuffer from '../../helpers/storage/TimeSeriesBuffer';
-import { getChartAxis, getChartTitle } from '../../styles/chartTheme';
+import { getChartAxis } from '../../styles/chartTheme';
 import { useThemeColors } from '../../styles/useThemeColors';
 import { getLineSeries } from './lineSeries';
+import { PlotBoundsHandler, usePlotBounds } from './usePlotBounds';
+import { useVisibleSamples, VisibleSamplesHandler } from './useVisibleSamples';
 
 export interface DequeChartHandle {
     addData: (
@@ -24,7 +26,6 @@ export interface DequeChartHandle {
 }
 
 interface IDequeChart {
-    readonly title?: string;
     readonly animation?: boolean;
     readonly lineColor?: string;
     readonly lineWidth?: number;
@@ -37,13 +38,14 @@ interface IDequeChart {
     readonly minSpanValue?: number;
     readonly maxDuration?: number; // Buffer duration in seconds
     readonly paused?: boolean;
+    readonly onVisibleSamples?: VisibleSamplesHandler;
+    readonly onPlotBounds?: PlotBoundsHandler;
 }
 
 export const DequeChart = memo(
     forwardRef<DequeChartHandle, IDequeChart>(
         (
             {
-                title,
                 animation = true,
                 lineColor,
                 lineWidth = 2,
@@ -55,7 +57,9 @@ export const DequeChart = memo(
                 yPosition = 'left',
                 maxDuration = 60,
                 minSpanValue,
-                paused = false
+                paused = false,
+                onVisibleSamples,
+                onPlotBounds
             }: IDequeChart,
             ref
         ) => {
@@ -74,6 +78,15 @@ export const DequeChart = memo(
             const scheduleRef = useRef<() => void>(() => {});
             pausedRef.current = paused;
             maxDurationRef.current = maxDuration;
+            const { onEvents, notify, reset } = useVisibleSamples(() => {
+                const endTime = bufferRef.current.getEndTime();
+                return {
+                    points: bufferRef.current.getSamples(),
+                    extent: [endTime - maxDurationRef.current * 1000, endTime]
+                };
+            }, onVisibleSamples);
+            const plotEvents = usePlotBounds(chartRef, onPlotBounds);
+            const events = useMemo(() => ({ ...onEvents, ...plotEvents }), [onEvents, plotEvents]);
 
             scheduleRef.current = () => {
                 if (rafRef.current !== null) {
@@ -109,6 +122,7 @@ export const DequeChart = memo(
                         },
                         { replaceMerge: ['series'] }
                     );
+                    notify();
                     if (needsUpdateRef.current && !pausedRef.current) {
                         scheduleRef.current();
                     }
@@ -175,7 +189,6 @@ export const DequeChart = memo(
                     animation,
                     backgroundColor: 'transparent',
                     textStyle: { color: colors.label },
-                    title: getChartTitle(title, colors),
                     xAxis: {
                         ...axis,
                         type: 'time',
@@ -218,7 +231,6 @@ export const DequeChart = memo(
                 };
             }, [
                 animation,
-                title,
                 yMax,
                 yMin,
                 yInterval,
@@ -230,14 +242,16 @@ export const DequeChart = memo(
                 zoom,
                 minSpanValue
             ]);
+            useEffect(() => reset(), [option, reset]);
 
             return (
                 <ReactECharts
                     ref={chartRef}
                     option={option}
-                    className="app-line-chart"
+                    className={`app-line-chart ${zoom ? 'app-draggable-cancel' : ''}`}
                     style={{ height }}
                     opts={{ renderer: 'canvas' }}
+                    onEvents={events}
                     notMerge={true}
                     lazyUpdate={true}
                 />

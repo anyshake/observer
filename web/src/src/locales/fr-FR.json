@@ -45,6 +45,10 @@
                 "min_db": "dB min",
                 "max_db": "dB max"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "Exporter en PNG",
+            "export_failed": "Échec de l'export de l'image : {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "Mode forme d’onde",
                 "spectrogram_mode": "Mode spectrogramme"
             },
+            "fft_analysis": {
+                "show_button": "Afficher la FFT",
+                "hide_button": "Masquer la FFT"
+            },
             "share_link": {
                 "share_button": "Partager le lien",
                 "link_copied": "Le lien partagé a été copié dans le presse-papiers."
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "Mode forme d’onde",
                 "spectrogram_mode": "Mode spectrogramme"
+            },
+            "fft_analysis": {
+                "show_button": "Afficher la FFT",
+                "hide_button": "Masquer la FFT"
             },
             "reset_layout": {
                 "reset_button": "Tout réinitialiser",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "Préférences Web",
+                "realtime_retention": {
+                    "title": "Conservation des données en temps réel",
+                    "description": "Durée des formes d'onde et spectrogrammes en temps réel conservés dans les graphiques, de 10 secondes à 5 minutes.",
+                    "unit": "s",
+                    "edit_button": "Ajuster",
+                    "cancel_button": "Annuler",
+                    "save_button": "Enregistrer",
+                    "success": "Conservation des données en temps réel mise à jour."
+                },
                 "reset_layout_preference": {
                     "title": "Réinitialiser les préférences de disposition",
                     "description": "Ceci réinitialisera toutes les préférences de disposition, l'opération est irréversible.",

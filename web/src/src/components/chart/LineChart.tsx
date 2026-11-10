@@ -1,13 +1,14 @@
 import ReactECharts from 'echarts-for-react';
 import { memo, useEffect, useMemo, useRef } from 'react';
 
-import { getChartAxis, getChartTitle } from '../../styles/chartTheme';
+import { getChartAxis } from '../../styles/chartTheme';
 import { useThemeColors } from '../../styles/useThemeColors';
 import { getLineSeries, type LineChartData } from './lineSeries';
+import { PlotBoundsHandler, usePlotBounds } from './usePlotBounds';
+import { getPointsExtent, useVisibleSamples, VisibleSamplesHandler } from './useVisibleSamples';
 
 interface ILineChart {
     readonly hidden?: boolean;
-    readonly title?: string;
     readonly animation?: boolean;
     readonly lineColor?: string;
     readonly lineWidth?: number;
@@ -19,12 +20,13 @@ interface ILineChart {
     readonly yInterval?: number;
     readonly yPosition?: 'left' | 'right';
     readonly minSpanValue?: number;
+    readonly onVisibleSamples?: VisibleSamplesHandler;
+    readonly onPlotBounds?: PlotBoundsHandler;
 }
 
 export const LineChart = memo(
     ({
         hidden,
-        title,
         animation = true,
         lineColor,
         lineWidth = 2,
@@ -35,19 +37,29 @@ export const LineChart = memo(
         yMin,
         yInterval,
         minSpanValue,
-        yPosition = 'left'
+        yPosition = 'left',
+        onVisibleSamples,
+        onPlotBounds
     }: ILineChart) => {
         const chartRef = useRef<ReactECharts>(null);
         const colors = useThemeColors();
         const seriesColor = lineColor ?? colors.line;
         const axis = useMemo(() => getChartAxis(colors), [colors]);
+        const { onEvents, reset } = useVisibleSamples(() => {
+            if (!Array.isArray(data[0])) {
+                return null;
+            }
+            const points = data as [number, number | null][];
+            return { points, extent: getPointsExtent(points) };
+        }, onVisibleSamples);
+        const plotEvents = usePlotBounds(chartRef, onPlotBounds);
+        const events = useMemo(() => ({ ...onEvents, ...plotEvents }), [onEvents, plotEvents]);
 
         const option = useMemo(
             () => ({
                 animation,
                 backgroundColor: 'transparent',
                 textStyle: { color: colors.label },
-                title: getChartTitle(title, colors),
                 xAxis: {
                     ...axis,
                     type: 'time',
@@ -87,7 +99,6 @@ export const LineChart = memo(
                     : []
             }),
             [
-                title,
                 animation,
                 yMax,
                 yMin,
@@ -108,15 +119,17 @@ export const LineChart = memo(
                 const instance = chartRef.current.getEchartsInstance();
                 instance.setOption(option, true);
             }
-        }, [option]);
+            reset();
+        }, [option, reset]);
 
         return (
             <ReactECharts
                 ref={chartRef}
                 option={option}
-                className={`app-line-chart ${hidden ? 'app-hidden' : ''}`}
+                className={`app-line-chart ${zoom ? 'app-draggable-cancel' : ''} ${hidden ? 'app-hidden' : ''}`}
                 style={hidden ? undefined : { height }}
                 opts={{ renderer: 'canvas' }}
+                onEvents={events}
                 notMerge={true}
                 lazyUpdate={true}
             />

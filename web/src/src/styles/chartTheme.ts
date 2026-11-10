@@ -9,15 +9,3 @@ export const getChartAxis = (colors: ThemeColors) => ({
     },
     splitLine: { lineStyle: { color: colors.grid } }
 });
-
-export const getChartTitle = (title: string | undefined, colors: ThemeColors) =>
-    title
-        ? {
-              text: title,
-              left: 'left',
-              textStyle: { color: colors.label, fontSize: 13, fontWeight: 'bold' },
-              backgroundColor: colors.titleBackground,
-              padding: [6, 12],
-              borderRadius: 3
-          }
-        : {};

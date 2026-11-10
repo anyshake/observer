@@ -127,7 +127,7 @@ const Settings = ({ currentLocale }: IRouterComponent) => {
                 <Skeleton />
             ) : (
                 <>
-                    <div role="tablist" className="tabs tabs-lift">
+                    <div role="tablist" className="tabs tabs-lift app-settings-tabs">
                         {Object.keys(tabs)
                             .filter(
                                 (tabKey) => !tabs[tabKey as keyof typeof tabs].adminOnly || isAdmin

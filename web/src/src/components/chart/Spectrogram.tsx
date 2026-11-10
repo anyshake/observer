@@ -10,7 +10,6 @@ import { useThemeColors } from '../../styles/useThemeColors';
 import { DEFAULT_SPECTROGRAM_COLOR_MAP, SPECTROGRAM_COLOR_MAPS } from './spectrogramColorMaps';
 
 interface ISpectrogram {
-    readonly title?: string;
     readonly sampleRate: number;
     readonly freqRange: [number, number];
     readonly duration: number;
@@ -19,6 +18,7 @@ interface ISpectrogram {
     readonly windowSize: number;
     readonly overlap: number;
     readonly data: [number, number][];
+    readonly gapThreshold?: number;
     readonly colorMap?: ColorMapName;
     readonly fftExecutor?: FFTExecutor;
     readonly renderFPS?: number;
@@ -29,7 +29,6 @@ interface ISpectrogram {
 
 export const Spectrogram = memo(
     ({
-        title,
         sampleRate,
         minDB,
         maxDB,
@@ -38,6 +37,7 @@ export const Spectrogram = memo(
         windowSize,
         overlap,
         data,
+        gapThreshold,
         colorMap = DEFAULT_SPECTROGRAM_COLOR_MAP,
         fftExecutor,
         renderFPS = 2,
@@ -67,7 +67,8 @@ export const Spectrogram = memo(
                 fftExecutor,
                 minDb: minDB,
                 maxDb: maxDB,
-                windowType: 'hann'
+                windowType: 'hann',
+                gapThreshold
             });
             spectrogramRef.current = sp;
             sp.init().then(() => {
@@ -82,7 +83,7 @@ export const Spectrogram = memo(
                     spectrogramRef.current = null;
                 }
             };
-        }, [fftExecutor, maxDB, minDB, overlap, sampleRate, windowSize]);
+        }, [fftExecutor, gapThreshold, maxDB, minDB, overlap, sampleRate, windowSize]);
 
         useEffect(() => {
             setColormap(colorMap);
@@ -289,8 +290,6 @@ export const Spectrogram = memo(
                 <canvas className="app-block" ref={canvasRef} />
 
                 <div className="app-spectrogram-toolbar">
-                    {title && <div className="app-spectrogram-title">{title}</div>}
-
                     <button
                         className="app-spectrogram-button"
                         onClick={() => setShowSettings((v) => !v)}

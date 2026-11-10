@@ -45,6 +45,10 @@
                 "min_db": "最小 dB",
                 "max_db": "最大 dB"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "匯出 PNG",
+            "export_failed": "匯出圖片失敗：{{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "波形模式",
                 "spectrogram_mode": "頻譜圖模式"
             },
+            "fft_analysis": {
+                "show_button": "顯示 FFT",
+                "hide_button": "隱藏 FFT"
+            },
             "share_link": {
                 "share_button": "分享連結",
                 "link_copied": "分享連結已複製到剪貼簿。"
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "波形模式",
                 "spectrogram_mode": "頻譜圖模式"
+            },
+            "fft_analysis": {
+                "show_button": "顯示 FFT",
+                "hide_button": "隱藏 FFT"
             },
             "reset_layout": {
                 "reset_button": "全部重設",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "網頁偏好設定",
+                "realtime_retention": {
+                    "title": "即時資料保留時長",
+                    "description": "即時波形與頻譜圖在圖表中保留的時間長度，範圍為 10 秒至 5 分鐘。",
+                    "unit": "秒",
+                    "edit_button": "調整",
+                    "cancel_button": "取消",
+                    "save_button": "儲存",
+                    "success": "已更新即時資料保留時長。"
+                },
                 "reset_layout_preference": {
                     "title": "重設佈局偏好",
                     "description": "這將重設所有佈局偏好，此操作不可逆。",

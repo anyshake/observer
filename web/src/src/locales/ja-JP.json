@@ -45,6 +45,10 @@
                 "min_db": "最小 dB",
                 "max_db": "最大 dB"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "PNG をエクスポート",
+            "export_failed": "画像のエクスポートに失敗しました：{{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "波形モード",
                 "spectrogram_mode": "スペクトログラムモード"
             },
+            "fft_analysis": {
+                "show_button": "FFT を表示",
+                "hide_button": "FFT を非表示"
+            },
             "share_link": {
                 "share_button": "リンクを共有",
                 "link_copied": "共有リンクがクリップボードにコピーされました。"
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "波形モード",
                 "spectrogram_mode": "スペクトログラムモード"
+            },
+            "fft_analysis": {
+                "show_button": "FFT を表示",
+                "hide_button": "FFT を非表示"
             },
             "reset_layout": {
                 "reset_button": "すべてリセット",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "Web 設定",
+                "realtime_retention": {
+                    "title": "リアルタイムデータ保持時間",
+                    "description": "リアルタイム波形とスペクトログラムをチャートに保持する時間幅です（10 秒〜5 分）。",
+                    "unit": "秒",
+                    "edit_button": "調整",
+                    "cancel_button": "キャンセル",
+                    "save_button": "保存",
+                    "success": "リアルタイムデータ保持時間を更新しました。"
+                },
                 "reset_layout_preference": {
                     "title": "レイアウト設定をリセット",
                     "description": "すべてのレイアウト設定がリセットされます。この操作は元に戻せません。",

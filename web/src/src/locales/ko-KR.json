@@ -45,6 +45,10 @@
                 "min_db": "최소 dB",
                 "max_db": "최대 dB"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "PNG 내보내기",
+            "export_failed": "이미지를 내보내지 못했습니다: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "파형 모드",
                 "spectrogram_mode": "스펙트로그램 모드"
             },
+            "fft_analysis": {
+                "show_button": "FFT 표시",
+                "hide_button": "FFT 숨기기"
+            },
             "share_link": {
                 "share_button": "링크 공유",
                 "link_copied": "공유 링크를 클립보드에 복사했습니다."
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "파형 모드",
                 "spectrogram_mode": "스펙트로그램 모드"
+            },
+            "fft_analysis": {
+                "show_button": "FFT 표시",
+                "hide_button": "FFT 숨기기"
             },
             "reset_layout": {
                 "reset_button": "모두 초기화",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "웹 환경 설정",
+                "realtime_retention": {
+                    "title": "실시간 데이터 보존 시간",
+                    "description": "차트에 보존할 실시간 파형과 스펙트로그램의 시간 범위입니다(10초~5분).",
+                    "unit": "초",
+                    "edit_button": "조정",
+                    "cancel_button": "취소",
+                    "save_button": "저장",
+                    "success": "실시간 데이터 보존 시간이 업데이트되었습니다."
+                },
                 "reset_layout_preference": {
                     "title": "레이아웃 환경 설정 초기화",
                     "description": "모든 레이아웃 환경 설정이 초기화됩니다. 이 작업은 되돌릴 수 없습니다.",

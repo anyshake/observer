@@ -20,7 +20,6 @@ const readThemeColors = (mode: ThemeMode) => {
         label: color('chart-label'),
         axis: color('chart-axis'),
         grid: color('chart-grid'),
-        titleBackground: color('chart-title'),
         map: {
             background: color('map-background'),
             water: color('map-water'),

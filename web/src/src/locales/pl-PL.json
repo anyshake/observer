@@ -45,6 +45,10 @@
                 "min_db": "Min dB",
                 "max_db": "Max dB"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "Eksportuj PNG",
+            "export_failed": "Nie udało się wyeksportować obrazu: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "Tryb przebiegu",
                 "spectrogram_mode": "Tryb spektrogramu"
             },
+            "fft_analysis": {
+                "show_button": "Pokaż FFT",
+                "hide_button": "Ukryj FFT"
+            },
             "share_link": {
                 "share_button": "Udostępnij link",
                 "link_copied": "Udostępniony link został skopiowany do schowka."
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "Tryb przebiegu",
                 "spectrogram_mode": "Tryb spektrogramu"
+            },
+            "fft_analysis": {
+                "show_button": "Pokaż FFT",
+                "hide_button": "Ukryj FFT"
             },
             "reset_layout": {
                 "reset_button": "Zresetuj wszystko",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "Preferencje internetowe",
+                "realtime_retention": {
+                    "title": "Przechowywanie danych w czasie rzeczywistym",
+                    "description": "Zakres czasu przebiegów i spektrogramów w czasie rzeczywistym przechowywanych na wykresach, od 10 sekund do 5 minut.",
+                    "unit": "s",
+                    "edit_button": "Dostosuj",
+                    "cancel_button": "Anuluj",
+                    "save_button": "Zapisz",
+                    "success": "Zaktualizowano przechowywanie danych w czasie rzeczywistym."
+                },
                 "reset_layout_preference": {
                     "title": "Resetuj preferencje układu",
                     "description": "Spowoduje to zresetowanie wszystkich preferencji układu, Operacja jest nieodwracalna.",

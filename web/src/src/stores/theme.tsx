@@ -4,6 +4,8 @@ import { persist } from 'zustand/middleware';
 import { getLocalStorage } from '../helpers/storage/getLocalStorage';
 import { setLocalStorage } from '../helpers/storage/setLocalStorage';
 
+const themeStoreKey = 'theme-store';
+
 export type ThemeMode = 'light' | 'dark';
 export type ThemePreference = ThemeMode | 'system';
 
@@ -26,7 +28,7 @@ export const useThemeStore = create<ITheme>()(
             setTheme: (theme) => set({ theme })
         }),
         {
-            name: 'theme-store',
+            name: themeStoreKey,
             partialize: ({ theme }) => ({ theme }),
             merge: (persisted, current) => {
                 const theme = (persisted as { theme?: unknown } | null)?.theme;

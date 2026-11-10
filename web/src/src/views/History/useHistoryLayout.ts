@@ -12,7 +12,15 @@ export const useHistoryLayout = (
     activeChannels: ReturnType<typeof useSeismicRecords>['activeChannels']
 ) => {
     const { t } = useTranslation();
-    const { config, locks, toggleLock, setLayoutConfig, resetLayoutConfig } = useLayoutStore();
+    const {
+        config,
+        locks,
+        toggleLock,
+        fftModes,
+        toggleFftMode,
+        setLayoutConfig,
+        resetLayoutConfig
+    } = useLayoutStore();
     const getInitialLayout = useCallback(
         (id: string, index: number) => {
             if (config[id]?.position && config[id]?.size && config[id]?.spectrogram) {
@@ -56,6 +64,7 @@ export const useHistoryLayout = (
             confirmBtnText: t('views.History.reset_layout.confirm_button'),
             onConfirmed: () => {
                 Object.values(activeChannels).forEach(({ id }) => resetLayoutConfig(id));
+                resetLayoutConfig(HistoryConstraints.id);
             }
         });
     }, [t, activeChannels, resetLayoutConfig]);
@@ -99,6 +108,8 @@ export const useHistoryLayout = (
     return {
         locks,
         toggleLock,
+        fftModes,
+        toggleFftMode,
         getInitialLayout,
         handleResetLayout,
         handleDragStop,

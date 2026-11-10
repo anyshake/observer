@@ -45,6 +45,10 @@
                 "min_db": "dB ต่ำสุด",
                 "max_db": "dB สูงสุด"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "ส่งออก PNG",
+            "export_failed": "ส่งออกรูปภาพไม่สำเร็จ: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "โหมดรูปคลื่น",
                 "spectrogram_mode": "โหมดสเปกโตรแกรม"
             },
+            "fft_analysis": {
+                "show_button": "แสดง FFT",
+                "hide_button": "ซ่อน FFT"
+            },
             "share_link": {
                 "share_button": "แชร์ลิงก์",
                 "link_copied": "คัดลอกลิงก์แชร์ไปยังคลิปบอร์ดแล้ว"
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "โหมดรูปคลื่น",
                 "spectrogram_mode": "โหมดสเปกโตรแกรม"
+            },
+            "fft_analysis": {
+                "show_button": "แสดง FFT",
+                "hide_button": "ซ่อน FFT"
             },
             "reset_layout": {
                 "reset_button": "รีเซ็ตทั้งหมด",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "การตั้งค่าเว็บ",
+                "realtime_retention": {
+                    "title": "ระยะเวลาเก็บข้อมูลเรียลไทม์",
+                    "description": "ช่วงเวลาของรูปคลื่นและสเปกโตรแกรมแบบเรียลไทม์ที่เก็บไว้ในแผนภูมิ ตั้งแต่ 10 วินาทีถึง 5 นาที",
+                    "unit": "วินาที",
+                    "edit_button": "ปรับ",
+                    "cancel_button": "ยกเลิก",
+                    "save_button": "บันทึก",
+                    "success": "อัปเดตระยะเวลาเก็บข้อมูลเรียลไทม์แล้ว"
+                },
                 "reset_layout_preference": {
                     "title": "รีเซ็ตการตั้งค่าเลย์เอาต์",
                     "description": "การดำเนินการนี้จะรีเซ็ตการตั้งค่าเลย์เอาต์ทั้งหมด และไม่สามารถย้อนกลับได้",

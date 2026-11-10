@@ -45,6 +45,10 @@
                 "min_db": "Min. dB",
                 "max_db": "Max. dB"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "Als PNG exportieren",
+            "export_failed": "Bildexport fehlgeschlagen: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "Wellenformmodus",
                 "spectrogram_mode": "Spektrogramm-Modus"
             },
+            "fft_analysis": {
+                "show_button": "FFT anzeigen",
+                "hide_button": "FFT ausblenden"
+            },
             "share_link": {
                 "share_button": "Link teilen",
                 "link_copied": "Geteilter Link wurde in die Zwischenablage kopiert."
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "Wellenformmodus",
                 "spectrogram_mode": "Spektrogramm-Modus"
+            },
+            "fft_analysis": {
+                "show_button": "FFT anzeigen",
+                "hide_button": "FFT ausblenden"
             },
             "reset_layout": {
                 "reset_button": "Alles zurücksetzen",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "Web-Einstellungen",
+                "realtime_retention": {
+                    "title": "Aufbewahrung der Echtzeitdaten",
+                    "description": "Zeitspanne der in Diagrammen gehaltenen Echtzeit-Wellenformen und -Spektrogramme, von 10 Sekunden bis 5 Minuten.",
+                    "unit": "s",
+                    "edit_button": "Anpassen",
+                    "cancel_button": "Abbrechen",
+                    "save_button": "Speichern",
+                    "success": "Aufbewahrung der Echtzeitdaten wurde aktualisiert."
+                },
                 "reset_layout_preference": {
                     "title": "Layout-Einstellungen zurücksetzen",
                     "description": "Dies setzt alle Layout-Einstellungen zurück. Dieser Vorgang kann nicht rückgängig gemacht werden.",

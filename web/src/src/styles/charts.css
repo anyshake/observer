@@ -23,10 +23,6 @@
         @apply absolute top-5 left-15 mr-15 flex flex-wrap items-center gap-1;
     }
 
-    .app-spectrogram-title {
-        @apply flex h-6 items-center rounded bg-black/50 px-3 text-sm font-bold text-white select-none;
-    }
-
     .app-spectrogram-button {
         @apply flex size-6 shrink-0 cursor-pointer items-center justify-center rounded bg-black/50 text-white opacity-50 transition-all hover:opacity-100;
     }
@@ -65,6 +61,38 @@
 
     .app-spectrogram-speed-value {
         @apply px-2 font-mono text-xs text-white select-none;
+    }
+
+    .app-chart-panel {
+        @apply flex h-full w-full flex-col;
+    }
+
+    .app-chart-panel-header {
+        @apply border-app-border-soft flex shrink-0 items-center gap-2 border-b pb-1 select-none;
+    }
+
+    .app-chart-panel-icon {
+        @apply text-app-subtle shrink-0;
+    }
+
+    .app-chart-panel-title {
+        @apply text-app-heading min-w-0 flex-1 truncate py-px text-xs leading-6 font-semibold;
+    }
+
+    .app-chart-panel-body {
+        @apply min-h-0 flex-1 pt-1;
+    }
+
+    .app-chart-split {
+        @apply flex h-full w-full flex-col;
+    }
+
+    .app-chart-split-pane {
+        @apply min-h-0 flex-1;
+    }
+
+    .app-chart-split-spectrum {
+        @apply border-app-border-soft mt-1 border-t pt-1;
     }
 
     .app-chart-workspace {

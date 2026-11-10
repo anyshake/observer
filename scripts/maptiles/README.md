@@ -200,3 +200,79 @@ Raw concatenation of tile payloads:
 
 - No padding
 - No compression added (original MBTiles data is preserved, typically gzip-compressed MVT)
+
+## Map Label Glyphs
+
+Map labels (the `populated-places-label` layer) are rendered with pre-built SDF glyphs instead of local browser fonts. Without a `glyphs` URL, MapLibre draws every glyph on a canvas and reads the pixels back, which breaks under Firefox's `privacy.resistFingerprinting` (canvas readback is randomized, so labels turn into boxes).
+
+### Source
+
+- Font: [Noto Sans](https://fonts.google.com/noto/specimen/Noto+Sans) Regular, licensed under the [SIL Open Font License 1.1](https://openfontlicense.org)
+- Pre-built PBF glyphs: [MapLibre Demo Tiles](https://github.com/maplibre/demotiles), served at `https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf`
+
+### Required Ranges
+
+Only the Unicode ranges used by the `NAME` (fallback `name`) property of `ne_10m_populated_places` are bundled. Scanning all generated tiles (z1 - z6) gives the following ranges:
+
+| Range       | Characters                                               |
+| ----------- | -------------------------------------------------------- |
+| `0-255`     | Basic Latin, Latin-1 Supplement                          |
+| `256-511`   | Latin Extended-A, Latin Extended-B, e.g. `ă ą Č ł ō š ơ` |
+| `512-767`   | Latin Extended-B, e.g. `ș ț`                             |
+| `7680-7935` | Latin Extended Additional, e.g. `ạ ả ắ ệ ố ỹ`            |
+| `8192-8447` | General Punctuation, `U+200E` (Left-to-Right Mark)       |
+
+If the Natural Earth data is updated, recompute the ranges from the GeoJSON (this may return a superset of the ranges found in the tiles):
+
+```bash
+$ python3 - <<'PY'
+import json
+features = json.load(open("ne_10m_populated_places/ne_10m_populated_places.geojson"))["features"]
+names = [f["properties"].get("NAME") or f["properties"].get("name") or "" for f in features]
+ranges = sorted({ord(ch) // 256 * 256 for name in names for ch in name})
+print(" ".join(f"{r}-{r + 255}" for r in ranges))
+PY
+```
+
+### Download Glyphs
+
+The directory name uses underscores instead of spaces, it must match `MapGlyphsConstraints.fontStack` in `web/src/src/config/constraints.tsx`:
+
+```bash
+$ mkdir -p glyphs/Noto_Sans_Regular
+$ for range in 0-255 256-511 512-767 7680-7935 8192-8447; do
+  curl -fsSL -o "glyphs/Noto_Sans_Regular/$range.pbf" \
+    "https://demotiles.maplibre.org/font/Noto%20Sans%20Regular/$range.pbf"
+done
+```
+
+### Compress Glyphs
+
+Compress each file in place with gzip, keeping the `.pbf` file name (`-n` omits the file name and timestamp from the header, so the output is reproducible):
+
+```bash
+$ for f in glyphs/Noto_Sans_Regular/*.pbf; do
+  gzip -9 -n -c "$f" > "$f.gz" && mv "$f.gz" "$f"
+done
+```
+
+Copy the `glyphs` directory into `web/tiles`, next to the `z*` chunk directories. The files are embedded into the binary together with the map tiles. Like the map tiles, gzip-compressed glyphs are detected by the gzip magic bytes and served with `Content-Encoding: gzip` (`/api/tiles` is excluded from the gzip middleware, so they are not compressed twice):
+
+```
+web/tiles/
+  glyphs/
+    Noto_Sans_Regular/
+      0-255.pbf
+      256-511.pbf
+      ...
+  z1/
+  z2/
+  ...
+```
+
+They are served by the same endpoint as the map tiles:
+
+```
+GET /api/tiles?type=maptile&z={z}&x={x}&y={y}
+GET /api/tiles?type=glyph&fontstack={fontstack}&range={range}
+```

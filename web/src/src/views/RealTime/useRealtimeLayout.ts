@@ -13,7 +13,15 @@ export const useRealtimeLayout = (
     activeChannels: ReturnType<typeof useRealtimeStream>['activeChannels']
 ) => {
     const { t } = useTranslation();
-    const { config, locks, toggleLock, setLayoutConfig, resetLayoutConfig } = useLayoutStore();
+    const {
+        config,
+        locks,
+        toggleLock,
+        fftModes,
+        toggleFftMode,
+        setLayoutConfig,
+        resetLayoutConfig
+    } = useLayoutStore();
     const layoutCacheRef = useRef(new Map<string, LayoutConfig>());
     const getInitialLayout = useCallback(
         (id: string, index: number) => {
@@ -62,6 +70,7 @@ export const useRealtimeLayout = (
             confirmBtnText: t('views.RealTime.reset_layout.confirm_button'),
             onConfirmed: () => {
                 Object.values(activeChannels).forEach(({ id }) => resetLayoutConfig(id));
+                resetLayoutConfig(RealTimeConstraints.id);
             }
         });
     }, [t, activeChannels, resetLayoutConfig]);
@@ -105,6 +114,8 @@ export const useRealtimeLayout = (
     return {
         locks,
         toggleLock,
+        fftModes,
+        toggleFftMode,
         getInitialLayout,
         handleResetLayout,
         handleDragStop,

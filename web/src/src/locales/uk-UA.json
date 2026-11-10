@@ -45,6 +45,10 @@
                 "min_db": "Мін. дБ",
                 "max_db": "Макс. дБ"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "Експорт у PNG",
+            "export_failed": "Не вдалося експортувати зображення: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "Режим сейсмограми",
                 "spectrogram_mode": "Режим спектрограми"
             },
+            "fft_analysis": {
+                "show_button": "Показати FFT",
+                "hide_button": "Приховати FFT"
+            },
             "share_link": {
                 "share_button": "Поділитися посиланням",
                 "link_copied": "Посилання скопійовано до буфера обміну."
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "Режим сейсмограми",
                 "spectrogram_mode": "Режим спектрограми"
+            },
+            "fft_analysis": {
+                "show_button": "Показати FFT",
+                "hide_button": "Приховати FFT"
             },
             "reset_layout": {
                 "reset_button": "Скинути все",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "Налаштування вебінтерфейсу",
+                "realtime_retention": {
+                    "title": "Час зберігання даних у реальному часі",
+                    "description": "Проміжок часу хвильових форм і спектрограм у реальному часі, що зберігаються на графіках, від 10 секунд до 5 хвилин.",
+                    "unit": "с",
+                    "edit_button": "Налаштувати",
+                    "cancel_button": "Скасувати",
+                    "save_button": "Зберегти",
+                    "success": "Час зберігання даних у реальному часі оновлено."
+                },
                 "reset_layout_preference": {
                     "title": "Скинути налаштування макета",
                     "description": "Це скине всі налаштування макета. Дію неможливо скасувати.",

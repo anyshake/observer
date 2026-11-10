@@ -41,33 +41,28 @@ export const DraggableBox = ({
     }, [layout.position]);
 
     useEffect(() => {
-        const handleResize = () => {
-            if (locked) {
-                return;
+        const parent = dragRef.current?.parentElement;
+        if (locked || !parent) {
+            return;
+        }
+        const observer = new ResizeObserver(() => {
+            const parentRect = parent.getBoundingClientRect();
+            const newX = Math.max(0, Math.min(position.x, parentRect.width - layout.size.width));
+            const newY = Math.max(0, Math.min(position.y, parentRect.height - layout.size.height));
+            if (newX !== position.x || newY !== position.y) {
+                setPosition({ x: newX, y: newY });
+                onWindowResize?.(newX, newY);
             }
-            if (dragRef.current) {
-                const parent = dragRef.current.parentElement;
-                if (parent) {
-                    const parentRect = parent.getBoundingClientRect();
-                    let newX = Math.min(position.x, parentRect.width - layout.size.width);
-                    let newY = Math.min(position.y, parentRect.height - layout.size.height);
-                    newX = Math.max(0, newX);
-                    newY = Math.max(0, newY);
-                    setPosition({ x: newX, y: newY });
-                    onWindowResize?.(newX, newY);
-                }
-            }
-        };
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        });
+        observer.observe(parent);
+        return () => observer.disconnect();
     }, [position, layout.size.width, layout.size.height, onWindowResize, locked]);
 
     return (
         <Draggable
             nodeRef={dragRef as RefObject<HTMLElement>}
             disabled={locked}
-            cancel=".react-resizable-handle"
+            cancel=".react-resizable-handle, .app-draggable-cancel"
             defaultClassNameDragging="app-draggable-dragging"
             bounds="parent"
             grid={[1, 1]}

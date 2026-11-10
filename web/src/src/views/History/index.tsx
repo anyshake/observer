@@ -1,17 +1,32 @@
-import { mdiBlurLinear, mdiLink, mdiLock, mdiLockOpen, mdiLockReset, mdiWaveform } from '@mdi/js';
+import {
+    mdiBlurLinear,
+    mdiChartBellCurve,
+    mdiChartLine,
+    mdiGradientVertical,
+    mdiLink,
+    mdiLock,
+    mdiLockOpen,
+    mdiLockReset,
+    mdiWaveform
+} from '@mdi/js';
 import Icon from '@mdi/react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { FFTExecutor } from 'spectrogram-js';
 
+import { ChartPanel } from '../../components/chart/ChartPanel';
 import { LineChart } from '../../components/chart/LineChart';
 import { Spectrogram } from '../../components/chart/Spectrogram';
+import { SpectrumSplit } from '../../components/chart/SpectrumSplit';
 import { DraggableBox } from '../../components/ui/DraggableBox';
+import { ResizableWorkspace } from '../../components/ui/ResizableWorkspace';
+import { WorkspaceExportButton } from '../../components/ui/WorkspaceExportButton';
 import { HistoryConstraints } from '../../config/constraints';
 import { IRouterComponent } from '../../config/router';
 import { useGetSeismicEventSourceListQuery } from '../../graphql';
 import { sendUserAlert } from '../../helpers/alert/sendUserAlert';
+import { SpectrumExecutor } from '../../helpers/dsp/SpectrumExecutor';
 import { useUrlParams } from '../../helpers/request/useUrlParams';
 import { setClipboardText } from '../../helpers/utils/setClipboardText';
 import { useRetentionStore } from '../../stores/retention';
@@ -27,6 +42,8 @@ import { useSeismicRecords } from './useSeismicRecords';
 const History = ({ currentLocale }: IRouterComponent) => {
     const { t } = useTranslation();
     const sharedFFTExecutor = useMemo(() => new FFTExecutor(HistoryConstraints.fftSize), []);
+    const sharedSpectrumExecutor = useMemo(() => new SpectrumExecutor(), []);
+    useEffect(() => () => sharedSpectrumExecutor.dispose(), [sharedSpectrumExecutor]);
 
     const [displayMode, setDisplayMode] = useState<'waveform' | 'spectrogram'>('waveform');
     const handleToggleDisplayMode = useCallback(() => {
@@ -63,14 +80,18 @@ const History = ({ currentLocale }: IRouterComponent) => {
     const {
         locks,
         toggleLock,
+        fftModes,
+        toggleFftMode,
         getInitialLayout,
         handleResetLayout,
         handleDragStop,
         handleResizeStop,
         handleSpectrogramUpdate
     } = useHistoryLayout(activeChannels);
+    const fftMode = Boolean(fftModes[HistoryConstraints.id]);
     const { retention } = useRetentionStore();
     const [activeChart, setActiveChart] = useState<string | null>(null); // Track the active chart
+    const workspaceRef = useRef<HTMLDivElement>(null);
 
     const handleShareLink = useCallback(() => {
         const params = new URLSearchParams(searchParams);
@@ -126,6 +147,18 @@ const History = ({ currentLocale }: IRouterComponent) => {
                     <Icon className="app-icon" path={mdiLockReset} size={0.7} />
                     <span>{t('views.History.reset_layout.reset_button')}</span>
                 </button>
+                <button
+                    className="btn btn-sm app-button-toolbar"
+                    disabled={displayMode !== 'waveform'}
+                    onClick={() => toggleFftMode(HistoryConstraints.id)}
+                >
+                    <Icon className="app-icon" path={mdiChartBellCurve} size={0.7} />
+                    <span>
+                        {fftMode
+                            ? t('views.History.fft_analysis.hide_button')
+                            : t('views.History.fft_analysis.show_button')}
+                    </span>
+                </button>
                 {sampleRate >= HistoryConstraints.freqRange[1] * 2 && (
                     <button
                         className="btn btn-sm app-button-toolbar"
@@ -143,13 +176,22 @@ const History = ({ currentLocale }: IRouterComponent) => {
                         </span>
                     </button>
                 )}
+                <WorkspaceExportButton
+                    workspaceRef={workspaceRef}
+                    fileName="history_workspace"
+                    disabled={!Object.keys(activeChannels).length}
+                />
                 <button className="btn btn-sm" onClick={handleShareLink}>
                     <Icon className="app-icon" path={mdiLink} size={0.7} />
                     <span>{t('views.History.share_link.share_button')}</span>
                 </button>
             </div>
 
-            <div className="app-chart-workspace">
+            <ResizableWorkspace
+                id={HistoryConstraints.id}
+                className="app-chart-workspace"
+                containerRef={workspaceRef}
+            >
                 {Object.keys(activeChannels)
                     .sort((a, b) => {
                         // Move active chart to the end
@@ -191,58 +233,77 @@ const History = ({ currentLocale }: IRouterComponent) => {
                                     )
                                 }
                             >
-                                <div
-                                    className={
+                                <ChartPanel
+                                    title={channel}
+                                    icon={
                                         displayMode === 'waveform'
-                                            ? 'app-chart-visible'
-                                            : 'app-hidden'
+                                            ? mdiChartLine
+                                            : mdiGradientVertical
                                     }
                                 >
-                                    <LineChart
-                                        minSpanValue={HistoryConstraints.minSpanValue}
-                                        height={'100%'}
-                                        yPosition="right"
-                                        title={channel}
-                                        zoom={true}
-                                        animation={false}
-                                        data={chartData[channel]}
-                                    />
-                                </div>
-                                <div
-                                    className={
-                                        displayMode === 'spectrogram'
-                                            ? 'app-chart-visible'
-                                            : 'app-hidden'
-                                    }
-                                >
-                                    <Spectrogram
-                                        title={channel}
-                                        duration={retention}
-                                        overlap={HistoryConstraints.overlap}
-                                        freqRange={HistoryConstraints.freqRange}
-                                        windowSize={HistoryConstraints.windowSize}
-                                        maxDB={initialLayout.spectrogram.maxDB}
-                                        minDB={initialLayout.spectrogram.minDB}
-                                        colorMap={initialLayout.spectrogram.colorMap}
-                                        fftExecutor={sharedFFTExecutor}
-                                        data={spectrogramSeries[channel] ?? []}
-                                        sampleRate={sampleRate}
-                                        paused={displayMode !== 'spectrogram'}
-                                        onSpectrogramUpdate={(minDB, maxDB, colorMap) =>
-                                            handleSpectrogramUpdate(
-                                                activeChannels[channel].id,
-                                                activeChannels[channel].index,
-                                                minDB,
-                                                maxDB,
-                                                colorMap
-                                            )
+                                    <div
+                                        className={
+                                            displayMode === 'waveform'
+                                                ? 'app-chart-visible'
+                                                : 'app-hidden'
                                         }
-                                    />
-                                </div>
+                                    >
+                                        <SpectrumSplit
+                                            enabled={fftMode && displayMode === 'waveform'}
+                                            sampleRate={sampleRate}
+                                            executor={sharedSpectrumExecutor}
+                                        >
+                                            {(onVisibleSamples, onPlotBounds) => (
+                                                <LineChart
+                                                    minSpanValue={HistoryConstraints.minSpanValue}
+                                                    height={'100%'}
+                                                    lineWidth={1}
+                                                    yPosition="right"
+                                                    zoom={true}
+                                                    animation={false}
+                                                    data={chartData[channel]}
+                                                    onVisibleSamples={onVisibleSamples}
+                                                    onPlotBounds={onPlotBounds}
+                                                />
+                                            )}
+                                        </SpectrumSplit>
+                                    </div>
+                                    <div
+                                        className={
+                                            displayMode === 'spectrogram'
+                                                ? 'app-chart-visible'
+                                                : 'app-hidden'
+                                        }
+                                    >
+                                        <Spectrogram
+                                            duration={retention}
+                                            overlap={HistoryConstraints.overlap}
+                                            gapThreshold={HistoryConstraints.gapThreshold}
+                                            freqRange={HistoryConstraints.freqRange}
+                                            windowSize={HistoryConstraints.windowSize}
+                                            maxDB={initialLayout.spectrogram.maxDB}
+                                            minDB={initialLayout.spectrogram.minDB}
+                                            colorMap={initialLayout.spectrogram.colorMap}
+                                            fftExecutor={sharedFFTExecutor}
+                                            data={spectrogramSeries[channel] ?? []}
+                                            sampleRate={sampleRate}
+                                            paused={displayMode !== 'spectrogram'}
+                                            onSpectrogramUpdate={(minDB, maxDB, colorMap) =>
+                                                handleSpectrogramUpdate(
+                                                    activeChannels[channel].id,
+                                                    activeChannels[channel].index,
+                                                    minDB,
+                                                    maxDB,
+                                                    colorMap
+                                                )
+                                            }
+                                        />
+                                    </div>
+                                </ChartPanel>
                             </DraggableBox>
                         );
                     })}
-            </div>
+            </ResizableWorkspace>
 
             <EventListModal currentLocale={currentLocale} events={events} />
         </div>

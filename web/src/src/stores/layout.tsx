@@ -17,6 +17,10 @@ interface ILayout {
     locks: Record<string, boolean>;
     toggleLock: (id: string) => void;
     setLock: (id: string, locked: boolean) => void;
+    fftModes: Record<string, boolean>;
+    toggleFftMode: (id: string) => void;
+    workspaceHeights: Record<string, number>;
+    setWorkspaceHeight: (id: string, height: number | null) => void;
     config: Record<string, LayoutConfig>;
     resetLayoutConfig: (id?: string) => void;
     setLayoutConfig: (id: string, config: LayoutConfig) => void;
@@ -41,15 +45,33 @@ export const useLayoutStore = create<ILayout>()(
                     return { locks: state.locks };
                 });
             },
+            fftModes: {},
+            toggleFftMode: (id: string) => {
+                set((state) => ({ fftModes: { ...state.fftModes, [id]: !state.fftModes[id] } }));
+            },
+            workspaceHeights: {},
+            setWorkspaceHeight: (id: string, height: number | null) => {
+                set((state) => {
+                    const workspaceHeights = { ...state.workspaceHeights };
+                    if (height === null) {
+                        delete workspaceHeights[id];
+                    } else {
+                        workspaceHeights[id] = height;
+                    }
+                    return { workspaceHeights };
+                });
+            },
             config: getLocalStorage(layoutStoreKey, {}),
             resetLayoutConfig: (id?: string) => {
                 set((state) => {
+                    const workspaceHeights = { ...state.workspaceHeights };
                     if (id) {
                         delete state.config[id];
+                        delete workspaceHeights[id];
                     } else {
                         state.config = {};
                     }
-                    return { config: state.config };
+                    return { config: state.config, workspaceHeights: id ? workspaceHeights : {} };
                 });
             },
             setLayoutConfig: (id: string, config: LayoutConfig) => {

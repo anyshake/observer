@@ -4,6 +4,7 @@ import { mdiMapMarker } from '@mdi/js';
 import maplibregl from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
+import { MapGlyphsConstraints } from '../../config/constraints';
 import { applyMapTheme } from '../../styles/mapTheme';
 import { useThemeColors } from '../../styles/useThemeColors';
 
@@ -30,6 +31,7 @@ const createMapStyle = (
     layers: maplibregl.LayerSpecification[]
 ): maplibregl.StyleSpecification => ({
     version: 8,
+    glyphs: MapGlyphsConstraints.glyphsUrl,
     layers,
     sources: {
         naturalearth: {
@@ -224,11 +226,12 @@ export const MapContainer = ({
             dragPan: dragging ?? true,
             scrollZoom: scrollWheelZoom ?? true,
             transformRequest: (url, resourceType) => {
-                if (resourceType === 'Tile' && tileToken) {
+                if ((resourceType === 'Tile' || resourceType === 'Glyphs') && tileToken) {
                     return { url, headers: { Authorization: `Bearer ${tileToken}` } };
                 }
                 return { url };
-            }
+            },
+            localIdeographFontFamily: false
         });
 
         if (zoomControl) {

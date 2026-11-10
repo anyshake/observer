@@ -45,6 +45,10 @@
                 "min_db": "Мин. dB",
                 "max_db": "Макс. dB"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "Экспорт в PNG",
+            "export_failed": "Не удалось экспортировать изображение: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "Режим волновой формы",
                 "spectrogram_mode": "Режим спектрограммы"
             },
+            "fft_analysis": {
+                "show_button": "Показать FFT",
+                "hide_button": "Скрыть FFT"
+            },
             "share_link": {
                 "share_button": "Поделиться ссылкой",
                 "link_copied": "Ссылка скопирована в буфер обмена."
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "Режим волновой формы",
                 "spectrogram_mode": "Режим спектрограммы"
+            },
+            "fft_analysis": {
+                "show_button": "Показать FFT",
+                "hide_button": "Скрыть FFT"
             },
             "reset_layout": {
                 "reset_button": "Сбросить все",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "Веб-настройки",
+                "realtime_retention": {
+                    "title": "Время хранения данных в реальном времени",
+                    "description": "Интервал волновых форм и спектрограмм в реальном времени, сохраняемых на графиках, от 10 секунд до 5 минут.",
+                    "unit": "с",
+                    "edit_button": "Настроить",
+                    "cancel_button": "Отмена",
+                    "save_button": "Сохранить",
+                    "success": "Время хранения данных в реальном времени обновлено."
+                },
                 "reset_layout_preference": {
                     "title": "Сбросить настройки макета",
                     "description": "Это сбросит все настройки макета, операция необратима.",

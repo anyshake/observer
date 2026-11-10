@@ -45,6 +45,10 @@
                 "min_db": "Min. dB",
                 "max_db": "Max. dB"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "PNG exporteren",
+            "export_failed": "Afbeelding exporteren mislukt: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "Golfvormmodus",
                 "spectrogram_mode": "Spectrogrammodus"
             },
+            "fft_analysis": {
+                "show_button": "FFT tonen",
+                "hide_button": "FFT verbergen"
+            },
             "share_link": {
                 "share_button": "Link delen",
                 "link_copied": "De gedeelde link is naar het klembord gekopieerd."
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "Golfvormmodus",
                 "spectrogram_mode": "Spectrogrammodus"
+            },
+            "fft_analysis": {
+                "show_button": "FFT tonen",
+                "hide_button": "FFT verbergen"
             },
             "reset_layout": {
                 "reset_button": "Alles opnieuw instellen",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "Webvoorkeuren",
+                "realtime_retention": {
+                    "title": "Bewaartijd realtimegegevens",
+                    "description": "Tijdsduur van realtime golfvormen en spectrogrammen die in grafieken worden bewaard, van 10 seconden tot 5 minuten.",
+                    "unit": "s",
+                    "edit_button": "Aanpassen",
+                    "cancel_button": "Annuleren",
+                    "save_button": "Opslaan",
+                    "success": "Bewaartijd realtimegegevens bijgewerkt."
+                },
                 "reset_layout_preference": {
                     "title": "Indelingsvoorkeuren opnieuw instellen",
                     "description": "Hiermee worden alle indelingsvoorkeuren opnieuw ingesteld. Deze actie kan niet ongedaan worden gemaakt.",

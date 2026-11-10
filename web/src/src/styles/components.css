@@ -119,6 +119,18 @@
         @apply cursor-move;
     }
 
+    .app-workspace {
+        @apply space-y-1;
+    }
+
+    .app-workspace-handle {
+        @apply text-app-subtle hover:bg-app-hover hover:text-app-text focus-visible:outline-app-primary flex h-5 w-full cursor-row-resize touch-none items-center justify-center rounded-md select-none focus-visible:outline-2;
+    }
+
+    .app-workspace-handle-active {
+        @apply bg-app-hover text-app-primary;
+    }
+
     .app-error-page {
         @apply flex min-h-screen flex-col items-center justify-center space-y-4 p-5;
     }

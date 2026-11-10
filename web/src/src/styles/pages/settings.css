@@ -7,6 +7,18 @@
         @apply border-app-border-strong flex flex-col justify-between gap-4 border-b p-4 sm:flex-row sm:items-center;
     }
 
+    .app-retention-fields {
+        @apply flex flex-col gap-4 sm:flex-row sm:items-center;
+    }
+
+    .app-retention-range {
+        @apply w-full sm:min-w-0 sm:flex-1;
+    }
+
+    .app-retention-input {
+        @apply w-full sm:w-32 sm:shrink-0;
+    }
+
     .app-backup-import {
         @apply flex flex-col gap-4 p-4;
     }
@@ -87,8 +99,12 @@
         @apply text-app-muted block text-xs;
     }
 
+    .app-settings-tabs {
+        @apply flex-nowrap overflow-x-auto overflow-y-hidden;
+    }
+
     .app-settings-tab {
-        @apply space-x-1;
+        @apply shrink-0 space-x-1 whitespace-nowrap;
     }
 
     .app-service-config-heading {

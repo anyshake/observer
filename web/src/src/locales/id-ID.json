@@ -45,6 +45,10 @@
                 "min_db": "dB Minimum",
                 "max_db": "dB Maksimum"
             }
+        },
+        "WorkspaceExportButton": {
+            "export_button": "Ekspor PNG",
+            "export_failed": "Gagal mengekspor gambar: {{message}}"
         }
     },
     "views": {
@@ -135,6 +139,10 @@
                 "waveform_mode": "Mode Gelombang",
                 "spectrogram_mode": "Mode Spektrogram"
             },
+            "fft_analysis": {
+                "show_button": "Tampilkan FFT",
+                "hide_button": "Sembunyikan FFT"
+            },
             "share_link": {
                 "share_button": "Bagikan Tautan",
                 "link_copied": "Tautan yang dibagikan telah disalin ke clipboard."
@@ -211,6 +219,10 @@
             "display_mode": {
                 "waveform_mode": "Mode Gelombang",
                 "spectrogram_mode": "Mode Spektrogram"
+            },
+            "fft_analysis": {
+                "show_button": "Tampilkan FFT",
+                "hide_button": "Sembunyikan FFT"
             },
             "reset_layout": {
                 "reset_button": "Reset Semua",
@@ -452,6 +464,15 @@
             },
             "Preference": {
                 "title": "Preferensi Web",
+                "realtime_retention": {
+                    "title": "Retensi Data Waktu Nyata",
+                    "description": "Rentang waktu bentuk gelombang dan spektrogram waktu nyata yang disimpan di grafik, dari 10 detik hingga 5 menit.",
+                    "unit": "detik",
+                    "edit_button": "Sesuaikan",
+                    "cancel_button": "Batal",
+                    "save_button": "Simpan",
+                    "success": "Retensi data waktu nyata diperbarui."
+                },
                 "reset_layout_preference": {
                     "title": "Reset Preferensi Tata Letak",
                     "description": "Ini akan mereset semua preferensi tata letak, operasi ini tidak dapat dibatalkan.",

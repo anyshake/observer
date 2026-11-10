@@ -24,7 +24,6 @@ export interface DequeSpectrogramHandle {
 }
 
 interface ISpectrogramDeque {
-    readonly title?: string;
     readonly sampleRate: number;
     readonly duration: number;
     readonly freqRange: [number, number];
@@ -32,6 +31,7 @@ interface ISpectrogramDeque {
     readonly maxDB: number;
     readonly windowSize: number;
     readonly overlap: number;
+    readonly gapThreshold?: number;
     readonly colorMap?: ColorMapName;
     readonly fftExecutor?: FFTExecutor;
     readonly renderFPS?: number;
@@ -43,7 +43,6 @@ export const DequeSpectrogram = memo(
     forwardRef<DequeSpectrogramHandle, ISpectrogramDeque>(
         (
             {
-                title,
                 sampleRate,
                 duration,
                 minDB,
@@ -51,6 +50,7 @@ export const DequeSpectrogram = memo(
                 freqRange,
                 windowSize,
                 overlap,
+                gapThreshold,
                 colorMap = DEFAULT_SPECTROGRAM_COLOR_MAP,
                 fftExecutor,
                 renderFPS = 2,
@@ -84,7 +84,8 @@ export const DequeSpectrogram = memo(
                     fftExecutor,
                     minDb: minDB,
                     maxDb: maxDB,
-                    windowType: 'hann'
+                    windowType: 'hann',
+                    gapThreshold
                 });
                 spectrogramRef.current = sp;
                 sp.init().then(() => {
@@ -100,7 +101,7 @@ export const DequeSpectrogram = memo(
                         spectrogramRef.current = null;
                     }
                 };
-            }, [fftExecutor, maxDB, minDB, overlap, sampleRate, windowSize]);
+            }, [fftExecutor, gapThreshold, maxDB, minDB, overlap, sampleRate, windowSize]);
 
             useEffect(() => {
                 setColormap(colorMap);
@@ -314,8 +315,6 @@ export const DequeSpectrogram = memo(
                     <canvas ref={canvasRef} className="app-chart-visible" />
 
                     <div className="app-spectrogram-toolbar-live">
-                        {title && <div className="app-spectrogram-title">{title}</div>}
-
                         <button
                             className="app-spectrogram-button"
                             onClick={() => setShowSettings((v) => !v)}
