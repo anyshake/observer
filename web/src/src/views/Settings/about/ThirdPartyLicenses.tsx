@@ -80,7 +80,7 @@ const LicenseContent = ({ fileName }: { fileName: string }) => {
                         </p>
                     }
                 >
-                    <Markdown className="prose app-license-markdown">{text}</Markdown>
+                    <Markdown className="app-license-markdown">{text}</Markdown>
                 </Suspense>
             )}
         </div>

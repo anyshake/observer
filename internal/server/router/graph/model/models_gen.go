@@ -170,6 +170,8 @@ type UpgradeStatus struct {
 	Eligible    bool   `json:"eligible"`
 	Applied     bool   `json:"applied"`
 	CheckFailed bool   `json:"checkFailed"`
+	Running     bool   `json:"running"`
+	Cancellable bool   `json:"cancellable"`
 }
 
 type JobStatus string

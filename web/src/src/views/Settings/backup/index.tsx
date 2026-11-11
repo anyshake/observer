@@ -6,22 +6,24 @@ import { useExportGlobalConfigLazyQuery, useImportGlobalConfigMutation } from '.
 import { sendPromiseAlert } from '../../../helpers/alert/sendPromiseAlert';
 import { sendUserAlert } from '../../../helpers/alert/sendUserAlert';
 import { sendUserConfirm } from '../../../helpers/alert/sendUserConfirm';
+import { useRequestSignal } from '../../../helpers/request/useRequestSignal';
 
 export const Backup = () => {
     const { t } = useTranslation();
+    const getRequestSignal = useRequestSignal();
     const [mode, setMode] = useState<'backup' | 'restore'>('backup');
 
-    const [, { refetch: exportGlobalConfigRefetch, data: exportGlobalConfigData }] =
+    const [exportGlobalConfig, { data: exportGlobalConfigData }] =
         useExportGlobalConfigLazyQuery();
     const handleExportGlobalConfig = useCallback(
         async () =>
             await sendPromiseAlert(
-                exportGlobalConfigRefetch(),
+                exportGlobalConfig({ context: { signal: getRequestSignal() } }),
                 t('views.Settings.Backup.backup_config.generating'),
                 t('views.Settings.Backup.backup_config.success'),
                 (error) => t('views.Settings.Backup.backup_config.error', { error })
             ),
-        [exportGlobalConfigRefetch, t]
+        [exportGlobalConfig, getRequestSignal, t]
     );
 
     const fileInputRef = useRef<HTMLInputElement>(null);

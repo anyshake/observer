@@ -26,7 +26,7 @@ class AxiosWrapper {
         this.instance.interceptors.response.use(
             (response) => response,
             (error) => {
-                if (error.response.status === 401) {
+                if (error.response?.status === 401) {
                     useCredentialStore.getState().clearCredential();
                 }
                 return Promise.reject(error);
@@ -35,10 +35,23 @@ class AxiosWrapper {
     }
 
     createGraphQlLink(url: string) {
-        return new ApolloLink(({ query, variables, operationName }: Operation) => {
+        return new ApolloLink((operation: Operation) => {
+            const { query, variables, operationName } = operation;
             return new Observable<FetchResult>((observer) => {
+                const controller = new AbortController();
+                const signal: AbortSignal | undefined = operation.getContext().signal;
+                const abort = () => controller.abort();
+                if (signal?.aborted) {
+                    abort();
+                } else {
+                    signal?.addEventListener('abort', abort, { once: true });
+                }
                 this.instance
-                    .post(url, { variables, operationName, query: query.loc?.source.body })
+                    .post(
+                        url,
+                        { variables, operationName, query: query.loc?.source.body },
+                        { signal: controller.signal }
+                    )
                     .then((result) => {
                         observer.next(result.data);
                         observer.complete();
@@ -46,6 +59,10 @@ class AxiosWrapper {
                     .catch((error) => {
                         observer.error(error);
                     });
+                return () => {
+                    signal?.removeEventListener('abort', abort);
+                    controller.abort();
+                };
             });
         });
     }

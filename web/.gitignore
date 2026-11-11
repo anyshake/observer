@@ -1,1 +1,2 @@
-dist
+dist/*
+!dist/health_check.txt

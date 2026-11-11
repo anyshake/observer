@@ -24,6 +24,7 @@ export type Scalars = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  cancelUpgrade: Scalars['Boolean']['output'];
   createFDSNAccessKey: CreatedFdsnAccessKey;
   createSysUser: Scalars['String']['output'];
   importGlobalConfig: Scalars['Boolean']['output'];
@@ -367,11 +368,13 @@ export type SystemStatus = {
 export type UpgradeStatus = {
   __typename?: 'upgradeStatus';
   applied: Scalars['Boolean']['output'];
+  cancellable: Scalars['Boolean']['output'];
   checkFailed: Scalars['Boolean']['output'];
   current: Scalars['String']['output'];
   eligible: Scalars['Boolean']['output'];
   latest: Scalars['String']['output'];
   required: Scalars['String']['output'];
+  running: Scalars['Boolean']['output'];
 };
 
 export type GetSoftwareVersionQueryVariables = Exact<{ [key: string]: never; }>;
@@ -414,12 +417,17 @@ export type GetHomeDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetHomeDataQuery = { __typename?: 'Query', getCurrentTime: number, getStationConfig: any, getDeviceId: string, getCurrentUser: { __typename?: 'sysUser', admin: boolean }, getDeviceConfig: { __typename?: 'deviceConfig', packetInterval: number, sampleRate: number, channelCodes: Array<string>, gnssEnabled: boolean, model: string, protocol: string }, getDeviceInfo: { __typename?: 'deviceInfo', latitude?: number | null, longitude?: number | null, elevation?: number | null, temperature?: number | null }, getDeviceStatus: { __typename?: 'deviceStatus', startedAt: number, updatedAt: number, frames: number, errors: number, messages: number }, getServiceStatus?: Array<{ __typename?: 'serviceStatus', serviceId: string, isRunning: boolean, name: string, description: string }> | null, getSystemStatus: { __typename?: 'systemStatus', cpu: number, memory: number, disk: number, uptime: number } };
 
+export type CancelUpgradeMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CancelUpgradeMutation = { __typename?: 'Mutation', cancelUpgrade: boolean };
+
 export type GetUpgradeStatusQueryVariables = Exact<{
   fresh?: Scalars['Boolean']['input'];
 }>;
 
 
-export type GetUpgradeStatusQuery = { __typename?: 'Query', getSoftwareVersion: string, getUpgradeStatus?: { __typename?: 'upgradeStatus', current: string, required: string, latest: string, eligible: boolean, applied: boolean, checkFailed: boolean } | null };
+export type GetUpgradeStatusQuery = { __typename?: 'Query', getSoftwareVersion: string, getUpgradeStatus?: { __typename?: 'upgradeStatus', current: string, required: string, latest: string, eligible: boolean, applied: boolean, checkFailed: boolean, running: boolean, cancellable: boolean } | null };
 
 export type TriggerUpgradeMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -966,6 +974,36 @@ export type GetHomeDataQueryHookResult = ReturnType<typeof useGetHomeDataQuery>;
 export type GetHomeDataLazyQueryHookResult = ReturnType<typeof useGetHomeDataLazyQuery>;
 export type GetHomeDataSuspenseQueryHookResult = ReturnType<typeof useGetHomeDataSuspenseQuery>;
 export type GetHomeDataQueryResult = ApolloReactCommon.QueryResult<GetHomeDataQuery, GetHomeDataQueryVariables>;
+export const CancelUpgradeDocument = gql`
+    mutation cancelUpgrade {
+  cancelUpgrade
+}
+    `;
+export type CancelUpgradeMutationFn = ApolloReactCommon.MutationFunction<CancelUpgradeMutation, CancelUpgradeMutationVariables>;
+
+/**
+ * __useCancelUpgradeMutation__
+ *
+ * To run a mutation, you first call `useCancelUpgradeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCancelUpgradeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cancelUpgradeMutation, { data, loading, error }] = useCancelUpgradeMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCancelUpgradeMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CancelUpgradeMutation, CancelUpgradeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<CancelUpgradeMutation, CancelUpgradeMutationVariables>(CancelUpgradeDocument, options);
+      }
+export type CancelUpgradeMutationHookResult = ReturnType<typeof useCancelUpgradeMutation>;
+export type CancelUpgradeMutationResult = ApolloReactCommon.MutationResult<CancelUpgradeMutation>;
+export type CancelUpgradeMutationOptions = ApolloReactCommon.BaseMutationOptions<CancelUpgradeMutation, CancelUpgradeMutationVariables>;
 export const GetUpgradeStatusDocument = gql`
     query getUpgradeStatus($fresh: Boolean! = false) {
   getSoftwareVersion
@@ -976,6 +1014,8 @@ export const GetUpgradeStatusDocument = gql`
     eligible
     applied
     checkFailed
+    running
+    cancellable
   }
 }
     `;

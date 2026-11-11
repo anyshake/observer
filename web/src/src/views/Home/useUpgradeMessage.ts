@@ -37,9 +37,13 @@ export const useUpgradeMessage = (getHomeDataData: GetHomeDataQuery | undefined)
     );
 
     useEffect(() => {
+        const controller = new AbortController();
         if (getHomeDataData?.getCurrentUser.admin) {
-            getUpgradeStatus()
+            getUpgradeStatus({ context: { signal: controller.signal } })
                 .then(({ data, error }) => {
+                    if (controller.signal.aborted) {
+                        return;
+                    }
                     if (error) {
                         setUpgradeMessage(t('views.Home.upgrade.check_failed'));
                         return;
@@ -59,8 +63,13 @@ export const useUpgradeMessage = (getHomeDataData: GetHomeDataQuery | undefined)
                     }
                     setUpgradeMessage(msg);
                 })
-                .catch(() => setUpgradeMessage(t('views.Home.upgrade.check_failed')));
+                .catch(() => {
+                    if (!controller.signal.aborted) {
+                        setUpgradeMessage(t('views.Home.upgrade.check_failed'));
+                    }
+                });
         }
+        return () => controller.abort();
     }, [generateUpgradeMessage, getHomeDataData?.getCurrentUser.admin, getUpgradeStatus, t]);
 
     return { upgradeMessage };

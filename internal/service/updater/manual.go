@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/internal/notification"
+	"github.com/anyshake/observer/pkg/logger"
 	"github.com/anyshake/observer/pkg/semver"
 )
 
@@ -32,11 +33,61 @@ func (s *UpdaterServiceImpl) RequestUpgrade(ctx context.Context) error {
 			return err
 		}
 	}
-	s.manualRequests <- struct{}{}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if err := s.ctx.Err(); err != nil {
+		s.manualPending.Store(false)
+		return err
+	}
+	requestCtx, cancel := context.WithCancel(s.ctx)
+	s.manualCancel = cancel
+	s.manualApplying = false
+	s.notify("Manual upgrade queued.", notification.LevelInfo)
+	s.manualRequests <- requestCtx
 	return nil
 }
 
+// CancelUpgrade interrupts checking and downloading. Executable replacement is
+// atomic from the user's perspective and must finish once it has started.
+func (s *UpdaterServiceImpl) CancelUpgrade() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.manualCancel == nil || s.manualApplying {
+		return errors.New("no cancellable manual upgrade is running")
+	}
+	s.manualCancel()
+	return nil
+}
+
+func (s *UpdaterServiceImpl) ManualUpgradeStatus() (running, cancellable bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.manualPending.Load(), s.manualCancel != nil && !s.manualApplying
+}
+
+func (s *UpdaterServiceImpl) finishManualUpgrade(manualOnly bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.manualCancel != nil {
+		s.manualCancel()
+		s.manualCancel = nil
+	}
+	s.manualApplying = false
+	if !manualOnly {
+		s.manualPending.Store(false)
+	}
+}
+
 func (s *UpdaterServiceImpl) notify(message string, level notification.Level) {
+	log := logger.GetLogger(ID)
+	switch level {
+	case notification.LevelError:
+		log.Errorln(message)
+	case notification.LevelWarning:
+		log.Warnln(message)
+	default:
+		log.Infoln(message)
+	}
 	if s.notifications != nil {
 		s.notifications.Publish(notification.Event{
 			ServiceID: ID,
@@ -47,21 +98,35 @@ func (s *UpdaterServiceImpl) notify(message string, level notification.Level) {
 	}
 }
 
+func (s *UpdaterServiceImpl) upgradeFailed(ctx context.Context, err error) error {
+	if errors.Is(ctx.Err(), context.Canceled) {
+		s.notify("Upgrade cancelled.", notification.LevelWarning)
+		return context.Canceled
+	}
+	s.notify("Upgrade failed: "+err.Error(), notification.LevelError)
+	return err
+}
+
 func (s *UpdaterServiceImpl) runManualUpgrade(ctx context.Context) error {
+	s.notify("Checking for an official upgrade.", notification.LevelInfo)
+	if err := ctx.Err(); err != nil {
+		return s.upgradeFailed(ctx, err)
+	}
 	latest, _, eligible, applied, err := s.upgradeHelper.CheckUpdateFresh(ctx)
 	if err != nil {
-		s.notify("Upgrade failed: version check failed: "+err.Error(), notification.LevelError)
-		return err
+		return s.upgradeFailed(ctx, fmt.Errorf("version check failed: %w", err))
 	}
 	if !eligible || applied {
 		err := errors.New("no eligible, unapplied official upgrade is available")
-		s.notify("Upgrade failed: "+err.Error(), notification.LevelError)
-		return err
+		return s.upgradeFailed(ctx, err)
 	}
-	return s.applyUpdate(ctx, latest, true)
+	return s.applyUpdate(ctx, latest, true, true)
 }
 
-func (s *UpdaterServiceImpl) applyUpdate(ctx context.Context, latest *semver.Version, restart bool) error {
+func (s *UpdaterServiceImpl) applyUpdate(ctx context.Context, latest *semver.Version, restart, manual bool) error {
+	if err := ctx.Err(); err != nil {
+		return s.upgradeFailed(ctx, err)
+	}
 	s.notify("Upgrade to "+latest.String()+" started.", notification.LevelInfo)
 	lastProgress := 0
 	progress := func(percent int) {
@@ -71,8 +136,7 @@ func (s *UpdaterServiceImpl) applyUpdate(ctx context.Context, latest *semver.Ver
 		}
 	}
 	fail := func(err error) error {
-		s.notify("Upgrade failed: "+err.Error(), notification.LevelError)
-		return err
+		return s.upgradeFailed(ctx, err)
 	}
 
 	progress(10)
@@ -84,7 +148,13 @@ func (s *UpdaterServiceImpl) applyUpdate(ctx context.Context, latest *semver.Ver
 		return fail(fmt.Errorf("release download or verification failed: %w", err))
 	}
 	progress(80)
-	if err := ctx.Err(); err != nil {
+	s.mu.Lock()
+	err = ctx.Err()
+	if err == nil && manual {
+		s.manualApplying = true
+	}
+	s.mu.Unlock()
+	if err != nil {
 		return fail(err)
 	}
 	progress(90)

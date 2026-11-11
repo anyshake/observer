@@ -20,7 +20,7 @@
     }
 
     .app-markdown {
-        @apply max-w-full wrap-break-word;
+        @apply min-w-0 max-w-full wrap-anywhere;
         color: var(--app-text);
         --tw-prose-body: var(--app-text);
         --tw-prose-headings: var(--app-heading);
@@ -28,12 +28,14 @@
         --tw-prose-links: var(--app-primary);
         --tw-prose-bold: var(--app-heading);
         --tw-prose-counters: var(--app-muted);
-        --tw-prose-bullets: var(--app-subtle);
+        --tw-prose-bullets: var(--app-muted);
         --tw-prose-hr: var(--app-border);
         --tw-prose-quotes: var(--app-text);
         --tw-prose-quote-borders: var(--app-border-strong);
         --tw-prose-captions: var(--app-muted);
         --tw-prose-code: var(--app-text);
+        --tw-prose-pre-code: var(--app-code-text);
+        --tw-prose-pre-bg: var(--app-code-surface);
         --tw-prose-th-borders: var(--app-border-strong);
         --tw-prose-td-borders: var(--app-border);
     }
@@ -55,11 +57,24 @@
     }
 
     .app-markdown-pre {
-        @apply bg-transparent p-2;
+        @apply my-4 min-w-0 max-w-full overflow-x-auto rounded-lg bg-transparent p-2;
+    }
+
+    .app-markdown-pre > .app-markdown-inline-code {
+        @apply m-0 block overflow-visible whitespace-pre bg-app-code text-[color:var(--app-code-text)] p-3;
     }
 
     .app-markdown-inline-code {
-        @apply bg-base-300 text-app-text overflow-scroll rounded-sm px-2 py-0.5 font-mono;
+        @apply bg-base-300 text-app-text m-0.5 inline-block max-w-full rounded-sm px-2 py-0.5 font-mono;
+    }
+
+    .app-markdown code::before,
+    .app-markdown code::after {
+        content: none;
+    }
+
+    .app-markdown .katex-display {
+        @apply max-w-full overflow-x-auto overflow-y-hidden;
     }
 
     .app-markdown-table {

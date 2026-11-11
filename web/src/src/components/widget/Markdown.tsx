@@ -27,7 +27,7 @@ export const Markdown = ({ className, children }: IMarkdown) => {
     return (
         <div className={className}>
             <ReactMarkdown
-                className="prose-sm app-markdown"
+                className="prose prose-sm app-markdown"
                 children={children}
                 components={{
                     a: ({ ...props }) => (
@@ -35,6 +35,7 @@ export const Markdown = ({ className, children }: IMarkdown) => {
                             className="app-markdown-link"
                             href={props.href}
                             target="_blank"
+                            rel="noopener noreferrer"
                             {...props}
                         >
                             {props.children}
@@ -51,7 +52,7 @@ export const Markdown = ({ className, children }: IMarkdown) => {
                             <span className="app-markdown-caption">{props.alt}</span>
                         </a>
                     ),
-                    pre: ({ ...props }) => <pre className="app-markdown-pre" {...props} />,
+                    pre: ({ children }) => <div className="app-markdown-pre">{children}</div>,
                     code: ({ className, children }) => {
                         const match = /language-(\w+)/.exec(className ?? '');
                         const lang = match !== null ? match[1] : '';

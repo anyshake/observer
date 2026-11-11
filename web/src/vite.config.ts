@@ -99,7 +99,11 @@ export default defineConfig({
             registerType: 'prompt',
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
-                navigateFallbackDenylist: [/^\/api/, /^\/fdsnws(?:\/|\?|$)/],
+                navigateFallbackDenylist: [
+                    /^\/api/,
+                    /^\/fdsnws(?:\/|\?|$)/,
+                    /\/health_check\.txt(?:\?|$)/
+                ],
                 maximumFileSizeToCacheInBytes: 3000000
             },
             manifest: {

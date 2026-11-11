@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useGetSeismicEventBySourceLazyQuery } from '../../graphql';
 import { sendPromiseAlert } from '../../helpers/alert/sendPromiseAlert';
 import { sendUserAlert } from '../../helpers/alert/sendUserAlert';
+import { useRequestSignal } from '../../helpers/request/useRequestSignal';
 import { getTimeString } from '../../helpers/utils/getTimeString';
 
 const isTravelTimeAvailable = (seconds: number) => Number.isFinite(seconds) && seconds >= 0;
@@ -18,6 +19,7 @@ export const useSeismicEvents = ({
     setEndTime: Dispatch<SetStateAction<number>>;
 }) => {
     const { t } = useTranslation();
+    const getRequestSignal = useRequestSignal();
     const [getSeismicEventBySource] = useGetSeismicEventBySourceLazyQuery();
     const [selectedSeismicEventSource, setSelectedSeismicEventSource] = useState<{
         id: string;
@@ -42,10 +44,16 @@ export const useSeismicEvents = ({
     const handleSearchEvents = useCallback(async () => {
         const requestFn = async () => {
             setIsBusy(true);
+            const signal = getRequestSignal();
             const { data, error } = await getSeismicEventBySource({
-                variables: { sourceId: selectedSeismicEventSource?.id ?? '' }
+                variables: { sourceId: selectedSeismicEventSource?.id ?? '' },
+                context: { signal }
+            }).finally(() => {
+                if (!signal.aborted) {
+                    setIsBusy(false);
+                }
             });
-            setIsBusy(false);
+            signal.throwIfAborted();
             if (error) {
                 throw error;
             }
@@ -148,7 +156,7 @@ export const useSeismicEvents = ({
             },
             (error) => t('views.History.search_events.error', { error })
         );
-    }, [t, getSeismicEventBySource, selectedSeismicEventSource, setIsBusy]);
+    }, [t, getSeismicEventBySource, getRequestSignal, selectedSeismicEventSource, setIsBusy]);
     const handleChooseEvent = useCallback(
         (eventId: string) => {
             const selectedEvent = seismicEventsData[eventId];

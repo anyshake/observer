@@ -5,9 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { sendPromiseAlert } from '../../helpers/alert/sendPromiseAlert';
 import { getRestfulApiUrl } from '../../helpers/app/getRestfulApiUrl';
 import { ApiClient } from '../../helpers/request/ApiClient';
+import { useRequestSignal } from '../../helpers/request/useRequestSignal';
 
 export const useAssetActions = () => {
     const { t } = useTranslation();
+    const getRequestSignal = useRequestSignal();
     const getAssetFetchLink = useCallback(
         (apiUrl: string, token: string, namespace: string, filePath: string) => {
             const urlObj = new URL(apiUrl);
@@ -26,6 +28,7 @@ export const useAssetActions = () => {
                 ApiClient.request<string>({
                     url: apiUrl,
                     method: 'post',
+                    signal: getRequestSignal(),
                     data: { file_path: filePath }
                 }),
                 t('views.Download.request_file.requesting', { fileName }),
@@ -37,7 +40,7 @@ export const useAssetActions = () => {
                 (error) => t('views.Download.request_file.error', { fileName, error })
             );
         },
-        [t, getAssetFetchLink]
+        [t, getAssetFetchLink, getRequestSignal]
     );
 
     const handlePreviewAsset = useCallback(
@@ -47,10 +50,14 @@ export const useAssetActions = () => {
                 const res = await ApiClient.request<string>({
                     url: apiUrl,
                     method: 'post',
+                    signal: getRequestSignal(),
                     data: { file_path: filePath }
                 });
                 const fetchUrl = getAssetFetchLink(apiUrl, res!.data!, namespace, filePath);
-                const blobObj = await ApiClient.getBlob({ url: fetchUrl });
+                const blobObj = await ApiClient.getBlob({
+                    url: fetchUrl,
+                    signal: getRequestSignal()
+                });
                 const blobUrl = URL.createObjectURL(blobObj!);
                 Fancybox.show([{ src: blobUrl, type: 'image' }], {
                     on: { close: () => URL.revokeObjectURL(blobUrl) }
@@ -63,7 +70,7 @@ export const useAssetActions = () => {
                 (error) => t('views.Download.preview_file.error', { fileName, error })
             );
         },
-        [t, getAssetFetchLink]
+        [t, getAssetFetchLink, getRequestSignal]
     );
     useEffect(
         () => () => {

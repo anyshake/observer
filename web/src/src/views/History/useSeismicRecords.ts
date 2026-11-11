@@ -5,6 +5,7 @@ import { HistoryConstraints } from '../../config/constraints';
 import { useGetSeismicRecordsLazyQuery } from '../../graphql';
 import { sendPromiseAlert } from '../../helpers/alert/sendPromiseAlert';
 import { sendUserAlert } from '../../helpers/alert/sendUserAlert';
+import { useRequestSignal } from '../../helpers/request/useRequestSignal';
 import { sameStrings } from '../../helpers/utils/sameStrings';
 
 export const useSeismicRecords = ({
@@ -17,6 +18,7 @@ export const useSeismicRecords = ({
     setIsBusy: Dispatch<SetStateAction<boolean>>;
 }) => {
     const { t } = useTranslation();
+    const getRequestSignal = useRequestSignal();
     const [sampleRate, setSampleRate] = useState(0);
     const [chartData, setChartData] = useState<{ [key: string]: Array<[number, number | null]> }>(
         {}
@@ -53,8 +55,16 @@ export const useSeismicRecords = ({
             setSampleRate(0);
             setChartData({});
             setIsBusy(true);
-            const { data, error } = await getSeismicRecords({ variables: { startTime, endTime } });
-            setIsBusy(false);
+            const signal = getRequestSignal();
+            const { data, error } = await getSeismicRecords({
+                variables: { startTime, endTime },
+                context: { signal }
+            }).finally(() => {
+                if (!signal.aborted) {
+                    setIsBusy(false);
+                }
+            });
+            signal.throwIfAborted();
             if (error) {
                 throw error;
             }
@@ -197,7 +207,7 @@ export const useSeismicRecords = ({
             },
             (error) => t('views.History.search_records.error', { error })
         );
-    }, [t, startTime, endTime, getSeismicRecords, setIsBusy]);
+    }, [t, startTime, endTime, getSeismicRecords, getRequestSignal, setIsBusy]);
 
     const [activeChannels, setActiveChannels] = useState<
         Record<string, { id: string; index: number }>

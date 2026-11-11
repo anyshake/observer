@@ -1,22 +1,49 @@
-import { mdiDownload, mdiRefresh } from '@mdi/js';
+import { mdiDownload, mdiRefresh, mdiStop } from '@mdi/js';
 import Icon from '@mdi/react';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useGetUpgradeStatusQuery, useTriggerUpgradeMutation } from '../../../graphql';
+import {
+    useCancelUpgradeMutation,
+    useGetUpgradeStatusQuery,
+    useTriggerUpgradeMutation
+} from '../../../graphql';
 import { sendPromiseAlert } from '../../../helpers/alert/sendPromiseAlert';
 import { sendUserConfirm } from '../../../helpers/alert/sendUserConfirm';
 
 export const UpgradePanel = () => {
     const { t } = useTranslation();
-    const { data, loading, error, refetch } = useGetUpgradeStatusQuery({
+    const { data, loading, error, refetch, startPolling, stopPolling } = useGetUpgradeStatusQuery({
         fetchPolicy: 'cache-and-network',
         notifyOnNetworkStatusChange: true
     });
-    const [triggerUpgrade, { loading: triggering }] = useTriggerUpgradeMutation();
+    const mutationOptions = {
+        refetchQueries: ['getUpgradeStatus'],
+        awaitRefetchQueries: true
+    };
+    const [triggerUpgrade, { loading: triggering }] = useTriggerUpgradeMutation(mutationOptions);
+    const [cancelUpgrade, { loading: cancelling }] = useCancelUpgradeMutation(mutationOptions);
 
     const status = data?.getUpgradeStatus;
     const supported = status !== null && status !== undefined;
+
+    useEffect(() => {
+        if (status?.running) {
+            startPolling(1000);
+        } else {
+            stopPolling();
+        }
+        return () => stopPolling();
+    }, [status?.running, startPolling, stopPolling]);
+
+    const handleCancel = useCallback(() => {
+        void sendPromiseAlert(
+            cancelUpgrade(),
+            t('views.Settings.About.upgrade.cancelling'),
+            t('views.Settings.About.upgrade.cancel_requested'),
+            (err) => (err instanceof Error ? err.message : String(err))
+        );
+    }, [cancelUpgrade, t]);
 
     const handleCheck = useCallback(() => {
         refetch({ fresh: true }).catch(() => undefined);
@@ -42,6 +69,9 @@ export const UpgradePanel = () => {
         if (!status) {
             return '';
         }
+        if (status.running) {
+            return t('views.Settings.About.upgrade.running');
+        }
         if (status.applied) {
             return t('views.Settings.About.upgrade.applied_yes');
         }
@@ -50,7 +80,8 @@ export const UpgradePanel = () => {
             : t('views.Settings.About.upgrade.eligible_no');
     })();
 
-    const upgradeEnabled = Boolean(status?.eligible) && !status?.applied && !triggering;
+    const upgradeEnabled =
+        Boolean(status?.eligible) && !status?.applied && !status?.running && !triggering;
 
     return (
         <section className="app-software-panel" aria-labelledby="software-upgrade-title">
@@ -140,6 +171,28 @@ export const UpgradePanel = () => {
                         />
                         <span>{t('views.Settings.About.upgrade.upgrade_button')}</span>
                     </button>
+                    {status?.running && (
+                        <button
+                            type="button"
+                            className="btn btn-sm app-button-toolbar"
+                            disabled={!status.cancellable || cancelling}
+                            onClick={handleCancel}
+                        >
+                            <Icon
+                                className="app-icon"
+                                path={mdiStop}
+                                size={0.7}
+                                aria-hidden="true"
+                            />
+                            <span>
+                                {t(
+                                    cancelling
+                                        ? 'views.Settings.About.upgrade.cancelling'
+                                        : 'views.Settings.About.upgrade.stop_button'
+                                )}
+                            </span>
+                        </button>
+                    )}
                 </div>
             </div>
         </section>

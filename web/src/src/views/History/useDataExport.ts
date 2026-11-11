@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { sendPromiseAlert } from '../../helpers/alert/sendPromiseAlert';
 import { getRestfulApiUrl } from '../../helpers/app/getRestfulApiUrl';
 import { ApiClient } from '../../helpers/request/ApiClient';
+import { useRequestSignal } from '../../helpers/request/useRequestSignal';
 
 export const useDataExport = ({
     startTime,
@@ -15,6 +16,7 @@ export const useDataExport = ({
     setIsBusy: Dispatch<SetStateAction<boolean>>;
 }) => {
     const { t } = useTranslation();
+    const getRequestSignal = useRequestSignal();
     const [availableExports, setAvailableExports] = useState<{
         channels: string[];
         formats: Record<string, string>;
@@ -32,6 +34,7 @@ export const useDataExport = ({
             }>({
                 url: getRestfulApiUrl('/export'),
                 method: 'get',
+                signal: getRequestSignal(),
                 ignoreErrors: true
             });
             setIsBusy(false);
@@ -41,13 +44,14 @@ export const useDataExport = ({
             }
         };
         requestFn();
-    }, [setIsBusy]);
+    }, [getRequestSignal, setIsBusy]);
     const handleGetData = useCallback(async () => {
         setIsBusy(true);
         await sendPromiseAlert(
             ApiClient.saveAs({
                 url: getRestfulApiUrl('/export'),
                 method: 'post',
+                signal: getRequestSignal(),
                 data: {
                     start_time: startTime,
                     end_time: endTime,
@@ -77,6 +81,7 @@ export const useDataExport = ({
         selectedExport.format,
         selectedExport.channel,
         setIsBusy,
+        getRequestSignal,
         t,
         availableExports?.formats
     ]);

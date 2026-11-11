@@ -48,6 +48,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
+		CancelUpgrade              func(childComplexity int) int
 		CreateFDSNAccessKey        func(childComplexity int, remark string, expiresAt *int64) int
 		CreateSysUser              func(childComplexity int, username string, password string, admin bool) int
 		ImportGlobalConfig         func(childComplexity int, data string) int
@@ -251,11 +252,13 @@ type ComplexityRoot struct {
 
 	UpgradeStatus struct {
 		Applied     func(childComplexity int) int
+		Cancellable func(childComplexity int) int
 		CheckFailed func(childComplexity int) int
 		Current     func(childComplexity int) int
 		Eligible    func(childComplexity int) int
 		Latest      func(childComplexity int) int
 		Required    func(childComplexity int) int
+		Running     func(childComplexity int) int
 	}
 }
 
@@ -270,6 +273,7 @@ type MutationResolver interface {
 	PurgeHelicorderFiles(ctx context.Context) (*graph_model.PurgeDataJob, error)
 	PurgeHelicorderFilesByDate(ctx context.Context, startDate int64, endDate int64) (*graph_model.PurgeDataJob, error)
 	TriggerUpgrade(ctx context.Context) (bool, error)
+	CancelUpgrade(ctx context.Context) (bool, error)
 	RemoveExecutableBackups(ctx context.Context, names []string) ([]*graph_model.ExecutableBackupRemoval, error)
 	StopService(ctx context.Context, serviceID string) (bool, error)
 	StartService(ctx context.Context, serviceID string) (bool, error)
@@ -331,6 +335,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	_ = ec
 	switch typeName + "." + field {
 
+	case "Mutation.cancelUpgrade":
+		if e.complexity.Mutation.CancelUpgrade == nil {
+			break
+		}
+
+		return e.complexity.Mutation.CancelUpgrade(childComplexity), true
 	case "Mutation.createFDSNAccessKey":
 		if e.complexity.Mutation.CreateFDSNAccessKey == nil {
 			break
@@ -1309,6 +1319,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.UpgradeStatus.Applied(childComplexity), true
+	case "upgradeStatus.cancellable":
+		if e.complexity.UpgradeStatus.Cancellable == nil {
+			break
+		}
+
+		return e.complexity.UpgradeStatus.Cancellable(childComplexity), true
 	case "upgradeStatus.checkFailed":
 		if e.complexity.UpgradeStatus.CheckFailed == nil {
 			break
@@ -1339,6 +1355,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.UpgradeStatus.Required(childComplexity), true
+	case "upgradeStatus.running":
+		if e.complexity.UpgradeStatus.Running == nil {
+			break
+		}
+
+		return e.complexity.UpgradeStatus.Running(childComplexity), true
 
 	}
 	return 0, false
@@ -2259,6 +2281,35 @@ func (ec *executionContext) fieldContext_Mutation_triggerUpgrade(_ context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_cancelUpgrade(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_cancelUpgrade,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Mutation().CancelUpgrade(ctx)
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_cancelUpgrade(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_removeExecutableBackups(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -3152,6 +3203,10 @@ func (ec *executionContext) fieldContext_Query_getUpgradeStatus(ctx context.Cont
 				return ec.fieldContext_upgradeStatus_applied(ctx, field)
 			case "checkFailed":
 				return ec.fieldContext_upgradeStatus_checkFailed(ctx, field)
+			case "running":
+				return ec.fieldContext_upgradeStatus_running(ctx, field)
+			case "cancellable":
+				return ec.fieldContext_upgradeStatus_cancellable(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type upgradeStatus", field.Name)
 		},
@@ -8303,6 +8358,64 @@ func (ec *executionContext) fieldContext_upgradeStatus_checkFailed(_ context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _upgradeStatus_running(ctx context.Context, field graphql.CollectedField, obj *graph_model.UpgradeStatus) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_upgradeStatus_running,
+		func(ctx context.Context) (any, error) {
+			return obj.Running, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_upgradeStatus_running(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "upgradeStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _upgradeStatus_cancellable(ctx context.Context, field graphql.CollectedField, obj *graph_model.UpgradeStatus) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_upgradeStatus_cancellable,
+		func(ctx context.Context) (any, error) {
+			return obj.Cancellable, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_upgradeStatus_cancellable(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "upgradeStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 // endregion **************************** field.gotpl *****************************
 
 // region    **************************** input.gotpl *****************************
@@ -8400,6 +8513,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "triggerUpgrade":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_triggerUpgrade(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "cancelUpgrade":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_cancelUpgrade(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -10539,6 +10659,16 @@ func (ec *executionContext) _upgradeStatus(ctx context.Context, sel ast.Selectio
 			}
 		case "checkFailed":
 			out.Values[i] = ec._upgradeStatus_checkFailed(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "running":
+			out.Values[i] = ec._upgradeStatus_running(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "cancellable":
+			out.Values[i] = ec._upgradeStatus_cancellable(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

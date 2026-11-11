@@ -36,8 +36,10 @@ type UpdaterServiceImpl struct {
 	currentExePath string
 	restartChan    chan struct{}
 	notifications  notification.Publisher
-	manualRequests chan struct{}
+	manualRequests chan context.Context
 	manualPending  atomic.Bool
+	manualCancel   context.CancelFunc
+	manualApplying bool
 
 	autoRestartEnabled bool
 }

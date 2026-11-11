@@ -183,6 +183,21 @@ func (r *mutationResolver) TriggerUpgrade(ctx context.Context) (bool, error) {
 	return true, nil
 }
 
+// CancelUpgrade is the resolver for the cancelUpgrade field.
+func (r *mutationResolver) CancelUpgrade(ctx context.Context) (bool, error) {
+	if !r.checkIsAdmin(ctx) {
+		return false, errors.New("permission denied")
+	}
+	updaterService, _ := r.ServiceMap[updater.ID].(*updater.UpdaterServiceImpl)
+	if updaterService == nil {
+		return false, errors.New("updater service is unavailable for this build")
+	}
+	if err := updaterService.CancelUpgrade(); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 // RemoveExecutableBackups is the resolver for the removeExecutableBackups field.
 func (r *mutationResolver) RemoveExecutableBackups(ctx context.Context, names []string) ([]*graph_model.ExecutableBackupRemoval, error) {
 	if !r.checkIsAdmin(ctx) {
@@ -216,6 +231,11 @@ func (r *queryResolver) GetUpgradeStatus(ctx context.Context, fresh bool) (*grap
 		return nil, nil
 	}
 
+	var running, cancellable bool
+	if updaterService, ok := r.ServiceMap[updater.ID].(*updater.UpdaterServiceImpl); ok {
+		running, cancellable = updaterService.ManualUpgradeStatus()
+	}
+
 	checkUpdate := r.UpgradeHelper.CheckUpdate
 	if fresh {
 		checkUpdate = r.UpgradeHelper.CheckUpdateFresh
@@ -225,14 +245,18 @@ func (r *queryResolver) GetUpgradeStatus(ctx context.Context, fresh bool) (*grap
 		return &graph_model.UpgradeStatus{
 			Current:     r.CurrentVersion.String(),
 			CheckFailed: true,
+			Running:     running,
+			Cancellable: cancellable,
 		}, nil
 	}
 	return &graph_model.UpgradeStatus{
-		Current:  r.CurrentVersion.String(),
-		Latest:   latest.String(),
-		Required: required.String(),
-		Eligible: eligible,
-		Applied:  applied,
+		Current:     r.CurrentVersion.String(),
+		Latest:      latest.String(),
+		Required:    required.String(),
+		Eligible:    eligible,
+		Applied:     applied,
+		Running:     running,
+		Cancellable: cancellable,
 	}, nil
 }
 

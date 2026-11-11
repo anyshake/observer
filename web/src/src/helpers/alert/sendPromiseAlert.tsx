@@ -1,5 +1,7 @@
 import toast from 'react-hot-toast';
 
+import { isRequestCanceled } from '../request/isRequestCanceled';
+
 export const sendPromiseAlert = async <T,>(
     promiseFn: Promise<T>,
     loading: string,
@@ -7,21 +9,19 @@ export const sendPromiseAlert = async <T,>(
     error: string | ((error: unknown) => string),
     hideError = true
 ) => {
-    if (!hideError) {
-        return await toast.promise(promiseFn, {
-            loading,
-            success,
-            error
-        });
-    }
-
+    const id = toast.loading(loading);
     try {
-        return await toast.promise(promiseFn, {
-            loading,
-            success,
-            error
-        });
-    } catch {
-        /* empty */
+        const data = await promiseFn;
+        toast.success(typeof success === 'function' ? success(data) : success, { id });
+        return data;
+    } catch (reason) {
+        if (isRequestCanceled(reason)) {
+            toast.dismiss(id);
+        } else {
+            toast.error(typeof error === 'function' ? error(reason) : error, { id });
+        }
+        if (!hideError) {
+            throw reason;
+        }
     }
 };

@@ -78,11 +78,17 @@ func (s *UpdaterServiceImpl) start(ctx context.Context, manualOnly bool) error {
 		defer func() {
 			ticker.Stop()
 			runCancel()
+			s.finishManualUpgrade(true)
+			s.mu.Lock()
+			select {
+			case <-s.manualRequests:
+				s.notify("Upgrade cancelled.", notification.LevelWarning)
+			default:
+			}
 			s.status.SetStoppedAt(s.timeSource.Now())
 			s.status.SetIsRunning(false)
-			if manualOnly {
-				s.manualPending.Store(false)
-			}
+			s.manualPending.Store(false)
+			s.mu.Unlock()
 			if r := recover(); r != nil {
 				logger.GetLogger(ID).Errorf("service unexpectedly crashed, recovered from panic: %v\n%s", r, debug.Stack())
 			}
@@ -92,14 +98,12 @@ func (s *UpdaterServiceImpl) start(ctx context.Context, manualOnly bool) error {
 			select {
 			case <-runCtx.Done():
 				return
-			case <-s.manualRequests:
-				if err := s.runManualUpgrade(runCtx); err != nil {
-					logger.GetLogger(ID).Errorf("manual upgrade failed: %v", err)
-				}
+			case requestCtx := <-s.manualRequests:
+				_ = s.runManualUpgrade(requestCtx)
+				s.finishManualUpgrade(manualOnly)
 				if manualOnly {
 					return
 				}
-				s.manualPending.Store(false)
 			case <-ticker.C:
 				latestVer, _, needUpdate, isApplied, err := s.upgradeHelper.CheckUpdate(runCtx)
 				if err != nil {
@@ -113,8 +117,7 @@ func (s *UpdaterServiceImpl) start(ctx context.Context, manualOnly bool) error {
 
 				if needUpdate && !isApplied {
 					logger.GetLogger(ID).Infof("found new version %s, upgrading process will start now", latestVer.String())
-					if err := s.applyUpdate(runCtx, latestVer, s.autoRestartEnabled); err != nil {
-						logger.GetLogger(ID).Errorf("failed to upgrade: %v", err)
+					if err := s.applyUpdate(runCtx, latestVer, s.autoRestartEnabled, false); err != nil {
 						continue
 					}
 					if !s.autoRestartEnabled {
@@ -131,7 +134,6 @@ func (s *UpdaterServiceImpl) start(ctx context.Context, manualOnly bool) error {
 				}
 
 				if needRestart {
-					logger.GetLogger(ID).Infoln("restarting application in 3 second...")
 					s.notify("Application will restart in 3 seconds.", notification.LevelWarning)
 					time.AfterFunc(3*time.Second, s.requestRestart)
 				}

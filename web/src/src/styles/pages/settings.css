@@ -152,7 +152,8 @@
     }
 
     .app-license-section {
-        @apply rounded-none;
+        @apply min-w-0 rounded-none;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .app-license-section,
@@ -171,11 +172,11 @@
     }
 
     .app-license-section[open] > .collapse-content {
-        @apply pt-4;
+        @apply min-w-0 overflow-x-auto pt-4;
     }
 
     .app-license-markdown {
-        @apply min-w-0 max-w-none;
+        @apply min-w-0 max-w-full;
     }
 
     .app-license-markdown .app-markdown {
@@ -190,11 +191,7 @@
         @apply text-sm font-medium;
     }
 
-    .app-license-markdown .app-markdown-pre {
-        @apply whitespace-pre-wrap wrap-anywhere;
-    }
-
-    .app-license-markdown .app-markdown-pre .app-markdown-inline-code {
-        @apply block overflow-visible bg-transparent p-0;
+    .app-license-markdown .app-markdown-pre > .app-markdown-inline-code {
+        @apply whitespace-pre-wrap wrap-anywhere bg-transparent text-app-text;
     }
 }

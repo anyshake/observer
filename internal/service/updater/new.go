@@ -22,7 +22,7 @@ func New(parentCtx context.Context, actionHandler *action.Handler, timeSource *t
 		currentExePath: currentExePath,
 		restartChan:    restartChan,
 		notifications:  notifications,
-		manualRequests: make(chan struct{}, 1),
+		manualRequests: make(chan context.Context, 1),
 	}
 	obj.status.SetStartedAt(time.Unix(0, 0))
 	obj.status.SetStoppedAt(time.Unix(0, 0))
