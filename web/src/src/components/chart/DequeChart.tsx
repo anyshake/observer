@@ -12,6 +12,7 @@ import {
 import TimeSeriesBuffer from '../../helpers/storage/TimeSeriesBuffer';
 import { getChartAxis } from '../../styles/chartTheme';
 import { useThemeColors } from '../../styles/useThemeColors';
+import { getPressureTooltip } from './getPressureTooltip';
 import { getLineSeries } from './lineSeries';
 import { HoverTimeHandler, useHoverTime } from './useHoverTime';
 import { PlotBoundsHandler, usePlotBounds } from './usePlotBounds';
@@ -32,6 +33,7 @@ interface IDequeChart {
     readonly lineWidth?: number;
     readonly height?: number | string;
     readonly zoom?: boolean;
+    readonly unit?: string;
     readonly yMax?: number;
     readonly yMin?: number;
     readonly yInterval?: number;
@@ -53,6 +55,7 @@ export const DequeChart = memo(
                 lineWidth = 2,
                 height = 250,
                 zoom = false,
+                unit,
                 yMax,
                 yMin,
                 yInterval,
@@ -213,6 +216,8 @@ export const DequeChart = memo(
                     yAxis: {
                         ...axis,
                         type: 'value',
+                        name: unit,
+                        nameTextStyle: { color: colors.label, align: yPosition },
                         max: yMax,
                         min: yMin,
                         interval: yInterval,
@@ -220,7 +225,8 @@ export const DequeChart = memo(
                         scale: true
                     },
                     series: getLineSeries(data, seriesColor, lineWidth),
-                    grid: { top: '5%', bottom: '3%', containLabel: true },
+                    grid: { top: unit ? 28 : '5%', bottom: '3%', containLabel: true },
+                    tooltip: getPressureTooltip(unit),
                     dataZoom: zoom
                         ? [
                               {
@@ -235,6 +241,7 @@ export const DequeChart = memo(
                 };
             }, [
                 animation,
+                unit,
                 yMax,
                 yMin,
                 yInterval,

@@ -19,6 +19,9 @@ type ChannelData struct {
 	ChannelCode string  `json:"channelCode"`
 	ChannelID   int     `json:"channelId"`
 	Data        []int32 `json:"data"`
+	InputUnit   string  `json:"inputUnit"`
+	// Counts per input unit at recording time, zero when unavailable
+	Sensitivity float64 `json:"sensitivity"`
 	// Peak ground acceleration of this record in m/s^2, null without metadata
 	Pga *float64 `json:"pga,omitempty"`
 	// Peak ground velocity of this record in m/s, null without metadata

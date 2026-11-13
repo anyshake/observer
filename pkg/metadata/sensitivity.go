@@ -13,12 +13,13 @@ import (
 const (
 	UNIT_VELOCITY     = "m/s"
 	UNIT_ACCELERATION = "m/s2"
+	UNIT_PRESSURE     = "Pa"
 )
 
 // Sensitivity is the overall instrument sensitivity of one channel, in counts per SI unit.
 type Sensitivity struct {
 	Gain      float64
-	Unit      string  // UNIT_VELOCITY or UNIT_ACCELERATION
+	Unit      string
 	Frequency float64 // frequency (Hz) at which Gain is valid, 0 if unknown
 	// Poles are the analog (Laplace, rad/s) poles of the sensor response, used
 	// to correct the low-frequency roll-off of geophones. Empty when the
@@ -26,7 +27,7 @@ type Sensitivity struct {
 	Poles []complex128
 }
 
-// NormalizeUnit maps StationXML input unit names to UNIT_VELOCITY or UNIT_ACCELERATION.
+// NormalizeUnit maps StationXML input unit names to supported physical units.
 // Unsupported units yield an empty string.
 func NormalizeUnit(name string) string {
 	unit := strings.ToLower(strings.ReplaceAll(strings.TrimSpace(name), " ", ""))
@@ -35,6 +36,8 @@ func NormalizeUnit(name string) string {
 		return UNIT_VELOCITY
 	case "m/s2", "m/s**2", "m/s^2", "m*s**-2", "m/sec**2":
 		return UNIT_ACCELERATION
+	case "pa", "pascal", "pascals":
+		return UNIT_PRESSURE
 	}
 	return ""
 }

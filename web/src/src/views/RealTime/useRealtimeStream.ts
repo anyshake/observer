@@ -1,5 +1,6 @@
 import { createRef, RefObject, useCallback, useRef, useState } from 'react';
 
+import { getDisplayUnit, isGroundMotionChannel } from '../../components/chart/channelUnits';
 import { DequeChartHandle } from '../../components/chart/DequeChart';
 import { DequeSpectrogramHandle } from '../../components/chart/DequeSpectrogram';
 import type { IGroundMotion, IGroundMotionRecord } from '../../components/chart/groundMotion';
@@ -13,6 +14,8 @@ export const useRealtimeStream = () => {
     const { getCredential } = useCredentialStore();
     const [sampleRate, setSampleRate] = useState(0);
     const [updatedAt, setUpdatedAt] = useState(0);
+    const [channelUnits, setChannelUnits] = useState<Record<string, string>>({});
+    const [latestValues, setLatestValues] = useState<Record<string, number>>({});
     const [activeChannels, setActiveChannels] = useState<
         Record<string, { id: string; index: number }>
     >({});
@@ -84,8 +87,16 @@ export const useRealtimeStream = () => {
             onData: ({ data }) => {
                 const { channel_data, sample_rate, record_time, current_time } = data;
 
+                const units: Record<string, string> = {};
+                const latest: Record<string, number> = {};
                 for (const channel in channel_data) {
-                    const samples = channel_data[channel].data_array;
+                    const { data_array, input_unit, sensitivity } = channel_data[channel];
+                    const unit = getDisplayUnit(input_unit, sensitivity);
+                    units[channel] = unit;
+                    const samples = unit
+                        ? data_array.map((value: number) => value / sensitivity)
+                        : data_array;
+                    latest[channel] = samples[samples.length - 1];
                     waveformRefs.current[channel]?.current?.addData(
                         samples,
                         record_time,
@@ -93,18 +104,28 @@ export const useRealtimeStream = () => {
                         sample_rate
                     );
                     spectrogramRefs.current[channel]?.current?.addData(
-                        samples,
+                        data_array,
                         record_time,
                         current_time,
                         sample_rate
                     );
                 }
+                setChannelUnits((prev) =>
+                    sameStrings(Object.keys(prev), Object.keys(units)) &&
+                    Object.keys(units).every((channel) => prev[channel] === units[channel])
+                        ? prev
+                        : units
+                );
+                setLatestValues(latest);
 
                 const motion: Record<string, IGroundMotion> = {};
                 const history: Record<string, IGroundMotionRecord[]> = {};
                 const expired = record_time - RetentionConstraints.maxValue * 1000;
                 for (const channel in channel_data) {
-                    const { pga, pgv, pgd, data_array } = channel_data[channel];
+                    const { pga, pgv, pgd, data_array, input_unit } = channel_data[channel];
+                    if (!isGroundMotionChannel(channel, input_unit, { pga, pgv, pgd })) {
+                        continue;
+                    }
                     const peaks = { pga: pga ?? null, pgv: pgv ?? null, pgd: pgd ?? null };
                     motion[channel] = peaks;
 
@@ -134,6 +155,8 @@ export const useRealtimeStream = () => {
     return {
         sampleRate,
         updatedAt,
+        channelUnits,
+        latestValues,
         activeChannels,
         groundMotion,
         getGroundMotionRecords,

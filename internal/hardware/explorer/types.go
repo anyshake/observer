@@ -77,6 +77,8 @@ type ChannelData struct {
 	ByteSize    int
 	DataType    string
 	Data        []int32
+	InputUnit   string
+	Sensitivity float64 // Counts per input unit; zero when unavailable.
 
 	// Ground motion peaks of this block in SI units (m/s², m/s, m).
 	// They are nil when the channel is not described by metadata.

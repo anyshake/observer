@@ -3,6 +3,7 @@ import { memo, useEffect, useMemo, useRef } from 'react';
 
 import { getChartAxis } from '../../styles/chartTheme';
 import { useThemeColors } from '../../styles/useThemeColors';
+import { getPressureTooltip } from './getPressureTooltip';
 import { getLineSeries, type LineChartData } from './lineSeries';
 import { HoverTimeHandler, useHoverTime } from './useHoverTime';
 import { PlotBoundsHandler, usePlotBounds } from './usePlotBounds';
@@ -16,6 +17,7 @@ interface ILineChart {
     readonly height?: number | string;
     readonly zoom?: boolean;
     readonly data: LineChartData;
+    readonly unit?: string;
     readonly yMax?: number;
     readonly yMin?: number;
     readonly yInterval?: number;
@@ -38,6 +40,7 @@ export const LineChart = memo(
         height = 250,
         zoom = false,
         data,
+        unit,
         yMax,
         yMin,
         yInterval,
@@ -84,6 +87,8 @@ export const LineChart = memo(
                 yAxis: {
                     ...axis,
                     type: 'value',
+                    name: unit,
+                    nameTextStyle: { color: colors.label, align: yPosition },
                     max: yMax,
                     min: yMin,
                     interval: yInterval,
@@ -91,7 +96,8 @@ export const LineChart = memo(
                     scale: true
                 },
                 series: getLineSeries(Array.isArray(data) ? data : [], seriesColor, lineWidth),
-                grid: { top: '5%', bottom: '3%', containLabel: true },
+                grid: { top: unit ? 28 : '5%', bottom: '3%', containLabel: true },
+                tooltip: getPressureTooltip(unit),
                 dataZoom: zoom
                     ? [
                           {
@@ -106,6 +112,7 @@ export const LineChart = memo(
             }),
             [
                 animation,
+                unit,
                 yMax,
                 yMin,
                 yInterval,

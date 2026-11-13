@@ -6,6 +6,8 @@ query getSeismicRecords($startTime: Int64!, $endTime: Int64!) {
             channelCode
             channelId
             data
+            inputUnit
+            sensitivity
             pga
             pgv
             pgd

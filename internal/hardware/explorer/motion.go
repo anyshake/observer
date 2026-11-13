@@ -43,10 +43,17 @@ func (g *groundMotion) annotate(start time.Time, sampleRate int, channelData []C
 	for i := range channelData {
 		ch := &channelData[i]
 		ch.PGA, ch.PGV, ch.PGD = nil, nil, nil
+		ch.InputUnit, ch.Sensitivity = "", 0
+		var sensitivity *metadata.Sensitivity
+		if idx := ch.ChannelId - 1; idx >= 0 && idx < len(g.sensitivities) {
+			sensitivity = g.sensitivities[idx]
+		}
+		if sensitivity != nil {
+			ch.InputUnit, ch.Sensitivity = sensitivity.Unit, sensitivity.Gain
+		}
 		calculator, ok := g.channels[ch.ChannelId]
 		if !ok {
-			if idx := ch.ChannelId - 1; idx >= 0 && idx < len(g.sensitivities) && g.sensitivities[idx] != nil {
-				sensitivity := g.sensitivities[idx]
+			if sensitivity != nil {
 				calculator = groundmotion.NewChannel(sensitivity.Gain, sensitivity.Unit).
 					WithResponse(sensitivity.Poles, sensitivity.Frequency)
 			}
