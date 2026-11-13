@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/anyshake/observer/internal/notification"
 	"github.com/anyshake/observer/pkg/logger"
@@ -80,13 +82,14 @@ func (s *UpdaterServiceImpl) finishManualUpgrade(manualOnly bool) {
 
 func (s *UpdaterServiceImpl) notify(message string, level notification.Level) {
 	log := logger.GetLogger(ID)
+	logMessage := lowerFirst(message)
 	switch level {
 	case notification.LevelError:
-		log.Errorln(message)
+		log.Errorln(logMessage)
 	case notification.LevelWarning:
-		log.Warnln(message)
+		log.Warnln(logMessage)
 	default:
-		log.Infoln(message)
+		log.Infoln(logMessage)
 	}
 	if s.notifications != nil {
 		s.notifications.Publish(notification.Event{
@@ -168,4 +171,14 @@ func (s *UpdaterServiceImpl) applyUpdate(ctx context.Context, latest *semver.Ver
 		time.AfterFunc(3*time.Second, s.requestRestart)
 	}
 	return nil
+}
+
+// lowerFirst keeps log lines in the lower-case style used elsewhere while
+// notifications shown to users remain sentence-cased.
+func lowerFirst(message string) string {
+	r, size := utf8.DecodeRuneInString(message)
+	if r == utf8.RuneError || !unicode.IsUpper(r) {
+		return message
+	}
+	return string(unicode.ToLower(r)) + message[size:]
 }
