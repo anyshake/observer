@@ -2,6 +2,29 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.11.0
+
+### Release Notes
+
+This release adds **per-second PGA, PGV, and PGD measurements** to live and historical waveforms, with metadata-based instrument response correction. It also isolates archive writes from waveform reception and adds cancellation controls for software upgrades.
+
+### New Features
+
+- Added real-time **peak ground acceleration, velocity, and displacement** calculated from station metadata before waveform publication. Measurements are archived alongside raw samples and exposed through GraphQL and WebSocket APIs.
+- Added ground motion readings beside live channel titles and time-based tooltips in live and historical waveform views. Values use four decimal places in gal, cm/s, and cm, with wrapping layouts for narrow panels and localized unavailable-data messages in all 24 interface languages. Older recordings remain readable without backfilling measurements.
+- Added administrator controls to **cancel an ongoing software upgrade**, with automatic status polling and clearer progress and cancellation messages.
+
+### Improvements
+
+- Added streaming, pole-based instrument response correction for low-frequency geophone roll-off, normalized at the metadata sensitivity frequency and bounded by a high-pass filter. Flat-response channels retain sensitivity-only conversion.
+- Moved archive inserts to a dedicated writer with bounded batches, insert timeouts, delayed retries, and a bounded final flush. The in-memory queue retains up to 1,800 records and logs dropped records during prolonged database failures.
+- Improved frontend request cancellation handling and Markdown rendering for third-party license reports.
+
+### Bug Fixes
+
+- Fixed slow or stalled SQLite archive writes blocking the waveform subscriber and causing message delivery timeouts. Persistently failing batches are eventually discarded so newer records can proceed.
+- Fixed live ground motion readings being clipped when chart panels are resized to narrow widths.
+
 ## v4.10.0
 
 ### Release Notes
