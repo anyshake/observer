@@ -24,8 +24,9 @@ const (
 	RECORDS_INSERT_TIMEOUT = 20 * time.Second
 	// RECORDS_INSERT_RETRY_DELAY spaces retries after a failed insert.
 	RECORDS_INSERT_RETRY_DELAY = 5 * time.Second
-	// RECORDS_INSERT_MAX_ATTEMPTS discards a batch that keeps failing (e.g. a
-	// constraint violation) instead of blocking newer records forever.
+	// RECORDS_INSERT_MAX_ATTEMPTS discards a batch that keeps failing with a
+	// non-transient error instead of blocking newer records forever. Timeouts
+	// and busy errors are retried until the pending limit drops old records.
 	RECORDS_INSERT_MAX_ATTEMPTS = 5
 	// RECORDS_INSERT_BATCH_LIMIT caps one transaction when catching up.
 	RECORDS_INSERT_BATCH_LIMIT = 120

@@ -15,6 +15,7 @@ type fakeInserter struct {
 	mu      sync.Mutex
 	block   chan struct{}
 	fail    int
+	failErr error
 	calls   int
 	written []int64
 }
@@ -36,6 +37,9 @@ func (f *fakeInserter) insert(ctx context.Context, records ...model.SeisRecord) 
 		}
 	}
 	if failing {
+		if f.failErr != nil {
+			return f.failErr
+		}
 		return errors.New("database is locked")
 	}
 	f.mu.Lock()
@@ -114,7 +118,7 @@ func TestWriterRetriesFailedBatchInOrder(t *testing.T) {
 
 func TestWriterDiscardsPermanentlyFailingBatch(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
-		inserter := &fakeInserter{fail: RECORDS_INSERT_MAX_ATTEMPTS}
+		inserter := &fakeInserter{fail: RECORDS_INSERT_MAX_ATTEMPTS, failErr: errors.New("NOT NULL constraint failed")}
 		queue := newRecordQueue()
 		writer := &recordWriter{queue: queue, insert: inserter.insert}
 		ctx, cancel := context.WithCancel(t.Context())
@@ -173,5 +177,26 @@ func TestWriterStopIsBoundedWhenDatabaseHangs(t *testing.T) {
 		if elapsed := time.Since(started); elapsed > RECORDS_FINAL_FLUSH_TIMEOUT {
 			t.Fatalf("stop took %s with a hung database", elapsed)
 		}
+	})
+}
+
+func TestWriterKeepsRetryingTransientFailures(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		inserter := &fakeInserter{fail: RECORDS_INSERT_MAX_ATTEMPTS * 3, failErr: context.DeadlineExceeded}
+		queue := newRecordQueue()
+		writer := &recordWriter{queue: queue, insert: inserter.insert}
+		ctx, cancel := context.WithCancel(t.Context())
+		done := make(chan struct{})
+		go func() { writer.run(ctx); close(done) }()
+
+		for i := range RECORDS_INSERT_INTERVAL {
+			queue.push(record(int64(i)))
+		}
+		time.Sleep(5 * time.Minute)
+		if written := inserter.snapshot(); len(written) != RECORDS_INSERT_INTERVAL {
+			t.Fatalf("written = %v, want the batch kept through transient failures", written)
+		}
+		cancel()
+		<-done
 	})
 }

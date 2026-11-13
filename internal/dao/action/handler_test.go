@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"path/filepath"
 	"testing"
 	"time"
@@ -240,8 +241,10 @@ func TestSeismicRecords(t *testing.T) {
 	if err := handler.SeisRecordsCreate(t.Context(), model.SeisRecord{RecordTime: nextDay.UnixMilli(), SampleRate: 50, ChannelData: []byte{3}}); err != nil {
 		t.Fatal(err)
 	}
-	if err := handler.SeisRecordsCreate(t.Context(), records[0]); err == nil {
-		t.Fatal("duplicate record accepted")
+	// A retry of a batch whose commit outcome was unknown must succeed and must
+	// not store duplicates.
+	if err := handler.SeisRecordsCreate(t.Context(), records...); err != nil {
+		t.Fatalf("retrying a stored batch failed: %v", err)
 	}
 
 	got, err := handler.SeisRecordsQuery(t.Context(), first.Add(-time.Second), second.Add(time.Second))
@@ -431,5 +434,106 @@ func TestRecordCodec(t *testing.T) {
 	}
 	if bytes.Equal(record.ChannelData, nil) {
 		t.Fatal("channel data unexpectedly cleared")
+	}
+}
+
+func TestSeisRecordsCreateRetryStoresOnlyMissingRecords(t *testing.T) {
+	obj, handler := openActionDB(t)
+	first := time.Date(2026, 1, 2, 23, 59, 58, 0, time.UTC)
+	ensureSeisTables(t, obj, first, first.Add(24*time.Hour))
+	records := make([]model.SeisRecord, 4)
+	for i := range records {
+		records[i] = model.SeisRecord{RecordTime: first.Add(time.Duration(i) * time.Second).UnixMilli(), SampleRate: 100, ChannelData: []byte{byte(i)}}
+	}
+	// The first two records were committed before the caller saw a timeout.
+	if err := handler.SeisRecordsCreate(t.Context(), records[:2]...); err != nil {
+		t.Fatal(err)
+	}
+	if err := handler.SeisRecordsCreate(t.Context(), append(records, records[3])...); err != nil {
+		t.Fatalf("retry failed: %v", err)
+	}
+	got, err := handler.SeisRecordsQuery(t.Context(), first, first.Add(4*time.Second))
+	if err != nil || len(got) != len(records) {
+		t.Fatalf("query = %d records, %v; want %d", len(got), err, len(records))
+	}
+	for i, record := range got {
+		if record.RecordTime != records[i].RecordTime || record.ChannelData[0] != byte(i) {
+			t.Fatalf("record %d = %d/%v", i, record.RecordTime, record.ChannelData)
+		}
+	}
+}
+
+func TestSeisRecordsQueryCallbackDoesNotHoldConnection(t *testing.T) {
+	obj, handler := openActionDB(t)
+	start := time.Date(2026, 1, 2, 12, 0, 0, 0, time.UTC)
+	ensureSeisTables(t, obj, start)
+	total := seisRecordsQueryPageSize*2 + 7
+	records := make([]model.SeisRecord, total)
+	for i := range records {
+		records[i] = model.SeisRecord{RecordTime: start.Add(time.Duration(i) * time.Second).UnixMilli(), SampleRate: 100, ChannelData: []byte{1}}
+	}
+	if err := handler.SeisRecordsCreate(t.Context(), records...); err != nil {
+		t.Fatal(err)
+	}
+	sqlDB, err := obj.Database.DB()
+	if err != nil {
+		t.Fatal(err)
+	}
+	sqlDB.SetMaxOpenConns(1)
+
+	seen := 0
+	last := int64(-1)
+	err = handler.SeisRecordsQueryEach(t.Context(), start, start.Add(time.Hour-time.Second), func(record model.SeisRecord) error {
+		if record.RecordTime <= last {
+			t.Fatalf("record %d returned after %d", record.RecordTime, last)
+		}
+		last = record.RecordTime
+		seen++
+		if seen == 1 {
+			// With one connection, this insert can only finish if the query
+			// released it before invoking callbacks.
+			ctx, cancel := context.WithTimeout(t.Context(), 2*time.Second)
+			defer cancel()
+			return handler.SeisRecordsCreate(ctx, model.SeisRecord{RecordTime: start.Add(30 * time.Minute).UnixMilli(), SampleRate: 100, ChannelData: []byte{2}})
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("query with writing callback failed: %v", err)
+	}
+	if seen != total+1 {
+		t.Fatalf("seen %d records, want %d", seen, total+1)
+	}
+}
+
+func TestSeisRecordsPurgeDeletesInBatches(t *testing.T) {
+	obj, handler := openActionDB(t)
+	start := time.Date(2026, 1, 2, 0, 0, 0, 0, time.UTC)
+	ensureSeisTables(t, obj, start)
+	total := seisRecordsPurgeBatchSize*2 + 3
+	records := make([]model.SeisRecord, total)
+	for i := range records {
+		records[i] = model.SeisRecord{RecordTime: start.Add(time.Duration(i) * time.Second).UnixMilli(), SampleRate: 100, ChannelData: []byte{1}}
+	}
+	if err := handler.SeisRecordsCreate(t.Context(), records...); err != nil {
+		t.Fatal(err)
+	}
+	keep := start.Add(time.Duration(total-1) * time.Second)
+	if err := handler.SeisRecordsPurge(t.Context(), start, keep.Add(-time.Second)); err != nil {
+		t.Fatal(err)
+	}
+	got, err := handler.SeisRecordsQuery(t.Context(), start, keep)
+	if err != nil || len(got) != 1 || got[0].RecordTime != keep.UnixMilli() {
+		t.Fatalf("remaining = %v, %v", got, err)
+	}
+}
+
+func ensureSeisTables(t *testing.T, obj *dao.DAO, times ...time.Time) {
+	t.Helper()
+	for _, at := range times {
+		table := fmt.Sprintf("%sseis_records_%d", obj.GetPrefix(), at.UTC().YearDay()%model.SEIS_RECORD_SHARDS)
+		if err := obj.Database.Table(table).AutoMigrate(&model.SeisRecord{}); err != nil {
+			t.Fatal(err)
+		}
 	}
 }

@@ -2,7 +2,11 @@ package archiver
 
 import (
 	"context"
+	"database/sql"
+	"errors"
+	"fmt"
 	"slices"
+	"strings"
 	"sync"
 	"time"
 
@@ -106,8 +110,25 @@ func (q *recordQueue) size() int {
 type recordWriter struct {
 	queue      *recordQueue
 	insert     func(context.Context, ...model.SeisRecord) error
+	dbStats    func() (sql.DBStats, bool)
 	failures   int
 	retryAfter time.Time
+}
+
+// describeFailure records enough context to tell a connection that never became
+// available from a statement that ran too long.
+func (w *recordWriter) describeFailure(batch []model.SeisRecord, elapsed time.Duration) string {
+	description := fmt.Sprintf("batch=%d records (%d..%d), elapsed=%s, backlog=%d",
+		len(batch), batch[0].RecordTime, batch[len(batch)-1].RecordTime,
+		elapsed.Round(time.Millisecond), w.queue.size())
+	if w.dbStats == nil {
+		return description
+	}
+	if stats, ok := w.dbStats(); ok {
+		description += fmt.Sprintf(", pool in_use=%d idle=%d max_open=%d wait_count=%d wait_duration=%s",
+			stats.InUse, stats.Idle, stats.MaxOpenConnections, stats.WaitCount, stats.WaitDuration.Round(time.Millisecond))
+	}
+	return description
 }
 
 func (w *recordWriter) run(ctx context.Context) {
@@ -138,7 +159,9 @@ func (w *recordWriter) flush(ctx context.Context) {
 			return
 		}
 		insertCtx, cancel := context.WithTimeout(ctx, RECORDS_INSERT_TIMEOUT)
+		started := time.Now()
 		err := w.insert(insertCtx, batch...)
+		elapsed := time.Since(started)
 		cancel()
 		if err == nil {
 			w.failures = 0
@@ -151,15 +174,20 @@ func (w *recordWriter) flush(ctx context.Context) {
 			w.queue.requeue(batch)
 			return
 		}
-		w.failures++
+		// A busy or slow database is temporary: keep the batch (bounded by the
+		// queue limit) instead of turning a stall into a permanent gap. Only
+		// errors that retries cannot fix count toward discarding the batch.
+		if !isTransientInsertError(err) {
+			w.failures++
+		}
 		if w.failures >= RECORDS_INSERT_MAX_ATTEMPTS {
-			logger.GetLogger(ID).Errorf("discarded %d seismic waveform records after %d failed insert attempts: %v", len(batch), w.failures, err)
+			logger.GetLogger(ID).Errorf("discarded %d seismic waveform records after %d failed insert attempts: %v [%s]", len(batch), w.failures, err, w.describeFailure(batch, elapsed))
 			w.failures = 0
 			continue
 		}
 		w.queue.requeue(batch)
 		w.retryAfter = time.Now().Add(RECORDS_INSERT_RETRY_DELAY)
-		logger.GetLogger(ID).Warnf("failed to create seismic waveform records, will retry: %v", err)
+		logger.GetLogger(ID).Warnf("failed to create seismic waveform records, will retry: %v [%s]", err, w.describeFailure(batch, elapsed))
 		return
 	}
 }
@@ -179,4 +207,17 @@ func (w *recordWriter) finalFlush() {
 			return
 		}
 	}
+}
+
+func isTransientInsertError(err error) bool {
+	if errors.Is(err, context.DeadlineExceeded) {
+		return true
+	}
+	message := strings.ToLower(err.Error())
+	for _, marker := range []string{"database is locked", "sqlite_busy", "sqlite_interrupt", "interrupted", "deadline exceeded"} {
+		if strings.Contains(message, marker) {
+			return true
+		}
+	}
+	return false
 }

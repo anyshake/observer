@@ -73,7 +73,7 @@ func (s *ArchiverServiceImpl) Start(ctx context.Context) error {
 
 	rotation := s.rotation
 	queue := newRecordQueue()
-	writer := &recordWriter{queue: queue, insert: s.actionHandler.SeisRecordsCreate}
+	writer := &recordWriter{queue: queue, insert: s.actionHandler.SeisRecordsCreate, dbStats: s.actionHandler.DatabaseStats}
 
 	runCtx, runCancel := s.ctx, s.cancelFn
 	// The callback runs on the hardware message bus. It must never wait for the
