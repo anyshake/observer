@@ -106,9 +106,11 @@ type ComplexityRoot struct {
 		ChannelCode func(childComplexity int) int
 		ChannelID   func(childComplexity int) int
 		Data        func(childComplexity int) int
+		InputUnit   func(childComplexity int) int
 		Pga         func(childComplexity int) int
 		Pgd         func(childComplexity int) int
 		Pgv         func(childComplexity int) int
+		Sensitivity func(childComplexity int) int
 	}
 
 	ConfigConstraint struct {
@@ -752,6 +754,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity._channelData.Data(childComplexity), true
+	case "_channelData.inputUnit":
+		if e.complexity._channelData.InputUnit == nil {
+			break
+		}
+
+		return e.complexity._channelData.InputUnit(childComplexity), true
 	case "_channelData.pga":
 		if e.complexity._channelData.Pga == nil {
 			break
@@ -770,6 +778,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity._channelData.Pgv(childComplexity), true
+	case "_channelData.sensitivity":
+		if e.complexity._channelData.Sensitivity == nil {
+			break
+		}
+
+		return e.complexity._channelData.Sensitivity(childComplexity), true
 
 	case "configConstraint.configType":
 		if e.complexity.ConfigConstraint.ConfigType == nil {
@@ -5520,6 +5534,64 @@ func (ec *executionContext) fieldContext__channelData_data(_ context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) __channelData_inputUnit(ctx context.Context, field graphql.CollectedField, obj *graph_model.ChannelData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext__channelData_inputUnit,
+		func(ctx context.Context) (any, error) {
+			return obj.InputUnit, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext__channelData_inputUnit(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "_channelData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) __channelData_sensitivity(ctx context.Context, field graphql.CollectedField, obj *graph_model.ChannelData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext__channelData_sensitivity,
+		func(ctx context.Context) (any, error) {
+			return obj.Sensitivity, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext__channelData_sensitivity(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "_channelData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) __channelData_pga(ctx context.Context, field graphql.CollectedField, obj *graph_model.ChannelData) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -7455,6 +7527,10 @@ func (ec *executionContext) fieldContext_seisRecord_channelData(_ context.Contex
 				return ec.fieldContext__channelData_channelId(ctx, field)
 			case "data":
 				return ec.fieldContext__channelData_data(ctx, field)
+			case "inputUnit":
+				return ec.fieldContext__channelData_inputUnit(ctx, field)
+			case "sensitivity":
+				return ec.fieldContext__channelData_sensitivity(ctx, field)
 			case "pga":
 				return ec.fieldContext__channelData_pga(ctx, field)
 			case "pgv":
@@ -9712,6 +9788,16 @@ func (ec *executionContext) __channelData(ctx context.Context, sel ast.Selection
 			}
 		case "data":
 			out.Values[i] = ec.__channelData_data(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "inputUnit":
+			out.Values[i] = ec.__channelData_inputUnit(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "sensitivity":
+			out.Values[i] = ec.__channelData_sensitivity(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

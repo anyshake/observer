@@ -1,6 +1,7 @@
-import { type Dispatch, type SetStateAction, useCallback, useMemo, useRef, useState } from 'react';
+import { type Dispatch, type SetStateAction, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { getDisplayUnit, isGroundMotionChannel } from '../../components/chart/channelUnits';
 import type { IGroundMotionRecord } from '../../components/chart/groundMotion';
 import { HistoryConstraints } from '../../config/constraints';
 import { useGetSeismicRecordsLazyQuery } from '../../graphql';
@@ -21,33 +22,15 @@ export const useSeismicRecords = ({
     const { t } = useTranslation();
     const getRequestSignal = useRequestSignal();
     const [sampleRate, setSampleRate] = useState(0);
+    const [channelUnits, setChannelUnits] = useState<Record<string, string>>({});
     const [chartData, setChartData] = useState<{ [key: string]: Array<[number, number | null]> }>(
         {}
     );
     // Per-second peaks sorted by record start; looked up while hovering the waveform.
     const [groundMotion, setGroundMotion] = useState<{ [key: string]: IGroundMotionRecord[] }>({});
-    const spectrogramSeries = useMemo(() => {
-        const series: { [key: string]: Array<[number, number]> } = {};
-        for (const channel in chartData) {
-            const source = chartData[channel];
-            let count = 0;
-            for (let i = 0; i < source.length; i++) {
-                if (source[i][1] !== null) {
-                    count++;
-                }
-            }
-            const points = new Array<[number, number]>(count);
-            let offset = 0;
-            for (let i = 0; i < source.length; i++) {
-                const point = source[i];
-                if (point[1] !== null) {
-                    points[offset++] = [point[0], point[1]];
-                }
-            }
-            series[channel] = points;
-        }
-        return series;
-    }, [chartData]);
+    const [spectrogramSeries, setSpectrogramSeries] = useState<Record<string, [number, number][]>>(
+        {}
+    );
     const [getSeismicRecords] = useGetSeismicRecordsLazyQuery();
     const handleSearchRecords = useCallback(async () => {
         if (startTime > endTime) {
@@ -58,6 +41,8 @@ export const useSeismicRecords = ({
             setSampleRate(0);
             setChartData({});
             setGroundMotion({});
+            setChannelUnits({});
+            setSpectrogramSeries({});
             setIsBusy(true);
             const signal = getRequestSignal();
             const { data, error } = await getSeismicRecords({
@@ -85,12 +70,18 @@ export const useSeismicRecords = ({
                     (a, b) => a!.timestamp - b!.timestamp
                 );
                 const currentChannels = new Map<string, number>();
+                const units: Record<string, string> = {};
                 records.forEach((record) => {
                     record?.channelData.forEach((channel) => {
                         // channelId is 1-based; keep the physical index when earlier channels are absent.
                         currentChannels.set(channel.channelCode, channel.channelId - 1);
+                        const unit = getDisplayUnit(channel.inputUnit, channel.sensitivity);
+                        const previous = units[channel.channelCode];
+                        units[channel.channelCode] =
+                            previous === undefined || previous === unit ? unit : '';
                     });
                 });
+                setChannelUnits(units);
                 const channels = Array.from(currentChannels.keys());
                 const channelIndices = Array.from(currentChannels.values());
 
@@ -127,7 +118,10 @@ export const useSeismicRecords = ({
                             (channel) => (channel.data.length * 1000) / record!.sampleRate
                         )
                     );
-                    for (const { channelCode, pga, pgv, pgd } of record!.channelData) {
+                    for (const { channelCode, pga, pgv, pgd, inputUnit } of record!.channelData) {
+                        if (!isGroundMotionChannel(channelCode, inputUnit, { pga, pgv, pgd })) {
+                            continue;
+                        }
                         (motion[channelCode] ??= []).push({
                             start: record!.timestamp,
                             end: record!.timestamp + duration,
@@ -162,6 +156,8 @@ export const useSeismicRecords = ({
                 setChartData((prevChartData) => {
                     const newChartData: typeof prevChartData = {};
                     const writeAt: Record<string, number> = {};
+                    const spectra: Record<string, [number, number][]> = {};
+                    const spectraWriteAt: Record<string, number> = {};
 
                     for (let channelIndex = 0; channelIndex < channels.length; channelIndex++) {
                         const channel = channels[channelIndex];
@@ -174,6 +170,8 @@ export const useSeismicRecords = ({
                         }
                         newChartData[channel] = dataArray;
                         writeAt[channel] = base;
+                        spectra[channel] = new Array(sampleCounts[channel] ?? 0);
+                        spectraWriteAt[channel] = 0;
                     }
 
                     let lastTimestamp: number | null = null;
@@ -211,17 +209,26 @@ export const useSeismicRecords = ({
                             }
                             let offset = writeAt[channel.channelCode];
                             const samples = channel.data;
+                            const spectrum = spectra[channel.channelCode];
+                            let spectrumOffset = spectraWriteAt[channel.channelCode];
+                            const divisor = units[channel.channelCode] ? channel.sensitivity : 1;
                             for (let sampleIndex = 0; sampleIndex < samples.length; sampleIndex++) {
                                 dataArray[offset++] = [
+                                    timestamp + sampleIndex * interval,
+                                    samples[sampleIndex] / divisor
+                                ];
+                                spectrum[spectrumOffset++] = [
                                     timestamp + sampleIndex * interval,
                                     samples[sampleIndex]
                                 ];
                             }
                             writeAt[channel.channelCode] = offset;
+                            spectraWriteAt[channel.channelCode] = spectrumOffset;
                         }
 
                         lastTimestamp = timestamp;
                     }
+                    setSpectrogramSeries(spectra);
                     setSampleRate(records.length > 0 ? records[0]!.sampleRate : 0);
 
                     return newChartData;
@@ -243,6 +250,7 @@ export const useSeismicRecords = ({
         sampleRate,
         chartData,
         groundMotion,
+        channelUnits,
         spectrogramSeries,
         activeChannels,
         handleSearchRecords

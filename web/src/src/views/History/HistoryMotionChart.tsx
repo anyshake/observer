@@ -11,6 +11,7 @@ import { HistoryConstraints } from '../../config/constraints';
 interface IHistoryMotionChart {
     readonly data: LineChartData;
     readonly groundMotion?: IGroundMotionRecord[];
+    readonly unit?: string;
     readonly onVisibleSamples?: VisibleSamplesHandler;
     readonly onPlotBounds?: PlotBoundsHandler;
 }
@@ -19,6 +20,7 @@ interface IHistoryMotionChart {
 export const HistoryMotionChart = memo(function HistoryMotionChart({
     data,
     groundMotion,
+    unit,
     onVisibleSamples,
     onPlotBounds
 }: IHistoryMotionChart) {
@@ -34,6 +36,7 @@ export const HistoryMotionChart = memo(function HistoryMotionChart({
                     zoom={true}
                     animation={false}
                     data={data}
+                    unit={unit}
                     onVisibleSamples={onVisibleSamples}
                     onPlotBounds={onPlotBounds}
                     onHoverTime={groundMotion?.length ? onHoverTime : undefined}

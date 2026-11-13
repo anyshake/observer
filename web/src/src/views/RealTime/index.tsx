@@ -38,6 +38,8 @@ const RealTime = () => {
         updatedAt,
         activeChannels,
         groundMotion,
+        channelUnits,
+        latestValues,
         getGroundMotionRecords,
         waveformRefs,
         spectrogramRefs,
@@ -241,6 +243,8 @@ const RealTime = () => {
                                 waveformRef={waveformRefs.current[channel]}
                                 spectrogramRef={spectrogramRefs.current[channel]}
                                 groundMotion={groundMotion[channel]}
+                                unit={channelUnits[channel]}
+                                latestValue={latestValues[channel]}
                                 getGroundMotionRecords={getGroundMotionRecords}
                                 onActive={handleActiveChart}
                                 onDragStop={handleDragStop}

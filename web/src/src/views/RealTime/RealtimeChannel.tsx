@@ -9,6 +9,7 @@ import { DequeSpectrogram, DequeSpectrogramHandle } from '../../components/chart
 import type { IGroundMotion, IGroundMotionRecord } from '../../components/chart/groundMotion';
 import { GroundMotionHover } from '../../components/chart/GroundMotionHover';
 import { GroundMotionValues } from '../../components/chart/GroundMotionValues';
+import { PressureValues } from '../../components/chart/PressureValues';
 import { SpectrumSplit } from '../../components/chart/SpectrumSplit';
 import { DraggableBox } from '../../components/ui/DraggableBox';
 import { RealTimeConstraints } from '../../config/constraints';
@@ -30,6 +31,8 @@ interface IRealTimeChannel {
     readonly waveformRef?: RefObject<DequeChartHandle>;
     readonly spectrogramRef?: RefObject<DequeSpectrogramHandle>;
     readonly groundMotion?: IGroundMotion;
+    readonly unit?: string;
+    readonly latestValue?: number;
     readonly getGroundMotionRecords: (channel: string) => IGroundMotionRecord[] | undefined;
     readonly onActive: (channel: string) => void;
     readonly onDragStop: (channel: string, index: number, x: number, y: number) => void;
@@ -58,6 +61,8 @@ export const RealtimeChannel = memo(function RealtimeChannel({
     waveformRef,
     spectrogramRef,
     groundMotion,
+    unit,
+    latestValue,
     getGroundMotionRecords,
     onActive,
     onDragStop,
@@ -96,18 +101,26 @@ export const RealtimeChannel = memo(function RealtimeChannel({
             <ChartPanel
                 title={channel}
                 icon={waveformMode ? mdiChartLine : mdiGradientVertical}
-                extra={<GroundMotionValues motion={groundMotion} />}
+                extra={
+                    unit ? (
+                        <PressureValues value={latestValue} unit={unit} />
+                    ) : groundMotion ? (
+                        <GroundMotionValues motion={groundMotion} />
+                    ) : undefined
+                }
             >
                 <div className={waveformMode ? 'app-chart-visible' : 'app-hidden'}>
                     <SpectrumSplit
                         enabled={fftMode && waveformMode}
                         sampleRate={sampleRate}
                         executor={spectrumExecutor}
+                        unit={unit}
                     >
                         {(onVisibleSamples, onPlotBounds) => (
                             <GroundMotionHover getRecords={getRecords}>
                                 {(onHoverTime) => (
                                     <DequeChart
+                                        key={unit || 'counts'}
                                         minSpanValue={RealTimeConstraints.minSpanValue}
                                         ref={waveformRef}
                                         maxDuration={retention}
@@ -117,9 +130,10 @@ export const RealtimeChannel = memo(function RealtimeChannel({
                                         zoom={true}
                                         animation={false}
                                         paused={!waveformMode}
+                                        unit={unit}
                                         onVisibleSamples={onVisibleSamples}
                                         onPlotBounds={onPlotBounds}
-                                        onHoverTime={onHoverTime}
+                                        onHoverTime={groundMotion ? onHoverTime : undefined}
                                     />
                                 )}
                             </GroundMotionHover>

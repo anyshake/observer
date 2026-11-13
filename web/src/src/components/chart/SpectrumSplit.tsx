@@ -8,6 +8,7 @@ import type { VisibleSamplesHandler } from './useVisibleSamples';
 interface ISpectrumSplit {
     readonly enabled: boolean;
     readonly sampleRate: number;
+    readonly unit?: string;
     readonly executor: SpectrumExecutor;
     readonly children: (
         onVisibleSamples?: VisibleSamplesHandler,
@@ -15,7 +16,13 @@ interface ISpectrumSplit {
     ) => ReactNode;
 }
 
-export const SpectrumSplit = ({ enabled, sampleRate, executor, children }: ISpectrumSplit) => {
+export const SpectrumSplit = ({
+    enabled,
+    sampleRate,
+    unit,
+    executor,
+    children
+}: ISpectrumSplit) => {
     const [samples, setSamples] = useState<Float64Array | null>(null);
     const [bounds, setBounds] = useState<IPlotBounds | null>(null);
     const [prevEnabled, setPrevEnabled] = useState(enabled);
@@ -42,6 +49,7 @@ export const SpectrumSplit = ({ enabled, sampleRate, executor, children }: ISpec
                         sampleRate={sampleRate}
                         executor={executor}
                         bounds={bounds}
+                        unit={unit}
                     />
                 </div>
             )}

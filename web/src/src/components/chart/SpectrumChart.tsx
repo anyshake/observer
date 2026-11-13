@@ -9,13 +9,20 @@ import type { IPlotBounds } from './usePlotBounds';
 interface ISpectrumChart {
     readonly samples: Float64Array | null;
     readonly sampleRate: number;
+    readonly unit?: string;
     readonly executor: SpectrumExecutor;
     readonly bounds: IPlotBounds | null;
 }
 
 const EMPTY_POINTS: SpectrumPoints = [];
 
-export const SpectrumChart = memo(({ samples, sampleRate, executor, bounds }: ISpectrumChart) => {
+export const SpectrumChart = memo(function SpectrumChart({
+    samples,
+    sampleRate,
+    unit,
+    executor,
+    bounds
+}: ISpectrumChart) {
     const [points, setPoints] = useState(EMPTY_POINTS);
 
     useEffect(() => {
@@ -51,6 +58,7 @@ export const SpectrumChart = memo(({ samples, sampleRate, executor, bounds }: IS
             height="100%"
             data={points}
             xName="Frequency (Hz)"
+            yName={unit}
             xMin={SpectrumConstraints.minFrequency}
             yLog
             yPosition="right"

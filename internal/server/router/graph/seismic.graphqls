@@ -2,6 +2,9 @@ type _channelData {
   channelCode: String!
   channelId: Int!
   data: [Int32!]!
+  inputUnit: String!
+  "Counts per input unit at recording time, zero when unavailable"
+  sensitivity: Float!
   "Peak ground acceleration of this record in m/s^2, null without metadata"
   pga: Float
   "Peak ground velocity of this record in m/s, null without metadata"
