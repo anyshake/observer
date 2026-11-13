@@ -16,7 +16,6 @@ import { useSearchParams } from 'react-router-dom';
 import { FFTExecutor } from 'spectrogram-js';
 
 import { ChartPanel } from '../../components/chart/ChartPanel';
-import { LineChart } from '../../components/chart/LineChart';
 import { Spectrogram } from '../../components/chart/Spectrogram';
 import { SpectrumSplit } from '../../components/chart/SpectrumSplit';
 import { DraggableBox } from '../../components/ui/DraggableBox';
@@ -33,6 +32,7 @@ import { useRetentionStore } from '../../stores/retention';
 import { DataExport } from './DataExport';
 import { EventListModal } from './EventListModal';
 import { EventSearch } from './EventSearch';
+import { HistoryMotionChart } from './HistoryMotionChart';
 import { RecordSearch } from './RecordSearch';
 import { useDataExport } from './useDataExport';
 import { useHistoryLayout } from './useHistoryLayout';
@@ -75,8 +75,14 @@ const History = ({ currentLocale }: IRouterComponent) => {
 
     const dataExport = useDataExport({ startTime, endTime, setIsBusy });
 
-    const { sampleRate, chartData, spectrogramSeries, activeChannels, handleSearchRecords } =
-        useSeismicRecords({ startTime, endTime, setIsBusy });
+    const {
+        sampleRate,
+        chartData,
+        groundMotion,
+        spectrogramSeries,
+        activeChannels,
+        handleSearchRecords
+    } = useSeismicRecords({ startTime, endTime, setIsBusy });
     const {
         locks,
         toggleLock,
@@ -254,14 +260,9 @@ const History = ({ currentLocale }: IRouterComponent) => {
                                             executor={sharedSpectrumExecutor}
                                         >
                                             {(onVisibleSamples, onPlotBounds) => (
-                                                <LineChart
-                                                    minSpanValue={HistoryConstraints.minSpanValue}
-                                                    height={'100%'}
-                                                    lineWidth={1}
-                                                    yPosition="right"
-                                                    zoom={true}
-                                                    animation={false}
+                                                <HistoryMotionChart
                                                     data={chartData[channel]}
+                                                    groundMotion={groundMotion[channel]}
                                                     onVisibleSamples={onVisibleSamples}
                                                     onPlotBounds={onPlotBounds}
                                                 />

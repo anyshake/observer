@@ -14,6 +14,16 @@
         }
     },
     "components": {
+        "GroundMotion": {
+            "pga": "PGA",
+            "pgv": "PGV",
+            "pgd": "PGD",
+            "pga_unit": "gal",
+            "pgv_unit": "cm/s",
+            "pgd_unit": "cm",
+            "unavailable": "Geen grondbewegingsgegevens voor deze seconde",
+            "description": "Piekwaarden per seconde van grondversnelling, -snelheid en -verplaatsing, berekend uit de stationsmetadata. Er wordt \"-\" getoond als metadata ontbreken of de filters nog niet zijn gestabiliseerd."
+        },
         "ThemeToggle": {
             "label": "Thema",
             "light": "Licht",

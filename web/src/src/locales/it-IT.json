@@ -14,6 +14,16 @@
         }
     },
     "components": {
+        "GroundMotion": {
+            "pga": "PGA",
+            "pgv": "PGV",
+            "pgd": "PGD",
+            "pga_unit": "gal",
+            "pgv_unit": "cm/s",
+            "pgd_unit": "cm",
+            "unavailable": "Nessun dato di movimento del suolo per questo secondo",
+            "description": "Picchi al secondo di accelerazione, velocità e spostamento del suolo, calcolati dai metadati della stazione. Viene mostrato «-» quando i metadati non sono disponibili o i filtri non sono ancora stabilizzati."
+        },
         "ThemeToggle": {
             "label": "Tema",
             "light": "Chiaro",

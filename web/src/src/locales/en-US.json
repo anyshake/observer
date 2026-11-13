@@ -14,6 +14,16 @@
         }
     },
     "components": {
+        "GroundMotion": {
+            "pga": "PGA",
+            "pgv": "PGV",
+            "pgd": "PGD",
+            "pga_unit": "gal",
+            "pgv_unit": "cm/s",
+            "pgd_unit": "cm",
+            "unavailable": "No ground motion data for this second",
+            "description": "Per-second peak ground acceleration, velocity and displacement computed from station metadata. Shown as \"-\" when metadata is unavailable or filters are still settling."
+        },
         "ThemeToggle": {
             "label": "Theme",
             "light": "Light",

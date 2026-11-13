@@ -2,7 +2,8 @@ import { createRef, RefObject, useCallback, useRef, useState } from 'react';
 
 import { DequeChartHandle } from '../../components/chart/DequeChart';
 import { DequeSpectrogramHandle } from '../../components/chart/DequeSpectrogram';
-import { RealTimeConstraints } from '../../config/constraints';
+import type { IGroundMotion, IGroundMotionRecord } from '../../components/chart/groundMotion';
+import { RealTimeConstraints, RetentionConstraints } from '../../config/constraints';
 import { getSocketApiUrl } from '../../helpers/app/getSocketApiUrl';
 import { useSocket } from '../../helpers/request/useSocket';
 import { sameStrings } from '../../helpers/utils/sameStrings';
@@ -15,6 +16,15 @@ export const useRealtimeStream = () => {
     const [activeChannels, setActiveChannels] = useState<
         Record<string, { id: string; index: number }>
     >({});
+
+    // Latest per-second peaks of each channel; null when the station has no metadata.
+    const [groundMotion, setGroundMotion] = useState<Record<string, IGroundMotion>>({});
+    // Per-second peaks kept for the longest retention, looked up while hovering the waveform.
+    const motionHistoryRef = useRef<Record<string, IGroundMotionRecord[]>>({});
+    const getGroundMotionRecords = useCallback(
+        (channel: string) => motionHistoryRef.current[channel],
+        []
+    );
 
     const waveformRefs = useRef<{ [key: string]: RefObject<DequeChartHandle> }>({});
     const spectrogramRefs = useRef<{ [key: string]: RefObject<DequeSpectrogramHandle> }>({});
@@ -90,6 +100,26 @@ export const useRealtimeStream = () => {
                     );
                 }
 
+                const motion: Record<string, IGroundMotion> = {};
+                const history: Record<string, IGroundMotionRecord[]> = {};
+                const expired = record_time - RetentionConstraints.maxValue * 1000;
+                for (const channel in channel_data) {
+                    const { pga, pgv, pgd, data_array } = channel_data[channel];
+                    const peaks = { pga: pga ?? null, pgv: pgv ?? null, pgd: pgd ?? null };
+                    motion[channel] = peaks;
+
+                    // Records stay sorted by start; a stream restart clears older entries.
+                    const records = (motionHistoryRef.current[channel] ?? []).filter(
+                        ({ start }) => start >= expired && start < record_time
+                    );
+                    const duration =
+                        sample_rate > 0 ? (data_array.length * 1000) / sample_rate : 1000;
+                    records.push({ start: record_time, end: record_time + duration, ...peaks });
+                    history[channel] = records;
+                }
+                motionHistoryRef.current = history;
+                setGroundMotion(motion);
+
                 updatedAtRef.current = record_time;
                 setSampleRate((prev) => (prev === sample_rate ? prev : sample_rate));
                 setUpdatedAt((prev) =>
@@ -105,6 +135,8 @@ export const useRealtimeStream = () => {
         sampleRate,
         updatedAt,
         activeChannels,
+        groundMotion,
+        getGroundMotionRecords,
         waveformRefs,
         spectrogramRefs,
         updatedAtRef,

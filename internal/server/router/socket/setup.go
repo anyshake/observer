@@ -122,6 +122,9 @@ func (s *socket) sendHistory(conn *websocket.Conn, writeMu *sync.Mutex, timeSour
 					"channel_code": v.ChannelCode,
 					"data_type":    v.DataType,
 					"data_array":   v.Data,
+					"pga":          v.PGA,
+					"pgv":          v.PGV,
+					"pgd":          v.PGD,
 				}
 			}),
 		}
@@ -201,6 +204,9 @@ func (s *socket) handleWebSocket(_ *gin.Context, conn *websocket.Conn, timeSourc
 					"channel_code": v.ChannelCode,
 					"data_type":    v.DataType,
 					"data_array":   v.Data,
+					"pga":          v.PGA,
+					"pgv":          v.PGV,
+					"pgd":          v.PGD,
 				}
 			}),
 		}

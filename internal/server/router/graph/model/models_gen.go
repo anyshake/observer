@@ -19,6 +19,12 @@ type ChannelData struct {
 	ChannelCode string  `json:"channelCode"`
 	ChannelID   int     `json:"channelId"`
 	Data        []int32 `json:"data"`
+	// Peak ground acceleration of this record in m/s^2, null without metadata
+	Pga *float64 `json:"pga,omitempty"`
+	// Peak ground velocity of this record in m/s, null without metadata
+	Pgv *float64 `json:"pgv,omitempty"`
+	// Peak ground displacement of this record in m, null without metadata
+	Pgd *float64 `json:"pgd,omitempty"`
 }
 
 type ConfigConstraint struct {

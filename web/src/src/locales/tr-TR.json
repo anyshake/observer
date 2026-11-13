@@ -14,6 +14,16 @@
         }
     },
     "components": {
+        "GroundMotion": {
+            "pga": "PGA",
+            "pgv": "PGV",
+            "pgd": "PGD",
+            "pga_unit": "gal",
+            "pgv_unit": "cm/s",
+            "pgd_unit": "cm",
+            "unavailable": "Bu saniye için yer hareketi verisi yok",
+            "description": "İstasyon meta verilerinden hesaplanan, her saniye için en yüksek yer ivmesi, hızı ve yer değiştirmesi değerleri. Meta veriler yoksa veya filtreler henüz kararlı duruma gelmediyse \"-\" gösterilir."
+        },
         "ThemeToggle": {
             "label": "Tema",
             "light": "Açık",

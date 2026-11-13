@@ -14,6 +14,16 @@
         }
     },
     "components": {
+        "GroundMotion": {
+            "pga": "PGA",
+            "pgv": "PGV",
+            "pgd": "PGD",
+            "pga_unit": "gal",
+            "pgv_unit": "cm/s",
+            "pgd_unit": "cm",
+            "unavailable": "Keine Bodenbewegungsdaten für diese Sekunde",
+            "description": "Sekündliche Spitzenwerte der Bodenbeschleunigung, -geschwindigkeit und -verschiebung, berechnet anhand der Stationsmetadaten. „-“ wird angezeigt, wenn Metadaten fehlen oder die Filter noch einschwingen."
+        },
         "ThemeToggle": {
             "label": "Design",
             "light": "Hell",

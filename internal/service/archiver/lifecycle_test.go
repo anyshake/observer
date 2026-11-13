@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/anyshake/observer/internal/dao/action"
+	"github.com/anyshake/observer/internal/dao/model"
 	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/internal/testsupport"
 	"github.com/anyshake/observer/pkg/timesource"
@@ -71,9 +72,16 @@ func TestLifecycle(t *testing.T) {
 			}},
 		})
 	}
-	records, err := handler.SeisRecordsQuery(t.Context(), fixed.Add(-time.Second), fixed.Add(time.Minute))
-	if err != nil {
-		t.Fatalf("query records: %v", err)
+	// Records are written asynchronously by the writer goroutine.
+	var records []model.SeisRecord
+	for deadline := time.Now().Add(2 * time.Second); time.Now().Before(deadline); time.Sleep(10 * time.Millisecond) {
+		var err error
+		if records, err = handler.SeisRecordsQuery(t.Context(), fixed.Add(-time.Second), fixed.Add(time.Minute)); err != nil {
+			t.Fatalf("query records: %v", err)
+		}
+		if len(records) == RECORDS_INSERT_INTERVAL {
+			break
+		}
 	}
 	if len(records) != RECORDS_INSERT_INTERVAL {
 		t.Fatalf("inserted records = %d, want %d", len(records), RECORDS_INSERT_INTERVAL)

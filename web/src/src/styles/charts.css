@@ -68,7 +68,7 @@
     }
 
     .app-chart-panel-header {
-        @apply border-app-border-soft flex shrink-0 items-center gap-2 border-b pb-1 select-none;
+        @apply border-app-border-soft flex shrink-0 flex-wrap items-center gap-x-2 border-b pb-1 select-none;
     }
 
     .app-chart-panel-icon {
@@ -76,7 +76,52 @@
     }
 
     .app-chart-panel-title {
-        @apply text-app-heading min-w-0 flex-1 truncate py-px text-xs leading-6 font-semibold;
+        @apply text-app-heading max-w-full min-w-0 shrink-0 truncate py-px text-xs leading-6 font-semibold;
+    }
+
+    /* Wraps below the title instead of clipping when the panel is narrow. */
+    .app-chart-panel-extra {
+        @apply ml-1 flex min-w-0 items-center;
+    }
+
+    .app-ground-motion {
+        @apply text-app-subtle flex min-w-0 flex-wrap items-center gap-x-3 font-sans text-[11px] leading-5 tabular-nums;
+    }
+
+    .app-ground-motion-item {
+        @apply flex items-baseline gap-1 whitespace-nowrap;
+    }
+
+    .app-ground-motion-label {
+        @apply font-semibold;
+    }
+
+    .app-ground-motion-value {
+        @apply text-app-heading;
+    }
+
+    .app-ground-motion-unit {
+        @apply text-app-subtle ml-0.5;
+    }
+
+    .app-ground-motion-overlay {
+        @apply bg-base-100/90 border-app-border-soft pointer-events-none absolute z-10 rounded-md border px-2 py-1.5 shadow-md backdrop-blur-sm;
+    }
+
+    .app-ground-motion-overlay .app-ground-motion {
+        @apply flex-col items-start gap-y-0.5;
+    }
+
+    .app-ground-motion-overlay-time {
+        @apply text-app-heading mb-0.5 font-sans text-[11px] leading-4 font-semibold tabular-nums;
+    }
+
+    .app-ground-motion-overlay-empty {
+        @apply text-app-subtle font-sans text-[11px] leading-5;
+    }
+
+    .app-chart-hover-area {
+        @apply relative h-full w-full;
     }
 
     .app-chart-panel-body {

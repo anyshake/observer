@@ -1,6 +1,7 @@
 import { type Dispatch, type SetStateAction, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import type { IGroundMotionRecord } from '../../components/chart/groundMotion';
 import { HistoryConstraints } from '../../config/constraints';
 import { useGetSeismicRecordsLazyQuery } from '../../graphql';
 import { sendPromiseAlert } from '../../helpers/alert/sendPromiseAlert';
@@ -23,6 +24,8 @@ export const useSeismicRecords = ({
     const [chartData, setChartData] = useState<{ [key: string]: Array<[number, number | null]> }>(
         {}
     );
+    // Per-second peaks sorted by record start; looked up while hovering the waveform.
+    const [groundMotion, setGroundMotion] = useState<{ [key: string]: IGroundMotionRecord[] }>({});
     const spectrogramSeries = useMemo(() => {
         const series: { [key: string]: Array<[number, number]> } = {};
         for (const channel in chartData) {
@@ -54,6 +57,7 @@ export const useSeismicRecords = ({
         const requestFn = async () => {
             setSampleRate(0);
             setChartData({});
+            setGroundMotion({});
             setIsBusy(true);
             const signal = getRequestSignal();
             const { data, error } = await getSeismicRecords({
@@ -114,6 +118,26 @@ export const useSeismicRecords = ({
                         return newChannels;
                     });
                 }
+
+                const motion: { [key: string]: IGroundMotionRecord[] } = {};
+                for (const record of records) {
+                    const duration = Math.max(
+                        1,
+                        ...record!.channelData.map(
+                            (channel) => (channel.data.length * 1000) / record!.sampleRate
+                        )
+                    );
+                    for (const { channelCode, pga, pgv, pgd } of record!.channelData) {
+                        (motion[channelCode] ??= []).push({
+                            start: record!.timestamp,
+                            end: record!.timestamp + duration,
+                            pga: pga ?? null,
+                            pgv: pgv ?? null,
+                            pgd: pgd ?? null
+                        });
+                    }
+                }
+                setGroundMotion(motion);
 
                 const sampleCounts: Record<string, number> = {};
                 let gapCount = 0;
@@ -215,5 +239,12 @@ export const useSeismicRecords = ({
     const prevChannelsRef = useRef<string[]>([]);
     const prevChannelIndicesRef = useRef<number[]>([]);
 
-    return { sampleRate, chartData, spectrogramSeries, activeChannels, handleSearchRecords };
+    return {
+        sampleRate,
+        chartData,
+        groundMotion,
+        spectrogramSeries,
+        activeChannels,
+        handleSearchRecords
+    };
 };

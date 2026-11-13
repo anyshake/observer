@@ -255,6 +255,7 @@ func (g *ExplorerProtoImplV2) processPacket(ctx context.Context, packet []byte, 
 	g.messageBusRealtime.Publish(NewEvent(packetTime, &g.deviceConfig, channelData))
 	if s.archiveSamples >= g.deviceConfig.GetSampleRate() {
 		if s.archiveSamples == g.deviceConfig.GetSampleRate() {
+			g.groundMotion.annotate(s.archiveStart, s.archiveSamples, g.channelDataBuf)
 			g.messageBus.Publish(NewEvent(s.archiveStart, &g.deviceConfig, g.channelDataBuf))
 			g.deviceStatus.IncrementMessages()
 		}

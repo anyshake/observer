@@ -13,6 +13,7 @@ import TimeSeriesBuffer from '../../helpers/storage/TimeSeriesBuffer';
 import { getChartAxis } from '../../styles/chartTheme';
 import { useThemeColors } from '../../styles/useThemeColors';
 import { getLineSeries } from './lineSeries';
+import { HoverTimeHandler, useHoverTime } from './useHoverTime';
 import { PlotBoundsHandler, usePlotBounds } from './usePlotBounds';
 import { useVisibleSamples, VisibleSamplesHandler } from './useVisibleSamples';
 
@@ -40,6 +41,7 @@ interface IDequeChart {
     readonly paused?: boolean;
     readonly onVisibleSamples?: VisibleSamplesHandler;
     readonly onPlotBounds?: PlotBoundsHandler;
+    readonly onHoverTime?: HoverTimeHandler;
 }
 
 export const DequeChart = memo(
@@ -59,7 +61,8 @@ export const DequeChart = memo(
                 minSpanValue,
                 paused = false,
                 onVisibleSamples,
-                onPlotBounds
+                onPlotBounds,
+                onHoverTime
             }: IDequeChart,
             ref
         ) => {
@@ -87,6 +90,7 @@ export const DequeChart = memo(
             }, onVisibleSamples);
             const plotEvents = usePlotBounds(chartRef, onPlotBounds);
             const events = useMemo(() => ({ ...onEvents, ...plotEvents }), [onEvents, plotEvents]);
+            useHoverTime(chartRef, onHoverTime);
 
             scheduleRef.current = () => {
                 if (rafRef.current !== null) {

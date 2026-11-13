@@ -37,6 +37,8 @@ const RealTime = () => {
         sampleRate,
         updatedAt,
         activeChannels,
+        groundMotion,
+        getGroundMotionRecords,
         waveformRefs,
         spectrogramRefs,
         updatedAtRef,
@@ -238,6 +240,8 @@ const RealTime = () => {
                                 spectrumExecutor={sharedSpectrumExecutor}
                                 waveformRef={waveformRefs.current[channel]}
                                 spectrogramRef={spectrogramRefs.current[channel]}
+                                groundMotion={groundMotion[channel]}
+                                getGroundMotionRecords={getGroundMotionRecords}
                                 onActive={handleActiveChart}
                                 onDragStop={handleDragStop}
                                 onResizeStop={handleResizeStop}

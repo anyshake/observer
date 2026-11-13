@@ -116,6 +116,7 @@ func (g *ExplorerProtoImplV1) decodeStream(subCtx context.Context, packetSize in
 				g.messageBusRealtime.Publish(NewEvent(time.UnixMilli(timestamp), &g.deviceConfig, channelData))
 				if len(collectedTimestampArr)*DATA_PACKET_CHANNEL_SIZE == currentSampleRate {
 					packetTimestamp := collectedTimestampArr[0]
+					g.groundMotion.annotate(time.UnixMilli(packetTimestamp), currentSampleRate, g.channelDataBuf)
 					g.messageBus.Publish(NewEvent(time.UnixMilli(packetTimestamp), &g.deviceConfig, g.channelDataBuf))
 					g.deviceStatus.IncrementMessages()
 					collectedTimestampArr = []int64{}

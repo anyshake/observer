@@ -14,6 +14,16 @@
         }
     },
     "components": {
+        "GroundMotion": {
+            "pga": "PGA",
+            "pgv": "PGV",
+            "pgd": "PGD",
+            "pga_unit": "gal",
+            "pgv_unit": "cm/s",
+            "pgd_unit": "cm",
+            "unavailable": "Tidak ada data gerakan tanah untuk detik ini",
+            "description": "Nilai puncak percepatan, kecepatan, dan perpindahan tanah per detik, dihitung dari metadata stasiun. Ditampilkan sebagai \"-\" jika metadata tidak tersedia atau filter masih dalam proses stabilisasi."
+        },
         "ThemeToggle": {
             "label": "Tema",
             "light": "Terang",

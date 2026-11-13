@@ -77,6 +77,12 @@ type ChannelData struct {
 	ByteSize    int
 	DataType    string
 	Data        []int32
+
+	// Ground motion peaks of this block in SI units (m/s², m/s, m).
+	// They are nil when the channel is not described by metadata.
+	PGA *float64
+	PGV *float64
+	PGD *float64
 }
 
 type Event struct {
@@ -93,6 +99,9 @@ func NewEvent(timestamp time.Time, deviceConfig *DeviceConfig, channelData []Cha
 	for i := range channelData {
 		clonedChannelData[i] = channelData[i]
 		clonedChannelData[i].Data = append([]int32(nil), channelData[i].Data...)
+		clonedChannelData[i].PGA = cloneFloat(channelData[i].PGA)
+		clonedChannelData[i].PGV = cloneFloat(channelData[i].PGV)
+		clonedChannelData[i].PGD = cloneFloat(channelData[i].PGD)
 	}
 
 	return Event{

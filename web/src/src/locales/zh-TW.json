@@ -14,6 +14,16 @@
         }
     },
     "components": {
+        "GroundMotion": {
+            "pga": "PGA",
+            "pgv": "PGV",
+            "pgd": "PGD",
+            "pga_unit": "gal",
+            "pgv_unit": "cm/s",
+            "pgd_unit": "cm",
+            "unavailable": "此秒無地動參數",
+            "description": "依測站元數據計算的每秒峰值地動加速度、速度與位移。無元數據或濾波器尚在穩定時顯示「-」。"
+        },
         "ThemeToggle": {
             "label": "主題",
             "light": "亮色",

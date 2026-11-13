@@ -40,7 +40,8 @@ type ExplorerProtoImplV1 struct {
 	clockDriftBuf *ringbuf.Buffer[clockDrift]
 
 	// 1 message per second, for archiving service, etc.
-	messageBus *message.Bus[Event]
+	messageBus   *message.Bus[Event]
+	groundMotion *groundMotion
 	// 1 message per packet, for realtime purposes
 	messageBusRealtime *message.Bus[Event]
 
@@ -234,6 +235,7 @@ func (g *ExplorerProtoImplV1) Open(ctx context.Context) (context.Context, contex
 	g.fifoBuffer = fifo.New[byte](10 * packetSize)
 	g.clockDriftBuf = ringbuf.New[clockDrift](100)
 	g.messageBus = message.NewBus[Event](EXPLORER_STREAM_TOPIC)
+	g.groundMotion = newGroundMotion(g.ExplorerOptions.Model)
 	g.messageBusRealtime = message.NewBus[Event](EXPLORER_REALTIME_STREAM_TOPIC)
 	g.deviceConfig.SetGnssAvailability(false)
 

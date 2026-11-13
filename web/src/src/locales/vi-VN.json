@@ -14,6 +14,16 @@
         }
     },
     "components": {
+        "GroundMotion": {
+            "pga": "PGA",
+            "pgv": "PGV",
+            "pgd": "PGD",
+            "pga_unit": "gal",
+            "pgv_unit": "cm/s",
+            "pgd_unit": "cm",
+            "unavailable": "Không có dữ liệu chuyển động nền đất cho giây này",
+            "description": "Giá trị cực đại mỗi giây của gia tốc, vận tốc và độ dịch chuyển nền đất, được tính từ siêu dữ liệu trạm. Hiển thị \"-\" khi không có siêu dữ liệu hoặc bộ lọc chưa ổn định."
+        },
         "ThemeToggle": {
             "label": "Giao diện",
             "light": "Sáng",

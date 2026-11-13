@@ -2,6 +2,12 @@ type _channelData {
   channelCode: String!
   channelId: Int!
   data: [Int32!]!
+  "Peak ground acceleration of this record in m/s^2, null without metadata"
+  pga: Float
+  "Peak ground velocity of this record in m/s, null without metadata"
+  pgv: Float
+  "Peak ground displacement of this record in m, null without metadata"
+  pgd: Float
 }
 
 type seisRecord {

@@ -312,6 +312,7 @@ func (g *ExplorerProtoImplV3) decodePacket(initFlag *int32) {
 	if collectedSamples < sampleRate {
 		return
 	} else if collectedSamples == sampleRate {
+		g.groundMotion.annotate(g.packetTimeObj, sampleRate, g.channelDataBuf)
 		g.messageBus.Publish(NewEvent(g.packetTimeObj, &g.deviceConfig, g.channelDataBuf))
 		g.deviceStatus.IncrementMessages()
 	} else {

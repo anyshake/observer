@@ -14,6 +14,16 @@
         }
     },
     "components": {
+        "GroundMotion": {
+            "pga": "PGA",
+            "pgv": "PGV",
+            "pgd": "PGD",
+            "pga_unit": "gal",
+            "pgv_unit": "cm/s",
+            "pgd_unit": "cm",
+            "unavailable": "이 초의 지반 운동 데이터가 없습니다",
+            "description": "관측소 메타데이터를 바탕으로 계산한 초당 최대 지반 가속도, 속도 및 변위입니다. 메타데이터가 없거나 필터가 아직 안정화 중이면 \"-\"로 표시됩니다."
+        },
         "ThemeToggle": {
             "label": "테마",
             "light": "라이트",

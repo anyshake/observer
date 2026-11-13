@@ -197,6 +197,12 @@ export type _ChannelData = {
   channelCode: Scalars['String']['output'];
   channelId: Scalars['Int']['output'];
   data: Array<Scalars['Int32']['output']>;
+  /** Peak ground acceleration of this record in m/s^2, null without metadata */
+  pga?: Maybe<Scalars['Float']['output']>;
+  /** Peak ground displacement of this record in m, null without metadata */
+  pgd?: Maybe<Scalars['Float']['output']>;
+  /** Peak ground velocity of this record in m/s, null without metadata */
+  pgv?: Maybe<Scalars['Float']['output']>;
 };
 
 export type ConfigConstraint = {
@@ -410,7 +416,7 @@ export type GetSeismicRecordsQueryVariables = Exact<{
 }>;
 
 
-export type GetSeismicRecordsQuery = { __typename?: 'Query', getSeisRecordsByTime: Array<{ __typename?: 'seisRecord', timestamp: number, sampleRate: number, channelData: Array<{ __typename?: '_channelData', channelCode: string, channelId: number, data: Array<number> }> } | null> };
+export type GetSeismicRecordsQuery = { __typename?: 'Query', getSeisRecordsByTime: Array<{ __typename?: 'seisRecord', timestamp: number, sampleRate: number, channelData: Array<{ __typename?: '_channelData', channelCode: string, channelId: number, data: Array<number>, pga?: number | null, pgv?: number | null, pgd?: number | null }> } | null> };
 
 export type GetHomeDataQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -861,6 +867,9 @@ export const GetSeismicRecordsDocument = gql`
       channelCode
       channelId
       data
+      pga
+      pgv
+      pgd
     }
   }
 }

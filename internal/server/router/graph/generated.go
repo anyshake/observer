@@ -106,6 +106,9 @@ type ComplexityRoot struct {
 		ChannelCode func(childComplexity int) int
 		ChannelID   func(childComplexity int) int
 		Data        func(childComplexity int) int
+		Pga         func(childComplexity int) int
+		Pgd         func(childComplexity int) int
+		Pgv         func(childComplexity int) int
 	}
 
 	ConfigConstraint struct {
@@ -749,6 +752,24 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity._channelData.Data(childComplexity), true
+	case "_channelData.pga":
+		if e.complexity._channelData.Pga == nil {
+			break
+		}
+
+		return e.complexity._channelData.Pga(childComplexity), true
+	case "_channelData.pgd":
+		if e.complexity._channelData.Pgd == nil {
+			break
+		}
+
+		return e.complexity._channelData.Pgd(childComplexity), true
+	case "_channelData.pgv":
+		if e.complexity._channelData.Pgv == nil {
+			break
+		}
+
+		return e.complexity._channelData.Pgv(childComplexity), true
 
 	case "configConstraint.configType":
 		if e.complexity.ConfigConstraint.ConfigType == nil {
@@ -5499,6 +5520,93 @@ func (ec *executionContext) fieldContext__channelData_data(_ context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) __channelData_pga(ctx context.Context, field graphql.CollectedField, obj *graph_model.ChannelData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext__channelData_pga,
+		func(ctx context.Context) (any, error) {
+			return obj.Pga, nil
+		},
+		nil,
+		ec.marshalOFloat2ᚖfloat64,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext__channelData_pga(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "_channelData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) __channelData_pgv(ctx context.Context, field graphql.CollectedField, obj *graph_model.ChannelData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext__channelData_pgv,
+		func(ctx context.Context) (any, error) {
+			return obj.Pgv, nil
+		},
+		nil,
+		ec.marshalOFloat2ᚖfloat64,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext__channelData_pgv(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "_channelData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) __channelData_pgd(ctx context.Context, field graphql.CollectedField, obj *graph_model.ChannelData) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext__channelData_pgd,
+		func(ctx context.Context) (any, error) {
+			return obj.Pgd, nil
+		},
+		nil,
+		ec.marshalOFloat2ᚖfloat64,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext__channelData_pgd(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "_channelData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _configConstraint_namespace(ctx context.Context, field graphql.CollectedField, obj *graph_model.ConfigConstraint) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -7347,6 +7455,12 @@ func (ec *executionContext) fieldContext_seisRecord_channelData(_ context.Contex
 				return ec.fieldContext__channelData_channelId(ctx, field)
 			case "data":
 				return ec.fieldContext__channelData_data(ctx, field)
+			case "pga":
+				return ec.fieldContext__channelData_pga(ctx, field)
+			case "pgv":
+				return ec.fieldContext__channelData_pgv(ctx, field)
+			case "pgd":
+				return ec.fieldContext__channelData_pgd(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type _channelData", field.Name)
 		},
@@ -9601,6 +9715,12 @@ func (ec *executionContext) __channelData(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "pga":
+			out.Values[i] = ec.__channelData_pga(ctx, field, obj)
+		case "pgv":
+			out.Values[i] = ec.__channelData_pgv(ctx, field, obj)
+		case "pgd":
+			out.Values[i] = ec.__channelData_pgd(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

@@ -71,16 +71,15 @@ func (s *ArchiverServiceImpl) Start(ctx context.Context) error {
 		s.ctx, s.cancelFn = context.WithCancel(s.parentCtx)
 	}
 
-	s.cleanupCountDown = RECORDS_CLEANUP_INTERVAL
-	s.insertCountDown = RECORDS_INSERT_INTERVAL
-	s.recordBuffer = make([]model.SeisRecord, RECORDS_INSERT_INTERVAL)
+	rotation := s.rotation
+	queue := newRecordQueue()
+	writer := &recordWriter{queue: queue, insert: s.actionHandler.SeisRecordsCreate}
 
 	runCtx, runCancel := s.ctx, s.cancelFn
+	// The callback runs on the hardware message bus. It must never wait for the
+	// database: it only encodes the event and hands it to the writer goroutine.
 	err := s.hardwareDev.Subscribe(ID, func(event explorer.Event) {
 		defer service.RecoverCallback(ID, runCancel)
-		s.mu.Lock()
-		defer s.mu.Unlock()
-
 		if runCtx.Err() != nil {
 			return
 		}
@@ -89,24 +88,9 @@ func (s *ArchiverServiceImpl) Start(ctx context.Context) error {
 			logger.GetLogger(ID).Errorf("failed to encode seismic waveform record: %v", err)
 			return
 		}
-		s.recordBuffer[len(s.recordBuffer)-s.insertCountDown] = record
-
-		s.insertCountDown--
-		if s.rotation > 0 {
-			s.cleanupCountDown--
-		}
-
-		if s.insertCountDown == 0 {
-			s.insertCountDown = RECORDS_INSERT_INTERVAL
-			if err := s.actionHandler.SeisRecordsCreate(runCtx, s.recordBuffer...); err != nil {
-				logger.GetLogger(ID).Errorf("failed to create seismic waveform records: %v", err)
-				return
-			}
-			logger.GetLogger(ID).Infof("%d seismic waveform records have been inserted to database", len(s.recordBuffer))
-		}
-		if s.cleanupCountDown == 0 {
-			s.cleanupCountDown = RECORDS_CLEANUP_INTERVAL
-			endTime := event.Timestamp.Add(time.Duration(-s.rotation) * time.Hour * 24)
+		queue.push(record)
+		if rotation > 0 && queue.tickCleanup() {
+			endTime := event.Timestamp.Add(time.Duration(-rotation) * time.Hour * 24)
 			s.startExpiredSeisRecordsPurge(runCtx, endTime)
 		}
 	})
@@ -117,7 +101,12 @@ func (s *ArchiverServiceImpl) Start(ctx context.Context) error {
 
 	s.status.SetStartedAt(s.timeSource.Now())
 	s.status.SetIsRunning(true)
-	s.wg.Add(1)
+	s.wg.Add(2)
+	go func() {
+		defer s.wg.Done()
+		defer service.RecoverWorker(ID, runCancel)
+		writer.run(runCtx)
+	}()
 	go func() {
 		defer s.wg.Done()
 		defer func() {

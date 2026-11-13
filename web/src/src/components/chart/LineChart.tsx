@@ -4,6 +4,7 @@ import { memo, useEffect, useMemo, useRef } from 'react';
 import { getChartAxis } from '../../styles/chartTheme';
 import { useThemeColors } from '../../styles/useThemeColors';
 import { getLineSeries, type LineChartData } from './lineSeries';
+import { HoverTimeHandler, useHoverTime } from './useHoverTime';
 import { PlotBoundsHandler, usePlotBounds } from './usePlotBounds';
 import { getPointsExtent, useVisibleSamples, VisibleSamplesHandler } from './useVisibleSamples';
 
@@ -22,7 +23,11 @@ interface ILineChart {
     readonly minSpanValue?: number;
     readonly onVisibleSamples?: VisibleSamplesHandler;
     readonly onPlotBounds?: PlotBoundsHandler;
+    // Reports the time under the pointer and its offset in the chart, or null on leave.
+    readonly onHoverTime?: HoverTimeHandler;
 }
+
+export type { HoverTimeHandler } from './useHoverTime';
 
 export const LineChart = memo(
     ({
@@ -39,7 +44,8 @@ export const LineChart = memo(
         minSpanValue,
         yPosition = 'left',
         onVisibleSamples,
-        onPlotBounds
+        onPlotBounds,
+        onHoverTime
     }: ILineChart) => {
         const chartRef = useRef<ReactECharts>(null);
         const colors = useThemeColors();
@@ -113,6 +119,8 @@ export const LineChart = memo(
                 minSpanValue
             ]
         );
+
+        useHoverTime(chartRef, onHoverTime);
 
         useEffect(() => {
             if (chartRef.current) {

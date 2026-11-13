@@ -104,6 +104,9 @@ func (r *queryResolver) GetSeisRecordsByTime(ctx context.Context, startTime int6
 				ChannelCode: data.ChannelCode,
 				ChannelID:   data.ChannelId,
 				Data:        data.Data,
+				Pga:         data.PGA,
+				Pgv:         data.PGV,
+				Pgd:         data.PGD,
 			}
 		}
 		respRecords = append(respRecords, &graph_model.SeisRecord{

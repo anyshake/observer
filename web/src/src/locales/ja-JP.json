@@ -14,6 +14,16 @@
         }
     },
     "components": {
+        "GroundMotion": {
+            "pga": "PGA",
+            "pgv": "PGV",
+            "pgd": "PGD",
+            "pga_unit": "gal",
+            "pgv_unit": "cm/s",
+            "pgd_unit": "cm",
+            "unavailable": "この秒の地動データはありません",
+            "description": "観測点のメタデータから計算した、毎秒の地動加速度・速度・変位の最大値です。メタデータがない場合やフィルターが安定するまでは「-」を表示します。"
+        },
         "ThemeToggle": {
             "label": "テーマ",
             "light": "ライト",

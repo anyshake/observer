@@ -6,6 +6,9 @@ import { FFTExecutor } from 'spectrogram-js';
 import { ChartPanel } from '../../components/chart/ChartPanel';
 import { DequeChart, DequeChartHandle } from '../../components/chart/DequeChart';
 import { DequeSpectrogram, DequeSpectrogramHandle } from '../../components/chart/DequeSpectrogram';
+import type { IGroundMotion, IGroundMotionRecord } from '../../components/chart/groundMotion';
+import { GroundMotionHover } from '../../components/chart/GroundMotionHover';
+import { GroundMotionValues } from '../../components/chart/GroundMotionValues';
 import { SpectrumSplit } from '../../components/chart/SpectrumSplit';
 import { DraggableBox } from '../../components/ui/DraggableBox';
 import { RealTimeConstraints } from '../../config/constraints';
@@ -26,6 +29,8 @@ interface IRealTimeChannel {
     readonly spectrumExecutor: SpectrumExecutor;
     readonly waveformRef?: RefObject<DequeChartHandle>;
     readonly spectrogramRef?: RefObject<DequeSpectrogramHandle>;
+    readonly groundMotion?: IGroundMotion;
+    readonly getGroundMotionRecords: (channel: string) => IGroundMotionRecord[] | undefined;
     readonly onActive: (channel: string) => void;
     readonly onDragStop: (channel: string, index: number, x: number, y: number) => void;
     readonly onResizeStop: (channel: string, index: number, width: number, height: number) => void;
@@ -52,6 +57,8 @@ export const RealtimeChannel = memo(function RealtimeChannel({
     spectrumExecutor,
     waveformRef,
     spectrogramRef,
+    groundMotion,
+    getGroundMotionRecords,
     onActive,
     onDragStop,
     onResizeStop,
@@ -72,6 +79,11 @@ export const RealtimeChannel = memo(function RealtimeChannel({
         [channelId, index, onSpectrogram]
     );
 
+    const getRecords = useCallback(
+        () => getGroundMotionRecords(channel),
+        [channel, getGroundMotionRecords]
+    );
+
     return (
         <DraggableBox
             layout={layout}
@@ -81,7 +93,11 @@ export const RealtimeChannel = memo(function RealtimeChannel({
             onDragStop={handleDragStop}
             onResizeStop={handleResizeStop}
         >
-            <ChartPanel title={channel} icon={waveformMode ? mdiChartLine : mdiGradientVertical}>
+            <ChartPanel
+                title={channel}
+                icon={waveformMode ? mdiChartLine : mdiGradientVertical}
+                extra={<GroundMotionValues motion={groundMotion} />}
+            >
                 <div className={waveformMode ? 'app-chart-visible' : 'app-hidden'}>
                     <SpectrumSplit
                         enabled={fftMode && waveformMode}
@@ -89,19 +105,24 @@ export const RealtimeChannel = memo(function RealtimeChannel({
                         executor={spectrumExecutor}
                     >
                         {(onVisibleSamples, onPlotBounds) => (
-                            <DequeChart
-                                minSpanValue={RealTimeConstraints.minSpanValue}
-                                ref={waveformRef}
-                                maxDuration={retention}
-                                height="100%"
-                                lineWidth={1}
-                                yPosition="right"
-                                zoom={true}
-                                animation={false}
-                                paused={!waveformMode}
-                                onVisibleSamples={onVisibleSamples}
-                                onPlotBounds={onPlotBounds}
-                            />
+                            <GroundMotionHover getRecords={getRecords}>
+                                {(onHoverTime) => (
+                                    <DequeChart
+                                        minSpanValue={RealTimeConstraints.minSpanValue}
+                                        ref={waveformRef}
+                                        maxDuration={retention}
+                                        height="100%"
+                                        lineWidth={1}
+                                        yPosition="right"
+                                        zoom={true}
+                                        animation={false}
+                                        paused={!waveformMode}
+                                        onVisibleSamples={onVisibleSamples}
+                                        onPlotBounds={onPlotBounds}
+                                        onHoverTime={onHoverTime}
+                                    />
+                                )}
+                            </GroundMotionHover>
                         )}
                     </SpectrumSplit>
                 </div>
