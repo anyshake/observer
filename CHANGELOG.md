@@ -2,6 +2,23 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.11.1
+
+### Release Notes
+
+This release fixes **gaps in archived waveform data** that could appear after the database became slow or briefly unavailable. It also reduces how long history queries and expired-data cleanup occupy SQLite's only database connection.
+
+### Improvements
+
+- Updated history queries to read archived records in pages and release the database connection before processing each page.
+- Updated expired waveform cleanup to delete records in bounded batches, so cleanup no longer holds the database for one long operation.
+- Added diagnostics to archive write failures, including the batch time range, elapsed time, backlog size, and database connection pool usage.
+
+### Bug Fixes
+
+- Fixed retried archive writes failing on records that had already been stored after a timeout, which caused later records in the batch to be discarded.
+- Fixed temporary database timeouts and lock errors counting toward the retry limit. These batches are now retried until the in-memory backlog limit is reached.
+
 ## v4.11.0
 
 ### Release Notes
