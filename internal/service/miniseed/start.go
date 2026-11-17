@@ -278,18 +278,13 @@ func (s *MiniSeedServiceImpl) saveMiniSeedRecords(gnssAvailable bool) (int, erro
 			timeline = &waveform.Timeline{}
 			s.timelines[timelineKey] = timeline
 		}
-		allowedJitter := time.Duration(allowedJitterMs) * time.Millisecond
-		recordTime := time.UnixMilli(startTimestamp).UTC()
+		// Event times are already disciplined at the source. The timeline only
+		// removes millisecond rounding, so no time correction is recorded.
 		correctedStartTime := timeline.AppendStartTime(
-			recordTime,
+			time.UnixMilli(startTimestamp),
 			startSampleRate,
 			len(channelBuffer),
-			allowedJitter,
 		)
-		timeCorrection, err := waveform.MiniSeedTimeCorrection(recordTime, correctedStartTime)
-		if err != nil {
-			return 0, err
-		}
 		timingQuality := lo.Ternary[int32](gnssAvailable, 100, 90)
 
 		dateDir := filepath.Join(s.filePath, correctedStartTime.Format("2006-01-02"))
@@ -300,15 +295,13 @@ func (s *MiniSeedServiceImpl) saveMiniSeedRecords(gnssAvailable bool) (int, erro
 		}
 
 		err = miniseed.Append(channelBuffer, &mseedio.AppendOptions{
-			SequenceNumber:        fmt.Sprintf("%06d", seq),
-			SampleRate:            float64(startSampleRate),
-			StartTime:             correctedStartTime,
-			ChannelCode:           channelCode,
-			StationCode:           s.stationCode,
-			NetworkCode:           s.networkCode,
-			LocationCode:          s.locationCode,
-			TimeCorrection:        timeCorrection,
-			TimeCorrectionApplied: true,
+			SequenceNumber: fmt.Sprintf("%06d", seq),
+			SampleRate:     float64(startSampleRate),
+			StartTime:      correctedStartTime,
+			ChannelCode:    channelCode,
+			StationCode:    s.stationCode,
+			NetworkCode:    s.networkCode,
+			LocationCode:   s.locationCode,
 			Blockette1001: &mseedio.Blockette1001Options{
 				TimingQuality: timingQuality,
 			},

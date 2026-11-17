@@ -37,6 +37,7 @@ type explorerStreamV2 struct {
 	lastCalibration  int64
 	ntpOffset        time.Duration
 	ntpMeasuredAt    time.Time
+	timeline         sampleClock
 }
 
 // The caller holds streamMutex. A discontinuity invalidates both the time
@@ -173,6 +174,7 @@ func (g *ExplorerProtoImplV2) processPacket(ctx context.Context, packet []byte, 
 		g.deviceConfig.SetPacketInterval(0)
 		g.channelDataBuf = nil
 		s.archiveSamples = 0
+		s.timeline.Reset()
 		s.rateStart, s.ratePackets = timestamp, 0
 		g.deviceStatus.IncrementErrors()
 		return false, nil
@@ -242,7 +244,20 @@ func (g *ExplorerProtoImplV2) processPacket(ctx context.Context, packet []byte, 
 		if len(s.offsetSamples) == STABLE_CHECK_SAMPLES && lo.Max(s.offsetSamples)-lo.Min(s.offsetSamples) <= V2_JITTER_MS {
 			s.timeOffset = lo.Mean(s.offsetSamples)
 		}
-		packetTime = time.UnixMilli(timestamp + s.timeOffset)
+		// The averaged offset steps when it is refreshed or NTP updates the
+		// time source. Publish a continuous sample timeline slewed toward it.
+		var (
+			event      sampleClockEvent
+			clockError time.Duration
+		)
+		packetTime, event, clockError = s.timeline.Next(time.UnixMilli(timestamp+s.timeOffset), g.deviceConfig.GetSampleRate(), V2_CHANNEL_SIZE, true)
+		if event == sampleClockStepped {
+			g.Logger.Warnf("sample timeline reset after a persistent time offset of %s", clockError)
+		}
+		if event != sampleClockContinued {
+			g.channelDataBuf = nil
+			s.archiveSamples = 0
+		}
 	}
 	channelData, err := g.getChannelData(packet, 2, V2_CHANNEL_SIZE)
 	if err != nil {

@@ -24,6 +24,9 @@ type explorerStreamV3 struct {
 	packetDelay           time.Duration
 	packetDelayKnown      bool
 	packetDelayConfig     uint32
+	// NTP-mode publish timeline, owned by the decoder under streamMutex.
+	timeline        sampleClock
+	timelineMcuTime int64
 }
 
 func (g *ExplorerProtoImplV3) readStream(subCtx context.Context, readyChan chan struct{}, initFlag *int32) {
@@ -122,6 +125,7 @@ func (g *ExplorerProtoImplV3) processPacket(subCtx context.Context, packetBytes 
 			g.prevMcuTimestamp = 0
 			g.isDataStreamStable = false
 			g.stream.timeDiffSamples = make([]int64, 0, STABLE_CHECK_SAMPLES)
+			g.stream.timeline.Reset()
 			return
 		}
 		g.updatePacketDelay(mcuTimestamp, deviceConfig, binary.LittleEndian.Uint32(packetBytes[12:16]))
@@ -270,12 +274,34 @@ func (g *ExplorerProtoImplV3) decodePacket(initFlag *int32) {
 	}
 
 	gnssEnabled := g.parseGnssAvailibility(deviceConfig)
-	timeObj := lo.Ternary(gnssEnabled, time.UnixMilli(mcuTimestamp), dataPacketObj.dataTime)
+	channelChunkLength, _, channelData := g.getChannelSize(deviceConfig)
+	timeObj := time.UnixMilli(mcuTimestamp)
+	if gnssEnabled {
+		g.stream.timeline.Reset()
+	} else {
+		// MCU time is a free-running counter in NTP mode; it only tells whether
+		// this packet directly follows the previous one.
+		packetInterval := g.parsePacketInterval(deviceConfig).Milliseconds()
+		mcuDelta := mcuTimestamp - g.stream.timelineMcuTime
+		contiguous := mcuDelta > packetInterval/2 && mcuDelta < packetInterval*3/2
+		g.stream.timelineMcuTime = mcuTimestamp
+		var (
+			event      sampleClockEvent
+			clockError time.Duration
+		)
+		timeObj, event, clockError = g.stream.timeline.Next(dataPacketObj.dataTime, g.parseSampleRate(deviceConfig), channelChunkLength, contiguous)
+		if event == sampleClockStepped {
+			g.Logger.Warnf("sample timeline reset after a persistent time offset of %s", clockError)
+		}
+		if event != sampleClockContinued {
+			// Never splice samples from both sides of a gap or step into one record.
+			g.resetFlags()
+		}
+	}
 
 	g.deviceStatus.IncrementFrames()
 	g.deviceStatus.SetUpdatedAt(timeObj)
 
-	channelChunkLength, _, channelData := g.getChannelSize(deviceConfig)
 	g.getChannelData(channelData, dataPacketObj.dataBytes[8+4+4:len(dataPacketObj.dataBytes)-1], channelChunkLength)
 	g.flagMutex.Lock()
 	g.collectedSamples += channelChunkLength

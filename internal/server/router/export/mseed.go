@@ -8,7 +8,6 @@ import (
 	"github.com/anyshake/observer/config"
 	"github.com/anyshake/observer/internal/dao/action"
 	"github.com/anyshake/observer/internal/dao/model"
-	"github.com/anyshake/observer/internal/hardware/explorer"
 	"github.com/anyshake/observer/internal/waveform"
 	"github.com/bclswl0827/mseedio"
 )
@@ -69,23 +68,15 @@ func (e *seismicDataEncoderMseedImpl) Encode(ctx context.Context, records seismi
 				timeline = &waveform.Timeline{}
 				timelines[channelData.ChannelCode] = timeline
 			}
-			allowedJitter := time.Duration(explorer.ALLOWED_JITTER_MS_NTP) * time.Millisecond
-			recordTime := tm.UTC()
-			correctedStartTime := timeline.AppendStartTime(recordTime, sampleRate, len(channelData.Data), allowedJitter)
-			timeCorrection, err := waveform.MiniSeedTimeCorrection(recordTime, correctedStartTime)
-			if err != nil {
-				return err
-			}
+			correctedStartTime := timeline.AppendStartTime(tm, sampleRate, len(channelData.Data))
 			err = miniseed.Append(channelData.Data, &mseedio.AppendOptions{
-				SequenceNumber:        fmt.Sprintf("%06d", sequence),
-				SampleRate:            float64(sampleRate),
-				StartTime:             correctedStartTime,
-				ChannelCode:           channelData.ChannelCode,
-				StationCode:           stationCodeStr,
-				NetworkCode:           networkCodeStr,
-				LocationCode:          locationCodeStr,
-				TimeCorrection:        timeCorrection,
-				TimeCorrectionApplied: true,
+				SequenceNumber: fmt.Sprintf("%06d", sequence),
+				SampleRate:     float64(sampleRate),
+				StartTime:      correctedStartTime,
+				ChannelCode:    channelData.ChannelCode,
+				StationCode:    stationCodeStr,
+				NetworkCode:    networkCodeStr,
+				LocationCode:   locationCodeStr,
 				Blockette1001: &mseedio.Blockette1001Options{
 					TimingQuality: 0,
 				},

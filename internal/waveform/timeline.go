@@ -1,63 +1,52 @@
 package waveform
 
-import (
-	"fmt"
-	"time"
+import "time"
+
+const (
+	// TimelineMaxSlewPPM bounds how fast a continuous segment follows its
+	// recorded times. It matches the source-side NTP slew, so a recorded time
+	// that is already continuous is reproduced within millisecond rounding.
+	TimelineMaxSlewPPM = 100
+	// TimelineTolerance absorbs millisecond rounding and the receive jitter of
+	// records stored before source-side disciplining. The source itself only
+	// steps by more than its 50 ms reset threshold, which stays visible here.
+	TimelineTolerance = 20 * time.Millisecond
 )
 
-// MiniSeedTimeCorrectionUnit is the fixed-header correction resolution.
-const MiniSeedTimeCorrectionUnit = 100 * time.Microsecond
-
-// Timeline places continuous packets on the sample timeline while using
-// adjacent raw timestamps to distinguish clock drift from a real discontinuity.
+// Timeline places records on a continuous sample timeline. Recorded times are
+// already disciplined at the source, so this only removes millisecond rounding
+// and detects discontinuities; it never accumulates an offset from them.
 type Timeline struct {
-	startTime      time.Time
-	lastRecordTime time.Time
-	sampleRate     int
-	lastSamples    int
-	samples        int64
+	startTime  time.Time
+	sampleRate int
+	samples    int
 }
 
-func (t *Timeline) AppendStartTime(recordTime time.Time, sampleRate, samples int, allowedJitter time.Duration) time.Time {
+// AppendStartTime returns the start time to write for a record. A record that
+// continues the previous one within tolerance keeps the sample timeline and
+// moves toward its recorded time by at most TimelineMaxSlewPPM; otherwise a new
+// segment starts at the recorded time.
+func (t *Timeline) AppendStartTime(recordTime time.Time, sampleRate, samples int) time.Time {
 	recordTime = recordTime.UTC()
 	startTime := recordTime
-	continuous := false
-	if t.sampleRate == sampleRate && sampleRate > 0 {
-		expectedRecordTime := t.lastRecordTime.Add(sampleOffset(int64(t.lastSamples), sampleRate))
-		jitter := recordTime.Sub(expectedRecordTime)
-		if jitter > -allowedJitter && jitter < allowedJitter {
-			startTime = t.startTime.Add(sampleOffset(t.samples, sampleRate))
-			continuous = true
+	if t.sampleRate == sampleRate && sampleRate > 0 && !t.startTime.IsZero() {
+		expected := t.startTime.Add(SampleOffset(int64(t.samples), sampleRate))
+		offset := recordTime.Sub(expected)
+		if offset > -TimelineTolerance && offset < TimelineTolerance {
+			maxStep := SampleOffset(int64(samples), sampleRate) * TimelineMaxSlewPPM / 1_000_000
+			startTime = expected.Add(min(maxStep, max(-maxStep, offset)))
 		}
 	}
-	if !continuous {
-		t.startTime = startTime
-		t.sampleRate = sampleRate
-		t.samples = 0
-	}
-	t.lastRecordTime = recordTime
-	t.lastSamples = samples
-	t.samples += int64(samples)
+	t.startTime = startTime
+	t.sampleRate = sampleRate
+	t.samples = samples
 	return startTime
 }
 
-func sampleOffset(samples int64, sampleRate int) time.Duration {
+// SampleOffset returns the time spanned by the given number of samples.
+func SampleOffset(samples int64, sampleRate int) time.Duration {
 	rate := int64(sampleRate)
 	seconds := samples / rate
 	remainder := samples % rate
 	return time.Duration(seconds)*time.Second + time.Duration(remainder)*time.Second/time.Duration(rate)
-}
-
-// MiniSeedTimeCorrection converts the difference between a raw record time and
-// its effective start time to the signed MiniSEED 2 fixed-header field.
-func MiniSeedTimeCorrection(recordTime, correctedStartTime time.Time) (int32, error) {
-	correction := correctedStartTime.Sub(recordTime.UTC())
-	if correction%MiniSeedTimeCorrectionUnit != 0 {
-		return 0, fmt.Errorf("MiniSEED time correction %s is not representable in 0.0001 second units", correction)
-	}
-	units := correction / MiniSeedTimeCorrectionUnit
-	if units < -1<<31 || units > 1<<31-1 {
-		return 0, fmt.Errorf("MiniSEED time correction %s exceeds the int32 field range", correction)
-	}
-	return int32(units), nil
 }

@@ -89,6 +89,7 @@ func (g *ExplorerProtoImplV1) decodeStream(subCtx context.Context, packetSize in
 	const decodeInterval = 5 * time.Millisecond
 	var (
 		collectedTimestampArr []int64
+		timeline              sampleClock
 	)
 	for timer := time.NewTimer(decodeInterval); ; {
 		timer.Reset(decodeInterval)
@@ -102,22 +103,35 @@ func (g *ExplorerProtoImplV1) decodeStream(subCtx context.Context, packetSize in
 
 			currentSampleRate := g.deviceConfig.GetSampleRate()
 			if currentSampleRate > 0 {
-				timestamp := int64(binary.BigEndian.Uint64(dataPacket[2:10]))
+				// v1 has no device clock; every packet carries its receive time.
+				// Publish a continuous sample timeline slewed toward it instead.
+				measured := time.UnixMilli(int64(binary.BigEndian.Uint64(dataPacket[2:10])))
+				packetTime, event, clockError := timeline.Next(measured, currentSampleRate, DATA_PACKET_CHANNEL_SIZE, true)
+				if event == sampleClockStepped {
+					g.Logger.Warnf("sample timeline reset after a persistent time offset of %s", clockError)
+				}
+				if event != sampleClockContinued {
+					// Never splice samples from both sides of a step into one record.
+					collectedTimestampArr = nil
+					g.channelDataBuf = []ChannelData{}
+				}
+				timestamp := packetTime.UnixNano()
 				channelData, err := g.getChannelData(dataPacket, len(DATA_PACKET_HEADER), DATA_PACKET_CHANNEL_SIZE)
 				if err != nil {
 					g.Logger.Errorf("failed to get channel data: %v", err)
 					g.deviceStatus.IncrementErrors()
+					timeline.Reset()
 					continue
 				}
 
 				collectedTimestampArr = append(collectedTimestampArr, timestamp)
 				g.deviceStatus.IncrementFrames()
 
-				g.messageBusRealtime.Publish(NewEvent(time.UnixMilli(timestamp), &g.deviceConfig, channelData))
+				g.messageBusRealtime.Publish(NewEvent(time.Unix(0, timestamp), &g.deviceConfig, channelData))
 				if len(collectedTimestampArr)*DATA_PACKET_CHANNEL_SIZE == currentSampleRate {
 					packetTimestamp := collectedTimestampArr[0]
-					g.groundMotion.annotate(time.UnixMilli(packetTimestamp), currentSampleRate, g.channelDataBuf)
-					g.messageBus.Publish(NewEvent(time.UnixMilli(packetTimestamp), &g.deviceConfig, g.channelDataBuf))
+					g.groundMotion.annotate(time.Unix(0, packetTimestamp), currentSampleRate, g.channelDataBuf)
+					g.messageBus.Publish(NewEvent(time.Unix(0, packetTimestamp), &g.deviceConfig, g.channelDataBuf))
 					g.deviceStatus.IncrementMessages()
 					collectedTimestampArr = []int64{}
 					g.channelDataBuf = []ChannelData{}
@@ -125,10 +139,11 @@ func (g *ExplorerProtoImplV1) decodeStream(subCtx context.Context, packetSize in
 					g.Logger.Warnf("packet timestamp is not in sync with current sample rate, packet timestamp: %v, current sample rate: %v", collectedTimestampArr[0], currentSampleRate)
 					collectedTimestampArr = []int64{}
 					g.channelDataBuf = []ChannelData{}
+					timeline.Reset()
 					g.deviceStatus.IncrementErrors()
 				}
 
-				g.deviceStatus.SetUpdatedAt(time.UnixMilli(timestamp))
+				g.deviceStatus.SetUpdatedAt(time.Unix(0, timestamp))
 			}
 		case <-subCtx.Done():
 			g.Logger.Infoln("exiting from data packet decoder")

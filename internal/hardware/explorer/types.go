@@ -24,6 +24,14 @@ const (
 	ALLOWED_JITTER_MS_NTP  = 20
 )
 
+// NTP-mode sample timeline discipline, see sampleClock.
+const (
+	NTP_TIMELINE_MAX_SLEW_PPM    = 100
+	NTP_TIMELINE_FILTER_WINDOW   = 30 * time.Second
+	NTP_TIMELINE_RESET_THRESHOLD = 50 * time.Millisecond
+	NTP_TIMELINE_RESET_AFTER     = 2 * time.Second
+)
+
 type ExplorerOptions struct {
 	Endpoint    string
 	Protocol    string

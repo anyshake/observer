@@ -13,10 +13,13 @@ import (
 	"github.com/bclswl0827/mseedio"
 )
 
-func TestSaveMiniSeedRecordsWritesTimeCorrection(t *testing.T) {
+func TestSaveMiniSeedRecordsFollowsSourceTimeline(t *testing.T) {
 	dir := t.TempDir()
 	start := time.Date(2024, 3, 15, 13, 5, 9, 123000000, time.UTC)
-	jitters := []time.Duration{0, 15 * time.Millisecond, 30 * time.Millisecond}
+	// A small offset is followed at the bounded slew rate (100 us per second);
+	// a 60 ms source step is a real discontinuity and is preserved, not corrected.
+	jitters := []time.Duration{0, -time.Millisecond, 60 * time.Millisecond}
+	wantOffsets := []time.Duration{0, -100 * time.Microsecond, 60 * time.Millisecond}
 	svc := &MiniSeedServiceImpl{
 		filePath:     dir,
 		stationCode:  "SHAKE",
@@ -57,27 +60,18 @@ func TestSaveMiniSeedRecordsWritesTimeCorrection(t *testing.T) {
 		t.Fatalf("series count = %d, want 3", len(decoded.Series))
 	}
 	for i, series := range decoded.Series {
-		wantTime := start.Add(time.Duration(i) * time.Second)
-		recordTime := wantTime.Add(jitters[i])
+		wantTime := start.Add(time.Duration(i)*time.Second + wantOffsets[i])
 		if !series.FixedSection.StartTime.Equal(wantTime) {
 			t.Fatalf("record %d effective start time = %s, want %s", i, series.FixedSection.StartTime, wantTime)
 		}
 		header := data[series.FixedSection.ReaderOffset.Start:]
 		gotFraction := binary.BigEndian.Uint16(header[28:30])
-		wantFraction := uint16(wantTime.Nanosecond() / int(waveform.MiniSeedTimeCorrectionUnit))
+		wantFraction := uint16(wantTime.Nanosecond() / int(100*time.Microsecond))
 		if gotFraction != wantFraction {
 			t.Fatalf("record %d BTIME fraction = %d, want %d (100us units)", i, gotFraction, wantFraction)
 		}
-		wantCorrection := int32(-jitters[i] / waveform.MiniSeedTimeCorrectionUnit)
-		if series.FixedSection.TimeCorrection != wantCorrection {
-			t.Fatalf("record %d time correction = %d, want %d", i, series.FixedSection.TimeCorrection, wantCorrection)
-		}
-		if series.FixedSection.ActivityFlags&mseedio.ACTIVITY_TIME_CORRECTION_APPLIED == 0 {
-			t.Fatalf("record %d does not mark time correction as applied", i)
-		}
-		reconstructedRecordTime := wantTime.Add(-time.Duration(series.FixedSection.TimeCorrection) * waveform.MiniSeedTimeCorrectionUnit)
-		if !reconstructedRecordTime.Equal(recordTime) {
-			t.Fatalf("record %d reconstructed raw time = %s, want %s", i, reconstructedRecordTime, recordTime)
+		if series.FixedSection.TimeCorrection != 0 || series.FixedSection.ActivityFlags&mseedio.ACTIVITY_TIME_CORRECTION_APPLIED != 0 {
+			t.Fatalf("record %d time correction = %d, flags = %#x; want none", i, series.FixedSection.TimeCorrection, series.FixedSection.ActivityFlags)
 		}
 		if len(series.BlocketteSections) != 2 || series.BlocketteSections[1].BlocketteCode != 1001 || series.BlocketteSections[1].TimingQuality != 90 {
 			t.Fatalf("record %d blockettes = %#v", i, series.BlocketteSections)
