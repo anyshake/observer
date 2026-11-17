@@ -2,6 +2,36 @@
 
 Starting from v2.2.5, all notable changes to this project will be documented in this file.
 
+## v4.12.0
+
+### Release Notes
+
+This release adds **GNSS status tracking** for Explorer devices that report GNSS diagnostics, and redesigns the home page around station health. The page shows data reception, time source, reception errors, services, packet throughput, and host resources.
+
+It also fixes **missing samples in NTP mode**. Host clock jitter could shift packet timestamps by a few milliseconds, which made SeedLink clients drop or misplace single samples.
+
+### New Features
+
+- Added GNSS diagnostics reported by protocol v3 firmware: lock state, position fix, NMEA time validity, HDOP, satellite count, and time since the last PPS pulse.
+- Added a GNSS status field to the device status GraphQL API.
+- Added home page health tiles for data reception, time source, reception errors, and services.
+- Added a packet throughput chart that shows packets per second over the last 10 minutes.
+- Added a service status table with running state, restart count, and last start and stop times.
+
+### Improvements
+
+- Redesigned the home and realtime page headers to show the station name, station code, connection state, and last update time.
+- Updated the host resources panel on the home page to switch between CPU and memory usage history.
+- Updated realtime spectrograms to draw only the newest continuous stream of samples, so gaps no longer distort the display.
+- Updated upgrade log messages to start with lower-case letters, matching other log messages.
+
+### Bug Fixes
+
+- Fixed packet delay values from protocol v3 firmware being read as signed integers. Delays above INT32_MAX are now accepted, and only UINT32_MAX is treated as unavailable.
+- Fixed Explorer sample timestamps in NTP mode following host clock jitter. Protocol v1, v2, and v3 streams now keep a continuous sample timeline that slews toward the synchronized clock by at most 100 ppm, and restart the timeline only when the error stays above 50 ms for 2 seconds. GNSS mode still uses the timestamps reported by the device.
+- Fixed MiniSEED recordings and exports depending on the time correction field for sample timing. Record start times now come from the continuous sample timeline and the time correction field is always zero, so all readers see the same start times.
+- Fixed SeedLink streams dropping samples when the device sampling clock runs slightly fast, by upgrading `slgo` to v0.4.4.
+
 ## v4.11.1
 
 ### Release Notes
