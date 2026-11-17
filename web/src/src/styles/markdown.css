@@ -20,7 +20,7 @@
     }
 
     .app-markdown {
-        @apply min-w-0 max-w-full wrap-anywhere;
+        @apply max-w-full min-w-0 wrap-anywhere;
         color: var(--app-text);
         --tw-prose-body: var(--app-text);
         --tw-prose-headings: var(--app-heading);
@@ -57,11 +57,11 @@
     }
 
     .app-markdown-pre {
-        @apply my-4 min-w-0 max-w-full overflow-x-auto rounded-lg bg-transparent p-2;
+        @apply my-4 max-w-full min-w-0 overflow-x-auto rounded-lg bg-transparent p-2;
     }
 
     .app-markdown-pre > .app-markdown-inline-code {
-        @apply m-0 block overflow-visible whitespace-pre bg-app-code text-[color:var(--app-code-text)] p-3;
+        @apply bg-app-code m-0 block overflow-visible p-3 whitespace-pre text-(--app-code-text);
     }
 
     .app-markdown-inline-code {

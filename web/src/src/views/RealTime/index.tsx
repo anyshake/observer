@@ -17,9 +17,11 @@ import { FFTExecutor } from 'spectrogram-js';
 
 import { ResizableWorkspace } from '../../components/ui/ResizableWorkspace';
 import { WorkspaceExportButton } from '../../components/ui/WorkspaceExportButton';
-import { Banner } from '../../components/widget/Banner';
+import { PageHeader } from '../../components/widget/PageHeader';
 import { RealTimeConstraints } from '../../config/constraints';
 import { routerConfig } from '../../config/router';
+import { useGetRealtimeStationQuery } from '../../graphql';
+import { getStationIdentity } from '../../helpers/app/getStationIdentity';
 import { SpectrumExecutor } from '../../helpers/dsp/SpectrumExecutor';
 import { getTimeString } from '../../helpers/utils/getTimeString';
 import { useRetentionStore } from '../../stores/retention';
@@ -32,6 +34,11 @@ const RealTime = () => {
     const { t } = useTranslation();
 
     const { retention } = useRetentionStore();
+    const { data: stationData } = useGetRealtimeStationQuery();
+    const station = useMemo(
+        () => getStationIdentity(stationData?.getStationConfig),
+        [stationData?.getStationConfig]
+    );
 
     const {
         sampleRate,
@@ -87,14 +94,28 @@ const RealTime = () => {
 
     return (
         <div className="app-page">
-            <Banner
+            <PageHeader
+                title={station.name || t('config.router.realtime')}
+                meta={[
+                    station.code,
+                    t('views.RealTime.stream_status.sample_rate', { value: sampleRate }),
+                    t('views.RealTime.stream_status.channels', {
+                        num: Object.keys(activeChannels).length
+                    }),
+                    t('views.RealTime.stream_status.retention', { retention })
+                ]
+                    .filter(Boolean)
+                    .join(' · ')}
                 status={readyState === 1 ? 'ok' : 'warning'}
-                message={
+                statusText={t(
                     readyState === 1
-                        ? t('views.RealTime.connectivity.connected', {
-                              updatedAt: getTimeString(updatedAt)
-                          })
-                        : t('views.RealTime.connectivity.connecting')
+                        ? 'views.RealTime.connectivity.online'
+                        : 'views.RealTime.connectivity.offline'
+                )}
+                detail={
+                    updatedAt > 0
+                        ? `${t('views.RealTime.connectivity.updated_at')} ${getTimeString(updatedAt)}`
+                        : undefined
                 }
             />
             <div className="app-toolbar">
@@ -167,19 +188,6 @@ const RealTime = () => {
                             : t('views.RealTime.record_data.start_button')}
                     </span>
                 </button>
-                <div className="app-recordings-status">
-                    <div className="badge badge-soft badge-primary app-text-medium">
-                        {t('views.RealTime.stream_status.sample_rate', { value: sampleRate })}
-                    </div>
-                    <div className="badge badge-soft badge-primary app-text-medium">
-                        {t('views.RealTime.stream_status.channels', {
-                            num: Object.keys(activeChannels).length
-                        })}
-                    </div>
-                    <div className="badge badge-soft badge-primary app-text-medium">
-                        {t('views.RealTime.stream_status.retention', { retention })}
-                    </div>
-                </div>
             </div>
 
             {recordList.length > 0 && (

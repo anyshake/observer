@@ -748,6 +748,37 @@ func TestPurgeJobs(t *testing.T) {
 	}
 }
 
+func TestDeviceGnssStatus(t *testing.T) {
+	env := newEnv(t)
+	query := env.query()
+	status, err := query.GetDeviceStatus(context.Background())
+	if err != nil || status.GnssStatus != nil {
+		t.Fatalf("legacy GNSS status = %+v, %v", status, err)
+	}
+
+	hdop, age := 0.9, 2
+	env.hardware.gnssStatus = &explorer.GnssStatus{
+		Locked: true, FixValid: true, TimeValid: true,
+		HDOP: &hdop, Satellites: 12, PPSAgeSeconds: &age,
+	}
+	for _, ctx := range []context.Context{adminContext("admin"), userContext("user", false)} {
+		status, err = query.GetDeviceStatus(ctx)
+		if err != nil || status.GnssStatus == nil {
+			t.Fatalf("GNSS status = %+v, %v", status, err)
+		}
+		gnss := status.GnssStatus
+		if !gnss.Locked || !gnss.FixValid || !gnss.TimeValid || gnss.Hdop == nil || *gnss.Hdop != hdop || gnss.Satellites != 12 || gnss.PpsAgeSeconds == nil || *gnss.PpsAgeSeconds != age {
+			t.Fatalf("decoded GNSS status = %+v", gnss)
+		}
+	}
+
+	env.hardware.gnssStatus = &explorer.GnssStatus{Satellites: 31}
+	status, err = query.GetDeviceStatus(context.Background())
+	if err != nil || status.GnssStatus == nil || status.GnssStatus.Hdop != nil || status.GnssStatus.PpsAgeSeconds != nil || status.GnssStatus.Locked {
+		t.Fatalf("holdover with unavailable measurements = %+v, %v", status, err)
+	}
+}
+
 func TestDeviceQueries(t *testing.T) {
 	env := newEnv(t)
 	query := env.query()
@@ -1130,6 +1161,7 @@ type fakeHardware struct {
 	interval                   time.Duration
 	channels                   []string
 	gnss                       bool
+	gnssStatus                 *explorer.GnssStatus
 	model, protocol            string
 	started, updated           time.Time
 	frames, errors, messages   int64
@@ -1162,6 +1194,7 @@ func (f *fakeHardware) GetConfig() *explorer.DeviceConfig {
 }
 func (f *fakeHardware) GetStatus() *explorer.DeviceStatus {
 	status := &explorer.DeviceStatus{}
+	status.SetGnssStatus(f.gnssStatus)
 	status.SetStartedAt(f.started)
 	status.SetUpdatedAt(f.updated)
 	for i := int64(0); i < f.frames; i++ {

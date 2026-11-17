@@ -13,6 +13,16 @@ type deviceStatus {
   frames: Int64!
   errors: Int64!
   messages: Int64!
+  gnssStatus: gnssStatus
+}
+
+type gnssStatus {
+  locked: Boolean!
+  fixValid: Boolean!
+  timeValid: Boolean!
+  hdop: Float
+  satellites: Int!
+  ppsAgeSeconds: Int
 }
 
 type deviceInfo {

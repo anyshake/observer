@@ -195,7 +195,6 @@
             },
             "connectivity": {
                 "loading": "स्टेसनमा जडान गरिँदै छ...",
-                "success": "स्टेसनमा जडान भयो। सर्भर {{uptime}} सेकेन्डदेखि चलिरहेको छ, अद्यावधिक समय {{updatedAt}}।",
                 "error": "स्टेसनमा जडान गर्दा त्रुटि भयो। आफ्नो जडान जाँच्नुहोस्।"
             },
             "station_location": {
@@ -208,7 +207,15 @@
                 "manual_upgrade_needed": "नयाँ संस्करण {{latest}} उपलब्ध छ, तर हालको संस्करण {{current}} न्यूनतम मिल्दो संस्करण {{required}} भन्दा पुरानो छ। आफैँ स्तरवृद्धि गर्नुपर्छ।"
             },
             "service_status": {
-                "title": "सेवाको स्थिति"
+                "title": "सेवाको स्थिति",
+                "name": "सेवा",
+                "state": "स्थिति",
+                "restarts": "पुनः सुरु",
+                "started_at": "अन्तिम पटक सुरु",
+                "stopped_at": "अन्तिम पटक रोकिएको",
+                "running": "चलिरहेको",
+                "stopped": "रोकिएको",
+                "empty": "कुनै सेवा उपलब्ध छैन।"
             },
             "cpu_usage": {
                 "title": "CPU प्रयोग"
@@ -218,6 +225,63 @@
             },
             "disk_usage": {
                 "title": "डिस्क प्रयोग"
+            },
+            "packet_throughput": {
+                "title": "प्याकेट थ्रुपुट",
+                "note": "प्रति सेकेन्ड प्याकेट, पछिल्लो {{minutes}} मिनेट",
+                "collecting": "डेटा सङ्कलन गरिँदै…"
+            },
+            "system_resources": {
+                "title": "होस्ट स्रोतहरू",
+                "uptime": "{{days}} दिन {{hours}} घण्टा {{minutes}} मिनेटदेखि चालु",
+                "collecting": "डेटा सङ्कलन गरिँदै…"
+            },
+            "station_header": {
+                "online": "स्टेसन अनलाइन",
+                "offline": "जडान टुट्यो",
+                "updated_at": "अद्यावधिक समय"
+            },
+            "health_level": {
+                "unknown": "अज्ञात"
+            },
+            "data_reception": {
+                "title": "डेटा प्राप्ति",
+                "receiving": "प्राप्त हुँदै",
+                "waiting": "डेटाको प्रतीक्षा",
+                "stale": "अद्यावधिक भइरहेको छैन",
+                "unavailable": "सर्भरसँगको जडान टुट्यो।",
+                "packet_rate": "{{value}} प्याकेट/से",
+                "last_frame": "अन्तिम प्याकेट {{time}} मा"
+            },
+            "time_source": {
+                "title": "समय स्रोत",
+                "unavailable": "डेटा प्राप्ति अवरुद्ध हुँदा उपलब्ध छैन।",
+                "gnss_locked": "GNSS लक भयो",
+                "holdover": "होल्डओभर",
+                "gnss_locked_note": "टाइमस्ट्याम्पहरू GNSS PPS द्वारा मिलाइन्छन्।",
+                "holdover_note": "GNSS हरायो; आन्तरिक घडीले UTC कायम राखेको छ।",
+                "ntp_note": "GNSS असक्षम; टाइमस्ट्याम्पहरूले NTP प्रयोग गर्छन्।"
+            },
+            "reception_errors": {
+                "title": "प्राप्ति त्रुटिहरू",
+                "note": "पछिल्लो {{minutes}} मिनेट · सुरुदेखि {{total}}"
+            },
+            "service_summary": {
+                "title": "सेवाहरू",
+                "running_count": "{{running}} / {{total}} चलिरहेका",
+                "note": "रोकिएका सेवाहरू जानाजानी असक्षम गरिएका हुन सक्छन्।"
+            },
+            "gnss_status": {
+                "title": "GNSS निदान",
+                "position_fix": "स्थिति निर्धारण",
+                "nmea_time": "NMEA समय",
+                "satellites": "उपग्रहहरू",
+                "pps_age": "अन्तिम PPS देखि",
+                "valid": "मान्य",
+                "invalid": "अमान्य",
+                "disabled": "यो उपकरणमा GNSS असक्षम छ; नमूना टाइमस्ट्याम्पहरू NTP मार्फत सिङ्क्रोनाइज हुन्छन्।",
+                "pending": "फर्मवेयरले GNSS निदान रिपोर्ट गर्ने प्रतीक्षा गर्दै।",
+                "note": "संतृप्त वा अनुपलब्ध मापनहरू N/A को रूपमा देखाइन्छन्; 31+ को अर्थ कम्तीमा 31 उपग्रह हो।"
             }
         },
         "NotFound": {
@@ -253,8 +317,9 @@
                 "no_data_recorded": "यस अवधिमा कुनै डाटा रेकर्ड भएन।"
             },
             "connectivity": {
-                "connecting": "जडान छैन, जडान गरिँदै छ...",
-                "connected": "जडान भयो, पछिल्लो अद्यावधिक {{updatedAt}} मा।"
+                "online": "प्रत्यक्ष स्ट्रिमिङ",
+                "offline": "जडान हुँदै...",
+                "updated_at": "अद्यावधिक समय"
             },
             "stream_status": {
                 "sample_rate": "{{value}} नमुना/सेकेन्ड",

@@ -79,6 +79,7 @@ func (g *ExplorerProtoImplV3) resetVariables() {
 	g.flagMutex.Unlock()
 
 	g.deviceVariable.Reset()
+	g.deviceStatus.SetGnssStatus(nil)
 	g.stream.packetDelayKnown = false
 }
 
@@ -141,11 +142,10 @@ func (g *ExplorerProtoImplV3) updatePacketDelay(mcuTimestamp int64, deviceConfig
 	}
 	g.stream.packetDelayConfig = delayConfig
 	if deviceConfig&(1<<5) != 0 && (mcuTimestamp/1000)%10 == 5 {
-		delay := int32(variableData)
-		// INT32_MAX means the firmware could not measure a valid delay.
-		g.stream.packetDelayKnown = delay >= 0 && delay != math.MaxInt32
+		// UINT32_MAX means the firmware could not measure a valid delay.
+		g.stream.packetDelayKnown = variableData != math.MaxUint32
 		if g.stream.packetDelayKnown {
-			g.stream.packetDelay = time.Duration(delay) * time.Microsecond
+			g.stream.packetDelay = time.Duration(variableData) * time.Microsecond
 		}
 	}
 }
@@ -153,6 +153,9 @@ func (g *ExplorerProtoImplV3) updatePacketDelay(mcuTimestamp int64, deviceConfig
 func (g *ExplorerProtoImplV3) getVariableData(mcuTimestamp int64, deviceConfig uint32, variableBytes [4]byte) {
 	variableData := binary.LittleEndian.Uint32(variableBytes[:])
 	variableBits := deviceConfig & 0x3FF
+	if variableBits&(1<<6) == 0 {
+		g.deviceStatus.SetGnssStatus(nil)
+	}
 
 	switch (mcuTimestamp / 1000) % 10 {
 	case 0:
@@ -188,6 +191,24 @@ func (g *ExplorerProtoImplV3) getVariableData(mcuTimestamp int64, deviceConfig u
 			g.deviceVariable.SetTemperature(&n)
 		} else {
 			g.deviceVariable.SetTemperature(nil)
+		}
+	case 6:
+		if variableBits&(1<<6) != 0 {
+			status := &GnssStatus{
+				Locked:     variableData&1 != 0,
+				FixValid:   variableData&(1<<1) != 0,
+				TimeValid:  variableData&(1<<2) != 0,
+				Satellites: int((variableData >> 11) & 0x1F),
+			}
+			if hdop := (variableData >> 3) & 0xFF; hdop != math.MaxUint8 {
+				n := float64(hdop) / 10
+				status.HDOP = &n
+			}
+			if age := variableData >> 16; age != math.MaxUint16 {
+				n := int(age)
+				status.PPSAgeSeconds = &n
+			}
+			g.deviceStatus.SetGnssStatus(status)
 		}
 	}
 

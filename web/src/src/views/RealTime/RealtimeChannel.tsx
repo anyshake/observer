@@ -131,6 +131,7 @@ export const RealtimeChannel = memo(function RealtimeChannel({
                         duration={retention}
                         overlap={RealTimeConstraints.overlap}
                         gapThreshold={RealTimeConstraints.gapThreshold}
+                        continuityTolerance={RealTimeConstraints.continuityTolerance}
                         freqRange={RealTimeConstraints.freqRange}
                         windowSize={RealTimeConstraints.windowSize}
                         maxDB={layout.spectrogram.maxDB}

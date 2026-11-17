@@ -144,11 +144,12 @@ type ComplexityRoot struct {
 	}
 
 	DeviceStatus struct {
-		Errors    func(childComplexity int) int
-		Frames    func(childComplexity int) int
-		Messages  func(childComplexity int) int
-		StartedAt func(childComplexity int) int
-		UpdatedAt func(childComplexity int) int
+		Errors     func(childComplexity int) int
+		Frames     func(childComplexity int) int
+		GnssStatus func(childComplexity int) int
+		Messages   func(childComplexity int) int
+		StartedAt  func(childComplexity int) int
+		UpdatedAt  func(childComplexity int) int
 	}
 
 	ExecutableBackup struct {
@@ -173,6 +174,15 @@ type ComplexityRoot struct {
 		RevokedAt       func(childComplexity int) int
 		UserAgent       func(childComplexity int) int
 		UserIP          func(childComplexity int) int
+	}
+
+	GnssStatus struct {
+		FixValid      func(childComplexity int) int
+		Hdop          func(childComplexity int) int
+		Locked        func(childComplexity int) int
+		PpsAgeSeconds func(childComplexity int) int
+		Satellites    func(childComplexity int) int
+		TimeValid     func(childComplexity int) int
 	}
 
 	PurgeDataJob struct {
@@ -907,6 +917,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.DeviceStatus.Frames(childComplexity), true
+	case "deviceStatus.gnssStatus":
+		if e.complexity.DeviceStatus.GnssStatus == nil {
+			break
+		}
+
+		return e.complexity.DeviceStatus.GnssStatus(childComplexity), true
 	case "deviceStatus.messages":
 		if e.complexity.DeviceStatus.Messages == nil {
 			break
@@ -1018,6 +1034,43 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.FdsnAccessKey.UserIP(childComplexity), true
+
+	case "gnssStatus.fixValid":
+		if e.complexity.GnssStatus.FixValid == nil {
+			break
+		}
+
+		return e.complexity.GnssStatus.FixValid(childComplexity), true
+	case "gnssStatus.hdop":
+		if e.complexity.GnssStatus.Hdop == nil {
+			break
+		}
+
+		return e.complexity.GnssStatus.Hdop(childComplexity), true
+	case "gnssStatus.locked":
+		if e.complexity.GnssStatus.Locked == nil {
+			break
+		}
+
+		return e.complexity.GnssStatus.Locked(childComplexity), true
+	case "gnssStatus.ppsAgeSeconds":
+		if e.complexity.GnssStatus.PpsAgeSeconds == nil {
+			break
+		}
+
+		return e.complexity.GnssStatus.PpsAgeSeconds(childComplexity), true
+	case "gnssStatus.satellites":
+		if e.complexity.GnssStatus.Satellites == nil {
+			break
+		}
+
+		return e.complexity.GnssStatus.Satellites(childComplexity), true
+	case "gnssStatus.timeValid":
+		if e.complexity.GnssStatus.TimeValid == nil {
+			break
+		}
+
+		return e.complexity.GnssStatus.TimeValid(childComplexity), true
 
 	case "purgeDataJob.error":
 		if e.complexity.PurgeDataJob.Error == nil {
@@ -3092,6 +3145,8 @@ func (ec *executionContext) fieldContext_Query_getDeviceStatus(_ context.Context
 				return ec.fieldContext_deviceStatus_errors(ctx, field)
 			case "messages":
 				return ec.fieldContext_deviceStatus_messages(ctx, field)
+			case "gnssStatus":
+				return ec.fieldContext_deviceStatus_gnssStatus(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type deviceStatus", field.Name)
 		},
@@ -6352,6 +6407,49 @@ func (ec *executionContext) fieldContext_deviceStatus_messages(_ context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _deviceStatus_gnssStatus(ctx context.Context, field graphql.CollectedField, obj *graph_model.DeviceStatus) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_deviceStatus_gnssStatus,
+		func(ctx context.Context) (any, error) {
+			return obj.GnssStatus, nil
+		},
+		nil,
+		ec.marshalOgnssStatus2ᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐGnssStatus,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_deviceStatus_gnssStatus(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "deviceStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "locked":
+				return ec.fieldContext_gnssStatus_locked(ctx, field)
+			case "fixValid":
+				return ec.fieldContext_gnssStatus_fixValid(ctx, field)
+			case "timeValid":
+				return ec.fieldContext_gnssStatus_timeValid(ctx, field)
+			case "hdop":
+				return ec.fieldContext_gnssStatus_hdop(ctx, field)
+			case "satellites":
+				return ec.fieldContext_gnssStatus_satellites(ctx, field)
+			case "ppsAgeSeconds":
+				return ec.fieldContext_gnssStatus_ppsAgeSeconds(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type gnssStatus", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _executableBackup_name(ctx context.Context, field graphql.CollectedField, obj *graph_model.ExecutableBackup) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -6782,6 +6880,180 @@ func (ec *executionContext) fieldContext_fdsnAccessKey_userAgent(_ context.Conte
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _gnssStatus_locked(ctx context.Context, field graphql.CollectedField, obj *graph_model.GnssStatus) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_gnssStatus_locked,
+		func(ctx context.Context) (any, error) {
+			return obj.Locked, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_gnssStatus_locked(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "gnssStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _gnssStatus_fixValid(ctx context.Context, field graphql.CollectedField, obj *graph_model.GnssStatus) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_gnssStatus_fixValid,
+		func(ctx context.Context) (any, error) {
+			return obj.FixValid, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_gnssStatus_fixValid(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "gnssStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _gnssStatus_timeValid(ctx context.Context, field graphql.CollectedField, obj *graph_model.GnssStatus) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_gnssStatus_timeValid,
+		func(ctx context.Context) (any, error) {
+			return obj.TimeValid, nil
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_gnssStatus_timeValid(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "gnssStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _gnssStatus_hdop(ctx context.Context, field graphql.CollectedField, obj *graph_model.GnssStatus) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_gnssStatus_hdop,
+		func(ctx context.Context) (any, error) {
+			return obj.Hdop, nil
+		},
+		nil,
+		ec.marshalOFloat2ᚖfloat64,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_gnssStatus_hdop(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "gnssStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _gnssStatus_satellites(ctx context.Context, field graphql.CollectedField, obj *graph_model.GnssStatus) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_gnssStatus_satellites,
+		func(ctx context.Context) (any, error) {
+			return obj.Satellites, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_gnssStatus_satellites(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "gnssStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _gnssStatus_ppsAgeSeconds(ctx context.Context, field graphql.CollectedField, obj *graph_model.GnssStatus) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_gnssStatus_ppsAgeSeconds,
+		func(ctx context.Context) (any, error) {
+			return obj.PpsAgeSeconds, nil
+		},
+		nil,
+		ec.marshalOInt2ᚖint,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_gnssStatus_ppsAgeSeconds(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "gnssStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -10001,6 +10273,8 @@ func (ec *executionContext) _deviceStatus(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "gnssStatus":
+			out.Values[i] = ec._deviceStatus_gnssStatus(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10166,6 +10440,64 @@ func (ec *executionContext) _fdsnAccessKey(ctx context.Context, sel ast.Selectio
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var gnssStatusImplementors = []string{"gnssStatus"}
+
+func (ec *executionContext) _gnssStatus(ctx context.Context, sel ast.SelectionSet, obj *graph_model.GnssStatus) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, gnssStatusImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("gnssStatus")
+		case "locked":
+			out.Values[i] = ec._gnssStatus_locked(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "fixValid":
+			out.Values[i] = ec._gnssStatus_fixValid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "timeValid":
+			out.Values[i] = ec._gnssStatus_timeValid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "hdop":
+			out.Values[i] = ec._gnssStatus_hdop(ctx, field, obj)
+		case "satellites":
+			out.Values[i] = ec._gnssStatus_satellites(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "ppsAgeSeconds":
+			out.Values[i] = ec._gnssStatus_ppsAgeSeconds(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -12059,6 +12391,24 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	return graphql.WrapContextMarshaler(ctx, res)
 }
 
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v any) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	_ = sel
+	_ = ctx
+	res := graphql.MarshalInt(*v)
+	return res
+}
+
 func (ec *executionContext) unmarshalOInt642ᚖint64(ctx context.Context, v any) (*int64, error) {
 	if v == nil {
 		return nil, nil
@@ -12338,6 +12688,13 @@ func (ec *executionContext) marshalOconfigConstraint2ᚖgithubᚗcomᚋanyshake�
 		return graphql.Null
 	}
 	return ec._configConstraint(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOgnssStatus2ᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐGnssStatus(ctx context.Context, sel ast.SelectionSet, v *graph_model.GnssStatus) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._gnssStatus(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOseisEventSource2ᚖgithubᚗcomᚋanyshakeᚋobserverᚋinternalᚋserverᚋrouterᚋgraphᚋmodelᚐSeisEventSource(ctx context.Context, sel ast.SelectionSet, v *graph_model.SeisEventSource) graphql.Marshaler {

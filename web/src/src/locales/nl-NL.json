@@ -195,7 +195,6 @@
             },
             "connectivity": {
                 "loading": "Verbinding maken met het station...",
-                "success": "Verbonden met het station. Server actief sinds {{uptime}} seconden, bijgewerkt om {{updatedAt}}.",
                 "error": "Er is een fout opgetreden bij het verbinden met het station. Controleer je verbinding."
             },
             "station_location": {
@@ -208,7 +207,15 @@
                 "manual_upgrade_needed": "Er is een nieuwe versie {{latest}} beschikbaar, maar de huidige versie {{current}} is ouder dan de minimaal ondersteunde versie {{required}}. Handmatig bijwerken is vereist."
             },
             "service_status": {
-                "title": "Servicestatus"
+                "title": "Servicestatus",
+                "name": "Service",
+                "state": "Status",
+                "restarts": "Herstarts",
+                "started_at": "Laatst gestart",
+                "stopped_at": "Laatst gestopt",
+                "running": "Actief",
+                "stopped": "Gestopt",
+                "empty": "Geen services beschikbaar."
             },
             "cpu_usage": {
                 "title": "CPU-gebruik"
@@ -218,6 +225,63 @@
             },
             "disk_usage": {
                 "title": "Schijfgebruik"
+            },
+            "packet_throughput": {
+                "title": "Pakketdoorvoer",
+                "note": "Pakketten per seconde, laatste {{minutes}} min",
+                "collecting": "Gegevens verzamelen…"
+            },
+            "system_resources": {
+                "title": "Hostbronnen",
+                "uptime": "Actief {{days}} d {{hours}} u {{minutes}} m",
+                "collecting": "Gegevens verzamelen…"
+            },
+            "station_header": {
+                "online": "Station online",
+                "offline": "Verbinding verbroken",
+                "updated_at": "Bijgewerkt om"
+            },
+            "health_level": {
+                "unknown": "Onbekend"
+            },
+            "data_reception": {
+                "title": "Gegevensontvangst",
+                "receiving": "Ontvangen",
+                "waiting": "Wachten op gegevens",
+                "stale": "Niet bijgewerkt",
+                "unavailable": "De verbinding met de server is verbroken.",
+                "packet_rate": "{{value}} pakketten/s",
+                "last_frame": "Laatste pakket om {{time}}"
+            },
+            "time_source": {
+                "title": "Tijdbron",
+                "unavailable": "Niet beschikbaar zolang de gegevensontvangst onderbroken is.",
+                "gnss_locked": "GNSS vergrendeld",
+                "holdover": "Holdover",
+                "gnss_locked_note": "Tijdstempels worden gestuurd door GNSS-PPS.",
+                "holdover_note": "GNSS verloren; de interne klok houdt UTC bij.",
+                "ntp_note": "GNSS uitgeschakeld; tijdstempels gebruiken NTP."
+            },
+            "reception_errors": {
+                "title": "Ontvangstfouten",
+                "note": "Laatste {{minutes}} min · {{total}} sinds start"
+            },
+            "service_summary": {
+                "title": "Services",
+                "running_count": "{{running}} / {{total}} actief",
+                "note": "Gestopte services kunnen bewust zijn uitgeschakeld."
+            },
+            "gnss_status": {
+                "title": "GNSS-diagnose",
+                "position_fix": "Positiefix",
+                "nmea_time": "NMEA-tijd",
+                "satellites": "Satellieten",
+                "pps_age": "Sinds laatste PPS",
+                "valid": "Geldig",
+                "invalid": "Ongeldig",
+                "disabled": "GNSS is uitgeschakeld op dit apparaat; tijdstempels worden via NTP gesynchroniseerd.",
+                "pending": "Wachten tot de firmware GNSS-diagnose rapporteert.",
+                "note": "Verzadigde of niet-beschikbare metingen worden als N/A weergegeven; 31+ betekent minstens 31 satellieten."
             }
         },
         "NotFound": {
@@ -253,8 +317,9 @@
                 "no_data_recorded": "Er zijn geen gegevens opgenomen in deze periode."
             },
             "connectivity": {
-                "connecting": "Geen verbinding, bezig met verbinden...",
-                "connected": "Verbonden, laatst bijgewerkt om {{updatedAt}}."
+                "online": "Live streaming",
+                "offline": "Verbinden...",
+                "updated_at": "Bijgewerkt om"
             },
             "stream_status": {
                 "sample_rate": "{{value}} samples/s",

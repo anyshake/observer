@@ -195,7 +195,6 @@
             },
             "connectivity": {
                 "loading": "Conectando con la estación...",
-                "success": "Conectado con la estación; el servidor lleva {{uptime}} segundos activo. Última actualización: {{updatedAt}}.",
                 "error": "Ocurrió un error al conectar con la estación. Comprueba tu conexión."
             },
             "station_location": {
@@ -208,7 +207,15 @@
                 "manual_upgrade_needed": "Hay una nueva versión disponible: {{latest}}, pero la versión actual, {{current}}, es inferior a la versión mínima compatible, {{required}}. Es necesario actualizar manualmente."
             },
             "service_status": {
-                "title": "Estado del servicio"
+                "title": "Estado del servicio",
+                "name": "Servicio",
+                "state": "Estado",
+                "restarts": "Reinicios",
+                "started_at": "Último inicio",
+                "stopped_at": "Última parada",
+                "running": "En ejecución",
+                "stopped": "Detenido",
+                "empty": "No hay servicios disponibles."
             },
             "cpu_usage": {
                 "title": "Uso de CPU"
@@ -218,6 +225,63 @@
             },
             "disk_usage": {
                 "title": "Uso del disco"
+            },
+            "packet_throughput": {
+                "title": "Rendimiento de paquetes",
+                "note": "Paquetes por segundo, últimos {{minutes}} min",
+                "collecting": "Recopilando datos…"
+            },
+            "system_resources": {
+                "title": "Recursos del host",
+                "uptime": "Activo {{days}} d {{hours}} h {{minutes}} min",
+                "collecting": "Recopilando datos…"
+            },
+            "station_header": {
+                "online": "Estación en línea",
+                "offline": "Conexión perdida",
+                "updated_at": "Actualizado a las"
+            },
+            "health_level": {
+                "unknown": "Desconocido"
+            },
+            "data_reception": {
+                "title": "Recepción de datos",
+                "receiving": "Recibiendo",
+                "waiting": "Esperando datos",
+                "stale": "Sin actualizar",
+                "unavailable": "Se perdió la conexión con el servidor.",
+                "packet_rate": "{{value}} paq/s",
+                "last_frame": "Último paquete a las {{time}}"
+            },
+            "time_source": {
+                "title": "Fuente de tiempo",
+                "unavailable": "No disponible mientras la recepción de datos esté interrumpida.",
+                "gnss_locked": "GNSS sincronizado",
+                "holdover": "Mantenimiento",
+                "gnss_locked_note": "Las marcas de tiempo se sincronizan con el PPS del GNSS.",
+                "holdover_note": "GNSS perdido; el reloj interno mantiene la hora UTC.",
+                "ntp_note": "GNSS deshabilitado; las marcas de tiempo usan NTP."
+            },
+            "reception_errors": {
+                "title": "Errores de recepción",
+                "note": "Últimos {{minutes}} min · {{total}} desde el inicio"
+            },
+            "service_summary": {
+                "title": "Servicios",
+                "running_count": "{{running}} / {{total}} en ejecución",
+                "note": "Los servicios detenidos pueden estar deshabilitados intencionalmente."
+            },
+            "gnss_status": {
+                "title": "Diagnóstico GNSS",
+                "position_fix": "Fijación de posición",
+                "nmea_time": "Hora NMEA",
+                "satellites": "Satélites",
+                "pps_age": "Desde el último PPS",
+                "valid": "Válido",
+                "invalid": "No válido",
+                "disabled": "El GNSS está deshabilitado en este dispositivo; las marcas de tiempo se sincronizan mediante NTP.",
+                "pending": "Esperando a que el firmware informe del diagnóstico GNSS.",
+                "note": "Las mediciones saturadas o no disponibles se muestran como N/A; 31+ significa al menos 31 satélites."
             }
         },
         "NotFound": {
@@ -253,8 +317,9 @@
                 "no_data_recorded": "No se registraron datos durante este periodo."
             },
             "connectivity": {
-                "connecting": "Sin conexión. Conectando ahora...",
-                "connected": "Conectado. Última actualización: {{updatedAt}}."
+                "online": "Transmisión en vivo",
+                "offline": "Conectando...",
+                "updated_at": "Actualizado a las"
             },
             "stream_status": {
                 "sample_rate": "{{value}} SPS",

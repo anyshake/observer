@@ -195,7 +195,6 @@
             },
             "connectivity": {
                 "loading": "正在連接到測站...",
-                "success": "已連接到測站，伺服器已運行 {{uptime}} 秒，更新於 {{updatedAt}}。",
                 "error": "連接測站時發生錯誤，請檢查您的連線。"
             },
             "upgrade": {
@@ -208,7 +207,15 @@
                 "title": "測站位置"
             },
             "service_status": {
-                "title": "服務狀態"
+                "title": "服務狀態",
+                "name": "服務",
+                "state": "狀態",
+                "restarts": "重新啟動次數",
+                "started_at": "上次啟動",
+                "stopped_at": "上次停止",
+                "running": "運行中",
+                "stopped": "已停止",
+                "empty": "目前沒有可顯示的服務。"
             },
             "cpu_usage": {
                 "title": "CPU 使用率"
@@ -218,6 +225,63 @@
             },
             "disk_usage": {
                 "title": "磁碟使用率"
+            },
+            "packet_throughput": {
+                "title": "封包吞吐量",
+                "note": "每秒封包數，近 {{minutes}} 分鐘",
+                "collecting": "正在收集資料…"
+            },
+            "system_resources": {
+                "title": "主機資源",
+                "uptime": "已運行 {{days}} 天 {{hours}} 小時 {{minutes}} 分",
+                "collecting": "正在收集資料…"
+            },
+            "station_header": {
+                "online": "測站在線",
+                "offline": "連線中斷",
+                "updated_at": "更新時間"
+            },
+            "health_level": {
+                "unknown": "未知"
+            },
+            "data_reception": {
+                "title": "資料接收",
+                "receiving": "接收中",
+                "waiting": "等待資料",
+                "stale": "資料未更新",
+                "unavailable": "與伺服器的連線中斷。",
+                "packet_rate": "{{value}} 包/秒",
+                "last_frame": "最新封包：{{time}}"
+            },
+            "time_source": {
+                "title": "時間來源",
+                "unavailable": "資料接收中斷時無法判斷。",
+                "gnss_locked": "GNSS 已鎖定",
+                "holdover": "保持模式",
+                "gnss_locked_note": "時間戳記由 GNSS PPS 校準。",
+                "holdover_note": "GNSS 訊號遺失，暫由內部時鐘維持 UTC。",
+                "ntp_note": "GNSS 未啟用，時間戳記使用 NTP。"
+            },
+            "reception_errors": {
+                "title": "接收錯誤",
+                "note": "近 {{minutes}} 分鐘 · 累計 {{total}}"
+            },
+            "service_summary": {
+                "title": "服務運行",
+                "running_count": "{{running}} / {{total}} 運行中",
+                "note": "停止的服務可能是刻意停用。"
+            },
+            "gnss_status": {
+                "title": "GNSS 診斷",
+                "position_fix": "定位資料",
+                "nmea_time": "NMEA 時間",
+                "satellites": "衛星數",
+                "pps_age": "距上次 PPS",
+                "valid": "有效",
+                "invalid": "無效",
+                "disabled": "此裝置未啟用 GNSS，取樣時間經由 NTP 同步。",
+                "pending": "等待韌體回報 GNSS 診斷資料。",
+                "note": "量測值飽和或無法取得時顯示 N/A；衛星數 31+ 表示至少 31 顆。"
             }
         },
         "NotFound": {
@@ -253,8 +317,9 @@
                 "no_data_recorded": "此期間內未錄製任何資料。"
             },
             "connectivity": {
-                "connecting": "沒有連線，正在嘗試連接...",
-                "connected": "已連線，最後更新於 {{updatedAt}}。"
+                "online": "即時串流中",
+                "offline": "正在連線...",
+                "updated_at": "更新時間"
             },
             "stream_status": {
                 "sample_rate": "{{value}} SPS",

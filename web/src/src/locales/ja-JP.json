@@ -195,7 +195,6 @@
             },
             "connectivity": {
                 "loading": "観測点に接続中...",
-                "success": "観測点に接続しました。サーバー稼働時間 {{uptime}} 秒、更新日時 {{updatedAt}}。",
                 "error": "観測点への接続中にエラーが発生しました。接続を確認してください。"
             },
             "upgrade": {
@@ -208,7 +207,15 @@
                 "title": "観測点の場所"
             },
             "service_status": {
-                "title": "サービスステータス"
+                "title": "サービスステータス",
+                "name": "サービス",
+                "state": "状態",
+                "restarts": "再起動回数",
+                "started_at": "最終起動",
+                "stopped_at": "最終停止",
+                "running": "稼働中",
+                "stopped": "停止中",
+                "empty": "利用可能なサービスはありません。"
             },
             "cpu_usage": {
                 "title": "CPU 使用率"
@@ -218,6 +225,63 @@
             },
             "disk_usage": {
                 "title": "ディスク使用率"
+            },
+            "packet_throughput": {
+                "title": "パケットスループット",
+                "note": "直近 {{minutes}} 分間の毎秒パケット数",
+                "collecting": "データを収集中…"
+            },
+            "system_resources": {
+                "title": "ホストリソース",
+                "uptime": "稼働 {{days}} 日 {{hours}} 時間 {{minutes}} 分",
+                "collecting": "データを収集中…"
+            },
+            "station_header": {
+                "online": "観測点オンライン",
+                "offline": "接続が切断されました",
+                "updated_at": "更新日時"
+            },
+            "health_level": {
+                "unknown": "不明"
+            },
+            "data_reception": {
+                "title": "データ受信",
+                "receiving": "受信中",
+                "waiting": "データ待機中",
+                "stale": "更新なし",
+                "unavailable": "サーバーとの接続が切断されました。",
+                "packet_rate": "{{value}} パケット/秒",
+                "last_frame": "最新パケット {{time}}"
+            },
+            "time_source": {
+                "title": "時刻源",
+                "unavailable": "データ受信が中断している間は利用できません。",
+                "gnss_locked": "GNSS ロック",
+                "holdover": "ホールドオーバー",
+                "gnss_locked_note": "タイムスタンプは GNSS PPS で補正されています。",
+                "holdover_note": "GNSS を喪失しました。内部クロックが UTC を維持しています。",
+                "ntp_note": "GNSS は無効です。タイムスタンプは NTP を使用します。"
+            },
+            "reception_errors": {
+                "title": "受信エラー",
+                "note": "直近 {{minutes}} 分 · 起動以来 {{total}} 件"
+            },
+            "service_summary": {
+                "title": "サービス",
+                "running_count": "{{running}} / {{total}} 稼働中",
+                "note": "停止中のサービスは意図的に無効化されている場合があります。"
+            },
+            "gnss_status": {
+                "title": "GNSS 診断",
+                "position_fix": "測位",
+                "nmea_time": "NMEA 時刻",
+                "satellites": "衛星数",
+                "pps_age": "最後の PPS から",
+                "valid": "有効",
+                "invalid": "無効",
+                "disabled": "このデバイスでは GNSS が無効です。サンプルのタイムスタンプは NTP で同期されます。",
+                "pending": "ファームウェアからの GNSS 診断情報を待っています。",
+                "note": "飽和または取得できない測定値は N/A と表示されます。31+ は 31 基以上を意味します。"
             }
         },
         "NotFound": {
@@ -253,8 +317,9 @@
                 "no_data_recorded": "この期間中に記録されたデータはありません。"
             },
             "connectivity": {
-                "connecting": "接続なし、接続中...",
-                "connected": "接続済み、最終更新日時 {{updatedAt}}。"
+                "online": "ライブ配信中",
+                "offline": "接続中...",
+                "updated_at": "更新日時"
             },
             "stream_status": {
                 "sample_rate": "{{value}} SPS",

@@ -3,10 +3,6 @@
         @apply text-app-primary;
     }
 
-    .app-recordings-status {
-        @apply flex flex-wrap gap-2;
-    }
-
     .app-recording-files {
         @apply border-app-border-strong flex w-fit flex-col rounded-lg border border-dashed p-4;
     }

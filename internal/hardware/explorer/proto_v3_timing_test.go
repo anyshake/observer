@@ -11,9 +11,9 @@ import (
 	"github.com/anyshake/observer/pkg/timesource"
 )
 
-func packetDelayWord(delay int32) [4]byte {
+func packetDelayWord(delay uint32) [4]byte {
 	var word [4]byte
-	binary.LittleEndian.PutUint32(word[:], uint32(delay))
+	binary.LittleEndian.PutUint32(word[:], delay)
 	return word
 }
 
@@ -42,15 +42,15 @@ func TestV3PacketDelayMetadata(t *testing.T) {
 	if !protocol.variablesReady() || protocol.stream.packetDelay != 207123*time.Microsecond {
 		t.Fatal("reserved metadata slot changed the cached delay")
 	}
-	for _, delay := range []int32{-1, math.MaxInt32} {
-		collect(5000, config, packetDelayWord(delay))
-		if protocol.variablesReady() {
-			t.Fatalf("unavailable delay %d was accepted", delay)
-		}
+	collect(5000, config, packetDelayWord(math.MaxUint32))
+	if protocol.variablesReady() {
+		t.Fatal("unavailable delay UINT32_MAX was accepted")
 	}
-	collect(5000, config, packetDelayWord(0))
-	if !protocol.variablesReady() || protocol.stream.packetDelay != 0 {
-		t.Fatal("a measured zero delay must be valid")
+	for _, delay := range []uint32{0, math.MaxInt32, math.MaxInt32 + 1, math.MaxUint32 - 1} {
+		collect(5000, config, packetDelayWord(delay))
+		if !protocol.variablesReady() || protocol.stream.packetDelay != time.Duration(delay)*time.Microsecond {
+			t.Fatalf("valid unsigned delay %d was not collected", delay)
+		}
 	}
 	protocol.resetVariables()
 	collect(6000, config, [4]byte{})

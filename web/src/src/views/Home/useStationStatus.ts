@@ -2,158 +2,125 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { GetHomeDataQuery } from '../../graphql';
+import { getStationIdentity } from '../../helpers/app/getStationIdentity';
 import { getTimeString } from '../../helpers/utils/getTimeString';
 
-export const useStationStatus = (getHomeDataData: GetHomeDataQuery | undefined) => {
+interface IField {
+    readonly label: string;
+    readonly value: string;
+}
+
+const text = (value: unknown) => (typeof value === 'string' && value.length > 0 ? value : '');
+const fixed = (value: number | null | undefined, digits: number, unit: string) =>
+    typeof value === 'number' ? `${value.toFixed(digits)}${unit}` : 'N/A';
+const timestamp = (value: number) => (value > 0 ? getTimeString(value) : 'N/A');
+
+export const useStationStatus = (data: GetHomeDataQuery) => {
     const { t } = useTranslation();
-    const getStationCoordinates = useMemo(
-        () =>
-            getHomeDataData
-                ? [
-                      getHomeDataData.getDeviceInfo.latitude ?? 0,
-                      getHomeDataData.getDeviceInfo.longitude ?? 0,
-                      getHomeDataData.getDeviceInfo.elevation ?? 0
-                  ]
-                : [0, 0, 0],
-        [getHomeDataData]
-    );
-    const getStationInfo = useMemo(
-        () => [
-            {
-                label: t('views.Home.station_info.name'),
-                value: getHomeDataData?.getStationConfig.station_name ?? 'N/A'
-            },
+
+    const station = useMemo(() => {
+        const identity = getStationIdentity(data.getStationConfig);
+        return { ...identity, name: identity.name || 'N/A' };
+    }, [data.getStationConfig]);
+
+    const coordinates = useMemo(() => {
+        const { latitude, longitude, elevation } = data.getDeviceInfo;
+        return [latitude ?? 0, longitude ?? 0, elevation ?? 0];
+    }, [data.getDeviceInfo]);
+
+    const stationInfo = useMemo<IField[]>(() => {
+        const config = data.getStationConfig ?? {};
+        return [
+            { label: t('views.Home.station_info.name'), value: text(config.station_name) || 'N/A' },
             {
                 label: t('views.Home.station_info.country'),
-                value: getHomeDataData?.getStationConfig.station_country ?? 'N/A'
+                value: text(config.station_country) || 'N/A'
             },
             {
                 label: t('views.Home.station_info.place'),
-                value: getHomeDataData?.getStationConfig.station_place ?? 'N/A'
+                value: text(config.station_place) || 'N/A'
             },
             {
                 label: t('views.Home.station_info.affiliation'),
-                value: getHomeDataData?.getStationConfig.station_affiliation ?? 'N/A'
+                value: text(config.station_affiliation) || 'N/A'
             },
             {
                 label: t('views.Home.station_info.channels'),
-                value:
-                    (getHomeDataData?.getDeviceConfig.channelCodes ?? []).join(', ').length > 0
-                        ? getHomeDataData?.getDeviceConfig.channelCodes.join(', ')
-                        : 'N/A'
+                value: data.getDeviceConfig.channelCodes.join(', ') || 'N/A'
             }
-        ],
-        [t, getHomeDataData]
-    );
-    const getDeviceInfo = useMemo(
-        () => [
-            {
-                label: t('views.Home.device_info.product_model'),
-                value: getHomeDataData?.getDeviceConfig.model ?? 'N/A'
-            },
-            {
-                label: t('views.Home.device_info.device_id'),
-                value: getHomeDataData?.getDeviceId ?? 'N/A'
-            },
-            {
-                label: t('views.Home.device_info.link_protocol'),
-                value: getHomeDataData?.getDeviceConfig.protocol ?? 'N/A'
-            },
+        ];
+    }, [t, data.getStationConfig, data.getDeviceConfig.channelCodes]);
+
+    const deviceInfo = useMemo<IField[]>(() => {
+        const config = data.getDeviceConfig;
+        return [
+            { label: t('views.Home.device_info.product_model'), value: config.model || 'N/A' },
+            { label: t('views.Home.device_info.device_id'), value: data.getDeviceId || 'N/A' },
+            { label: t('views.Home.device_info.link_protocol'), value: config.protocol || 'N/A' },
             {
                 label: t('views.Home.device_info.packet_interval'),
-                value: `${getHomeDataData?.getDeviceConfig.packetInterval ?? 0} ms`
+                value: `${config.packetInterval} ms`
             },
             {
                 label: t('views.Home.device_info.gnss_active'),
-                value: getHomeDataData?.getDeviceConfig.gnssEnabled
-                    ? t('views.Home.device_info.yes')
-                    : t('views.Home.device_info.no')
+                value: t(
+                    config.gnssEnabled ? 'views.Home.device_info.yes' : 'views.Home.device_info.no'
+                )
             }
-        ],
-        [t, getHomeDataData]
-    );
-    const getDeviceStatus = useMemo(
-        () => [
+        ];
+    }, [t, data.getDeviceConfig, data.getDeviceId]);
+
+    const deviceStatus = useMemo<IField[]>(() => {
+        const info = data.getDeviceInfo;
+        return [
             {
                 label: t('views.Home.device_status.sample_rate'),
-                value: `${getHomeDataData?.getDeviceConfig.sampleRate ?? 0} SPS`
+                value: `${data.getDeviceConfig.sampleRate} SPS`
             },
-            {
-                label: t('views.Home.device_status.latitude'),
-                value: getHomeDataData?.getDeviceInfo.latitude
-                    ? `${getHomeDataData.getDeviceInfo.latitude.toFixed(2)}°`
-                    : 'N/A'
-            },
+            { label: t('views.Home.device_status.latitude'), value: fixed(info.latitude, 2, '°') },
             {
                 label: t('views.Home.device_status.longitude'),
-                value: getHomeDataData?.getDeviceInfo.longitude
-                    ? `${getHomeDataData.getDeviceInfo.longitude?.toFixed(2)}°`
-                    : 'N/A'
+                value: fixed(info.longitude, 2, '°')
             },
             {
                 label: t('views.Home.device_status.elevation'),
-                value: getHomeDataData?.getDeviceInfo.elevation
-                    ? `${getHomeDataData.getDeviceInfo.elevation?.toFixed(2)} m`
-                    : 'N/A'
+                value: fixed(info.elevation, 2, ' m')
             },
             {
                 label: t('views.Home.device_status.temperature'),
-                value: getHomeDataData?.getDeviceInfo.temperature
-                    ? `${getHomeDataData.getDeviceInfo.temperature.toFixed(2)} °C`
-                    : 'N/A'
+                value: fixed(info.temperature, 2, ' °C')
             }
-        ],
-        [t, getHomeDataData]
-    );
-    const getLinkStatus = useMemo(
-        () => [
-            {
-                label: t('views.Home.link_status.started_at'),
-                value: getHomeDataData?.getDeviceStatus.startedAt
-                    ? getTimeString(getHomeDataData.getDeviceStatus.startedAt)
-                    : 'N/A'
-            },
-            {
-                label: t('views.Home.link_status.last_frame'),
-                value: getHomeDataData?.getDeviceStatus.updatedAt
-                    ? getTimeString(getHomeDataData.getDeviceStatus.updatedAt)
-                    : 'N/A'
-            },
-            {
-                label: t('views.Home.link_status.frames'),
-                value: `${getHomeDataData?.getDeviceStatus.frames ?? 0}`
-            },
-            {
-                label: t('views.Home.link_status.errors'),
-                value: `${getHomeDataData?.getDeviceStatus.errors ?? 0}`
-            },
-            {
-                label: t('views.Home.link_status.messages'),
-                value: `${getHomeDataData?.getDeviceStatus.messages ?? 0}`
-            }
-        ],
-        [t, getHomeDataData]
-    );
-    const getServiceStatus = useMemo(
-        () =>
-            getHomeDataData?.getServiceStatus
-                ? [...getHomeDataData.getServiceStatus]
-                      .sort((a, b) => (a.serviceId ?? '').localeCompare(b.serviceId ?? ''))
-                      .map((serviceStatus) => ({
-                          title: serviceStatus.name!,
-                          description: serviceStatus.description!,
-                          running: serviceStatus.isRunning ?? false
-                      }))
-                : [],
-        [getHomeDataData?.getServiceStatus]
-    );
+        ];
+    }, [t, data.getDeviceInfo, data.getDeviceConfig.sampleRate]);
 
-    return {
-        getStationCoordinates,
-        getStationInfo,
-        getDeviceInfo,
-        getDeviceStatus,
-        getLinkStatus,
-        getServiceStatus
-    };
+    const linkStatus = useMemo<IField[]>(() => {
+        const status = data.getDeviceStatus;
+        return [
+            { label: t('views.Home.link_status.started_at'), value: timestamp(status.startedAt) },
+            { label: t('views.Home.link_status.last_frame'), value: timestamp(status.updatedAt) },
+            { label: t('views.Home.link_status.frames'), value: `${status.frames}` },
+            { label: t('views.Home.link_status.errors'), value: `${status.errors}` },
+            { label: t('views.Home.link_status.messages'), value: `${status.messages}` }
+        ];
+    }, [t, data.getDeviceStatus]);
+
+    const gnss = useMemo<IField[]>(() => {
+        const status = data.getDeviceStatus.gnssStatus;
+        if (!status) {
+            return [];
+        }
+        const valid = (ok: boolean) => t(ok ? 'views.Home.gnss_status.valid' : 'views.Home.gnss_status.invalid');
+        return [
+            { label: t('views.Home.gnss_status.position_fix'), value: valid(status.fixValid) },
+            { label: t('views.Home.gnss_status.nmea_time'), value: valid(status.timeValid) },
+            {
+                label: t('views.Home.gnss_status.satellites'),
+                value: status.satellites >= 31 ? '31+' : `${status.satellites}`
+            },
+            { label: 'HDOP', value: fixed(status.hdop, 1, '') },
+            { label: t('views.Home.gnss_status.pps_age'), value: fixed(status.ppsAgeSeconds, 0, ' s') }
+        ];
+    }, [t, data.getDeviceStatus.gnssStatus]);
+
+    return { station, coordinates, stationInfo, deviceInfo, deviceStatus, linkStatus, gnss };
 };

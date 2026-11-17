@@ -43,24 +43,48 @@
         @apply bg-base-200 text-app-primary rounded px-2 font-mono text-sm whitespace-nowrap;
     }
 
-    .app-status-list {
-        @apply max-h-75;
-    }
-
-    [data-theme='dark'] .app-status-badge.badge-success {
-        @apply border-app-success/30 bg-app-success-soft text-app-success;
-    }
-
-    [data-theme='dark'] .app-status-badge.badge-error {
-        @apply border-app-error/30 bg-app-danger-soft text-app-error;
-    }
-
-    .app-status-icon {
-        @apply shrink-0 opacity-50;
-    }
-
     .app-status-description {
         @apply text-xs opacity-50;
+    }
+
+    .app-page-header {
+        @apply flex flex-col gap-3;
+    }
+
+    .app-page-header-row {
+        @apply flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between;
+    }
+
+    .app-page-header-notices {
+        @apply border-app-border-soft flex flex-col gap-1.5 border-t pt-3;
+    }
+
+    .app-page-header-notice {
+        @apply text-app-text inline-flex items-center gap-2 text-sm;
+    }
+
+    .app-page-header-notice > .status {
+        @apply shrink-0;
+    }
+
+    .app-page-header-main {
+        @apply min-w-0 space-y-1;
+    }
+
+    .app-page-header-title {
+        @apply text-app-heading truncate text-xl font-bold;
+    }
+
+    .app-page-header-meta {
+        @apply text-app-muted text-sm tabular-nums;
+    }
+
+    .app-page-header-side {
+        @apply flex flex-col gap-1 sm:items-end;
+    }
+
+    .app-page-header-state {
+        @apply inline-flex items-center gap-2 text-sm whitespace-nowrap;
     }
 
     .app-banner {

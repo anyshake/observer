@@ -195,7 +195,6 @@
             },
             "connectivity": {
                 "loading": "З'єднання зі станцією...",
-                "success": "З'єднано зі станцією. Сервер працює {{uptime}} с, оновлено о {{updatedAt}}.",
                 "error": "Помилка з'єднання зі станцією. Перевірте підключення."
             },
             "station_location": {
@@ -208,7 +207,15 @@
                 "manual_upgrade_needed": "Доступна нова версія {{latest}}, але поточна версія {{current}} нижча за мінімальну сумісну {{required}}. Потрібне оновлення вручну."
             },
             "service_status": {
-                "title": "Стан служб"
+                "title": "Стан служб",
+                "name": "Служба",
+                "state": "Стан",
+                "restarts": "Перезапуски",
+                "started_at": "Останній запуск",
+                "stopped_at": "Остання зупинка",
+                "running": "Працює",
+                "stopped": "Зупинено",
+                "empty": "Немає доступних служб."
             },
             "cpu_usage": {
                 "title": "Використання процесора"
@@ -218,6 +225,63 @@
             },
             "disk_usage": {
                 "title": "Використання диска"
+            },
+            "packet_throughput": {
+                "title": "Пропускна здатність пакетів",
+                "note": "Пакетів за секунду, останні {{minutes}} хв",
+                "collecting": "Збирання даних…"
+            },
+            "system_resources": {
+                "title": "Ресурси хоста",
+                "uptime": "Працює {{days}} д {{hours}} год {{minutes}} хв",
+                "collecting": "Збирання даних…"
+            },
+            "station_header": {
+                "online": "Станція в мережі",
+                "offline": "З'єднання втрачено",
+                "updated_at": "Оновлено"
+            },
+            "health_level": {
+                "unknown": "Невідомо"
+            },
+            "data_reception": {
+                "title": "Приймання даних",
+                "receiving": "Приймання триває",
+                "waiting": "Очікування даних",
+                "stale": "Немає оновлень",
+                "unavailable": "З'єднання із сервером втрачено.",
+                "packet_rate": "{{value}} пак/с",
+                "last_frame": "Останній пакет о {{time}}"
+            },
+            "time_source": {
+                "title": "Джерело часу",
+                "unavailable": "Недоступно, поки приймання даних перервано.",
+                "gnss_locked": "GNSS синхронізовано",
+                "holdover": "Утримання",
+                "gnss_locked_note": "Мітки часу синхронізуються за PPS GNSS.",
+                "holdover_note": "GNSS втрачено; внутрішній годинник підтримує UTC.",
+                "ntp_note": "GNSS вимкнено; мітки часу беруться з NTP."
+            },
+            "reception_errors": {
+                "title": "Помилки приймання",
+                "note": "Останні {{minutes}} хв · {{total}} від запуску"
+            },
+            "service_summary": {
+                "title": "Служби",
+                "running_count": "Працює {{running}} / {{total}}",
+                "note": "Зупинені служби можуть бути вимкнені навмисно."
+            },
+            "gnss_status": {
+                "title": "Діагностика GNSS",
+                "position_fix": "Визначення позиції",
+                "nmea_time": "Час NMEA",
+                "satellites": "Супутники",
+                "pps_age": "Від останнього PPS",
+                "valid": "Дійсний",
+                "invalid": "Недійсний",
+                "disabled": "GNSS на цьому пристрої вимкнено; мітки часу синхронізуються через NTP.",
+                "pending": "Очікування діагностики GNSS від мікропрограми.",
+                "note": "Насичені або недоступні вимірювання показано як N/A; 31+ означає щонайменше 31 супутник."
             }
         },
         "NotFound": {
@@ -253,8 +317,9 @@
                 "no_data_recorded": "За цей період даних не записано."
             },
             "connectivity": {
-                "connecting": "Немає з'єднання, підключення...",
-                "connected": "З'єднано, останнє оновлення о {{updatedAt}}."
+                "online": "Пряма трансляція",
+                "offline": "Під'єднання...",
+                "updated_at": "Оновлено"
             },
             "stream_status": {
                 "sample_rate": "{{value}} відліків/с",

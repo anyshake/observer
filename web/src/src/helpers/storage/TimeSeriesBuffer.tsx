@@ -80,6 +80,41 @@ export default class TimeSeriesBuffer {
         return samples;
     }
 
+    getLatestContinuousSamples(toleranceMs: number): Array<[number, number]> {
+        const end = this.buffer.length;
+        if (this.head >= end || this.lastSampleRate === null || this.lastSampleRate <= 0) {
+            return [];
+        }
+
+        this.ensureSorted();
+
+        const interval = 1000 / this.lastSampleRate;
+        const maxStep = interval + toleranceMs;
+        const minStep = interval / 2;
+        const reversed: Array<[number, number]> = [];
+        let nextTime = Infinity;
+
+        for (let i = this.buffer.length - 1; i >= this.head; i--) {
+            const [timestamp, value] = this.buffer[i];
+            if (value === null) {
+                break;
+            }
+            if (nextTime !== Infinity) {
+                const step = nextTime - timestamp;
+                if (step < minStep) {
+                    continue;
+                }
+                if (step > maxStep) {
+                    break;
+                }
+            }
+            reversed.push([timestamp, value]);
+            nextTime = timestamp;
+        }
+
+        return reversed.reverse();
+    }
+
     getStartTime() {
         return this.buffer.length > this.head ? this.buffer[this.head][0] : 0;
     }

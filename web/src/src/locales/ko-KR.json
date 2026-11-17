@@ -195,7 +195,6 @@
             },
             "connectivity": {
                 "loading": "관측소에 연결하는 중...",
-                "success": "관측소에 연결되었습니다. 서버 가동 시간: {{uptime}}초, 업데이트 시간: {{updatedAt}}.",
                 "error": "관측소 연결 중 오류가 발생했습니다. 연결 상태를 확인해 주세요."
             },
             "station_location": {
@@ -208,7 +207,15 @@
                 "manual_upgrade_needed": "새 버전 {{latest}}을(를) 사용할 수 있지만 현재 버전 {{current}}이(가) 최소 호환 버전 {{required}}보다 낮습니다. 수동으로 업그레이드해야 합니다."
             },
             "service_status": {
-                "title": "서비스 상태"
+                "title": "서비스 상태",
+                "name": "서비스",
+                "state": "상태",
+                "restarts": "재시작",
+                "started_at": "마지막 시작",
+                "stopped_at": "마지막 중지",
+                "running": "실행 중",
+                "stopped": "중지됨",
+                "empty": "사용 가능한 서비스가 없습니다."
             },
             "cpu_usage": {
                 "title": "CPU 사용량"
@@ -218,6 +225,63 @@
             },
             "disk_usage": {
                 "title": "디스크 사용량"
+            },
+            "packet_throughput": {
+                "title": "패킷 처리량",
+                "note": "최근 {{minutes}}분간 초당 패킷 수",
+                "collecting": "데이터 수집 중…"
+            },
+            "system_resources": {
+                "title": "호스트 리소스",
+                "uptime": "가동 {{days}}일 {{hours}}시간 {{minutes}}분",
+                "collecting": "데이터 수집 중…"
+            },
+            "station_header": {
+                "online": "관측소 온라인",
+                "offline": "연결 끊김",
+                "updated_at": "업데이트 시각"
+            },
+            "health_level": {
+                "unknown": "알 수 없음"
+            },
+            "data_reception": {
+                "title": "데이터 수신",
+                "receiving": "수신 중",
+                "waiting": "데이터 대기 중",
+                "stale": "업데이트 없음",
+                "unavailable": "서버와의 연결이 끊어졌습니다.",
+                "packet_rate": "{{value}} 패킷/초",
+                "last_frame": "최근 패킷 {{time}}"
+            },
+            "time_source": {
+                "title": "시간 소스",
+                "unavailable": "데이터 수신이 중단된 동안에는 사용할 수 없습니다.",
+                "gnss_locked": "GNSS 잠금",
+                "holdover": "홀드오버",
+                "gnss_locked_note": "타임스탬프가 GNSS PPS로 보정됩니다.",
+                "holdover_note": "GNSS 신호가 끊겼습니다. 내부 시계가 UTC를 유지합니다.",
+                "ntp_note": "GNSS가 비활성화되어 타임스탬프에 NTP를 사용합니다."
+            },
+            "reception_errors": {
+                "title": "수신 오류",
+                "note": "최근 {{minutes}}분 · 시작 이후 {{total}}건"
+            },
+            "service_summary": {
+                "title": "서비스",
+                "running_count": "{{running}} / {{total}} 실행 중",
+                "note": "중지된 서비스는 의도적으로 비활성화된 것일 수 있습니다."
+            },
+            "gnss_status": {
+                "title": "GNSS 진단",
+                "position_fix": "위치 측정",
+                "nmea_time": "NMEA 시간",
+                "satellites": "위성",
+                "pps_age": "마지막 PPS 이후",
+                "valid": "유효",
+                "invalid": "유효하지 않음",
+                "disabled": "이 장치에서 GNSS가 비활성화되어 있어 샘플 타임스탬프가 NTP로 동기화됩니다.",
+                "pending": "펌웨어가 GNSS 진단 정보를 보고하기를 기다리는 중입니다.",
+                "note": "포화되었거나 사용할 수 없는 측정값은 N/A로 표시되며, 31+는 31개 이상의 위성을 의미합니다."
             }
         },
         "NotFound": {
@@ -253,8 +317,9 @@
                 "no_data_recorded": "이 기간에 기록된 데이터가 없습니다."
             },
             "connectivity": {
-                "connecting": "연결되지 않았습니다. 연결하는 중...",
-                "connected": "연결되었습니다. 마지막 업데이트: {{updatedAt}}."
+                "online": "실시간 스트리밍 중",
+                "offline": "연결 중...",
+                "updated_at": "업데이트 시각"
             },
             "stream_status": {
                 "sample_rate": "{{value}} SPS",

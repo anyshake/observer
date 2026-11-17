@@ -12,6 +12,9 @@ export const HomeConstraints = {
     lineChartRetention: 100,
     pollInterval: 2000,
     maxGapSeconds: 10,
+    staleAfter: 10000,
+    linkHistoryRetention: 300,
+    linkHistoryMinutes: 10,
     mapMinZoom: 1,
     mapMaxZoom: 6,
     mapDefaultZoom: 2,
@@ -186,6 +189,8 @@ export const RealTimeConstraints = {
     minSpanValue: 100,
     // spectrogram default options
     gapThreshold: 2000,
+    // Max timestamp jitter (ms) between packets before the stream counts as broken
+    continuityTolerance: 50,
     fftSize: 1024,
     windowSize: 512,
     overlap: Math.floor(512 * 0.86),

@@ -195,7 +195,6 @@
             },
             "connectivity": {
                 "loading": "Connecting to the station...",
-                "success": "Connected to station, server up for {{uptime}} seconds, updated at {{updatedAt}}.",
                 "error": "Error occurred while connecting to station, please check your connection."
             },
             "station_location": {
@@ -208,7 +207,15 @@
                 "manual_upgrade_needed": "A new version {{latest}} is available, but the current version {{current}} is below the minimum compatible version {{required}}. Manual upgrade is required."
             },
             "service_status": {
-                "title": "Service Status"
+                "title": "Service Status",
+                "name": "Service",
+                "state": "State",
+                "restarts": "Restarts",
+                "started_at": "Last started",
+                "stopped_at": "Last stopped",
+                "running": "Running",
+                "stopped": "Stopped",
+                "empty": "No services are available."
             },
             "cpu_usage": {
                 "title": "CPU Usage"
@@ -218,6 +225,63 @@
             },
             "disk_usage": {
                 "title": "Disk Usage"
+            },
+            "packet_throughput": {
+                "title": "Packet Throughput",
+                "note": "Packets per second, last {{minutes}} min",
+                "collecting": "Collecting data…"
+            },
+            "system_resources": {
+                "title": "Host Resources",
+                "uptime": "Up {{days}}d {{hours}}h {{minutes}}m",
+                "collecting": "Collecting data…"
+            },
+            "station_header": {
+                "online": "Station online",
+                "offline": "Connection lost",
+                "updated_at": "Updated at"
+            },
+            "health_level": {
+                "unknown": "Unknown"
+            },
+            "data_reception": {
+                "title": "Data reception",
+                "receiving": "Receiving",
+                "waiting": "Waiting for data",
+                "stale": "Not updating",
+                "unavailable": "Connection to the server was lost.",
+                "packet_rate": "{{value}} pkt/s",
+                "last_frame": "Latest packet at {{time}}"
+            },
+            "time_source": {
+                "title": "Time source",
+                "unavailable": "Unavailable while data reception is interrupted.",
+                "gnss_locked": "GNSS locked",
+                "holdover": "Holdover",
+                "gnss_locked_note": "Timestamps are disciplined by GNSS PPS.",
+                "holdover_note": "GNSS lost; the internal clock maintains UTC.",
+                "ntp_note": "GNSS disabled; timestamps use NTP."
+            },
+            "reception_errors": {
+                "title": "Reception errors",
+                "note": "Last {{minutes}} min · {{total}} since start"
+            },
+            "service_summary": {
+                "title": "Services",
+                "running_count": "{{running}} / {{total}} running",
+                "note": "Stopped services may be intentionally disabled."
+            },
+            "gnss_status": {
+                "title": "GNSS Diagnostics",
+                "position_fix": "Position fix",
+                "nmea_time": "NMEA time",
+                "satellites": "Satellites",
+                "pps_age": "Since last PPS",
+                "valid": "Valid",
+                "invalid": "Invalid",
+                "disabled": "GNSS is disabled on this device; sample timestamps are synchronized via NTP.",
+                "pending": "Waiting for the firmware to report GNSS diagnostics.",
+                "note": "Saturated or unavailable measurements show as N/A; 31+ means at least 31 satellites."
             }
         },
         "NotFound": {
@@ -253,8 +317,9 @@
                 "no_data_recorded": "No data was recorded during this period."
             },
             "connectivity": {
-                "connecting": "No connection, connecting now...",
-                "connected": "Connected, last updated at {{updatedAt}}."
+                "online": "Streaming live",
+                "offline": "Connecting...",
+                "updated_at": "Updated at"
             },
             "stream_status": {
                 "sample_rate": "{{value}} SPS",

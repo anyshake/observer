@@ -245,6 +245,7 @@ export type DeviceStatus = {
   __typename?: 'deviceStatus';
   errors: Scalars['Int64']['output'];
   frames: Scalars['Int64']['output'];
+  gnssStatus?: Maybe<GnssStatus>;
   messages: Scalars['Int64']['output'];
   startedAt: Scalars['Int64']['output'];
   updatedAt: Scalars['Int64']['output'];
@@ -275,6 +276,16 @@ export type FdsnAccessKey = {
   revokedAt?: Maybe<Scalars['Int64']['output']>;
   userAgent: Scalars['String']['output'];
   userIp: Scalars['String']['output'];
+};
+
+export type GnssStatus = {
+  __typename?: 'gnssStatus';
+  fixValid: Scalars['Boolean']['output'];
+  hdop?: Maybe<Scalars['Float']['output']>;
+  locked: Scalars['Boolean']['output'];
+  ppsAgeSeconds?: Maybe<Scalars['Int']['output']>;
+  satellites: Scalars['Int']['output'];
+  timeValid: Scalars['Boolean']['output'];
 };
 
 export enum JobStatus {
@@ -421,7 +432,12 @@ export type GetSeismicRecordsQuery = { __typename?: 'Query', getSeisRecordsByTim
 export type GetHomeDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetHomeDataQuery = { __typename?: 'Query', getCurrentTime: number, getStationConfig: any, getDeviceId: string, getCurrentUser: { __typename?: 'sysUser', admin: boolean }, getDeviceConfig: { __typename?: 'deviceConfig', packetInterval: number, sampleRate: number, channelCodes: Array<string>, gnssEnabled: boolean, model: string, protocol: string }, getDeviceInfo: { __typename?: 'deviceInfo', latitude?: number | null, longitude?: number | null, elevation?: number | null, temperature?: number | null }, getDeviceStatus: { __typename?: 'deviceStatus', startedAt: number, updatedAt: number, frames: number, errors: number, messages: number }, getServiceStatus?: Array<{ __typename?: 'serviceStatus', serviceId: string, isRunning: boolean, name: string, description: string }> | null, getSystemStatus: { __typename?: 'systemStatus', cpu: number, memory: number, disk: number, uptime: number } };
+export type GetHomeDataQuery = { __typename?: 'Query', getCurrentTime: number, getStationConfig: any, getDeviceId: string, getCurrentUser: { __typename?: 'sysUser', admin: boolean }, getDeviceConfig: { __typename?: 'deviceConfig', packetInterval: number, sampleRate: number, channelCodes: Array<string>, gnssEnabled: boolean, model: string, protocol: string }, getDeviceInfo: { __typename?: 'deviceInfo', latitude?: number | null, longitude?: number | null, elevation?: number | null, temperature?: number | null }, getDeviceStatus: { __typename?: 'deviceStatus', startedAt: number, updatedAt: number, frames: number, errors: number, messages: number, gnssStatus?: { __typename?: 'gnssStatus', locked: boolean, fixValid: boolean, timeValid: boolean, hdop?: number | null, satellites: number, ppsAgeSeconds?: number | null } | null }, getServiceStatus?: Array<{ __typename?: 'serviceStatus', serviceId: string, isRunning: boolean, name: string, description: string, restarts: number, startedAt: number, stoppedAt: number }> | null, getSystemStatus: { __typename?: 'systemStatus', cpu: number, memory: number, disk: number, uptime: number } };
+
+export type GetRealtimeStationQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetRealtimeStationQuery = { __typename?: 'Query', getStationConfig: any };
 
 export type CancelUpgradeMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -936,12 +952,23 @@ export const GetHomeDataDocument = gql`
     frames
     errors
     messages
+    gnssStatus {
+      locked
+      fixValid
+      timeValid
+      hdop
+      satellites
+      ppsAgeSeconds
+    }
   }
   getServiceStatus {
     serviceId
     isRunning
     name
     description
+    restarts
+    startedAt
+    stoppedAt
   }
   getSystemStatus {
     cpu
@@ -983,6 +1010,43 @@ export type GetHomeDataQueryHookResult = ReturnType<typeof useGetHomeDataQuery>;
 export type GetHomeDataLazyQueryHookResult = ReturnType<typeof useGetHomeDataLazyQuery>;
 export type GetHomeDataSuspenseQueryHookResult = ReturnType<typeof useGetHomeDataSuspenseQuery>;
 export type GetHomeDataQueryResult = ApolloReactCommon.QueryResult<GetHomeDataQuery, GetHomeDataQueryVariables>;
+export const GetRealtimeStationDocument = gql`
+    query getRealtimeStation {
+  getStationConfig
+}
+    `;
+
+/**
+ * __useGetRealtimeStationQuery__
+ *
+ * To run a query within a React component, call `useGetRealtimeStationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetRealtimeStationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetRealtimeStationQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetRealtimeStationQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetRealtimeStationQuery, GetRealtimeStationQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetRealtimeStationQuery, GetRealtimeStationQueryVariables>(GetRealtimeStationDocument, options);
+      }
+export function useGetRealtimeStationLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetRealtimeStationQuery, GetRealtimeStationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetRealtimeStationQuery, GetRealtimeStationQueryVariables>(GetRealtimeStationDocument, options);
+        }
+export function useGetRealtimeStationSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetRealtimeStationQuery, GetRealtimeStationQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetRealtimeStationQuery, GetRealtimeStationQueryVariables>(GetRealtimeStationDocument, options);
+        }
+export type GetRealtimeStationQueryHookResult = ReturnType<typeof useGetRealtimeStationQuery>;
+export type GetRealtimeStationLazyQueryHookResult = ReturnType<typeof useGetRealtimeStationLazyQuery>;
+export type GetRealtimeStationSuspenseQueryHookResult = ReturnType<typeof useGetRealtimeStationSuspenseQuery>;
+export type GetRealtimeStationQueryResult = ApolloReactCommon.QueryResult<GetRealtimeStationQuery, GetRealtimeStationQueryVariables>;
 export const CancelUpgradeDocument = gql`
     mutation cancelUpgrade {
   cancelUpgrade

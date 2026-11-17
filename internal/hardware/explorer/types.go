@@ -43,11 +43,23 @@ type NtpOptions struct {
 type DeviceStatus struct {
 	mu sync.Mutex
 
-	startedAt time.Time
-	updatedAt time.Time
-	frames    int64
-	errors    int64
-	messages  int64
+	startedAt  time.Time
+	updatedAt  time.Time
+	frames     int64
+	errors     int64
+	messages   int64
+	gnssStatus *GnssStatus
+}
+
+// GnssStatus reports v3 variable 6 independently of GNSS time availability.
+// A receiver in holdover continues to timestamp samples using its UTC clock.
+type GnssStatus struct {
+	Locked        bool
+	FixValid      bool
+	TimeValid     bool
+	HDOP          *float64 // nil when saturated or unavailable (wire value 255).
+	Satellites    int      // Saturated at 31 by the firmware.
+	PPSAgeSeconds *int     // nil when saturated or no PPS was received (65535).
 }
 
 type DeviceConfig struct {

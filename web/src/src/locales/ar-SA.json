@@ -195,7 +195,6 @@
             },
             "connectivity": {
                 "loading": "جارٍ الاتصال بالمحطة...",
-                "success": "تم الاتصال بالمحطة. مدة تشغيل الخادم {{uptime}} ثانية، وآخر تحديث في {{updatedAt}}.",
                 "error": "حدث خطأ أثناء الاتصال بالمحطة. يرجى التحقق من اتصالك."
             },
             "station_location": {
@@ -208,7 +207,15 @@
                 "manual_upgrade_needed": "يتوفر إصدار جديد {{latest}}، لكن الإصدار الحالي {{current}} أقدم من الحد الأدنى المتوافق {{required}}. يلزم التحديث يدويًا."
             },
             "service_status": {
-                "title": "حالة الخدمات"
+                "title": "حالة الخدمات",
+                "name": "الخدمة",
+                "state": "الحالة",
+                "restarts": "مرات إعادة التشغيل",
+                "started_at": "آخر تشغيل",
+                "stopped_at": "آخر إيقاف",
+                "running": "قيد التشغيل",
+                "stopped": "متوقفة",
+                "empty": "لا توجد خدمات متاحة."
             },
             "cpu_usage": {
                 "title": "استخدام المعالج"
@@ -218,6 +225,63 @@
             },
             "disk_usage": {
                 "title": "استخدام القرص"
+            },
+            "packet_throughput": {
+                "title": "معدل الحزم",
+                "note": "الحزم في الثانية، آخر {{minutes}} دقيقة",
+                "collecting": "جارٍ جمع البيانات…"
+            },
+            "system_resources": {
+                "title": "موارد المضيف",
+                "uptime": "يعمل منذ {{days}} ي {{hours}} س {{minutes}} د",
+                "collecting": "جارٍ جمع البيانات…"
+            },
+            "station_header": {
+                "online": "المحطة متصلة",
+                "offline": "انقطع الاتصال",
+                "updated_at": "آخر تحديث"
+            },
+            "health_level": {
+                "unknown": "غير معروف"
+            },
+            "data_reception": {
+                "title": "استقبال البيانات",
+                "receiving": "جارٍ الاستقبال",
+                "waiting": "بانتظار البيانات",
+                "stale": "لا يتم التحديث",
+                "unavailable": "انقطع الاتصال بالخادم.",
+                "packet_rate": "{{value}} حزمة/ث",
+                "last_frame": "آخر حزمة في {{time}}"
+            },
+            "time_source": {
+                "title": "مصدر الوقت",
+                "unavailable": "غير متاح أثناء انقطاع استقبال البيانات.",
+                "gnss_locked": "GNSS مقفل",
+                "holdover": "الاحتفاظ (Holdover)",
+                "gnss_locked_note": "يتم ضبط الطوابع الزمنية بواسطة PPS من GNSS.",
+                "holdover_note": "فُقد GNSS؛ تحافظ الساعة الداخلية على توقيت UTC.",
+                "ntp_note": "GNSS معطل؛ تستخدم الطوابع الزمنية NTP."
+            },
+            "reception_errors": {
+                "title": "أخطاء الاستقبال",
+                "note": "آخر {{minutes}} دقيقة · {{total}} منذ البدء"
+            },
+            "service_summary": {
+                "title": "الخدمات",
+                "running_count": "{{running}} / {{total}} قيد التشغيل",
+                "note": "قد تكون الخدمات المتوقفة معطلة عمدًا."
+            },
+            "gnss_status": {
+                "title": "تشخيص GNSS",
+                "position_fix": "تحديد الموقع",
+                "nmea_time": "وقت NMEA",
+                "satellites": "الأقمار الصناعية",
+                "pps_age": "منذ آخر PPS",
+                "valid": "صالح",
+                "invalid": "غير صالح",
+                "disabled": "GNSS معطل على هذا الجهاز؛ تتم مزامنة الطوابع الزمنية للعينات عبر NTP.",
+                "pending": "بانتظار أن يُبلغ البرنامج الثابت عن تشخيص GNSS.",
+                "note": "تُعرض القياسات المشبعة أو غير المتاحة على أنها N/A؛ وتعني 31+ وجود 31 قمرًا صناعيًا على الأقل."
             }
         },
         "NotFound": {
@@ -253,8 +317,9 @@
                 "no_data_recorded": "لم تُسجّل بيانات خلال هذه الفترة."
             },
             "connectivity": {
-                "connecting": "لا يوجد اتصال، جارٍ الاتصال...",
-                "connected": "متصل، آخر تحديث في {{updatedAt}}."
+                "online": "بث مباشر",
+                "offline": "جارٍ الاتصال...",
+                "updated_at": "آخر تحديث"
             },
             "stream_status": {
                 "sample_rate": "{{value}} عينة/ثانية",

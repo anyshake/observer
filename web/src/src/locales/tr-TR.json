@@ -195,7 +195,6 @@
             },
             "connectivity": {
                 "loading": "İstasyona bağlanılıyor...",
-                "success": "İstasyona bağlandı, sunucu {{uptime}} saniyedir aktif, {{updatedAt}} tarihinde güncellendi.",
                 "error": "İstasyona bağlanırken hata oluştu, lütfen bağlantınızı kontrol edin."
             },
             "upgrade": {
@@ -208,7 +207,15 @@
                 "title": "İstasyon Konumu"
             },
             "service_status": {
-                "title": "Hizmet Durumu"
+                "title": "Hizmet Durumu",
+                "name": "Hizmet",
+                "state": "Durum",
+                "restarts": "Yeniden başlatma",
+                "started_at": "Son başlatma",
+                "stopped_at": "Son durdurma",
+                "running": "Çalışıyor",
+                "stopped": "Durduruldu",
+                "empty": "Kullanılabilir hizmet yok."
             },
             "cpu_usage": {
                 "title": "CPU Kullanımı"
@@ -218,6 +225,63 @@
             },
             "disk_usage": {
                 "title": "Disk Kullanımı"
+            },
+            "packet_throughput": {
+                "title": "Paket Akışı",
+                "note": "Saniyede paket, son {{minutes}} dk",
+                "collecting": "Veri toplanıyor…"
+            },
+            "system_resources": {
+                "title": "Sunucu Kaynakları",
+                "uptime": "{{days}} g {{hours}} sa {{minutes}} dk çalışıyor",
+                "collecting": "Veri toplanıyor…"
+            },
+            "station_header": {
+                "online": "İstasyon çevrimiçi",
+                "offline": "Bağlantı kesildi",
+                "updated_at": "Güncellenme"
+            },
+            "health_level": {
+                "unknown": "Bilinmiyor"
+            },
+            "data_reception": {
+                "title": "Veri alımı",
+                "receiving": "Alınıyor",
+                "waiting": "Veri bekleniyor",
+                "stale": "Güncellenmiyor",
+                "unavailable": "Sunucuyla bağlantı kesildi.",
+                "packet_rate": "{{value}} paket/sn",
+                "last_frame": "Son paket: {{time}}"
+            },
+            "time_source": {
+                "title": "Zaman kaynağı",
+                "unavailable": "Veri alımı kesintiye uğradığında kullanılamaz.",
+                "gnss_locked": "GNSS kilitli",
+                "holdover": "Bekletme (holdover)",
+                "gnss_locked_note": "Zaman damgaları GNSS PPS ile düzenlenir.",
+                "holdover_note": "GNSS kaybedildi; dahili saat UTC zamanını korur.",
+                "ntp_note": "GNSS devre dışı; zaman damgaları NTP kullanır."
+            },
+            "reception_errors": {
+                "title": "Alım hataları",
+                "note": "Son {{minutes}} dk · başlangıçtan beri {{total}}"
+            },
+            "service_summary": {
+                "title": "Hizmetler",
+                "running_count": "{{running}} / {{total}} çalışıyor",
+                "note": "Durdurulan hizmetler bilerek devre dışı bırakılmış olabilir."
+            },
+            "gnss_status": {
+                "title": "GNSS Tanılama",
+                "position_fix": "Konum sabitleme",
+                "nmea_time": "NMEA zamanı",
+                "satellites": "Uydular",
+                "pps_age": "Son PPS’ten beri",
+                "valid": "Geçerli",
+                "invalid": "Geçersiz",
+                "disabled": "Bu cihazda GNSS devre dışı; zaman damgaları NTP ile senkronize edilir.",
+                "pending": "Donanım yazılımının GNSS tanılama verilerini bildirmesi bekleniyor.",
+                "note": "Doymuş veya kullanılamayan ölçümler N/A olarak gösterilir; 31+ en az 31 uydu anlamına gelir."
             }
         },
         "NotFound": {
@@ -253,8 +317,9 @@
                 "no_data_recorded": "Bu süre zarfında veri kaydedilmedi."
             },
             "connectivity": {
-                "connecting": "Bağlantı yok, şimdi bağlanılıyor...",
-                "connected": "Bağlandı, son güncelleme {{updatedAt}}."
+                "online": "Canlı yayın",
+                "offline": "Bağlanılıyor...",
+                "updated_at": "Güncellenme"
             },
             "stream_status": {
                 "sample_rate": "{{value}} SPS",

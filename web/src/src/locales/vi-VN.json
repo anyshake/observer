@@ -195,7 +195,6 @@
             },
             "connectivity": {
                 "loading": "Đang kết nối với trạm...",
-                "success": "Đã kết nối với trạm. Máy chủ đã chạy {{uptime}} giây, cập nhật lúc {{updatedAt}}.",
                 "error": "Có lỗi khi kết nối với trạm. Vui lòng kiểm tra kết nối."
             },
             "station_location": {
@@ -208,7 +207,15 @@
                 "manual_upgrade_needed": "Có phiên bản mới {{latest}}, nhưng phiên bản hiện tại {{current}} cũ hơn phiên bản tương thích tối thiểu {{required}}. Cần nâng cấp thủ công."
             },
             "service_status": {
-                "title": "Trạng thái dịch vụ"
+                "title": "Trạng thái dịch vụ",
+                "name": "Dịch vụ",
+                "state": "Trạng thái",
+                "restarts": "Số lần khởi động lại",
+                "started_at": "Khởi động gần nhất",
+                "stopped_at": "Dừng gần nhất",
+                "running": "Đang chạy",
+                "stopped": "Đã dừng",
+                "empty": "Không có dịch vụ nào."
             },
             "cpu_usage": {
                 "title": "Mức sử dụng CPU"
@@ -218,6 +225,63 @@
             },
             "disk_usage": {
                 "title": "Mức sử dụng đĩa"
+            },
+            "packet_throughput": {
+                "title": "Lưu lượng gói tin",
+                "note": "Gói tin mỗi giây, {{minutes}} phút gần nhất",
+                "collecting": "Đang thu thập dữ liệu…"
+            },
+            "system_resources": {
+                "title": "Tài nguyên máy chủ",
+                "uptime": "Đã chạy {{days}} ngày {{hours}} giờ {{minutes}} phút",
+                "collecting": "Đang thu thập dữ liệu…"
+            },
+            "station_header": {
+                "online": "Trạm trực tuyến",
+                "offline": "Mất kết nối",
+                "updated_at": "Cập nhật lúc"
+            },
+            "health_level": {
+                "unknown": "Không xác định"
+            },
+            "data_reception": {
+                "title": "Nhận dữ liệu",
+                "receiving": "Đang nhận",
+                "waiting": "Đang chờ dữ liệu",
+                "stale": "Không cập nhật",
+                "unavailable": "Đã mất kết nối với máy chủ.",
+                "packet_rate": "{{value}} gói/giây",
+                "last_frame": "Gói tin gần nhất lúc {{time}}"
+            },
+            "time_source": {
+                "title": "Nguồn thời gian",
+                "unavailable": "Không khả dụng khi việc nhận dữ liệu bị gián đoạn.",
+                "gnss_locked": "GNSS đã khóa",
+                "holdover": "Duy trì (holdover)",
+                "gnss_locked_note": "Dấu thời gian được hiệu chỉnh theo PPS của GNSS.",
+                "holdover_note": "Mất GNSS; đồng hồ nội bộ duy trì giờ UTC.",
+                "ntp_note": "GNSS đã tắt; dấu thời gian dùng NTP."
+            },
+            "reception_errors": {
+                "title": "Lỗi nhận dữ liệu",
+                "note": "{{minutes}} phút gần nhất · {{total}} kể từ khi khởi động"
+            },
+            "service_summary": {
+                "title": "Dịch vụ",
+                "running_count": "{{running}} / {{total}} đang chạy",
+                "note": "Các dịch vụ đã dừng có thể được tắt có chủ ý."
+            },
+            "gnss_status": {
+                "title": "Chẩn đoán GNSS",
+                "position_fix": "Định vị",
+                "nmea_time": "Thời gian NMEA",
+                "satellites": "Vệ tinh",
+                "pps_age": "Kể từ PPS gần nhất",
+                "valid": "Hợp lệ",
+                "invalid": "Không hợp lệ",
+                "disabled": "GNSS đã bị tắt trên thiết bị này; dấu thời gian được đồng bộ qua NTP.",
+                "pending": "Đang chờ firmware báo cáo chẩn đoán GNSS.",
+                "note": "Các phép đo bão hòa hoặc không khả dụng hiển thị là N/A; 31+ nghĩa là ít nhất 31 vệ tinh."
             }
         },
         "NotFound": {
@@ -253,8 +317,9 @@
                 "no_data_recorded": "Không có dữ liệu được ghi trong khoảng thời gian này."
             },
             "connectivity": {
-                "connecting": "Chưa kết nối, đang kết nối...",
-                "connected": "Đã kết nối, cập nhật gần nhất lúc {{updatedAt}}."
+                "online": "Đang phát trực tiếp",
+                "offline": "Đang kết nối...",
+                "updated_at": "Cập nhật lúc"
             },
             "stream_status": {
                 "sample_rate": "{{value}} mẫu/giây",

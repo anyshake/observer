@@ -1,29 +1,183 @@
 @layer utilities {
-    .app-usage-grid {
-        @apply grid grid-cols-1 gap-6 md:grid-cols-19;
+    .app-page.app-home-page {
+        @apply max-w-7xl;
     }
 
-    .app-usage-line-card {
-        @apply flex flex-col space-y-8 md:col-span-7;
+    .app-health-grid {
+        @apply grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4;
     }
 
-    .app-usage-gauge-card {
-        @apply flex flex-col space-y-8 md:col-span-5;
+    .app-health-tile {
+        @apply flex flex-col gap-1;
+    }
+
+    .app-health-head {
+        @apply flex items-center justify-between gap-2;
+    }
+
+    .app-health-title {
+        @apply text-app-muted text-sm font-medium;
+    }
+
+    .app-health-value {
+        @apply text-app-heading truncate text-xl font-bold;
+    }
+
+    .app-health-detail {
+        @apply text-app-subtle truncate text-xs;
     }
 
     .app-status-grid {
         @apply grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4;
     }
 
-    .app-station-grid {
-        @apply grid grid-cols-1 gap-6 md:grid-cols-16;
+    .app-home-grid {
+        @apply grid grid-cols-1 gap-6 lg:grid-cols-5;
     }
 
-    .app-location-card {
-        @apply flex flex-col space-y-4 md:col-span-7;
+    .app-home-col-wide {
+        @apply flex min-w-0 flex-col gap-6 lg:col-span-3;
     }
 
-    .app-services-card {
-        @apply flex flex-col space-y-4 md:col-span-9;
+    .app-home-col-narrow {
+        @apply flex min-w-0 flex-col gap-6 lg:col-span-2;
+    }
+
+    .app-home-col-wide > .card,
+    .app-home-col-narrow > .card {
+        @apply h-auto;
+    }
+
+    .app-home-map-slot {
+        @apply flex min-h-80 flex-1 flex-col;
+    }
+
+    .app-home-map-slot > .card {
+        @apply h-auto flex-1;
+    }
+
+    .app-home-card-body {
+        @apply space-y-2;
+    }
+
+    .app-home-chart-empty {
+        @apply text-app-muted flex h-full min-h-60 items-center justify-center gap-2 text-sm;
+    }
+
+    .app-home-footnote {
+        @apply text-app-subtle text-xs leading-5;
+    }
+
+    .app-home-map {
+        @apply relative min-h-60 flex-1 overflow-hidden rounded-lg;
+    }
+
+    .app-home-map > .app-map {
+        @apply absolute inset-0 h-full!;
+    }
+
+    .app-service-list-container {
+        @apply @container relative max-h-75 overflow-auto;
+    }
+
+    .app-service-head {
+        @apply bg-base-100 border-app-border text-app-muted sticky top-0 z-1 hidden border-b px-3 py-2 text-xs font-medium whitespace-nowrap;
+    }
+
+    .app-service-row {
+        @apply border-app-border-soft grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1.5 border-b px-3 py-2.5 text-sm last:border-b-0;
+    }
+
+    .app-service-name {
+        @apply min-w-0;
+    }
+
+    .app-service-state {
+        @apply inline-flex items-center gap-2 whitespace-nowrap;
+    }
+
+    .app-service-meta {
+        @apply text-app-muted col-span-2 flex flex-wrap gap-x-4 gap-y-0.5 text-xs;
+    }
+
+    .app-service-meta > div {
+        @apply flex gap-1 whitespace-nowrap;
+    }
+
+    .app-service-meta dt::after {
+        content: ':';
+    }
+
+    .app-service-meta dd {
+        @apply tabular-nums;
+    }
+
+    .app-service-head,
+    .app-service-row {
+        @apply @2xl:grid-cols-[minmax(0,1fr)_6rem_5.5rem_9.5rem_9.5rem];
+    }
+
+    .app-service-head {
+        @apply @2xl:grid @2xl:gap-x-4;
+    }
+
+    .app-service-meta {
+        @apply @2xl:contents;
+    }
+
+    .app-service-meta dt {
+        @apply @2xl:sr-only;
+    }
+
+    .app-home-system-body {
+        @apply grid grid-cols-1 gap-6 lg:grid-cols-3;
+    }
+
+    .app-home-meters {
+        @apply flex flex-col gap-2;
+    }
+
+    .app-home-meter {
+        @apply hover:bg-app-hover flex cursor-pointer flex-col gap-2 rounded-lg border border-transparent px-3 py-2.5 text-left transition-colors disabled:cursor-default disabled:hover:bg-transparent;
+    }
+
+    .app-home-meter-active {
+        @apply border-app-border bg-base-200;
+    }
+
+    .app-home-meter-row {
+        @apply flex items-baseline justify-between gap-2;
+    }
+
+    .app-home-meter-label {
+        @apply text-app-muted text-sm font-medium;
+    }
+
+    .app-home-meter-value {
+        @apply text-app-heading font-semibold tabular-nums;
+    }
+
+    .app-home-meter-track {
+        @apply bg-base-300 block h-1 overflow-hidden rounded-full;
+    }
+
+    .app-home-meter-bar {
+        @apply bg-app-primary block h-full rounded-full transition-all duration-500;
+    }
+
+    .app-home-meter-bar-high {
+        @apply bg-app-warning;
+    }
+
+    .app-home-system-chart {
+        @apply flex min-h-60 min-w-0 flex-col lg:col-span-2;
+    }
+
+    .app-home-chart-fill {
+        @apply relative min-h-60 flex-1;
+    }
+
+    .app-home-chart-fill > .app-line-chart {
+        @apply absolute inset-0;
     }
 }

@@ -1,115 +1,120 @@
-import { mdiChip, mdiHarddisk, mdiMemory } from '@mdi/js';
-import Icon from '@mdi/react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { mdiServer } from '@mdi/js';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { GaugeChart } from '../../components/chart/GaugeChart';
 import { LineChart } from '../../components/chart/LineChart';
-import { Skeleton } from '../../components/ui/Skeleton';
+import { Card } from '../../components/widget/Card';
 import { HomeConstraints } from '../../config/constraints';
 import type { GetHomeDataQuery } from '../../graphql';
 
-export const SystemUsage = ({ data: getHomeDataData }: { data: GetHomeDataQuery | undefined }) => {
+type Series = Array<[number, number | null]>;
+
+const appendPoint = (prev: Series, point: [number, number]): Series => {
+    const last = [...prev].reverse().find(([, value]) => value !== null);
+    const next: Series =
+        last && (point[0] - last[0]) / 1000 > HomeConstraints.maxGapSeconds
+            ? [[last[0] + 1, null], point]
+            : [point];
+    return [...prev, ...next].slice(-HomeConstraints.lineChartRetention);
+};
+
+const formatUptime = (ms: number) => ({
+    days: Math.floor(ms / 86400000),
+    hours: Math.floor((ms % 86400000) / 3600000),
+    minutes: Math.floor((ms % 3600000) / 60000)
+});
+
+export const SystemUsage = ({ data }: { data: GetHomeDataQuery }) => {
     const { t } = useTranslation();
-    const lineChartConfig = useMemo(
-        () => ({
-            height: 250,
-            lineWidth: 5,
-            yMax: 100,
-            yMin: 0,
-            yInterval: 20,
-            yPosition: 'left' as const
-        }),
-        []
-    );
+    const [metric, setMetric] = useState<'cpu' | 'memory'>('cpu');
+    const [history, setHistory] = useState<{ cpu: Series; memory: Series }>({
+        cpu: [],
+        memory: []
+    });
+    const lastTime = useRef(0);
 
-    const [memoryData, setMemoryData] = useState<Array<[number, number | null]>>([]);
-    const [cpuData, setCpuData] = useState<Array<[number, number | null]>>([]);
-    const memoryDataRef = useRef(memoryData);
-    const cpuDataRef = useRef(cpuData);
-    const processChartData = useCallback(
-        (
-            prevData: Array<[number, number | null]>,
-            newPoint: [number, number],
-            retention: number,
-            maxGap: number
-        ): Array<[number, number | null]> => {
-            if (prevData.length === 0) {
-                return [newPoint];
-            }
-
-            const lastValidPoint = [...prevData].reverse().find((point) => point[1] !== null);
-            if (!lastValidPoint) {
-                return [...prevData.slice(-retention), newPoint];
-            }
-
-            const timeDiff = (newPoint[0] - lastValidPoint[0]) / 1000;
-            if (timeDiff > maxGap) {
-                return [...prevData.slice(-retention), [lastValidPoint[0] + 1, null], newPoint];
-            }
-
-            return [...prevData.slice(-retention), newPoint];
-        },
-        []
-    );
     useEffect(() => {
-        if (getHomeDataData) {
-            const newCpuData = processChartData(
-                cpuDataRef.current,
-                [getHomeDataData.getCurrentTime, getHomeDataData.getSystemStatus.cpu ?? 0],
-                HomeConstraints.lineChartRetention,
-                HomeConstraints.maxGapSeconds
-            );
-            cpuDataRef.current = newCpuData;
-            setCpuData(newCpuData);
-
-            const newMemoryData = processChartData(
-                memoryDataRef.current,
-                [getHomeDataData.getCurrentTime, getHomeDataData.getSystemStatus.memory ?? 0],
-                HomeConstraints.lineChartRetention,
-                HomeConstraints.maxGapSeconds
-            );
-            memoryDataRef.current = newMemoryData;
-            setMemoryData(newMemoryData);
+        if (data.getCurrentTime <= lastTime.current) {
+            return;
         }
-    }, [getHomeDataData, processChartData]);
+        lastTime.current = data.getCurrentTime;
+        const { cpu, memory } = data.getSystemStatus;
+        setHistory((prev) => ({
+            cpu: appendPoint(prev.cpu, [data.getCurrentTime, cpu]),
+            memory: appendPoint(prev.memory, [data.getCurrentTime, memory])
+        }));
+    }, [data]);
+
+    const system = data.getSystemStatus;
+    const meters = useMemo(
+        () => [
+            { key: 'cpu' as const, label: t('views.Home.cpu_usage.title'), value: system.cpu },
+            {
+                key: 'memory' as const,
+                label: t('views.Home.memory_usage.title'),
+                value: system.memory
+            },
+            { key: 'disk' as const, label: t('views.Home.disk_usage.title'), value: system.disk }
+        ],
+        [t, system]
+    );
 
     return (
-        <div className="app-usage-grid">
-            <div className="card app-panel app-usage-line-card">
-                <h2 className="app-section-title">
-                    <Icon className="app-icon" path={mdiChip} size={1} />
-                    <span>{t('views.Home.cpu_usage.title')}</span>
-                </h2>
-                {cpuData.length > 1 ? (
-                    <LineChart {...lineChartConfig} data={cpuData} />
+        <Card
+            title={t('views.Home.system_resources.title')}
+            iconPath={mdiServer}
+            className="app-home-system-body"
+        >
+            <div className="app-home-meters">
+                {meters.map(({ key, label, value }) => {
+                    const selectable = key !== 'disk';
+                    const percent = Math.min(100, Math.max(0, value));
+                    return (
+                        <button
+                            key={key}
+                            type="button"
+                            disabled={!selectable}
+                            aria-pressed={selectable ? metric === key : undefined}
+                            className={`app-home-meter ${metric === key ? 'app-home-meter-active' : ''}`}
+                            onClick={() => selectable && setMetric(key)}
+                        >
+                            <span className="app-home-meter-row">
+                                <span className="app-home-meter-label">{label}</span>
+                                <span className="app-home-meter-value">{value.toFixed(1)}%</span>
+                            </span>
+                            <span className="app-home-meter-track">
+                                <span
+                                    className={`app-home-meter-bar ${percent >= 90 ? 'app-home-meter-bar-high' : ''}`}
+                                    style={{ width: `${percent}%` }}
+                                />
+                            </span>
+                        </button>
+                    );
+                })}
+                <p className="app-home-footnote">
+                    {t('views.Home.system_resources.uptime', formatUptime(system.uptime))}
+                </p>
+            </div>
+
+            <div className="app-home-system-chart">
+                {history[metric].length > 1 ? (
+                    <div className="app-home-chart-fill">
+                        <LineChart
+                            height="100%"
+                            lineWidth={2}
+                            yMin={0}
+                            yMax={100}
+                            yInterval={25}
+                            data={history[metric]}
+                        />
+                    </div>
                 ) : (
-                    <Skeleton height={lineChartConfig.height} />
+                    <div className="app-home-chart-empty">
+                        <span className="loading loading-dots loading-sm" />
+                        <span>{t('views.Home.system_resources.collecting')}</span>
+                    </div>
                 )}
             </div>
-            <div className="card app-panel app-usage-line-card">
-                <h2 className="app-section-title">
-                    <Icon className="app-icon" path={mdiMemory} size={1} />
-                    <span>{t('views.Home.memory_usage.title')}</span>
-                </h2>
-                {memoryData.length > 1 ? (
-                    <LineChart {...lineChartConfig} data={memoryData} />
-                ) : (
-                    <Skeleton height={lineChartConfig.height} />
-                )}
-            </div>
-            <div className="card app-panel app-usage-gauge-card">
-                <h2 className="app-section-title">
-                    <Icon className="app-icon" path={mdiHarddisk} size={1} />
-                    <span>{t('views.Home.disk_usage.title')}</span>
-                </h2>
-                <GaugeChart
-                    height={lineChartConfig.height}
-                    valueMax={100}
-                    animation={true}
-                    value={getHomeDataData?.getSystemStatus.disk ?? 0}
-                />
-            </div>
-        </div>
+        </Card>
     );
 };

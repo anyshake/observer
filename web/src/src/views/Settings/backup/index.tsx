@@ -13,8 +13,7 @@ export const Backup = () => {
     const getRequestSignal = useRequestSignal();
     const [mode, setMode] = useState<'backup' | 'restore'>('backup');
 
-    const [exportGlobalConfig, { data: exportGlobalConfigData }] =
-        useExportGlobalConfigLazyQuery();
+    const [exportGlobalConfig, { data: exportGlobalConfigData }] = useExportGlobalConfigLazyQuery();
     const handleExportGlobalConfig = useCallback(
         async () =>
             await sendPromiseAlert(

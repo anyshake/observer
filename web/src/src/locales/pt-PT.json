@@ -195,7 +195,6 @@
             },
             "connectivity": {
                 "loading": "A ligar à estação...",
-                "success": "Ligado à estação, servidor ativo há {{uptime}} segundos, atualizado às {{updatedAt}}.",
                 "error": "Ocorreu um erro ao ligar à estação, por favor verifique a sua ligação."
             },
             "upgrade": {
@@ -208,7 +207,15 @@
                 "title": "Localização da Estação"
             },
             "service_status": {
-                "title": "Estado do Serviço"
+                "title": "Estado do Serviço",
+                "name": "Serviço",
+                "state": "Estado",
+                "restarts": "Reinícios",
+                "started_at": "Último arranque",
+                "stopped_at": "Última paragem",
+                "running": "Em execução",
+                "stopped": "Parado",
+                "empty": "Não existem serviços disponíveis."
             },
             "cpu_usage": {
                 "title": "Utilização do CPU"
@@ -218,6 +225,63 @@
             },
             "disk_usage": {
                 "title": "Utilização do Disco"
+            },
+            "packet_throughput": {
+                "title": "Débito de pacotes",
+                "note": "Pacotes por segundo, últimos {{minutes}} min",
+                "collecting": "A recolher dados…"
+            },
+            "system_resources": {
+                "title": "Recursos do anfitrião",
+                "uptime": "Ativo há {{days}} d {{hours}} h {{minutes}} min",
+                "collecting": "A recolher dados…"
+            },
+            "station_header": {
+                "online": "Estação online",
+                "offline": "Ligação perdida",
+                "updated_at": "Atualizado às"
+            },
+            "health_level": {
+                "unknown": "Desconhecido"
+            },
+            "data_reception": {
+                "title": "Receção de dados",
+                "receiving": "A receber",
+                "waiting": "A aguardar dados",
+                "stale": "Sem atualização",
+                "unavailable": "A ligação ao servidor foi perdida.",
+                "packet_rate": "{{value}} pacotes/s",
+                "last_frame": "Último pacote às {{time}}"
+            },
+            "time_source": {
+                "title": "Fonte de tempo",
+                "unavailable": "Indisponível enquanto a receção de dados estiver interrompida.",
+                "gnss_locked": "GNSS sincronizado",
+                "holdover": "Holdover",
+                "gnss_locked_note": "As marcas temporais são disciplinadas pelo PPS do GNSS.",
+                "holdover_note": "GNSS perdido; o relógio interno mantém o UTC.",
+                "ntp_note": "GNSS desativado; as marcas temporais usam NTP."
+            },
+            "reception_errors": {
+                "title": "Erros de receção",
+                "note": "Últimos {{minutes}} min · {{total}} desde o arranque"
+            },
+            "service_summary": {
+                "title": "Serviços",
+                "running_count": "{{running}} / {{total}} em execução",
+                "note": "Os serviços parados podem estar desativados intencionalmente."
+            },
+            "gnss_status": {
+                "title": "Diagnóstico GNSS",
+                "position_fix": "Fixação de posição",
+                "nmea_time": "Hora NMEA",
+                "satellites": "Satélites",
+                "pps_age": "Desde o último PPS",
+                "valid": "Válido",
+                "invalid": "Inválido",
+                "disabled": "O GNSS está desativado neste dispositivo; as marcas temporais são sincronizadas através de NTP.",
+                "pending": "A aguardar que o firmware comunique o diagnóstico GNSS.",
+                "note": "As medições saturadas ou indisponíveis aparecem como N/A; 31+ significa pelo menos 31 satélites."
             }
         },
         "NotFound": {
@@ -253,8 +317,9 @@
                 "no_data_recorded": "Nenhum dado foi gravado durante este período."
             },
             "connectivity": {
-                "connecting": "Sem ligação, a ligar agora...",
-                "connected": "Ligado, última atualização às {{updatedAt}}."
+                "online": "Transmissão em direto",
+                "offline": "A ligar...",
+                "updated_at": "Atualizado às"
             },
             "stream_status": {
                 "sample_rate": "{{value}} SPS",

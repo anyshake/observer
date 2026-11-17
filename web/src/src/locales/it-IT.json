@@ -195,7 +195,6 @@
             },
             "connectivity": {
                 "loading": "Connessione alla stazione...",
-                "success": "Connesso alla stazione. Server attivo da {{uptime}} secondi, aggiornato alle {{updatedAt}}.",
                 "error": "Errore durante la connessione alla stazione. Controlla la connessione."
             },
             "station_location": {
@@ -208,7 +207,15 @@
                 "manual_upgrade_needed": "È disponibile la nuova versione {{latest}}, ma la versione attuale {{current}} è precedente alla versione minima compatibile {{required}}. È necessario aggiornare manualmente."
             },
             "service_status": {
-                "title": "Stato dei servizi"
+                "title": "Stato dei servizi",
+                "name": "Servizio",
+                "state": "Stato",
+                "restarts": "Riavvii",
+                "started_at": "Ultimo avvio",
+                "stopped_at": "Ultimo arresto",
+                "running": "In esecuzione",
+                "stopped": "Arrestato",
+                "empty": "Nessun servizio disponibile."
             },
             "cpu_usage": {
                 "title": "Utilizzo della CPU"
@@ -218,6 +225,63 @@
             },
             "disk_usage": {
                 "title": "Utilizzo del disco"
+            },
+            "packet_throughput": {
+                "title": "Throughput dei pacchetti",
+                "note": "Pacchetti al secondo, ultimi {{minutes}} min",
+                "collecting": "Raccolta dati in corso…"
+            },
+            "system_resources": {
+                "title": "Risorse dell'host",
+                "uptime": "Attivo da {{days}} g {{hours}} h {{minutes}} min",
+                "collecting": "Raccolta dati in corso…"
+            },
+            "station_header": {
+                "online": "Stazione online",
+                "offline": "Connessione persa",
+                "updated_at": "Aggiornato alle"
+            },
+            "health_level": {
+                "unknown": "Sconosciuto"
+            },
+            "data_reception": {
+                "title": "Ricezione dati",
+                "receiving": "In ricezione",
+                "waiting": "In attesa di dati",
+                "stale": "Non aggiornato",
+                "unavailable": "La connessione al server è stata persa.",
+                "packet_rate": "{{value}} pacchetti/s",
+                "last_frame": "Ultimo pacchetto alle {{time}}"
+            },
+            "time_source": {
+                "title": "Sorgente temporale",
+                "unavailable": "Non disponibile mentre la ricezione dei dati è interrotta.",
+                "gnss_locked": "GNSS agganciato",
+                "holdover": "Holdover",
+                "gnss_locked_note": "I timestamp sono disciplinati dal PPS del GNSS.",
+                "holdover_note": "GNSS perso; l'orologio interno mantiene l'ora UTC.",
+                "ntp_note": "GNSS disattivato; i timestamp usano NTP."
+            },
+            "reception_errors": {
+                "title": "Errori di ricezione",
+                "note": "Ultimi {{minutes}} min · {{total}} dall’avvio"
+            },
+            "service_summary": {
+                "title": "Servizi",
+                "running_count": "{{running}} / {{total}} in esecuzione",
+                "note": "I servizi arrestati potrebbero essere disattivati intenzionalmente."
+            },
+            "gnss_status": {
+                "title": "Diagnostica GNSS",
+                "position_fix": "Fix di posizione",
+                "nmea_time": "Ora NMEA",
+                "satellites": "Satelliti",
+                "pps_age": "Dall'ultimo PPS",
+                "valid": "Valido",
+                "invalid": "Non valido",
+                "disabled": "Il GNSS è disattivato su questo dispositivo; i timestamp sono sincronizzati tramite NTP.",
+                "pending": "In attesa che il firmware invii la diagnostica GNSS.",
+                "note": "Le misure saturate o non disponibili sono mostrate come N/A; 31+ indica almeno 31 satelliti."
             }
         },
         "NotFound": {
@@ -253,8 +317,9 @@
                 "no_data_recorded": "Nessun dato registrato in questo intervallo."
             },
             "connectivity": {
-                "connecting": "Nessuna connessione, connessione in corso...",
-                "connected": "Connesso, ultimo aggiornamento alle {{updatedAt}}."
+                "online": "Streaming in diretta",
+                "offline": "Connessione in corso...",
+                "updated_at": "Aggiornato alle"
             },
             "stream_status": {
                 "sample_rate": "{{value}} campioni/s",

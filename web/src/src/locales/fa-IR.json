@@ -195,7 +195,6 @@
             },
             "connectivity": {
                 "loading": "در حال اتصال به ایستگاه...",
-                "success": "به ایستگاه متصل شد. سرور {{uptime}} ثانیه فعال بوده و در {{updatedAt}} به‌روز شده است.",
                 "error": "هنگام اتصال به ایستگاه خطایی رخ داد. لطفاً اتصال خود را بررسی کنید."
             },
             "station_location": {
@@ -208,7 +207,15 @@
                 "manual_upgrade_needed": "نسخهٔ جدید {{latest}} در دسترس است، اما نسخهٔ فعلی {{current}} از حداقل نسخهٔ سازگار {{required}} قدیمی‌تر است. ارتقای دستی لازم است."
             },
             "service_status": {
-                "title": "وضعیت سرویس‌ها"
+                "title": "وضعیت سرویس‌ها",
+                "name": "سرویس",
+                "state": "وضعیت",
+                "restarts": "راه‌اندازی مجدد",
+                "started_at": "آخرین شروع",
+                "stopped_at": "آخرین توقف",
+                "running": "در حال اجرا",
+                "stopped": "متوقف",
+                "empty": "هیچ سرویسی در دسترس نیست."
             },
             "cpu_usage": {
                 "title": "مصرف پردازنده"
@@ -218,6 +225,63 @@
             },
             "disk_usage": {
                 "title": "مصرف دیسک"
+            },
+            "packet_throughput": {
+                "title": "نرخ بسته‌ها",
+                "note": "بسته در ثانیه، {{minutes}} دقیقهٔ اخیر",
+                "collecting": "در حال جمع‌آوری داده…"
+            },
+            "system_resources": {
+                "title": "منابع میزبان",
+                "uptime": "فعال از {{days}} روز {{hours}} ساعت {{minutes}} دقیقه",
+                "collecting": "در حال جمع‌آوری داده…"
+            },
+            "station_header": {
+                "online": "ایستگاه آنلاین",
+                "offline": "اتصال قطع شد",
+                "updated_at": "زمان به‌روزرسانی"
+            },
+            "health_level": {
+                "unknown": "نامشخص"
+            },
+            "data_reception": {
+                "title": "دریافت داده",
+                "receiving": "در حال دریافت",
+                "waiting": "در انتظار داده",
+                "stale": "به‌روزرسانی نمی‌شود",
+                "unavailable": "اتصال به سرور قطع شد.",
+                "packet_rate": "{{value}} بسته/ثانیه",
+                "last_frame": "آخرین بسته در {{time}}"
+            },
+            "time_source": {
+                "title": "منبع زمان",
+                "unavailable": "تا زمانی که دریافت داده قطع است در دسترس نیست.",
+                "gnss_locked": "GNSS قفل شده",
+                "holdover": "نگهداری زمان (Holdover)",
+                "gnss_locked_note": "برچسب‌های زمانی با PPS ماهواره‌ای GNSS تنظیم می‌شوند.",
+                "holdover_note": "GNSS از دست رفت؛ ساعت داخلی زمان UTC را حفظ می‌کند.",
+                "ntp_note": "GNSS غیرفعال است؛ برچسب‌های زمانی از NTP استفاده می‌کنند."
+            },
+            "reception_errors": {
+                "title": "خطاهای دریافت",
+                "note": "{{minutes}} دقیقهٔ اخیر · {{total}} از زمان شروع"
+            },
+            "service_summary": {
+                "title": "سرویس‌ها",
+                "running_count": "{{running}} / {{total}} در حال اجرا",
+                "note": "سرویس‌های متوقف ممکن است عمداً غیرفعال شده باشند."
+            },
+            "gnss_status": {
+                "title": "عیب‌یابی GNSS",
+                "position_fix": "تعیین موقعیت",
+                "nmea_time": "زمان NMEA",
+                "satellites": "ماهواره‌ها",
+                "pps_age": "از آخرین PPS",
+                "valid": "معتبر",
+                "invalid": "نامعتبر",
+                "disabled": "GNSS در این دستگاه غیرفعال است؛ برچسب‌های زمانی نمونه‌ها از طریق NTP همگام می‌شوند.",
+                "pending": "در انتظار گزارش عیب‌یابی GNSS از سفت‌افزار.",
+                "note": "اندازه‌گیری‌های اشباع‌شده یا نامعتبر به صورت N/A نمایش داده می‌شوند؛ 31+ یعنی دست‌کم 31 ماهواره."
             }
         },
         "NotFound": {
@@ -253,8 +317,9 @@
                 "no_data_recorded": "در این بازه داده‌ای ضبط نشد."
             },
             "connectivity": {
-                "connecting": "اتصال برقرار نیست، در حال اتصال...",
-                "connected": "متصل است، آخرین به‌روزرسانی در {{updatedAt}}."
+                "online": "پخش زنده",
+                "offline": "در حال اتصال...",
+                "updated_at": "زمان به‌روزرسانی"
             },
             "stream_status": {
                 "sample_rate": "{{value}} نمونه در ثانیه",

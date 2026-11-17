@@ -25,12 +25,23 @@ query getHomeData {
         frames
         errors
         messages
+        gnssStatus {
+            locked
+            fixValid
+            timeValid
+            hdop
+            satellites
+            ppsAgeSeconds
+        }
     }
     getServiceStatus {
         serviceId
         isRunning
         name
         description
+        restarts
+        startedAt
+        stoppedAt
     }
     getSystemStatus {
         cpu

@@ -32,6 +32,8 @@ interface ISpectrogramDeque {
     readonly windowSize: number;
     readonly overlap: number;
     readonly gapThreshold?: number;
+    // When set, only the newest gap-free run of samples is drawn (ms of allowed jitter)
+    readonly continuityTolerance?: number;
     readonly colorMap?: ColorMapName;
     readonly fftExecutor?: FFTExecutor;
     readonly renderFPS?: number;
@@ -51,6 +53,7 @@ export const DequeSpectrogram = memo(
                 windowSize,
                 overlap,
                 gapThreshold,
+                continuityTolerance,
                 colorMap = DEFAULT_SPECTROGRAM_COLOR_MAP,
                 fftExecutor,
                 renderFPS = 2,
@@ -192,7 +195,10 @@ export const DequeSpectrogram = memo(
 
                 if (needsUpdateRef.current) {
                     needsUpdateRef.current = false;
-                    const bufData = bufferRef.current.getSamples();
+                    const bufData =
+                        continuityTolerance === undefined
+                            ? bufferRef.current.getSamples()
+                            : bufferRef.current.getLatestContinuousSamples(continuityTolerance);
                     sp.setData(bufData);
                     if (bufData.length > 0) {
                         const end = sp.getDuration();
@@ -214,7 +220,7 @@ export const DequeSpectrogram = memo(
                         });
                     });
                 }
-            }, [drawSpectrogram, duration, initializedSpectrogram]);
+            }, [continuityTolerance, drawSpectrogram, duration, initializedSpectrogram]);
 
             const pendingRenderRef = useRef<number | null>(null);
             const requestSpectrogramRender = useCallback(() => {

@@ -195,7 +195,6 @@
             },
             "connectivity": {
                 "loading": "स्टेशन से कनेक्ट किया जा रहा है...",
-                "success": "स्टेशन से कनेक्ट हो गया। सर्वर {{uptime}} सेकंड से चल रहा है, अद्यतन समय {{updatedAt}}।",
                 "error": "स्टेशन से कनेक्ट करते समय त्रुटि हुई। कृपया अपना कनेक्शन जाँचें।"
             },
             "station_location": {
@@ -208,7 +207,15 @@
                 "manual_upgrade_needed": "नया संस्करण {{latest}} उपलब्ध है, लेकिन वर्तमान संस्करण {{current}} न्यूनतम संगत संस्करण {{required}} से पुराना है। मैन्युअल अपग्रेड आवश्यक है।"
             },
             "service_status": {
-                "title": "सेवा की स्थिति"
+                "title": "सेवा की स्थिति",
+                "name": "सेवा",
+                "state": "स्थिति",
+                "restarts": "पुनः आरंभ",
+                "started_at": "अंतिम बार शुरू",
+                "stopped_at": "अंतिम बार रुका",
+                "running": "चल रही है",
+                "stopped": "रुकी हुई",
+                "empty": "कोई सेवा उपलब्ध नहीं है।"
             },
             "cpu_usage": {
                 "title": "CPU उपयोग"
@@ -218,6 +225,63 @@
             },
             "disk_usage": {
                 "title": "डिस्क उपयोग"
+            },
+            "packet_throughput": {
+                "title": "पैकेट थ्रूपुट",
+                "note": "प्रति सेकंड पैकेट, पिछले {{minutes}} मिनट",
+                "collecting": "डेटा एकत्र किया जा रहा है…"
+            },
+            "system_resources": {
+                "title": "होस्ट संसाधन",
+                "uptime": "{{days}} दिन {{hours}} घं {{minutes}} मि से चालू",
+                "collecting": "डेटा एकत्र किया जा रहा है…"
+            },
+            "station_header": {
+                "online": "स्टेशन ऑनलाइन",
+                "offline": "कनेक्शन टूट गया",
+                "updated_at": "अपडेट समय"
+            },
+            "health_level": {
+                "unknown": "अज्ञात"
+            },
+            "data_reception": {
+                "title": "डेटा प्राप्ति",
+                "receiving": "प्राप्त हो रहा है",
+                "waiting": "डेटा की प्रतीक्षा",
+                "stale": "अपडेट नहीं हो रहा",
+                "unavailable": "सर्वर से कनेक्शन टूट गया।",
+                "packet_rate": "{{value}} पैकेट/से",
+                "last_frame": "अंतिम पैकेट {{time}} पर"
+            },
+            "time_source": {
+                "title": "समय स्रोत",
+                "unavailable": "डेटा प्राप्ति बाधित रहने तक उपलब्ध नहीं।",
+                "gnss_locked": "GNSS लॉक",
+                "holdover": "होल्डओवर",
+                "gnss_locked_note": "टाइमस्टैम्प GNSS PPS द्वारा नियंत्रित हैं।",
+                "holdover_note": "GNSS खो गया; आंतरिक घड़ी UTC बनाए रख रही है।",
+                "ntp_note": "GNSS अक्षम; टाइमस्टैम्प NTP का उपयोग करते हैं।"
+            },
+            "reception_errors": {
+                "title": "प्राप्ति त्रुटियाँ",
+                "note": "पिछले {{minutes}} मिनट · शुरू से {{total}}"
+            },
+            "service_summary": {
+                "title": "सेवाएँ",
+                "running_count": "{{running}} / {{total}} चल रही हैं",
+                "note": "रुकी हुई सेवाएँ जानबूझकर अक्षम की गई हो सकती हैं।"
+            },
+            "gnss_status": {
+                "title": "GNSS निदान",
+                "position_fix": "स्थिति निर्धारण",
+                "nmea_time": "NMEA समय",
+                "satellites": "उपग्रह",
+                "pps_age": "अंतिम PPS से",
+                "valid": "मान्य",
+                "invalid": "अमान्य",
+                "disabled": "इस डिवाइस पर GNSS अक्षम है; नमूना टाइमस्टैम्प NTP के माध्यम से सिंक्रनाइज़ होते हैं।",
+                "pending": "फ़र्मवेयर द्वारा GNSS निदान रिपोर्ट किए जाने की प्रतीक्षा।",
+                "note": "संतृप्त या अनुपलब्ध माप N/A के रूप में दिखते हैं; 31+ का अर्थ कम से कम 31 उपग्रह है।"
             }
         },
         "NotFound": {
@@ -253,8 +317,9 @@
                 "no_data_recorded": "इस अवधि में कोई डेटा रिकॉर्ड नहीं हुआ।"
             },
             "connectivity": {
-                "connecting": "कनेक्शन नहीं है, कनेक्ट किया जा रहा है...",
-                "connected": "कनेक्ट हो गया, अंतिम अद्यतन {{updatedAt}} पर।"
+                "online": "लाइव स्ट्रीमिंग",
+                "offline": "कनेक्ट हो रहा है...",
+                "updated_at": "अपडेट समय"
             },
             "stream_status": {
                 "sample_rate": "{{value}} नमूने/सेकंड",

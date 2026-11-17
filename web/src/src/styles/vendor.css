@@ -85,7 +85,9 @@
 .app-dropdown-menu > li > button {
     background-color: transparent;
     color: var(--app-text);
-    transition: color 300ms ease, background-color 300ms ease;
+    transition:
+        color 300ms ease,
+        background-color 300ms ease;
 }
 
 .app-dropdown-menu > li > button:is(:hover, :focus-visible) {

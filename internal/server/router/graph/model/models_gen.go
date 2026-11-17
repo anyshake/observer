@@ -60,11 +60,12 @@ type DeviceInfo struct {
 }
 
 type DeviceStatus struct {
-	StartedAt int64 `json:"startedAt"`
-	UpdatedAt int64 `json:"updatedAt"`
-	Frames    int64 `json:"frames"`
-	Errors    int64 `json:"errors"`
-	Messages  int64 `json:"messages"`
+	StartedAt  int64       `json:"startedAt"`
+	UpdatedAt  int64       `json:"updatedAt"`
+	Frames     int64       `json:"frames"`
+	Errors     int64       `json:"errors"`
+	Messages   int64       `json:"messages"`
+	GnssStatus *GnssStatus `json:"gnssStatus,omitempty"`
 }
 
 type ExecutableBackup struct {
@@ -89,6 +90,15 @@ type FdsnAccessKey struct {
 	LastRequestedAt *int64 `json:"lastRequestedAt,omitempty"`
 	UserIP          string `json:"userIp"`
 	UserAgent       string `json:"userAgent"`
+}
+
+type GnssStatus struct {
+	Locked        bool     `json:"locked"`
+	FixValid      bool     `json:"fixValid"`
+	TimeValid     bool     `json:"timeValid"`
+	Hdop          *float64 `json:"hdop,omitempty"`
+	Satellites    int      `json:"satellites"`
+	PpsAgeSeconds *int     `json:"ppsAgeSeconds,omitempty"`
 }
 
 type PurgeDataJob struct {

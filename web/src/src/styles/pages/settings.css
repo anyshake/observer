@@ -176,7 +176,7 @@
     }
 
     .app-license-markdown {
-        @apply min-w-0 max-w-full;
+        @apply max-w-full min-w-0;
     }
 
     .app-license-markdown .app-markdown {
@@ -192,6 +192,6 @@
     }
 
     .app-license-markdown .app-markdown-pre > .app-markdown-inline-code {
-        @apply whitespace-pre-wrap wrap-anywhere bg-transparent text-app-text;
+        @apply text-app-text bg-transparent wrap-anywhere whitespace-pre-wrap;
     }
 }

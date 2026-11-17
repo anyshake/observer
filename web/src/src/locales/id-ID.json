@@ -195,7 +195,6 @@
             },
             "connectivity": {
                 "loading": "Menghubungkan ke stasiun...",
-                "success": "Terhubung ke stasiun, server aktif selama {{uptime}} detik, diperbarui pada {{updatedAt}}.",
                 "error": "Terjadi error saat menghubungkan ke stasiun, silakan periksa koneksi Anda."
             },
             "upgrade": {
@@ -208,7 +207,15 @@
                 "title": "Lokasi Stasiun"
             },
             "service_status": {
-                "title": "Status Layanan"
+                "title": "Status Layanan",
+                "name": "Layanan",
+                "state": "Status",
+                "restarts": "Mulai ulang",
+                "started_at": "Terakhir dimulai",
+                "stopped_at": "Terakhir dihentikan",
+                "running": "Berjalan",
+                "stopped": "Berhenti",
+                "empty": "Tidak ada layanan yang tersedia."
             },
             "cpu_usage": {
                 "title": "Penggunaan CPU"
@@ -218,6 +225,63 @@
             },
             "disk_usage": {
                 "title": "Penggunaan Disk"
+            },
+            "packet_throughput": {
+                "title": "Throughput Paket",
+                "note": "Paket per detik, {{minutes}} menit terakhir",
+                "collecting": "Mengumpulkan data…"
+            },
+            "system_resources": {
+                "title": "Sumber Daya Host",
+                "uptime": "Aktif {{days}} h {{hours}} j {{minutes}} m",
+                "collecting": "Mengumpulkan data…"
+            },
+            "station_header": {
+                "online": "Stasiun online",
+                "offline": "Koneksi terputus",
+                "updated_at": "Diperbarui pada"
+            },
+            "health_level": {
+                "unknown": "Tidak diketahui"
+            },
+            "data_reception": {
+                "title": "Penerimaan data",
+                "receiving": "Menerima",
+                "waiting": "Menunggu data",
+                "stale": "Tidak diperbarui",
+                "unavailable": "Koneksi ke server terputus.",
+                "packet_rate": "{{value}} paket/dtk",
+                "last_frame": "Paket terakhir pada {{time}}"
+            },
+            "time_source": {
+                "title": "Sumber waktu",
+                "unavailable": "Tidak tersedia selama penerimaan data terputus.",
+                "gnss_locked": "GNSS terkunci",
+                "holdover": "Holdover",
+                "gnss_locked_note": "Stempel waktu disiplinkan oleh PPS GNSS.",
+                "holdover_note": "GNSS hilang; jam internal mempertahankan UTC.",
+                "ntp_note": "GNSS dinonaktifkan; stempel waktu menggunakan NTP."
+            },
+            "reception_errors": {
+                "title": "Kesalahan penerimaan",
+                "note": "{{minutes}} menit terakhir · {{total}} sejak mulai"
+            },
+            "service_summary": {
+                "title": "Layanan",
+                "running_count": "{{running}} / {{total}} berjalan",
+                "note": "Layanan yang berhenti mungkin sengaja dinonaktifkan."
+            },
+            "gnss_status": {
+                "title": "Diagnostik GNSS",
+                "position_fix": "Penentuan posisi",
+                "nmea_time": "Waktu NMEA",
+                "satellites": "Satelit",
+                "pps_age": "Sejak PPS terakhir",
+                "valid": "Valid",
+                "invalid": "Tidak valid",
+                "disabled": "GNSS dinonaktifkan pada perangkat ini; stempel waktu disinkronkan melalui NTP.",
+                "pending": "Menunggu firmware melaporkan diagnostik GNSS.",
+                "note": "Pengukuran jenuh atau tidak tersedia ditampilkan sebagai N/A; 31+ berarti minimal 31 satelit."
             }
         },
         "NotFound": {
@@ -253,8 +317,9 @@
                 "no_data_recorded": "Tidak ada data yang direkam selama periode ini."
             },
             "connectivity": {
-                "connecting": "Tidak ada koneksi, sedang menghubungkan...",
-                "connected": "Terhubung, terakhir diperbarui pada {{updatedAt}}."
+                "online": "Streaming langsung",
+                "offline": "Menghubungkan...",
+                "updated_at": "Diperbarui pada"
             },
             "stream_status": {
                 "sample_rate": "{{value}} SPS",

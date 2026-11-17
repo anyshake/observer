@@ -34,13 +34,24 @@ func (r *queryResolver) GetDeviceConfig(ctx context.Context) (*graph_model.Devic
 // GetDeviceStatus is the resolver for the getDeviceStatus field.
 func (r *queryResolver) GetDeviceStatus(ctx context.Context) (*graph_model.DeviceStatus, error) {
 	status := r.HardwareDev.GetStatus()
-	return &graph_model.DeviceStatus{
+	result := &graph_model.DeviceStatus{
 		StartedAt: status.GetStartedAt().UnixMilli(),
 		UpdatedAt: status.GetUpdatedAt().UnixMilli(),
 		Frames:    status.GetFrames(),
 		Errors:    status.GetErrors(),
 		Messages:  status.GetMessages(),
-	}, nil
+	}
+	if gnss := status.GetGnssStatus(); gnss != nil {
+		result.GnssStatus = &graph_model.GnssStatus{
+			Locked:        gnss.Locked,
+			FixValid:      gnss.FixValid,
+			TimeValid:     gnss.TimeValid,
+			Hdop:          gnss.HDOP,
+			Satellites:    gnss.Satellites,
+			PpsAgeSeconds: gnss.PPSAgeSeconds,
+		}
+	}
+	return result, nil
 }
 
 // GetDeviceInfo is the resolver for the getDeviceInfo field.

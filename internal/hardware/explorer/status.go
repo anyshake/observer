@@ -8,12 +8,44 @@ func (s *DeviceStatus) Snapshot() *DeviceStatus {
 	defer s.mu.Unlock()
 
 	return &DeviceStatus{
-		startedAt: s.startedAt,
-		updatedAt: s.updatedAt,
-		frames:    s.frames,
-		errors:    s.errors,
-		messages:  s.messages,
+		startedAt:  s.startedAt,
+		updatedAt:  s.updatedAt,
+		frames:     s.frames,
+		errors:     s.errors,
+		messages:   s.messages,
+		gnssStatus: s.gnssStatus.clone(),
 	}
+}
+
+func (s *GnssStatus) clone() *GnssStatus {
+	if s == nil {
+		return nil
+	}
+	snapshot := *s
+	if s.HDOP != nil {
+		hdop := *s.HDOP
+		snapshot.HDOP = &hdop
+	}
+	if s.PPSAgeSeconds != nil {
+		age := *s.PPSAgeSeconds
+		snapshot.PPSAgeSeconds = &age
+	}
+	return &snapshot
+}
+
+func (s *DeviceStatus) SetGnssStatus(status *GnssStatus) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.gnssStatus = status.clone()
+}
+
+// GetGnssStatus returns nil until firmware advertising variable 6 reports it.
+func (s *DeviceStatus) GetGnssStatus() *GnssStatus {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	return s.gnssStatus.clone()
 }
 
 func (s *DeviceStatus) SetStartedAt(startedAt time.Time) {

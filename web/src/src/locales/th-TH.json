@@ -195,7 +195,6 @@
             },
             "connectivity": {
                 "loading": "กำลังเชื่อมต่อสถานี...",
-                "success": "เชื่อมต่อสถานีแล้ว เซิร์ฟเวอร์ทำงานมา {{uptime}} วินาที อัปเดตเมื่อ {{updatedAt}}",
                 "error": "เกิดข้อผิดพลาดในการเชื่อมต่อสถานี โปรดตรวจสอบการเชื่อมต่อ"
             },
             "station_location": {
@@ -208,7 +207,15 @@
                 "manual_upgrade_needed": "มีเวอร์ชันใหม่ {{latest}} แต่เวอร์ชันปัจจุบัน {{current}} ต่ำกว่าเวอร์ชันขั้นต่ำที่รองรับ {{required}} ต้องอัปเกรดด้วยตนเอง"
             },
             "service_status": {
-                "title": "สถานะบริการ"
+                "title": "สถานะบริการ",
+                "name": "บริการ",
+                "state": "สถานะ",
+                "restarts": "รีสตาร์ต",
+                "started_at": "เริ่มล่าสุด",
+                "stopped_at": "หยุดล่าสุด",
+                "running": "กำลังทำงาน",
+                "stopped": "หยุดแล้ว",
+                "empty": "ไม่มีบริการที่ใช้งานได้"
             },
             "cpu_usage": {
                 "title": "การใช้ CPU"
@@ -218,6 +225,63 @@
             },
             "disk_usage": {
                 "title": "การใช้ดิสก์"
+            },
+            "packet_throughput": {
+                "title": "อัตราการรับแพ็กเก็ต",
+                "note": "แพ็กเก็ตต่อวินาที ในช่วง {{minutes}} นาทีล่าสุด",
+                "collecting": "กำลังรวบรวมข้อมูล…"
+            },
+            "system_resources": {
+                "title": "ทรัพยากรโฮสต์",
+                "uptime": "ทำงานมาแล้ว {{days}} วัน {{hours}} ชม. {{minutes}} นาที",
+                "collecting": "กำลังรวบรวมข้อมูล…"
+            },
+            "station_header": {
+                "online": "สถานีออนไลน์",
+                "offline": "การเชื่อมต่อขาดหาย",
+                "updated_at": "อัปเดตเมื่อ"
+            },
+            "health_level": {
+                "unknown": "ไม่ทราบ"
+            },
+            "data_reception": {
+                "title": "การรับข้อมูล",
+                "receiving": "กำลังรับ",
+                "waiting": "กำลังรอข้อมูล",
+                "stale": "ไม่มีการอัปเดต",
+                "unavailable": "การเชื่อมต่อกับเซิร์ฟเวอร์ขาดหาย",
+                "packet_rate": "{{value}} แพ็กเก็ต/วินาที",
+                "last_frame": "แพ็กเก็ตล่าสุดเมื่อ {{time}}"
+            },
+            "time_source": {
+                "title": "แหล่งเวลา",
+                "unavailable": "ไม่พร้อมใช้งานขณะการรับข้อมูลหยุดชะงัก",
+                "gnss_locked": "GNSS ล็อกแล้ว",
+                "holdover": "โหมดรักษาเวลา (Holdover)",
+                "gnss_locked_note": "การประทับเวลาถูกควบคุมด้วย PPS จาก GNSS",
+                "holdover_note": "สัญญาณ GNSS ขาดหาย นาฬิกาภายในกำลังรักษาเวลา UTC",
+                "ntp_note": "ปิดใช้งาน GNSS การประทับเวลาใช้ NTP"
+            },
+            "reception_errors": {
+                "title": "ข้อผิดพลาดในการรับ",
+                "note": "{{minutes}} นาทีล่าสุด · {{total}} ตั้งแต่เริ่มต้น"
+            },
+            "service_summary": {
+                "title": "บริการ",
+                "running_count": "ทำงาน {{running}} / {{total}}",
+                "note": "บริการที่หยุดอยู่อาจถูกปิดใช้งานโดยตั้งใจ"
+            },
+            "gnss_status": {
+                "title": "การวินิจฉัย GNSS",
+                "position_fix": "การระบุตำแหน่ง",
+                "nmea_time": "เวลา NMEA",
+                "satellites": "ดาวเทียม",
+                "pps_age": "นับจาก PPS ล่าสุด",
+                "valid": "ถูกต้อง",
+                "invalid": "ไม่ถูกต้อง",
+                "disabled": "GNSS ถูกปิดใช้งานบนอุปกรณ์นี้ การประทับเวลาซิงโครไนซ์ผ่าน NTP",
+                "pending": "กำลังรอให้เฟิร์มแวร์รายงานข้อมูลวินิจฉัย GNSS",
+                "note": "ค่าที่อิ่มตัวหรือไม่พร้อมใช้งานจะแสดงเป็น N/A และ 31+ หมายถึงอย่างน้อย 31 ดวง"
             }
         },
         "NotFound": {
@@ -253,8 +317,9 @@
                 "no_data_recorded": "ไม่มีข้อมูลที่บันทึกในช่วงเวลานี้"
             },
             "connectivity": {
-                "connecting": "ไม่มีการเชื่อมต่อ กำลังเชื่อมต่อ...",
-                "connected": "เชื่อมต่อแล้ว อัปเดตล่าสุดเมื่อ {{updatedAt}}"
+                "online": "กำลังสตรีมสด",
+                "offline": "กำลังเชื่อมต่อ...",
+                "updated_at": "อัปเดตเมื่อ"
             },
             "stream_status": {
                 "sample_rate": "{{value}} ตัวอย่าง/วินาที",
