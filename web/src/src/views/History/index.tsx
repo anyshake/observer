@@ -79,6 +79,7 @@ const History = ({ currentLocale }: IRouterComponent) => {
         sampleRate,
         chartData,
         groundMotion,
+        channelUnits,
         spectrogramSeries,
         activeChannels,
         handleSearchRecords
@@ -258,11 +259,13 @@ const History = ({ currentLocale }: IRouterComponent) => {
                                             enabled={fftMode && displayMode === 'waveform'}
                                             sampleRate={sampleRate}
                                             executor={sharedSpectrumExecutor}
+                                            unit={channelUnits[channel]}
                                         >
                                             {(onVisibleSamples, onPlotBounds) => (
                                                 <HistoryMotionChart
                                                     data={chartData[channel]}
                                                     groundMotion={groundMotion[channel]}
+                                                    unit={channelUnits[channel]}
                                                     onVisibleSamples={onVisibleSamples}
                                                     onPlotBounds={onPlotBounds}
                                                 />

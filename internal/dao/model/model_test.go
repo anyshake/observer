@@ -47,13 +47,16 @@ func TestModelMetadata(t *testing.T) {
 func TestSeisRecordCodecAndShards(t *testing.T) {
 	record := SeisRecord{}
 	when := time.Date(2026, 3, 4, 5, 6, 7, 0, time.UTC)
-	channels := []explorer.ChannelData{{ChannelCode: "EHZ", ChannelId: 1, ByteSize: 4, DataType: "int32", Data: []int32{1, -2, 3}}}
+	channels := []explorer.ChannelData{{ChannelCode: "HDF", ChannelId: 1, ByteSize: 4, DataType: "int32", Data: []int32{1, -2, 3}, InputUnit: "Pa", Sensitivity: 1e6}}
 	if err := record.Encode(when, 100, channels); err != nil {
 		t.Fatal(err)
 	}
 	gotWhen, rate, gotChannels, err := record.Decode()
 	if err != nil || !gotWhen.Equal(when) || rate != 100 || len(gotChannels) != 1 || gotChannels[0].Data[1] != -2 {
 		t.Fatalf("decoded = %v %d %#v %v", gotWhen, rate, gotChannels, err)
+	}
+	if gotChannels[0].InputUnit != "Pa" || gotChannels[0].Sensitivity != 1e6 {
+		t.Fatalf("pressure metadata was not preserved: %+v", gotChannels[0])
 	}
 	record.ChannelData = []byte{0}
 	if _, _, _, err := record.Decode(); err == nil {

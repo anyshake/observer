@@ -65,7 +65,7 @@ func TestSensitivityResponsePoles(t *testing.T) {
 
 func TestNormalizeUnit(t *testing.T) {
 	t.Parallel()
-	for name, want := range map[string]string{"m/s": UNIT_VELOCITY, "M/S**2": UNIT_ACCELERATION, "m/s2": UNIT_ACCELERATION, "COUNTS": ""} {
+	for name, want := range map[string]string{"m/s": UNIT_VELOCITY, "M/S**2": UNIT_ACCELERATION, "m/s2": UNIT_ACCELERATION, "COUNTS": "", "Pa": UNIT_PRESSURE, "PASCALS": UNIT_PRESSURE} {
 		if got := NormalizeUnit(name); got != want {
 			t.Errorf("NormalizeUnit(%q) = %q, want %q", name, got, want)
 		}
